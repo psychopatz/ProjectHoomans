@@ -1,9 +1,13 @@
 {
-  "id": "label",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.group.time",
+  "id": "label",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.group.time.label",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.group.time.label",
@@ -12,14 +16,17 @@
           "TL": "Oras at petsa"
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "Time and date",
-    "TL": "Oras at petsa"
-  },
-  "namespace": "ui.suggestion.group.time",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Time and date",
+          "TL": "Oras at petsa"
+        }
+      }
+    ]
+  }
 }

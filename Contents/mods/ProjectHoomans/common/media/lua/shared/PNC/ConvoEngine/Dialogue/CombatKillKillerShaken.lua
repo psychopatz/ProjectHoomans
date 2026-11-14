@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_kill_killer_shaken",
-        ["id"] = "semantic.combat.reaction.kill_killer_shaken_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.kill_killer_shaken",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "It's down... give me a second.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "It's down... give me a second.",
+                                        "I got it... but my breath won't catch.",
+                                        "Dead... give me a moment to steady my hands.",
+                                        "It's down... that was way too close.",
+                                        "Just... wait a second. My chest hurts.",
+                                        "It's dead... hands are shaking like crazy.",
+                                        "Got him down... need half a minute.",
+                                        "God... it's over. Give me a second.",
+                                        "Down... heart is pounding in my ears.",
+                                        "It's finished... just give me a moment.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na... sandali lang.",
+                                        "Nakuha ko... pero kinakapos ako sa hininga.",
+                                        "Patay na... bigyan mo ako ng saglit para kumalma ang kamay ko.",
+                                        "Bagsak na... masyadong malapit 'yon.",
+                                        "Saglit lang... kumikirot ang dibdib ko.",
+                                        "Patay na... nanginginig nang husto ang mga kamay ko.",
+                                        "Naibagsak ko... kailangan ko ng kalahating minuto.",
+                                        "Diyos ko... tapos na. Sandali lang.",
+                                        "Bagsak... dumadagundong ang puso sa tenga ko.",
+                                        "Tapos na... bigyan mo lang ako ng saglit.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Got it. I need a breath.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Got it. I need a breath.",
+                                        "It's dead. Let me catch my breath.",
+                                        "Down. I can barely breathe right now.",
+                                        "Took it out... need air.",
+                                        "Dead. Just let me inhale for a second.",
+                                        "I got it down. Deep breath... deep breath.",
+                                        "Finished. My lungs are burning.",
+                                        "It's on the ground. Catching my breath.",
+                                        "Got it. Just need ten seconds to breathe.",
+                                        "Killed it. Breathing hard... one second.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko. Kailangan ko munang huminga.",
+                                        "Patay na. Pahingahin mo muna ako.",
+                                        "Bagsak. Halos hindi ako makahinga ngayon.",
+                                        "Tinapos ko na... kailangan ko ng hangin.",
+                                        "Patay na. Hayaan mo muna akong huminga nang malalim.",
+                                        "Naibagsak ko na. Malalim na hininga... malalim na hininga.",
+                                        "Tapos na. Parang nasusunog ang baga ko.",
+                                        "Nasa lupa na. Humihinga muna ako nang maayos.",
+                                        "Nakuha ko. Kailangan ko lang ng sampung segundo para huminga.",
+                                        "Napatay ko na. Hinihingal ako... isang saglit.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "It's dead. I really hate this.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "It's dead. I really hate this.",
+                                        "Down. God, the smell makes me sick.",
+                                        "It's finished. I despise having to do that.",
+                                        "Dead. Look at all that blood... horrible.",
+                                        "Got it down. Hate everything about this.",
+                                        "It's dead. Why does it always have to be like this?",
+                                        "Down. I hate the crunch it made.",
+                                        "It's over. Sick of the violence.",
+                                        "Dead. I really, really hate this world.",
+                                        "Killed it. Hate the feeling in my hands.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na. Ayoko talaga nito.",
+                                        "Bagsak. Diyos ko, nasusuka ako sa amoy.",
+                                        "Tapos na. Ayaw na ayaw kong kailangang gawin 'yon.",
+                                        "Patay na. Tingnan mo ang dugo... kakila-kilabot.",
+                                        "Naibagsak ko na. Kinamumuhian ko ang lahat ng ito.",
+                                        "Patay na. Bakit kailangang laging ganito?",
+                                        "Bagsak. Ayaw ko 'yung naging lagutok no'n.",
+                                        "Tapos na. Sawa na ako sa karahasan.",
+                                        "Patay. Ayoko talaga, ayoko sa mundong 'to.",
+                                        "Napatay ko na. Ayoko 'yung pakiramdam sa mga kamay ko.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "It's down... give me a second.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "It's down... give me a second.",
+                            "I got it... but my breath won't catch.",
+                            "Dead... give me a moment to steady my hands.",
+                            "It's down... that was way too close.",
+                            "Just... wait a second. My chest hurts.",
+                            "It's dead... hands are shaking like crazy.",
+                            "Got him down... need half a minute.",
+                            "God... it's over. Give me a second.",
+                            "Down... heart is pounding in my ears.",
+                            "It's finished... just give me a moment.",
+                        },
+                        ["TL"] = {
+                            "Patay na... sandali lang.",
+                            "Nakuha ko... pero kinakapos ako sa hininga.",
+                            "Patay na... bigyan mo ako ng saglit para kumalma ang kamay ko.",
+                            "Bagsak na... masyadong malapit 'yon.",
+                            "Saglit lang... kumikirot ang dibdib ko.",
+                            "Patay na... nanginginig nang husto ang mga kamay ko.",
+                            "Naibagsak ko... kailangan ko ng kalahating minuto.",
+                            "Diyos ko... tapos na. Sandali lang.",
+                            "Bagsak... dumadagundong ang puso sa tenga ko.",
+                            "Tapos na... bigyan mo lang ako ng saglit.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Got it. I need a breath.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Got it. I need a breath.",
+                            "It's dead. Let me catch my breath.",
+                            "Down. I can barely breathe right now.",
+                            "Took it out... need air.",
+                            "Dead. Just let me inhale for a second.",
+                            "I got it down. Deep breath... deep breath.",
+                            "Finished. My lungs are burning.",
+                            "It's on the ground. Catching my breath.",
+                            "Got it. Just need ten seconds to breathe.",
+                            "Killed it. Breathing hard... one second.",
+                        },
+                        ["TL"] = {
+                            "Nakuha ko. Kailangan ko munang huminga.",
+                            "Patay na. Pahingahin mo muna ako.",
+                            "Bagsak. Halos hindi ako makahinga ngayon.",
+                            "Tinapos ko na... kailangan ko ng hangin.",
+                            "Patay na. Hayaan mo muna akong huminga nang malalim.",
+                            "Naibagsak ko na. Malalim na hininga... malalim na hininga.",
+                            "Tapos na. Parang nasusunog ang baga ko.",
+                            "Nasa lupa na. Humihinga muna ako nang maayos.",
+                            "Nakuha ko. Kailangan ko lang ng sampung segundo para huminga.",
+                            "Napatay ko na. Hinihingal ako... isang saglit.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "It's dead. I really hate this.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "It's dead. I really hate this.",
+                            "Down. God, the smell makes me sick.",
+                            "It's finished. I despise having to do that.",
+                            "Dead. Look at all that blood... horrible.",
+                            "Got it down. Hate everything about this.",
+                            "It's dead. Why does it always have to be like this?",
+                            "Down. I hate the crunch it made.",
+                            "It's over. Sick of the violence.",
+                            "Dead. I really, really hate this world.",
+                            "Killed it. Hate the feeling in my hands.",
+                        },
+                        ["TL"] = {
+                            "Patay na. Ayoko talaga nito.",
+                            "Bagsak. Diyos ko, nasusuka ako sa amoy.",
+                            "Tapos na. Ayaw na ayaw kong kailangang gawin 'yon.",
+                            "Patay na. Tingnan mo ang dugo... kakila-kilabot.",
+                            "Naibagsak ko na. Kinamumuhian ko ang lahat ng ito.",
+                            "Patay na. Bakit kailangang laging ganito?",
+                            "Bagsak. Ayaw ko 'yung naging lagutok no'n.",
+                            "Tapos na. Sawa na ako sa karahasan.",
+                            "Patay. Ayoko talaga, ayoko sa mundong 'to.",
+                            "Napatay ko na. Ayoko 'yung pakiramdam sa mga kamay ko.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.kill_killer_shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "kill_killer_shaken_01",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_shaken_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken_01.json",
+            ["localId"] = "kill_killer_shaken",
+            ["sourceId"] = "combat.reaction.kill_killer_shaken",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerShaken",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_shaken_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/shaken.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's down... give me a second.",
-                            },
-                            ["TL"] = {
-                                "Patay na... sandali lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I got it... but my breath won't catch.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko... pero kinakapos ako sa hininga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead... give me a moment to steady my hands.",
-                            },
-                            ["TL"] = {
-                                "Patay na... bigyan mo ako ng saglit para kumalma ang kamay ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's down... that was way too close.",
-                            },
-                            ["TL"] = {
-                                "Bagsak na... masyadong malapit 'yon.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "It's down... give me a second.",
+                                        "I got it... but my breath won't catch.",
+                                        "Dead... give me a moment to steady my hands.",
+                                        "It's down... that was way too close.",
+                                        "Just... wait a second. My chest hurts.",
+                                        "It's dead... hands are shaking like crazy.",
+                                        "Got him down... need half a minute.",
+                                        "God... it's over. Give me a second.",
+                                        "Down... heart is pounding in my ears.",
+                                        "It's finished... just give me a moment.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na... sandali lang.",
+                                        "Nakuha ko... pero kinakapos ako sa hininga.",
+                                        "Patay na... bigyan mo ako ng saglit para kumalma ang kamay ko.",
+                                        "Bagsak na... masyadong malapit 'yon.",
+                                        "Saglit lang... kumikirot ang dibdib ko.",
+                                        "Patay na... nanginginig nang husto ang mga kamay ko.",
+                                        "Naibagsak ko... kailangan ko ng kalahating minuto.",
+                                        "Diyos ko... tapos na. Sandali lang.",
+                                        "Bagsak... dumadagundong ang puso sa tenga ko.",
+                                        "Tapos na... bigyan mo lang ako ng saglit.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just... wait a second. My chest hurts.",
-                            },
-                            ["TL"] = {
-                                "Saglit lang... kumikirot ang dibdib ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead... hands are shaking like crazy.",
-                            },
-                            ["TL"] = {
-                                "Patay na... nanginginig nang husto ang mga kamay ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got him down... need half a minute.",
-                            },
-                            ["TL"] = {
-                                "Naibagsak ko... kailangan ko ng kalahating minuto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "God... it's over. Give me a second.",
-                            },
-                            ["TL"] = {
-                                "Diyos ko... tapos na. Sandali lang.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Got it. I need a breath.",
+                                        "It's dead. Let me catch my breath.",
+                                        "Down. I can barely breathe right now.",
+                                        "Took it out... need air.",
+                                        "Dead. Just let me inhale for a second.",
+                                        "I got it down. Deep breath... deep breath.",
+                                        "Finished. My lungs are burning.",
+                                        "It's on the ground. Catching my breath.",
+                                        "Got it. Just need ten seconds to breathe.",
+                                        "Killed it. Breathing hard... one second.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko. Kailangan ko munang huminga.",
+                                        "Patay na. Pahingahin mo muna ako.",
+                                        "Bagsak. Halos hindi ako makahinga ngayon.",
+                                        "Tinapos ko na... kailangan ko ng hangin.",
+                                        "Patay na. Hayaan mo muna akong huminga nang malalim.",
+                                        "Naibagsak ko na. Malalim na hininga... malalim na hininga.",
+                                        "Tapos na. Parang nasusunog ang baga ko.",
+                                        "Nasa lupa na. Humihinga muna ako nang maayos.",
+                                        "Nakuha ko. Kailangan ko lang ng sampung segundo para huminga.",
+                                        "Napatay ko na. Hinihingal ako... isang saglit.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down... heart is pounding in my ears.",
-                            },
-                            ["TL"] = {
-                                "Bagsak... dumadagundong ang puso sa tenga ko.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "It's dead. I really hate this.",
+                                        "Down. God, the smell makes me sick.",
+                                        "It's finished. I despise having to do that.",
+                                        "Dead. Look at all that blood... horrible.",
+                                        "Got it down. Hate everything about this.",
+                                        "It's dead. Why does it always have to be like this?",
+                                        "Down. I hate the crunch it made.",
+                                        "It's over. Sick of the violence.",
+                                        "Dead. I really, really hate this world.",
+                                        "Killed it. Hate the feeling in my hands.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na. Ayoko talaga nito.",
+                                        "Bagsak. Diyos ko, nasusuka ako sa amoy.",
+                                        "Tapos na. Ayaw na ayaw kong kailangang gawin 'yon.",
+                                        "Patay na. Tingnan mo ang dugo... kakila-kilabot.",
+                                        "Naibagsak ko na. Kinamumuhian ko ang lahat ng ito.",
+                                        "Patay na. Bakit kailangang laging ganito?",
+                                        "Bagsak. Ayaw ko 'yung naging lagutok no'n.",
+                                        "Tapos na. Sawa na ako sa karahasan.",
+                                        "Patay. Ayoko talaga, ayoko sa mundong 'to.",
+                                        "Napatay ko na. Ayoko 'yung pakiramdam sa mga kamay ko.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's finished... just give me a moment.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.kill_killer_shaken",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Tapos na... bigyan mo lang ako ng saglit.",
-                            },
+                            ["fallback"] = "It's down... give me a second.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.kill_killer_shaken.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_killer_shaken",
-        ["id"] = "semantic.combat.reaction.kill_killer_shaken_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_killer_shaken_02",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_shaken_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerShaken",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_shaken_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/shaken.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. I need a breath.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko. Kailangan ko munang huminga.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "It's down... give me a second.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "It's down... give me a second.",
+                        "I got it... but my breath won't catch.",
+                        "Dead... give me a moment to steady my hands.",
+                        "It's down... that was way too close.",
+                        "Just... wait a second. My chest hurts.",
+                        "It's dead... hands are shaking like crazy.",
+                        "Got him down... need half a minute.",
+                        "God... it's over. Give me a second.",
+                        "Down... heart is pounding in my ears.",
+                        "It's finished... just give me a moment.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead. Let me catch my breath.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Pahingahin mo muna ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down. I can barely breathe right now.",
-                            },
-                            ["TL"] = {
-                                "Bagsak. Halos hindi ako makahinga ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Took it out... need air.",
-                            },
-                            ["TL"] = {
-                                "Tinapos ko na... kailangan ko ng hangin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead. Just let me inhale for a second.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Hayaan mo muna akong huminga nang malalim.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I got it down. Deep breath... deep breath.",
-                            },
-                            ["TL"] = {
-                                "Naibagsak ko na. Malalim na hininga... malalim na hininga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished. My lungs are burning.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Parang nasusunog ang baga ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's on the ground. Catching my breath.",
-                            },
-                            ["TL"] = {
-                                "Nasa lupa na. Humihinga muna ako nang maayos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. Just need ten seconds to breathe.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko. Kailangan ko lang ng sampung segundo para huminga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Killed it. Breathing hard... one second.",
-                            },
-                            ["TL"] = {
-                                "Napatay ko na. Hinihingal ako... isang saglit.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Patay na... sandali lang.",
+                        "Nakuha ko... pero kinakapos ako sa hininga.",
+                        "Patay na... bigyan mo ako ng saglit para kumalma ang kamay ko.",
+                        "Bagsak na... masyadong malapit 'yon.",
+                        "Saglit lang... kumikirot ang dibdib ko.",
+                        "Patay na... nanginginig nang husto ang mga kamay ko.",
+                        "Naibagsak ko... kailangan ko ng kalahating minuto.",
+                        "Diyos ko... tapos na. Sandali lang.",
+                        "Bagsak... dumadagundong ang puso sa tenga ko.",
+                        "Tapos na... bigyan mo lang ako ng saglit.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_killer_shaken",
-        ["id"] = "semantic.combat.reaction.kill_killer_shaken_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_killer_shaken_03",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_shaken_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerShaken",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_shaken_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/shaken.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead. I really hate this.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Ayoko talaga nito.",
-                            },
-                        },
+            {
+                ["fallback"] = "Got it. I need a breath.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Got it. I need a breath.",
+                        "It's dead. Let me catch my breath.",
+                        "Down. I can barely breathe right now.",
+                        "Took it out... need air.",
+                        "Dead. Just let me inhale for a second.",
+                        "I got it down. Deep breath... deep breath.",
+                        "Finished. My lungs are burning.",
+                        "It's on the ground. Catching my breath.",
+                        "Got it. Just need ten seconds to breathe.",
+                        "Killed it. Breathing hard... one second.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down. God, the smell makes me sick.",
-                            },
-                            ["TL"] = {
-                                "Bagsak. Diyos ko, nasusuka ako sa amoy.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's finished. I despise having to do that.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Ayaw na ayaw kong kailangang gawin 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead. Look at all that blood... horrible.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Tingnan mo ang dugo... kakila-kilabot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it down. Hate everything about this.",
-                            },
-                            ["TL"] = {
-                                "Naibagsak ko na. Kinamumuhian ko ang lahat ng ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead. Why does it always have to be like this?",
-                            },
-                            ["TL"] = {
-                                "Patay na. Bakit kailangang laging ganito?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down. I hate the crunch it made.",
-                            },
-                            ["TL"] = {
-                                "Bagsak. Ayaw ko 'yung naging lagutok no'n.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's over. Sick of the violence.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Sawa na ako sa karahasan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead. I really, really hate this world.",
-                            },
-                            ["TL"] = {
-                                "Patay. Ayoko talaga, ayoko sa mundong 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Killed it. Hate the feeling in my hands.",
-                            },
-                            ["TL"] = {
-                                "Napatay ko na. Ayoko 'yung pakiramdam sa mga kamay ko.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Nakuha ko. Kailangan ko munang huminga.",
+                        "Patay na. Pahingahin mo muna ako.",
+                        "Bagsak. Halos hindi ako makahinga ngayon.",
+                        "Tinapos ko na... kailangan ko ng hangin.",
+                        "Patay na. Hayaan mo muna akong huminga nang malalim.",
+                        "Naibagsak ko na. Malalim na hininga... malalim na hininga.",
+                        "Tapos na. Parang nasusunog ang baga ko.",
+                        "Nasa lupa na. Humihinga muna ako nang maayos.",
+                        "Nakuha ko. Kailangan ko lang ng sampung segundo para huminga.",
+                        "Napatay ko na. Hinihingal ako... isang saglit.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "It's dead. I really hate this.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_shaken.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "It's dead. I really hate this.",
+                        "Down. God, the smell makes me sick.",
+                        "It's finished. I despise having to do that.",
+                        "Dead. Look at all that blood... horrible.",
+                        "Got it down. Hate everything about this.",
+                        "It's dead. Why does it always have to be like this?",
+                        "Down. I hate the crunch it made.",
+                        "It's over. Sick of the violence.",
+                        "Dead. I really, really hate this world.",
+                        "Killed it. Hate the feeling in my hands.",
+                    },
+                    ["TL"] = {
+                        "Patay na. Ayoko talaga nito.",
+                        "Bagsak. Diyos ko, nasusuka ako sa amoy.",
+                        "Tapos na. Ayaw na ayaw kong kailangang gawin 'yon.",
+                        "Patay na. Tingnan mo ang dugo... kakila-kilabot.",
+                        "Naibagsak ko na. Kinamumuhian ko ang lahat ng ito.",
+                        "Patay na. Bakit kailangang laging ganito?",
+                        "Bagsak. Ayaw ko 'yung naging lagutok no'n.",
+                        "Tapos na. Sawa na ako sa karahasan.",
+                        "Patay. Ayoko talaga, ayoko sa mundong 'to.",
+                        "Napatay ko na. Ayoko 'yung pakiramdam sa mga kamay ko.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

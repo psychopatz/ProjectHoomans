@@ -98,7 +98,7 @@ registerBehavior({
     outputs = {
         speech = {
             dialogueAct = "INFORM",
-            contentTemplateID = "semantic.social.acknowledged",
+            contentTemplateID = "social.acknowledged",
         },
     },
     continuation = {
@@ -126,7 +126,7 @@ registerBehavior({
     outputs = {
         speech = {
             dialogueAct = "ACKNOWLEDGE",
-            contentTemplateID = "semantic.social.acknowledged",
+            contentTemplateID = "social.acknowledged",
         },
     },
     continuation = { mode = "terminate" },

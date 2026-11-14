@@ -35,7 +35,7 @@ function ResponseAdapter.IdentityQuestion(context, state)
     end
     if type(response) ~= "table" then
         response = {
-            templateID = "semantic.question.identity",
+            templateID = "question.identity",
             fallback = "I'll tell you my name once we've established some trust. What's your name?",
         }
     end

@@ -1,9 +1,13 @@
 {
-  "id": "label",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.companion_orders",
+  "id": "label",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.companion_orders.label",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.companion_orders.label",
@@ -12,14 +16,17 @@
           "TL": "May ipapagawa ako sa iyo..."
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "I need you to do something...",
-    "TL": "May ipapagawa ako sa iyo..."
-  },
-  "namespace": "ui.suggestion.companion_orders",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "I need you to do something...",
+          "TL": "May ipapagawa ako sa iyo..."
+        }
+      }
+    ]
+  }
 }

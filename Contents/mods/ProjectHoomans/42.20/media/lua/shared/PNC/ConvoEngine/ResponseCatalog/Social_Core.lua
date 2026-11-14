@@ -7,79 +7,28 @@ if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
     return false
 end
 
-local ConversationRegistry = require
-    "PNC/ConvoEngine/Registry"
+local ConvoPlanFamily = require
+    "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
 
-local function activeLanguage()
-    if Translator and type(Translator.getLanguage) == "function" then
-        local language = Translator.getLanguage()
-        if language and type(language.toString) == "function" then
-            return tostring(language:toString())
-        end
-    end
-    return "EN"
+local function installConvoFamily(templateID)
+    return ConvoPlanFamily.install(templateID, {
+        defaultContentOwner = "projecthoomans.dialogue_content.social",
+    })
 end
 
-local function installPSDLFamily(templateID)
-    local existing = ConversationRegistry.PHRASE_FAMILIES[templateID]
-    if type(existing) == "table" and existing._psdl == true then
-        return existing
-    end
-
-    local styles = {
-        neutral = {},
-        warm = {},
-        terse = {},
-        guarded = {},
-    }
-    local language = activeLanguage()
-    local found = false
-    for _, style in ipairs({ "neutral", "warm", "terse", "guarded" }) do
-        local plan = ConversationRegistry.ConvoPlan(
-            templateID .. "." .. style
-        )
-        local payload = type(plan) == "table" and plan.payload or nil
-        local response = type(payload) == "table" and payload.response or nil
-        local authored = type(response) == "table" and response.variants or nil
-        if type(authored) == "table" then
-            for index, variant in ipairs(authored) do
-                local text = type(variant) == "table" and variant.text or nil
-                local localized = type(text) == "table"
-                    and (text[language] or text.EN) or nil
-                local fallback = type(localized) == "table"
-                    and localized[1] or localized
-                if type(fallback) == "string" and fallback ~= "" then
-                    styles[style][#styles[style] + 1] = {
-                        id = templateID .. "." .. style .. "."
-                            .. string.format("%02d", index),
-                        key = "",
-                        fallback = fallback,
-                        phraseID = tostring(
-                            variant.id or (style .. "." .. index)
-                        ),
-                    }
-                    found = true
-                end
-            end
-        end
-    end
-    if not found then return nil end
-
-    local family = {
-        id = "phrase." .. templateID,
-        semanticTemplateID = templateID,
-        owner = "projecthoomans.dialogue_content.social",
-        _psdl = true,
-        styles = styles,
-    }
-    ConversationRegistry.PHRASE_FAMILIES[templateID] = family
-    return family
-end
-
-installPSDLFamily("semantic.social.apology.default")
-installPSDLFamily("semantic.social.apology.friendly")
-installPSDLFamily("semantic.social.apology.stressed")
-installPSDLFamily("semantic.social.apology.withdrawn")
+installConvoFamily("social.apology.default")
+installConvoFamily("social.apology.friendly")
+installConvoFamily("social.apology.stressed")
+installConvoFamily("social.apology.withdrawn")
+installConvoFamily("social.acknowledged")
+installConvoFamily("conversation.acknowledged.friendly")
+installConvoFamily("conversation.acknowledged.withdrawn")
+installConvoFamily("conversation.acknowledged.default")
+installConvoFamily("social.dispute_stressed")
+installConvoFamily("social.dispute_friendly")
+installConvoFamily("social.dispute_trusted")
+installConvoFamily("social.dispute_withdrawn")
+installConvoFamily("gossip.unknown")
 
 Catalog.Register("semantic.thanks", {
     variants = {
@@ -95,7 +44,7 @@ Catalog.Register("semantic.apology", {
     variants = {
         {
             id = "semantic.apology.stressed",
-            templateID = "semantic.social.apology.stressed",
+            templateID = "social.apology.stressed",
             fallback = "I know things are tense. Let's keep it calm.",
             when = {
                 emotionType = { "stress", "panic" },
@@ -107,7 +56,7 @@ Catalog.Register("semantic.apology", {
         },
         {
             id = "semantic.apology.friendly",
-            templateID = "semantic.social.apology.friendly",
+            templateID = "social.apology.friendly",
             fallback = "It's okay. We can put that behind us.",
             when = { socialStyle = { "friendly", "protective" } },
             priority = 3,
@@ -125,14 +74,14 @@ Catalog.Register("semantic.apology", {
         },
         {
             id = "semantic.apology.withdrawn",
-            templateID = "semantic.social.apology.withdrawn",
+            templateID = "social.apology.withdrawn",
             fallback = "All right. Let's leave it there.",
             when = { socialStyle = "withdrawn" },
             priority = 1,
         },
         {
             id = "semantic.apology.default",
-            templateID = "semantic.social.apology.default",
+            templateID = "social.apology.default",
             fallback = "Noted. Let's move on.",
         },
     },
@@ -185,7 +134,7 @@ Catalog.Register("semantic.accept", {
         },
         {
             id = "semantic.accept.default",
-            templateID = "semantic.social.acknowledged",
+            templateID = "social.acknowledged",
             fallback = "All right.",
         },
     },
@@ -195,21 +144,21 @@ Catalog.Register("semantic.conversation.acknowledged", {
     variants = {
         {
             id = "semantic.conversation.acknowledged.friendly",
-            templateID = "semantic.conversation.acknowledged.friendly",
+            templateID = "conversation.acknowledged.friendly",
             fallback = "All right. Ask if you want to talk about it more.",
             when = { socialStyle = { "friendly", "protective" } },
             priority = 2,
         },
         {
             id = "semantic.conversation.acknowledged.withdrawn",
-            templateID = "semantic.conversation.acknowledged.withdrawn",
+            templateID = "conversation.acknowledged.withdrawn",
             fallback = "All right. We can leave it there for now.",
             when = { socialStyle = "withdrawn" },
             priority = 2,
         },
         {
             id = "semantic.conversation.acknowledged.default",
-            templateID = "semantic.conversation.acknowledged.default",
+            templateID = "conversation.acknowledged.default",
             fallback = "All right. Ask if you want to talk about it more.",
         },
     },
@@ -219,7 +168,7 @@ Catalog.Register("semantic.refuse", {
     variants = {
         {
             id = "semantic.refuse.stressed",
-            templateID = "semantic.social.dispute_stressed",
+            templateID = "social.dispute_stressed",
             fallback = "I hear you, but I can't take that on while I'm this tense.",
             when = {
                 emotionType = { "stress", "panic" },
@@ -238,14 +187,14 @@ Catalog.Register("semantic.refuse", {
         },
         {
             id = "semantic.refuse.friendly",
-            templateID = "semantic.social.dispute_friendly",
+            templateID = "social.dispute_friendly",
             fallback = "I see it differently, but we're okay.",
             when = { socialStyle = { "friendly", "protective" } },
             priority = 2,
         },
         {
             id = "semantic.refuse.trusted",
-            templateID = "semantic.social.dispute_trusted",
+            templateID = "social.dispute_trusted",
             fallback = "I respect that. I still don't agree.",
             when = {
                 relationshipState = {
@@ -256,14 +205,14 @@ Catalog.Register("semantic.refuse", {
         },
         {
             id = "semantic.refuse.withdrawn",
-            templateID = "semantic.social.dispute_withdrawn",
+            templateID = "social.dispute_withdrawn",
             fallback = "Let's leave it there.",
             when = { socialStyle = "withdrawn" },
             priority = 1,
         },
         {
             id = "semantic.refuse.default",
-            templateID = "semantic.social.acknowledged",
+            templateID = "social.acknowledged",
             fallback = "No.",
         },
     },
@@ -280,7 +229,7 @@ Catalog.Register("semantic.gossip", {
         },
         {
             id = "semantic.gossip.unknown",
-            templateID = "semantic.gossip.unknown",
+            templateID = "gossip.unknown",
             fallback = "I haven't heard anything about that yet.",
         },
     },

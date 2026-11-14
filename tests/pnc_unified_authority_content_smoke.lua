@@ -19,10 +19,10 @@ local Registry = PNC.ConvoEngine.Registry
 
 T.truthy(Registry and Registry.FamilyFor,
     "generated Conversation registry is available to production realization")
-T.truthy(Registry.PHRASE_FAMILIES["semantic.leader_loss.default"],
+T.truthy(Registry.PHRASE_FAMILIES["leader_loss.default"],
     "migrated leader-loss variant has a stable phrase family")
 T.equal(
-    Registry.PHRASE_FAMILIES["semantic.leader_loss.default"].contentOwner,
+    Registry.PHRASE_FAMILIES["leader_loss.default"].contentOwner,
         "projecthoomans.dialogue_content.events",
     "event wording exposes the canonical content owner"
 )
@@ -72,7 +72,7 @@ local leader, leaderRendered = realize("semantic.leader_loss.reaction", {
 T.equal(leader.id, "semantic.leader_loss.devoted",
     "leader-loss semantic variant remains the selected meaning")
 T.equal(leaderRendered.phraseID,
-    "phrase.semantic.leader_loss.devoted.neutral.01",
+    "phrase.leader_loss.devoted.neutral.01",
     "leader-loss wording comes from a stable Dialogue Content phrase")
 
 local medical = realize("semantic.medical.distress.call", {
@@ -82,7 +82,7 @@ T.equal(medical.id, "semantic.medical.distress.call.bleedout",
     "medical semantic condition remains ResponseCatalog-owned")
 
 local tool = realize("semantic.tool_reply.order.camp")
-T.truthy(string.find(tool.templateID, "semantic.tool_reply.order_camp.", 1, true),
+T.truthy(string.find(tool.templateID, "tool_reply.order_camp.", 1, true),
     "ToolReply wording uses stable semantic content identity")
 
 local compatibility = realize("semantic.compat.bandits.hooman_hurt", {

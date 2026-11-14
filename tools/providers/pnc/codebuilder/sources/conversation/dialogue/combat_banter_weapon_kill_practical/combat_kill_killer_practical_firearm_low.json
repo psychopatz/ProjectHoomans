@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.practical",
+  "id": "firearm_low",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/practical.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Hit it. Don't count on luck twice.",
+            "Took two shots, but it's down.",
+            "Messy hit, but it did the job.",
+            "Downed. Check remaining ammo now.",
+            "Wasted a round there. Settle your aim.",
+            "It's on the floor. Reload if needed.",
+            "Hit the mark eventually. Stay focused.",
+            "Threat down. Don't get sloppy.",
+            "Barely got that in time. Reset.",
+            "Downed. Watch the noise level."
+          ],
+          "TL": [
+            "Tinamaan. Huwag umasa sa swerte nang dalawang beses.",
+            "Dalawang putok ang kinailangan, pero bagsak na.",
+            "Magulo ang tama, pero nagawa ang trabaho.",
+            "Bagsak. Tignan ang natitirang bala ngayon.",
+            "Nakaaksaya ng bala roon. Pakalmahin ang asinta.",
+            "Nasa sahig na. Mag-reload kung kailangan.",
+            "Tumama rin sa wakas. Manatiling nakatutok.",
+            "Bagsak ang banta. Huwag magpabaya.",
+            "Muntik na 'yon. Ayusin ulit ang pwesto.",
+            "Bagsak. Bantayan ang ingay."
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,198 +1,83 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "emote.reply",
+  "id": "thankyou",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "You're welcome.",
+            "No problem.",
+            "Don't mention it.",
+            "Glad to help.",
+            "Anytime.",
+            "Just doing my part.",
+            "Happy to assist.",
+            "No trouble at all.",
+            "All part of surviving together.",
+            "You'd do the same for me."
+          ],
+          "TL": [
+            "Walang anuman.",
+            "Walang problema.",
+            "Huwag mo nang alalahanin.",
+            "Masayang tumulong.",
+            "Kahit kailan.",
+            "Ginagawa ko lang ang bahagi ko.",
+            "Mabuti at nakatulong ako.",
+            "Walang anuman talaga.",
+            "Bahagi lang 'yan ng sabay na pamumuhay.",
+            "Gagawin mo rin 'yan para sa akin."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-        "responseTemplateID": "semantic.emote.reply.thankyou",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "You're welcome.",
-              "TL": "Walang anuman."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "No problem.",
-              "TL": "Walang problema."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Don't mention it.",
-              "TL": "Huwag mo nang alalahanin."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Glad to help.",
-              "TL": "Masayang tumulong."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Anytime.",
-              "TL": "Kahit kailan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Just doing my part.",
-              "TL": "Ginagawa ko lang ang bahagi ko."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Happy to assist.",
-              "TL": "Mabuti at nakatulong ako."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "No trouble at all.",
-              "TL": "Walang anuman talaga."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "All part of surviving together.",
-              "TL": "Bahagi lang 'yan ng sabay na pamumuhay."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "You'd do the same for me.",
-              "TL": "Gagawin mo rin 'yan para sa akin."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.emote.reply.thankyou"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-        "responseTemplateID": "semantic.emote.reply.thankyou",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "Anytime. We look after our own.",
-              "TL": "Kahit kailan. Inaalagaan natin ang mga kasama natin."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "You're very welcome, friend.",
-              "TL": "Walang anuman talaga, kaibigan."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Always happy to lend a hand to you.",
-              "TL": "Lagi akong handang tumulong sa 'yo."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "Don't worry about it for a second. Glad to be here.",
-              "TL": "Huwag mo nang isipin kahit sandali. Mabuti at narito ako."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "We've got each other's backs. That's what counts.",
-              "TL": "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "You deserve the help. Don't mention it.",
-              "TL": "Karapat-dapat ka sa tulong. Huwag mo nang banggitin."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "Anytime! Seriously, just ask whenever.",
-              "TL": "Kahit kailan! magsabi ka lang kapag may kailangan ka."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "I'm glad I could be there for you.",
-              "TL": "Mabuti at nakatulong ako sa 'yo."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "No need to thank me. That's what partners do.",
-              "TL": "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "Happy to help. Always.",
-              "TL": "Masayang tumulong. Palagi."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.emote.reply.thankyou"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "Anytime. We look after our own.",
+            "You're very welcome, friend.",
+            "Always happy to lend a hand to you.",
+            "Don't worry about it for a second. Glad to be here.",
+            "We've got each other's backs. That's what counts.",
+            "You deserve the help. Don't mention it.",
+            "Anytime! Seriously, just ask whenever.",
+            "I'm glad I could be there for you.",
+            "No need to thank me. That's what partners do.",
+            "Happy to help. Always."
+          ],
+          "TL": [
+            "Kahit kailan. Inaalagaan natin ang mga kasama natin.",
+            "Walang anuman talaga, kaibigan.",
+            "Lagi akong handang tumulong sa 'yo.",
+            "Huwag mo nang isipin kahit sandali. Mabuti at narito ako.",
+            "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga.",
+            "Karapat-dapat ka sa tulong. Huwag mo nang banggitin.",
+            "Kahit kailan! magsabi ka lang kapag may kailangan ka.",
+            "Mabuti at nakatulong ako sa 'yo.",
+            "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama.",
+            "Masayang tumulong. Palagi."
+          ]
+        }
+      }
+    ]
+  }
 }

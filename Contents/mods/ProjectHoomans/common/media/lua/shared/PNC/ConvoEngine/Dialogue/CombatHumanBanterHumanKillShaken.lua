@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_human_banter_human_kill_shaken",
-        ["id"] = "semantic.combat.human_kill.shaken.line_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.human_kill.shaken",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Jesus... he's dead.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.human_kill.shaken.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Jesus... he's dead.",
+                                        "I... I really killed him.",
+                                        "God... look at him lying there.",
+                                        "He stopped moving... he's really gone.",
+                                        "I had to do it... he was shooting at us.",
+                                        "Lord help us... what have we done?",
+                                        "He's dead. I can't look at it.",
+                                        "His eyes are still open... Jesus.",
+                                        "I didn't want this... but he wouldn't stop.",
+                                        "God forgive me. He's dead.",
+                                    },
+                                    ["TL"] = {
+                                        "Diyos ko... patay na siya.",
+                                        "Ako... napatay ko talaga siya.",
+                                        "Diyos ko... tingnan mo siyang nakahandusay.",
+                                        "Tumigil na siya sa paggalaw... wala na talaga.",
+                                        "Kinailangan kong gawin... binaril niya tayo eh.",
+                                        "Panginoon tulungan mo kami... ano'ng nagawa natin?",
+                                        "Patay na siya. Hindi ko kayang tingnan.",
+                                        "Bukas pa ang mga mata niya... Diyos ko.",
+                                        "Ayoko nito... pero ayaw niyang tumigil.",
+                                        "Patawarin ako ng Diyos. Patay na siya.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "God. That was a person.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.human_kill.shaken.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "God. That was a person.",
+                                        "A real person... not a zombie.",
+                                        "He had a name... someone knew him.",
+                                        "We're killing each other now... God.",
+                                        "He was just trying to survive too...",
+                                        "That was an actual human being lying there.",
+                                        "I can't shake this feeling... we took a life.",
+                                        "He had boots, a jacket, a life... now he's gone.",
+                                        "Killing people... what are we becoming?",
+                                        "That was somebody's family once.",
+                                    },
+                                    ["TL"] = {
+                                        "Diyos ko. Tao 'yon.",
+                                        "Tunay na tao... hindi zombie.",
+                                        "May pangalan 'yon... may nakakakilala sa kanya.",
+                                        "Pumapatay na tayo ng kapwa... Diyos ko.",
+                                        "Gusto lang din niyang mabuhay...",
+                                        "Tunay na tao ang nakahandusay diyan.",
+                                        "Hindi maalis sa isip ko... pumatay tayo ng tao.",
+                                        "May gamit siya, may buhay... ngayon wala na.",
+                                        "Pumapatay ng kapwa... ano na nagiging tayo?",
+                                        "Pamilya rin siya ng iba noon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "He's down... let's just get out of here.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.human_kill.shaken.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "He's down... let's just get out of here.",
+                                        "Please... can we just leave this place?",
+                                        "Don't search him. Let's just go.",
+                                        "I don't want to be here anymore.",
+                                        "He's dead. We need to leave before others show up.",
+                                        "Let's grab what we need and run.",
+                                        "I can't stay near his body. Come on.",
+                                        "He's dead... let's just move away.",
+                                        "Get me out of here. Please.",
+                                        "It's done. Don't look back. Walk.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak na siya... umalis na tayo rito.",
+                                        "Pakiusap... pwede bang lumayo na tayo rito?",
+                                        "Huwag mo na siyang kapkapan. Umalis na lang tayo.",
+                                        "Ayoko nang manatili rito.",
+                                        "Patay na siya. Kailangan nating umalis bago may dumating pang iba.",
+                                        "Kuhanin ang kailangan at tumakbo na tayo.",
+                                        "Hindi ko kayang tumayo malapit sa bangkay niya. Halika na.",
+                                        "Patay na siya... lumayo na tayo.",
+                                        "Ilayo mo ako rito. Pakiusap.",
+                                        "Tapos na. Huwag kang lilingon. Lakad.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.human_kill",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Jesus... he's dead.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.human_kill.shaken.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Jesus... he's dead.",
+                            "I... I really killed him.",
+                            "God... look at him lying there.",
+                            "He stopped moving... he's really gone.",
+                            "I had to do it... he was shooting at us.",
+                            "Lord help us... what have we done?",
+                            "He's dead. I can't look at it.",
+                            "His eyes are still open... Jesus.",
+                            "I didn't want this... but he wouldn't stop.",
+                            "God forgive me. He's dead.",
+                        },
+                        ["TL"] = {
+                            "Diyos ko... patay na siya.",
+                            "Ako... napatay ko talaga siya.",
+                            "Diyos ko... tingnan mo siyang nakahandusay.",
+                            "Tumigil na siya sa paggalaw... wala na talaga.",
+                            "Kinailangan kong gawin... binaril niya tayo eh.",
+                            "Panginoon tulungan mo kami... ano'ng nagawa natin?",
+                            "Patay na siya. Hindi ko kayang tingnan.",
+                            "Bukas pa ang mga mata niya... Diyos ko.",
+                            "Ayoko nito... pero ayaw niyang tumigil.",
+                            "Patawarin ako ng Diyos. Patay na siya.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "God. That was a person.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.human_kill.shaken.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "God. That was a person.",
+                            "A real person... not a zombie.",
+                            "He had a name... someone knew him.",
+                            "We're killing each other now... God.",
+                            "He was just trying to survive too...",
+                            "That was an actual human being lying there.",
+                            "I can't shake this feeling... we took a life.",
+                            "He had boots, a jacket, a life... now he's gone.",
+                            "Killing people... what are we becoming?",
+                            "That was somebody's family once.",
+                        },
+                        ["TL"] = {
+                            "Diyos ko. Tao 'yon.",
+                            "Tunay na tao... hindi zombie.",
+                            "May pangalan 'yon... may nakakakilala sa kanya.",
+                            "Pumapatay na tayo ng kapwa... Diyos ko.",
+                            "Gusto lang din niyang mabuhay...",
+                            "Tunay na tao ang nakahandusay diyan.",
+                            "Hindi maalis sa isip ko... pumatay tayo ng tao.",
+                            "May gamit siya, may buhay... ngayon wala na.",
+                            "Pumapatay ng kapwa... ano na nagiging tayo?",
+                            "Pamilya rin siya ng iba noon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "He's down... let's just get out of here.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.human_kill.shaken.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "He's down... let's just get out of here.",
+                            "Please... can we just leave this place?",
+                            "Don't search him. Let's just go.",
+                            "I don't want to be here anymore.",
+                            "He's dead. We need to leave before others show up.",
+                            "Let's grab what we need and run.",
+                            "I can't stay near his body. Come on.",
+                            "He's dead... let's just move away.",
+                            "Get me out of here. Please.",
+                            "It's done. Don't look back. Walk.",
+                        },
+                        ["TL"] = {
+                            "Bagsak na siya... umalis na tayo rito.",
+                            "Pakiusap... pwede bang lumayo na tayo rito?",
+                            "Huwag mo na siyang kapkapan. Umalis na lang tayo.",
+                            "Ayoko nang manatili rito.",
+                            "Patay na siya. Kailangan nating umalis bago may dumating pang iba.",
+                            "Kuhanin ang kailangan at tumakbo na tayo.",
+                            "Hindi ko kayang tumayo malapit sa bangkay niya. Halika na.",
+                            "Patay na siya... lumayo na tayo.",
+                            "Ilayo mo ako rito. Pakiusap.",
+                            "Tapos na. Huwag kang lilingon. Lakad.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.human_kill.shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "line_01",
-            ["sourceId"] = "semantic.combat.human_kill.shaken.line_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken_line_01.json",
+            ["localId"] = "shaken",
+            ["sourceId"] = "combat.human_kill.shaken",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillShaken",
-        ["namespace"] = "semantic.combat.human_kill.shaken",
+        ["namespace"] = "combat.human_kill",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
-                ["responseTemplateID"] = "semantic.combat.human_kill.shaken.line_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/shaken.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Jesus... he's dead.",
-                            },
-                            ["TL"] = {
-                                "Diyos ko... patay na siya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I... I really killed him.",
-                            },
-                            ["TL"] = {
-                                "Ako... napatay ko talaga siya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "God... look at him lying there.",
-                            },
-                            ["TL"] = {
-                                "Diyos ko... tingnan mo siyang nakahandusay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He stopped moving... he's really gone.",
-                            },
-                            ["TL"] = {
-                                "Tumigil na siya sa paggalaw... wala na talaga.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Jesus... he's dead.",
+                                        "I... I really killed him.",
+                                        "God... look at him lying there.",
+                                        "He stopped moving... he's really gone.",
+                                        "I had to do it... he was shooting at us.",
+                                        "Lord help us... what have we done?",
+                                        "He's dead. I can't look at it.",
+                                        "His eyes are still open... Jesus.",
+                                        "I didn't want this... but he wouldn't stop.",
+                                        "God forgive me. He's dead.",
+                                    },
+                                    ["TL"] = {
+                                        "Diyos ko... patay na siya.",
+                                        "Ako... napatay ko talaga siya.",
+                                        "Diyos ko... tingnan mo siyang nakahandusay.",
+                                        "Tumigil na siya sa paggalaw... wala na talaga.",
+                                        "Kinailangan kong gawin... binaril niya tayo eh.",
+                                        "Panginoon tulungan mo kami... ano'ng nagawa natin?",
+                                        "Patay na siya. Hindi ko kayang tingnan.",
+                                        "Bukas pa ang mga mata niya... Diyos ko.",
+                                        "Ayoko nito... pero ayaw niyang tumigil.",
+                                        "Patawarin ako ng Diyos. Patay na siya.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I had to do it... he was shooting at us.",
-                            },
-                            ["TL"] = {
-                                "Kinailangan kong gawin... binaril niya tayo eh.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Lord help us... what have we done?",
-                            },
-                            ["TL"] = {
-                                "Panginoon tulungan mo kami... ano'ng nagawa natin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's dead. I can't look at it.",
-                            },
-                            ["TL"] = {
-                                "Patay na siya. Hindi ko kayang tingnan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "His eyes are still open... Jesus.",
-                            },
-                            ["TL"] = {
-                                "Bukas pa ang mga mata niya... Diyos ko.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "God. That was a person.",
+                                        "A real person... not a zombie.",
+                                        "He had a name... someone knew him.",
+                                        "We're killing each other now... God.",
+                                        "He was just trying to survive too...",
+                                        "That was an actual human being lying there.",
+                                        "I can't shake this feeling... we took a life.",
+                                        "He had boots, a jacket, a life... now he's gone.",
+                                        "Killing people... what are we becoming?",
+                                        "That was somebody's family once.",
+                                    },
+                                    ["TL"] = {
+                                        "Diyos ko. Tao 'yon.",
+                                        "Tunay na tao... hindi zombie.",
+                                        "May pangalan 'yon... may nakakakilala sa kanya.",
+                                        "Pumapatay na tayo ng kapwa... Diyos ko.",
+                                        "Gusto lang din niyang mabuhay...",
+                                        "Tunay na tao ang nakahandusay diyan.",
+                                        "Hindi maalis sa isip ko... pumatay tayo ng tao.",
+                                        "May gamit siya, may buhay... ngayon wala na.",
+                                        "Pumapatay ng kapwa... ano na nagiging tayo?",
+                                        "Pamilya rin siya ng iba noon.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I didn't want this... but he wouldn't stop.",
-                            },
-                            ["TL"] = {
-                                "Ayoko nito... pero ayaw niyang tumigil.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "He's down... let's just get out of here.",
+                                        "Please... can we just leave this place?",
+                                        "Don't search him. Let's just go.",
+                                        "I don't want to be here anymore.",
+                                        "He's dead. We need to leave before others show up.",
+                                        "Let's grab what we need and run.",
+                                        "I can't stay near his body. Come on.",
+                                        "He's dead... let's just move away.",
+                                        "Get me out of here. Please.",
+                                        "It's done. Don't look back. Walk.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak na siya... umalis na tayo rito.",
+                                        "Pakiusap... pwede bang lumayo na tayo rito?",
+                                        "Huwag mo na siyang kapkapan. Umalis na lang tayo.",
+                                        "Ayoko nang manatili rito.",
+                                        "Patay na siya. Kailangan nating umalis bago may dumating pang iba.",
+                                        "Kuhanin ang kailangan at tumakbo na tayo.",
+                                        "Hindi ko kayang tumayo malapit sa bangkay niya. Halika na.",
+                                        "Patay na siya... lumayo na tayo.",
+                                        "Ilayo mo ako rito. Pakiusap.",
+                                        "Tapos na. Huwag kang lilingon. Lakad.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "God forgive me. He's dead.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.human_kill.shaken",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Patawarin ako ng Diyos. Patay na siya.",
-                            },
+                            ["fallback"] = "Jesus... he's dead.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.human_kill.shaken.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken_line_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_human_banter_human_kill_shaken",
-        ["id"] = "semantic.combat.human_kill.shaken.line_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "line_02",
-            ["sourceId"] = "semantic.combat.human_kill.shaken.line_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken_line_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillShaken",
-        ["namespace"] = "semantic.combat.human_kill.shaken",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
-                ["responseTemplateID"] = "semantic.combat.human_kill.shaken.line_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/shaken.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "God. That was a person.",
-                            },
-                            ["TL"] = {
-                                "Diyos ko. Tao 'yon.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Jesus... he's dead.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.human_kill.shaken.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Jesus... he's dead.",
+                        "I... I really killed him.",
+                        "God... look at him lying there.",
+                        "He stopped moving... he's really gone.",
+                        "I had to do it... he was shooting at us.",
+                        "Lord help us... what have we done?",
+                        "He's dead. I can't look at it.",
+                        "His eyes are still open... Jesus.",
+                        "I didn't want this... but he wouldn't stop.",
+                        "God forgive me. He's dead.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A real person... not a zombie.",
-                            },
-                            ["TL"] = {
-                                "Tunay na tao... hindi zombie.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He had a name... someone knew him.",
-                            },
-                            ["TL"] = {
-                                "May pangalan 'yon... may nakakakilala sa kanya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We're killing each other now... God.",
-                            },
-                            ["TL"] = {
-                                "Pumapatay na tayo ng kapwa... Diyos ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He was just trying to survive too...",
-                            },
-                            ["TL"] = {
-                                "Gusto lang din niyang mabuhay...",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That was an actual human being lying there.",
-                            },
-                            ["TL"] = {
-                                "Tunay na tao ang nakahandusay diyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't shake this feeling... we took a life.",
-                            },
-                            ["TL"] = {
-                                "Hindi maalis sa isip ko... pumatay tayo ng tao.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He had boots, a jacket, a life... now he's gone.",
-                            },
-                            ["TL"] = {
-                                "May gamit siya, may buhay... ngayon wala na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Killing people... what are we becoming?",
-                            },
-                            ["TL"] = {
-                                "Pumapatay ng kapwa... ano na nagiging tayo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That was somebody's family once.",
-                            },
-                            ["TL"] = {
-                                "Pamilya rin siya ng iba noon.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Diyos ko... patay na siya.",
+                        "Ako... napatay ko talaga siya.",
+                        "Diyos ko... tingnan mo siyang nakahandusay.",
+                        "Tumigil na siya sa paggalaw... wala na talaga.",
+                        "Kinailangan kong gawin... binaril niya tayo eh.",
+                        "Panginoon tulungan mo kami... ano'ng nagawa natin?",
+                        "Patay na siya. Hindi ko kayang tingnan.",
+                        "Bukas pa ang mga mata niya... Diyos ko.",
+                        "Ayoko nito... pero ayaw niyang tumigil.",
+                        "Patawarin ako ng Diyos. Patay na siya.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken_line_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_human_banter_human_kill_shaken",
-        ["id"] = "semantic.combat.human_kill.shaken.line_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "line_03",
-            ["sourceId"] = "semantic.combat.human_kill.shaken.line_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken_line_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillShaken",
-        ["namespace"] = "semantic.combat.human_kill.shaken",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
-                ["responseTemplateID"] = "semantic.combat.human_kill.shaken.line_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/shaken.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's down... let's just get out of here.",
-                            },
-                            ["TL"] = {
-                                "Bagsak na siya... umalis na tayo rito.",
-                            },
-                        },
+            {
+                ["fallback"] = "God. That was a person.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.human_kill.shaken.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "God. That was a person.",
+                        "A real person... not a zombie.",
+                        "He had a name... someone knew him.",
+                        "We're killing each other now... God.",
+                        "He was just trying to survive too...",
+                        "That was an actual human being lying there.",
+                        "I can't shake this feeling... we took a life.",
+                        "He had boots, a jacket, a life... now he's gone.",
+                        "Killing people... what are we becoming?",
+                        "That was somebody's family once.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Please... can we just leave this place?",
-                            },
-                            ["TL"] = {
-                                "Pakiusap... pwede bang lumayo na tayo rito?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't search him. Let's just go.",
-                            },
-                            ["TL"] = {
-                                "Huwag mo na siyang kapkapan. Umalis na lang tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't want to be here anymore.",
-                            },
-                            ["TL"] = {
-                                "Ayoko nang manatili rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's dead. We need to leave before others show up.",
-                            },
-                            ["TL"] = {
-                                "Patay na siya. Kailangan nating umalis bago may dumating pang iba.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's grab what we need and run.",
-                            },
-                            ["TL"] = {
-                                "Kuhanin ang kailangan at tumakbo na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't stay near his body. Come on.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko kayang tumayo malapit sa bangkay niya. Halika na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's dead... let's just move away.",
-                            },
-                            ["TL"] = {
-                                "Patay na siya... lumayo na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Get me out of here. Please.",
-                            },
-                            ["TL"] = {
-                                "Ilayo mo ako rito. Pakiusap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's done. Don't look back. Walk.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Huwag kang lilingon. Lakad.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Diyos ko. Tao 'yon.",
+                        "Tunay na tao... hindi zombie.",
+                        "May pangalan 'yon... may nakakakilala sa kanya.",
+                        "Pumapatay na tayo ng kapwa... Diyos ko.",
+                        "Gusto lang din niyang mabuhay...",
+                        "Tunay na tao ang nakahandusay diyan.",
+                        "Hindi maalis sa isip ko... pumatay tayo ng tao.",
+                        "May gamit siya, may buhay... ngayon wala na.",
+                        "Pumapatay ng kapwa... ano na nagiging tayo?",
+                        "Pamilya rin siya ng iba noon.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken_line_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "He's down... let's just get out of here.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.human_kill.shaken.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "He's down... let's just get out of here.",
+                        "Please... can we just leave this place?",
+                        "Don't search him. Let's just go.",
+                        "I don't want to be here anymore.",
+                        "He's dead. We need to leave before others show up.",
+                        "Let's grab what we need and run.",
+                        "I can't stay near his body. Come on.",
+                        "He's dead... let's just move away.",
+                        "Get me out of here. Please.",
+                        "It's done. Don't look back. Walk.",
+                    },
+                    ["TL"] = {
+                        "Bagsak na siya... umalis na tayo rito.",
+                        "Pakiusap... pwede bang lumayo na tayo rito?",
+                        "Huwag mo na siyang kapkapan. Umalis na lang tayo.",
+                        "Ayoko nang manatili rito.",
+                        "Patay na siya. Kailangan nating umalis bago may dumating pang iba.",
+                        "Kuhanin ang kailangan at tumakbo na tayo.",
+                        "Hindi ko kayang tumayo malapit sa bangkay niya. Halika na.",
+                        "Patay na siya... lumayo na tayo.",
+                        "Ilayo mo ako rito. Pakiusap.",
+                        "Tapos na. Huwag kang lilingon. Lakad.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

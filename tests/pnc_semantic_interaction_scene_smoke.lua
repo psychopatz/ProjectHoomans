@@ -137,7 +137,7 @@ T.equal(followup.interactionPlan.groundedFactRefs[1], memoryFact,
 T.truthy(type(followup.presentation.speech) == "table",
     "perceived scene realizes the selected speech output")
 T.equal(followup.presentation.speech.phraseSemanticTemplateID,
-    "semantic.interaction.memory.followup",
+    "interaction.memory.followup",
     "speech uses ordinary Dialogue Content")
 T.truthy(followup.presentation.speech.fallback ~= nil,
     "speech realization produced visible wording")
@@ -186,7 +186,7 @@ T.equal(acknowledgement.presentation.emote.id, "emote.nod",
 T.truthy(type(acknowledgement.presentation.flavor) == "table",
     "same semantic behavior can realize ambient flavor")
 T.equal(acknowledgement.presentation.flavor.phraseSemanticTemplateID,
-    "semantic.interaction.memory.acknowledge_flavor",
+    "interaction.memory.acknowledge_flavor",
     "ambient flavor uses ordinary Dialogue Content")
 T.equal(acknowledgement.presentation.behaviorID,
     "behavior.acknowledge_memory",

@@ -425,9 +425,17 @@ local activeNameDelivered = Integration.Deliver({
 })
 T.truthy(activeNameDelivered.accepted,
     "active identity fallback response was not delivered")
-T.truthy(string.find(
-    tostring(activeMessages[2].payload and activeMessages[2].payload.fallback or ""),
-    "name", 1, true
+local askNameText = tostring(
+    activeMessages[2].payload and activeMessages[2].payload.fallback or ""
+)
+T.falsy(string.find(askNameText, "Give me a moment.", 1, true),
+    "provider fallback prose is replaced by the authoritative name prompt")
+T.truthy(askNameText ~= "" and (
+    string.find(askNameText, "name", 1, true)
+    or string.find(askNameText, "who you are", 1, true)
+    or string.find(askNameText, "call you", 1, true)
+    or string.find(askNameText, "speaking with", 1, true)
+    or string.find(askNameText, "Introduce", 1, true)
 ), "provider fallback prose hid the reciprocal name prompt")
 
 T.finish("pnc_llm_closed_ui_delivery_smoke")

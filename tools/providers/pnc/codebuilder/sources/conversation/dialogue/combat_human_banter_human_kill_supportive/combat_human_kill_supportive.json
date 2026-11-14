@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.human_kill",
+  "id": "supportive",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.combat_human",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/supportive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "He's down. You alright?",
+              "Got the shooter. Did you take any hits?",
+              "He's dead. Are you hurt anywhere?",
+              "Took him down. Check yourself over.",
+              "Threat is eliminated. You safe?",
+              "I got him off you. Breathe.",
+              "He's not getting back up. You good?",
+              "Downed the gunman. Stay with me.",
+              "It's okay, I got him. Check your wounds.",
+              "Shooter's dead. We're still standing."
+            ],
+            "TL": [
+              "Bagsak na siya. Ayos ka?",
+              "Naitumba ang bumaril. Tinamaan ka ba?",
+              "Patay na siya. May masakit ba sa'yo?",
+              "Ibinagsak ko na. Tignan mo ang katawan mo.",
+              "Wala na ang banta. Ligtas ka ba?",
+              "Nailayo ko sa'yo. Huminga ka.",
+              "Hindi na siya babangon. Ayos ka lang?",
+              "Bagsak ang may baril. Sumabay ka sa akin.",
+              "Ayos lang, nakuha ko na siya. Tignan ang mga sugat mo.",
+              "Patay na ang bumaril. Nakatayo pa rin tayo."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "It's over. Stay close to me.",
+              "He's dead. Keep tight on my shoulder.",
+              "Fight's ending. Don't wander off.",
+              "He won't hurt us now. Stay near.",
+              "Target down. Stick close while we clear.",
+              "Got him. Stay behind cover with me.",
+              "It's handled. We stick together.",
+              "Threat dropped. Keep close until it's quiet.",
+              "He's finished. I've got your back.",
+              "Down. Don't leave my side."
+            ],
+            "TL": [
+              "Tapos na. Dumikit ka sa akin.",
+              "Patay na siya. Dumikit ka lang sa balikat ko.",
+              "Pahupa na ang laban. Huwag kang lalayo.",
+              "Hindi na niya tayo masasaktan. Manatili sa malapit.",
+              "Bagsak ang target. Dumikit habang naglilinis tayo.",
+              "Nakuha ko na. Dito ka sa kublihan kasama ko.",
+              "Naasikaso na. Magsama tayo.",
+              "Bagsak ang banta. Dumikit hanggang tumahimik.",
+              "Tapos na siya. Hawak ko ang likod mo.",
+              "Bagsak. Huwag kang aalis sa tabi ko."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "He's dead. Check yourself for hits.",
+              "Threat cleared. Inspect your gear and clothes.",
+              "He's gone. Any blood on you?",
+              "Got him down. Tell me if you're bleeding.",
+              "Shooter is dead. Check each other over.",
+              "Target down. Do a quick self-check.",
+              "He's finished. Make sure you weren't grazed.",
+              "Downed. Patch up if you need to.",
+              "Confirmed kill. Are all your limbs okay?",
+              "He's on the ground. Check your condition."
+            ],
+            "TL": [
+              "Patay na siya. Tingnan mo kung tinamaan ka.",
+              "Malinis ang banta. Tignan ang gamit at damit mo.",
+              "Wala na siya. May dugo ba sa'yo?",
+              "Ibinagsak ko na. Sabihin mo agad kung dumurugo ka.",
+              "Patay na ang bumaril. Magtinginan tayo kung may tama.",
+              "Bagsak ang target. Mag-check ka agad sa sarili mo.",
+              "Tapos na siya. Siguraduhing hindi ka nadaplisan.",
+              "Bagsak. Magbenda ka kung kailangan.",
+              "Kumpirmadong patay. Ayos ba lahat ng braso at binti mo?",
+              "Nasa lupa na siya. Tignan ang kondisyon mo."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

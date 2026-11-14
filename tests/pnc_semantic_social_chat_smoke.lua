@@ -122,7 +122,7 @@ local standaloneAcknowledgement = Policy.Decide(
 T.equal(standaloneAcknowledgement.branch, "SOCIAL_ACKNOWLEDGED",
     "acknowledgment uses the existing social response branch")
 T.equal(standaloneAcknowledgement.response.templateID,
-    "semantic.social.acknowledged",
+    "social.acknowledged",
     "an acknowledgment without matching dialogue context gets a generic reply")
 local acknowledgementDuringGiftOffer = Policy.Decide(
     acknowledgementIR,
@@ -373,7 +373,7 @@ local unrelatedAcknowledgement = Policy.Decide(
     }
 )
 T.equal(unrelatedAcknowledgement.response.templateID,
-    "semantic.social.acknowledged",
+    "social.acknowledged",
     "an older relationship answer does not trigger a contextual response")
 T.equal(Presentation.Internal.QueueDeterministicResponse(
     view,

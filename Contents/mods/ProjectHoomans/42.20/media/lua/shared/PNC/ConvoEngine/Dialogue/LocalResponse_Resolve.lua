@@ -119,14 +119,14 @@ function Response.Resolve(ir, state, context, branch)
     end
     if branch == "GIFT_SELECTION_REQUIRED" then
         return {
-            templateID = "semantic.gift.selection_required",
+            templateID = "gift.selection_required",
             fallback = "Oh? What did you bring me?",
             args = copyArgs({ object = ir.object }),
         }
     end
     if branch == "GIFT_OFFER_DISPATCHED" then
         return {
-            templateID = "semantic.gift.pending",
+            templateID = "gift.pending",
             fallback = "",
             args = copyArgs({ object = ir.object }),
         }

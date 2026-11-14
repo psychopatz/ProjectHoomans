@@ -2,15 +2,174 @@
 return {
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.accepted_generic.1.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.accepted_generic",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I hear you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.accepted_generic.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I hear you.",
+                                        "Got it.",
+                                        "Fair enough.",
+                                        "Understood.",
+                                        "I hear what you are saying.",
+                                        "Message received.",
+                                        "Makes sense to me.",
+                                        "Point taken.",
+                                        "I am listening.",
+                                        "All right. I hear you.",
+                                    },
+                                    ["TL"] = {
+                                        "Narinig kita.",
+                                        "Nakuha ko.",
+                                        "May punto ka.",
+                                        "Naiintindihan ko.",
+                                        "Naririnig ko ang sinasabi mo.",
+                                        "Malinaw, nakuha ko.",
+                                        "May katuturan 'yan para sa akin.",
+                                        "Nakuha ko ang punto mo.",
+                                        "Nakikinig ako sa 'yo.",
+                                        "Sige. Naririnig kita.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I will keep that in mind.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.accepted_generic.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I will keep that in mind.",
+                                        "I will remember that.",
+                                        "Good to know. I will think about it.",
+                                        "I will note that down in my head.",
+                                        "Thanks for telling me. I will keep it in mind.",
+                                        "I will hold onto that thought.",
+                                        "I will factor that in.",
+                                        "Duly noted.",
+                                        "I will be mindful of that.",
+                                        "Right. I will keep that in mind moving forward.",
+                                    },
+                                    ["TL"] = {
+                                        "Isasaisip ko iyan.",
+                                        "Tandaan ko iyan.",
+                                        "Mabuting malaman. Pag-iisipan ko.",
+                                        "Itatatak ko 'yan sa isip ko.",
+                                        "Salamat sa pagsabi. Tatandaan ko.",
+                                        "Isasapuso at isasaisip ko iyan.",
+                                        "Isasaalang-alang ko 'yan.",
+                                        "Tala ko na 'yan.",
+                                        "Magiging maingat ako tungkol diyan.",
+                                        "Sige. Tatandaan ko 'yan sa mga susunod.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I hear you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.accepted_generic.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I hear you.",
+                            "Got it.",
+                            "Fair enough.",
+                            "Understood.",
+                            "I hear what you are saying.",
+                            "Message received.",
+                            "Makes sense to me.",
+                            "Point taken.",
+                            "I am listening.",
+                            "All right. I hear you.",
+                        },
+                        ["TL"] = {
+                            "Narinig kita.",
+                            "Nakuha ko.",
+                            "May punto ka.",
+                            "Naiintindihan ko.",
+                            "Naririnig ko ang sinasabi mo.",
+                            "Malinaw, nakuha ko.",
+                            "May katuturan 'yan para sa akin.",
+                            "Nakuha ko ang punto mo.",
+                            "Nakikinig ako sa 'yo.",
+                            "Sige. Naririnig kita.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "I will keep that in mind.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.accepted_generic.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I will keep that in mind.",
+                            "I will remember that.",
+                            "Good to know. I will think about it.",
+                            "I will note that down in my head.",
+                            "Thanks for telling me. I will keep it in mind.",
+                            "I will hold onto that thought.",
+                            "I will factor that in.",
+                            "Duly noted.",
+                            "I will be mindful of that.",
+                            "Right. I will keep that in mind moving forward.",
+                        },
+                        ["TL"] = {
+                            "Isasaisip ko iyan.",
+                            "Tandaan ko iyan.",
+                            "Mabuting malaman. Pag-iisipan ko.",
+                            "Itatatak ko 'yan sa isip ko.",
+                            "Salamat sa pagsabi. Tatandaan ko.",
+                            "Isasapuso at isasaisip ko iyan.",
+                            "Isasaalang-alang ko 'yan.",
+                            "Tala ko na 'yan.",
+                            "Magiging maingat ako tungkol diyan.",
+                            "Sige. Tatandaan ko 'yan sa mga susunod.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "tool_reply.accepted_generic",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.accepted_generic.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["localId"] = "accepted_generic",
+            ["sourceId"] = "tool_reply.accepted_generic",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
+        ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -24,127 +183,114 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.accepted_generic.1",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/accepted_generic.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear you.",
-                            },
-                            ["TL"] = {
-                                "Narinig kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fair enough.",
-                            },
-                            ["TL"] = {
-                                "May punto ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I hear you.",
+                                        "Got it.",
+                                        "Fair enough.",
+                                        "Understood.",
+                                        "I hear what you are saying.",
+                                        "Message received.",
+                                        "Makes sense to me.",
+                                        "Point taken.",
+                                        "I am listening.",
+                                        "All right. I hear you.",
+                                    },
+                                    ["TL"] = {
+                                        "Narinig kita.",
+                                        "Nakuha ko.",
+                                        "May punto ka.",
+                                        "Naiintindihan ko.",
+                                        "Naririnig ko ang sinasabi mo.",
+                                        "Malinaw, nakuha ko.",
+                                        "May katuturan 'yan para sa akin.",
+                                        "Nakuha ko ang punto mo.",
+                                        "Nakikinig ako sa 'yo.",
+                                        "Sige. Naririnig kita.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear what you are saying.",
-                            },
-                            ["TL"] = {
-                                "Naririnig ko ang sinasabi mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Message received.",
-                            },
-                            ["TL"] = {
-                                "Malinaw, nakuha ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Makes sense to me.",
-                            },
-                            ["TL"] = {
-                                "May katuturan 'yan para sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Point taken.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko ang punto mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am listening.",
-                            },
-                            ["TL"] = {
-                                "Nakikinig ako sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. I hear you.",
-                            },
-                            ["TL"] = {
-                                "Sige. Naririnig kita.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I will keep that in mind.",
+                                        "I will remember that.",
+                                        "Good to know. I will think about it.",
+                                        "I will note that down in my head.",
+                                        "Thanks for telling me. I will keep it in mind.",
+                                        "I will hold onto that thought.",
+                                        "I will factor that in.",
+                                        "Duly noted.",
+                                        "I will be mindful of that.",
+                                        "Right. I will keep that in mind moving forward.",
+                                    },
+                                    ["TL"] = {
+                                        "Isasaisip ko iyan.",
+                                        "Tandaan ko iyan.",
+                                        "Mabuting malaman. Pag-iisipan ko.",
+                                        "Itatatak ko 'yan sa isip ko.",
+                                        "Salamat sa pagsabi. Tatandaan ko.",
+                                        "Isasapuso at isasaisip ko iyan.",
+                                        "Isasaalang-alang ko 'yan.",
+                                        "Tala ko na 'yan.",
+                                        "Magiging maingat ako tungkol diyan.",
+                                        "Sige. Tatandaan ko 'yan sa mga susunod.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.accepted_generic",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I hear you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.accepted_generic.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -154,175 +300,318 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I hear you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.accepted_generic.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I hear you.",
+                        "Got it.",
+                        "Fair enough.",
+                        "Understood.",
+                        "I hear what you are saying.",
+                        "Message received.",
+                        "Makes sense to me.",
+                        "Point taken.",
+                        "I am listening.",
+                        "All right. I hear you.",
+                    },
+                    ["TL"] = {
+                        "Narinig kita.",
+                        "Nakuha ko.",
+                        "May punto ka.",
+                        "Naiintindihan ko.",
+                        "Naririnig ko ang sinasabi mo.",
+                        "Malinaw, nakuha ko.",
+                        "May katuturan 'yan para sa akin.",
+                        "Nakuha ko ang punto mo.",
+                        "Nakikinig ako sa 'yo.",
+                        "Sige. Naririnig kita.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "I will keep that in mind.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.accepted_generic.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I will keep that in mind.",
+                        "I will remember that.",
+                        "Good to know. I will think about it.",
+                        "I will note that down in my head.",
+                        "Thanks for telling me. I will keep it in mind.",
+                        "I will hold onto that thought.",
+                        "I will factor that in.",
+                        "Duly noted.",
+                        "I will be mindful of that.",
+                        "Right. I will keep that in mind moving forward.",
+                    },
+                    ["TL"] = {
+                        "Isasaisip ko iyan.",
+                        "Tandaan ko iyan.",
+                        "Mabuting malaman. Pag-iisipan ko.",
+                        "Itatatak ko 'yan sa isip ko.",
+                        "Salamat sa pagsabi. Tatandaan ko.",
+                        "Isasapuso at isasaisip ko iyan.",
+                        "Isasaalang-alang ko 'yan.",
+                        "Tala ko na 'yan.",
+                        "Magiging maingat ako tungkol diyan.",
+                        "Sige. Tatandaan ko 'yan sa mga susunod.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.accepted_generic.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.accepted_generic.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.accepted_generic.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/accepted_generic.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I will keep that in mind.",
-                            },
-                            ["TL"] = {
-                                "Isasaisip ko iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I will remember that.",
-                            },
-                            ["TL"] = {
-                                "Tandaan ko iyan.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.admire",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I appreciate that more than you know.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.admire.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I appreciate that more than you know.",
+                                        "That means a great deal to me.",
+                                        "Thank you. That means a lot out here.",
+                                        "I do not hear that often. Thank you.",
+                                        "Hearing that really helps keep me going.",
+                                        "I am grateful for your words.",
+                                        "That is very kind. Thank you.",
+                                        "I try my best. It is good to know you see that.",
+                                        "I appreciate the respect.",
+                                        "That really touches me. Thanks.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas pinahahalagahan ko iyan kaysa sa iniisip mo.",
+                                        "Malaking bagay iyan para sa akin.",
+                                        "Salamat. Malaking tulong ang marinig iyan dito.",
+                                        "Bihira kong marinig 'yan. Maraming salamat.",
+                                        "Ang marinig 'yan ay nakakatulong sa pagpapatuloy ko.",
+                                        "Nagpapasalamat ako sa iyong mga salita.",
+                                        "Napakabait mo naman. Salamat.",
+                                        "Ginagawa ko ang makakaya ko. Mabuting malaman na nakikita mo 'yon.",
+                                        "Salamat sa respeto.",
+                                        "Tumatagos talaga sa akin 'yan. Salamat.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to know. I will think about it.",
-                            },
-                            ["TL"] = {
-                                "Mabuting malaman. Pag-iisipan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I will note that down in my head.",
-                            },
-                            ["TL"] = {
-                                "Itatatak ko 'yan sa isip ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for telling me. I will keep it in mind.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagsabi. Tatandaan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I will hold onto that thought.",
-                            },
-                            ["TL"] = {
-                                "Isasapuso at isasaisip ko iyan.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That is kind of you to say.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.admire.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That is kind of you to say.",
+                                        "Thank you. You did not have to say that, but thanks.",
+                                        "I appreciate the thought.",
+                                        "You are generous with your words.",
+                                        "That is good of you to say.",
+                                        "I take that as high praise.",
+                                        "Thanks. I appreciate the courtesy.",
+                                        "It is nice to hear something decent for once.",
+                                        "Thank you for saying so.",
+                                        "That is good to hear.",
+                                    },
+                                    ["TL"] = {
+                                        "Mabait sa 'yo ang magsabi niyan.",
+                                        "Salamat. Hindi mo naman kailangang sabihin, pero salamat pa rin.",
+                                        "Salamat sa magandang kaisipan.",
+                                        "Bukas-palad ka sa iyong papuri.",
+                                        "Mabuting tao ka para sabihin 'yan.",
+                                        "Itinuturing ko 'yang mataas na papuri.",
+                                        "Salamat. Pinahahalagahan ko ang galang mo.",
+                                        "Masarap makarinig ng maayos na salita paminsan-minsan.",
+                                        "Salamat sa pagsasabi niyan.",
+                                        "Magandang marinig 'yan.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I will factor that in.",
-                            },
-                            ["TL"] = {
-                                "Isasaalang-alang ko 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Duly noted.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I will be mindful of that.",
-                            },
-                            ["TL"] = {
-                                "Magiging maingat ako tungkol diyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. I will keep that in mind moving forward.",
-                            },
-                            ["TL"] = {
-                                "Sige. Tatandaan ko 'yan sa mga susunod.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You see more in me than most people do.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.admire.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You see more in me than most people do.",
+                                        "Most folks out here would never notice that. Thanks.",
+                                        "It is rare to find someone who actually pays attention.",
+                                        "I am glad someone recognizes what I put into this.",
+                                        "You have a good eye. I appreciate that.",
+                                        "Not many people look closely enough to see that.",
+                                        "That means something coming from you.",
+                                        "I did not expect you to see that. Thank you.",
+                                        "You give me credit where others would not.",
+                                        "I appreciate that you see what I am trying to do.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas marami kang nakikita sa akin kaysa sa karamihan.",
+                                        "Karamihan ng tao rito ay hindi 'yan mapapansin. Salamat.",
+                                        "Bihira makahanap ng taong talagang nagmamasid.",
+                                        "Mabuti naman at may nakakapansin sa pagsusumikap ko.",
+                                        "Matalas ang mata mo. Salamat.",
+                                        "Kakaunti lang ang taong tumitingin nang malalim para makita 'yan.",
+                                        "May bigat 'yan lalo't nanggaling sa 'yo.",
+                                        "Hindi ko inasahang mapapansin mo 'yon. Salamat.",
+                                        "Binibigyan mo ako ng tiwala kung saan ang iba ay hindi.",
+                                        "Salamat dahil naiintindihan mo ang sinusubukan kong gawin.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I appreciate that more than you know.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.admire.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I appreciate that more than you know.",
+                            "That means a great deal to me.",
+                            "Thank you. That means a lot out here.",
+                            "I do not hear that often. Thank you.",
+                            "Hearing that really helps keep me going.",
+                            "I am grateful for your words.",
+                            "That is very kind. Thank you.",
+                            "I try my best. It is good to know you see that.",
+                            "I appreciate the respect.",
+                            "That really touches me. Thanks.",
+                        },
+                        ["TL"] = {
+                            "Mas pinahahalagahan ko iyan kaysa sa iniisip mo.",
+                            "Malaking bagay iyan para sa akin.",
+                            "Salamat. Malaking tulong ang marinig iyan dito.",
+                            "Bihira kong marinig 'yan. Maraming salamat.",
+                            "Ang marinig 'yan ay nakakatulong sa pagpapatuloy ko.",
+                            "Nagpapasalamat ako sa iyong mga salita.",
+                            "Napakabait mo naman. Salamat.",
+                            "Ginagawa ko ang makakaya ko. Mabuting malaman na nakikita mo 'yon.",
+                            "Salamat sa respeto.",
+                            "Tumatagos talaga sa akin 'yan. Salamat.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "That is kind of you to say.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.admire.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That is kind of you to say.",
+                            "Thank you. You did not have to say that, but thanks.",
+                            "I appreciate the thought.",
+                            "You are generous with your words.",
+                            "That is good of you to say.",
+                            "I take that as high praise.",
+                            "Thanks. I appreciate the courtesy.",
+                            "It is nice to hear something decent for once.",
+                            "Thank you for saying so.",
+                            "That is good to hear.",
+                        },
+                        ["TL"] = {
+                            "Mabait sa 'yo ang magsabi niyan.",
+                            "Salamat. Hindi mo naman kailangang sabihin, pero salamat pa rin.",
+                            "Salamat sa magandang kaisipan.",
+                            "Bukas-palad ka sa iyong papuri.",
+                            "Mabuting tao ka para sabihin 'yan.",
+                            "Itinuturing ko 'yang mataas na papuri.",
+                            "Salamat. Pinahahalagahan ko ang galang mo.",
+                            "Masarap makarinig ng maayos na salita paminsan-minsan.",
+                            "Salamat sa pagsasabi niyan.",
+                            "Magandang marinig 'yan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "You see more in me than most people do.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.admire.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You see more in me than most people do.",
+                            "Most folks out here would never notice that. Thanks.",
+                            "It is rare to find someone who actually pays attention.",
+                            "I am glad someone recognizes what I put into this.",
+                            "You have a good eye. I appreciate that.",
+                            "Not many people look closely enough to see that.",
+                            "That means something coming from you.",
+                            "I did not expect you to see that. Thank you.",
+                            "You give me credit where others would not.",
+                            "I appreciate that you see what I am trying to do.",
+                        },
+                        ["TL"] = {
+                            "Mas marami kang nakikita sa akin kaysa sa karamihan.",
+                            "Karamihan ng tao rito ay hindi 'yan mapapansin. Salamat.",
+                            "Bihira makahanap ng taong talagang nagmamasid.",
+                            "Mabuti naman at may nakakapansin sa pagsusumikap ko.",
+                            "Matalas ang mata mo. Salamat.",
+                            "Kakaunti lang ang taong tumitingin nang malalim para makita 'yan.",
+                            "May bigat 'yan lalo't nanggaling sa 'yo.",
+                            "Hindi ko inasahang mapapansin mo 'yon. Salamat.",
+                            "Binibigyan mo ako ng tiwala kung saan ang iba ay hindi.",
+                            "Salamat dahil naiintindihan mo ang sinusubukan kong gawin.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.admire.1.neutral",
+        ["id"] = "tool_reply.admire",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.admire.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_admire.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["localId"] = "admire",
+            ["sourceId"] = "tool_reply.admire",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_admire.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
+        ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -336,127 +625,150 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.admire.1",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/admire.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate that more than you know.",
-                            },
-                            ["TL"] = {
-                                "Mas pinahahalagahan ko iyan kaysa sa iniisip mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That means a great deal to me.",
-                            },
-                            ["TL"] = {
-                                "Malaking bagay iyan para sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you. That means a lot out here.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Malaking tulong ang marinig iyan dito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I do not hear that often. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Bihira kong marinig 'yan. Maraming salamat.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I appreciate that more than you know.",
+                                        "That means a great deal to me.",
+                                        "Thank you. That means a lot out here.",
+                                        "I do not hear that often. Thank you.",
+                                        "Hearing that really helps keep me going.",
+                                        "I am grateful for your words.",
+                                        "That is very kind. Thank you.",
+                                        "I try my best. It is good to know you see that.",
+                                        "I appreciate the respect.",
+                                        "That really touches me. Thanks.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas pinahahalagahan ko iyan kaysa sa iniisip mo.",
+                                        "Malaking bagay iyan para sa akin.",
+                                        "Salamat. Malaking tulong ang marinig iyan dito.",
+                                        "Bihira kong marinig 'yan. Maraming salamat.",
+                                        "Ang marinig 'yan ay nakakatulong sa pagpapatuloy ko.",
+                                        "Nagpapasalamat ako sa iyong mga salita.",
+                                        "Napakabait mo naman. Salamat.",
+                                        "Ginagawa ko ang makakaya ko. Mabuting malaman na nakikita mo 'yon.",
+                                        "Salamat sa respeto.",
+                                        "Tumatagos talaga sa akin 'yan. Salamat.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hearing that really helps keep me going.",
-                            },
-                            ["TL"] = {
-                                "Ang marinig 'yan ay nakakatulong sa pagpapatuloy ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am grateful for your words.",
-                            },
-                            ["TL"] = {
-                                "Nagpapasalamat ako sa iyong mga salita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is very kind. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Napakabait mo naman. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I try my best. It is good to know you see that.",
-                            },
-                            ["TL"] = {
-                                "Ginagawa ko ang makakaya ko. Mabuting malaman na nakikita mo 'yon.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That is kind of you to say.",
+                                        "Thank you. You did not have to say that, but thanks.",
+                                        "I appreciate the thought.",
+                                        "You are generous with your words.",
+                                        "That is good of you to say.",
+                                        "I take that as high praise.",
+                                        "Thanks. I appreciate the courtesy.",
+                                        "It is nice to hear something decent for once.",
+                                        "Thank you for saying so.",
+                                        "That is good to hear.",
+                                    },
+                                    ["TL"] = {
+                                        "Mabait sa 'yo ang magsabi niyan.",
+                                        "Salamat. Hindi mo naman kailangang sabihin, pero salamat pa rin.",
+                                        "Salamat sa magandang kaisipan.",
+                                        "Bukas-palad ka sa iyong papuri.",
+                                        "Mabuting tao ka para sabihin 'yan.",
+                                        "Itinuturing ko 'yang mataas na papuri.",
+                                        "Salamat. Pinahahalagahan ko ang galang mo.",
+                                        "Masarap makarinig ng maayos na salita paminsan-minsan.",
+                                        "Salamat sa pagsasabi niyan.",
+                                        "Magandang marinig 'yan.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate the respect.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa respeto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That really touches me. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Tumatagos talaga sa akin 'yan. Salamat.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You see more in me than most people do.",
+                                        "Most folks out here would never notice that. Thanks.",
+                                        "It is rare to find someone who actually pays attention.",
+                                        "I am glad someone recognizes what I put into this.",
+                                        "You have a good eye. I appreciate that.",
+                                        "Not many people look closely enough to see that.",
+                                        "That means something coming from you.",
+                                        "I did not expect you to see that. Thank you.",
+                                        "You give me credit where others would not.",
+                                        "I appreciate that you see what I am trying to do.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas marami kang nakikita sa akin kaysa sa karamihan.",
+                                        "Karamihan ng tao rito ay hindi 'yan mapapansin. Salamat.",
+                                        "Bihira makahanap ng taong talagang nagmamasid.",
+                                        "Mabuti naman at may nakakapansin sa pagsusumikap ko.",
+                                        "Matalas ang mata mo. Salamat.",
+                                        "Kakaunti lang ang taong tumitingin nang malalim para makita 'yan.",
+                                        "May bigat 'yan lalo't nanggaling sa 'yo.",
+                                        "Hindi ko inasahang mapapansin mo 'yon. Salamat.",
+                                        "Binibigyan mo ako ng tiwala kung saan ang iba ay hindi.",
+                                        "Salamat dahil naiintindihan mo ang sinusubukan kong gawin.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.admire",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I appreciate that more than you know.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.admire.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -466,331 +778,351 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I appreciate that more than you know.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.admire.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I appreciate that more than you know.",
+                        "That means a great deal to me.",
+                        "Thank you. That means a lot out here.",
+                        "I do not hear that often. Thank you.",
+                        "Hearing that really helps keep me going.",
+                        "I am grateful for your words.",
+                        "That is very kind. Thank you.",
+                        "I try my best. It is good to know you see that.",
+                        "I appreciate the respect.",
+                        "That really touches me. Thanks.",
+                    },
+                    ["TL"] = {
+                        "Mas pinahahalagahan ko iyan kaysa sa iniisip mo.",
+                        "Malaking bagay iyan para sa akin.",
+                        "Salamat. Malaking tulong ang marinig iyan dito.",
+                        "Bihira kong marinig 'yan. Maraming salamat.",
+                        "Ang marinig 'yan ay nakakatulong sa pagpapatuloy ko.",
+                        "Nagpapasalamat ako sa iyong mga salita.",
+                        "Napakabait mo naman. Salamat.",
+                        "Ginagawa ko ang makakaya ko. Mabuting malaman na nakikita mo 'yon.",
+                        "Salamat sa respeto.",
+                        "Tumatagos talaga sa akin 'yan. Salamat.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "That is kind of you to say.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.admire.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That is kind of you to say.",
+                        "Thank you. You did not have to say that, but thanks.",
+                        "I appreciate the thought.",
+                        "You are generous with your words.",
+                        "That is good of you to say.",
+                        "I take that as high praise.",
+                        "Thanks. I appreciate the courtesy.",
+                        "It is nice to hear something decent for once.",
+                        "Thank you for saying so.",
+                        "That is good to hear.",
+                    },
+                    ["TL"] = {
+                        "Mabait sa 'yo ang magsabi niyan.",
+                        "Salamat. Hindi mo naman kailangang sabihin, pero salamat pa rin.",
+                        "Salamat sa magandang kaisipan.",
+                        "Bukas-palad ka sa iyong papuri.",
+                        "Mabuting tao ka para sabihin 'yan.",
+                        "Itinuturing ko 'yang mataas na papuri.",
+                        "Salamat. Pinahahalagahan ko ang galang mo.",
+                        "Masarap makarinig ng maayos na salita paminsan-minsan.",
+                        "Salamat sa pagsasabi niyan.",
+                        "Magandang marinig 'yan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "You see more in me than most people do.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.admire.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You see more in me than most people do.",
+                        "Most folks out here would never notice that. Thanks.",
+                        "It is rare to find someone who actually pays attention.",
+                        "I am glad someone recognizes what I put into this.",
+                        "You have a good eye. I appreciate that.",
+                        "Not many people look closely enough to see that.",
+                        "That means something coming from you.",
+                        "I did not expect you to see that. Thank you.",
+                        "You give me credit where others would not.",
+                        "I appreciate that you see what I am trying to do.",
+                    },
+                    ["TL"] = {
+                        "Mas marami kang nakikita sa akin kaysa sa karamihan.",
+                        "Karamihan ng tao rito ay hindi 'yan mapapansin. Salamat.",
+                        "Bihira makahanap ng taong talagang nagmamasid.",
+                        "Mabuti naman at may nakakapansin sa pagsusumikap ko.",
+                        "Matalas ang mata mo. Salamat.",
+                        "Kakaunti lang ang taong tumitingin nang malalim para makita 'yan.",
+                        "May bigat 'yan lalo't nanggaling sa 'yo.",
+                        "Hindi ko inasahang mapapansin mo 'yon. Salamat.",
+                        "Binibigyan mo ako ng tiwala kung saan ang iba ay hindi.",
+                        "Salamat dahil naiintindihan mo ang sinusubukan kong gawin.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.admire.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.admire.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_admire.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.admire.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/admire.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is kind of you to say.",
-                            },
-                            ["TL"] = {
-                                "Mabait sa 'yo ang magsabi niyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you. You did not have to say that, but thanks.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Hindi mo naman kailangang sabihin, pero salamat pa rin.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.apology",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "All right. Let us move on.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.apology.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "All right. Let us move on.",
+                                        "No problem. Let us keep moving.",
+                                        "We are good. Let us get back to business.",
+                                        "Done. No need to dwell on it.",
+                                        "All right. Water under the bridge.",
+                                        "Let us put it behind us and focus on surviving.",
+                                        "Fine by me. Move forward.",
+                                        "Okay. We move past it.",
+                                        "Agreed. Let us not waste daylight on it.",
+                                        "Understood. We are square.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Magpatuloy na tayo.",
+                                        "Walang anuman. Tuloy na tayo.",
+                                        "Ayos na tayo. Balik na tayo sa ginagawa natin.",
+                                        "Tapos na 'yon. Hindi na kailangang pag-usapan pa.",
+                                        "Sige. Lumipas na 'yon.",
+                                        "Iwan na natin 'yan sa likod at magpokus sa kaligtasan.",
+                                        "Ayos lang sa 'kin. Abante na.",
+                                        "Sige. Kalimutan na 'yon.",
+                                        "Sang-ayon ako. Huwag nating sayangin ang oras diyan.",
+                                        "Naiintindihan ko. Kuwits na tayo.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate the thought.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa magandang kaisipan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You are generous with your words.",
-                            },
-                            ["TL"] = {
-                                "Bukas-palad ka sa iyong papuri.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is good of you to say.",
-                            },
-                            ["TL"] = {
-                                "Mabuting tao ka para sabihin 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I take that as high praise.",
-                            },
-                            ["TL"] = {
-                                "Itinuturing ko 'yang mataas na papuri.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I accept the apology.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.apology.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I accept the apology.",
+                                        "Apology accepted. We are fine.",
+                                        "I appreciate you owning up to it.",
+                                        "Takes guts to say that out here. I accept.",
+                                        "Thank you. Apology accepted.",
+                                        "We all make mistakes under pressure. Accepted.",
+                                        "I hear you, and I accept.",
+                                        "Fair enough. Apology accepted.",
+                                        "Good. I accept your apology.",
+                                        "I appreciate the honesty. We are good.",
+                                    },
+                                    ["TL"] = {
+                                        "Tinatanggap ko ang tawad mo.",
+                                        "Tanggap ko na. Ayos na tayo.",
+                                        "Salamat at inamin mo ang pagkakamali mo.",
+                                        "Kailangan ng tapang para aminin 'yan dito. Tanggap ko.",
+                                        "Salamat. Tanggap ko ang paumanhin.",
+                                        "Lahat naman nagkakamali kapag tensiyonado. Tanggap ko.",
+                                        "Narinig kita, at tanggap ko.",
+                                        "Makatwiran. Tanggap ko ang paumanhin.",
+                                        "Mabuti. Tinatanggap ko ang tawad mo.",
+                                        "Salamat sa katapatan. Ayos na tayo.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. I appreciate the courtesy.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Pinahahalagahan ko ang galang mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It is nice to hear something decent for once.",
-                            },
-                            ["TL"] = {
-                                "Masarap makarinig ng maayos na salita paminsan-minsan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you for saying so.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagsasabi niyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is good to hear.",
-                            },
-                            ["TL"] = {
-                                "Magandang marinig 'yan.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Fine. We can put it behind us.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.apology.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Fine. We can put it behind us.",
+                                        "Let it go. We have bigger problems.",
+                                        "It is done. No grudges.",
+                                        "Consider it forgotten.",
+                                        "We are clear. Do not sweat it.",
+                                        "Past is past. Watch your step next time.",
+                                        "I am not holding onto it. Let us move.",
+                                        "All right. We put it behind us.",
+                                        "No hard feelings. Let us keep our heads on.",
+                                        "Agreed. It is behind us now.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Iwan na natin sa nakaraan 'yon.",
+                                        "Hayaan mo na. Mas malaki ang mga problema natin.",
+                                        "Tapos na. Walang samaan ng loob.",
+                                        "Ituring mo nang limot na.",
+                                        "Malinaw na tayo. Huwag mo nang alalahanin.",
+                                        "Nakalipas na. Mag-ingat ka na lang sa susunod.",
+                                        "Hindi ko na 'yan itatago sa loob ko. Tara na.",
+                                        "Sige. Kalimutan na natin 'yan.",
+                                        "Walang samaan ng loob. Manatili tayong alisto.",
+                                        "Sige. Tapos na 'yon ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_admire.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.admire.3.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.admire.3.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_admire.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.admire.3",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/admire.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You see more in me than most people do.",
-                            },
-                            ["TL"] = {
-                                "Mas marami kang nakikita sa akin kaysa sa karamihan.",
-                            },
+            ["namespace"] = "tool_reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "All right. Let us move on.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.apology.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "All right. Let us move on.",
+                            "No problem. Let us keep moving.",
+                            "We are good. Let us get back to business.",
+                            "Done. No need to dwell on it.",
+                            "All right. Water under the bridge.",
+                            "Let us put it behind us and focus on surviving.",
+                            "Fine by me. Move forward.",
+                            "Okay. We move past it.",
+                            "Agreed. Let us not waste daylight on it.",
+                            "Understood. We are square.",
+                        },
+                        ["TL"] = {
+                            "Sige. Magpatuloy na tayo.",
+                            "Walang anuman. Tuloy na tayo.",
+                            "Ayos na tayo. Balik na tayo sa ginagawa natin.",
+                            "Tapos na 'yon. Hindi na kailangang pag-usapan pa.",
+                            "Sige. Lumipas na 'yon.",
+                            "Iwan na natin 'yan sa likod at magpokus sa kaligtasan.",
+                            "Ayos lang sa 'kin. Abante na.",
+                            "Sige. Kalimutan na 'yon.",
+                            "Sang-ayon ako. Huwag nating sayangin ang oras diyan.",
+                            "Naiintindihan ko. Kuwits na tayo.",
                         },
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Most folks out here would never notice that. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Karamihan ng tao rito ay hindi 'yan mapapansin. Salamat.",
-                            },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "I accept the apology.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.apology.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I accept the apology.",
+                            "Apology accepted. We are fine.",
+                            "I appreciate you owning up to it.",
+                            "Takes guts to say that out here. I accept.",
+                            "Thank you. Apology accepted.",
+                            "We all make mistakes under pressure. Accepted.",
+                            "I hear you, and I accept.",
+                            "Fair enough. Apology accepted.",
+                            "Good. I accept your apology.",
+                            "I appreciate the honesty. We are good.",
+                        },
+                        ["TL"] = {
+                            "Tinatanggap ko ang tawad mo.",
+                            "Tanggap ko na. Ayos na tayo.",
+                            "Salamat at inamin mo ang pagkakamali mo.",
+                            "Kailangan ng tapang para aminin 'yan dito. Tanggap ko.",
+                            "Salamat. Tanggap ko ang paumanhin.",
+                            "Lahat naman nagkakamali kapag tensiyonado. Tanggap ko.",
+                            "Narinig kita, at tanggap ko.",
+                            "Makatwiran. Tanggap ko ang paumanhin.",
+                            "Mabuti. Tinatanggap ko ang tawad mo.",
+                            "Salamat sa katapatan. Ayos na tayo.",
                         },
                     },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It is rare to find someone who actually pays attention.",
-                            },
-                            ["TL"] = {
-                                "Bihira makahanap ng taong talagang nagmamasid.",
-                            },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Fine. We can put it behind us.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.apology.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Fine. We can put it behind us.",
+                            "Let it go. We have bigger problems.",
+                            "It is done. No grudges.",
+                            "Consider it forgotten.",
+                            "We are clear. Do not sweat it.",
+                            "Past is past. Watch your step next time.",
+                            "I am not holding onto it. Let us move.",
+                            "All right. We put it behind us.",
+                            "No hard feelings. Let us keep our heads on.",
+                            "Agreed. It is behind us now.",
+                        },
+                        ["TL"] = {
+                            "Sige. Iwan na natin sa nakaraan 'yon.",
+                            "Hayaan mo na. Mas malaki ang mga problema natin.",
+                            "Tapos na. Walang samaan ng loob.",
+                            "Ituring mo nang limot na.",
+                            "Malinaw na tayo. Huwag mo nang alalahanin.",
+                            "Nakalipas na. Mag-ingat ka na lang sa susunod.",
+                            "Hindi ko na 'yan itatago sa loob ko. Tara na.",
+                            "Sige. Kalimutan na natin 'yan.",
+                            "Walang samaan ng loob. Manatili tayong alisto.",
+                            "Sige. Tapos na 'yon ngayon.",
                         },
                     },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am glad someone recognizes what I put into this.",
-                            },
-                            ["TL"] = {
-                                "Mabuti naman at may nakakapansin sa pagsusumikap ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You have a good eye. I appreciate that.",
-                            },
-                            ["TL"] = {
-                                "Matalas ang mata mo. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not many people look closely enough to see that.",
-                            },
-                            ["TL"] = {
-                                "Kakaunti lang ang taong tumitingin nang malalim para makita 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That means something coming from you.",
-                            },
-                            ["TL"] = {
-                                "May bigat 'yan lalo't nanggaling sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I did not expect you to see that. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko inasahang mapapansin mo 'yon. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You give me credit where others would not.",
-                            },
-                            ["TL"] = {
-                                "Binibigyan mo ako ng tiwala kung saan ang iba ay hindi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate that you see what I am trying to do.",
-                            },
-                            ["TL"] = {
-                                "Salamat dahil naiintindihan mo ang sinusubukan kong gawin.",
-                            },
-                        },
-                    },
+                    ["variantID"] = "neutral",
                 },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_admire.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.apology.1.neutral",
+        ["id"] = "tool_reply.apology",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.apology.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_apology.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["localId"] = "apology",
+            ["sourceId"] = "tool_reply.apology",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_apology.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
+        ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -804,127 +1136,150 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.apology.1",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/apology.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. Let us move on.",
-                            },
-                            ["TL"] = {
-                                "Sige. Magpatuloy na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No problem. Let us keep moving.",
-                            },
-                            ["TL"] = {
-                                "Walang anuman. Tuloy na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We are good. Let us get back to business.",
-                            },
-                            ["TL"] = {
-                                "Ayos na tayo. Balik na tayo sa ginagawa natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. No need to dwell on it.",
-                            },
-                            ["TL"] = {
-                                "Tapos na 'yon. Hindi na kailangang pag-usapan pa.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "All right. Let us move on.",
+                                        "No problem. Let us keep moving.",
+                                        "We are good. Let us get back to business.",
+                                        "Done. No need to dwell on it.",
+                                        "All right. Water under the bridge.",
+                                        "Let us put it behind us and focus on surviving.",
+                                        "Fine by me. Move forward.",
+                                        "Okay. We move past it.",
+                                        "Agreed. Let us not waste daylight on it.",
+                                        "Understood. We are square.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Magpatuloy na tayo.",
+                                        "Walang anuman. Tuloy na tayo.",
+                                        "Ayos na tayo. Balik na tayo sa ginagawa natin.",
+                                        "Tapos na 'yon. Hindi na kailangang pag-usapan pa.",
+                                        "Sige. Lumipas na 'yon.",
+                                        "Iwan na natin 'yan sa likod at magpokus sa kaligtasan.",
+                                        "Ayos lang sa 'kin. Abante na.",
+                                        "Sige. Kalimutan na 'yon.",
+                                        "Sang-ayon ako. Huwag nating sayangin ang oras diyan.",
+                                        "Naiintindihan ko. Kuwits na tayo.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. Water under the bridge.",
-                            },
-                            ["TL"] = {
-                                "Sige. Lumipas na 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let us put it behind us and focus on surviving.",
-                            },
-                            ["TL"] = {
-                                "Iwan na natin 'yan sa likod at magpokus sa kaligtasan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fine by me. Move forward.",
-                            },
-                            ["TL"] = {
-                                "Ayos lang sa 'kin. Abante na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay. We move past it.",
-                            },
-                            ["TL"] = {
-                                "Sige. Kalimutan na 'yon.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I accept the apology.",
+                                        "Apology accepted. We are fine.",
+                                        "I appreciate you owning up to it.",
+                                        "Takes guts to say that out here. I accept.",
+                                        "Thank you. Apology accepted.",
+                                        "We all make mistakes under pressure. Accepted.",
+                                        "I hear you, and I accept.",
+                                        "Fair enough. Apology accepted.",
+                                        "Good. I accept your apology.",
+                                        "I appreciate the honesty. We are good.",
+                                    },
+                                    ["TL"] = {
+                                        "Tinatanggap ko ang tawad mo.",
+                                        "Tanggap ko na. Ayos na tayo.",
+                                        "Salamat at inamin mo ang pagkakamali mo.",
+                                        "Kailangan ng tapang para aminin 'yan dito. Tanggap ko.",
+                                        "Salamat. Tanggap ko ang paumanhin.",
+                                        "Lahat naman nagkakamali kapag tensiyonado. Tanggap ko.",
+                                        "Narinig kita, at tanggap ko.",
+                                        "Makatwiran. Tanggap ko ang paumanhin.",
+                                        "Mabuti. Tinatanggap ko ang tawad mo.",
+                                        "Salamat sa katapatan. Ayos na tayo.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Agreed. Let us not waste daylight on it.",
-                            },
-                            ["TL"] = {
-                                "Sang-ayon ako. Huwag nating sayangin ang oras diyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. We are square.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Kuwits na tayo.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Fine. We can put it behind us.",
+                                        "Let it go. We have bigger problems.",
+                                        "It is done. No grudges.",
+                                        "Consider it forgotten.",
+                                        "We are clear. Do not sweat it.",
+                                        "Past is past. Watch your step next time.",
+                                        "I am not holding onto it. Let us move.",
+                                        "All right. We put it behind us.",
+                                        "No hard feelings. Let us keep our heads on.",
+                                        "Agreed. It is behind us now.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Iwan na natin sa nakaraan 'yon.",
+                                        "Hayaan mo na. Mas malaki ang mga problema natin.",
+                                        "Tapos na. Walang samaan ng loob.",
+                                        "Ituring mo nang limot na.",
+                                        "Malinaw na tayo. Huwag mo nang alalahanin.",
+                                        "Nakalipas na. Mag-ingat ka na lang sa susunod.",
+                                        "Hindi ko na 'yan itatago sa loob ko. Tara na.",
+                                        "Sige. Kalimutan na natin 'yan.",
+                                        "Walang samaan ng loob. Manatili tayong alisto.",
+                                        "Sige. Tapos na 'yon ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.apology",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "All right. Let us move on.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.apology.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -934,331 +1289,351 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "All right. Let us move on.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.apology.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "All right. Let us move on.",
+                        "No problem. Let us keep moving.",
+                        "We are good. Let us get back to business.",
+                        "Done. No need to dwell on it.",
+                        "All right. Water under the bridge.",
+                        "Let us put it behind us and focus on surviving.",
+                        "Fine by me. Move forward.",
+                        "Okay. We move past it.",
+                        "Agreed. Let us not waste daylight on it.",
+                        "Understood. We are square.",
+                    },
+                    ["TL"] = {
+                        "Sige. Magpatuloy na tayo.",
+                        "Walang anuman. Tuloy na tayo.",
+                        "Ayos na tayo. Balik na tayo sa ginagawa natin.",
+                        "Tapos na 'yon. Hindi na kailangang pag-usapan pa.",
+                        "Sige. Lumipas na 'yon.",
+                        "Iwan na natin 'yan sa likod at magpokus sa kaligtasan.",
+                        "Ayos lang sa 'kin. Abante na.",
+                        "Sige. Kalimutan na 'yon.",
+                        "Sang-ayon ako. Huwag nating sayangin ang oras diyan.",
+                        "Naiintindihan ko. Kuwits na tayo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "I accept the apology.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.apology.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I accept the apology.",
+                        "Apology accepted. We are fine.",
+                        "I appreciate you owning up to it.",
+                        "Takes guts to say that out here. I accept.",
+                        "Thank you. Apology accepted.",
+                        "We all make mistakes under pressure. Accepted.",
+                        "I hear you, and I accept.",
+                        "Fair enough. Apology accepted.",
+                        "Good. I accept your apology.",
+                        "I appreciate the honesty. We are good.",
+                    },
+                    ["TL"] = {
+                        "Tinatanggap ko ang tawad mo.",
+                        "Tanggap ko na. Ayos na tayo.",
+                        "Salamat at inamin mo ang pagkakamali mo.",
+                        "Kailangan ng tapang para aminin 'yan dito. Tanggap ko.",
+                        "Salamat. Tanggap ko ang paumanhin.",
+                        "Lahat naman nagkakamali kapag tensiyonado. Tanggap ko.",
+                        "Narinig kita, at tanggap ko.",
+                        "Makatwiran. Tanggap ko ang paumanhin.",
+                        "Mabuti. Tinatanggap ko ang tawad mo.",
+                        "Salamat sa katapatan. Ayos na tayo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Fine. We can put it behind us.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.apology.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Fine. We can put it behind us.",
+                        "Let it go. We have bigger problems.",
+                        "It is done. No grudges.",
+                        "Consider it forgotten.",
+                        "We are clear. Do not sweat it.",
+                        "Past is past. Watch your step next time.",
+                        "I am not holding onto it. Let us move.",
+                        "All right. We put it behind us.",
+                        "No hard feelings. Let us keep our heads on.",
+                        "Agreed. It is behind us now.",
+                    },
+                    ["TL"] = {
+                        "Sige. Iwan na natin sa nakaraan 'yon.",
+                        "Hayaan mo na. Mas malaki ang mga problema natin.",
+                        "Tapos na. Walang samaan ng loob.",
+                        "Ituring mo nang limot na.",
+                        "Malinaw na tayo. Huwag mo nang alalahanin.",
+                        "Nakalipas na. Mag-ingat ka na lang sa susunod.",
+                        "Hindi ko na 'yan itatago sa loob ko. Tara na.",
+                        "Sige. Kalimutan na natin 'yan.",
+                        "Walang samaan ng loob. Manatili tayong alisto.",
+                        "Sige. Tapos na 'yon ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.apology.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.apology.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_apology.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.apology.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/apology.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I accept the apology.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggap ko ang tawad mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Apology accepted. We are fine.",
-                            },
-                            ["TL"] = {
-                                "Tanggap ko na. Ayos na tayo.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.ask_name.named",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I am %s.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.named.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I am %s.",
+                                        "My name is %s.",
+                                        "Call me %s.",
+                                        "I go by %s.",
+                                        "%s is what people call me.",
+                                        "I'm %s, good to meet you.",
+                                        "Folks around here know me as %s.",
+                                        "The name's %s. Pleased to make your acquaintance.",
+                                        "You can know me as %s.",
+                                        "I'm %s, standing before you.",
+                                    },
+                                    ["TL"] = {
+                                        "Ako si %s.",
+                                        "%s ang pangalan ko.",
+                                        "Tawagin mo akong %s.",
+                                        "%s ang tawag sa akin.",
+                                        "%s ang itawag mo sa akin.",
+                                        "Ako si %s, ikinagagalak kitang makilala.",
+                                        "Kilala ako ng mga tao rito bilang %s.",
+                                        "%s ang pangalan ko. Ikinagagalak kitang makilala.",
+                                        "Maaari mo akong makilala bilang %s.",
+                                        "Ako si %s, na kaharap mo ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate you owning up to it.",
-                            },
-                            ["TL"] = {
-                                "Salamat at inamin mo ang pagkakamali mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Takes guts to say that out here. I accept.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ng tapang para aminin 'yan dito. Tanggap ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you. Apology accepted.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Tanggap ko ang paumanhin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We all make mistakes under pressure. Accepted.",
-                            },
-                            ["TL"] = {
-                                "Lahat naman nagkakamali kapag tensiyonado. Tanggap ko.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "The name is %s.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.named.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "The name is %s.",
+                                        "I'm %s. Nice to meet you properly.",
+                                        "You're speaking with %s.",
+                                        "%s is my name. Don't wear it out.",
+                                        "I answer to %s.",
+                                        "They call me %s around these parts.",
+                                        "Name's %s. Glad we got that sorted.",
+                                        "Just call me %s.",
+                                        "I'm known as %s to the survivors here.",
+                                        "It's %s. Good to put a name to the face.",
+                                    },
+                                    ["TL"] = {
+                                        "%s ang pangalan ko.",
+                                        "Ako si %s. Mabuti at pormal tayong nagkakilala.",
+                                        "Kausap mo si %s.",
+                                        "%s ang pangalan ko. Tandaan mo 'yan.",
+                                        "Sumasagot ako sa pangalang %s.",
+                                        "Tinatawag nila akong %s dito sa lugar na ito.",
+                                        "%s ang pangalan. Mabuti at nalaman mo na.",
+                                        "Tawagin mo na lang akong %s.",
+                                        "Kilala ako bilang %s ng mga nakaligtas dito.",
+                                        "%s ako. Mabuti at may pangalan na ang mukhang ito.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear you, and I accept.",
-                            },
-                            ["TL"] = {
-                                "Narinig kita, at tanggap ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fair enough. Apology accepted.",
-                            },
-                            ["TL"] = {
-                                "Makatwiran. Tanggap ko ang paumanhin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good. I accept your apology.",
-                            },
-                            ["TL"] = {
-                                "Mabuti. Tinatanggap ko ang tawad mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate the honesty. We are good.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa katapatan. Ayos na tayo.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You can call me %s.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.named.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You can call me %s.",
+                                        "Go ahead and call me %s.",
+                                        "%s works fine for me.",
+                                        "I'm %s. That's the handle I go by.",
+                                        "You may call me %s if you'd like.",
+                                        "%s is what my companions call me.",
+                                        "I prefer %s, if you're asking.",
+                                        "Call me %s. Simple enough to remember.",
+                                        "%s is the name. Keep it in mind.",
+                                        "I'm %s. Let's make sure we both survive today.",
+                                    },
+                                    ["TL"] = {
+                                        "Maaari mo akong tawaging %s.",
+                                        "Sige lang, tawagin mo akong %s.",
+                                        "Ayos na ang %s para sa akin.",
+                                        "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan.",
+                                        "Maaari mo akong tawaging %s kung nais mo.",
+                                        "%s ang tawag sa akin ng mga kasamahan ko.",
+                                        "Mas gusto ko ang %s, kung nagtatanong ka.",
+                                        "Tawagin mo akong %s. Madaling matandaan.",
+                                        "%s ang pangalan. Itatak mo sa isip mo.",
+                                        "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_apology.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.apology.3.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.apology.3.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_apology.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.apology.3",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/apology.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fine. We can put it behind us.",
-                            },
-                            ["TL"] = {
-                                "Sige. Iwan na natin sa nakaraan 'yon.",
-                            },
+            ["namespace"] = "tool_reply.ask_name",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I am %s.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.named.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I am %s.",
+                            "My name is %s.",
+                            "Call me %s.",
+                            "I go by %s.",
+                            "%s is what people call me.",
+                            "I'm %s, good to meet you.",
+                            "Folks around here know me as %s.",
+                            "The name's %s. Pleased to make your acquaintance.",
+                            "You can know me as %s.",
+                            "I'm %s, standing before you.",
+                        },
+                        ["TL"] = {
+                            "Ako si %s.",
+                            "%s ang pangalan ko.",
+                            "Tawagin mo akong %s.",
+                            "%s ang tawag sa akin.",
+                            "%s ang itawag mo sa akin.",
+                            "Ako si %s, ikinagagalak kitang makilala.",
+                            "Kilala ako ng mga tao rito bilang %s.",
+                            "%s ang pangalan ko. Ikinagagalak kitang makilala.",
+                            "Maaari mo akong makilala bilang %s.",
+                            "Ako si %s, na kaharap mo ngayon.",
                         },
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let it go. We have bigger problems.",
-                            },
-                            ["TL"] = {
-                                "Hayaan mo na. Mas malaki ang mga problema natin.",
-                            },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "The name is %s.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.named.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "The name is %s.",
+                            "I'm %s. Nice to meet you properly.",
+                            "You're speaking with %s.",
+                            "%s is my name. Don't wear it out.",
+                            "I answer to %s.",
+                            "They call me %s around these parts.",
+                            "Name's %s. Glad we got that sorted.",
+                            "Just call me %s.",
+                            "I'm known as %s to the survivors here.",
+                            "It's %s. Good to put a name to the face.",
+                        },
+                        ["TL"] = {
+                            "%s ang pangalan ko.",
+                            "Ako si %s. Mabuti at pormal tayong nagkakilala.",
+                            "Kausap mo si %s.",
+                            "%s ang pangalan ko. Tandaan mo 'yan.",
+                            "Sumasagot ako sa pangalang %s.",
+                            "Tinatawag nila akong %s dito sa lugar na ito.",
+                            "%s ang pangalan. Mabuti at nalaman mo na.",
+                            "Tawagin mo na lang akong %s.",
+                            "Kilala ako bilang %s ng mga nakaligtas dito.",
+                            "%s ako. Mabuti at may pangalan na ang mukhang ito.",
                         },
                     },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It is done. No grudges.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Walang samaan ng loob.",
-                            },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "You can call me %s.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.named.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You can call me %s.",
+                            "Go ahead and call me %s.",
+                            "%s works fine for me.",
+                            "I'm %s. That's the handle I go by.",
+                            "You may call me %s if you'd like.",
+                            "%s is what my companions call me.",
+                            "I prefer %s, if you're asking.",
+                            "Call me %s. Simple enough to remember.",
+                            "%s is the name. Keep it in mind.",
+                            "I'm %s. Let's make sure we both survive today.",
+                        },
+                        ["TL"] = {
+                            "Maaari mo akong tawaging %s.",
+                            "Sige lang, tawagin mo akong %s.",
+                            "Ayos na ang %s para sa akin.",
+                            "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan.",
+                            "Maaari mo akong tawaging %s kung nais mo.",
+                            "%s ang tawag sa akin ng mga kasamahan ko.",
+                            "Mas gusto ko ang %s, kung nagtatanong ka.",
+                            "Tawagin mo akong %s. Madaling matandaan.",
+                            "%s ang pangalan. Itatak mo sa isip mo.",
+                            "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon.",
                         },
                     },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Consider it forgotten.",
-                            },
-                            ["TL"] = {
-                                "Ituring mo nang limot na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We are clear. Do not sweat it.",
-                            },
-                            ["TL"] = {
-                                "Malinaw na tayo. Huwag mo nang alalahanin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Past is past. Watch your step next time.",
-                            },
-                            ["TL"] = {
-                                "Nakalipas na. Mag-ingat ka na lang sa susunod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am not holding onto it. Let us move.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko na 'yan itatago sa loob ko. Tara na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. We put it behind us.",
-                            },
-                            ["TL"] = {
-                                "Sige. Kalimutan na natin 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No hard feelings. Let us keep our heads on.",
-                            },
-                            ["TL"] = {
-                                "Walang samaan ng loob. Manatili tayong alisto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Agreed. It is behind us now.",
-                            },
-                            ["TL"] = {
-                                "Sige. Tapos na 'yon ngayon.",
-                            },
-                        },
-                    },
+                    ["variantID"] = "neutral",
                 },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_apology.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.named.1.neutral",
+        ["id"] = "tool_reply.ask_name.named",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.ask_name.named.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_named.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["localId"] = "named",
+            ["sourceId"] = "tool_reply.ask_name.named",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_named.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
+        ["namespace"] = "tool_reply.ask_name",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1272,127 +1647,150 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.named.1",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am %s.",
-                            },
-                            ["TL"] = {
-                                "Ako si %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "My name is %s.",
-                            },
-                            ["TL"] = {
-                                "%s ang pangalan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Call me %s.",
-                            },
-                            ["TL"] = {
-                                "Tawagin mo akong %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I go by %s.",
-                            },
-                            ["TL"] = {
-                                "%s ang tawag sa akin.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I am %s.",
+                                        "My name is %s.",
+                                        "Call me %s.",
+                                        "I go by %s.",
+                                        "%s is what people call me.",
+                                        "I'm %s, good to meet you.",
+                                        "Folks around here know me as %s.",
+                                        "The name's %s. Pleased to make your acquaintance.",
+                                        "You can know me as %s.",
+                                        "I'm %s, standing before you.",
+                                    },
+                                    ["TL"] = {
+                                        "Ako si %s.",
+                                        "%s ang pangalan ko.",
+                                        "Tawagin mo akong %s.",
+                                        "%s ang tawag sa akin.",
+                                        "%s ang itawag mo sa akin.",
+                                        "Ako si %s, ikinagagalak kitang makilala.",
+                                        "Kilala ako ng mga tao rito bilang %s.",
+                                        "%s ang pangalan ko. Ikinagagalak kitang makilala.",
+                                        "Maaari mo akong makilala bilang %s.",
+                                        "Ako si %s, na kaharap mo ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "%s is what people call me.",
-                            },
-                            ["TL"] = {
-                                "%s ang itawag mo sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm %s, good to meet you.",
-                            },
-                            ["TL"] = {
-                                "Ako si %s, ikinagagalak kitang makilala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Folks around here know me as %s.",
-                            },
-                            ["TL"] = {
-                                "Kilala ako ng mga tao rito bilang %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The name's %s. Pleased to make your acquaintance.",
-                            },
-                            ["TL"] = {
-                                "%s ang pangalan ko. Ikinagagalak kitang makilala.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "The name is %s.",
+                                        "I'm %s. Nice to meet you properly.",
+                                        "You're speaking with %s.",
+                                        "%s is my name. Don't wear it out.",
+                                        "I answer to %s.",
+                                        "They call me %s around these parts.",
+                                        "Name's %s. Glad we got that sorted.",
+                                        "Just call me %s.",
+                                        "I'm known as %s to the survivors here.",
+                                        "It's %s. Good to put a name to the face.",
+                                    },
+                                    ["TL"] = {
+                                        "%s ang pangalan ko.",
+                                        "Ako si %s. Mabuti at pormal tayong nagkakilala.",
+                                        "Kausap mo si %s.",
+                                        "%s ang pangalan ko. Tandaan mo 'yan.",
+                                        "Sumasagot ako sa pangalang %s.",
+                                        "Tinatawag nila akong %s dito sa lugar na ito.",
+                                        "%s ang pangalan. Mabuti at nalaman mo na.",
+                                        "Tawagin mo na lang akong %s.",
+                                        "Kilala ako bilang %s ng mga nakaligtas dito.",
+                                        "%s ako. Mabuti at may pangalan na ang mukhang ito.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You can know me as %s.",
-                            },
-                            ["TL"] = {
-                                "Maaari mo akong makilala bilang %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm %s, standing before you.",
-                            },
-                            ["TL"] = {
-                                "Ako si %s, na kaharap mo ngayon.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You can call me %s.",
+                                        "Go ahead and call me %s.",
+                                        "%s works fine for me.",
+                                        "I'm %s. That's the handle I go by.",
+                                        "You may call me %s if you'd like.",
+                                        "%s is what my companions call me.",
+                                        "I prefer %s, if you're asking.",
+                                        "Call me %s. Simple enough to remember.",
+                                        "%s is the name. Keep it in mind.",
+                                        "I'm %s. Let's make sure we both survive today.",
+                                    },
+                                    ["TL"] = {
+                                        "Maaari mo akong tawaging %s.",
+                                        "Sige lang, tawagin mo akong %s.",
+                                        "Ayos na ang %s para sa akin.",
+                                        "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan.",
+                                        "Maaari mo akong tawaging %s kung nais mo.",
+                                        "%s ang tawag sa akin ng mga kasamahan ko.",
+                                        "Mas gusto ko ang %s, kung nagtatanong ka.",
+                                        "Tawagin mo akong %s. Madaling matandaan.",
+                                        "%s ang pangalan. Itatak mo sa isip mo.",
+                                        "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.ask_name.named",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I am %s.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.ask_name.named.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1402,332 +1800,207 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I am %s.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.named.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I am %s.",
+                        "My name is %s.",
+                        "Call me %s.",
+                        "I go by %s.",
+                        "%s is what people call me.",
+                        "I'm %s, good to meet you.",
+                        "Folks around here know me as %s.",
+                        "The name's %s. Pleased to make your acquaintance.",
+                        "You can know me as %s.",
+                        "I'm %s, standing before you.",
+                    },
+                    ["TL"] = {
+                        "Ako si %s.",
+                        "%s ang pangalan ko.",
+                        "Tawagin mo akong %s.",
+                        "%s ang tawag sa akin.",
+                        "%s ang itawag mo sa akin.",
+                        "Ako si %s, ikinagagalak kitang makilala.",
+                        "Kilala ako ng mga tao rito bilang %s.",
+                        "%s ang pangalan ko. Ikinagagalak kitang makilala.",
+                        "Maaari mo akong makilala bilang %s.",
+                        "Ako si %s, na kaharap mo ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "The name is %s.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.named.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "The name is %s.",
+                        "I'm %s. Nice to meet you properly.",
+                        "You're speaking with %s.",
+                        "%s is my name. Don't wear it out.",
+                        "I answer to %s.",
+                        "They call me %s around these parts.",
+                        "Name's %s. Glad we got that sorted.",
+                        "Just call me %s.",
+                        "I'm known as %s to the survivors here.",
+                        "It's %s. Good to put a name to the face.",
+                    },
+                    ["TL"] = {
+                        "%s ang pangalan ko.",
+                        "Ako si %s. Mabuti at pormal tayong nagkakilala.",
+                        "Kausap mo si %s.",
+                        "%s ang pangalan ko. Tandaan mo 'yan.",
+                        "Sumasagot ako sa pangalang %s.",
+                        "Tinatawag nila akong %s dito sa lugar na ito.",
+                        "%s ang pangalan. Mabuti at nalaman mo na.",
+                        "Tawagin mo na lang akong %s.",
+                        "Kilala ako bilang %s ng mga nakaligtas dito.",
+                        "%s ako. Mabuti at may pangalan na ang mukhang ito.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "You can call me %s.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.named.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You can call me %s.",
+                        "Go ahead and call me %s.",
+                        "%s works fine for me.",
+                        "I'm %s. That's the handle I go by.",
+                        "You may call me %s if you'd like.",
+                        "%s is what my companions call me.",
+                        "I prefer %s, if you're asking.",
+                        "Call me %s. Simple enough to remember.",
+                        "%s is the name. Keep it in mind.",
+                        "I'm %s. Let's make sure we both survive today.",
+                    },
+                    ["TL"] = {
+                        "Maaari mo akong tawaging %s.",
+                        "Sige lang, tawagin mo akong %s.",
+                        "Ayos na ang %s para sa akin.",
+                        "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan.",
+                        "Maaari mo akong tawaging %s kung nais mo.",
+                        "%s ang tawag sa akin ng mga kasamahan ko.",
+                        "Mas gusto ko ang %s, kung nagtatanong ka.",
+                        "Tawagin mo akong %s. Madaling matandaan.",
+                        "%s ang pangalan. Itatak mo sa isip mo.",
+                        "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.named.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.ask_name.named.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_named.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.named.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The name is %s.",
-                            },
-                            ["TL"] = {
-                                "%s ang pangalan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm %s. Nice to meet you properly.",
-                            },
-                            ["TL"] = {
-                                "Ako si %s. Mabuti at pormal tayong nagkakilala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're speaking with %s.",
-                            },
-                            ["TL"] = {
-                                "Kausap mo si %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "%s is my name. Don't wear it out.",
-                            },
-                            ["TL"] = {
-                                "%s ang pangalan ko. Tandaan mo 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I answer to %s.",
-                            },
-                            ["TL"] = {
-                                "Sumasagot ako sa pangalang %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They call me %s around these parts.",
-                            },
-                            ["TL"] = {
-                                "Tinatawag nila akong %s dito sa lugar na ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Name's %s. Glad we got that sorted.",
-                            },
-                            ["TL"] = {
-                                "%s ang pangalan. Mabuti at nalaman mo na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just call me %s.",
-                            },
-                            ["TL"] = {
-                                "Tawagin mo na lang akong %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm known as %s to the survivors here.",
-                            },
-                            ["TL"] = {
-                                "Kilala ako bilang %s ng mga nakaligtas dito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's %s. Good to put a name to the face.",
-                            },
-                            ["TL"] = {
-                                "%s ako. Mabuti at may pangalan na ang mukhang ito.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.ask_name.prompt",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll tell you my name once we've established some trust. What's your name?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.prompt.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll tell you my name once we've established some trust. What's your name?",
+                                        "Fair is fair. Tell me who you are first.",
+                                        "I don't hand my name to strangers. What do they call you?",
+                                        "How about introductions on your side first? What's your name?",
+                                        "You first. Who am I speaking with?",
+                                        "Names carry weight out here. Tell me yours before asking mine.",
+                                        "Let's trade names fairly. What should I call you?",
+                                        "I'd like to know who's asking before I give up my name.",
+                                        "Give me your name first, then maybe I'll share mine.",
+                                        "Introduce yourself first. It's only polite in these times.",
+                                    },
+                                    ["TL"] = {
+                                        "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
+                                        "Patas lang dapat. Sabihin mo muna kung sino ka.",
+                                        "Hindi ko ibinibigay ang pangalan ko sa di-kilala. Anong tawag sa 'yo?",
+                                        "Paano kung ikaw muna ang magpakilala? Ano ang pangalan mo?",
+                                        "Ikaw muna. Sino ba ang kausap ko?",
+                                        "Mahalaga ang pangalan dito. Sabihin mo muna ang sa 'yo bago magtanong.",
+                                        "Magpalitan tayo ng pangalan nang patas. Ano dapat ang itawag ko sa 'yo?",
+                                        "Gusto ko munang malaman kung sino ang nagtatanong bago ko ibigay ang akin.",
+                                        "Ibigay mo muna ang pangalan mo, baka sakaling ibahagi ko rin ang akin.",
+                                        "Magpakilala ka muna. Pagpapakita 'yon ng galang sa panahong ito.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_named.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.named.3.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.ask_name.named.3.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_named.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.named.3",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You can call me %s.",
-                            },
-                            ["TL"] = {
-                                "Maaari mo akong tawaging %s.",
-                            },
+            ["namespace"] = "tool_reply.ask_name",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll tell you my name once we've established some trust. What's your name?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.prompt.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll tell you my name once we've established some trust. What's your name?",
+                            "Fair is fair. Tell me who you are first.",
+                            "I don't hand my name to strangers. What do they call you?",
+                            "How about introductions on your side first? What's your name?",
+                            "You first. Who am I speaking with?",
+                            "Names carry weight out here. Tell me yours before asking mine.",
+                            "Let's trade names fairly. What should I call you?",
+                            "I'd like to know who's asking before I give up my name.",
+                            "Give me your name first, then maybe I'll share mine.",
+                            "Introduce yourself first. It's only polite in these times.",
+                        },
+                        ["TL"] = {
+                            "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
+                            "Patas lang dapat. Sabihin mo muna kung sino ka.",
+                            "Hindi ko ibinibigay ang pangalan ko sa di-kilala. Anong tawag sa 'yo?",
+                            "Paano kung ikaw muna ang magpakilala? Ano ang pangalan mo?",
+                            "Ikaw muna. Sino ba ang kausap ko?",
+                            "Mahalaga ang pangalan dito. Sabihin mo muna ang sa 'yo bago magtanong.",
+                            "Magpalitan tayo ng pangalan nang patas. Ano dapat ang itawag ko sa 'yo?",
+                            "Gusto ko munang malaman kung sino ang nagtatanong bago ko ibigay ang akin.",
+                            "Ibigay mo muna ang pangalan mo, baka sakaling ibahagi ko rin ang akin.",
+                            "Magpakilala ka muna. Pagpapakita 'yon ng galang sa panahong ito.",
                         },
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Go ahead and call me %s.",
-                            },
-                            ["TL"] = {
-                                "Sige lang, tawagin mo akong %s.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "%s works fine for me.",
-                            },
-                            ["TL"] = {
-                                "Ayos na ang %s para sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm %s. That's the handle I go by.",
-                            },
-                            ["TL"] = {
-                                "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You may call me %s if you'd like.",
-                            },
-                            ["TL"] = {
-                                "Maaari mo akong tawaging %s kung nais mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "%s is what my companions call me.",
-                            },
-                            ["TL"] = {
-                                "%s ang tawag sa akin ng mga kasamahan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I prefer %s, if you're asking.",
-                            },
-                            ["TL"] = {
-                                "Mas gusto ko ang %s, kung nagtatanong ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Call me %s. Simple enough to remember.",
-                            },
-                            ["TL"] = {
-                                "Tawagin mo akong %s. Madaling matandaan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "%s is the name. Keep it in mind.",
-                            },
-                            ["TL"] = {
-                                "%s ang pangalan. Itatak mo sa isip mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm %s. Let's make sure we both survive today.",
-                            },
-                            ["TL"] = {
-                                "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon.",
-                            },
-                        },
-                    },
+                    ["variantID"] = "neutral",
                 },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_named.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.prompt.neutral",
+        ["id"] = "tool_reply.ask_name.prompt",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.tool_reply.ask_name.prompt.neutral",
+            ["localId"] = "prompt",
+            ["sourceId"] = "tool_reply.ask_name.prompt",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_prompt.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["namespace"] = "semantic.tool_reply.ask_name.prompt",
+        ["namespace"] = "tool_reply.ask_name",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1741,127 +2014,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.prompt",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll tell you my name once we've established some trust. What's your name?",
-                            },
-                            ["TL"] = {
-                                "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fair is fair. Tell me who you are first.",
-                            },
-                            ["TL"] = {
-                                "Patas lang dapat. Sabihin mo muna kung sino ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't hand my name to strangers. What do they call you?",
-                            },
-                            ["TL"] = {
-                                "Hindi ko ibinibigay ang pangalan ko sa di-kilala. Anong tawag sa 'yo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "How about introductions on your side first? What's your name?",
-                            },
-                            ["TL"] = {
-                                "Paano kung ikaw muna ang magpakilala? Ano ang pangalan mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You first. Who am I speaking with?",
-                            },
-                            ["TL"] = {
-                                "Ikaw muna. Sino ba ang kausap ko?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Names carry weight out here. Tell me yours before asking mine.",
-                            },
-                            ["TL"] = {
-                                "Mahalaga ang pangalan dito. Sabihin mo muna ang sa 'yo bago magtanong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's trade names fairly. What should I call you?",
-                            },
-                            ["TL"] = {
-                                "Magpalitan tayo ng pangalan nang patas. Ano dapat ang itawag ko sa 'yo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'd like to know who's asking before I give up my name.",
-                            },
-                            ["TL"] = {
-                                "Gusto ko munang malaman kung sino ang nagtatanong bago ko ibigay ang akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Give me your name first, then maybe I'll share mine.",
-                            },
-                            ["TL"] = {
-                                "Ibigay mo muna ang pangalan mo, baka sakaling ibahagi ko rin ang akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Introduce yourself first. It's only polite in these times.",
-                            },
-                            ["TL"] = {
-                                "Magpakilala ka muna. Pagpapakita 'yon ng galang sa panahong ito.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll tell you my name once we've established some trust. What's your name?",
+                                        "Fair is fair. Tell me who you are first.",
+                                        "I don't hand my name to strangers. What do they call you?",
+                                        "How about introductions on your side first? What's your name?",
+                                        "You first. Who am I speaking with?",
+                                        "Names carry weight out here. Tell me yours before asking mine.",
+                                        "Let's trade names fairly. What should I call you?",
+                                        "I'd like to know who's asking before I give up my name.",
+                                        "Give me your name first, then maybe I'll share mine.",
+                                        "Introduce yourself first. It's only polite in these times.",
+                                    },
+                                    ["TL"] = {
+                                        "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
+                                        "Patas lang dapat. Sabihin mo muna kung sino ka.",
+                                        "Hindi ko ibinibigay ang pangalan ko sa di-kilala. Anong tawag sa 'yo?",
+                                        "Paano kung ikaw muna ang magpakilala? Ano ang pangalan mo?",
+                                        "Ikaw muna. Sino ba ang kausap ko?",
+                                        "Mahalaga ang pangalan dito. Sabihin mo muna ang sa 'yo bago magtanong.",
+                                        "Magpalitan tayo ng pangalan nang patas. Ano dapat ang itawag ko sa 'yo?",
+                                        "Gusto ko munang malaman kung sino ang nagtatanong bago ko ibigay ang akin.",
+                                        "Ibigay mo muna ang pangalan mo, baka sakaling ibahagi ko rin ang akin.",
+                                        "Magpakilala ka muna. Pagpapakita 'yon ng galang sa panahong ito.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.ask_name.prompt",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll tell you my name once we've established some trust. What's your name?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.ask_name.prompt.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1871,19 +2095,213 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll tell you my name once we've established some trust. What's your name?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.prompt.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll tell you my name once we've established some trust. What's your name?",
+                        "Fair is fair. Tell me who you are first.",
+                        "I don't hand my name to strangers. What do they call you?",
+                        "How about introductions on your side first? What's your name?",
+                        "You first. Who am I speaking with?",
+                        "Names carry weight out here. Tell me yours before asking mine.",
+                        "Let's trade names fairly. What should I call you?",
+                        "I'd like to know who's asking before I give up my name.",
+                        "Give me your name first, then maybe I'll share mine.",
+                        "Introduce yourself first. It's only polite in these times.",
+                    },
+                    ["TL"] = {
+                        "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
+                        "Patas lang dapat. Sabihin mo muna kung sino ka.",
+                        "Hindi ko ibinibigay ang pangalan ko sa di-kilala. Anong tawag sa 'yo?",
+                        "Paano kung ikaw muna ang magpakilala? Ano ang pangalan mo?",
+                        "Ikaw muna. Sino ba ang kausap ko?",
+                        "Mahalaga ang pangalan dito. Sabihin mo muna ang sa 'yo bago magtanong.",
+                        "Magpalitan tayo ng pangalan nang patas. Ano dapat ang itawag ko sa 'yo?",
+                        "Gusto ko munang malaman kung sino ang nagtatanong bago ko ibigay ang akin.",
+                        "Ibigay mo muna ang pangalan mo, baka sakaling ibahagi ko rin ang akin.",
+                        "Magpakilala ka muna. Pagpapakita 'yon ng galang sa panahong ito.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.rejected.1.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.ask_name.rejected",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I am not ready to share that yet.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.rejected.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I am not ready to share that yet.",
+                                        "We don't know each other well enough for names.",
+                                        "Names are a luxury for trusted folks. Keep your distance.",
+                                        "I prefer to remain anonymous for now.",
+                                        "Not sharing my name with someone I just met.",
+                                        "You don't need my name to deal with me.",
+                                        "I keep my identity to myself out here. Back off.",
+                                        "That information stays private between me and my people.",
+                                        "I'm not in the habit of giving names to armed strangers.",
+                                        "No names today. Let's keep things strictly professional.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi pa ako handang sabihin iyan sa ngayon.",
+                                        "Hindi pa tayo lubos na magkakilala para sa mga pangalan.",
+                                        "Para lang sa pinagkakatiwalaan ang pangalan. Lumayo ka muna.",
+                                        "Mas gusto kong manatiling walang pangalan sa ngayon.",
+                                        "Hindi ko ibinabahagi ang pangalan ko sa kakatagpo ko lang.",
+                                        "Hindi mo kailangan ang pangalan ko para makipag-usap sa akin.",
+                                        "Itinatago ko ang pagkakakilanlan ko dito. Umatras ka.",
+                                        "Pribado ang impormasyong 'yan sa akin at sa mga kasama ko.",
+                                        "Hindi ako sanay magbigay ng pangalan sa mga armadong di-kilala.",
+                                        "Walang pangalan ngayon. Panatilihin nating pormal ang lahat.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Ask me again when we know each other better.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.rejected.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Ask me again when we know each other better.",
+                                        "Prove you're trustworthy first, then ask again.",
+                                        "We'll get to names after we survive a while together.",
+                                        "Not yet. Maybe down the road if you don't shoot me.",
+                                        "Give it some time. I don't give away who I am so easily.",
+                                        "Come back after you've shown you can be trusted.",
+                                        "Let's see if we both make it through the week first.",
+                                        "Trust takes time out here. Ask me another day.",
+                                        "Hold on to that question until we've traded a few times.",
+                                        "Too soon for personal details. Let's wait a bit.",
+                                    },
+                                    ["TL"] = {
+                                        "Tanungin mo ako ulit kapag mas magkakilala na tayo.",
+                                        "Patunayan mo munang mapagkakatiwalaan ka, bago ka magtanong ulit.",
+                                        "Pag-uusapan natin ang mga pangalan kapag nagkasama na tayo nang matagal.",
+                                        "Hindi pa ngayon. Baka sa susunod kung hindi mo ako babarilin.",
+                                        "Bigyan mo muna ng panahon. Hindi ko basta-basta ibinibigay kung sino ako.",
+                                        "Bumalik ka kapag naipakita mo nang maaasahan ka.",
+                                        "Tingnan muna natin kung pareho tayong tatagal ngayong linggo.",
+                                        "Matagal mabuo ang tiwala rito. Tanungin mo ako sa ibang araw.",
+                                        "Itabi mo muna ang tanong na 'yan hanggang sa makailang palitan tayo.",
+                                        "Masyado pang maaga para sa personal na bagay. Maghintay tayo nang kaunti.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply.ask_name",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I am not ready to share that yet.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.rejected.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I am not ready to share that yet.",
+                            "We don't know each other well enough for names.",
+                            "Names are a luxury for trusted folks. Keep your distance.",
+                            "I prefer to remain anonymous for now.",
+                            "Not sharing my name with someone I just met.",
+                            "You don't need my name to deal with me.",
+                            "I keep my identity to myself out here. Back off.",
+                            "That information stays private between me and my people.",
+                            "I'm not in the habit of giving names to armed strangers.",
+                            "No names today. Let's keep things strictly professional.",
+                        },
+                        ["TL"] = {
+                            "Hindi pa ako handang sabihin iyan sa ngayon.",
+                            "Hindi pa tayo lubos na magkakilala para sa mga pangalan.",
+                            "Para lang sa pinagkakatiwalaan ang pangalan. Lumayo ka muna.",
+                            "Mas gusto kong manatiling walang pangalan sa ngayon.",
+                            "Hindi ko ibinabahagi ang pangalan ko sa kakatagpo ko lang.",
+                            "Hindi mo kailangan ang pangalan ko para makipag-usap sa akin.",
+                            "Itinatago ko ang pagkakakilanlan ko dito. Umatras ka.",
+                            "Pribado ang impormasyong 'yan sa akin at sa mga kasama ko.",
+                            "Hindi ako sanay magbigay ng pangalan sa mga armadong di-kilala.",
+                            "Walang pangalan ngayon. Panatilihin nating pormal ang lahat.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Ask me again when we know each other better.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.rejected.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Ask me again when we know each other better.",
+                            "Prove you're trustworthy first, then ask again.",
+                            "We'll get to names after we survive a while together.",
+                            "Not yet. Maybe down the road if you don't shoot me.",
+                            "Give it some time. I don't give away who I am so easily.",
+                            "Come back after you've shown you can be trusted.",
+                            "Let's see if we both make it through the week first.",
+                            "Trust takes time out here. Ask me another day.",
+                            "Hold on to that question until we've traded a few times.",
+                            "Too soon for personal details. Let's wait a bit.",
+                        },
+                        ["TL"] = {
+                            "Tanungin mo ako ulit kapag mas magkakilala na tayo.",
+                            "Patunayan mo munang mapagkakatiwalaan ka, bago ka magtanong ulit.",
+                            "Pag-uusapan natin ang mga pangalan kapag nagkasama na tayo nang matagal.",
+                            "Hindi pa ngayon. Baka sa susunod kung hindi mo ako babarilin.",
+                            "Bigyan mo muna ng panahon. Hindi ko basta-basta ibinibigay kung sino ako.",
+                            "Bumalik ka kapag naipakita mo nang maaasahan ka.",
+                            "Tingnan muna natin kung pareho tayong tatagal ngayong linggo.",
+                            "Matagal mabuo ang tiwala rito. Tanungin mo ako sa ibang araw.",
+                            "Itabi mo muna ang tanong na 'yan hanggang sa makailang palitan tayo.",
+                            "Masyado pang maaga para sa personal na bagay. Maghintay tayo nang kaunti.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "tool_reply.ask_name.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.ask_name.rejected.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_rejected.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["localId"] = "rejected",
+            ["sourceId"] = "tool_reply.ask_name.rejected",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
+        ["namespace"] = "tool_reply.ask_name",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1897,127 +2315,114 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.rejected.1",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am not ready to share that yet.",
-                            },
-                            ["TL"] = {
-                                "Hindi pa ako handang sabihin iyan sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We don't know each other well enough for names.",
-                            },
-                            ["TL"] = {
-                                "Hindi pa tayo lubos na magkakilala para sa mga pangalan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Names are a luxury for trusted folks. Keep your distance.",
-                            },
-                            ["TL"] = {
-                                "Para lang sa pinagkakatiwalaan ang pangalan. Lumayo ka muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I prefer to remain anonymous for now.",
-                            },
-                            ["TL"] = {
-                                "Mas gusto kong manatiling walang pangalan sa ngayon.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I am not ready to share that yet.",
+                                        "We don't know each other well enough for names.",
+                                        "Names are a luxury for trusted folks. Keep your distance.",
+                                        "I prefer to remain anonymous for now.",
+                                        "Not sharing my name with someone I just met.",
+                                        "You don't need my name to deal with me.",
+                                        "I keep my identity to myself out here. Back off.",
+                                        "That information stays private between me and my people.",
+                                        "I'm not in the habit of giving names to armed strangers.",
+                                        "No names today. Let's keep things strictly professional.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi pa ako handang sabihin iyan sa ngayon.",
+                                        "Hindi pa tayo lubos na magkakilala para sa mga pangalan.",
+                                        "Para lang sa pinagkakatiwalaan ang pangalan. Lumayo ka muna.",
+                                        "Mas gusto kong manatiling walang pangalan sa ngayon.",
+                                        "Hindi ko ibinabahagi ang pangalan ko sa kakatagpo ko lang.",
+                                        "Hindi mo kailangan ang pangalan ko para makipag-usap sa akin.",
+                                        "Itinatago ko ang pagkakakilanlan ko dito. Umatras ka.",
+                                        "Pribado ang impormasyong 'yan sa akin at sa mga kasama ko.",
+                                        "Hindi ako sanay magbigay ng pangalan sa mga armadong di-kilala.",
+                                        "Walang pangalan ngayon. Panatilihin nating pormal ang lahat.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not sharing my name with someone I just met.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko ibinabahagi ang pangalan ko sa kakatagpo ko lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You don't need my name to deal with me.",
-                            },
-                            ["TL"] = {
-                                "Hindi mo kailangan ang pangalan ko para makipag-usap sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I keep my identity to myself out here. Back off.",
-                            },
-                            ["TL"] = {
-                                "Itinatago ko ang pagkakakilanlan ko dito. Umatras ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That information stays private between me and my people.",
-                            },
-                            ["TL"] = {
-                                "Pribado ang impormasyong 'yan sa akin at sa mga kasama ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm not in the habit of giving names to armed strangers.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako sanay magbigay ng pangalan sa mga armadong di-kilala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No names today. Let's keep things strictly professional.",
-                            },
-                            ["TL"] = {
-                                "Walang pangalan ngayon. Panatilihin nating pormal ang lahat.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Ask me again when we know each other better.",
+                                        "Prove you're trustworthy first, then ask again.",
+                                        "We'll get to names after we survive a while together.",
+                                        "Not yet. Maybe down the road if you don't shoot me.",
+                                        "Give it some time. I don't give away who I am so easily.",
+                                        "Come back after you've shown you can be trusted.",
+                                        "Let's see if we both make it through the week first.",
+                                        "Trust takes time out here. Ask me another day.",
+                                        "Hold on to that question until we've traded a few times.",
+                                        "Too soon for personal details. Let's wait a bit.",
+                                    },
+                                    ["TL"] = {
+                                        "Tanungin mo ako ulit kapag mas magkakilala na tayo.",
+                                        "Patunayan mo munang mapagkakatiwalaan ka, bago ka magtanong ulit.",
+                                        "Pag-uusapan natin ang mga pangalan kapag nagkasama na tayo nang matagal.",
+                                        "Hindi pa ngayon. Baka sa susunod kung hindi mo ako babarilin.",
+                                        "Bigyan mo muna ng panahon. Hindi ko basta-basta ibinibigay kung sino ako.",
+                                        "Bumalik ka kapag naipakita mo nang maaasahan ka.",
+                                        "Tingnan muna natin kung pareho tayong tatagal ngayong linggo.",
+                                        "Matagal mabuo ang tiwala rito. Tanungin mo ako sa ibang araw.",
+                                        "Itabi mo muna ang tanong na 'yan hanggang sa makailang palitan tayo.",
+                                        "Masyado pang maaga para sa personal na bagay. Maghintay tayo nang kaunti.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.ask_name.rejected",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I am not ready to share that yet.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.ask_name.rejected.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2027,19 +2432,246 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I am not ready to share that yet.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.rejected.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I am not ready to share that yet.",
+                        "We don't know each other well enough for names.",
+                        "Names are a luxury for trusted folks. Keep your distance.",
+                        "I prefer to remain anonymous for now.",
+                        "Not sharing my name with someone I just met.",
+                        "You don't need my name to deal with me.",
+                        "I keep my identity to myself out here. Back off.",
+                        "That information stays private between me and my people.",
+                        "I'm not in the habit of giving names to armed strangers.",
+                        "No names today. Let's keep things strictly professional.",
+                    },
+                    ["TL"] = {
+                        "Hindi pa ako handang sabihin iyan sa ngayon.",
+                        "Hindi pa tayo lubos na magkakilala para sa mga pangalan.",
+                        "Para lang sa pinagkakatiwalaan ang pangalan. Lumayo ka muna.",
+                        "Mas gusto kong manatiling walang pangalan sa ngayon.",
+                        "Hindi ko ibinabahagi ang pangalan ko sa kakatagpo ko lang.",
+                        "Hindi mo kailangan ang pangalan ko para makipag-usap sa akin.",
+                        "Itinatago ko ang pagkakakilanlan ko dito. Umatras ka.",
+                        "Pribado ang impormasyong 'yan sa akin at sa mga kasama ko.",
+                        "Hindi ako sanay magbigay ng pangalan sa mga armadong di-kilala.",
+                        "Walang pangalan ngayon. Panatilihin nating pormal ang lahat.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Ask me again when we know each other better.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.rejected.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Ask me again when we know each other better.",
+                        "Prove you're trustworthy first, then ask again.",
+                        "We'll get to names after we survive a while together.",
+                        "Not yet. Maybe down the road if you don't shoot me.",
+                        "Give it some time. I don't give away who I am so easily.",
+                        "Come back after you've shown you can be trusted.",
+                        "Let's see if we both make it through the week first.",
+                        "Trust takes time out here. Ask me another day.",
+                        "Hold on to that question until we've traded a few times.",
+                        "Too soon for personal details. Let's wait a bit.",
+                    },
+                    ["TL"] = {
+                        "Tanungin mo ako ulit kapag mas magkakilala na tayo.",
+                        "Patunayan mo munang mapagkakatiwalaan ka, bago ka magtanong ulit.",
+                        "Pag-uusapan natin ang mga pangalan kapag nagkasama na tayo nang matagal.",
+                        "Hindi pa ngayon. Baka sa susunod kung hindi mo ako babarilin.",
+                        "Bigyan mo muna ng panahon. Hindi ko basta-basta ibinibigay kung sino ako.",
+                        "Bumalik ka kapag naipakita mo nang maaasahan ka.",
+                        "Tingnan muna natin kung pareho tayong tatagal ngayong linggo.",
+                        "Matagal mabuo ang tiwala rito. Tanungin mo ako sa ibang araw.",
+                        "Itabi mo muna ang tanong na 'yan hanggang sa makailang palitan tayo.",
+                        "Masyado pang maaga para sa personal na bagay. Maghintay tayo nang kaunti.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.rejected.2.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.ask_name.unnamed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You want to know my name? Give me a second.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.unnamed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You want to know my name? Give me a second.",
+                                        "Haven't heard anyone call me by name in months.",
+                                        "A name? Almost forgot people still used them.",
+                                        "Takes a moment to remember what folks used to call me.",
+                                        "Funny question. Been so long since I introduced myself.",
+                                        "Hold on, let me think back to what I was called before this.",
+                                        "My name... feels like another person owned it.",
+                                        "Just a survivor out here. But give me a second to recall.",
+                                        "Doesn't come to mind as fast as it used to.",
+                                        "A name... give me a moment to dust off the cobwebs.",
+                                    },
+                                    ["TL"] = {
+                                        "Gusto mong malaman ang pangalan ko? Bigyan mo ako ng sandali.",
+                                        "Ilang buwan na mula noong may tumawag sa pangalan ko.",
+                                        "Pangalan? Halos nakalimutan ko nang may gumagamit pa niyan.",
+                                        "Inaalala ko pa kung ano ang tawag sa akin ng mga tao noon.",
+                                        "Nakakatuwang tanong. Matagal na mula noong huling nagpakilala ako.",
+                                        "Teka lang, inaalala ko kung ano ang tawag sa akin bago ang lahat ng ito.",
+                                        "Ang pangalan ko... parang ibang tao ang nagmamay-ari noon.",
+                                        "Isa lang akong nakaligtas dito. Pero bigyan mo ako ng sandali para alalahanin.",
+                                        "Hindi na agad pumapasok sa isip ko gaya ng dati.",
+                                        "Pangalan... bigyan mo ako ng sandali para alalahanin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "My name is a longer story than you might expect.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.ask_name.unnamed.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "My name is a longer story than you might expect.",
+                                        "Left my old name behind when the world fell apart.",
+                                        "Names belong to the world before Knox. Now we're just survivors.",
+                                        "I don't use the name I was born with anymore.",
+                                        "There's a lot of baggage attached to my real name.",
+                                        "I gave up that name when I lost everyone I loved.",
+                                        "Too much history behind that name to bring it up lightly.",
+                                        "Call me whatever you want. Old names don't matter much now.",
+                                        "That name died with the old life. I haven't picked a new one.",
+                                        "It's complicated. Maybe I'll tell you the story around a campfire someday.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas mahabang kuwento ang pangalan ko kaysa sa inaasahan mo.",
+                                        "Iniwan ko ang dati kong pangalan noong gumuho ang mundo.",
+                                        "Para sa lumang mundo ang mga pangalan bago ang Knox. Ngayon, mga nakaligtas na lang tayo.",
+                                        "Hindi ko na ginagamit ang pangalang ibinigay sa akin noong ipinanganak ako.",
+                                        "Maraming mabigat na alaala ang nakakabit sa tunay kong pangalan.",
+                                        "Binitiwan ko ang pangalang 'yon noong mawala ang lahat ng mahal ko.",
+                                        "Masyadong masalimuot ang kasaysayan ng pangalang 'yan para basta banggitin.",
+                                        "Tawagin mo ako kahit ano. Wala nang masyadong halaga ang lumang pangalan.",
+                                        "Namatay ang pangalang 'yon kasama ng dating buhay. Hindi pa ako pumipili ng bago.",
+                                        "Medyo magulo. Baka ikuwento ko sa 'yo sa tabi ng apoy balang-araw.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply.ask_name",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "You want to know my name? Give me a second.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.unnamed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You want to know my name? Give me a second.",
+                            "Haven't heard anyone call me by name in months.",
+                            "A name? Almost forgot people still used them.",
+                            "Takes a moment to remember what folks used to call me.",
+                            "Funny question. Been so long since I introduced myself.",
+                            "Hold on, let me think back to what I was called before this.",
+                            "My name... feels like another person owned it.",
+                            "Just a survivor out here. But give me a second to recall.",
+                            "Doesn't come to mind as fast as it used to.",
+                            "A name... give me a moment to dust off the cobwebs.",
+                        },
+                        ["TL"] = {
+                            "Gusto mong malaman ang pangalan ko? Bigyan mo ako ng sandali.",
+                            "Ilang buwan na mula noong may tumawag sa pangalan ko.",
+                            "Pangalan? Halos nakalimutan ko nang may gumagamit pa niyan.",
+                            "Inaalala ko pa kung ano ang tawag sa akin ng mga tao noon.",
+                            "Nakakatuwang tanong. Matagal na mula noong huling nagpakilala ako.",
+                            "Teka lang, inaalala ko kung ano ang tawag sa akin bago ang lahat ng ito.",
+                            "Ang pangalan ko... parang ibang tao ang nagmamay-ari noon.",
+                            "Isa lang akong nakaligtas dito. Pero bigyan mo ako ng sandali para alalahanin.",
+                            "Hindi na agad pumapasok sa isip ko gaya ng dati.",
+                            "Pangalan... bigyan mo ako ng sandali para alalahanin.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "My name is a longer story than you might expect.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.ask_name.unnamed.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "My name is a longer story than you might expect.",
+                            "Left my old name behind when the world fell apart.",
+                            "Names belong to the world before Knox. Now we're just survivors.",
+                            "I don't use the name I was born with anymore.",
+                            "There's a lot of baggage attached to my real name.",
+                            "I gave up that name when I lost everyone I loved.",
+                            "Too much history behind that name to bring it up lightly.",
+                            "Call me whatever you want. Old names don't matter much now.",
+                            "That name died with the old life. I haven't picked a new one.",
+                            "It's complicated. Maybe I'll tell you the story around a campfire someday.",
+                        },
+                        ["TL"] = {
+                            "Mas mahabang kuwento ang pangalan ko kaysa sa inaasahan mo.",
+                            "Iniwan ko ang dati kong pangalan noong gumuho ang mundo.",
+                            "Para sa lumang mundo ang mga pangalan bago ang Knox. Ngayon, mga nakaligtas na lang tayo.",
+                            "Hindi ko na ginagamit ang pangalang ibinigay sa akin noong ipinanganak ako.",
+                            "Maraming mabigat na alaala ang nakakabit sa tunay kong pangalan.",
+                            "Binitiwan ko ang pangalang 'yon noong mawala ang lahat ng mahal ko.",
+                            "Masyadong masalimuot ang kasaysayan ng pangalang 'yan para basta banggitin.",
+                            "Tawagin mo ako kahit ano. Wala nang masyadong halaga ang lumang pangalan.",
+                            "Namatay ang pangalang 'yon kasama ng dating buhay. Hindi pa ako pumipili ng bago.",
+                            "Medyo magulo. Baka ikuwento ko sa 'yo sa tabi ng apoy balang-araw.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "tool_reply.ask_name.unnamed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.ask_name.rejected.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_rejected.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["localId"] = "unnamed",
+            ["sourceId"] = "tool_reply.ask_name.unnamed",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_unnamed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
+        ["namespace"] = "tool_reply.ask_name",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2053,283 +2685,114 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.rejected.2",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ask me again when we know each other better.",
-                            },
-                            ["TL"] = {
-                                "Tanungin mo ako ulit kapag mas magkakilala na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Prove you're trustworthy first, then ask again.",
-                            },
-                            ["TL"] = {
-                                "Patunayan mo munang mapagkakatiwalaan ka, bago ka magtanong ulit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We'll get to names after we survive a while together.",
-                            },
-                            ["TL"] = {
-                                "Pag-uusapan natin ang mga pangalan kapag nagkasama na tayo nang matagal.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not yet. Maybe down the road if you don't shoot me.",
-                            },
-                            ["TL"] = {
-                                "Hindi pa ngayon. Baka sa susunod kung hindi mo ako babarilin.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You want to know my name? Give me a second.",
+                                        "Haven't heard anyone call me by name in months.",
+                                        "A name? Almost forgot people still used them.",
+                                        "Takes a moment to remember what folks used to call me.",
+                                        "Funny question. Been so long since I introduced myself.",
+                                        "Hold on, let me think back to what I was called before this.",
+                                        "My name... feels like another person owned it.",
+                                        "Just a survivor out here. But give me a second to recall.",
+                                        "Doesn't come to mind as fast as it used to.",
+                                        "A name... give me a moment to dust off the cobwebs.",
+                                    },
+                                    ["TL"] = {
+                                        "Gusto mong malaman ang pangalan ko? Bigyan mo ako ng sandali.",
+                                        "Ilang buwan na mula noong may tumawag sa pangalan ko.",
+                                        "Pangalan? Halos nakalimutan ko nang may gumagamit pa niyan.",
+                                        "Inaalala ko pa kung ano ang tawag sa akin ng mga tao noon.",
+                                        "Nakakatuwang tanong. Matagal na mula noong huling nagpakilala ako.",
+                                        "Teka lang, inaalala ko kung ano ang tawag sa akin bago ang lahat ng ito.",
+                                        "Ang pangalan ko... parang ibang tao ang nagmamay-ari noon.",
+                                        "Isa lang akong nakaligtas dito. Pero bigyan mo ako ng sandali para alalahanin.",
+                                        "Hindi na agad pumapasok sa isip ko gaya ng dati.",
+                                        "Pangalan... bigyan mo ako ng sandali para alalahanin.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Give it some time. I don't give away who I am so easily.",
-                            },
-                            ["TL"] = {
-                                "Bigyan mo muna ng panahon. Hindi ko basta-basta ibinibigay kung sino ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Come back after you've shown you can be trusted.",
-                            },
-                            ["TL"] = {
-                                "Bumalik ka kapag naipakita mo nang maaasahan ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's see if we both make it through the week first.",
-                            },
-                            ["TL"] = {
-                                "Tingnan muna natin kung pareho tayong tatagal ngayong linggo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Trust takes time out here. Ask me another day.",
-                            },
-                            ["TL"] = {
-                                "Matagal mabuo ang tiwala rito. Tanungin mo ako sa ibang araw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hold on to that question until we've traded a few times.",
-                            },
-                            ["TL"] = {
-                                "Itabi mo muna ang tanong na 'yan hanggang sa makailang palitan tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too soon for personal details. Let's wait a bit.",
-                            },
-                            ["TL"] = {
-                                "Masyado pang maaga para sa personal na bagay. Maghintay tayo nang kaunti.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "My name is a longer story than you might expect.",
+                                        "Left my old name behind when the world fell apart.",
+                                        "Names belong to the world before Knox. Now we're just survivors.",
+                                        "I don't use the name I was born with anymore.",
+                                        "There's a lot of baggage attached to my real name.",
+                                        "I gave up that name when I lost everyone I loved.",
+                                        "Too much history behind that name to bring it up lightly.",
+                                        "Call me whatever you want. Old names don't matter much now.",
+                                        "That name died with the old life. I haven't picked a new one.",
+                                        "It's complicated. Maybe I'll tell you the story around a campfire someday.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas mahabang kuwento ang pangalan ko kaysa sa inaasahan mo.",
+                                        "Iniwan ko ang dati kong pangalan noong gumuho ang mundo.",
+                                        "Para sa lumang mundo ang mga pangalan bago ang Knox. Ngayon, mga nakaligtas na lang tayo.",
+                                        "Hindi ko na ginagamit ang pangalang ibinigay sa akin noong ipinanganak ako.",
+                                        "Maraming mabigat na alaala ang nakakabit sa tunay kong pangalan.",
+                                        "Binitiwan ko ang pangalang 'yon noong mawala ang lahat ng mahal ko.",
+                                        "Masyadong masalimuot ang kasaysayan ng pangalang 'yan para basta banggitin.",
+                                        "Tawagin mo ako kahit ano. Wala nang masyadong halaga ang lumang pangalan.",
+                                        "Namatay ang pangalang 'yon kasama ng dating buhay. Hindi pa ako pumipili ng bago.",
+                                        "Medyo magulo. Baka ikuwento ko sa 'yo sa tabi ng apoy balang-araw.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
         },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_rejected.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.unnamed.1.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.ask_name.unnamed.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_unnamed.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.unnamed.1",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You want to know my name? Give me a second.",
-                            },
-                            ["TL"] = {
-                                "Gusto mong malaman ang pangalan ko? Bigyan mo ako ng sandali.",
-                            },
-                        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.ask_name.unnamed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Haven't heard anyone call me by name in months.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Ilang buwan na mula noong may tumawag sa pangalan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A name? Almost forgot people still used them.",
-                            },
-                            ["TL"] = {
-                                "Pangalan? Halos nakalimutan ko nang may gumagamit pa niyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Takes a moment to remember what folks used to call me.",
-                            },
-                            ["TL"] = {
-                                "Inaalala ko pa kung ano ang tawag sa akin ng mga tao noon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Funny question. Been so long since I introduced myself.",
-                            },
-                            ["TL"] = {
-                                "Nakakatuwang tanong. Matagal na mula noong huling nagpakilala ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hold on, let me think back to what I was called before this.",
-                            },
-                            ["TL"] = {
-                                "Teka lang, inaalala ko kung ano ang tawag sa akin bago ang lahat ng ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "My name... feels like another person owned it.",
-                            },
-                            ["TL"] = {
-                                "Ang pangalan ko... parang ibang tao ang nagmamay-ari noon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just a survivor out here. But give me a second to recall.",
-                            },
-                            ["TL"] = {
-                                "Isa lang akong nakaligtas dito. Pero bigyan mo ako ng sandali para alalahanin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Doesn't come to mind as fast as it used to.",
-                            },
-                            ["TL"] = {
-                                "Hindi na agad pumapasok sa isip ko gaya ng dati.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A name... give me a moment to dust off the cobwebs.",
-                            },
-                            ["TL"] = {
-                                "Pangalan... bigyan mo ako ng sandali para alalahanin.",
-                            },
+                            ["fallback"] = "You want to know my name? Give me a second.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.ask_name.unnamed.say_1",
                         },
                     },
                 },
             },
-        },
-        ["references"] = {
         },
         ["slots"] = {
         },
@@ -2339,175 +2802,318 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "You want to know my name? Give me a second.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.unnamed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You want to know my name? Give me a second.",
+                        "Haven't heard anyone call me by name in months.",
+                        "A name? Almost forgot people still used them.",
+                        "Takes a moment to remember what folks used to call me.",
+                        "Funny question. Been so long since I introduced myself.",
+                        "Hold on, let me think back to what I was called before this.",
+                        "My name... feels like another person owned it.",
+                        "Just a survivor out here. But give me a second to recall.",
+                        "Doesn't come to mind as fast as it used to.",
+                        "A name... give me a moment to dust off the cobwebs.",
+                    },
+                    ["TL"] = {
+                        "Gusto mong malaman ang pangalan ko? Bigyan mo ako ng sandali.",
+                        "Ilang buwan na mula noong may tumawag sa pangalan ko.",
+                        "Pangalan? Halos nakalimutan ko nang may gumagamit pa niyan.",
+                        "Inaalala ko pa kung ano ang tawag sa akin ng mga tao noon.",
+                        "Nakakatuwang tanong. Matagal na mula noong huling nagpakilala ako.",
+                        "Teka lang, inaalala ko kung ano ang tawag sa akin bago ang lahat ng ito.",
+                        "Ang pangalan ko... parang ibang tao ang nagmamay-ari noon.",
+                        "Isa lang akong nakaligtas dito. Pero bigyan mo ako ng sandali para alalahanin.",
+                        "Hindi na agad pumapasok sa isip ko gaya ng dati.",
+                        "Pangalan... bigyan mo ako ng sandali para alalahanin.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "My name is a longer story than you might expect.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.ask_name.unnamed.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "My name is a longer story than you might expect.",
+                        "Left my old name behind when the world fell apart.",
+                        "Names belong to the world before Knox. Now we're just survivors.",
+                        "I don't use the name I was born with anymore.",
+                        "There's a lot of baggage attached to my real name.",
+                        "I gave up that name when I lost everyone I loved.",
+                        "Too much history behind that name to bring it up lightly.",
+                        "Call me whatever you want. Old names don't matter much now.",
+                        "That name died with the old life. I haven't picked a new one.",
+                        "It's complicated. Maybe I'll tell you the story around a campfire someday.",
+                    },
+                    ["TL"] = {
+                        "Mas mahabang kuwento ang pangalan ko kaysa sa inaasahan mo.",
+                        "Iniwan ko ang dati kong pangalan noong gumuho ang mundo.",
+                        "Para sa lumang mundo ang mga pangalan bago ang Knox. Ngayon, mga nakaligtas na lang tayo.",
+                        "Hindi ko na ginagamit ang pangalang ibinigay sa akin noong ipinanganak ako.",
+                        "Maraming mabigat na alaala ang nakakabit sa tunay kong pangalan.",
+                        "Binitiwan ko ang pangalang 'yon noong mawala ang lahat ng mahal ko.",
+                        "Masyadong masalimuot ang kasaysayan ng pangalang 'yan para basta banggitin.",
+                        "Tawagin mo ako kahit ano. Wala nang masyadong halaga ang lumang pangalan.",
+                        "Namatay ang pangalang 'yon kasama ng dating buhay. Hindi pa ako pumipili ng bago.",
+                        "Medyo magulo. Baka ikuwento ko sa 'yo sa tabi ng apoy balang-araw.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.ask_name.unnamed.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.ask_name.unnamed.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_unnamed.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.ask_name.unnamed.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "My name is a longer story than you might expect.",
-                            },
-                            ["TL"] = {
-                                "Mas mahabang kuwento ang pangalan ko kaysa sa inaasahan mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Left my old name behind when the world fell apart.",
-                            },
-                            ["TL"] = {
-                                "Iniwan ko ang dati kong pangalan noong gumuho ang mundo.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.comfort",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Thanks. I needed that.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.comfort.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Thanks. I needed that.",
+                                        "I appreciate that. It has been a rough stretch.",
+                                        "Thanks. Sometimes you just need to hear that.",
+                                        "That helps steady my nerves. Thank you.",
+                                        "I did not know how much I needed to hear that. Thanks.",
+                                        "Thank you. That takes some of the weight off.",
+                                        "I am glad you said that. Thanks.",
+                                        "Much appreciated. Really.",
+                                        "Thanks for checking in on me.",
+                                        "That makes a difference. Thank you.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat. Kailangan ko talaga 'yon.",
+                                        "Salamat. Napakahirap ng mga nakaraang araw.",
+                                        "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                                        "Nakakatulong 'yan para kumalma ako. Salamat.",
+                                        "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                                        "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                                        "Mabuti at sinabi mo 'yan. Salamat.",
+                                        "Talagang pinahahalagahan ko. Salamat.",
+                                        "Salamat sa pangungumusta sa akin.",
+                                        "Malaki ang nagagawa niyan. Salamat.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Names belong to the world before Knox. Now we're just survivors.",
-                            },
-                            ["TL"] = {
-                                "Para sa lumang mundo ang mga pangalan bago ang Knox. Ngayon, mga nakaligtas na lang tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't use the name I was born with anymore.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko na ginagamit ang pangalang ibinigay sa akin noong ipinanganak ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "There's a lot of baggage attached to my real name.",
-                            },
-                            ["TL"] = {
-                                "Maraming mabigat na alaala ang nakakabit sa tunay kong pangalan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I gave up that name when I lost everyone I loved.",
-                            },
-                            ["TL"] = {
-                                "Binitiwan ko ang pangalang 'yon noong mawala ang lahat ng mahal ko.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I appreciate you being here.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.comfort.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I appreciate you being here.",
+                                        "Having you nearby makes this easier.",
+                                        "Good to know I am not facing this alone.",
+                                        "Thanks for sticking with me.",
+                                        "It is easier having someone reliable around. Thank you.",
+                                        "I am glad you are on my side.",
+                                        "Thanks for being here. It counts for a lot.",
+                                        "You being around keeps me grounded.",
+                                        "I am thankful we crossed paths.",
+                                        "Thanks. Do not go wandering off too far.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat at narito ka.",
+                                        "Mas madali ang lahat kapag kasama kita rito.",
+                                        "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                                        "Salamat sa pananatili sa tabi ko.",
+                                        "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                                        "Mabuti at kakampi kita.",
+                                        "Salamat sa presensya mo. Malaking bagay ito.",
+                                        "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                                        "Nagpapasalamat ako at nagkasama tayo rito.",
+                                        "Salamat. Huwag kang lalayo masyado.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too much history behind that name to bring it up lightly.",
-                            },
-                            ["TL"] = {
-                                "Masyadong masalimuot ang kasaysayan ng pangalang 'yan para basta banggitin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Call me whatever you want. Old names don't matter much now.",
-                            },
-                            ["TL"] = {
-                                "Tawagin mo ako kahit ano. Wala nang masyadong halaga ang lumang pangalan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That name died with the old life. I haven't picked a new one.",
-                            },
-                            ["TL"] = {
-                                "Namatay ang pangalang 'yon kasama ng dating buhay. Hindi pa ako pumipili ng bago.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's complicated. Maybe I'll tell you the story around a campfire someday.",
-                            },
-                            ["TL"] = {
-                                "Medyo magulo. Baka ikuwento ko sa 'yo sa tabi ng apoy balang-araw.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That helps more than I expected.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.comfort.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That helps more than I expected.",
+                                        "I feel a bit better hearing that.",
+                                        "That took some edge off the stress.",
+                                        "Honestly, that clears my head a little.",
+                                        "That actually helped. Thank you.",
+                                        "I can breathe a little easier now.",
+                                        "Thanks. That takes the bite out of things.",
+                                        "I needed a reminder that we can handle this.",
+                                        "You have a calming effect. Thanks.",
+                                        "That put things back into perspective for me.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                                        "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                                        "Nabawasan ang kaba ko sa sinabi mo.",
+                                        "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                                        "Talagang nakatulong 'yon. Salamat.",
+                                        "Medyo nakakahinga na ako nang maluwag.",
+                                        "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                                        "Kailangan ko ng paalala na kaya natin 'to.",
+                                        "Nakakapagpakalma ka. Salamat.",
+                                        "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Thanks. I needed that.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.comfort.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thanks. I needed that.",
+                            "I appreciate that. It has been a rough stretch.",
+                            "Thanks. Sometimes you just need to hear that.",
+                            "That helps steady my nerves. Thank you.",
+                            "I did not know how much I needed to hear that. Thanks.",
+                            "Thank you. That takes some of the weight off.",
+                            "I am glad you said that. Thanks.",
+                            "Much appreciated. Really.",
+                            "Thanks for checking in on me.",
+                            "That makes a difference. Thank you.",
+                        },
+                        ["TL"] = {
+                            "Salamat. Kailangan ko talaga 'yon.",
+                            "Salamat. Napakahirap ng mga nakaraang araw.",
+                            "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                            "Nakakatulong 'yan para kumalma ako. Salamat.",
+                            "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                            "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                            "Mabuti at sinabi mo 'yan. Salamat.",
+                            "Talagang pinahahalagahan ko. Salamat.",
+                            "Salamat sa pangungumusta sa akin.",
+                            "Malaki ang nagagawa niyan. Salamat.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "I appreciate you being here.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.comfort.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I appreciate you being here.",
+                            "Having you nearby makes this easier.",
+                            "Good to know I am not facing this alone.",
+                            "Thanks for sticking with me.",
+                            "It is easier having someone reliable around. Thank you.",
+                            "I am glad you are on my side.",
+                            "Thanks for being here. It counts for a lot.",
+                            "You being around keeps me grounded.",
+                            "I am thankful we crossed paths.",
+                            "Thanks. Do not go wandering off too far.",
+                        },
+                        ["TL"] = {
+                            "Salamat at narito ka.",
+                            "Mas madali ang lahat kapag kasama kita rito.",
+                            "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                            "Salamat sa pananatili sa tabi ko.",
+                            "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                            "Mabuti at kakampi kita.",
+                            "Salamat sa presensya mo. Malaking bagay ito.",
+                            "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                            "Nagpapasalamat ako at nagkasama tayo rito.",
+                            "Salamat. Huwag kang lalayo masyado.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "That helps more than I expected.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.comfort.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That helps more than I expected.",
+                            "I feel a bit better hearing that.",
+                            "That took some edge off the stress.",
+                            "Honestly, that clears my head a little.",
+                            "That actually helped. Thank you.",
+                            "I can breathe a little easier now.",
+                            "Thanks. That takes the bite out of things.",
+                            "I needed a reminder that we can handle this.",
+                            "You have a calming effect. Thanks.",
+                            "That put things back into perspective for me.",
+                        },
+                        ["TL"] = {
+                            "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                            "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                            "Nabawasan ang kaba ko sa sinabi mo.",
+                            "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                            "Talagang nakatulong 'yon. Salamat.",
+                            "Medyo nakakahinga na ako nang maluwag.",
+                            "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                            "Kailangan ko ng paalala na kaya natin 'to.",
+                            "Nakakapagpakalma ka. Salamat.",
+                            "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_ask_name_unnamed.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.comfort.1.neutral",
+        ["id"] = "tool_reply.comfort",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.comfort.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_comfort.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["localId"] = "comfort",
+            ["sourceId"] = "tool_reply.comfort",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_comfort.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
+        ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2521,127 +3127,150 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.comfort.1",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/comfort.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. I needed that.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Kailangan ko talaga 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate that. It has been a rough stretch.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Napakahirap ng mga nakaraang araw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. Sometimes you just need to hear that.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That helps steady my nerves. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Nakakatulong 'yan para kumalma ako. Salamat.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Thanks. I needed that.",
+                                        "I appreciate that. It has been a rough stretch.",
+                                        "Thanks. Sometimes you just need to hear that.",
+                                        "That helps steady my nerves. Thank you.",
+                                        "I did not know how much I needed to hear that. Thanks.",
+                                        "Thank you. That takes some of the weight off.",
+                                        "I am glad you said that. Thanks.",
+                                        "Much appreciated. Really.",
+                                        "Thanks for checking in on me.",
+                                        "That makes a difference. Thank you.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat. Kailangan ko talaga 'yon.",
+                                        "Salamat. Napakahirap ng mga nakaraang araw.",
+                                        "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                                        "Nakakatulong 'yan para kumalma ako. Salamat.",
+                                        "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                                        "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                                        "Mabuti at sinabi mo 'yan. Salamat.",
+                                        "Talagang pinahahalagahan ko. Salamat.",
+                                        "Salamat sa pangungumusta sa akin.",
+                                        "Malaki ang nagagawa niyan. Salamat.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I did not know how much I needed to hear that. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you. That takes some of the weight off.",
-                            },
-                            ["TL"] = {
-                                "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am glad you said that. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at sinabi mo 'yan. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Much appreciated. Really.",
-                            },
-                            ["TL"] = {
-                                "Talagang pinahahalagahan ko. Salamat.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I appreciate you being here.",
+                                        "Having you nearby makes this easier.",
+                                        "Good to know I am not facing this alone.",
+                                        "Thanks for sticking with me.",
+                                        "It is easier having someone reliable around. Thank you.",
+                                        "I am glad you are on my side.",
+                                        "Thanks for being here. It counts for a lot.",
+                                        "You being around keeps me grounded.",
+                                        "I am thankful we crossed paths.",
+                                        "Thanks. Do not go wandering off too far.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat at narito ka.",
+                                        "Mas madali ang lahat kapag kasama kita rito.",
+                                        "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                                        "Salamat sa pananatili sa tabi ko.",
+                                        "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                                        "Mabuti at kakampi kita.",
+                                        "Salamat sa presensya mo. Malaking bagay ito.",
+                                        "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                                        "Nagpapasalamat ako at nagkasama tayo rito.",
+                                        "Salamat. Huwag kang lalayo masyado.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for checking in on me.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pangungumusta sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That makes a difference. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Malaki ang nagagawa niyan. Salamat.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That helps more than I expected.",
+                                        "I feel a bit better hearing that.",
+                                        "That took some edge off the stress.",
+                                        "Honestly, that clears my head a little.",
+                                        "That actually helped. Thank you.",
+                                        "I can breathe a little easier now.",
+                                        "Thanks. That takes the bite out of things.",
+                                        "I needed a reminder that we can handle this.",
+                                        "You have a calming effect. Thanks.",
+                                        "That put things back into perspective for me.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                                        "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                                        "Nabawasan ang kaba ko sa sinabi mo.",
+                                        "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                                        "Talagang nakatulong 'yon. Salamat.",
+                                        "Medyo nakakahinga na ako nang maluwag.",
+                                        "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                                        "Kailangan ko ng paalala na kaya natin 'to.",
+                                        "Nakakapagpakalma ka. Salamat.",
+                                        "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.comfort",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Thanks. I needed that.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.tool_reply.comfort.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2651,1253 +3280,106 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.comfort.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.comfort.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_comfort.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.comfort.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/comfort.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate you being here.",
-                            },
-                            ["TL"] = {
-                                "Salamat at narito ka.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Thanks. I needed that.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.comfort.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thanks. I needed that.",
+                        "I appreciate that. It has been a rough stretch.",
+                        "Thanks. Sometimes you just need to hear that.",
+                        "That helps steady my nerves. Thank you.",
+                        "I did not know how much I needed to hear that. Thanks.",
+                        "Thank you. That takes some of the weight off.",
+                        "I am glad you said that. Thanks.",
+                        "Much appreciated. Really.",
+                        "Thanks for checking in on me.",
+                        "That makes a difference. Thank you.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Having you nearby makes this easier.",
-                            },
-                            ["TL"] = {
-                                "Mas madali ang lahat kapag kasama kita rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to know I am not facing this alone.",
-                            },
-                            ["TL"] = {
-                                "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for sticking with me.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pananatili sa tabi ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It is easier having someone reliable around. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am glad you are on my side.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at kakampi kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for being here. It counts for a lot.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa presensya mo. Malaking bagay ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You being around keeps me grounded.",
-                            },
-                            ["TL"] = {
-                                "Ang pananatili mo rito ay nagpapahinahon sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am thankful we crossed paths.",
-                            },
-                            ["TL"] = {
-                                "Nagpapasalamat ako at nagkasama tayo rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. Do not go wandering off too far.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Huwag kang lalayo masyado.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Salamat. Kailangan ko talaga 'yon.",
+                        "Salamat. Napakahirap ng mga nakaraang araw.",
+                        "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                        "Nakakatulong 'yan para kumalma ako. Salamat.",
+                        "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                        "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                        "Mabuti at sinabi mo 'yan. Salamat.",
+                        "Talagang pinahahalagahan ko. Salamat.",
+                        "Salamat sa pangungumusta sa akin.",
+                        "Malaki ang nagagawa niyan. Salamat.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_comfort.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.comfort.3.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.comfort.3.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_comfort.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.comfort.3",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/comfort.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That helps more than I expected.",
-                            },
-                            ["TL"] = {
-                                "Mas nakakatulong 'yan kaysa sa inasahan ko.",
-                            },
-                        },
+            {
+                ["fallback"] = "I appreciate you being here.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.comfort.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I appreciate you being here.",
+                        "Having you nearby makes this easier.",
+                        "Good to know I am not facing this alone.",
+                        "Thanks for sticking with me.",
+                        "It is easier having someone reliable around. Thank you.",
+                        "I am glad you are on my side.",
+                        "Thanks for being here. It counts for a lot.",
+                        "You being around keeps me grounded.",
+                        "I am thankful we crossed paths.",
+                        "Thanks. Do not go wandering off too far.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I feel a bit better hearing that.",
-                            },
-                            ["TL"] = {
-                                "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That took some edge off the stress.",
-                            },
-                            ["TL"] = {
-                                "Nabawasan ang kaba ko sa sinabi mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Honestly, that clears my head a little.",
-                            },
-                            ["TL"] = {
-                                "Sa totoo lang, luminaw nang kaunti ang isip ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That actually helped. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Talagang nakatulong 'yon. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can breathe a little easier now.",
-                            },
-                            ["TL"] = {
-                                "Medyo nakakahinga na ako nang maluwag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. That takes the bite out of things.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Nabawasan ang tindi ng sitwasyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I needed a reminder that we can handle this.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng paalala na kaya natin 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You have a calming effect. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Nakakapagpakalma ka. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That put things back into perspective for me.",
-                            },
-                            ["TL"] = {
-                                "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Salamat at narito ka.",
+                        "Mas madali ang lahat kapag kasama kita rito.",
+                        "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                        "Salamat sa pananatili sa tabi ko.",
+                        "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                        "Mabuti at kakampi kita.",
+                        "Salamat sa presensya mo. Malaking bagay ito.",
+                        "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                        "Nagpapasalamat ako at nagkasama tayo rito.",
+                        "Salamat. Huwag kang lalayo masyado.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_comfort.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.compliment.1.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.compliment.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.compliment.1",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/compliment.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is kind of you to say.",
-                            },
-                            ["TL"] = {
-                                "Mabait sa 'yo ang magsabi niyan.",
-                            },
-                        },
+            {
+                ["fallback"] = "That helps more than I expected.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.comfort.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That helps more than I expected.",
+                        "I feel a bit better hearing that.",
+                        "That took some edge off the stress.",
+                        "Honestly, that clears my head a little.",
+                        "That actually helped. Thank you.",
+                        "I can breathe a little easier now.",
+                        "Thanks. That takes the bite out of things.",
+                        "I needed a reminder that we can handle this.",
+                        "You have a calming effect. Thanks.",
+                        "That put things back into perspective for me.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you. That is very nice of you.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Napakabait mo naman.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate the kind words.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa magagandang salita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is generous of you. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Mabuti ang puso mo. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. It is rare to get compliments out here.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Bihira ang papuri sa panahong ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That puts a smile on my face. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Napangiti mo ako roon. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You are too kind.",
-                            },
-                            ["TL"] = {
-                                "Napakabait mo talaga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate that. Truly.",
-                            },
-                            ["TL"] = {
-                                "Pinahahalagahan ko talaga 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. I will take all the good words I can get.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Tatanggapin ko ang anumang magandang salita ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you. That brightens things up a bit.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Nabigyan mo ng kaunting liwanag ang araw ko.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                        "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                        "Nabawasan ang kaba ko sa sinabi mo.",
+                        "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                        "Talagang nakatulong 'yon. Salamat.",
+                        "Medyo nakakahinga na ako nang maluwag.",
+                        "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                        "Kailangan ko ng paalala na kaya natin 'to.",
+                        "Nakakapagpakalma ka. Salamat.",
+                        "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.compliment.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.compliment.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.compliment.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/compliment.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate the compliment.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa papuri.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for the compliment.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa magandang sinabi mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I will take the compliment. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Tatanggapin ko ang papuri. Maraming salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Much obliged for the kind thought.",
-                            },
-                            ["TL"] = {
-                                "Maraming salamat sa magandang kaisipan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. I work hard at what I do.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Pinagsisikapan ko talaga ang ginagawa ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is good feedback to hear.",
-                            },
-                            ["TL"] = {
-                                "Magandang marinig ang ganitong puna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Appreciated. I try to stay sharp.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Sinisikap kong manatiling alerto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you. It means something coming from you.",
-                            },
-                            ["TL"] = {
-                                "Salamat. May halaga 'yan galing sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am flattered. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Natutuwa ako sa sinabi mo. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. That boost is welcome.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Nakakapagpalakas ng loob 'yan.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.compliment.3.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.compliment.3.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.compliment.3",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/compliment.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You noticed. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Napansin mo pala. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad somebody noticed.",
-                            },
-                            ["TL"] = {
-                                "Mabuti naman at may nakapansin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I was wondering if anyone would catch that. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Iniisip ko nga kung may makakapansin niyan. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good eye. Thanks for noticing.",
-                            },
-                            ["TL"] = {
-                                "Matalas ang paningin mo. Salamat sa pagpansin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I put some effort into that. Good to see it showed.",
-                            },
-                            ["TL"] = {
-                                "Pinaghirapan ko 'yon. Mabuti at lumitaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. Nice to know it did not go unseen.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Masarap malaman na hindi 'yon nabalewala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You have sharp observation skills. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Alesto ka magmasid. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Appreciate you noticing that detail.",
-                            },
-                            ["TL"] = {
-                                "Salamat at napansin mo ang detalyeng 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I try my best. Thank you for noticing.",
-                            },
-                            ["TL"] = {
-                                "Ginagawa ko ang buong makakaya ko. Salamat sa pagpansin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. That was worth the effort then.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Naging sulit ang pagod ko dahil diyan.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.flirt.1.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.flirt.1.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_flirt.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.flirt.1",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/flirt.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Careful. You are making me smile.",
-                            },
-                            ["TL"] = {
-                                "Dahan-dahan. Napapangiti mo ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch it. You might actually make me blush.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat ka. Baka mamula ako niyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You are playing with fire, you know that?",
-                            },
-                            ["TL"] = {
-                                "Naglalaro ka sa apoy, alam mo ba 'yon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Do not start something you cannot finish.",
-                            },
-                            ["TL"] = {
-                                "Huwag kang magsimula ng hindi mo kayang tapusin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You certainly know how to talk.",
-                            },
-                            ["TL"] = {
-                                "Marunong ka talagang magsalita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Is that your charm talking or the apocalypse?",
-                            },
-                            ["TL"] = {
-                                "Diskarte mo ba 'yan o dahil sa katapusan ng mundo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You are smooth. I will give you that.",
-                            },
-                            ["TL"] = {
-                                "Malaman kang bumanat, aaminin ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Save some of that charm for later.",
-                            },
-                            ["TL"] = {
-                                "Itabi mo ang ilan sa mga pambobola mo mamaya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Careful now. People are watching.",
-                            },
-                            ["TL"] = {
-                                "Dahan-dahan. May mga nakatingin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You have a way with words.",
-                            },
-                            ["TL"] = {
-                                "May galing ka talaga sa pananalita.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_flirt.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.flirt.2.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.flirt.2.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_flirt.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.flirt.2",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/flirt.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You always know how to get my attention.",
-                            },
-                            ["TL"] = {
-                                "Alam mo talaga kung paano kukunin ang pansin ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Well, you definitely have my full attention now.",
-                            },
-                            ["TL"] = {
-                                "Nakuha mo nang buo ang atensyon ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You do that on purpose, do you not?",
-                            },
-                            ["TL"] = {
-                                "Sinasadya mo 'yan, hindi ba?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You know exactly what you are doing.",
-                            },
-                            ["TL"] = {
-                                "Alam na alam mo ang ginagawa mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I was trying to focus, but you made that hard.",
-                            },
-                            ["TL"] = {
-                                "Sinisikap kong magpokus, pero pinapahirapan mo ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You caught my ear with that one.",
-                            },
-                            ["TL"] = {
-                                "Nakuha mo ako sa linyang 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You never miss a chance to turn heads, do you?",
-                            },
-                            ["TL"] = {
-                                "Hindi mo pinapalampas ang pagkakataong magpapansin, 'no?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am listening. What else do you have?",
-                            },
-                            ["TL"] = {
-                                "Nakikinig ako. Ano pa ang sasabihin mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You always manage to pull my focus your way.",
-                            },
-                            ["TL"] = {
-                                "Lagi mong nahahatak ang tingin ko papunta sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right, you got my eyes on you.",
-                            },
-                            ["TL"] = {
-                                "Sige na, nasa sa 'yo na ang tingin ko.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_flirt.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_tool_replies_affirmation",
-        ["id"] = "semantic.tool_reply.flirt.3.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.tool_reply.flirt.3.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_flirt.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.tool_reply.flirt.3",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/flirt.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is a dangerous thing to say to me.",
-                            },
-                            ["TL"] = {
-                                "Mapanganib na bagay ang sabihin 'yan sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You are taking a big risk talking like that.",
-                            },
-                            ["TL"] = {
-                                "Malaking sugal ang magsalita ka nang ganyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Be careful what you wish for.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat ka sa mga hinihiling mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You like living on the edge, do not you?",
-                            },
-                            ["TL"] = {
-                                "Gusto mo talagang sumugal sa delikado, 'no?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Do not tease me unless you mean it.",
-                            },
-                            ["TL"] = {
-                                "Huwag mo akong biruin kung hindi mo kayang panindigan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That kind of talk gets people into trouble.",
-                            },
-                            ["TL"] = {
-                                "Ang ganyang salitaan ay nagdadala ng gulo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Bold words for someone within arm's reach.",
-                            },
-                            ["TL"] = {
-                                "Matapang na salita para sa taong abot-kamay lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep talking like that and we will see.",
-                            },
-                            ["TL"] = {
-                                "Ipagpatuloy mo 'yan at tingnan natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You are walking a very thin line.",
-                            },
-                            ["TL"] = {
-                                "Napakakitid ng nilalakaran mong linya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dangerous words. But I like the confidence.",
-                            },
-                            ["TL"] = {
-                                "Delikadong salita. Pero gusto ko ang lakas ng loob mo.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_flirt.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
         },
         ["when"] = nil,
     },

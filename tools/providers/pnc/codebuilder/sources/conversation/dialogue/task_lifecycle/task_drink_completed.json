@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.drink",
   "id": "completed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
-    "responseTemplateID": "semantic.task.drink.completed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Much better. Thirst is gone.",
-          "TL": "Mas maayos na. Wala na ang uhaw."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Finished drinking. Feeling refreshed.",
-          "TL": "Tapos nang uminom. Maginhawa na ang pakiramdam."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "That hit the spot. Done drinking.",
-          "TL": "Eksakto 'yon. Tapos nang uminom."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Hydrated and ready to move.",
-          "TL": "May sapat nang tubig at handang kumilos."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Finished that drink.",
-          "TL": "Naubos na ang inumin."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Done. Throat isn't parched anymore.",
-          "TL": "Tapos na. Di na tuyo ang lalamunan ko."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "All drank. Ready for action.",
-          "TL": "Nainom na lahat. Handa na sa aksyon."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Finished having a drink.",
-          "TL": "Natapos nang uminom."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Done drinking. Let's keep going.",
-          "TL": "Tapos nang uminom. Tuloy na tayo."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Hydration complete.",
-          "TL": "Kumpleto na ang pag-inom."
+          "EN": [
+            "Much better. Thirst is gone.",
+            "Finished drinking. Feeling refreshed.",
+            "That hit the spot. Done drinking.",
+            "Hydrated and ready to move.",
+            "Finished that drink.",
+            "Done. Throat isn't parched anymore.",
+            "All drank. Ready for action.",
+            "Finished having a drink.",
+            "Done drinking. Let's keep going.",
+            "Hydration complete."
+          ],
+          "TL": [
+            "Mas maayos na. Wala na ang uhaw.",
+            "Tapos nang uminom. Maginhawa na ang pakiramdam.",
+            "Eksakto 'yon. Tapos nang uminom.",
+            "May sapat nang tubig at handang kumilos.",
+            "Naubos na ang inumin.",
+            "Tapos na. Di na tuyo ang lalamunan ko.",
+            "Nainom na lahat. Handa na sa aksyon.",
+            "Natapos nang uminom.",
+            "Tapos nang uminom. Tuloy na tayo.",
+            "Kumpleto na ang pag-inom."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.drink",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

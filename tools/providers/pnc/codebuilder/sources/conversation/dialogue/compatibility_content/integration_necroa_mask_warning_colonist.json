@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.necroa.mask_warning",
+  "id": "colonist",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.necroa.mask_warning.colonist",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Mask up. We keep the camp safe together.",
-          "TL": "Mask up. We keep the camp safe together."
+          "EN": [
+            "Mask up. We keep the camp safe together."
+          ],
+          "TL": [
+            "Mask up. We keep the camp safe together."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.necroa.mask_warning.colonist",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

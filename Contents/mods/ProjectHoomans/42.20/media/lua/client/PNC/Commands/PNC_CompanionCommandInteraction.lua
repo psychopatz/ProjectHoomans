@@ -132,7 +132,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     if outcome == "none" then
         if commandID ~= "camp" then return false end
         queued = Presentation.EnqueueSpeech(
-            "semantic.command.player.camp_none", "player", player,
+            "command.player.camp_none", "player", player,
             playerContext, {
                 eventID = type(context) == "table" and context.requestID
                     or nil,

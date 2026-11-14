@@ -2,11 +2,11 @@
 -- The facade merges this bounded domain table into the public key namespace.
 
 local keys = {
-        ["semantic.conversation.acknowledged.default"] =
+        ["conversation.acknowledged.default"] =
             "UI_PNC_Conversation_Semantic_ConversationAcknowledged",
-        ["semantic.conversation.acknowledged.friendly"] =
+        ["conversation.acknowledged.friendly"] =
             "UI_PNC_Conversation_Semantic_ConversationAcknowledgedFriendly",
-        ["semantic.conversation.acknowledged.withdrawn"] =
+        ["conversation.acknowledged.withdrawn"] =
             "UI_PNC_Conversation_Semantic_ConversationAcknowledgedWithdrawn",
         ["semantic.conversation.continuation.gossip_memory"] =
             "UI_PNC_Conversation_Semantic_ConversationContinuationGossipMemory",

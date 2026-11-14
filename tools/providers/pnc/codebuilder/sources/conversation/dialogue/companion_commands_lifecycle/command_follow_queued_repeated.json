@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.follow.queued",
   "id": "repeated",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/follow.json",
-    "responseTemplateID": "semantic.command.follow.queued.repeated"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'm still following you.",
-          "TL": "Sinusundan pa rin kita."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Already following right behind you.",
-          "TL": "Nakasunod na ako mismo sa likod mo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Still on your heels. No need to repeat.",
-          "TL": "Nasa likod mo pa rin. Di na kailangang ulitin."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "I haven't gone anywhere. Still right here.",
-          "TL": "Wala akong pinuntahan. Narito pa rin ako."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Following you already. Just keep walking.",
-          "TL": "Sumusunod na sa 'yo. Magpatuloy ka lang sa paglalakad."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "I'm right behind you! Look over your shoulder.",
-          "TL": "Nasa likod mo lang ako! Lumingon ka sa balikat mo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Still with you. Don't worry.",
-          "TL": "Kasama mo pa rin ako. Huwag kang mag-alala."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Already in tow. Lead the way.",
-          "TL": "Nakasunod na. Mauna ka na."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Following you as we speak.",
-          "TL": "Sumusunod sa 'yo habang nagsasalita ka."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "I'm already following. Keep moving.",
-          "TL": "Sumusunod na ako. Tuloy lang sa paglakad."
+          "EN": [
+            "I'm still following you.",
+            "Already following right behind you.",
+            "Still on your heels. No need to repeat.",
+            "I haven't gone anywhere. Still right here.",
+            "Following you already. Just keep walking.",
+            "I'm right behind you! Look over your shoulder.",
+            "Still with you. Don't worry.",
+            "Already in tow. Lead the way.",
+            "Following you as we speak.",
+            "I'm already following. Keep moving."
+          ],
+          "TL": [
+            "Sinusundan pa rin kita.",
+            "Nakasunod na ako mismo sa likod mo.",
+            "Nasa likod mo pa rin. Di na kailangang ulitin.",
+            "Wala akong pinuntahan. Narito pa rin ako.",
+            "Sumusunod na sa 'yo. Magpatuloy ka lang sa paglalakad.",
+            "Nasa likod mo lang ako! Lumingon ka sa balikat mo.",
+            "Kasama mo pa rin ako. Huwag kang mag-alala.",
+            "Nakasunod na. Mauna ka na.",
+            "Sumusunod sa 'yo habang nagsasalita ka.",
+            "Sumusunod na ako. Tuloy lang sa paglakad."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.follow.queued",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

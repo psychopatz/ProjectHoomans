@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.player",
   "id": "camp_rejected",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,34 +16,25 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
-    "responseTemplateID": "semantic.command.player.camp_rejected"
+    "responseAct": "DIRECTIVE"
   },
-  "response": {
-    "act": "DIRECTIVE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I can't find a safe room or campfire nearby.",
-          "TL": "Wala akong makitang ligtas na silid o apoy dito."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "We need a nearby room or campfire before we make camp.",
-          "TL": "Kailangan natin ng malapit na silid o apoy bago magkampo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "No usable camp site is visible from here.",
-          "TL": "Walang angkop na lugar ng kampo rito."
+          "EN": [
+            "I can't find a safe room or campfire nearby.",
+            "We need a nearby room or campfire before we make camp.",
+            "No usable camp site is visible from here."
+          ],
+          "TL": [
+            "Wala akong makitang ligtas na silid o apoy dito.",
+            "Kailangan natin ng malapit na silid o apoy bago magkampo.",
+            "Walang angkop na lugar ng kampo rito."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.player",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

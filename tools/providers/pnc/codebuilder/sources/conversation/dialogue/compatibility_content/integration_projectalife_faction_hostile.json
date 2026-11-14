@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.projectalife.faction",
+  "id": "hostile",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.projectalife.faction.hostile",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "That faction may be hostile toward us now. Stay alert.",
-          "TL": "That faction may be hostile toward us now. Stay alert."
+          "EN": [
+            "That faction may be hostile toward us now. Stay alert."
+          ],
+          "TL": [
+            "That faction may be hostile toward us now. Stay alert."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.projectalife.faction.hostile",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -266,7 +266,7 @@ local playerCommand = PNC.ConvoEngine.CompanionSpeech.ResolvePlayerCommand(
     }
 )
 T.truthy(playerCommand, "built-in player semantic realization missing")
-T.equal(playerCommand.realizationID, "semantic.command.player.follow",
+T.equal(playerCommand.realizationID, "command.player.follow",
     "player command meaning is selected by the semantic pool")
 T.equal(playerCommand.responsePlanID, "semantic.command.player",
     "player command carries its semantic response plan")
@@ -279,7 +279,7 @@ T.truthy(string.find(playerCommand.fallback, "Walker Sage", 1, true),
 local campNone = PNC.ConvoEngine.CompanionSpeech.ResolvePlayerCommand(
     "camp", "none", { requestID = "command-semantic-2" }
 )
-T.equal(campNone.realizationID, "semantic.command.player.camp_none",
+T.equal(campNone.realizationID, "command.player.camp_none",
     "camp without a site keeps the semantic none outcome")
 T.equal(campNone.fallback, "...",
     "camp without an NPC retains the accepted ellipsis wording")
@@ -287,7 +287,7 @@ T.equal(campNone.fallback, "...",
 local npcReply = PNC.ConvoEngine.CompanionSpeech.ResolveNPCCommand(
     "camp", "invalid", { requestID = "command-semantic-3" }
 )
-T.equal(npcReply.realizationID, "semantic.command.reply.camp_rejected",
+T.equal(npcReply.realizationID, "command.reply.camp_rejected",
     "NPC command rejection uses the semantic rejection variant")
 local campReplyText = string.lower(tostring(npcReply.fallback or ""))
 T.truthy(

@@ -8,12 +8,12 @@ Catalog.Register("semantic.question.identity", {
     variants = {
         {
             id = "semantic.question.identity.default",
-            templateID = "semantic.question.identity",
+            templateID = "question.identity",
             fallback = "I'll tell you my name once we've established some trust. What's your name?",
         },
         {
             id = "semantic.question.identity.untrustworthy",
-            templateID = "semantic.question.identity",
+            templateID = "question.identity",
             fallback = "I don't share my name with liars. What's yours, truthfully?",
             when = { identityTrust = "untrustworthy" },
             priority = 2,
@@ -32,7 +32,7 @@ Catalog.Register("semantic.question.activity", {
         },
         {
             id = "semantic.question.activity.fishing",
-            templateID = "semantic.question.activity.fishing",
+            templateID = "question.activity.fishing",
             fallback = "I'm trying to catch something.",
             when = { activity = "fishing" },
             priority = 2,
@@ -70,7 +70,7 @@ Catalog.Register("semantic.question.whats_up", {
     variants = {
         {
             id = "semantic.question.whats_up.weather",
-            templateID = "semantic.question.whats_up.weather",
+            templateID = "question.whats_up.weather",
             fallback = "The weather is the main thing on my mind right now.",
             when = {
                 subject = "CONVERSATION_TOPIC",
@@ -80,7 +80,7 @@ Catalog.Register("semantic.question.whats_up", {
         },
         {
             id = "semantic.question.whats_up.traveling",
-            templateID = "semantic.question.whats_up.traveling",
+            templateID = "question.whats_up.traveling",
             fallback = "I'm keeping moving and watching what is ahead.",
             when = {
                 subject = "CONVERSATION_TOPIC",
@@ -90,7 +90,7 @@ Catalog.Register("semantic.question.whats_up", {
         },
         {
             id = "semantic.question.whats_up.busy",
-            templateID = "semantic.question.whats_up.busy",
+            templateID = "question.whats_up.busy",
             fallback = "I'm keeping busy and trying to stay useful.",
             when = {
                 subject = "CONVERSATION_TOPIC",
@@ -100,13 +100,13 @@ Catalog.Register("semantic.question.whats_up", {
         },
         {
             id = "semantic.question.whats_up.default",
-            templateID = "semantic.question.whats_up.default",
+            templateID = "question.whats_up.default",
             fallback = "Not much. I'm just trying to keep things together.",
             when = { subject = "CONVERSATION_TOPIC" },
         },
         {
             id = "semantic.question.whats_up.default_alt",
-            templateID = "semantic.question.whats_up.default_alt",
+            templateID = "question.whats_up.default_alt",
             fallback = "Same as ever. Staying alive and watching the road.",
             when = { subject = "CONVERSATION_TOPIC" },
         },

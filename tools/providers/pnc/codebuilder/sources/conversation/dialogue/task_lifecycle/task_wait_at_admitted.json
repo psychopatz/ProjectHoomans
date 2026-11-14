@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.wait_at",
   "id": "admitted",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/wait_at.json",
-    "responseTemplateID": "semantic.task.wait_at.admitted",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Okay, I'll wait there.",
-          "TL": "Sige, maghihintay ako roon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Understood. Moving to the waiting spot.",
-          "TL": "Naintindihan. Papatungo sa pwesto ng paghihintay."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I'll go stand by over there.",
-          "TL": "Pupunta ako roon para maghintay."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "All right, I'll wait at that position.",
-          "TL": "Sige, maghihintay ako sa posisyong iyon."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Heading to the waypoint to wait.",
-          "TL": "Papatungo sa marka para maghintay."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Understood. I will hold that ground.",
-          "TL": "Naiintindihan ko. Hahawakan ko ang lupang iyon."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Right. Setting up to wait there.",
-          "TL": "Sige. Mag-aayos para maghintay doon."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I'll wait at the assigned marker.",
-          "TL": "Maghihintay ako sa iniatas na marka."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Moving to wait as ordered.",
-          "TL": "Kikilos para maghintay ayon sa utos."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Sounds good. Going to wait there.",
-          "TL": "Maganda 'yan. Pupunta para maghintay doon."
+          "EN": [
+            "Okay, I'll wait there.",
+            "Understood. Moving to the waiting spot.",
+            "I'll go stand by over there.",
+            "All right, I'll wait at that position.",
+            "Heading to the waypoint to wait.",
+            "Understood. I will hold that ground.",
+            "Right. Setting up to wait there.",
+            "I'll wait at the assigned marker.",
+            "Moving to wait as ordered.",
+            "Sounds good. Going to wait there."
+          ],
+          "TL": [
+            "Sige, maghihintay ako roon.",
+            "Naintindihan. Papatungo sa pwesto ng paghihintay.",
+            "Pupunta ako roon para maghintay.",
+            "Sige, maghihintay ako sa posisyong iyon.",
+            "Papatungo sa marka para maghintay.",
+            "Naiintindihan ko. Hahawakan ko ang lupang iyon.",
+            "Sige. Mag-aayos para maghintay doon.",
+            "Maghihintay ako sa iniatas na marka.",
+            "Kikilos para maghintay ayon sa utos.",
+            "Maganda 'yan. Pupunta para maghintay doon."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.wait_at",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

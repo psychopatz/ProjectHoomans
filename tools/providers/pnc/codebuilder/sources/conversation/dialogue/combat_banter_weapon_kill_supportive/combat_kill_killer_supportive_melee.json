@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.supportive",
+  "id": "melee",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/supportive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "It's down. Keep close.",
+            "Got it off you. You alright?",
+            "Downed it. Check your corners.",
+            "I'm right here with you. It's dead.",
+            "Crushed it before it got close.",
+            "Stay behind me. That one's done.",
+            "Took it down. Catch your breath.",
+            "Dead on the floor. You holding up?",
+            "I've got this line. Watch behind us.",
+            "It's over for that one. We're okay."
+          ],
+          "TL": [
+            "Bagsak na. Dumikit ka lang.",
+            "Nailayo ko sa'yo. Ayos ka lang?",
+            "Ibinagsak ko na. Tignan ang sulok mo.",
+            "Nandito lang ako kasama mo. Patay na.",
+            "Dinurog bago pa makalapit.",
+            "Manatili sa likod ko. Tapos na 'yon.",
+            "Ibinagsak ko na. Huminga ka muna.",
+            "Patay sa sahig. Nakakayanan mo pa?",
+            "Hawak ko ang linyang 'to. Bantayan ang likod.",
+            "Tapos na ang isang 'yon. Ayos lang tayo."
+          ]
+        }
+      }
+    ]
+  }
+}

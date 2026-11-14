@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.firstmeet",
   "id": "sunset",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/neutral/first_meet/sunset",
-    "textDomain": "pnc.psdl.social.greetings.neutral.first_meet.sunset"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.neutral.first_meet.sunset",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "You picked a late hour to approach a stranger.",
           "TL": "Huli na para lumapit sa isang estranghero."
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "The light is going. Say what you came to say.",
           "TL": "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin."
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "I don't know you, but I'm listening.",
           "TL": "Hindi kita kilala, pero nakikinig ako."
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "Before it gets dark, tell me who you are.",
           "TL": "Bago dumilim, sabihin mo sa akin kung sino ka."
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "Another survivor. Friendly, I hope?",
           "TL": "Isa pang nakaligtas. Friendly, sana?"
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.firstmeet",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "You picked a late hour to approach a stranger.",
+            "The light is going. Say what you came to say.",
+            "I don't know you, but I'm listening.",
+            "Before it gets dark, tell me who you are.",
+            "Another survivor. Friendly, I hope?"
+          ],
+          "TL": [
+            "Huli na para lumapit sa isang estranghero.",
+            "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
+            "Hindi kita kilala, pero nakikinig ako.",
+            "Bago dumilim, sabihin mo sa akin kung sino ka.",
+            "Isa pang nakaligtas. Friendly, sana?"
+          ]
+        }
+      }
+    ]
+  }
 }

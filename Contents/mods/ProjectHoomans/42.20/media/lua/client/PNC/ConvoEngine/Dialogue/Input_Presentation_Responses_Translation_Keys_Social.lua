@@ -36,19 +36,19 @@ local keys = {
             "UI_PNC_Conversation_Semantic_ThreatTrusted",
         ["semantic.social.offer_stressed"] =
             "UI_PNC_Conversation_Semantic_OfferStressed",
-        ["semantic.social.offer_friendly"] =
+        ["social.offer_friendly"] =
             "UI_PNC_Conversation_Semantic_OfferFriendly",
-        ["semantic.social.offer_trusted"] =
+        ["social.offer_trusted"] =
             "UI_PNC_Conversation_Semantic_OfferTrusted",
-        ["semantic.social.offer_withdrawn"] =
+        ["social.offer_withdrawn"] =
             "UI_PNC_Conversation_Semantic_OfferWithdrawn",
-        ["semantic.social.dispute_stressed"] =
+        ["social.dispute_stressed"] =
             "UI_PNC_Conversation_Semantic_DisputeStressed",
-        ["semantic.social.dispute_friendly"] =
+        ["social.dispute_friendly"] =
             "UI_PNC_Conversation_Semantic_DisputeFriendly",
-        ["semantic.social.dispute_trusted"] =
+        ["social.dispute_trusted"] =
             "UI_PNC_Conversation_Semantic_DisputeTrusted",
-        ["semantic.social.dispute_withdrawn"] =
+        ["social.dispute_withdrawn"] =
             "UI_PNC_Conversation_Semantic_DisputeWithdrawn",
         ["semantic.social.refuse_request"] =
             "UI_PNC_Conversation_Semantic_RefuseRequest",

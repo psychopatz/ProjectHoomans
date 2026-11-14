@@ -2,16 +2,297 @@
 return {
     {
         ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge.guarded",
+        ["exchangeFamily"] = {
+            ["familyID"] = "interaction.memory.acknowledge",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I hear you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I hear you.",
+                                        "I remember that.",
+                                        "Sounds familiar.",
+                                        "Makes sense given what happened.",
+                                        "I recall that well.",
+                                        "Yes, that was quite an event.",
+                                        "I understand why you bring that up.",
+                                        "Right. That was a significant moment.",
+                                        "I hear what you're saying about that.",
+                                        "Fair enough. That memory tracks.",
+                                    },
+                                    ["TL"] = {
+                                        "Naririnig kita.",
+                                        "Naaalala ko iyan.",
+                                        "Pamilyar ang dating.",
+                                        "May katuturan base sa nangyari.",
+                                        "Maliwanag kong naaalala 'yon.",
+                                        "Oo, matinding pangyayari 'yon.",
+                                        "Nauunawaan ko kung bakit mo binuksan 'yan.",
+                                        "Tama. Mahalagang sandali 'yon.",
+                                        "Naiintindihan ko ang sinasabi mo tungkol doon.",
+                                        "Makatwiran. Tugma ang alaalang 'yan.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "All right. I heard you.",
+                                ["id"] = "guarded",
+                                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.guarded",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "All right. I heard you.",
+                                        "I remember, but let's not dwell on the past.",
+                                        "Past is past. Keep your focus here.",
+                                        "I know what happened. No need to rehash it.",
+                                        "Noted. But don't expect me to get sentimental.",
+                                        "Yeah, I remember. Why bring it up now?",
+                                        "I haven't forgotten. I never forget.",
+                                        "Heard. Let's move on.",
+                                        "I remember the lesson it taught us.",
+                                        "All right. Keep that to yourself moving forward.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Narinig kita.",
+                                        "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan.",
+                                        "Nakalipas na. Magpokus ka sa kasalukuyan.",
+                                        "Alam ko ang nangyari. Di na kailangang ulitin pa.",
+                                        "Tala ko na. Pero huwag kang umasang magiging madrama ako.",
+                                        "Oo, tanda ko. Bakit mo binubuksan ngayon?",
+                                        "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot.",
+                                        "Narinig ko. Lumipat na tayo ng usapan.",
+                                        "Naaalala ko ang aral na itinuro niyan sa atin.",
+                                        "Sige. Itago mo na lang sa sarili mo sa susunod.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Mm.",
+                                ["id"] = "terse",
+                                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.terse",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Mm.",
+                                        "Remember.",
+                                        "Recall it.",
+                                        "Yeah.",
+                                        "Heard.",
+                                        "Right.",
+                                        "Got it.",
+                                        "True.",
+                                        "Yep.",
+                                        "Understood.",
+                                    },
+                                    ["TL"] = {
+                                        "Mm.",
+                                        "Tanda ko.",
+                                        "Naalala ko.",
+                                        "Oo.",
+                                        "Narinig.",
+                                        "Tama.",
+                                        "Nakuha ko.",
+                                        "Totoo.",
+                                        "Oo nga.",
+                                        "Naintindihan.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Yeah. I can see why that stayed with you.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Yeah. I can see why that stayed with you.",
+                                        "I remember that too. It meant a lot to me.",
+                                        "That was a special moment between us. Glad you remember.",
+                                        "It stayed in my heart as well, friend.",
+                                        "Thanks for reminding me of that. Good times.",
+                                        "Those memories keep us human out here.",
+                                        "I smile every time I think back on that day.",
+                                        "We made it through that together. I won't forget it.",
+                                        "I'm glad we share that memory.",
+                                        "That really stuck with both of us, didn't it?",
+                                    },
+                                    ["TL"] = {
+                                        "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan.",
+                                        "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin.",
+                                        "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo.",
+                                        "Nanatili rin 'yon sa puso ko, kaibigan.",
+                                        "Salamat sa pagpapaalala niyan. Magandang alaala.",
+                                        "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito.",
+                                        "Napapangiti ako tuwing naaalala ko ang araw na 'yon.",
+                                        "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan.",
+                                        "Masaya ako at pinagsaluhan natin ang alaalang 'yon.",
+                                        "Talagang tumatak sa ating dalawa 'yon, 'di ba?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "interaction.memory",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I hear you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I hear you.",
+                            "I remember that.",
+                            "Sounds familiar.",
+                            "Makes sense given what happened.",
+                            "I recall that well.",
+                            "Yes, that was quite an event.",
+                            "I understand why you bring that up.",
+                            "Right. That was a significant moment.",
+                            "I hear what you're saying about that.",
+                            "Fair enough. That memory tracks.",
+                        },
+                        ["TL"] = {
+                            "Naririnig kita.",
+                            "Naaalala ko iyan.",
+                            "Pamilyar ang dating.",
+                            "May katuturan base sa nangyari.",
+                            "Maliwanag kong naaalala 'yon.",
+                            "Oo, matinding pangyayari 'yon.",
+                            "Nauunawaan ko kung bakit mo binuksan 'yan.",
+                            "Tama. Mahalagang sandali 'yon.",
+                            "Naiintindihan ko ang sinasabi mo tungkol doon.",
+                            "Makatwiran. Tugma ang alaalang 'yan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "All right. I heard you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge.say.1.guarded",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "All right. I heard you.",
+                            "I remember, but let's not dwell on the past.",
+                            "Past is past. Keep your focus here.",
+                            "I know what happened. No need to rehash it.",
+                            "Noted. But don't expect me to get sentimental.",
+                            "Yeah, I remember. Why bring it up now?",
+                            "I haven't forgotten. I never forget.",
+                            "Heard. Let's move on.",
+                            "I remember the lesson it taught us.",
+                            "All right. Keep that to yourself moving forward.",
+                        },
+                        ["TL"] = {
+                            "Sige. Narinig kita.",
+                            "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan.",
+                            "Nakalipas na. Magpokus ka sa kasalukuyan.",
+                            "Alam ko ang nangyari. Di na kailangang ulitin pa.",
+                            "Tala ko na. Pero huwag kang umasang magiging madrama ako.",
+                            "Oo, tanda ko. Bakit mo binubuksan ngayon?",
+                            "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot.",
+                            "Narinig ko. Lumipat na tayo ng usapan.",
+                            "Naaalala ko ang aral na itinuro niyan sa atin.",
+                            "Sige. Itago mo na lang sa sarili mo sa susunod.",
+                        },
+                    },
+                    ["variantID"] = "guarded",
+                },
+                {
+                    ["fallback"] = "Mm.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge.say.1.terse",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Mm.",
+                            "Remember.",
+                            "Recall it.",
+                            "Yeah.",
+                            "Heard.",
+                            "Right.",
+                            "Got it.",
+                            "True.",
+                            "Yep.",
+                            "Understood.",
+                        },
+                        ["TL"] = {
+                            "Mm.",
+                            "Tanda ko.",
+                            "Naalala ko.",
+                            "Oo.",
+                            "Narinig.",
+                            "Tama.",
+                            "Nakuha ko.",
+                            "Totoo.",
+                            "Oo nga.",
+                            "Naintindihan.",
+                        },
+                    },
+                    ["variantID"] = "terse",
+                },
+                {
+                    ["fallback"] = "Yeah. I can see why that stayed with you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Yeah. I can see why that stayed with you.",
+                            "I remember that too. It meant a lot to me.",
+                            "That was a special moment between us. Glad you remember.",
+                            "It stayed in my heart as well, friend.",
+                            "Thanks for reminding me of that. Good times.",
+                            "Those memories keep us human out here.",
+                            "I smile every time I think back on that day.",
+                            "We made it through that together. I won't forget it.",
+                            "I'm glad we share that memory.",
+                            "That really stuck with both of us, didn't it?",
+                        },
+                        ["TL"] = {
+                            "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan.",
+                            "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin.",
+                            "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo.",
+                            "Nanatili rin 'yon sa puso ko, kaibigan.",
+                            "Salamat sa pagpapaalala niyan. Magandang alaala.",
+                            "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito.",
+                            "Napapangiti ako tuwing naaalala ko ang araw na 'yon.",
+                            "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan.",
+                            "Masaya ako at pinagsaluhan natin ang alaalang 'yon.",
+                            "Talagang tumatak sa ating dalawa 'yon, 'di ba?",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "interaction.memory.acknowledge",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "guarded",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge.guarded",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[3]",
+            ["localId"] = "acknowledge",
+            ["sourceId"] = "interaction.memory.acknowledge",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge",
+        ["namespace"] = "interaction.memory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +306,165 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-                ["style"] = "guarded",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "guarded.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. I heard you.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I hear you.",
+                                        "I remember that.",
+                                        "Sounds familiar.",
+                                        "Makes sense given what happened.",
+                                        "I recall that well.",
+                                        "Yes, that was quite an event.",
+                                        "I understand why you bring that up.",
+                                        "Right. That was a significant moment.",
+                                        "I hear what you're saying about that.",
+                                        "Fair enough. That memory tracks.",
+                                    },
+                                    ["TL"] = {
+                                        "Naririnig kita.",
+                                        "Naaalala ko iyan.",
+                                        "Pamilyar ang dating.",
+                                        "May katuturan base sa nangyari.",
+                                        "Maliwanag kong naaalala 'yon.",
+                                        "Oo, matinding pangyayari 'yon.",
+                                        "Nauunawaan ko kung bakit mo binuksan 'yan.",
+                                        "Tama. Mahalagang sandali 'yon.",
+                                        "Naiintindihan ko ang sinasabi mo tungkol doon.",
+                                        "Makatwiran. Tugma ang alaalang 'yan.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Sige. Narinig kita.",
+                            {
+                                ["id"] = "guarded",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "All right. I heard you.",
+                                        "I remember, but let's not dwell on the past.",
+                                        "Past is past. Keep your focus here.",
+                                        "I know what happened. No need to rehash it.",
+                                        "Noted. But don't expect me to get sentimental.",
+                                        "Yeah, I remember. Why bring it up now?",
+                                        "I haven't forgotten. I never forget.",
+                                        "Heard. Let's move on.",
+                                        "I remember the lesson it taught us.",
+                                        "All right. Keep that to yourself moving forward.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Narinig kita.",
+                                        "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan.",
+                                        "Nakalipas na. Magpokus ka sa kasalukuyan.",
+                                        "Alam ko ang nangyari. Di na kailangang ulitin pa.",
+                                        "Tala ko na. Pero huwag kang umasang magiging madrama ako.",
+                                        "Oo, tanda ko. Bakit mo binubuksan ngayon?",
+                                        "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot.",
+                                        "Narinig ko. Lumipat na tayo ng usapan.",
+                                        "Naaalala ko ang aral na itinuro niyan sa atin.",
+                                        "Sige. Itago mo na lang sa sarili mo sa susunod.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I remember, but let's not dwell on the past.",
+                            {
+                                ["id"] = "terse",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Mm.",
+                                        "Remember.",
+                                        "Recall it.",
+                                        "Yeah.",
+                                        "Heard.",
+                                        "Right.",
+                                        "Got it.",
+                                        "True.",
+                                        "Yep.",
+                                        "Understood.",
+                                    },
+                                    ["TL"] = {
+                                        "Mm.",
+                                        "Tanda ko.",
+                                        "Naalala ko.",
+                                        "Oo.",
+                                        "Narinig.",
+                                        "Tama.",
+                                        "Nakuha ko.",
+                                        "Totoo.",
+                                        "Oo nga.",
+                                        "Naintindihan.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Past is past. Keep your focus here.",
-                            },
-                            ["TL"] = {
-                                "Nakalipas na. Magpokus ka sa kasalukuyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I know what happened. No need to rehash it.",
-                            },
-                            ["TL"] = {
-                                "Alam ko ang nangyari. Di na kailangang ulitin pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted. But don't expect me to get sentimental.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na. Pero huwag kang umasang magiging madrama ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Yeah, I remember. Why bring it up now?",
-                            },
-                            ["TL"] = {
-                                "Oo, tanda ko. Bakit mo binubuksan ngayon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I haven't forgotten. I never forget.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heard. Let's move on.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko. Lumipat na tayo ng usapan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I remember the lesson it taught us.",
-                            },
-                            ["TL"] = {
-                                "Naaalala ko ang aral na itinuro niyan sa atin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. Keep that to yourself moving forward.",
-                            },
-                            ["TL"] = {
-                                "Sige. Itago mo na lang sa sarili mo sa susunod.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Yeah. I can see why that stayed with you.",
+                                        "I remember that too. It meant a lot to me.",
+                                        "That was a special moment between us. Glad you remember.",
+                                        "It stayed in my heart as well, friend.",
+                                        "Thanks for reminding me of that. Good times.",
+                                        "Those memories keep us human out here.",
+                                        "I smile every time I think back on that day.",
+                                        "We made it through that together. I won't forget it.",
+                                        "I'm glad we share that memory.",
+                                        "That really stuck with both of us, didn't it?",
+                                    },
+                                    ["TL"] = {
+                                        "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan.",
+                                        "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin.",
+                                        "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo.",
+                                        "Nanatili rin 'yon sa puso ko, kaibigan.",
+                                        "Salamat sa pagpapaalala niyan. Magandang alaala.",
+                                        "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito.",
+                                        "Napapangiti ako tuwing naaalala ko ang araw na 'yon.",
+                                        "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan.",
+                                        "Masaya ako at pinagsaluhan natin ang alaalang 'yon.",
+                                        "Talagang tumatak sa ating dalawa 'yon, 'di ba?",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "interaction.memory.acknowledge",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I hear you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.interaction.memory.acknowledge.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,334 +474,435 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I hear you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I hear you.",
+                        "I remember that.",
+                        "Sounds familiar.",
+                        "Makes sense given what happened.",
+                        "I recall that well.",
+                        "Yes, that was quite an event.",
+                        "I understand why you bring that up.",
+                        "Right. That was a significant moment.",
+                        "I hear what you're saying about that.",
+                        "Fair enough. That memory tracks.",
+                    },
+                    ["TL"] = {
+                        "Naririnig kita.",
+                        "Naaalala ko iyan.",
+                        "Pamilyar ang dating.",
+                        "May katuturan base sa nangyari.",
+                        "Maliwanag kong naaalala 'yon.",
+                        "Oo, matinding pangyayari 'yon.",
+                        "Nauunawaan ko kung bakit mo binuksan 'yan.",
+                        "Tama. Mahalagang sandali 'yon.",
+                        "Naiintindihan ko ang sinasabi mo tungkol doon.",
+                        "Makatwiran. Tugma ang alaalang 'yan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "All right. I heard you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.guarded",
+                ["translations"] = {
+                    ["EN"] = {
+                        "All right. I heard you.",
+                        "I remember, but let's not dwell on the past.",
+                        "Past is past. Keep your focus here.",
+                        "I know what happened. No need to rehash it.",
+                        "Noted. But don't expect me to get sentimental.",
+                        "Yeah, I remember. Why bring it up now?",
+                        "I haven't forgotten. I never forget.",
+                        "Heard. Let's move on.",
+                        "I remember the lesson it taught us.",
+                        "All right. Keep that to yourself moving forward.",
+                    },
+                    ["TL"] = {
+                        "Sige. Narinig kita.",
+                        "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan.",
+                        "Nakalipas na. Magpokus ka sa kasalukuyan.",
+                        "Alam ko ang nangyari. Di na kailangang ulitin pa.",
+                        "Tala ko na. Pero huwag kang umasang magiging madrama ako.",
+                        "Oo, tanda ko. Bakit mo binubuksan ngayon?",
+                        "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot.",
+                        "Narinig ko. Lumipat na tayo ng usapan.",
+                        "Naaalala ko ang aral na itinuro niyan sa atin.",
+                        "Sige. Itago mo na lang sa sarili mo sa susunod.",
+                    },
+                },
+                ["variantID"] = "guarded",
+            },
+            {
+                ["fallback"] = "Mm.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.terse",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Mm.",
+                        "Remember.",
+                        "Recall it.",
+                        "Yeah.",
+                        "Heard.",
+                        "Right.",
+                        "Got it.",
+                        "True.",
+                        "Yep.",
+                        "Understood.",
+                    },
+                    ["TL"] = {
+                        "Mm.",
+                        "Tanda ko.",
+                        "Naalala ko.",
+                        "Oo.",
+                        "Narinig.",
+                        "Tama.",
+                        "Nakuha ko.",
+                        "Totoo.",
+                        "Oo nga.",
+                        "Naintindihan.",
+                    },
+                },
+                ["variantID"] = "terse",
+            },
+            {
+                ["fallback"] = "Yeah. I can see why that stayed with you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Yeah. I can see why that stayed with you.",
+                        "I remember that too. It meant a lot to me.",
+                        "That was a special moment between us. Glad you remember.",
+                        "It stayed in my heart as well, friend.",
+                        "Thanks for reminding me of that. Good times.",
+                        "Those memories keep us human out here.",
+                        "I smile every time I think back on that day.",
+                        "We made it through that together. I won't forget it.",
+                        "I'm glad we share that memory.",
+                        "That really stuck with both of us, didn't it?",
+                    },
+                    ["TL"] = {
+                        "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan.",
+                        "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin.",
+                        "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo.",
+                        "Nanatili rin 'yon sa puso ko, kaibigan.",
+                        "Salamat sa pagpapaalala niyan. Magandang alaala.",
+                        "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito.",
+                        "Napapangiti ako tuwing naaalala ko ang araw na 'yon.",
+                        "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan.",
+                        "Masaya ako at pinagsaluhan natin ang alaalang 'yon.",
+                        "Talagang tumatak sa ating dalawa 'yon, 'di ba?",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear you.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "interaction.memory.acknowledge_flavor",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "The listener gives a small acknowledging nod.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "The listener gives a small acknowledging nod.",
+                                        "The listener listens thoughtfully and nods.",
+                                        "A steady nod shows the listener remembers.",
+                                        "The listener absorbs the words and dips their head.",
+                                        "The listener acknowledges the shared recollection quietly.",
+                                        "A quiet look of recognition passes over the listener's face.",
+                                        "The listener blinks slowly, recalling the moment.",
+                                        "The listener gives a calm, measured gesture of understanding.",
+                                        "A brief pause precedes an acknowledging nod.",
+                                        "The listener tilts their head in silent agreement.",
+                                    },
+                                    ["TL"] = {
+                                        "Bahagyang tumango ang nakikinig bilang pagkilala.",
+                                        "Matiyagang nakikinig ang kausap at tumatango.",
+                                        "Isang matatag na tango ang nagpapakitang naaalala niya.",
+                                        "Inintindi ng nakikinig ang mga salita at bahagyang yumukod.",
+                                        "Tahimik na kinilala ng nakikinig ang pinagsaluhang alaala.",
+                                        "Isang tahimik na anyo ng pagkilala ang dumaan sa mukha ng nakikinig.",
+                                        "Mabagal na kumurap ang nakikinig, inaalala ang sandali.",
+                                        "Nagbigay ang nakikinig ng kalmado at maingat na senyas ng pagkaunawa.",
+                                        "Isang maikling paghinto ang nauna bago tumango bilang pagkilala.",
+                                        "Itinagilid ng nakikinig ang ulo bilang tahimik na pagsang-ayon.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Naririnig kita.",
+                            {
+                                ["fallback"] = "The listener gives a guarded nod.",
+                                ["id"] = "guarded",
+                                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.guarded",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "The listener gives a guarded nod.",
+                                        "The listener watches closely without revealing their thoughts.",
+                                        "A cautious look crosses the listener's eyes.",
+                                        "The listener stiffens slightly as the past is mentioned.",
+                                        "A slow, guarded nod shows the words were registered.",
+                                        "The listener's hand rests near their belt during the pause.",
+                                        "The listener narrows their eyes, weighing the intent behind the words.",
+                                        "A tight, reserved expression settles on the listener's face.",
+                                        "The listener gives nothing away, nodding once carefully.",
+                                        "The listener keeps their guard up while acknowledging the memory.",
+                                    },
+                                    ["TL"] = {
+                                        "Maingat na tumango ang nakikinig.",
+                                        "Masusing nagmasid ang nakikinig nang walang inilalantad na iniisip.",
+                                        "Isang maingat na tingin ang dumaan sa mga mata ng nakikinig.",
+                                        "Bahagyang nanigas ang nakikinig nang mabanggit ang nakaraan.",
+                                        "Isang mabagal at maingat na tango ang nagpahiwatig na narinig ang sinabi.",
+                                        "Nakalapag ang kamay ng nakikinig malapit sa sinturon sa sandaling iyon.",
+                                        "Nanliit ang mga mata ng nakikinig, tinitimbang ang layunin sa likod ng salita.",
+                                        "Isang mahigpit at maramdamang ekspresyon ang namutawi sa mukha ng nakikinig.",
+                                        "Walang ipinakitang emosyon ang nakikinig, isang maingat na tango lang.",
+                                        "Nanatiling alerto ang nakikinig habang kinikilala ang alaala.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I remember that.",
+                            {
+                                ["fallback"] = "A brief nod follows.",
+                                ["id"] = "terse",
+                                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.terse",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "A brief nod follows.",
+                                        "A curt dip of the chin confirms it.",
+                                        "The listener grunts in assent.",
+                                        "A sharp single nod.",
+                                        "The listener barely shifts.",
+                                        "Eyes narrow briefly in recognition.",
+                                        "A quick jerk of the head acknowledges it.",
+                                        "The listener's jaw sets firmly.",
+                                        "A momentary pause, nothing more.",
+                                        "A flat nod ends the topic.",
+                                    },
+                                    ["TL"] = {
+                                        "Isang maikling tango ang sumunod.",
+                                        "Maikling pagyuko ng baba ang kumumpirma.",
+                                        "Umungol ang nakikinig bilang pagsang-ayon.",
+                                        "Isang mabilis at iisang tango.",
+                                        "Halos hindi gumalaw ang nakikinig.",
+                                        "Sandaling nanliit ang mga mata sa pagkilala.",
+                                        "Mabilis na paggalaw ng ulo ang kumilala roon.",
+                                        "Nadiin ang panga ng nakikinig.",
+                                        "Isang saglit na paghinto, wala nang iba.",
+                                        "Isang malamig na tango ang nagtapos sa paksa.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Naaalala ko iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds familiar.",
-                            },
-                            ["TL"] = {
-                                "Pamilyar ang dating.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Makes sense given what happened.",
-                            },
-                            ["TL"] = {
-                                "May katuturan base sa nangyari.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I recall that well.",
-                            },
-                            ["TL"] = {
-                                "Maliwanag kong naaalala 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Yes, that was quite an event.",
-                            },
-                            ["TL"] = {
-                                "Oo, matinding pangyayari 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I understand why you bring that up.",
-                            },
-                            ["TL"] = {
-                                "Nauunawaan ko kung bakit mo binuksan 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. That was a significant moment.",
-                            },
-                            ["TL"] = {
-                                "Tama. Mahalagang sandali 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear what you're saying about that.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko ang sinasabi mo tungkol doon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fair enough. That memory tracks.",
-                            },
-                            ["TL"] = {
-                                "Makatwiran. Tugma ang alaalang 'yan.",
+                            {
+                                ["fallback"] = "The listener softens and nods with quiet understanding.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "The listener softens and nods with quiet understanding.",
+                                        "A faint, gentle smile touches the listener's lips.",
+                                        "The listener's eyes warm as the memory settles in.",
+                                        "The listener gives a warm, reassuring nod.",
+                                        "A fond look washes over the listener's tired features.",
+                                        "The listener reaches out slightly, comforted by the recollection.",
+                                        "A soft breath escapes the listener as they remember.",
+                                        "The listener's shoulders relax with affectionate recognition.",
+                                        "The listener nods warmly, visibly moved by the memory.",
+                                        "A quiet sense of camaraderie passes between them.",
+                                    },
+                                    ["TL"] = {
+                                        "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango.",
+                                        "Isang banayad na ngiti ang lumitaw sa labi ng nakikinig.",
+                                        "Uminit ang mga mata ng nakikinig habang lumalalim ang alaala.",
+                                        "Nagbigay ang nakikinig ng mainit at nakapagpapanatag na tango.",
+                                        "Isang masuyong tingin ang dumaloy sa pagod na mukha ng nakikinig.",
+                                        "Bahagyang iniabot ng nakikinig ang kamay, gumaan ang loob sa alaala.",
+                                        "Isang marahang buntong-hininga ang pinakawalan ng nakikinig habang nagugunita.",
+                                        "Lumuwag ang balikat ng nakikinig kalakip ang magiliw na pagkilala.",
+                                        "Mainit na tumango ang nakikinig, halatang naantig sa alaala.",
+                                        "Isang tahimik na damdamin ng pagkakaibigan ang namagitan sa kanila.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge.terse",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "terse",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge.terse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[2]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-                ["style"] = "terse",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "terse.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Mm.",
-                            },
-                            ["TL"] = {
-                                "Mm.",
-                            },
+            ["namespace"] = "interaction.memory",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "The listener gives a small acknowledging nod.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "The listener gives a small acknowledging nod.",
+                            "The listener listens thoughtfully and nods.",
+                            "A steady nod shows the listener remembers.",
+                            "The listener absorbs the words and dips their head.",
+                            "The listener acknowledges the shared recollection quietly.",
+                            "A quiet look of recognition passes over the listener's face.",
+                            "The listener blinks slowly, recalling the moment.",
+                            "The listener gives a calm, measured gesture of understanding.",
+                            "A brief pause precedes an acknowledging nod.",
+                            "The listener tilts their head in silent agreement.",
+                        },
+                        ["TL"] = {
+                            "Bahagyang tumango ang nakikinig bilang pagkilala.",
+                            "Matiyagang nakikinig ang kausap at tumatango.",
+                            "Isang matatag na tango ang nagpapakitang naaalala niya.",
+                            "Inintindi ng nakikinig ang mga salita at bahagyang yumukod.",
+                            "Tahimik na kinilala ng nakikinig ang pinagsaluhang alaala.",
+                            "Isang tahimik na anyo ng pagkilala ang dumaan sa mukha ng nakikinig.",
+                            "Mabagal na kumurap ang nakikinig, inaalala ang sandali.",
+                            "Nagbigay ang nakikinig ng kalmado at maingat na senyas ng pagkaunawa.",
+                            "Isang maikling paghinto ang nauna bago tumango bilang pagkilala.",
+                            "Itinagilid ng nakikinig ang ulo bilang tahimik na pagsang-ayon.",
                         },
                     },
-                    {
-                        ["id"] = "terse.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Remember.",
-                            },
-                            ["TL"] = {
-                                "Tanda ko.",
-                            },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "The listener gives a guarded nod.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.guarded",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "The listener gives a guarded nod.",
+                            "The listener watches closely without revealing their thoughts.",
+                            "A cautious look crosses the listener's eyes.",
+                            "The listener stiffens slightly as the past is mentioned.",
+                            "A slow, guarded nod shows the words were registered.",
+                            "The listener's hand rests near their belt during the pause.",
+                            "The listener narrows their eyes, weighing the intent behind the words.",
+                            "A tight, reserved expression settles on the listener's face.",
+                            "The listener gives nothing away, nodding once carefully.",
+                            "The listener keeps their guard up while acknowledging the memory.",
+                        },
+                        ["TL"] = {
+                            "Maingat na tumango ang nakikinig.",
+                            "Masusing nagmasid ang nakikinig nang walang inilalantad na iniisip.",
+                            "Isang maingat na tingin ang dumaan sa mga mata ng nakikinig.",
+                            "Bahagyang nanigas ang nakikinig nang mabanggit ang nakaraan.",
+                            "Isang mabagal at maingat na tango ang nagpahiwatig na narinig ang sinabi.",
+                            "Nakalapag ang kamay ng nakikinig malapit sa sinturon sa sandaling iyon.",
+                            "Nanliit ang mga mata ng nakikinig, tinitimbang ang layunin sa likod ng salita.",
+                            "Isang mahigpit at maramdamang ekspresyon ang namutawi sa mukha ng nakikinig.",
+                            "Walang ipinakitang emosyon ang nakikinig, isang maingat na tango lang.",
+                            "Nanatiling alerto ang nakikinig habang kinikilala ang alaala.",
                         },
                     },
-                    {
-                        ["id"] = "terse.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Recall it.",
-                            },
-                            ["TL"] = {
-                                "Naalala ko.",
-                            },
+                    ["variantID"] = "guarded",
+                },
+                {
+                    ["fallback"] = "A brief nod follows.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.terse",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "A brief nod follows.",
+                            "A curt dip of the chin confirms it.",
+                            "The listener grunts in assent.",
+                            "A sharp single nod.",
+                            "The listener barely shifts.",
+                            "Eyes narrow briefly in recognition.",
+                            "A quick jerk of the head acknowledges it.",
+                            "The listener's jaw sets firmly.",
+                            "A momentary pause, nothing more.",
+                            "A flat nod ends the topic.",
+                        },
+                        ["TL"] = {
+                            "Isang maikling tango ang sumunod.",
+                            "Maikling pagyuko ng baba ang kumumpirma.",
+                            "Umungol ang nakikinig bilang pagsang-ayon.",
+                            "Isang mabilis at iisang tango.",
+                            "Halos hindi gumalaw ang nakikinig.",
+                            "Sandaling nanliit ang mga mata sa pagkilala.",
+                            "Mabilis na paggalaw ng ulo ang kumilala roon.",
+                            "Nadiin ang panga ng nakikinig.",
+                            "Isang saglit na paghinto, wala nang iba.",
+                            "Isang malamig na tango ang nagtapos sa paksa.",
                         },
                     },
-                    {
-                        ["id"] = "terse.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Yeah.",
-                            },
-                            ["TL"] = {
-                                "Oo.",
-                            },
+                    ["variantID"] = "terse",
+                },
+                {
+                    ["fallback"] = "The listener softens and nods with quiet understanding.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "The listener softens and nods with quiet understanding.",
+                            "A faint, gentle smile touches the listener's lips.",
+                            "The listener's eyes warm as the memory settles in.",
+                            "The listener gives a warm, reassuring nod.",
+                            "A fond look washes over the listener's tired features.",
+                            "The listener reaches out slightly, comforted by the recollection.",
+                            "A soft breath escapes the listener as they remember.",
+                            "The listener's shoulders relax with affectionate recognition.",
+                            "The listener nods warmly, visibly moved by the memory.",
+                            "A quiet sense of camaraderie passes between them.",
+                        },
+                        ["TL"] = {
+                            "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango.",
+                            "Isang banayad na ngiti ang lumitaw sa labi ng nakikinig.",
+                            "Uminit ang mga mata ng nakikinig habang lumalalim ang alaala.",
+                            "Nagbigay ang nakikinig ng mainit at nakapagpapanatag na tango.",
+                            "Isang masuyong tingin ang dumaloy sa pagod na mukha ng nakikinig.",
+                            "Bahagyang iniabot ng nakikinig ang kamay, gumaan ang loob sa alaala.",
+                            "Isang marahang buntong-hininga ang pinakawalan ng nakikinig habang nagugunita.",
+                            "Lumuwag ang balikat ng nakikinig kalakip ang magiliw na pagkilala.",
+                            "Mainit na tumango ang nakikinig, halatang naantig sa alaala.",
+                            "Isang tahimik na damdamin ng pagkakaibigan ang namagitan sa kanila.",
                         },
                     },
-                    {
-                        ["id"] = "terse.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heard.",
-                            },
-                            ["TL"] = {
-                                "Narinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right.",
-                            },
-                            ["TL"] = {
-                                "Tama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "True.",
-                            },
-                            ["TL"] = {
-                                "Totoo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Yep.",
-                            },
-                            ["TL"] = {
-                                "Oo nga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan.",
-                            },
-                        },
-                    },
+                    ["variantID"] = "warm",
                 },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge.warm",
+        ["id"] = "interaction.memory.acknowledge_flavor",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[1]",
+            ["localId"] = "acknowledge_flavor",
+            ["sourceId"] = "interaction.memory.acknowledge_flavor",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge",
+        ["namespace"] = "interaction.memory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -496,284 +916,165 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Yeah. I can see why that stayed with you.",
-                            },
-                            ["TL"] = {
-                                "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I remember that too. It meant a lot to me.",
-                            },
-                            ["TL"] = {
-                                "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That was a special moment between us. Glad you remember.",
-                            },
-                            ["TL"] = {
-                                "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It stayed in my heart as well, friend.",
-                            },
-                            ["TL"] = {
-                                "Nanatili rin 'yon sa puso ko, kaibigan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for reminding me of that. Good times.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagpapaalala niyan. Magandang alaala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Those memories keep us human out here.",
-                            },
-                            ["TL"] = {
-                                "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I smile every time I think back on that day.",
-                            },
-                            ["TL"] = {
-                                "Napapangiti ako tuwing naaalala ko ang araw na 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We made it through that together. I won't forget it.",
-                            },
-                            ["TL"] = {
-                                "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm glad we share that memory.",
-                            },
-                            ["TL"] = {
-                                "Masaya ako at pinagsaluhan natin ang alaalang 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That really stuck with both of us, didn't it?",
-                            },
-                            ["TL"] = {
-                                "Talagang tumatak sa ating dalawa 'yon, 'di ba?",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.guarded",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "guarded",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.guarded",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[3]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge_flavor",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-                ["style"] = "guarded",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "guarded.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener gives a guarded nod.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "The listener gives a small acknowledging nod.",
+                                        "The listener listens thoughtfully and nods.",
+                                        "A steady nod shows the listener remembers.",
+                                        "The listener absorbs the words and dips their head.",
+                                        "The listener acknowledges the shared recollection quietly.",
+                                        "A quiet look of recognition passes over the listener's face.",
+                                        "The listener blinks slowly, recalling the moment.",
+                                        "The listener gives a calm, measured gesture of understanding.",
+                                        "A brief pause precedes an acknowledging nod.",
+                                        "The listener tilts their head in silent agreement.",
+                                    },
+                                    ["TL"] = {
+                                        "Bahagyang tumango ang nakikinig bilang pagkilala.",
+                                        "Matiyagang nakikinig ang kausap at tumatango.",
+                                        "Isang matatag na tango ang nagpapakitang naaalala niya.",
+                                        "Inintindi ng nakikinig ang mga salita at bahagyang yumukod.",
+                                        "Tahimik na kinilala ng nakikinig ang pinagsaluhang alaala.",
+                                        "Isang tahimik na anyo ng pagkilala ang dumaan sa mukha ng nakikinig.",
+                                        "Mabagal na kumurap ang nakikinig, inaalala ang sandali.",
+                                        "Nagbigay ang nakikinig ng kalmado at maingat na senyas ng pagkaunawa.",
+                                        "Isang maikling paghinto ang nauna bago tumango bilang pagkilala.",
+                                        "Itinagilid ng nakikinig ang ulo bilang tahimik na pagsang-ayon.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Maingat na tumango ang nakikinig.",
+                            {
+                                ["id"] = "guarded",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "The listener gives a guarded nod.",
+                                        "The listener watches closely without revealing their thoughts.",
+                                        "A cautious look crosses the listener's eyes.",
+                                        "The listener stiffens slightly as the past is mentioned.",
+                                        "A slow, guarded nod shows the words were registered.",
+                                        "The listener's hand rests near their belt during the pause.",
+                                        "The listener narrows their eyes, weighing the intent behind the words.",
+                                        "A tight, reserved expression settles on the listener's face.",
+                                        "The listener gives nothing away, nodding once carefully.",
+                                        "The listener keeps their guard up while acknowledging the memory.",
+                                    },
+                                    ["TL"] = {
+                                        "Maingat na tumango ang nakikinig.",
+                                        "Masusing nagmasid ang nakikinig nang walang inilalantad na iniisip.",
+                                        "Isang maingat na tingin ang dumaan sa mga mata ng nakikinig.",
+                                        "Bahagyang nanigas ang nakikinig nang mabanggit ang nakaraan.",
+                                        "Isang mabagal at maingat na tango ang nagpahiwatig na narinig ang sinabi.",
+                                        "Nakalapag ang kamay ng nakikinig malapit sa sinturon sa sandaling iyon.",
+                                        "Nanliit ang mga mata ng nakikinig, tinitimbang ang layunin sa likod ng salita.",
+                                        "Isang mahigpit at maramdamang ekspresyon ang namutawi sa mukha ng nakikinig.",
+                                        "Walang ipinakitang emosyon ang nakikinig, isang maingat na tango lang.",
+                                        "Nanatiling alerto ang nakikinig habang kinikilala ang alaala.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener watches closely without revealing their thoughts.",
+                            {
+                                ["id"] = "terse",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "A brief nod follows.",
+                                        "A curt dip of the chin confirms it.",
+                                        "The listener grunts in assent.",
+                                        "A sharp single nod.",
+                                        "The listener barely shifts.",
+                                        "Eyes narrow briefly in recognition.",
+                                        "A quick jerk of the head acknowledges it.",
+                                        "The listener's jaw sets firmly.",
+                                        "A momentary pause, nothing more.",
+                                        "A flat nod ends the topic.",
+                                    },
+                                    ["TL"] = {
+                                        "Isang maikling tango ang sumunod.",
+                                        "Maikling pagyuko ng baba ang kumumpirma.",
+                                        "Umungol ang nakikinig bilang pagsang-ayon.",
+                                        "Isang mabilis at iisang tango.",
+                                        "Halos hindi gumalaw ang nakikinig.",
+                                        "Sandaling nanliit ang mga mata sa pagkilala.",
+                                        "Mabilis na paggalaw ng ulo ang kumilala roon.",
+                                        "Nadiin ang panga ng nakikinig.",
+                                        "Isang saglit na paghinto, wala nang iba.",
+                                        "Isang malamig na tango ang nagtapos sa paksa.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Masusing nagmasid ang nakikinig nang walang inilalantad na iniisip.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A cautious look crosses the listener's eyes.",
-                            },
-                            ["TL"] = {
-                                "Isang maingat na tingin ang dumaan sa mga mata ng nakikinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener stiffens slightly as the past is mentioned.",
-                            },
-                            ["TL"] = {
-                                "Bahagyang nanigas ang nakikinig nang mabanggit ang nakaraan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A slow, guarded nod shows the words were registered.",
-                            },
-                            ["TL"] = {
-                                "Isang mabagal at maingat na tango ang nagpahiwatig na narinig ang sinabi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener's hand rests near their belt during the pause.",
-                            },
-                            ["TL"] = {
-                                "Nakalapag ang kamay ng nakikinig malapit sa sinturon sa sandaling iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener narrows their eyes, weighing the intent behind the words.",
-                            },
-                            ["TL"] = {
-                                "Nanliit ang mga mata ng nakikinig, tinitimbang ang layunin sa likod ng salita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A tight, reserved expression settles on the listener's face.",
-                            },
-                            ["TL"] = {
-                                "Isang mahigpit at maramdamang ekspresyon ang namutawi sa mukha ng nakikinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener gives nothing away, nodding once carefully.",
-                            },
-                            ["TL"] = {
-                                "Walang ipinakitang emosyon ang nakikinig, isang maingat na tango lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener keeps their guard up while acknowledging the memory.",
-                            },
-                            ["TL"] = {
-                                "Nanatiling alerto ang nakikinig habang kinikilala ang alaala.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "The listener softens and nods with quiet understanding.",
+                                        "A faint, gentle smile touches the listener's lips.",
+                                        "The listener's eyes warm as the memory settles in.",
+                                        "The listener gives a warm, reassuring nod.",
+                                        "A fond look washes over the listener's tired features.",
+                                        "The listener reaches out slightly, comforted by the recollection.",
+                                        "A soft breath escapes the listener as they remember.",
+                                        "The listener's shoulders relax with affectionate recognition.",
+                                        "The listener nods warmly, visibly moved by the memory.",
+                                        "A quiet sense of camaraderie passes between them.",
+                                    },
+                                    ["TL"] = {
+                                        "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango.",
+                                        "Isang banayad na ngiti ang lumitaw sa labi ng nakikinig.",
+                                        "Uminit ang mga mata ng nakikinig habang lumalalim ang alaala.",
+                                        "Nagbigay ang nakikinig ng mainit at nakapagpapanatag na tango.",
+                                        "Isang masuyong tingin ang dumaloy sa pagod na mukha ng nakikinig.",
+                                        "Bahagyang iniabot ng nakikinig ang kamay, gumaan ang loob sa alaala.",
+                                        "Isang marahang buntong-hininga ang pinakawalan ng nakikinig habang nagugunita.",
+                                        "Lumuwag ang balikat ng nakikinig kalakip ang magiliw na pagkilala.",
+                                        "Mainit na tumango ang nakikinig, halatang naantig sa alaala.",
+                                        "Isang tahimik na damdamin ng pagkakaibigan ang namagitan sa kanila.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "interaction.memory.acknowledge_flavor",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "The listener gives a small acknowledging nod.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.interaction.memory.acknowledge_flavor.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -783,334 +1084,435 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "The listener gives a small acknowledging nod.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "The listener gives a small acknowledging nod.",
+                        "The listener listens thoughtfully and nods.",
+                        "A steady nod shows the listener remembers.",
+                        "The listener absorbs the words and dips their head.",
+                        "The listener acknowledges the shared recollection quietly.",
+                        "A quiet look of recognition passes over the listener's face.",
+                        "The listener blinks slowly, recalling the moment.",
+                        "The listener gives a calm, measured gesture of understanding.",
+                        "A brief pause precedes an acknowledging nod.",
+                        "The listener tilts their head in silent agreement.",
+                    },
+                    ["TL"] = {
+                        "Bahagyang tumango ang nakikinig bilang pagkilala.",
+                        "Matiyagang nakikinig ang kausap at tumatango.",
+                        "Isang matatag na tango ang nagpapakitang naaalala niya.",
+                        "Inintindi ng nakikinig ang mga salita at bahagyang yumukod.",
+                        "Tahimik na kinilala ng nakikinig ang pinagsaluhang alaala.",
+                        "Isang tahimik na anyo ng pagkilala ang dumaan sa mukha ng nakikinig.",
+                        "Mabagal na kumurap ang nakikinig, inaalala ang sandali.",
+                        "Nagbigay ang nakikinig ng kalmado at maingat na senyas ng pagkaunawa.",
+                        "Isang maikling paghinto ang nauna bago tumango bilang pagkilala.",
+                        "Itinagilid ng nakikinig ang ulo bilang tahimik na pagsang-ayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "The listener gives a guarded nod.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.guarded",
+                ["translations"] = {
+                    ["EN"] = {
+                        "The listener gives a guarded nod.",
+                        "The listener watches closely without revealing their thoughts.",
+                        "A cautious look crosses the listener's eyes.",
+                        "The listener stiffens slightly as the past is mentioned.",
+                        "A slow, guarded nod shows the words were registered.",
+                        "The listener's hand rests near their belt during the pause.",
+                        "The listener narrows their eyes, weighing the intent behind the words.",
+                        "A tight, reserved expression settles on the listener's face.",
+                        "The listener gives nothing away, nodding once carefully.",
+                        "The listener keeps their guard up while acknowledging the memory.",
+                    },
+                    ["TL"] = {
+                        "Maingat na tumango ang nakikinig.",
+                        "Masusing nagmasid ang nakikinig nang walang inilalantad na iniisip.",
+                        "Isang maingat na tingin ang dumaan sa mga mata ng nakikinig.",
+                        "Bahagyang nanigas ang nakikinig nang mabanggit ang nakaraan.",
+                        "Isang mabagal at maingat na tango ang nagpahiwatig na narinig ang sinabi.",
+                        "Nakalapag ang kamay ng nakikinig malapit sa sinturon sa sandaling iyon.",
+                        "Nanliit ang mga mata ng nakikinig, tinitimbang ang layunin sa likod ng salita.",
+                        "Isang mahigpit at maramdamang ekspresyon ang namutawi sa mukha ng nakikinig.",
+                        "Walang ipinakitang emosyon ang nakikinig, isang maingat na tango lang.",
+                        "Nanatiling alerto ang nakikinig habang kinikilala ang alaala.",
+                    },
+                },
+                ["variantID"] = "guarded",
+            },
+            {
+                ["fallback"] = "A brief nod follows.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.terse",
+                ["translations"] = {
+                    ["EN"] = {
+                        "A brief nod follows.",
+                        "A curt dip of the chin confirms it.",
+                        "The listener grunts in assent.",
+                        "A sharp single nod.",
+                        "The listener barely shifts.",
+                        "Eyes narrow briefly in recognition.",
+                        "A quick jerk of the head acknowledges it.",
+                        "The listener's jaw sets firmly.",
+                        "A momentary pause, nothing more.",
+                        "A flat nod ends the topic.",
+                    },
+                    ["TL"] = {
+                        "Isang maikling tango ang sumunod.",
+                        "Maikling pagyuko ng baba ang kumumpirma.",
+                        "Umungol ang nakikinig bilang pagsang-ayon.",
+                        "Isang mabilis at iisang tango.",
+                        "Halos hindi gumalaw ang nakikinig.",
+                        "Sandaling nanliit ang mga mata sa pagkilala.",
+                        "Mabilis na paggalaw ng ulo ang kumilala roon.",
+                        "Nadiin ang panga ng nakikinig.",
+                        "Isang saglit na paghinto, wala nang iba.",
+                        "Isang malamig na tango ang nagtapos sa paksa.",
+                    },
+                },
+                ["variantID"] = "terse",
+            },
+            {
+                ["fallback"] = "The listener softens and nods with quiet understanding.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.acknowledge_flavor.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "The listener softens and nods with quiet understanding.",
+                        "A faint, gentle smile touches the listener's lips.",
+                        "The listener's eyes warm as the memory settles in.",
+                        "The listener gives a warm, reassuring nod.",
+                        "A fond look washes over the listener's tired features.",
+                        "The listener reaches out slightly, comforted by the recollection.",
+                        "A soft breath escapes the listener as they remember.",
+                        "The listener's shoulders relax with affectionate recognition.",
+                        "The listener nods warmly, visibly moved by the memory.",
+                        "A quiet sense of camaraderie passes between them.",
+                    },
+                    ["TL"] = {
+                        "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango.",
+                        "Isang banayad na ngiti ang lumitaw sa labi ng nakikinig.",
+                        "Uminit ang mga mata ng nakikinig habang lumalalim ang alaala.",
+                        "Nagbigay ang nakikinig ng mainit at nakapagpapanatag na tango.",
+                        "Isang masuyong tingin ang dumaloy sa pagod na mukha ng nakikinig.",
+                        "Bahagyang iniabot ng nakikinig ang kamay, gumaan ang loob sa alaala.",
+                        "Isang marahang buntong-hininga ang pinakawalan ng nakikinig habang nagugunita.",
+                        "Lumuwag ang balikat ng nakikinig kalakip ang magiliw na pagkilala.",
+                        "Mainit na tumango ang nakikinig, halatang naantig sa alaala.",
+                        "Isang tahimik na damdamin ng pagkakaibigan ang namagitan sa kanila.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge_flavor",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener gives a small acknowledging nod.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "interaction.memory.followup",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You did? What happened after that?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.interaction.memory.followup.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You did? What happened after that?",
+                                        "How did you manage to get through it?",
+                                        "Did anyone else make it out with you?",
+                                        "Where did you go once that went down?",
+                                        "What made you think of that just now?",
+                                        "How long ago was that?",
+                                        "Were there many casualties back then?",
+                                        "What did you end up doing about it?",
+                                        "That sounds intense. What came next?",
+                                        "Did you ever go back to that place?",
+                                    },
+                                    ["TL"] = {
+                                        "Talaga? Ano ang nangyari pagkatapos noon?",
+                                        "Paano mo nagawang malusutan iyon?",
+                                        "May iba pa bang nakaligtas kasama mo?",
+                                        "Saan ka pumunta nang mangyari iyon?",
+                                        "Bakit mo biglang naisip iyon ngayon?",
+                                        "Gaano na katagal mula noon?",
+                                        "Marami bang nasawi noong panahong iyon?",
+                                        "Ano ang naging aksyon mo tungkol doon?",
+                                        "Matindi 'yon. Ano ang sumunod?",
+                                        "Bumalik ka pa ba sa lugar na iyon kailanman?",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Bahagyang tumango ang nakikinig bilang pagkilala.",
+                            {
+                                ["fallback"] = "Why are you telling me that?",
+                                ["id"] = "guarded",
+                                ["templateID"] = "convo.interaction.memory.followup.say.1.guarded",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Why are you telling me that?",
+                                        "What's the point of bringing that up now?",
+                                        "Are you testing my reaction?",
+                                        "Who else knows about that story?",
+                                        "Why share something so personal with me?",
+                                        "Sounds like an angle. What do you really want?",
+                                        "Does that story have anything to do with our safety here?",
+                                        "Be careful what details you hand out to people.",
+                                        "Are you trying to gauge where my loyalties lie?",
+                                        "Keep your personal history to yourself.",
+                                    },
+                                    ["TL"] = {
+                                        "Bakit mo sinasabi sa akin iyan?",
+                                        "Anong layunin sa pagbubukas niyan ngayon?",
+                                        "Sinusubukan mo ba ang magiging reaksyon ko?",
+                                        "Sino pa ang nakakaalam ng kuwentong 'yan?",
+                                        "Bakit mo ibinabahagi ang ganyang personal na bagay sa akin?",
+                                        "Mukhang may pakay ka. Ano ba talaga ang gusto mo?",
+                                        "May kinalaman ba ang kuwentong 'yan sa kaligtasan natin dito?",
+                                        "Mag-ingat ka sa mga detalyeng ipinamamahagi mo sa iba.",
+                                        "Sinusubukan mo bang alamin kung kanino ako tapat?",
+                                        "Itago mo na lang sa sarili mo ang sarili mong nakaraan.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener listens thoughtfully and nods.",
+                            {
+                                ["fallback"] = "And then?",
+                                ["id"] = "terse",
+                                ["templateID"] = "convo.interaction.memory.followup.say.1.terse",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "And then?",
+                                        "What happened?",
+                                        "After that?",
+                                        "How so?",
+                                        "Who survived?",
+                                        "When?",
+                                        "Outcome?",
+                                        "Next?",
+                                        "Details?",
+                                        "End result?",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos?",
+                                        "Anong nangyari?",
+                                        "Pagkatapos?",
+                                        "Paano?",
+                                        "Sinong nakaligtas?",
+                                        "Kailan?",
+                                        "Kinahinatnan?",
+                                        "Kasunod?",
+                                        "Mga detalye?",
+                                        "Huling resulta?",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Matiyagang nakikinig ang kausap at tumatango.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A steady nod shows the listener remembers.",
-                            },
-                            ["TL"] = {
-                                "Isang matatag na tango ang nagpapakitang naaalala niya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener absorbs the words and dips their head.",
-                            },
-                            ["TL"] = {
-                                "Inintindi ng nakikinig ang mga salita at bahagyang yumukod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener acknowledges the shared recollection quietly.",
-                            },
-                            ["TL"] = {
-                                "Tahimik na kinilala ng nakikinig ang pinagsaluhang alaala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A quiet look of recognition passes over the listener's face.",
-                            },
-                            ["TL"] = {
-                                "Isang tahimik na anyo ng pagkilala ang dumaan sa mukha ng nakikinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener blinks slowly, recalling the moment.",
-                            },
-                            ["TL"] = {
-                                "Mabagal na kumurap ang nakikinig, inaalala ang sandali.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener gives a calm, measured gesture of understanding.",
-                            },
-                            ["TL"] = {
-                                "Nagbigay ang nakikinig ng kalmado at maingat na senyas ng pagkaunawa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A brief pause precedes an acknowledging nod.",
-                            },
-                            ["TL"] = {
-                                "Isang maikling paghinto ang nauna bago tumango bilang pagkilala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener tilts their head in silent agreement.",
-                            },
-                            ["TL"] = {
-                                "Itinagilid ng nakikinig ang ulo bilang tahimik na pagsang-ayon.",
+                            {
+                                ["fallback"] = "Really? Tell me more about that.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.interaction.memory.followup.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Really? Tell me more about that.",
+                                        "That sounds like quite a memory. How did it feel?",
+                                        "I'd love to hear the rest of that story if you want to share.",
+                                        "It must have taken real courage. How did you hold up?",
+                                        "You went through so much. I'm glad you're here to talk about it.",
+                                        "Were you able to save anything from back then?",
+                                        "I'm listening, friend. Take all the time you need.",
+                                        "That sounds like someone who mattered deeply to you.",
+                                        "What a journey. What kept you holding on?",
+                                        "Thank you for trusting me with that memory. What happened next?",
+                                    },
+                                    ["TL"] = {
+                                        "Talaga? Kuwento mo pa sa akin.",
+                                        "Mukhang napakagandang alaala. Anong naramdaman mo?",
+                                        "Gusto kong marinig ang karugtong ng kuwento kung nais mong ibahagi.",
+                                        "Kailangan ng tunay na tapang doon. Paano mo kinaya?",
+                                        "Napakalaki ng pinagdaanan mo. Mabuti at narito ka para ikuwento.",
+                                        "May naisalba ka ba mula noong panahong iyon?",
+                                        "Nakikinig ako, kaibigan. Huwag kang magmadali.",
+                                        "Mukhang may taong napakahalaga sa 'yo sa kuwentong 'yan.",
+                                        "Napakalaking paglalakbay. Ano ang nagpatatag sa 'yo?",
+                                        "Salamat sa pagtitiwala sa akin ng alaalang 'yan. Ano sumunod?",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.terse",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "terse",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.terse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[2]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge_flavor",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-                ["style"] = "terse",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "terse.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A brief nod follows.",
-                            },
-                            ["TL"] = {
-                                "Isang maikling tango ang sumunod.",
-                            },
+            ["namespace"] = "interaction.memory",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "You did? What happened after that?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.followup.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You did? What happened after that?",
+                            "How did you manage to get through it?",
+                            "Did anyone else make it out with you?",
+                            "Where did you go once that went down?",
+                            "What made you think of that just now?",
+                            "How long ago was that?",
+                            "Were there many casualties back then?",
+                            "What did you end up doing about it?",
+                            "That sounds intense. What came next?",
+                            "Did you ever go back to that place?",
+                        },
+                        ["TL"] = {
+                            "Talaga? Ano ang nangyari pagkatapos noon?",
+                            "Paano mo nagawang malusutan iyon?",
+                            "May iba pa bang nakaligtas kasama mo?",
+                            "Saan ka pumunta nang mangyari iyon?",
+                            "Bakit mo biglang naisip iyon ngayon?",
+                            "Gaano na katagal mula noon?",
+                            "Marami bang nasawi noong panahong iyon?",
+                            "Ano ang naging aksyon mo tungkol doon?",
+                            "Matindi 'yon. Ano ang sumunod?",
+                            "Bumalik ka pa ba sa lugar na iyon kailanman?",
                         },
                     },
-                    {
-                        ["id"] = "terse.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A curt dip of the chin confirms it.",
-                            },
-                            ["TL"] = {
-                                "Maikling pagyuko ng baba ang kumumpirma.",
-                            },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Why are you telling me that?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.followup.say.1.guarded",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Why are you telling me that?",
+                            "What's the point of bringing that up now?",
+                            "Are you testing my reaction?",
+                            "Who else knows about that story?",
+                            "Why share something so personal with me?",
+                            "Sounds like an angle. What do you really want?",
+                            "Does that story have anything to do with our safety here?",
+                            "Be careful what details you hand out to people.",
+                            "Are you trying to gauge where my loyalties lie?",
+                            "Keep your personal history to yourself.",
+                        },
+                        ["TL"] = {
+                            "Bakit mo sinasabi sa akin iyan?",
+                            "Anong layunin sa pagbubukas niyan ngayon?",
+                            "Sinusubukan mo ba ang magiging reaksyon ko?",
+                            "Sino pa ang nakakaalam ng kuwentong 'yan?",
+                            "Bakit mo ibinabahagi ang ganyang personal na bagay sa akin?",
+                            "Mukhang may pakay ka. Ano ba talaga ang gusto mo?",
+                            "May kinalaman ba ang kuwentong 'yan sa kaligtasan natin dito?",
+                            "Mag-ingat ka sa mga detalyeng ipinamamahagi mo sa iba.",
+                            "Sinusubukan mo bang alamin kung kanino ako tapat?",
+                            "Itago mo na lang sa sarili mo ang sarili mong nakaraan.",
                         },
                     },
-                    {
-                        ["id"] = "terse.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener grunts in assent.",
-                            },
-                            ["TL"] = {
-                                "Umungol ang nakikinig bilang pagsang-ayon.",
-                            },
+                    ["variantID"] = "guarded",
+                },
+                {
+                    ["fallback"] = "And then?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.followup.say.1.terse",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "And then?",
+                            "What happened?",
+                            "After that?",
+                            "How so?",
+                            "Who survived?",
+                            "When?",
+                            "Outcome?",
+                            "Next?",
+                            "Details?",
+                            "End result?",
+                        },
+                        ["TL"] = {
+                            "Tapos?",
+                            "Anong nangyari?",
+                            "Pagkatapos?",
+                            "Paano?",
+                            "Sinong nakaligtas?",
+                            "Kailan?",
+                            "Kinahinatnan?",
+                            "Kasunod?",
+                            "Mga detalye?",
+                            "Huling resulta?",
                         },
                     },
-                    {
-                        ["id"] = "terse.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A sharp single nod.",
-                            },
-                            ["TL"] = {
-                                "Isang mabilis at iisang tango.",
-                            },
+                    ["variantID"] = "terse",
+                },
+                {
+                    ["fallback"] = "Really? Tell me more about that.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.memory.followup.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Really? Tell me more about that.",
+                            "That sounds like quite a memory. How did it feel?",
+                            "I'd love to hear the rest of that story if you want to share.",
+                            "It must have taken real courage. How did you hold up?",
+                            "You went through so much. I'm glad you're here to talk about it.",
+                            "Were you able to save anything from back then?",
+                            "I'm listening, friend. Take all the time you need.",
+                            "That sounds like someone who mattered deeply to you.",
+                            "What a journey. What kept you holding on?",
+                            "Thank you for trusting me with that memory. What happened next?",
+                        },
+                        ["TL"] = {
+                            "Talaga? Kuwento mo pa sa akin.",
+                            "Mukhang napakagandang alaala. Anong naramdaman mo?",
+                            "Gusto kong marinig ang karugtong ng kuwento kung nais mong ibahagi.",
+                            "Kailangan ng tunay na tapang doon. Paano mo kinaya?",
+                            "Napakalaki ng pinagdaanan mo. Mabuti at narito ka para ikuwento.",
+                            "May naisalba ka ba mula noong panahong iyon?",
+                            "Nakikinig ako, kaibigan. Huwag kang magmadali.",
+                            "Mukhang may taong napakahalaga sa 'yo sa kuwentong 'yan.",
+                            "Napakalaking paglalakbay. Ano ang nagpatatag sa 'yo?",
+                            "Salamat sa pagtitiwala sa akin ng alaalang 'yan. Ano sumunod?",
                         },
                     },
-                    {
-                        ["id"] = "terse.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener barely shifts.",
-                            },
-                            ["TL"] = {
-                                "Halos hindi gumalaw ang nakikinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eyes narrow briefly in recognition.",
-                            },
-                            ["TL"] = {
-                                "Sandaling nanliit ang mga mata sa pagkilala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A quick jerk of the head acknowledges it.",
-                            },
-                            ["TL"] = {
-                                "Mabilis na paggalaw ng ulo ang kumilala roon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener's jaw sets firmly.",
-                            },
-                            ["TL"] = {
-                                "Nadiin ang panga ng nakikinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A momentary pause, nothing more.",
-                            },
-                            ["TL"] = {
-                                "Isang saglit na paghinto, wala nang iba.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A flat nod ends the topic.",
-                            },
-                            ["TL"] = {
-                                "Isang malamig na tango ang nagtapos sa paksa.",
-                            },
-                        },
-                    },
+                    ["variantID"] = "warm",
                 },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.warm",
+        ["id"] = "interaction.memory.followup",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[1]",
+            ["localId"] = "followup",
+            ["sourceId"] = "interaction.memory.followup",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
+        ["namespace"] = "interaction.memory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1124,284 +1526,165 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.acknowledge_flavor",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener softens and nods with quiet understanding.",
-                            },
-                            ["TL"] = {
-                                "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A faint, gentle smile touches the listener's lips.",
-                            },
-                            ["TL"] = {
-                                "Isang banayad na ngiti ang lumitaw sa labi ng nakikinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener's eyes warm as the memory settles in.",
-                            },
-                            ["TL"] = {
-                                "Uminit ang mga mata ng nakikinig habang lumalalim ang alaala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener gives a warm, reassuring nod.",
-                            },
-                            ["TL"] = {
-                                "Nagbigay ang nakikinig ng mainit at nakapagpapanatag na tango.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A fond look washes over the listener's tired features.",
-                            },
-                            ["TL"] = {
-                                "Isang masuyong tingin ang dumaloy sa pagod na mukha ng nakikinig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener reaches out slightly, comforted by the recollection.",
-                            },
-                            ["TL"] = {
-                                "Bahagyang iniabot ng nakikinig ang kamay, gumaan ang loob sa alaala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A soft breath escapes the listener as they remember.",
-                            },
-                            ["TL"] = {
-                                "Isang marahang buntong-hininga ang pinakawalan ng nakikinig habang nagugunita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener's shoulders relax with affectionate recognition.",
-                            },
-                            ["TL"] = {
-                                "Lumuwag ang balikat ng nakikinig kalakip ang magiliw na pagkilala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The listener nods warmly, visibly moved by the memory.",
-                            },
-                            ["TL"] = {
-                                "Mainit na tumango ang nakikinig, halatang naantig sa alaala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A quiet sense of camaraderie passes between them.",
-                            },
-                            ["TL"] = {
-                                "Isang tahimik na damdamin ng pagkakaibigan ang namagitan sa kanila.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.followup.guarded",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "guarded",
-            ["sourceId"] = "semantic.interaction.memory.followup.guarded",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[3]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.followup",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.followup",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/followup.json",
-                ["style"] = "guarded",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "guarded.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Why are you telling me that?",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You did? What happened after that?",
+                                        "How did you manage to get through it?",
+                                        "Did anyone else make it out with you?",
+                                        "Where did you go once that went down?",
+                                        "What made you think of that just now?",
+                                        "How long ago was that?",
+                                        "Were there many casualties back then?",
+                                        "What did you end up doing about it?",
+                                        "That sounds intense. What came next?",
+                                        "Did you ever go back to that place?",
+                                    },
+                                    ["TL"] = {
+                                        "Talaga? Ano ang nangyari pagkatapos noon?",
+                                        "Paano mo nagawang malusutan iyon?",
+                                        "May iba pa bang nakaligtas kasama mo?",
+                                        "Saan ka pumunta nang mangyari iyon?",
+                                        "Bakit mo biglang naisip iyon ngayon?",
+                                        "Gaano na katagal mula noon?",
+                                        "Marami bang nasawi noong panahong iyon?",
+                                        "Ano ang naging aksyon mo tungkol doon?",
+                                        "Matindi 'yon. Ano ang sumunod?",
+                                        "Bumalik ka pa ba sa lugar na iyon kailanman?",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Bakit mo sinasabi sa akin iyan?",
+                            {
+                                ["id"] = "guarded",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Why are you telling me that?",
+                                        "What's the point of bringing that up now?",
+                                        "Are you testing my reaction?",
+                                        "Who else knows about that story?",
+                                        "Why share something so personal with me?",
+                                        "Sounds like an angle. What do you really want?",
+                                        "Does that story have anything to do with our safety here?",
+                                        "Be careful what details you hand out to people.",
+                                        "Are you trying to gauge where my loyalties lie?",
+                                        "Keep your personal history to yourself.",
+                                    },
+                                    ["TL"] = {
+                                        "Bakit mo sinasabi sa akin iyan?",
+                                        "Anong layunin sa pagbubukas niyan ngayon?",
+                                        "Sinusubukan mo ba ang magiging reaksyon ko?",
+                                        "Sino pa ang nakakaalam ng kuwentong 'yan?",
+                                        "Bakit mo ibinabahagi ang ganyang personal na bagay sa akin?",
+                                        "Mukhang may pakay ka. Ano ba talaga ang gusto mo?",
+                                        "May kinalaman ba ang kuwentong 'yan sa kaligtasan natin dito?",
+                                        "Mag-ingat ka sa mga detalyeng ipinamamahagi mo sa iba.",
+                                        "Sinusubukan mo bang alamin kung kanino ako tapat?",
+                                        "Itago mo na lang sa sarili mo ang sarili mong nakaraan.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What's the point of bringing that up now?",
+                            {
+                                ["id"] = "terse",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "And then?",
+                                        "What happened?",
+                                        "After that?",
+                                        "How so?",
+                                        "Who survived?",
+                                        "When?",
+                                        "Outcome?",
+                                        "Next?",
+                                        "Details?",
+                                        "End result?",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos?",
+                                        "Anong nangyari?",
+                                        "Pagkatapos?",
+                                        "Paano?",
+                                        "Sinong nakaligtas?",
+                                        "Kailan?",
+                                        "Kinahinatnan?",
+                                        "Kasunod?",
+                                        "Mga detalye?",
+                                        "Huling resulta?",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Anong layunin sa pagbubukas niyan ngayon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Are you testing my reaction?",
-                            },
-                            ["TL"] = {
-                                "Sinusubukan mo ba ang magiging reaksyon ko?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Who else knows about that story?",
-                            },
-                            ["TL"] = {
-                                "Sino pa ang nakakaalam ng kuwentong 'yan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Why share something so personal with me?",
-                            },
-                            ["TL"] = {
-                                "Bakit mo ibinabahagi ang ganyang personal na bagay sa akin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds like an angle. What do you really want?",
-                            },
-                            ["TL"] = {
-                                "Mukhang may pakay ka. Ano ba talaga ang gusto mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Does that story have anything to do with our safety here?",
-                            },
-                            ["TL"] = {
-                                "May kinalaman ba ang kuwentong 'yan sa kaligtasan natin dito?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Be careful what details you hand out to people.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat ka sa mga detalyeng ipinamamahagi mo sa iba.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Are you trying to gauge where my loyalties lie?",
-                            },
-                            ["TL"] = {
-                                "Sinusubukan mo bang alamin kung kanino ako tapat?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep your personal history to yourself.",
-                            },
-                            ["TL"] = {
-                                "Itago mo na lang sa sarili mo ang sarili mong nakaraan.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Really? Tell me more about that.",
+                                        "That sounds like quite a memory. How did it feel?",
+                                        "I'd love to hear the rest of that story if you want to share.",
+                                        "It must have taken real courage. How did you hold up?",
+                                        "You went through so much. I'm glad you're here to talk about it.",
+                                        "Were you able to save anything from back then?",
+                                        "I'm listening, friend. Take all the time you need.",
+                                        "That sounds like someone who mattered deeply to you.",
+                                        "What a journey. What kept you holding on?",
+                                        "Thank you for trusting me with that memory. What happened next?",
+                                    },
+                                    ["TL"] = {
+                                        "Talaga? Kuwento mo pa sa akin.",
+                                        "Mukhang napakagandang alaala. Anong naramdaman mo?",
+                                        "Gusto kong marinig ang karugtong ng kuwento kung nais mong ibahagi.",
+                                        "Kailangan ng tunay na tapang doon. Paano mo kinaya?",
+                                        "Napakalaki ng pinagdaanan mo. Mabuti at narito ka para ikuwento.",
+                                        "May naisalba ka ba mula noong panahong iyon?",
+                                        "Nakikinig ako, kaibigan. Huwag kang magmadali.",
+                                        "Mukhang may taong napakahalaga sa 'yo sa kuwentong 'yan.",
+                                        "Napakalaking paglalakbay. Ano ang nagpatatag sa 'yo?",
+                                        "Salamat sa pagtitiwala sa akin ng alaalang 'yan. Ano sumunod?",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "interaction.memory.followup",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "You did? What happened after that?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.interaction.memory.followup.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1411,476 +1694,139 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.followup.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.interaction.memory.followup.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.followup",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.followup",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/followup.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You did? What happened after that?",
-                            },
-                            ["TL"] = {
-                                "Talaga? Ano ang nangyari pagkatapos noon?",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "You did? What happened after that?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.followup.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You did? What happened after that?",
+                        "How did you manage to get through it?",
+                        "Did anyone else make it out with you?",
+                        "Where did you go once that went down?",
+                        "What made you think of that just now?",
+                        "How long ago was that?",
+                        "Were there many casualties back then?",
+                        "What did you end up doing about it?",
+                        "That sounds intense. What came next?",
+                        "Did you ever go back to that place?",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "How did you manage to get through it?",
-                            },
-                            ["TL"] = {
-                                "Paano mo nagawang malusutan iyon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Did anyone else make it out with you?",
-                            },
-                            ["TL"] = {
-                                "May iba pa bang nakaligtas kasama mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Where did you go once that went down?",
-                            },
-                            ["TL"] = {
-                                "Saan ka pumunta nang mangyari iyon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What made you think of that just now?",
-                            },
-                            ["TL"] = {
-                                "Bakit mo biglang naisip iyon ngayon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "How long ago was that?",
-                            },
-                            ["TL"] = {
-                                "Gaano na katagal mula noon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Were there many casualties back then?",
-                            },
-                            ["TL"] = {
-                                "Marami bang nasawi noong panahong iyon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What did you end up doing about it?",
-                            },
-                            ["TL"] = {
-                                "Ano ang naging aksyon mo tungkol doon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That sounds intense. What came next?",
-                            },
-                            ["TL"] = {
-                                "Matindi 'yon. Ano ang sumunod?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Did you ever go back to that place?",
-                            },
-                            ["TL"] = {
-                                "Bumalik ka pa ba sa lugar na iyon kailanman?",
-                            },
-                        },
+                    ["TL"] = {
+                        "Talaga? Ano ang nangyari pagkatapos noon?",
+                        "Paano mo nagawang malusutan iyon?",
+                        "May iba pa bang nakaligtas kasama mo?",
+                        "Saan ka pumunta nang mangyari iyon?",
+                        "Bakit mo biglang naisip iyon ngayon?",
+                        "Gaano na katagal mula noon?",
+                        "Marami bang nasawi noong panahong iyon?",
+                        "Ano ang naging aksyon mo tungkol doon?",
+                        "Matindi 'yon. Ano ang sumunod?",
+                        "Bumalik ka pa ba sa lugar na iyon kailanman?",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.followup.terse",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "terse",
-            ["sourceId"] = "semantic.interaction.memory.followup.terse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[2]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.followup",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.followup",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/followup.json",
-                ["style"] = "terse",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "terse.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "And then?",
-                            },
-                            ["TL"] = {
-                                "Tapos?",
-                            },
-                        },
+            {
+                ["fallback"] = "Why are you telling me that?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.followup.say.1.guarded",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Why are you telling me that?",
+                        "What's the point of bringing that up now?",
+                        "Are you testing my reaction?",
+                        "Who else knows about that story?",
+                        "Why share something so personal with me?",
+                        "Sounds like an angle. What do you really want?",
+                        "Does that story have anything to do with our safety here?",
+                        "Be careful what details you hand out to people.",
+                        "Are you trying to gauge where my loyalties lie?",
+                        "Keep your personal history to yourself.",
                     },
-                    {
-                        ["id"] = "terse.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What happened?",
-                            },
-                            ["TL"] = {
-                                "Anong nangyari?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "After that?",
-                            },
-                            ["TL"] = {
-                                "Pagkatapos?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "How so?",
-                            },
-                            ["TL"] = {
-                                "Paano?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Who survived?",
-                            },
-                            ["TL"] = {
-                                "Sinong nakaligtas?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "When?",
-                            },
-                            ["TL"] = {
-                                "Kailan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Outcome?",
-                            },
-                            ["TL"] = {
-                                "Kinahinatnan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Next?",
-                            },
-                            ["TL"] = {
-                                "Kasunod?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Details?",
-                            },
-                            ["TL"] = {
-                                "Mga detalye?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "End result?",
-                            },
-                            ["TL"] = {
-                                "Huling resulta?",
-                            },
-                        },
+                    ["TL"] = {
+                        "Bakit mo sinasabi sa akin iyan?",
+                        "Anong layunin sa pagbubukas niyan ngayon?",
+                        "Sinusubukan mo ba ang magiging reaksyon ko?",
+                        "Sino pa ang nakakaalam ng kuwentong 'yan?",
+                        "Bakit mo ibinabahagi ang ganyang personal na bagay sa akin?",
+                        "Mukhang may pakay ka. Ano ba talaga ang gusto mo?",
+                        "May kinalaman ba ang kuwentong 'yan sa kaligtasan natin dito?",
+                        "Mag-ingat ka sa mga detalyeng ipinamamahagi mo sa iba.",
+                        "Sinusubukan mo bang alamin kung kanino ako tapat?",
+                        "Itago mo na lang sa sarili mo ang sarili mong nakaraan.",
                     },
                 },
+                ["variantID"] = "guarded",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_memory",
-        ["id"] = "semantic.interaction.memory.followup.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.interaction.memory.followup.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        ["namespace"] = "semantic.interaction.memory.followup",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.memory.followup",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/followup.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Really? Tell me more about that.",
-                            },
-                            ["TL"] = {
-                                "Talaga? Kuwento mo pa sa akin.",
-                            },
-                        },
+            {
+                ["fallback"] = "And then?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.followup.say.1.terse",
+                ["translations"] = {
+                    ["EN"] = {
+                        "And then?",
+                        "What happened?",
+                        "After that?",
+                        "How so?",
+                        "Who survived?",
+                        "When?",
+                        "Outcome?",
+                        "Next?",
+                        "Details?",
+                        "End result?",
                     },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That sounds like quite a memory. How did it feel?",
-                            },
-                            ["TL"] = {
-                                "Mukhang napakagandang alaala. Anong naramdaman mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'd love to hear the rest of that story if you want to share.",
-                            },
-                            ["TL"] = {
-                                "Gusto kong marinig ang karugtong ng kuwento kung nais mong ibahagi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It must have taken real courage. How did you hold up?",
-                            },
-                            ["TL"] = {
-                                "Kailangan ng tunay na tapang doon. Paano mo kinaya?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You went through so much. I'm glad you're here to talk about it.",
-                            },
-                            ["TL"] = {
-                                "Napakalaki ng pinagdaanan mo. Mabuti at narito ka para ikuwento.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Were you able to save anything from back then?",
-                            },
-                            ["TL"] = {
-                                "May naisalba ka ba mula noong panahong iyon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm listening, friend. Take all the time you need.",
-                            },
-                            ["TL"] = {
-                                "Nakikinig ako, kaibigan. Huwag kang magmadali.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That sounds like someone who mattered deeply to you.",
-                            },
-                            ["TL"] = {
-                                "Mukhang may taong napakahalaga sa 'yo sa kuwentong 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What a journey. What kept you holding on?",
-                            },
-                            ["TL"] = {
-                                "Napakalaking paglalakbay. Ano ang nagpatatag sa 'yo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you for trusting me with that memory. What happened next?",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagtitiwala sa akin ng alaalang 'yan. Ano sumunod?",
-                            },
-                        },
+                    ["TL"] = {
+                        "Tapos?",
+                        "Anong nangyari?",
+                        "Pagkatapos?",
+                        "Paano?",
+                        "Sinong nakaligtas?",
+                        "Kailan?",
+                        "Kinahinatnan?",
+                        "Kasunod?",
+                        "Mga detalye?",
+                        "Huling resulta?",
                     },
                 },
+                ["variantID"] = "terse",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "Really? Tell me more about that.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.memory.followup.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Really? Tell me more about that.",
+                        "That sounds like quite a memory. How did it feel?",
+                        "I'd love to hear the rest of that story if you want to share.",
+                        "It must have taken real courage. How did you hold up?",
+                        "You went through so much. I'm glad you're here to talk about it.",
+                        "Were you able to save anything from back then?",
+                        "I'm listening, friend. Take all the time you need.",
+                        "That sounds like someone who mattered deeply to you.",
+                        "What a journey. What kept you holding on?",
+                        "Thank you for trusting me with that memory. What happened next?",
+                    },
+                    ["TL"] = {
+                        "Talaga? Kuwento mo pa sa akin.",
+                        "Mukhang napakagandang alaala. Anong naramdaman mo?",
+                        "Gusto kong marinig ang karugtong ng kuwento kung nais mong ibahagi.",
+                        "Kailangan ng tunay na tapang doon. Paano mo kinaya?",
+                        "Napakalaki ng pinagdaanan mo. Mabuti at narito ka para ikuwento.",
+                        "May naisalba ka ba mula noong panahong iyon?",
+                        "Nakikinig ako, kaibigan. Huwag kang magmadali.",
+                        "Mukhang may taong napakahalaga sa 'yo sa kuwentong 'yan.",
+                        "Napakalaking paglalakbay. Ano ang nagpatatag sa 'yo?",
+                        "Salamat sa pagtitiwala sa akin ng alaalang 'yan. Ano sumunod?",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
         },
         ["when"] = nil,
     },

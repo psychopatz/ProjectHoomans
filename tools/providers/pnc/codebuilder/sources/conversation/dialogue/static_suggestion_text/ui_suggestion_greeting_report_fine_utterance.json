@@ -1,9 +1,13 @@
 {
-  "id": "utterance",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.greeting_report_fine",
+  "id": "utterance",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.greeting_report_fine.utterance",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.greeting_report_fine.utterance",
@@ -12,14 +16,17 @@
           "TL": "Ayos lang ako, salamat."
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "I'm fine, thank you.",
-    "TL": "Ayos lang ako, salamat."
-  },
-  "namespace": "ui.suggestion.greeting_report_fine",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "I'm fine, thank you.",
+          "TL": "Ayos lang ako, salamat."
+        }
+      }
+    ]
+  }
 }

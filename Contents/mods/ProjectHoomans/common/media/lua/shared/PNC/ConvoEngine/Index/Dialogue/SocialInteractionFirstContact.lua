@@ -1,38 +1,14 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.interaction.first_contact.challenge.guarded"] = {
+    ["interaction.first_contact.challenge"] = {
+        ["dependents"] = {
+            "behavior.challenge",
+        },
         ["domain"] = "social_interaction_first_contact",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
         },
-        ["id"] = "semantic.interaction.first_contact.challenge.guarded",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
-    },
-    ["semantic.interaction.first_contact.challenge.neutral"] = {
-        ["domain"] = "social_interaction_first_contact",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
-        },
-        ["id"] = "semantic.interaction.first_contact.challenge.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
-    },
-    ["semantic.interaction.first_contact.challenge.terse"] = {
-        ["domain"] = "social_interaction_first_contact",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
-        },
-        ["id"] = "semantic.interaction.first_contact.challenge.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
-    },
-    ["semantic.interaction.first_contact.challenge.warm"] = {
-        ["domain"] = "social_interaction_first_contact",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
-        },
-        ["id"] = "semantic.interaction.first_contact.challenge.warm",
+        ["id"] = "interaction.first_contact.challenge",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
     },

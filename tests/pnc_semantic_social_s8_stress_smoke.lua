@@ -86,7 +86,7 @@ local function addBehavior(id, stimulus, intent, dialogueAct)
         outputs = {
             speech = {
                 dialogueAct = dialogueAct or "INFORM",
-                contentTemplateID = "semantic.social.acknowledged",
+                contentTemplateID = "social.acknowledged",
             },
         },
         continuation = { mode = "terminate" },

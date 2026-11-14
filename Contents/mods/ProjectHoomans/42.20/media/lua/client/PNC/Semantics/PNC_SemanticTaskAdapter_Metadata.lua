@@ -50,19 +50,19 @@ local TASK_METADATA = {
         },
         responsePools = {
             admitted = {
-                templateID = "semantic.task.fetch.admitted",
+                templateID = "task.fetch.admitted",
             },
             active = {
-                templateID = "semantic.task.fetch.active",
+                templateID = "task.fetch.active",
             },
             completed = {
-                templateID = "semantic.task.fetch.completed",
+                templateID = "task.fetch.completed",
             },
             rejected = {
-                templateID = "semantic.task.fetch.rejected",
+                templateID = "task.fetch.rejected",
             },
             failed = {
-                templateID = "semantic.task.fetch.failed",
+                templateID = "task.fetch.failed",
             },
         },
         },
@@ -113,19 +113,19 @@ local TASK_METADATA = {
         },
         responsePools = {
             admitted = {
-                templateID = "semantic.task.wait_at.admitted",
+                templateID = "task.wait_at.admitted",
             },
             active = {
-                templateID = "semantic.task.wait_at.active",
+                templateID = "task.wait_at.active",
             },
             completed = {
-                templateID = "semantic.task.wait_at.completed",
+                templateID = "task.wait_at.completed",
             },
             rejected = {
-                templateID = "semantic.task.wait_at.rejected",
+                templateID = "task.wait_at.rejected",
             },
             failed = {
-                templateID = "semantic.task.wait_at.failed",
+                templateID = "task.wait_at.failed",
             },
         },
         },

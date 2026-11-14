@@ -45,13 +45,13 @@ Adapter.RegisterAction("FOLLOW", {
     },
     responsePools = {
         queued = {
-            templateID = "semantic.command.follow.queued",
+            templateID = "command.follow.queued",
         },
         rejected = {
-            templateID = "semantic.command.follow.rejected",
+            templateID = "command.follow.rejected",
         },
         failed = {
-            templateID = "semantic.command.follow.failed",
+            templateID = "command.follow.failed",
         },
     },
     arguments = {
@@ -106,13 +106,13 @@ Adapter.RegisterAction("STAY", {
     },
     responsePools = {
         queued = {
-            templateID = "semantic.command.stay.queued",
+            templateID = "command.stay.queued",
         },
         rejected = {
-            templateID = "semantic.command.stay.rejected",
+            templateID = "command.stay.rejected",
         },
         failed = {
-            templateID = "semantic.command.stay.failed",
+            templateID = "command.stay.failed",
         },
     },
     arguments = {
@@ -170,13 +170,13 @@ Adapter.RegisterAction("STOP", {
     },
     responsePools = {
         queued = {
-            templateID = "semantic.command.stop_following.queued",
+            templateID = "command.stop_following.queued",
         },
         rejected = {
-            templateID = "semantic.command.stop_following.rejected",
+            templateID = "command.stop_following.rejected",
         },
         failed = {
-            templateID = "semantic.command.stop_following.failed",
+            templateID = "command.stop_following.failed",
         },
     },
     arguments = {
@@ -234,13 +234,13 @@ Adapter.RegisterAction("GO", {
     },
     responsePools = {
         queued = {
-            templateID = "semantic.command.return_home.queued",
+            templateID = "command.return_home.queued",
         },
         rejected = {
-            templateID = "semantic.command.return_home.rejected",
+            templateID = "command.return_home.rejected",
         },
         failed = {
-            templateID = "semantic.command.return_home.failed",
+            templateID = "command.return_home.failed",
         },
     },
     arguments = {
@@ -301,13 +301,13 @@ Adapter.RegisterAction("CAMP", {
     },
     responsePools = {
         queued = {
-            templateID = "semantic.command.camp.queued",
+            templateID = "command.camp.queued",
         },
         rejected = {
-            templateID = "semantic.command.camp.rejected",
+            templateID = "command.camp.rejected",
         },
         failed = {
-            templateID = "semantic.command.camp.failed",
+            templateID = "command.camp.failed",
         },
     },
     arguments = {
@@ -330,7 +330,7 @@ local COMBAT_INTENT_RESPONSES = {
         variants = {
             {
                 id = "eager",
-                templateID = "semantic.combat.horde.ack.engage_eager",
+                templateID = "combat.horde.ack.engage_eager",
                 priority = 4,
                 when = {
                     combatReactionStyle = { "aggressive", "brave" },
@@ -338,13 +338,13 @@ local COMBAT_INTENT_RESPONSES = {
             },
             {
                 id = "hesitant",
-                templateID = "semantic.combat.horde.ack.engage_hesitant",
+                templateID = "combat.horde.ack.engage_hesitant",
                 priority = 4,
                 when = { combatReactionStyle = "shaken" },
             },
             {
                 id = "reserved",
-                templateID = "semantic.combat.horde.ack.engage_reserved",
+                templateID = "combat.horde.ack.engage_reserved",
                 priority = 3,
                 when = {
                     combatReactionStyle = { "reserved", "cold" },
@@ -357,7 +357,7 @@ local COMBAT_INTENT_RESPONSES = {
         variants = {
             {
                 id = "relief",
-                templateID = "semantic.combat.horde.ack.avoid_relief",
+                templateID = "combat.horde.ack.avoid_relief",
                 priority = 4,
                 when = {
                     combatReactionStyle = { "shaken", "supportive" },
@@ -370,7 +370,7 @@ local COMBAT_INTENT_RESPONSES = {
         variants = {
             {
                 id = "eager",
-                templateID = "semantic.combat.horde.ack.hold_eager",
+                templateID = "combat.horde.ack.hold_eager",
                 priority = 3,
                 when = {
                     combatReactionStyle = { "aggressive", "brave" },
@@ -378,7 +378,7 @@ local COMBAT_INTENT_RESPONSES = {
             },
             {
                 id = "hesitant",
-                templateID = "semantic.combat.horde.ack.hold_hesitant",
+                templateID = "combat.horde.ack.hold_hesitant",
                 priority = 3,
                 when = { combatReactionStyle = "shaken" },
             },
@@ -429,10 +429,10 @@ local function registerCombatIntentAction(action, commandID)
                 variants = responses.variants,
             },
             rejected = {
-                templateID = "semantic.command.reply.generic_rejected",
+                templateID = "command.reply.generic_rejected",
             },
             failed = {
-                templateID = "semantic.command.reply.generic_rejected",
+                templateID = "command.reply.generic_rejected",
             },
         },
         arguments = {

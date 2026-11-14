@@ -18,17 +18,17 @@ Catalog.Register("semantic.hostile_remark", {
         },
         {
             id = "semantic.hostile.default",
-            templateID = "semantic.social.hostile_boundary",
+            templateID = "social.hostile_boundary",
             fallback = "Don't talk to me like that.",
         },
         {
             id = "semantic.hostile.short",
-            templateID = "semantic.social.hostile_short",
+            templateID = "social.hostile_short",
             fallback = "Watch your mouth.",
         },
         {
             id = "semantic.hostile.withdrawn",
-            templateID = "semantic.social.hostile_withdrawn",
+            templateID = "social.hostile_withdrawn",
             fallback = "Then leave me alone.",
             when = { socialStyle = "withdrawn" },
             priority = 2,
@@ -42,7 +42,7 @@ Catalog.Register("semantic.hostile_remark", {
         },
         {
             id = "semantic.hostile.stressed",
-            templateID = "semantic.social.hostile_stressed",
+            templateID = "social.hostile_stressed",
             fallback = "I've had enough already.",
             when = {
                 emotionType = { "stress", "panic" },
@@ -59,35 +59,35 @@ Catalog.Register("semantic.player_assaulted_npc", {
     variants = {
         {
             id = "semantic.player_assaulted_npc.shaken",
-            templateID = "semantic.combat.player_assaulted.shaken",
+            templateID = "combat.player_assaulted.shaken",
             fallback = "What the hell?! Stay back!",
             when = { combatReactionStyle = "shaken" },
             priority = 5,
         },
         {
             id = "semantic.player_assaulted_npc.aggressive",
-            templateID = "semantic.combat.player_assaulted.aggressive",
+            templateID = "combat.player_assaulted.aggressive",
             fallback = "You just made a big mistake.",
             when = { combatReactionStyle = "aggressive" },
             priority = 5,
         },
         {
             id = "semantic.player_assaulted_npc.brave",
-            templateID = "semantic.combat.player_assaulted.brave",
+            templateID = "combat.player_assaulted.brave",
             fallback = "That's it. You're done.",
             when = { combatReactionStyle = "brave" },
             priority = 4,
         },
         {
             id = "semantic.player_assaulted_npc.reserved",
-            templateID = "semantic.combat.player_assaulted.reserved",
+            templateID = "combat.player_assaulted.reserved",
             fallback = "Back off. Now.",
             when = { combatReactionStyle = "reserved" },
             priority = 3,
         },
         {
             id = "semantic.player_assaulted_npc.default",
-            templateID = "semantic.combat.player_assaulted.default",
+            templateID = "combat.player_assaulted.default",
             fallback = "Why did you do that?!",
         },
     },
@@ -127,7 +127,7 @@ Catalog.Register("semantic.threat", {
         },
         {
             id = "semantic.threat.default",
-            templateID = "semantic.social.threat_boundary",
+            templateID = "social.threat_boundary",
             fallback = "Back off.",
         },
         {
@@ -151,7 +151,7 @@ Catalog.Register("semantic.emote.reply", {
     variants = {
         {
             id = "semantic.emote.reply.thumbsup.active",
-            templateID = "semantic.emote.reply.thumbsup.active",
+            templateID = "emote.reply.thumbsup.active",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsup", previousTopic = "water" },
             priority = 4,
@@ -160,13 +160,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "water",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.thumbsup.active" },
+                    { kind = "translation", templateID = "emote.reply.thumbsup.active" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.thumbsup",
-            templateID = "semantic.emote.reply.thumbsup",
+            templateID = "emote.reply.thumbsup",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsup" },
             priority = 2,
@@ -175,13 +175,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "acknowledgement",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.thumbsup" },
+                    { kind = "translation", templateID = "emote.reply.thumbsup" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.thumbsdown",
-            templateID = "semantic.emote.reply.thumbsdown",
+            templateID = "emote.reply.thumbsdown",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsdown" },
             priority = 2,
@@ -190,13 +190,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "disapproval",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.thumbsdown" },
+                    { kind = "translation", templateID = "emote.reply.thumbsdown" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.insult",
-            templateID = "semantic.emote.reply.insult",
+            templateID = "emote.reply.insult",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "insult" },
             priority = 2,
@@ -205,13 +205,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "hostility",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.insult" },
+                    { kind = "translation", templateID = "emote.reply.insult" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.wavehi",
-            templateID = "semantic.emote.reply.wavehi",
+            templateID = "emote.reply.wavehi",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "wavehi" },
             priority = 2,
@@ -220,13 +220,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "greeting",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.wavehi" },
+                    { kind = "translation", templateID = "emote.reply.wavehi" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.wavebye",
-            templateID = "semantic.emote.reply.wavebye",
+            templateID = "emote.reply.wavebye",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "wavebye" },
             priority = 2,
@@ -235,13 +235,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "farewell",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.wavebye" },
+                    { kind = "translation", templateID = "emote.reply.wavebye" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.thankyou",
-            templateID = "semantic.emote.reply.thankyou",
+            templateID = "emote.reply.thankyou",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thankyou" },
             priority = 2,
@@ -250,13 +250,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "thanks",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.thankyou" },
+                    { kind = "translation", templateID = "emote.reply.thankyou" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.clap",
-            templateID = "semantic.emote.reply.clap",
+            templateID = "emote.reply.clap",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "clap" },
             priority = 2,
@@ -265,13 +265,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "praise",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.clap" },
+                    { kind = "translation", templateID = "emote.reply.clap" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.salute",
-            templateID = "semantic.emote.reply.salute",
+            templateID = "emote.reply.salute",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "salute" },
             priority = 2,
@@ -280,19 +280,19 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "acknowledgement",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.salute" },
+                    { kind = "translation", templateID = "emote.reply.salute" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.default",
-            templateID = "semantic.emote.reply.default",
+            templateID = "emote.reply.default",
             plan = {
                 dialogueAct = "REACT",
                 sourcePoolID = "semantic.emote.reply",
                 topic = "social_reaction",
                 turns = { { segments = {
-                    { kind = "translation", templateID = "semantic.emote.reply.default" },
+                    { kind = "translation", templateID = "emote.reply.default" },
                 } } },
             },
         },

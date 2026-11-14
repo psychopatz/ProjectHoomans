@@ -10,58 +10,19 @@ if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
     return false
 end
 
-local ConversationRegistry = require
-    "PNC/ConvoEngine/Registry"
+local ConvoPlanFamily = require
+    "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
 
 local OWNER = "projecthoomans.dialogue_content.commands_emotes"
 
-local function activeLanguage()
-    if Translator and type(Translator.getLanguage) == "function" then
-        local language = Translator.getLanguage()
-        if language and type(language.toString) == "function" then
-            return tostring(language:toString())
+local function installConvoFamily(templateID, options)
+    local opts = { defaultContentOwner = OWNER }
+    if type(options) == "table" then
+        for key, value in pairs(options) do
+            opts[key] = value
         end
     end
-    return "EN"
-end
-
-local function installPSDLFamily(templateID)
-    local existing = ConversationRegistry.PHRASE_FAMILIES[templateID]
-    if type(existing) == "table" then return existing end
-
-    local plan = ConversationRegistry.ConvoPlan(templateID)
-    local payload = type(plan) == "table" and plan.payload or nil
-    local response = type(payload) == "table" and payload.response or nil
-    local authored = type(response) == "table" and response.variants or nil
-    if type(authored) ~= "table" then return nil end
-
-    local language = activeLanguage()
-    local phrases = {}
-    for index, variant in ipairs(authored) do
-        local text = type(variant) == "table" and variant.text or nil
-        local localized = type(text) == "table"
-            and (text[language] or text.EN) or nil
-        local fallback = type(localized) == "table"
-            and localized[1] or localized
-        if type(fallback) == "string" and fallback ~= "" then
-            phrases[#phrases + 1] = {
-                id = templateID .. ".neutral." .. string.format("%02d", index),
-                key = "",
-                fallback = fallback,
-                phraseID = tostring(variant.id or ("neutral." .. index)),
-            }
-        end
-    end
-    if #phrases == 0 then return nil end
-
-    local family = {
-        id = "phrase." .. templateID,
-        semanticTemplateID = templateID,
-        contentOwner = OWNER,
-        styles = { neutral = phrases },
-    }
-    ConversationRegistry.PHRASE_FAMILIES[templateID] = family
-    return family
+    return ConvoPlanFamily.install(templateID, opts)
 end
 
 local PLAYER = {
@@ -149,18 +110,18 @@ local REPLY = {
 -- semantic horde plans share the final companion-command PSDL source, so
 -- project their wording into the same existing phrase-family authority.
 local HORDE_REACTION_TEMPLATES = {
-    "semantic.combat.horde.default",
-    "semantic.combat.horde.deescalated",
-    "semantic.combat.horde.escalated",
-    "semantic.combat.horde.started",
-    "semantic.combat.horde.prompt.default",
-    "semantic.combat.horde.prompt.eager",
-    "semantic.combat.horde.prompt.reserved",
-    "semantic.combat.horde.prompt.shaken",
+    "combat.horde.default",
+    "combat.horde.deescalated",
+    "combat.horde.escalated",
+    "combat.horde.started",
+    "combat.horde.prompt.default",
+    "combat.horde.prompt.eager",
+    "combat.horde.prompt.reserved",
+    "combat.horde.prompt.shaken",
 }
 
 for _, templateID in ipairs(HORDE_REACTION_TEMPLATES) do
-    installPSDLFamily(templateID)
+    installConvoFamily(templateID)
 end
 
 local function whenFor(row)
@@ -176,10 +137,18 @@ end
 local function variants(rows, poolID, act, presentationClass)
     local output = {}
     for index, row in ipairs(rows) do
-        local semanticID = "semantic." .. poolID .. "." .. row.id
+        local semanticID = poolID .. "." .. row.id
         local topic = poolID == "command.player"
             and "companion_command" or "companion_command_reply"
-        local family = installPSDLFamily(semanticID)
+        local family = installConvoFamily(semanticID)
+        if string.sub(semanticID, -7) == ".queued" then
+            installConvoFamily(semanticID, {
+                planID = semanticID,
+                installAs = semanticID .. ".friendly",
+                style = "friendly",
+                targetStyle = "neutral",
+            })
+        end
         local firstPhrase = family and family.styles
             and family.styles.neutral and family.styles.neutral[1] or nil
         output[#output + 1] = {

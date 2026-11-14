@@ -2,19 +2,19 @@
 -- The facade merges this bounded domain table into the public key namespace.
 
 local keys = {
-        ["semantic.flow.greeting.opening.friendly"] =
+        ["flow.greeting.opening.friendly"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
-        ["semantic.flow.greeting.opening.rain"] =
+        ["flow.greeting.opening.rain"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain",
-        ["semantic.flow.greeting.opening.default"] =
+        ["flow.greeting.opening.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
-        ["semantic.flow.greeting.opening.question.friendly"] =
+        ["flow.greeting.opening.question.friendly"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly",
-        ["semantic.flow.greeting.opening.question.default"] =
+        ["flow.greeting.opening.question.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion",
-        ["semantic.flow.greeting.followup.friendly"] =
+        ["flow.greeting.followup.friendly"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly",
-        ["semantic.flow.greeting.followup.default"] =
+        ["flow.greeting.followup.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingFollowup",
         ["semantic.flow.weather.raining.default"] =
             "UI_PNC_Conversation_Semantic_FlowWeatherRaining",

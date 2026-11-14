@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.horde",
   "id": "started",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
-    "responseTemplateID": "semantic.combat.horde.started"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "That's a lot of them. Stay sharp.",
-          "TL": "Ang dami nila. Mag-ingat tayo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "We've got a whole crowd moving in. Eyes open.",
-          "TL": "May malaking grupo na paparating. Magmatyag."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Horde spotted! Check your exits.",
-          "TL": "May kuyog! Tignan ang mga labasan."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Too many bodies out there. Watch the perimeter.",
-          "TL": "Masyado silang marami sa labas. Bantayan ang paligid."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "They're grouping up. Form a line.",
-          "TL": "Nagsasama-sama sila. Ayusin ang hanay."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Sound drew a swarm. Get ready.",
-          "TL": "Nakaakit ng kuyog ang ingay. Humanda."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Look at that herd. Stay close.",
-          "TL": "Tingnan mo ang kawan na 'yan. Dumikit ka."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Mass contacts coming from down the street.",
-          "TL": "Napakaraming papalapit mula sa kalsada."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Here they come. Don't let them flank us.",
-          "TL": "Heto na sila. Huwag silang hayaang pumaligid."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Big group incoming. Watch each other's backs.",
-          "TL": "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa."
+          "EN": [
+            "That's a lot of them. Stay sharp.",
+            "We've got a whole crowd moving in. Eyes open.",
+            "Horde spotted! Check your exits.",
+            "Too many bodies out there. Watch the perimeter.",
+            "They're grouping up. Form a line.",
+            "Sound drew a swarm. Get ready.",
+            "Look at that herd. Stay close.",
+            "Mass contacts coming from down the street.",
+            "Here they come. Don't let them flank us.",
+            "Big group incoming. Watch each other's backs."
+          ],
+          "TL": [
+            "Ang dami nila. Mag-ingat tayo.",
+            "May malaking grupo na paparating. Magmatyag.",
+            "May kuyog! Tignan ang mga labasan.",
+            "Masyado silang marami sa labas. Bantayan ang paligid.",
+            "Nagsasama-sama sila. Ayusin ang hanay.",
+            "Nakaakit ng kuyog ang ingay. Humanda.",
+            "Tingnan mo ang kawan na 'yan. Dumikit ka.",
+            "Napakaraming papalapit mula sa kalsada.",
+            "Heto na sila. Huwag silang hayaang pumaligid.",
+            "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.horde",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_kill_witness_cold",
-        ["id"] = "semantic.combat.reaction.kill_witness_cold_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.kill_witness_cold",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Don't expect applause.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Don't expect applause.",
+                                        "Basic survival. Nothing to celebrate.",
+                                        "You did what was expected. Move.",
+                                        "One kill doesn't earn a trophy.",
+                                        "A child could swing that weapon. Walk.",
+                                        "Don't smirk. Keep walking.",
+                                        "That was the minimum requirement.",
+                                        "You hit it. Congratulations on living.",
+                                        "Save the pride for when we're safe.",
+                                        "Routine takedown. Move on.",
+                                    },
+                                    ["TL"] = {
+                                        "Huwag kang umasa ng palakpak.",
+                                        "Pangkaraniwang kaligtasan. Walang ipagdiriwang.",
+                                        "Ginawa mo ang inaasahan. Kilos.",
+                                        "Ang isang patay ay hindi para ipagmalaki.",
+                                        "Kahit bata kayang ihataw ang sandatang 'yan. Lakad.",
+                                        "Huwag kang ngumisi. Magpatuloy sa paglalakad.",
+                                        "Iyon ang pinakamababang kailangan.",
+                                        "Tinamaan mo. Binabati kita sa pananatiling buhay.",
+                                        "Itago ang yabang kapag ligtas na tayo.",
+                                        "Pangkaraniwang patay. Tuloy.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You killed one. So what?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You killed one. So what?",
+                                        "One corpse among millions. Step over.",
+                                        "That was one. There are thousands more.",
+                                        "Do not admire your work. Advance.",
+                                        "A rotten corpse fell. Big deal.",
+                                        "Don't pause over it. Keep moving.",
+                                        "One less dead body standing. Next.",
+                                        "You survived a contact. Keep walking.",
+                                        "It was in the way. It fell. Move.",
+                                        "Hardly impressive. Keep your weapon ready.",
+                                    },
+                                    ["TL"] = {
+                                        "Napatay mo ang isa. Ano ngayon?",
+                                        "Isang bangkay sa milyun-milyon. Hakbangan.",
+                                        "Isa lang 'yan. May libu-libo pa.",
+                                        "Huwag mong hangaan ang gawa mo. Sulong.",
+                                        "Bumagsak ang isang bulok. Ano naman.",
+                                        "Huwag kang tumigil diyan. Kilos.",
+                                        "Bawas ang isang nakatayong bangkay. Sunod.",
+                                        "Nakaligtas ka sa isang engkwentro. Lakad.",
+                                        "Nakaharang, bumagsak. Kilos.",
+                                        "Hindi nakakahanga. Ihanda ang sandata mo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Fine. One less.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Fine. One less.",
+                                        "Acceptable. Keep moving.",
+                                        "One obstacle eliminated.",
+                                        "Target down. Sufficient.",
+                                        "Threat neutralized. Proceed.",
+                                        "One down. March on.",
+                                        "Handled. Next sector.",
+                                        "Done. Do not linger.",
+                                        "Adequate strike. Keep the pace.",
+                                        "Casualty verified. Step forward.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Isa na lang ang nabawas.",
+                                        "Pwede na. Tuloy ang lakad.",
+                                        "Isang sagabal ang naalis.",
+                                        "Bagsak ang target. Sapat na.",
+                                        "Banta naalis na. Magpatuloy.",
+                                        "Isang bagsak. Magmartsa.",
+                                        "Naasikaso. Susunod na bahagi.",
+                                        "Tapos. Huwag magtagal.",
+                                        "Sapat na tama. Panatilihin ang bilis.",
+                                        "Kumpirmadong biktima. Hakbang pasulong.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Don't expect applause.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Don't expect applause.",
+                            "Basic survival. Nothing to celebrate.",
+                            "You did what was expected. Move.",
+                            "One kill doesn't earn a trophy.",
+                            "A child could swing that weapon. Walk.",
+                            "Don't smirk. Keep walking.",
+                            "That was the minimum requirement.",
+                            "You hit it. Congratulations on living.",
+                            "Save the pride for when we're safe.",
+                            "Routine takedown. Move on.",
+                        },
+                        ["TL"] = {
+                            "Huwag kang umasa ng palakpak.",
+                            "Pangkaraniwang kaligtasan. Walang ipagdiriwang.",
+                            "Ginawa mo ang inaasahan. Kilos.",
+                            "Ang isang patay ay hindi para ipagmalaki.",
+                            "Kahit bata kayang ihataw ang sandatang 'yan. Lakad.",
+                            "Huwag kang ngumisi. Magpatuloy sa paglalakad.",
+                            "Iyon ang pinakamababang kailangan.",
+                            "Tinamaan mo. Binabati kita sa pananatiling buhay.",
+                            "Itago ang yabang kapag ligtas na tayo.",
+                            "Pangkaraniwang patay. Tuloy.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "You killed one. So what?",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You killed one. So what?",
+                            "One corpse among millions. Step over.",
+                            "That was one. There are thousands more.",
+                            "Do not admire your work. Advance.",
+                            "A rotten corpse fell. Big deal.",
+                            "Don't pause over it. Keep moving.",
+                            "One less dead body standing. Next.",
+                            "You survived a contact. Keep walking.",
+                            "It was in the way. It fell. Move.",
+                            "Hardly impressive. Keep your weapon ready.",
+                        },
+                        ["TL"] = {
+                            "Napatay mo ang isa. Ano ngayon?",
+                            "Isang bangkay sa milyun-milyon. Hakbangan.",
+                            "Isa lang 'yan. May libu-libo pa.",
+                            "Huwag mong hangaan ang gawa mo. Sulong.",
+                            "Bumagsak ang isang bulok. Ano naman.",
+                            "Huwag kang tumigil diyan. Kilos.",
+                            "Bawas ang isang nakatayong bangkay. Sunod.",
+                            "Nakaligtas ka sa isang engkwentro. Lakad.",
+                            "Nakaharang, bumagsak. Kilos.",
+                            "Hindi nakakahanga. Ihanda ang sandata mo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Fine. One less.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Fine. One less.",
+                            "Acceptable. Keep moving.",
+                            "One obstacle eliminated.",
+                            "Target down. Sufficient.",
+                            "Threat neutralized. Proceed.",
+                            "One down. March on.",
+                            "Handled. Next sector.",
+                            "Done. Do not linger.",
+                            "Adequate strike. Keep the pace.",
+                            "Casualty verified. Step forward.",
+                        },
+                        ["TL"] = {
+                            "Sige. Isa na lang ang nabawas.",
+                            "Pwede na. Tuloy ang lakad.",
+                            "Isang sagabal ang naalis.",
+                            "Bagsak ang target. Sapat na.",
+                            "Banta naalis na. Magpatuloy.",
+                            "Isang bagsak. Magmartsa.",
+                            "Naasikaso. Susunod na bahagi.",
+                            "Tapos. Huwag magtagal.",
+                            "Sapat na tama. Panatilihin ang bilis.",
+                            "Kumpirmadong biktima. Hakbang pasulong.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.kill_witness_cold",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "kill_witness_cold_01",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_cold_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold_01.json",
+            ["localId"] = "kill_witness_cold",
+            ["sourceId"] = "combat.reaction.kill_witness_cold",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessCold",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_cold_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/cold.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't expect applause.",
-                            },
-                            ["TL"] = {
-                                "Huwag kang umasa ng palakpak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Basic survival. Nothing to celebrate.",
-                            },
-                            ["TL"] = {
-                                "Pangkaraniwang kaligtasan. Walang ipagdiriwang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You did what was expected. Move.",
-                            },
-                            ["TL"] = {
-                                "Ginawa mo ang inaasahan. Kilos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One kill doesn't earn a trophy.",
-                            },
-                            ["TL"] = {
-                                "Ang isang patay ay hindi para ipagmalaki.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Don't expect applause.",
+                                        "Basic survival. Nothing to celebrate.",
+                                        "You did what was expected. Move.",
+                                        "One kill doesn't earn a trophy.",
+                                        "A child could swing that weapon. Walk.",
+                                        "Don't smirk. Keep walking.",
+                                        "That was the minimum requirement.",
+                                        "You hit it. Congratulations on living.",
+                                        "Save the pride for when we're safe.",
+                                        "Routine takedown. Move on.",
+                                    },
+                                    ["TL"] = {
+                                        "Huwag kang umasa ng palakpak.",
+                                        "Pangkaraniwang kaligtasan. Walang ipagdiriwang.",
+                                        "Ginawa mo ang inaasahan. Kilos.",
+                                        "Ang isang patay ay hindi para ipagmalaki.",
+                                        "Kahit bata kayang ihataw ang sandatang 'yan. Lakad.",
+                                        "Huwag kang ngumisi. Magpatuloy sa paglalakad.",
+                                        "Iyon ang pinakamababang kailangan.",
+                                        "Tinamaan mo. Binabati kita sa pananatiling buhay.",
+                                        "Itago ang yabang kapag ligtas na tayo.",
+                                        "Pangkaraniwang patay. Tuloy.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A child could swing that weapon. Walk.",
-                            },
-                            ["TL"] = {
-                                "Kahit bata kayang ihataw ang sandatang 'yan. Lakad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't smirk. Keep walking.",
-                            },
-                            ["TL"] = {
-                                "Huwag kang ngumisi. Magpatuloy sa paglalakad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That was the minimum requirement.",
-                            },
-                            ["TL"] = {
-                                "Iyon ang pinakamababang kailangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You hit it. Congratulations on living.",
-                            },
-                            ["TL"] = {
-                                "Tinamaan mo. Binabati kita sa pananatiling buhay.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You killed one. So what?",
+                                        "One corpse among millions. Step over.",
+                                        "That was one. There are thousands more.",
+                                        "Do not admire your work. Advance.",
+                                        "A rotten corpse fell. Big deal.",
+                                        "Don't pause over it. Keep moving.",
+                                        "One less dead body standing. Next.",
+                                        "You survived a contact. Keep walking.",
+                                        "It was in the way. It fell. Move.",
+                                        "Hardly impressive. Keep your weapon ready.",
+                                    },
+                                    ["TL"] = {
+                                        "Napatay mo ang isa. Ano ngayon?",
+                                        "Isang bangkay sa milyun-milyon. Hakbangan.",
+                                        "Isa lang 'yan. May libu-libo pa.",
+                                        "Huwag mong hangaan ang gawa mo. Sulong.",
+                                        "Bumagsak ang isang bulok. Ano naman.",
+                                        "Huwag kang tumigil diyan. Kilos.",
+                                        "Bawas ang isang nakatayong bangkay. Sunod.",
+                                        "Nakaligtas ka sa isang engkwentro. Lakad.",
+                                        "Nakaharang, bumagsak. Kilos.",
+                                        "Hindi nakakahanga. Ihanda ang sandata mo.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Save the pride for when we're safe.",
-                            },
-                            ["TL"] = {
-                                "Itago ang yabang kapag ligtas na tayo.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Fine. One less.",
+                                        "Acceptable. Keep moving.",
+                                        "One obstacle eliminated.",
+                                        "Target down. Sufficient.",
+                                        "Threat neutralized. Proceed.",
+                                        "One down. March on.",
+                                        "Handled. Next sector.",
+                                        "Done. Do not linger.",
+                                        "Adequate strike. Keep the pace.",
+                                        "Casualty verified. Step forward.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Isa na lang ang nabawas.",
+                                        "Pwede na. Tuloy ang lakad.",
+                                        "Isang sagabal ang naalis.",
+                                        "Bagsak ang target. Sapat na.",
+                                        "Banta naalis na. Magpatuloy.",
+                                        "Isang bagsak. Magmartsa.",
+                                        "Naasikaso. Susunod na bahagi.",
+                                        "Tapos. Huwag magtagal.",
+                                        "Sapat na tama. Panatilihin ang bilis.",
+                                        "Kumpirmadong biktima. Hakbang pasulong.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Routine takedown. Move on.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.kill_witness_cold",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Pangkaraniwang patay. Tuloy.",
-                            },
+                            ["fallback"] = "Don't expect applause.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.kill_witness_cold.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_witness_cold",
-        ["id"] = "semantic.combat.reaction.kill_witness_cold_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_witness_cold_02",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_cold_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessCold",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_cold_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/cold.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You killed one. So what?",
-                            },
-                            ["TL"] = {
-                                "Napatay mo ang isa. Ano ngayon?",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Don't expect applause.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Don't expect applause.",
+                        "Basic survival. Nothing to celebrate.",
+                        "You did what was expected. Move.",
+                        "One kill doesn't earn a trophy.",
+                        "A child could swing that weapon. Walk.",
+                        "Don't smirk. Keep walking.",
+                        "That was the minimum requirement.",
+                        "You hit it. Congratulations on living.",
+                        "Save the pride for when we're safe.",
+                        "Routine takedown. Move on.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One corpse among millions. Step over.",
-                            },
-                            ["TL"] = {
-                                "Isang bangkay sa milyun-milyon. Hakbangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That was one. There are thousands more.",
-                            },
-                            ["TL"] = {
-                                "Isa lang 'yan. May libu-libo pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Do not admire your work. Advance.",
-                            },
-                            ["TL"] = {
-                                "Huwag mong hangaan ang gawa mo. Sulong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A rotten corpse fell. Big deal.",
-                            },
-                            ["TL"] = {
-                                "Bumagsak ang isang bulok. Ano naman.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't pause over it. Keep moving.",
-                            },
-                            ["TL"] = {
-                                "Huwag kang tumigil diyan. Kilos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less dead body standing. Next.",
-                            },
-                            ["TL"] = {
-                                "Bawas ang isang nakatayong bangkay. Sunod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You survived a contact. Keep walking.",
-                            },
-                            ["TL"] = {
-                                "Nakaligtas ka sa isang engkwentro. Lakad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It was in the way. It fell. Move.",
-                            },
-                            ["TL"] = {
-                                "Nakaharang, bumagsak. Kilos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hardly impressive. Keep your weapon ready.",
-                            },
-                            ["TL"] = {
-                                "Hindi nakakahanga. Ihanda ang sandata mo.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Huwag kang umasa ng palakpak.",
+                        "Pangkaraniwang kaligtasan. Walang ipagdiriwang.",
+                        "Ginawa mo ang inaasahan. Kilos.",
+                        "Ang isang patay ay hindi para ipagmalaki.",
+                        "Kahit bata kayang ihataw ang sandatang 'yan. Lakad.",
+                        "Huwag kang ngumisi. Magpatuloy sa paglalakad.",
+                        "Iyon ang pinakamababang kailangan.",
+                        "Tinamaan mo. Binabati kita sa pananatiling buhay.",
+                        "Itago ang yabang kapag ligtas na tayo.",
+                        "Pangkaraniwang patay. Tuloy.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_witness_cold",
-        ["id"] = "semantic.combat.reaction.kill_witness_cold_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_witness_cold_03",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_cold_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessCold",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_cold_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/cold.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fine. One less.",
-                            },
-                            ["TL"] = {
-                                "Sige. Isa na lang ang nabawas.",
-                            },
-                        },
+            {
+                ["fallback"] = "You killed one. So what?",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You killed one. So what?",
+                        "One corpse among millions. Step over.",
+                        "That was one. There are thousands more.",
+                        "Do not admire your work. Advance.",
+                        "A rotten corpse fell. Big deal.",
+                        "Don't pause over it. Keep moving.",
+                        "One less dead body standing. Next.",
+                        "You survived a contact. Keep walking.",
+                        "It was in the way. It fell. Move.",
+                        "Hardly impressive. Keep your weapon ready.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Acceptable. Keep moving.",
-                            },
-                            ["TL"] = {
-                                "Pwede na. Tuloy ang lakad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One obstacle eliminated.",
-                            },
-                            ["TL"] = {
-                                "Isang sagabal ang naalis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down. Sufficient.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang target. Sapat na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat neutralized. Proceed.",
-                            },
-                            ["TL"] = {
-                                "Banta naalis na. Magpatuloy.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One down. March on.",
-                            },
-                            ["TL"] = {
-                                "Isang bagsak. Magmartsa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled. Next sector.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso. Susunod na bahagi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. Do not linger.",
-                            },
-                            ["TL"] = {
-                                "Tapos. Huwag magtagal.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Adequate strike. Keep the pace.",
-                            },
-                            ["TL"] = {
-                                "Sapat na tama. Panatilihin ang bilis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Casualty verified. Step forward.",
-                            },
-                            ["TL"] = {
-                                "Kumpirmadong biktima. Hakbang pasulong.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Napatay mo ang isa. Ano ngayon?",
+                        "Isang bangkay sa milyun-milyon. Hakbangan.",
+                        "Isa lang 'yan. May libu-libo pa.",
+                        "Huwag mong hangaan ang gawa mo. Sulong.",
+                        "Bumagsak ang isang bulok. Ano naman.",
+                        "Huwag kang tumigil diyan. Kilos.",
+                        "Bawas ang isang nakatayong bangkay. Sunod.",
+                        "Nakaligtas ka sa isang engkwentro. Lakad.",
+                        "Nakaharang, bumagsak. Kilos.",
+                        "Hindi nakakahanga. Ihanda ang sandata mo.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "Fine. One less.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_cold.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Fine. One less.",
+                        "Acceptable. Keep moving.",
+                        "One obstacle eliminated.",
+                        "Target down. Sufficient.",
+                        "Threat neutralized. Proceed.",
+                        "One down. March on.",
+                        "Handled. Next sector.",
+                        "Done. Do not linger.",
+                        "Adequate strike. Keep the pace.",
+                        "Casualty verified. Step forward.",
+                    },
+                    ["TL"] = {
+                        "Sige. Isa na lang ang nabawas.",
+                        "Pwede na. Tuloy ang lakad.",
+                        "Isang sagabal ang naalis.",
+                        "Bagsak ang target. Sapat na.",
+                        "Banta naalis na. Magpatuloy.",
+                        "Isang bagsak. Magmartsa.",
+                        "Naasikaso. Susunod na bahagi.",
+                        "Tapos. Huwag magtagal.",
+                        "Sapat na tama. Panatilihin ang bilis.",
+                        "Kumpirmadong biktima. Hakbang pasulong.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

@@ -1,27 +1,27 @@
 {
-  "id": "ambiguous",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.backstory.ambiguous",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "question.backstory",
+  "id": "ambiguous",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "AMBIGUOUS",
+  "metadata": {
+    "responsePoolID": "question.backstory.ambiguous",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "AMBIGUOUS"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.backstory.ambiguous.authored",
-        "metadata": {
-          "fallback": "Which part of my past do you mean?",
-          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous"
-        },
+        "id": "question.backstory.ambiguous.authored",
         "text": {
           "EN": "Which part of my past do you mean?",
           "TL": "Aling bahagi ng nakaraan ko ang ibig mong sabihin?"
+        },
+        "metadata": {
+          "fallback": "Which part of my past do you mean?",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous"
         }
       }
     ]
-  },
-  "namespace": "semantic.question.backstory",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

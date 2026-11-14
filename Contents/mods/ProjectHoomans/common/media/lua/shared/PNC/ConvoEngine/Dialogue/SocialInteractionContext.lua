@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "social_interaction_context",
-        ["id"] = "semantic.interaction.context.clarify.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "interaction.context.clarify",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "What are you referring to?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.interaction.context.clarify.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "What are you referring to?",
+                                        "Can you clarify what you mean?",
+                                        "What specifically are you talking about?",
+                                        "I'm not following. Explain what you mean.",
+                                        "Give me some more context on that.",
+                                        "What do you mean by that exactly?",
+                                        "Which situation are you talking about?",
+                                        "Could you break that down for me?",
+                                        "I need more details before I understand.",
+                                        "What are you getting at?",
+                                    },
+                                    ["TL"] = {
+                                        "Ano ang tinutukoy mo?",
+                                        "Pwede mo bang linawin ang ibig mong sabihin?",
+                                        "Tungkol saan ba partikular ang sinasabi mo?",
+                                        "Hindi kita masundan. Ipaliwanag mo ang ibig mong sabihin.",
+                                        "Bigyan mo ako ng karagdagang konteksto tungkol diyan.",
+                                        "Ano nga ba ang ibig mong sabihin doon?",
+                                        "Aling sitwasyon ba ang tinutukoy mo?",
+                                        "Pwede mo bang himayin 'yan para sa akin?",
+                                        "Kailangan ko ng dagdag na detalye bago ko maintindihan.",
+                                        "Saan ba patungo ang sinasabi mo?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "interaction.context",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "What are you referring to?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.context.clarify.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "What are you referring to?",
+                            "Can you clarify what you mean?",
+                            "What specifically are you talking about?",
+                            "I'm not following. Explain what you mean.",
+                            "Give me some more context on that.",
+                            "What do you mean by that exactly?",
+                            "Which situation are you talking about?",
+                            "Could you break that down for me?",
+                            "I need more details before I understand.",
+                            "What are you getting at?",
+                        },
+                        ["TL"] = {
+                            "Ano ang tinutukoy mo?",
+                            "Pwede mo bang linawin ang ibig mong sabihin?",
+                            "Tungkol saan ba partikular ang sinasabi mo?",
+                            "Hindi kita masundan. Ipaliwanag mo ang ibig mong sabihin.",
+                            "Bigyan mo ako ng karagdagang konteksto tungkol diyan.",
+                            "Ano nga ba ang ibig mong sabihin doon?",
+                            "Aling sitwasyon ba ang tinutukoy mo?",
+                            "Pwede mo bang himayin 'yan para sa akin?",
+                            "Kailangan ko ng dagdag na detalye bago ko maintindihan.",
+                            "Saan ba patungo ang sinasabi mo?",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "interaction.context.clarify",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.interaction.context.clarify.neutral",
+            ["localId"] = "clarify",
+            ["sourceId"] = "interaction.context.clarify",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionContext",
-        ["namespace"] = "semantic.interaction.context.clarify",
+        ["namespace"] = "interaction.context",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.context.clarify",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/context/clarify.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What are you referring to?",
-                            },
-                            ["TL"] = {
-                                "Ano ang tinutukoy mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can you clarify what you mean?",
-                            },
-                            ["TL"] = {
-                                "Pwede mo bang linawin ang ibig mong sabihin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What specifically are you talking about?",
-                            },
-                            ["TL"] = {
-                                "Tungkol saan ba partikular ang sinasabi mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm not following. Explain what you mean.",
-                            },
-                            ["TL"] = {
-                                "Hindi kita masundan. Ipaliwanag mo ang ibig mong sabihin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Give me some more context on that.",
-                            },
-                            ["TL"] = {
-                                "Bigyan mo ako ng karagdagang konteksto tungkol diyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What do you mean by that exactly?",
-                            },
-                            ["TL"] = {
-                                "Ano nga ba ang ibig mong sabihin doon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Which situation are you talking about?",
-                            },
-                            ["TL"] = {
-                                "Aling sitwasyon ba ang tinutukoy mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Could you break that down for me?",
-                            },
-                            ["TL"] = {
-                                "Pwede mo bang himayin 'yan para sa akin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need more details before I understand.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng dagdag na detalye bago ko maintindihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What are you getting at?",
-                            },
-                            ["TL"] = {
-                                "Saan ba patungo ang sinasabi mo?",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "What are you referring to?",
+                                        "Can you clarify what you mean?",
+                                        "What specifically are you talking about?",
+                                        "I'm not following. Explain what you mean.",
+                                        "Give me some more context on that.",
+                                        "What do you mean by that exactly?",
+                                        "Which situation are you talking about?",
+                                        "Could you break that down for me?",
+                                        "I need more details before I understand.",
+                                        "What are you getting at?",
+                                    },
+                                    ["TL"] = {
+                                        "Ano ang tinutukoy mo?",
+                                        "Pwede mo bang linawin ang ibig mong sabihin?",
+                                        "Tungkol saan ba partikular ang sinasabi mo?",
+                                        "Hindi kita masundan. Ipaliwanag mo ang ibig mong sabihin.",
+                                        "Bigyan mo ako ng karagdagang konteksto tungkol diyan.",
+                                        "Ano nga ba ang ibig mong sabihin doon?",
+                                        "Aling sitwasyon ba ang tinutukoy mo?",
+                                        "Pwede mo bang himayin 'yan para sa akin?",
+                                        "Kailangan ko ng dagdag na detalye bago ko maintindihan.",
+                                        "Saan ba patungo ang sinasabi mo?",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "interaction.context.clarify",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "What are you referring to?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.interaction.context.clarify.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -154,6 +191,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "What are you referring to?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.context.clarify.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "What are you referring to?",
+                        "Can you clarify what you mean?",
+                        "What specifically are you talking about?",
+                        "I'm not following. Explain what you mean.",
+                        "Give me some more context on that.",
+                        "What do you mean by that exactly?",
+                        "Which situation are you talking about?",
+                        "Could you break that down for me?",
+                        "I need more details before I understand.",
+                        "What are you getting at?",
+                    },
+                    ["TL"] = {
+                        "Ano ang tinutukoy mo?",
+                        "Pwede mo bang linawin ang ibig mong sabihin?",
+                        "Tungkol saan ba partikular ang sinasabi mo?",
+                        "Hindi kita masundan. Ipaliwanag mo ang ibig mong sabihin.",
+                        "Bigyan mo ako ng karagdagang konteksto tungkol diyan.",
+                        "Ano nga ba ang ibig mong sabihin doon?",
+                        "Aling sitwasyon ba ang tinutukoy mo?",
+                        "Pwede mo bang himayin 'yan para sa akin?",
+                        "Kailangan ko ng dagdag na detalye bago ko maintindihan.",
+                        "Saan ba patungo ang sinasabi mo?",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

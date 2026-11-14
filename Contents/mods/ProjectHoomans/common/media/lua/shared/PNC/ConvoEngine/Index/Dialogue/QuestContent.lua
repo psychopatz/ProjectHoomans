@@ -1,110 +1,110 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.quest.clinic_supplies.accept.failed.neutral"] = {
+    ["quest.clinic_supplies.accept.failed"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.accept.failed.neutral",
+        ["id"] = "quest.clinic_supplies.accept.failed",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_failed.json",
     },
-    ["semantic.quest.clinic_supplies.accept.queued.neutral"] = {
+    ["quest.clinic_supplies.accept.queued"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.accept.queued.neutral",
+        ["id"] = "quest.clinic_supplies.accept.queued",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_queued.json",
     },
-    ["semantic.quest.clinic_supplies.accept.rejected.neutral"] = {
+    ["quest.clinic_supplies.accept.rejected"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.accept.rejected.neutral",
+        ["id"] = "quest.clinic_supplies.accept.rejected",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_rejected.json",
     },
-    ["semantic.quest.clinic_supplies.offer.failed.neutral"] = {
+    ["quest.clinic_supplies.offer.failed"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.offer.failed.neutral",
+        ["id"] = "quest.clinic_supplies.offer.failed",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_failed.json",
     },
-    ["semantic.quest.clinic_supplies.offer.queued.neutral"] = {
+    ["quest.clinic_supplies.offer.queued"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.offer.queued.neutral",
+        ["id"] = "quest.clinic_supplies.offer.queued",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_queued.json",
     },
-    ["semantic.quest.clinic_supplies.offer.rejected.neutral"] = {
+    ["quest.clinic_supplies.offer.rejected"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.offer.rejected.neutral",
+        ["id"] = "quest.clinic_supplies.offer.rejected",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_rejected.json",
     },
-    ["semantic.quest.clinic_supplies.status.failed.neutral"] = {
+    ["quest.clinic_supplies.status.failed"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.status.failed.neutral",
+        ["id"] = "quest.clinic_supplies.status.failed",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_failed.json",
     },
-    ["semantic.quest.clinic_supplies.status.queued.neutral"] = {
+    ["quest.clinic_supplies.status.queued"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.status.queued.neutral",
+        ["id"] = "quest.clinic_supplies.status.queued",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_queued.json",
     },
-    ["semantic.quest.clinic_supplies.status.rejected.neutral"] = {
+    ["quest.clinic_supplies.status.rejected"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.status.rejected.neutral",
+        ["id"] = "quest.clinic_supplies.status.rejected",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_rejected.json",
     },
-    ["semantic.quest.clinic_supplies.turn_in.failed.neutral"] = {
+    ["quest.clinic_supplies.turn_in.failed"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.turn_in.failed.neutral",
+        ["id"] = "quest.clinic_supplies.turn_in.failed",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_failed.json",
     },
-    ["semantic.quest.clinic_supplies.turn_in.queued.neutral"] = {
+    ["quest.clinic_supplies.turn_in.queued"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.turn_in.queued.neutral",
+        ["id"] = "quest.clinic_supplies.turn_in.queued",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_queued.json",
     },
-    ["semantic.quest.clinic_supplies.turn_in.rejected.neutral"] = {
+    ["quest.clinic_supplies.turn_in.rejected"] = {
         ["domain"] = "quest_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/QuestContent",
         },
-        ["id"] = "semantic.quest.clinic_supplies.turn_in.rejected.neutral",
+        ["id"] = "quest.clinic_supplies.turn_in.rejected",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_rejected.json",
     },

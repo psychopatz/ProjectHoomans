@@ -1,30 +1,12 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.combat.reaction.kill_witness_reserved_01"] = {
+    ["combat.reaction.kill_witness_reserved"] = {
         ["domain"] = "combat_kill_witness_reserved",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
         },
-        ["id"] = "semantic.combat.reaction.kill_witness_reserved_01",
+        ["id"] = "combat.reaction.kill_witness_reserved",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_01.json",
-    },
-    ["semantic.combat.reaction.kill_witness_reserved_02"] = {
-        ["domain"] = "combat_kill_witness_reserved",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
-        },
-        ["id"] = "semantic.combat.reaction.kill_witness_reserved_02",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_02.json",
-    },
-    ["semantic.combat.reaction.kill_witness_reserved_03"] = {
-        ["domain"] = "combat_kill_witness_reserved",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
-        },
-        ["id"] = "semantic.combat.reaction.kill_witness_reserved_03",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_03.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved.json",
     },
 }

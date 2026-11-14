@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.eat",
   "id": "failed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-    "responseTemplateID": "semantic.task.eat.failed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I couldn't eat that.",
-          "TL": "Hindi ko nakain iyon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Failed to eat. The food was rotten or spoiled.",
-          "TL": "Bigo sa pagkain. Bulok o panis ang pagkain."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Couldn't eat that. It smelled dangerous.",
-          "TL": "Di makain 'yon. Amoy delikado."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "I was interrupted while trying to eat.",
-          "TL": "Naabala ako habang sumusubok kumain."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Unable to eat right now. Area under threat.",
-          "TL": "Di makakain ngayon. May banta sa lugar."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Eating failed. Food was ruined.",
-          "TL": "Pumalpak ang pagkain. Nasira ang pagkain."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Couldn't stomach that item.",
-          "TL": "Di matunawan sa bagay na 'yan."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Dropped or lost the food before eating.",
-          "TL": "Nahulog o nawala ang pagkain bago nakain."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Action failed. Still starving.",
-          "TL": "Bigo ang kilos. Gutom pa rin."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Failed to consume meal.",
-          "TL": "Bigo sa pagtapos ng pagkain."
+          "EN": [
+            "I couldn't eat that.",
+            "Failed to eat. The food was rotten or spoiled.",
+            "Couldn't eat that. It smelled dangerous.",
+            "I was interrupted while trying to eat.",
+            "Unable to eat right now. Area under threat.",
+            "Eating failed. Food was ruined.",
+            "Couldn't stomach that item.",
+            "Dropped or lost the food before eating.",
+            "Action failed. Still starving.",
+            "Failed to consume meal."
+          ],
+          "TL": [
+            "Hindi ko nakain iyon.",
+            "Bigo sa pagkain. Bulok o panis ang pagkain.",
+            "Di makain 'yon. Amoy delikado.",
+            "Naabala ako habang sumusubok kumain.",
+            "Di makakain ngayon. May banta sa lugar.",
+            "Pumalpak ang pagkain. Nasira ang pagkain.",
+            "Di matunawan sa bagay na 'yan.",
+            "Nahulog o nawala ang pagkain bago nakain.",
+            "Bigo ang kilos. Gutom pa rin.",
+            "Bigo sa pagtapos ng pagkain."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.eat",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

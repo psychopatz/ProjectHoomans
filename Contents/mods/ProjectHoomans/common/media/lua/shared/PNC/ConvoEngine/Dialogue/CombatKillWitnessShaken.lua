@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_kill_witness_shaken",
-        ["id"] = "semantic.combat.reaction.kill_witness_shaken_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.kill_witness_shaken",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "It's down... but there are more.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "It's down... but there are more.",
+                                        "You got it... God, look around us.",
+                                        "Dead... but I hear more shuffling.",
+                                        "That one's down... don't let others flank.",
+                                        "It's over for that one... but we're not safe.",
+                                        "You killed it... please tell me that's the last one.",
+                                        "One is down... but more could come.",
+                                        "Good, it's dead... just watch the darkness.",
+                                        "Down... but my heart won't stop racing.",
+                                        "You stopped it... but we have to keep checking.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na... pero may iba pa.",
+                                        "Nakuha mo... Diyos ko, tingnan mo ang paligid.",
+                                        "Patay na... pero may naririnig pa akong kaluskos.",
+                                        "Bagsak na ang isang 'yon... huwag hayaang may pumaligid.",
+                                        "Tapos na ang isa... pero hindi pa tayo ligtas.",
+                                        "Napatay mo... pakiusap sabihin mong huli na 'yan.",
+                                        "Isang bagsak... pero baka may dumating pa.",
+                                        "Mabuti at patay na... mag-ingat lang sa dilim.",
+                                        "Bagsak... pero ayaw humupa ng kaba ko.",
+                                        "Napigilan mo... pero kailangan nating patuloy na magmasid.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Good. Just—keep watching them.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Good. Just—keep watching them.",
+                                        "Nice hit... just don't let them get close.",
+                                        "You killed it... keep your eyes on the shadows.",
+                                        "It's dead... just watch out for more.",
+                                        "Okay, that one's gone... please stay watchful.",
+                                        "Good swing... don't turn your back on them.",
+                                        "It's on the floor... keep watching every door.",
+                                        "Down... just keep looking everywhere.",
+                                        "You dropped it... God, please be careful.",
+                                        "Handled... just don't let your guard down.",
+                                    },
+                                    ["TL"] = {
+                                        "Ayos. Basta—bantayan mo sila.",
+                                        "Magandang tama... huwag mo lang silang palapitin.",
+                                        "Napatay mo... bantayan mo ang mga anino.",
+                                        "Patay na... mag-ingat lang sa iba pa.",
+                                        "Sige, wala na 'yon... pakiusap magmatyag ka.",
+                                        "Magandang hataw... huwag mo silang tatalikuran.",
+                                        "Nasa sahig na... bantayan ang bawat pinto.",
+                                        "Bagsak... tumingin ka lang sa lahat ng sulok.",
+                                        "Ibinagsak mo... Diyos ko, mag-ingat ka.",
+                                        "Naasikaso... huwag mo lang ibaba ang depensa.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Okay. One less. I still don't like this.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Okay. One less. I still don't like this.",
+                                        "One down... this whole place creeps me out.",
+                                        "It's dead. I hate being surrounded like this.",
+                                        "One less threat... my knees are shaking.",
+                                        "Good, it stopped moving... I'm terrified.",
+                                        "Down. I just want this nightmare to end.",
+                                        "One less rotten thing... still scares me to death.",
+                                        "It's gone. I really, really don't like this.",
+                                        "Dead. Can we leave as soon as it's quiet?",
+                                        "You killed it... but my hands are ice cold.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Isa na lang ang nabawas. Ayoko pa rin nito.",
+                                        "Isang bagsak... kinikilabutan ako sa buong lugar na 'to.",
+                                        "Patay na. Ayaw na ayaw kong napapalibutan tayo.",
+                                        "Bawas ang isang banta... nanginginig ang mga tuhod ko.",
+                                        "Mabuti at tumigil na sa paggalaw... natatakot ako.",
+                                        "Bagsak. Gusto ko nang matapos ang bangungot na 'to.",
+                                        "Bawas ang isang bulok... takot na takot pa rin ako.",
+                                        "Wala na. Ayoko talaga, ayoko sa ganito.",
+                                        "Patay na. Pwede ba tayong umalis kapag tumahimik na?",
+                                        "Napatay mo... pero parang yelo ang lamig ng mga kamay ko.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "It's down... but there are more.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "It's down... but there are more.",
+                            "You got it... God, look around us.",
+                            "Dead... but I hear more shuffling.",
+                            "That one's down... don't let others flank.",
+                            "It's over for that one... but we're not safe.",
+                            "You killed it... please tell me that's the last one.",
+                            "One is down... but more could come.",
+                            "Good, it's dead... just watch the darkness.",
+                            "Down... but my heart won't stop racing.",
+                            "You stopped it... but we have to keep checking.",
+                        },
+                        ["TL"] = {
+                            "Patay na... pero may iba pa.",
+                            "Nakuha mo... Diyos ko, tingnan mo ang paligid.",
+                            "Patay na... pero may naririnig pa akong kaluskos.",
+                            "Bagsak na ang isang 'yon... huwag hayaang may pumaligid.",
+                            "Tapos na ang isa... pero hindi pa tayo ligtas.",
+                            "Napatay mo... pakiusap sabihin mong huli na 'yan.",
+                            "Isang bagsak... pero baka may dumating pa.",
+                            "Mabuti at patay na... mag-ingat lang sa dilim.",
+                            "Bagsak... pero ayaw humupa ng kaba ko.",
+                            "Napigilan mo... pero kailangan nating patuloy na magmasid.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Good. Just—keep watching them.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Good. Just—keep watching them.",
+                            "Nice hit... just don't let them get close.",
+                            "You killed it... keep your eyes on the shadows.",
+                            "It's dead... just watch out for more.",
+                            "Okay, that one's gone... please stay watchful.",
+                            "Good swing... don't turn your back on them.",
+                            "It's on the floor... keep watching every door.",
+                            "Down... just keep looking everywhere.",
+                            "You dropped it... God, please be careful.",
+                            "Handled... just don't let your guard down.",
+                        },
+                        ["TL"] = {
+                            "Ayos. Basta—bantayan mo sila.",
+                            "Magandang tama... huwag mo lang silang palapitin.",
+                            "Napatay mo... bantayan mo ang mga anino.",
+                            "Patay na... mag-ingat lang sa iba pa.",
+                            "Sige, wala na 'yon... pakiusap magmatyag ka.",
+                            "Magandang hataw... huwag mo silang tatalikuran.",
+                            "Nasa sahig na... bantayan ang bawat pinto.",
+                            "Bagsak... tumingin ka lang sa lahat ng sulok.",
+                            "Ibinagsak mo... Diyos ko, mag-ingat ka.",
+                            "Naasikaso... huwag mo lang ibaba ang depensa.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Okay. One less. I still don't like this.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Okay. One less. I still don't like this.",
+                            "One down... this whole place creeps me out.",
+                            "It's dead. I hate being surrounded like this.",
+                            "One less threat... my knees are shaking.",
+                            "Good, it stopped moving... I'm terrified.",
+                            "Down. I just want this nightmare to end.",
+                            "One less rotten thing... still scares me to death.",
+                            "It's gone. I really, really don't like this.",
+                            "Dead. Can we leave as soon as it's quiet?",
+                            "You killed it... but my hands are ice cold.",
+                        },
+                        ["TL"] = {
+                            "Sige. Isa na lang ang nabawas. Ayoko pa rin nito.",
+                            "Isang bagsak... kinikilabutan ako sa buong lugar na 'to.",
+                            "Patay na. Ayaw na ayaw kong napapalibutan tayo.",
+                            "Bawas ang isang banta... nanginginig ang mga tuhod ko.",
+                            "Mabuti at tumigil na sa paggalaw... natatakot ako.",
+                            "Bagsak. Gusto ko nang matapos ang bangungot na 'to.",
+                            "Bawas ang isang bulok... takot na takot pa rin ako.",
+                            "Wala na. Ayoko talaga, ayoko sa ganito.",
+                            "Patay na. Pwede ba tayong umalis kapag tumahimik na?",
+                            "Napatay mo... pero parang yelo ang lamig ng mga kamay ko.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.kill_witness_shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "kill_witness_shaken_01",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_shaken_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_01.json",
+            ["localId"] = "kill_witness_shaken",
+            ["sourceId"] = "combat.reaction.kill_witness_shaken",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessShaken",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_shaken_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/shaken.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's down... but there are more.",
-                            },
-                            ["TL"] = {
-                                "Patay na... pero may iba pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You got it... God, look around us.",
-                            },
-                            ["TL"] = {
-                                "Nakuha mo... Diyos ko, tingnan mo ang paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead... but I hear more shuffling.",
-                            },
-                            ["TL"] = {
-                                "Patay na... pero may naririnig pa akong kaluskos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That one's down... don't let others flank.",
-                            },
-                            ["TL"] = {
-                                "Bagsak na ang isang 'yon... huwag hayaang may pumaligid.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "It's down... but there are more.",
+                                        "You got it... God, look around us.",
+                                        "Dead... but I hear more shuffling.",
+                                        "That one's down... don't let others flank.",
+                                        "It's over for that one... but we're not safe.",
+                                        "You killed it... please tell me that's the last one.",
+                                        "One is down... but more could come.",
+                                        "Good, it's dead... just watch the darkness.",
+                                        "Down... but my heart won't stop racing.",
+                                        "You stopped it... but we have to keep checking.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na... pero may iba pa.",
+                                        "Nakuha mo... Diyos ko, tingnan mo ang paligid.",
+                                        "Patay na... pero may naririnig pa akong kaluskos.",
+                                        "Bagsak na ang isang 'yon... huwag hayaang may pumaligid.",
+                                        "Tapos na ang isa... pero hindi pa tayo ligtas.",
+                                        "Napatay mo... pakiusap sabihin mong huli na 'yan.",
+                                        "Isang bagsak... pero baka may dumating pa.",
+                                        "Mabuti at patay na... mag-ingat lang sa dilim.",
+                                        "Bagsak... pero ayaw humupa ng kaba ko.",
+                                        "Napigilan mo... pero kailangan nating patuloy na magmasid.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's over for that one... but we're not safe.",
-                            },
-                            ["TL"] = {
-                                "Tapos na ang isa... pero hindi pa tayo ligtas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You killed it... please tell me that's the last one.",
-                            },
-                            ["TL"] = {
-                                "Napatay mo... pakiusap sabihin mong huli na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One is down... but more could come.",
-                            },
-                            ["TL"] = {
-                                "Isang bagsak... pero baka may dumating pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good, it's dead... just watch the darkness.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at patay na... mag-ingat lang sa dilim.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Good. Just—keep watching them.",
+                                        "Nice hit... just don't let them get close.",
+                                        "You killed it... keep your eyes on the shadows.",
+                                        "It's dead... just watch out for more.",
+                                        "Okay, that one's gone... please stay watchful.",
+                                        "Good swing... don't turn your back on them.",
+                                        "It's on the floor... keep watching every door.",
+                                        "Down... just keep looking everywhere.",
+                                        "You dropped it... God, please be careful.",
+                                        "Handled... just don't let your guard down.",
+                                    },
+                                    ["TL"] = {
+                                        "Ayos. Basta—bantayan mo sila.",
+                                        "Magandang tama... huwag mo lang silang palapitin.",
+                                        "Napatay mo... bantayan mo ang mga anino.",
+                                        "Patay na... mag-ingat lang sa iba pa.",
+                                        "Sige, wala na 'yon... pakiusap magmatyag ka.",
+                                        "Magandang hataw... huwag mo silang tatalikuran.",
+                                        "Nasa sahig na... bantayan ang bawat pinto.",
+                                        "Bagsak... tumingin ka lang sa lahat ng sulok.",
+                                        "Ibinagsak mo... Diyos ko, mag-ingat ka.",
+                                        "Naasikaso... huwag mo lang ibaba ang depensa.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down... but my heart won't stop racing.",
-                            },
-                            ["TL"] = {
-                                "Bagsak... pero ayaw humupa ng kaba ko.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Okay. One less. I still don't like this.",
+                                        "One down... this whole place creeps me out.",
+                                        "It's dead. I hate being surrounded like this.",
+                                        "One less threat... my knees are shaking.",
+                                        "Good, it stopped moving... I'm terrified.",
+                                        "Down. I just want this nightmare to end.",
+                                        "One less rotten thing... still scares me to death.",
+                                        "It's gone. I really, really don't like this.",
+                                        "Dead. Can we leave as soon as it's quiet?",
+                                        "You killed it... but my hands are ice cold.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Isa na lang ang nabawas. Ayoko pa rin nito.",
+                                        "Isang bagsak... kinikilabutan ako sa buong lugar na 'to.",
+                                        "Patay na. Ayaw na ayaw kong napapalibutan tayo.",
+                                        "Bawas ang isang banta... nanginginig ang mga tuhod ko.",
+                                        "Mabuti at tumigil na sa paggalaw... natatakot ako.",
+                                        "Bagsak. Gusto ko nang matapos ang bangungot na 'to.",
+                                        "Bawas ang isang bulok... takot na takot pa rin ako.",
+                                        "Wala na. Ayoko talaga, ayoko sa ganito.",
+                                        "Patay na. Pwede ba tayong umalis kapag tumahimik na?",
+                                        "Napatay mo... pero parang yelo ang lamig ng mga kamay ko.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You stopped it... but we have to keep checking.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.kill_witness_shaken",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Napigilan mo... pero kailangan nating patuloy na magmasid.",
-                            },
+                            ["fallback"] = "It's down... but there are more.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.kill_witness_shaken.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_witness_shaken",
-        ["id"] = "semantic.combat.reaction.kill_witness_shaken_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_witness_shaken_02",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_shaken_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessShaken",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_shaken_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/shaken.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good. Just—keep watching them.",
-                            },
-                            ["TL"] = {
-                                "Ayos. Basta—bantayan mo sila.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "It's down... but there are more.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "It's down... but there are more.",
+                        "You got it... God, look around us.",
+                        "Dead... but I hear more shuffling.",
+                        "That one's down... don't let others flank.",
+                        "It's over for that one... but we're not safe.",
+                        "You killed it... please tell me that's the last one.",
+                        "One is down... but more could come.",
+                        "Good, it's dead... just watch the darkness.",
+                        "Down... but my heart won't stop racing.",
+                        "You stopped it... but we have to keep checking.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nice hit... just don't let them get close.",
-                            },
-                            ["TL"] = {
-                                "Magandang tama... huwag mo lang silang palapitin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You killed it... keep your eyes on the shadows.",
-                            },
-                            ["TL"] = {
-                                "Napatay mo... bantayan mo ang mga anino.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead... just watch out for more.",
-                            },
-                            ["TL"] = {
-                                "Patay na... mag-ingat lang sa iba pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay, that one's gone... please stay watchful.",
-                            },
-                            ["TL"] = {
-                                "Sige, wala na 'yon... pakiusap magmatyag ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good swing... don't turn your back on them.",
-                            },
-                            ["TL"] = {
-                                "Magandang hataw... huwag mo silang tatalikuran.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's on the floor... keep watching every door.",
-                            },
-                            ["TL"] = {
-                                "Nasa sahig na... bantayan ang bawat pinto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down... just keep looking everywhere.",
-                            },
-                            ["TL"] = {
-                                "Bagsak... tumingin ka lang sa lahat ng sulok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You dropped it... God, please be careful.",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak mo... Diyos ko, mag-ingat ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled... just don't let your guard down.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso... huwag mo lang ibaba ang depensa.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Patay na... pero may iba pa.",
+                        "Nakuha mo... Diyos ko, tingnan mo ang paligid.",
+                        "Patay na... pero may naririnig pa akong kaluskos.",
+                        "Bagsak na ang isang 'yon... huwag hayaang may pumaligid.",
+                        "Tapos na ang isa... pero hindi pa tayo ligtas.",
+                        "Napatay mo... pakiusap sabihin mong huli na 'yan.",
+                        "Isang bagsak... pero baka may dumating pa.",
+                        "Mabuti at patay na... mag-ingat lang sa dilim.",
+                        "Bagsak... pero ayaw humupa ng kaba ko.",
+                        "Napigilan mo... pero kailangan nating patuloy na magmasid.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_witness_shaken",
-        ["id"] = "semantic.combat.reaction.kill_witness_shaken_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_witness_shaken_03",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_shaken_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessShaken",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_shaken_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/shaken.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay. One less. I still don't like this.",
-                            },
-                            ["TL"] = {
-                                "Sige. Isa na lang ang nabawas. Ayoko pa rin nito.",
-                            },
-                        },
+            {
+                ["fallback"] = "Good. Just—keep watching them.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Good. Just—keep watching them.",
+                        "Nice hit... just don't let them get close.",
+                        "You killed it... keep your eyes on the shadows.",
+                        "It's dead... just watch out for more.",
+                        "Okay, that one's gone... please stay watchful.",
+                        "Good swing... don't turn your back on them.",
+                        "It's on the floor... keep watching every door.",
+                        "Down... just keep looking everywhere.",
+                        "You dropped it... God, please be careful.",
+                        "Handled... just don't let your guard down.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One down... this whole place creeps me out.",
-                            },
-                            ["TL"] = {
-                                "Isang bagsak... kinikilabutan ako sa buong lugar na 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead. I hate being surrounded like this.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Ayaw na ayaw kong napapalibutan tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less threat... my knees are shaking.",
-                            },
-                            ["TL"] = {
-                                "Bawas ang isang banta... nanginginig ang mga tuhod ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good, it stopped moving... I'm terrified.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at tumigil na sa paggalaw... natatakot ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down. I just want this nightmare to end.",
-                            },
-                            ["TL"] = {
-                                "Bagsak. Gusto ko nang matapos ang bangungot na 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less rotten thing... still scares me to death.",
-                            },
-                            ["TL"] = {
-                                "Bawas ang isang bulok... takot na takot pa rin ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's gone. I really, really don't like this.",
-                            },
-                            ["TL"] = {
-                                "Wala na. Ayoko talaga, ayoko sa ganito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead. Can we leave as soon as it's quiet?",
-                            },
-                            ["TL"] = {
-                                "Patay na. Pwede ba tayong umalis kapag tumahimik na?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You killed it... but my hands are ice cold.",
-                            },
-                            ["TL"] = {
-                                "Napatay mo... pero parang yelo ang lamig ng mga kamay ko.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Ayos. Basta—bantayan mo sila.",
+                        "Magandang tama... huwag mo lang silang palapitin.",
+                        "Napatay mo... bantayan mo ang mga anino.",
+                        "Patay na... mag-ingat lang sa iba pa.",
+                        "Sige, wala na 'yon... pakiusap magmatyag ka.",
+                        "Magandang hataw... huwag mo silang tatalikuran.",
+                        "Nasa sahig na... bantayan ang bawat pinto.",
+                        "Bagsak... tumingin ka lang sa lahat ng sulok.",
+                        "Ibinagsak mo... Diyos ko, mag-ingat ka.",
+                        "Naasikaso... huwag mo lang ibaba ang depensa.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "Okay. One less. I still don't like this.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Okay. One less. I still don't like this.",
+                        "One down... this whole place creeps me out.",
+                        "It's dead. I hate being surrounded like this.",
+                        "One less threat... my knees are shaking.",
+                        "Good, it stopped moving... I'm terrified.",
+                        "Down. I just want this nightmare to end.",
+                        "One less rotten thing... still scares me to death.",
+                        "It's gone. I really, really don't like this.",
+                        "Dead. Can we leave as soon as it's quiet?",
+                        "You killed it... but my hands are ice cold.",
+                    },
+                    ["TL"] = {
+                        "Sige. Isa na lang ang nabawas. Ayoko pa rin nito.",
+                        "Isang bagsak... kinikilabutan ako sa buong lugar na 'to.",
+                        "Patay na. Ayaw na ayaw kong napapalibutan tayo.",
+                        "Bawas ang isang banta... nanginginig ang mga tuhod ko.",
+                        "Mabuti at tumigil na sa paggalaw... natatakot ako.",
+                        "Bagsak. Gusto ko nang matapos ang bangungot na 'to.",
+                        "Bawas ang isang bulok... takot na takot pa rin ako.",
+                        "Wala na. Ayoko talaga, ayoko sa ganito.",
+                        "Patay na. Pwede ba tayong umalis kapag tumahimik na?",
+                        "Napatay mo... pero parang yelo ang lamig ng mga kamay ko.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

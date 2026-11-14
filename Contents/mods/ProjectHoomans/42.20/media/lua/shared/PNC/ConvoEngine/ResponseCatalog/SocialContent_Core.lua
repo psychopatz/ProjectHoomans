@@ -5,6 +5,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Registry = require
     "PNC/ConvoEngine/Registry"
+local ConvoPlanFamily = require
+    "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
 
 local OWNED_CATEGORIES = {
     ["projecthoomans:core_social_content"] = true,
@@ -14,16 +16,6 @@ local OWNED_CATEGORIES = {
     ["projecthoomans:quest_content"] = true,
     ["projecthoomans:wellbeing_content"] = true,
 }
-
-local function activeLanguage()
-    if Translator and type(Translator.getLanguage) == "function" then
-        local language = Translator.getLanguage()
-        if language and type(language.toString) == "function" then
-            return tostring(language:toString())
-        end
-    end
-    return "EN"
-end
 
 local function addPlan(families, plan)
     local payload = type(plan) == "table" and plan.payload or nil
@@ -61,60 +53,25 @@ local function addPlan(families, plan)
                 or playerChoice.choice,
         }
     end
+    local defaultOwner = metadata.contentOwner
+        or "projecthoomans.dialogue_content.social"
     local templateID = metadata.responseTemplateID
-    local style = metadata.style or "neutral"
-    if type(templateID) ~= "string" or templateID == ""
-        or type(style) ~= "string" or style == ""
+    ConvoPlanFamily.installPlan(families, plan, {
+        defaultContentOwner = defaultOwner,
+    })
+    if type(templateID) == "string" and templateID ~= ""
+        and templateID ~= plan.id
     then
-        return
-    end
-    local response = payload.response
-    local authored = type(response) == "table" and response.variants or nil
-    if type(authored) ~= "table" or #authored == 0 then return end
-
-    local family = families[templateID]
-    if not family then
-        family = {
-            id = "phrase." .. templateID,
-            semanticTemplateID = templateID,
-            owner = metadata.contentOwner
-                or "projecthoomans.dialogue_content.social",
-            contentOwner = metadata.contentOwner
-                or "projecthoomans.dialogue_content.social",
-            _psdl = true,
-            styles = {},
-        }
-        families[templateID] = family
-    end
-    local phrases = family.styles[style] or {}
-    family.styles[style] = phrases
-    local language = activeLanguage()
-    for index, variant in ipairs(authored) do
-        local text = type(variant) == "table" and variant.text or nil
-        local localized = type(text) == "table"
-            and (text[language] or text.EN) or nil
-        local fallback = type(localized) == "table"
-            and localized[1] or localized
-        if type(fallback) == "string" and fallback ~= "" then
-            phrases[#phrases + 1] = {
-                id = "phrase." .. templateID .. "." .. style .. "."
-                    .. string.format("%02d", index),
-                key = "",
-                fallback = fallback,
-                phraseID = tostring(
-                    variant.id or (style .. "." .. index)
-                ),
-            }
-        end
+        ConvoPlanFamily.installPlan(families, plan, {
+            installAs = templateID,
+            defaultContentOwner = defaultOwner,
+        })
     end
 end
 
 local families = {}
 for _, plan in pairs(Registry.CONVO_PLANS or {}) do
     addPlan(families, plan)
-end
-for templateID, family in pairs(families) do
-    Registry.PHRASE_FAMILIES[templateID] = family
 end
 
 return true

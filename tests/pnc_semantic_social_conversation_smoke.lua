@@ -63,7 +63,7 @@ local function behavior(id, stimulus, sourceIntent, act, dialogueAct)
         outputs = {
             speech = {
                 dialogueAct = dialogueAct,
-                contentTemplateID = "semantic.social.acknowledged",
+                contentTemplateID = "social.acknowledged",
             },
         },
         continuation = { mode = "terminate" },

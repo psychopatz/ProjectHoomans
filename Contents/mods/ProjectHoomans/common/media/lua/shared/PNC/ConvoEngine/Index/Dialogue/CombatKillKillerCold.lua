@@ -1,30 +1,12 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.combat.reaction.kill_killer_cold_01"] = {
+    ["combat.reaction.kill_killer_cold"] = {
         ["domain"] = "combat_kill_killer_cold",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatKillKillerCold",
         },
-        ["id"] = "semantic.combat.reaction.kill_killer_cold_01",
+        ["id"] = "combat.reaction.kill_killer_cold",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold_01.json",
-    },
-    ["semantic.combat.reaction.kill_killer_cold_02"] = {
-        ["domain"] = "combat_kill_killer_cold",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatKillKillerCold",
-        },
-        ["id"] = "semantic.combat.reaction.kill_killer_cold_02",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold_02.json",
-    },
-    ["semantic.combat.reaction.kill_killer_cold_03"] = {
-        ["domain"] = "combat_kill_killer_cold",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatKillKillerCold",
-        },
-        ["id"] = "semantic.combat.reaction.kill_killer_cold_03",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold_03.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
     },
 }

@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "event_reactions_corpse",
-        ["id"] = "semantic.corpse.reaction.default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "corpse.reaction.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Someone died here. We should remember that.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.corpse.reaction.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Someone died here. We should remember that.",
+                                        "Poor bastard. Didn't make it.",
+                                        "Another body in the dirt. World's unforgiving.",
+                                        "They fought hard, by the looks of it.",
+                                        "Someone lost a life here. Tread with respect.",
+                                        "Looks like they got trapped. Rest easy.",
+                                        "Could've been any of us. Keep walking.",
+                                        "Another survivor cut down too early.",
+                                        "Body's cold. Let's make sure we don't end up like this.",
+                                        "Rest in peace, stranger. Let's keep moving.",
+                                    },
+                                    ["TL"] = {
+                                        "May namatay dito. Dapat nating alalahanin 'yon.",
+                                        "Kawawa naman. Hindi nakaligtas.",
+                                        "Isa na namang bangkay sa lupa. Malupit ang mundo.",
+                                        "Lumaban nang husto, base sa hitsura.",
+                                        "May nawalan ng buhay rito. Maglakad nang may galang.",
+                                        "Mukhang naipit sila rito. Mamahinga ka na.",
+                                        "Kahit sino sa atin pwedeng maging ganyan. Lakad na.",
+                                        "Isa na namang survivor ang pumanaw nang maaga.",
+                                        "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito.",
+                                        "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "corpse.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Someone died here. We should remember that.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.corpse.reaction.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Someone died here. We should remember that.",
+                            "Poor bastard. Didn't make it.",
+                            "Another body in the dirt. World's unforgiving.",
+                            "They fought hard, by the looks of it.",
+                            "Someone lost a life here. Tread with respect.",
+                            "Looks like they got trapped. Rest easy.",
+                            "Could've been any of us. Keep walking.",
+                            "Another survivor cut down too early.",
+                            "Body's cold. Let's make sure we don't end up like this.",
+                            "Rest in peace, stranger. Let's keep moving.",
+                        },
+                        ["TL"] = {
+                            "May namatay dito. Dapat nating alalahanin 'yon.",
+                            "Kawawa naman. Hindi nakaligtas.",
+                            "Isa na namang bangkay sa lupa. Malupit ang mundo.",
+                            "Lumaban nang husto, base sa hitsura.",
+                            "May nawalan ng buhay rito. Maglakad nang may galang.",
+                            "Mukhang naipit sila rito. Mamahinga ka na.",
+                            "Kahit sino sa atin pwedeng maging ganyan. Lakad na.",
+                            "Isa na namang survivor ang pumanaw nang maaga.",
+                            "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito.",
+                            "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "corpse.reaction.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "default",
-            ["sourceId"] = "semantic.corpse.reaction.default",
+            ["sourceId"] = "corpse.reaction.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
-        ["namespace"] = "semantic.corpse.reaction",
+        ["namespace"] = "corpse.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.corpse.reaction.default",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/corpse.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Someone died here. We should remember that.",
-                            },
-                            ["TL"] = {
-                                "May namatay dito. Dapat nating alalahanin 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Poor bastard. Didn't make it.",
-                            },
-                            ["TL"] = {
-                                "Kawawa naman. Hindi nakaligtas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Another body in the dirt. World's unforgiving.",
-                            },
-                            ["TL"] = {
-                                "Isa na namang bangkay sa lupa. Malupit ang mundo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They fought hard, by the looks of it.",
-                            },
-                            ["TL"] = {
-                                "Lumaban nang husto, base sa hitsura.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Someone lost a life here. Tread with respect.",
-                            },
-                            ["TL"] = {
-                                "May nawalan ng buhay rito. Maglakad nang may galang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Looks like they got trapped. Rest easy.",
-                            },
-                            ["TL"] = {
-                                "Mukhang naipit sila rito. Mamahinga ka na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Could've been any of us. Keep walking.",
-                            },
-                            ["TL"] = {
-                                "Kahit sino sa atin pwedeng maging ganyan. Lakad na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Another survivor cut down too early.",
-                            },
-                            ["TL"] = {
-                                "Isa na namang survivor ang pumanaw nang maaga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Body's cold. Let's make sure we don't end up like this.",
-                            },
-                            ["TL"] = {
-                                "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Rest in peace, stranger. Let's keep moving.",
-                            },
-                            ["TL"] = {
-                                "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Someone died here. We should remember that.",
+                                        "Poor bastard. Didn't make it.",
+                                        "Another body in the dirt. World's unforgiving.",
+                                        "They fought hard, by the looks of it.",
+                                        "Someone lost a life here. Tread with respect.",
+                                        "Looks like they got trapped. Rest easy.",
+                                        "Could've been any of us. Keep walking.",
+                                        "Another survivor cut down too early.",
+                                        "Body's cold. Let's make sure we don't end up like this.",
+                                        "Rest in peace, stranger. Let's keep moving.",
+                                    },
+                                    ["TL"] = {
+                                        "May namatay dito. Dapat nating alalahanin 'yon.",
+                                        "Kawawa naman. Hindi nakaligtas.",
+                                        "Isa na namang bangkay sa lupa. Malupit ang mundo.",
+                                        "Lumaban nang husto, base sa hitsura.",
+                                        "May nawalan ng buhay rito. Maglakad nang may galang.",
+                                        "Mukhang naipit sila rito. Mamahinga ka na.",
+                                        "Kahit sino sa atin pwedeng maging ganyan. Lakad na.",
+                                        "Isa na namang survivor ang pumanaw nang maaga.",
+                                        "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito.",
+                                        "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "corpse.reaction.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Someone died here. We should remember that.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.corpse.reaction.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,20 +192,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Someone died here. We should remember that.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.corpse.reaction.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Someone died here. We should remember that.",
+                        "Poor bastard. Didn't make it.",
+                        "Another body in the dirt. World's unforgiving.",
+                        "They fought hard, by the looks of it.",
+                        "Someone lost a life here. Tread with respect.",
+                        "Looks like they got trapped. Rest easy.",
+                        "Could've been any of us. Keep walking.",
+                        "Another survivor cut down too early.",
+                        "Body's cold. Let's make sure we don't end up like this.",
+                        "Rest in peace, stranger. Let's keep moving.",
+                    },
+                    ["TL"] = {
+                        "May namatay dito. Dapat nating alalahanin 'yon.",
+                        "Kawawa naman. Hindi nakaligtas.",
+                        "Isa na namang bangkay sa lupa. Malupit ang mundo.",
+                        "Lumaban nang husto, base sa hitsura.",
+                        "May nawalan ng buhay rito. Maglakad nang may galang.",
+                        "Mukhang naipit sila rito. Mamahinga ka na.",
+                        "Kahit sino sa atin pwedeng maging ganyan. Lakad na.",
+                        "Isa na namang survivor ang pumanaw nang maaga.",
+                        "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito.",
+                        "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "event_reactions_corpse",
-        ["id"] = "semantic.corpse.reaction.revenge",
+        ["exchangeFamily"] = {
+            ["familyID"] = "corpse.reaction.revenge",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Someone is going to answer for this.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.corpse.reaction.revenge.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Someone is going to answer for this.",
+                                        "They didn't deserve this. Whoever did it will pay.",
+                                        "This wasn't rottens, this was murder. They'll bleed for it.",
+                                        "I'll find whoever did this and make them regret it.",
+                                        "They slaughtered them. There's no forgiving this.",
+                                        "Mark my words, retribution is coming for them.",
+                                        "Whoever left this body won't walk away clean.",
+                                        "Cold-blooded. I won't forget this sight.",
+                                        "Blood demands blood. We settle this score.",
+                                        "They butchered one of our own. They will pay.",
+                                    },
+                                    ["TL"] = {
+                                        "May mananagot para rito.",
+                                        "Hindi nila nararapat 'to. Pagbabayaran 'to ng may gawa.",
+                                        "Hindi 'to gawa ng infected, patayan 'to. Dudugo sila para rito.",
+                                        "Hahanapin ko ang may gawa nito at pagsisisihan nila.",
+                                        "Pinaslang nila sila. Walang kapatawaran ito.",
+                                        "Tandaan mo, darating ang ganti para sa kanila.",
+                                        "Ang nag-iwan ng bangkay na 'to ay hindi makakatakas nang buo.",
+                                        "Walang awang pagpatay. Hindi ko makakalimutan ang nakita ko.",
+                                        "Dugo ang kabayaran ng dugo. Tutuldukan natin 'to.",
+                                        "Kinatay nila ang isa sa atin. Pagbabayaran nila.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "corpse.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Someone is going to answer for this.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.corpse.reaction.revenge.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Someone is going to answer for this.",
+                            "They didn't deserve this. Whoever did it will pay.",
+                            "This wasn't rottens, this was murder. They'll bleed for it.",
+                            "I'll find whoever did this and make them regret it.",
+                            "They slaughtered them. There's no forgiving this.",
+                            "Mark my words, retribution is coming for them.",
+                            "Whoever left this body won't walk away clean.",
+                            "Cold-blooded. I won't forget this sight.",
+                            "Blood demands blood. We settle this score.",
+                            "They butchered one of our own. They will pay.",
+                        },
+                        ["TL"] = {
+                            "May mananagot para rito.",
+                            "Hindi nila nararapat 'to. Pagbabayaran 'to ng may gawa.",
+                            "Hindi 'to gawa ng infected, patayan 'to. Dudugo sila para rito.",
+                            "Hahanapin ko ang may gawa nito at pagsisisihan nila.",
+                            "Pinaslang nila sila. Walang kapatawaran ito.",
+                            "Tandaan mo, darating ang ganti para sa kanila.",
+                            "Ang nag-iwan ng bangkay na 'to ay hindi makakatakas nang buo.",
+                            "Walang awang pagpatay. Hindi ko makakalimutan ang nakita ko.",
+                            "Dugo ang kabayaran ng dugo. Tutuldukan natin 'to.",
+                            "Kinatay nila ang isa sa atin. Pagbabayaran nila.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "corpse.reaction.revenge",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "revenge",
-            ["sourceId"] = "semantic.corpse.reaction.revenge",
+            ["sourceId"] = "corpse.reaction.revenge",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
-        ["namespace"] = "semantic.corpse.reaction",
+        ["namespace"] = "corpse.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,127 +340,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.corpse.reaction.revenge",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/corpse.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Someone is going to answer for this.",
-                            },
-                            ["TL"] = {
-                                "May mananagot para rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They didn't deserve this. Whoever did it will pay.",
-                            },
-                            ["TL"] = {
-                                "Hindi nila nararapat 'to. Pagbabayaran 'to ng may gawa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "This wasn't rottens, this was murder. They'll bleed for it.",
-                            },
-                            ["TL"] = {
-                                "Hindi 'to gawa ng infected, patayan 'to. Dudugo sila para rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll find whoever did this and make them regret it.",
-                            },
-                            ["TL"] = {
-                                "Hahanapin ko ang may gawa nito at pagsisisihan nila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They slaughtered them. There's no forgiving this.",
-                            },
-                            ["TL"] = {
-                                "Pinaslang nila sila. Walang kapatawaran ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Mark my words, retribution is coming for them.",
-                            },
-                            ["TL"] = {
-                                "Tandaan mo, darating ang ganti para sa kanila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Whoever left this body won't walk away clean.",
-                            },
-                            ["TL"] = {
-                                "Ang nag-iwan ng bangkay na 'to ay hindi makakatakas nang buo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Cold-blooded. I won't forget this sight.",
-                            },
-                            ["TL"] = {
-                                "Walang awang pagpatay. Hindi ko makakalimutan ang nakita ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Blood demands blood. We settle this score.",
-                            },
-                            ["TL"] = {
-                                "Dugo ang kabayaran ng dugo. Tutuldukan natin 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They butchered one of our own. They will pay.",
-                            },
-                            ["TL"] = {
-                                "Kinatay nila ang isa sa atin. Pagbabayaran nila.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Someone is going to answer for this.",
+                                        "They didn't deserve this. Whoever did it will pay.",
+                                        "This wasn't rottens, this was murder. They'll bleed for it.",
+                                        "I'll find whoever did this and make them regret it.",
+                                        "They slaughtered them. There's no forgiving this.",
+                                        "Mark my words, retribution is coming for them.",
+                                        "Whoever left this body won't walk away clean.",
+                                        "Cold-blooded. I won't forget this sight.",
+                                        "Blood demands blood. We settle this score.",
+                                        "They butchered one of our own. They will pay.",
+                                    },
+                                    ["TL"] = {
+                                        "May mananagot para rito.",
+                                        "Hindi nila nararapat 'to. Pagbabayaran 'to ng may gawa.",
+                                        "Hindi 'to gawa ng infected, patayan 'to. Dudugo sila para rito.",
+                                        "Hahanapin ko ang may gawa nito at pagsisisihan nila.",
+                                        "Pinaslang nila sila. Walang kapatawaran ito.",
+                                        "Tandaan mo, darating ang ganti para sa kanila.",
+                                        "Ang nag-iwan ng bangkay na 'to ay hindi makakatakas nang buo.",
+                                        "Walang awang pagpatay. Hindi ko makakalimutan ang nakita ko.",
+                                        "Dugo ang kabayaran ng dugo. Tutuldukan natin 'to.",
+                                        "Kinatay nila ang isa sa atin. Pagbabayaran nila.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "corpse.reaction.revenge",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Someone is going to answer for this.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.corpse.reaction.revenge.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -311,6 +420,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Someone is going to answer for this.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.corpse.reaction.revenge.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Someone is going to answer for this.",
+                        "They didn't deserve this. Whoever did it will pay.",
+                        "This wasn't rottens, this was murder. They'll bleed for it.",
+                        "I'll find whoever did this and make them regret it.",
+                        "They slaughtered them. There's no forgiving this.",
+                        "Mark my words, retribution is coming for them.",
+                        "Whoever left this body won't walk away clean.",
+                        "Cold-blooded. I won't forget this sight.",
+                        "Blood demands blood. We settle this score.",
+                        "They butchered one of our own. They will pay.",
+                    },
+                    ["TL"] = {
+                        "May mananagot para rito.",
+                        "Hindi nila nararapat 'to. Pagbabayaran 'to ng may gawa.",
+                        "Hindi 'to gawa ng infected, patayan 'to. Dudugo sila para rito.",
+                        "Hahanapin ko ang may gawa nito at pagsisisihan nila.",
+                        "Pinaslang nila sila. Walang kapatawaran ito.",
+                        "Tandaan mo, darating ang ganti para sa kanila.",
+                        "Ang nag-iwan ng bangkay na 'to ay hindi makakatakas nang buo.",
+                        "Walang awang pagpatay. Hindi ko makakalimutan ang nakita ko.",
+                        "Dugo ang kabayaran ng dugo. Tutuldukan natin 'to.",
+                        "Kinatay nila ang isa sa atin. Pagbabayaran nila.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

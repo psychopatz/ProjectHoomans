@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.practical",
+  "id": "unarmed",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/practical.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "It's down. I need a weapon.",
+            "Managed that barehanded, but find me something to swing.",
+            "Too close for comfort. We need gear.",
+            "Took it down, but I can't keep doing that.",
+            "It's dead. Look around for any weapon.",
+            "Shoved and stomped. Get me something sharp.",
+            "Risky move. Need proper tools.",
+            "Downed it without gear. Won't get lucky twice.",
+            "Bare hands worked once. Find weapons now.",
+            "Bruised knuckles, but it's dead. Gear up."
+          ],
+          "TL": [
+            "Bagsak na. Kailangan ko ng sandata.",
+            "Nakaraos nang walang gamit, pero hanapan mo ako ng mahahawakan.",
+            "Masyadong delikado. Kailangan natin ng gamit.",
+            "Naibagsak ko, pero hindi ko kayang ulit-ulitin 'yon.",
+            "Patay na. Maghanap ka ng anumang pamalo sa paligid.",
+            "Tinulak at tinapakan. Bigyan mo ako ng kahit matalim.",
+            "Masyadong delikado. Kailangan ng maayos na gamit.",
+            "Naitumba nang walang armas. Huwag umasang mauulit ang swerte.",
+            "Gumabana ang mga kamay nang minsan. Maghanap ng sandata ngayon.",
+            "Pasa ang kamao ko, pero patay na. Mag-armas tayo."
+          ]
+        }
+      }
+    ]
+  }
+}

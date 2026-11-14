@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.reply",
+  "id": "thumbsdown",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-    "responseTemplateID": "semantic.emote.reply.thumbsdown",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I got the message. Tell me what's wrong.",
-          "TL": "Nakuha ko ang mensahe. Sabihin mo kung anong problema."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Not happy with that? What's your take?",
-          "TL": "Hindi ka sang-ayon? Ano ang opinyon mo?"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Understood. You disagree.",
-          "TL": "Naiintindihan ko. Hindi ka sang-ayon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Message received. We can rethink it.",
-          "TL": "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Got it. You don't like the look of this.",
-          "TL": "Naintindihan. Hindi maganda ang kutob mo rito."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Fair enough. What's the alternative?",
-          "TL": "Makatwiran. Ano ang alternatibo?"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I hear the disapproval. Let's adjust.",
-          "TL": "Naririnig ko ang pagtutol mo. Mag-ayos tayo."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Noted. We won't go that route then.",
-          "TL": "Tala ko na. Hindi na natin dadaanan ang rutang 'yan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Understood. Point taken.",
-          "TL": "Naintindihan. Nakuha ko ang punto mo."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "All right, let's look for a better option.",
-          "TL": "Sige, maghanap tayo ng mas magandang paraan."
+          "EN": [
+            "I got the message. Tell me what's wrong.",
+            "Not happy with that? What's your take?",
+            "Understood. You disagree.",
+            "Message received. We can rethink it.",
+            "Got it. You don't like the look of this.",
+            "Fair enough. What's the alternative?",
+            "I hear the disapproval. Let's adjust.",
+            "Noted. We won't go that route then.",
+            "Understood. Point taken.",
+            "All right, let's look for a better option."
+          ],
+          "TL": [
+            "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+            "Hindi ka sang-ayon? Ano ang opinyon mo?",
+            "Naiintindihan ko. Hindi ka sang-ayon.",
+            "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+            "Naintindihan. Hindi maganda ang kutob mo rito.",
+            "Makatwiran. Ano ang alternatibo?",
+            "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+            "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+            "Naintindihan. Nakuha ko ang punto mo.",
+            "Sige, maghanap tayo ng mas magandang paraan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.reply.thumbsdown",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

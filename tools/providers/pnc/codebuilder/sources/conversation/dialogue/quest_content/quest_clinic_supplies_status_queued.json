@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "quest.clinic_supplies.status",
+  "id": "queued",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:quest_content",
     "contentOwner": "projecthoomans.dialogue_content.quest",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
-    "responseTemplateID": "semantic.quest.clinic_supplies.status.queued",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'll check the clinic-supplies request.",
-          "TL": "Susuriin ko ang kahilingan para sa suplay ng klinika."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I'll see how we're doing on those medical supplies.",
-          "TL": "Titingnan ko kung kamusta na ang mga medikal na suplay natin."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Checking our progress on the clinic gear now.",
-          "TL": "Sinusuri na ang progreso natin sa gamot para sa klinika."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "I'll look into the status of the clinic task.",
-          "TL": "Sisiyasatin ko ang katayuan ng gawain sa klinika."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Reviewing where we stand with the clinic supplies.",
-          "TL": "Sinusuri kung nasaan na tayo sa mga suplay ng klinika."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "I'll pull up the clinic supply checklist.",
-          "TL": "Kukunin ko ang listahan ng suplay para sa klinika."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Let me verify our clinic supplies count.",
-          "TL": "Hayaan mong kumpirmahin ko ang bilang ng suplay sa klinika."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I'm checking the medical supplies progress.",
-          "TL": "Sinusuri ko ang progreso ng mga medikal na suplay."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "I'll inspect the clinic supplies status for you.",
-          "TL": "Titingnan ko ang katayuan ng suplay sa klinika para sa'yo."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Looking into the clinic request right now.",
-          "TL": "Sinisiyasat ko na ang kahilingan ng klinika ngayon."
+          "EN": [
+            "I'll check the clinic-supplies request.",
+            "I'll see how we're doing on those medical supplies.",
+            "Checking our progress on the clinic gear now.",
+            "I'll look into the status of the clinic task.",
+            "Reviewing where we stand with the clinic supplies.",
+            "I'll pull up the clinic supply checklist.",
+            "Let me verify our clinic supplies count.",
+            "I'm checking the medical supplies progress.",
+            "I'll inspect the clinic supplies status for you.",
+            "Looking into the clinic request right now."
+          ],
+          "TL": [
+            "Susuriin ko ang kahilingan para sa suplay ng klinika.",
+            "Titingnan ko kung kamusta na ang mga medikal na suplay natin.",
+            "Sinusuri na ang progreso natin sa gamot para sa klinika.",
+            "Sisiyasatin ko ang katayuan ng gawain sa klinika.",
+            "Sinusuri kung nasaan na tayo sa mga suplay ng klinika.",
+            "Kukunin ko ang listahan ng suplay para sa klinika.",
+            "Hayaan mong kumpirmahin ko ang bilang ng suplay sa klinika.",
+            "Sinusuri ko ang progreso ng mga medikal na suplay.",
+            "Titingnan ko ang katayuan ng suplay sa klinika para sa'yo.",
+            "Sinisiyasat ko na ang kahilingan ng klinika ngayon."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.quest.clinic_supplies.status.queued",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

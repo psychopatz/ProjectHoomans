@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.bandits.hooman_hurt",
+  "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.bandits.hooman_hurt.default",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Bandit fire! Stay with the wounded survivor and watch the flank.",
-          "TL": "Bandit fire! Stay with the wounded survivor and watch the flank."
+          "EN": [
+            "Bandit fire! Stay with the wounded survivor and watch the flank."
+          ],
+          "TL": [
+            "Bandit fire! Stay with the wounded survivor and watch the flank."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.bandits.hooman_hurt.default",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

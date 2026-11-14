@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "gift",
   "id": "completed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
-    "responseTemplateID": "semantic.gift.completed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Thank you for the gift.",
-          "TL": "Salamat sa regalo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I appreciate this gesture. Thank you.",
-          "TL": "Salamat sa magandang kalooban. Maraming salamat."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "That's generous of you. Thanks.",
-          "TL": "Bukas-palad ka. Salamat."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Thank you! This will be put to good use.",
-          "TL": "Salamat! Magagamit ito nang maayos."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "A welcome surprise. Thank you, friend.",
-          "TL": "Magandang sorpresa. Salamat, kaibigan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Much obliged for the gift.",
-          "TL": "Maraming salamat sa regalo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I'm grateful for this. Thank you.",
-          "TL": "Nagpapasalamat ako rito. Salamat."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "You didn't have to, but thanks a lot.",
-          "TL": "Di mo kailangang gawin, pero maraming salamat."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Received with gratitude. Thank you.",
-          "TL": "Tinatanggap kalakip ang pasasalamat. Salamat."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Thanks for thinking of me with this gift.",
-          "TL": "Salamat sa pag-alala sa akin sa regalong ito."
+          "EN": [
+            "Thank you for the gift.",
+            "I appreciate this gesture. Thank you.",
+            "That's generous of you. Thanks.",
+            "Thank you! This will be put to good use.",
+            "A welcome surprise. Thank you, friend.",
+            "Much obliged for the gift.",
+            "I'm grateful for this. Thank you.",
+            "You didn't have to, but thanks a lot.",
+            "Received with gratitude. Thank you.",
+            "Thanks for thinking of me with this gift."
+          ],
+          "TL": [
+            "Salamat sa regalo.",
+            "Salamat sa magandang kalooban. Maraming salamat.",
+            "Bukas-palad ka. Salamat.",
+            "Salamat! Magagamit ito nang maayos.",
+            "Magandang sorpresa. Salamat, kaibigan.",
+            "Maraming salamat sa regalo.",
+            "Nagpapasalamat ako rito. Salamat.",
+            "Di mo kailangang gawin, pero maraming salamat.",
+            "Tinatanggap kalakip ang pasasalamat. Salamat.",
+            "Salamat sa pag-alala sa akin sa regalong ito."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.gift",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "order_stay",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_stay.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_stay.json",
-        "responseTemplateID": "semantic.tool_reply.order_stay.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "All right. I will hold here.",
-              "TL": "Sige. Hahawakan ko ang pwesto rito."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Holding position right here.",
-              "TL": "Hawak ko ang pwestong ito."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Understood. Guarding this spot.",
-              "TL": "Naintindihan. Babantayan ang pwestong ito."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I will remain right where I am.",
-              "TL": "Mananatili ako kung nasaan ako."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Holding ground as ordered.",
-              "TL": "Hawak ang lupa ayon sa utos."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Understood. I won't move an inch.",
-              "TL": "Naiintindihan ko. Di ako aalis kahit isang pulgada."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Standing watch right here.",
-              "TL": "Nakatayong bantay dito mismo."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I'll keep this position secure.",
-              "TL": "Pananatilihing ligtas ang posisyong ito."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Holding here. Watch yourself out there.",
-              "TL": "Dito lang ako. Mag-ingat ka sa labas."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Stay order confirmed. Holding ground.",
-              "TL": "Kumpirmadong utos na manatili. Hawak ang lupa."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_stay.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "All right. I will hold here.",
+              "Holding position right here.",
+              "Understood. Guarding this spot.",
+              "I will remain right where I am.",
+              "Holding ground as ordered.",
+              "Understood. I won't move an inch.",
+              "Standing watch right here.",
+              "I'll keep this position secure.",
+              "Holding here. Watch yourself out there.",
+              "Stay order confirmed. Holding ground."
+            ],
+            "TL": [
+              "Sige. Hahawakan ko ang pwesto rito.",
+              "Hawak ko ang pwestong ito.",
+              "Naintindihan. Babantayan ang pwestong ito.",
+              "Mananatili ako kung nasaan ako.",
+              "Hawak ang lupa ayon sa utos.",
+              "Naiintindihan ko. Di ako aalis kahit isang pulgada.",
+              "Nakatayong bantay dito mismo.",
+              "Pananatilihing ligtas ang posisyong ito.",
+              "Dito lang ako. Mag-ingat ka sa labas.",
+              "Kumpirmadong utos na manatili. Hawak ang lupa."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_stay.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_stay.json",
-        "responseTemplateID": "semantic.tool_reply.order_stay.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I will stay put.",
-              "TL": "Dito lang ako."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Staying put until you return.",
-              "TL": "Mananatili rito hanggang sa makabalik ka."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Not moving from this spot.",
-              "TL": "Hindi aalis sa pwestong ito."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I'll keep my boots planted right here.",
-              "TL": "Nakatuntong ang bota ko rito mismo."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Staying put. Hurry back.",
-              "TL": "Dito lang ako. Bumalik ka agad."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Understood. I will wait right here.",
-              "TL": "Naintindihan. Maghihintay ako rito."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Rooted to this spot. Go ahead.",
-              "TL": "Nakatigil sa pwestong ito. Sige na."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Staying put and watching the area.",
-              "TL": "Nananatili rito at nagmamasid sa lugar."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I'll stay right where you left me.",
-              "TL": "Dito lang ako kung saan mo ako iniwan."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Holding still in this position.",
-              "TL": "Nakahinto sa posisyong ito."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I will stay put.",
+              "Staying put until you return.",
+              "Not moving from this spot.",
+              "I'll keep my boots planted right here.",
+              "Staying put. Hurry back.",
+              "Understood. I will wait right here.",
+              "Rooted to this spot. Go ahead.",
+              "Staying put and watching the area.",
+              "I'll stay right where you left me.",
+              "Holding still in this position."
+            ],
+            "TL": [
+              "Dito lang ako.",
+              "Mananatili rito hanggang sa makabalik ka.",
+              "Hindi aalis sa pwestong ito.",
+              "Nakatuntong ang bota ko rito mismo.",
+              "Dito lang ako. Bumalik ka agad.",
+              "Naintindihan. Maghihintay ako rito.",
+              "Nakatigil sa pwestong ito. Sige na.",
+              "Nananatili rito at nagmamasid sa lugar.",
+              "Dito lang ako kung saan mo ako iniwan.",
+              "Nakahinto sa posisyong ito."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

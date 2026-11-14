@@ -89,7 +89,7 @@ local function registerBehavior(id, intent)
         outputs = {
             speech = {
                 dialogueAct = "ACKNOWLEDGE",
-                contentTemplateID = "semantic.social.acknowledged",
+                contentTemplateID = "social.acknowledged",
             },
         },
         when = {

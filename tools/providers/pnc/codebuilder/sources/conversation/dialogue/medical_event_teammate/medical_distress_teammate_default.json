@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.teammate",
   "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/teammate.json",
-    "responseTemplateID": "semantic.medical.distress.teammate.default",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "They are hurt! Stay with them while I cover you.",
-          "TL": "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.02"
-        },
-        "text": {
-          "EN": "Our companion is down! Tend to them, I've got guard.",
-          "TL": "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.03"
-        },
-        "text": {
-          "EN": "They're injured! Get them patched up while I watch.",
-          "TL": "Sugatan sila! Bendahan mo habang nagmamasid ako."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.04"
-        },
-        "text": {
-          "EN": "Check on them right now! I'll hold off the threats.",
-          "TL": "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.05"
-        },
-        "text": {
-          "EN": "They took a hit! See to their wounds, I'm watching.",
-          "TL": "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.06"
-        },
-        "text": {
-          "EN": "Partner is wounded! Apply first aid, I've got your back.",
-          "TL": "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.07"
-        },
-        "text": {
-          "EN": "They're bleeding! Patch them while I keep perimeter.",
-          "TL": "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.08"
-        },
-        "text": {
-          "EN": "Help them up! I'll keep the lane clear.",
-          "TL": "Tulungan mo silang tumayo! Lilinisin ko ang daanan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.09"
-        },
-        "text": {
-          "EN": "They need attention! Administer aid, I'll protect you both.",
-          "TL": "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.default.neutral.10"
-        },
-        "text": {
-          "EN": "Our friend is hurt! Help them, I'm standing sentry.",
-          "TL": "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako."
+          "EN": [
+            "They are hurt! Stay with them while I cover you.",
+            "Our companion is down! Tend to them, I've got guard.",
+            "They're injured! Get them patched up while I watch.",
+            "Check on them right now! I'll hold off the threats.",
+            "They took a hit! See to their wounds, I'm watching.",
+            "Partner is wounded! Apply first aid, I've got your back.",
+            "They're bleeding! Patch them while I keep perimeter.",
+            "Help them up! I'll keep the lane clear.",
+            "They need attention! Administer aid, I'll protect you both.",
+            "Our friend is hurt! Help them, I'm standing sentry."
+          ],
+          "TL": [
+            "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo.",
+            "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo.",
+            "Sugatan sila! Bendahan mo habang nagmamasid ako.",
+            "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban.",
+            "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako.",
+            "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo.",
+            "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid.",
+            "Tulungan mo silang tumayo! Lilinisin ko ang daanan.",
+            "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa.",
+            "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.teammate",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

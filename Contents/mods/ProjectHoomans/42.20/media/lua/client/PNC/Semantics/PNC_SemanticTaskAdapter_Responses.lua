@@ -5,87 +5,87 @@
 local TASK_RESPONSE_POOLS = {
     GIVE = {
         admitted = {
-            templateID = "semantic.task.give.admitted",
+            templateID = "task.give.admitted",
         },
         active = {
-            templateID = "semantic.task.give.active",
+            templateID = "task.give.active",
         },
         completed = {
-            templateID = "semantic.task.give.completed",
+            templateID = "task.give.completed",
         },
         rejected = {
-            templateID = "semantic.task.give.rejected",
+            templateID = "task.give.rejected",
         },
         failed = {
-            templateID = "semantic.task.give.failed",
+            templateID = "task.give.failed",
         },
     },
     EAT = {
         admitted = {
-            templateID = "semantic.task.eat.admitted",
+            templateID = "task.eat.admitted",
         },
         active = {
-            templateID = "semantic.task.eat.active",
+            templateID = "task.eat.active",
         },
         completed = {
-            templateID = "semantic.task.eat.completed",
+            templateID = "task.eat.completed",
         },
         rejected = {
-            templateID = "semantic.task.eat.rejected",
+            templateID = "task.eat.rejected",
         },
         failed = {
-            templateID = "semantic.task.eat.failed",
+            templateID = "task.eat.failed",
         },
     },
     DRINK = {
         admitted = {
-            templateID = "semantic.task.drink.admitted",
+            templateID = "task.drink.admitted",
         },
         active = {
-            templateID = "semantic.task.drink.active",
+            templateID = "task.drink.active",
         },
         completed = {
-            templateID = "semantic.task.drink.completed",
+            templateID = "task.drink.completed",
         },
         rejected = {
-            templateID = "semantic.task.drink.rejected",
+            templateID = "task.drink.rejected",
         },
         failed = {
-            templateID = "semantic.task.drink.failed",
+            templateID = "task.drink.failed",
         },
     },
     REFILL = {
         admitted = {
-            templateID = "semantic.task.refill.admitted",
+            templateID = "task.refill.admitted",
         },
         active = {
-            templateID = "semantic.task.refill.active",
+            templateID = "task.refill.active",
         },
         completed = {
-            templateID = "semantic.task.refill.completed",
+            templateID = "task.refill.completed",
         },
         rejected = {
-            templateID = "semantic.task.refill.rejected",
+            templateID = "task.refill.rejected",
         },
         failed = {
-            templateID = "semantic.task.refill.failed",
+            templateID = "task.refill.failed",
         },
     },
     CONSUME = {
         admitted = {
-            templateID = "semantic.task.consume.admitted",
+            templateID = "task.consume.admitted",
         },
         active = {
-            templateID = "semantic.task.consume.active",
+            templateID = "task.consume.active",
         },
         completed = {
-            templateID = "semantic.task.consume.completed",
+            templateID = "task.consume.completed",
         },
         rejected = {
-            templateID = "semantic.task.consume.rejected",
+            templateID = "task.consume.rejected",
         },
         failed = {
-            templateID = "semantic.task.consume.failed",
+            templateID = "task.consume.failed",
         },
     },
 }

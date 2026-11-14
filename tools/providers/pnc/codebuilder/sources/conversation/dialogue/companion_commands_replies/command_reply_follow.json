@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.reply",
   "id": "follow",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.command.reply.follow"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Right behind you.",
-          "TL": "Susunod ako sa iyo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Following your lead.",
-          "TL": "Sumusunod sa pangunguna mo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I'm with you. Lead on.",
-          "TL": "Kasama mo ako. Mauna ka na."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Right on your heels.",
-          "TL": "Nasa likod mo lang ako."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Understood. Sticking close.",
-          "TL": "Naintindihan. Didikit ako."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Following. Watch our front.",
-          "TL": "Sumusunod na. Bantayan ang unahan natin."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I'll follow your pace.",
-          "TL": "Sasabay ako sa bilis mo."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Right with you.",
-          "TL": "Kasabay mo na ako."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Moving with you now.",
-          "TL": "Kumikilos na kasabay mo ngayon."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Lead the way. I'm right behind.",
-          "TL": "Ituro ang daan. Kasunod mo lang ako."
+          "EN": [
+            "Right behind you.",
+            "Following your lead.",
+            "I'm with you. Lead on.",
+            "Right on your heels.",
+            "Understood. Sticking close.",
+            "Following. Watch our front.",
+            "I'll follow your pace.",
+            "Right with you.",
+            "Moving with you now.",
+            "Lead the way. I'm right behind."
+          ],
+          "TL": [
+            "Susunod ako sa iyo.",
+            "Sumusunod sa pangunguna mo.",
+            "Kasama mo ako. Mauna ka na.",
+            "Nasa likod mo lang ako.",
+            "Naintindihan. Didikit ako.",
+            "Sumusunod na. Bantayan ang unahan natin.",
+            "Sasabay ako sa bilis mo.",
+            "Kasabay mo na ako.",
+            "Kumikilos na kasabay mo ngayon.",
+            "Ituro ang daan. Kasunod mo lang ako."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.reply",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

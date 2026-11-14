@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.consume",
   "id": "completed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-    "responseTemplateID": "semantic.task.consume.completed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "That's done.",
-          "TL": "Tapos na iyon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Finished using that.",
-          "TL": "Tapos nang gamitin iyon."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "All used up. Feeling better.",
-          "TL": "Naubos na. Mas maayos na ang pakiramdam."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Done. That helped out.",
-          "TL": "Tapos na. Nakatulong iyon."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Finished consuming the item.",
-          "TL": "Natapos nang gamitin ang bagay."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "That's taken care of.",
-          "TL": "Naasikaso na iyon."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "All done with that supply.",
-          "TL": "Tapos na sa gamit na 'yon."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Consumed. Ready to move on.",
-          "TL": "Nagamit na. Handa nang magpatuloy."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Finished. Much needed.",
-          "TL": "Tapos na. Kailangan ko talaga 'yon."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Done. Put to good use.",
-          "TL": "Tapos na. Nagamit nang maayos."
+          "EN": [
+            "That's done.",
+            "Finished using that.",
+            "All used up. Feeling better.",
+            "Done. That helped out.",
+            "Finished consuming the item.",
+            "That's taken care of.",
+            "All done with that supply.",
+            "Consumed. Ready to move on.",
+            "Finished. Much needed.",
+            "Done. Put to good use."
+          ],
+          "TL": [
+            "Tapos na iyon.",
+            "Tapos nang gamitin iyon.",
+            "Naubos na. Mas maayos na ang pakiramdam.",
+            "Tapos na. Nakatulong iyon.",
+            "Natapos nang gamitin ang bagay.",
+            "Naasikaso na iyon.",
+            "Tapos na sa gamit na 'yon.",
+            "Nagamit na. Handa nang magpatuloy.",
+            "Tapos na. Kailangan ko talaga 'yon.",
+            "Tapos na. Nagamit nang maayos."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.consume",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

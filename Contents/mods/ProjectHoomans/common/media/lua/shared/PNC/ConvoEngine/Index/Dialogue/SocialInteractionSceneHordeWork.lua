@@ -1,254 +1,86 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.interaction.scene.horde_prompt.guarded"] = {
+    ["interaction.scene.horde_prompt"] = {
+        ["dependents"] = {
+            "behavior.scene_horde_prompt",
+        },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
-        ["id"] = "semantic.interaction.scene.horde_prompt.guarded",
+        ["id"] = "interaction.scene.horde_prompt",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
     },
-    ["semantic.interaction.scene.horde_prompt.neutral"] = {
+    ["interaction.scene.horde_reply_brave"] = {
+        ["dependents"] = {
+            "behavior.scene_horde_reply_brave",
+        },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
-        ["id"] = "semantic.interaction.scene.horde_prompt.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
-    },
-    ["semantic.interaction.scene.horde_prompt.terse"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_prompt.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
-    },
-    ["semantic.interaction.scene.horde_prompt.warm"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_prompt.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
-    },
-    ["semantic.interaction.scene.horde_reply_brave.guarded"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_brave.guarded",
+        ["id"] = "interaction.scene.horde_reply_brave",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
     },
-    ["semantic.interaction.scene.horde_reply_brave.neutral"] = {
+    ["interaction.scene.horde_reply_cautious"] = {
+        ["dependents"] = {
+            "behavior.scene_horde_reply_cautious",
+        },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
-        ["id"] = "semantic.interaction.scene.horde_reply_brave.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
-    },
-    ["semantic.interaction.scene.horde_reply_brave.terse"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_brave.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
-    },
-    ["semantic.interaction.scene.horde_reply_brave.warm"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_brave.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
-    },
-    ["semantic.interaction.scene.horde_reply_cautious.guarded"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_cautious.guarded",
+        ["id"] = "interaction.scene.horde_reply_cautious",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
     },
-    ["semantic.interaction.scene.horde_reply_cautious.neutral"] = {
+    ["interaction.scene.horde_reply_steady"] = {
+        ["dependents"] = {
+            "behavior.scene_horde_reply_steady",
+        },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
-        ["id"] = "semantic.interaction.scene.horde_reply_cautious.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
-    },
-    ["semantic.interaction.scene.horde_reply_cautious.terse"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_cautious.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
-    },
-    ["semantic.interaction.scene.horde_reply_cautious.warm"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_cautious.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
-    },
-    ["semantic.interaction.scene.horde_reply_steady.guarded"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_steady.guarded",
+        ["id"] = "interaction.scene.horde_reply_steady",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
     },
-    ["semantic.interaction.scene.horde_reply_steady.neutral"] = {
+    ["interaction.scene.post_combat_clear"] = {
+        ["dependents"] = {
+            "behavior.scene_post_combat_clear",
+        },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
-        ["id"] = "semantic.interaction.scene.horde_reply_steady.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
-    },
-    ["semantic.interaction.scene.horde_reply_steady.terse"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_steady.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
-    },
-    ["semantic.interaction.scene.horde_reply_steady.warm"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.horde_reply_steady.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
-    },
-    ["semantic.interaction.scene.post_combat_clear.guarded"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.post_combat_clear.guarded",
+        ["id"] = "interaction.scene.post_combat_clear",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
     },
-    ["semantic.interaction.scene.post_combat_clear.neutral"] = {
+    ["interaction.scene.task_work_assigned"] = {
+        ["dependents"] = {
+            "behavior.scene_task_work_assigned",
+        },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork__74d92e89",
         },
-        ["id"] = "semantic.interaction.scene.post_combat_clear.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
-    },
-    ["semantic.interaction.scene.post_combat_clear.terse"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.post_combat_clear.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
-    },
-    ["semantic.interaction.scene.post_combat_clear.warm"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.post_combat_clear.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
-    },
-    ["semantic.interaction.scene.task_work_assigned.guarded"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.task_work_assigned.guarded",
+        ["id"] = "interaction.scene.task_work_assigned",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
     },
-    ["semantic.interaction.scene.task_work_assigned.neutral"] = {
+    ["interaction.scene.task_work_completed"] = {
+        ["dependents"] = {
+            "behavior.scene_task_work_completed",
+        },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork__74d92e89",
         },
-        ["id"] = "semantic.interaction.scene.task_work_assigned.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
-    },
-    ["semantic.interaction.scene.task_work_assigned.terse"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.task_work_assigned.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
-    },
-    ["semantic.interaction.scene.task_work_assigned.warm"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.task_work_assigned.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
-    },
-    ["semantic.interaction.scene.task_work_completed.guarded"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.task_work_completed.guarded",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
-    },
-    ["semantic.interaction.scene.task_work_completed.neutral"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.task_work_completed.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
-    },
-    ["semantic.interaction.scene.task_work_completed.terse"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.task_work_completed.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
-    },
-    ["semantic.interaction.scene.task_work_completed.warm"] = {
-        ["domain"] = "social_interaction_scene_horde_work",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
-        },
-        ["id"] = "semantic.interaction.scene.task_work_completed.warm",
+        ["id"] = "interaction.scene.task_work_completed",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
     },

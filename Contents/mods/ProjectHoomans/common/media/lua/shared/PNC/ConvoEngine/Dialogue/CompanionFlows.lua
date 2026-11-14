@@ -2,6 +2,56 @@
 return {
     {
         ["domain"] = "companion_flows",
+        ["exchangeFamily"] = {
+            ["familyID"] = "pnc.dialogue.follow",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Okay, I'll come with you.",
+                                ["id"] = "accepted",
+                                ["templateID"] = "convo.pnc.dialogue.follow.say.1.accepted",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Okay, I'll come with you.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige, sasama ako sa iyo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "pnc.dialogue",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Okay, I'll come with you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.pnc.dialogue.follow.say.1.accepted",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Okay, I'll come with you.",
+                        },
+                        ["TL"] = {
+                            "Sige, sasama ako sa iyo.",
+                        },
+                    },
+                    ["variantID"] = "accepted",
+                },
+            },
+        },
         ["id"] = "pnc.dialogue.follow",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -44,7 +94,8 @@ return {
                 },
                 ["originalOwner"] = "ProjectHoomans",
                 ["priority"] = 165,
-                ["responsePoolID"] = "semantic.authored.follow",
+                ["responseAct"] = "FLOW_RESPONSE",
+                ["responsePoolID"] = "authored.follow",
                 ["sourceProfile"] = "conversation.source.projecthoomans.8378f35867",
                 ["triggers"] = {
                     {
@@ -77,27 +128,60 @@ return {
                 ["intent"] = "REQUEST",
                 ["speechAct"] = "REQUEST",
             },
-            ["response"] = {
-                ["act"] = "FLOW_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "accepted",
-                        ["metadata"] = {
-                            ["templateID"] = "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay, I'll come with you.",
-                            },
-                            ["TL"] = {
-                                "Sige, sasama ako sa iyo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "accepted",
+                                ["metadata"] = {
+                                    ["templateID"] = "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted",
+                                },
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Okay, I'll come with you.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige, sasama ako sa iyo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "FLOW_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "pnc.dialogue.follow",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Okay, I'll come with you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.pnc.dialogue.follow.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -107,10 +191,77 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Okay, I'll come with you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.pnc.dialogue.follow.say.1.accepted",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Okay, I'll come with you.",
+                    },
+                    ["TL"] = {
+                        "Sige, sasama ako sa iyo.",
+                    },
+                },
+                ["variantID"] = "accepted",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_flows",
+        ["exchangeFamily"] = {
+            ["familyID"] = "pnc.lab.stay_with_you",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Okay, I'll stay with you.",
+                                ["id"] = "accepted",
+                                ["templateID"] = "convo.pnc.lab.stay_with_you.say.1.accepted",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Okay, I'll stay with you.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige, mananatili ako sa iyo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "pnc.lab",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Okay, I'll stay with you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.pnc.lab.stay_with_you.say.1.accepted",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Okay, I'll stay with you.",
+                        },
+                        ["TL"] = {
+                            "Sige, mananatili ako sa iyo.",
+                        },
+                    },
+                    ["variantID"] = "accepted",
+                },
+            },
+        },
         ["id"] = "pnc.lab.stay_with_you",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -152,7 +303,8 @@ return {
                 },
                 ["originalOwner"] = "SemanticLab",
                 ["priority"] = 170,
-                ["responsePoolID"] = "semantic.lab.stay.with.you",
+                ["responseAct"] = "FLOW_RESPONSE",
+                ["responsePoolID"] = "lab.stay.with.you",
                 ["sourceProfile"] = "conversation.source.projecthoomans.8378f35867",
                 ["triggers"] = {
                     {
@@ -176,27 +328,60 @@ return {
                 ["intent"] = "REQUEST",
                 ["speechAct"] = "REQUEST",
             },
-            ["response"] = {
-                ["act"] = "FLOW_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "accepted",
-                        ["metadata"] = {
-                            ["templateID"] = "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay, I'll stay with you.",
-                            },
-                            ["TL"] = {
-                                "Sige, mananatili ako sa iyo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "accepted",
+                                ["metadata"] = {
+                                    ["templateID"] = "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
+                                },
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Okay, I'll stay with you.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige, mananatili ako sa iyo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "FLOW_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "pnc.lab.stay_with_you",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Okay, I'll stay with you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.pnc.lab.stay_with_you.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -205,6 +390,23 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Okay, I'll stay with you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.pnc.lab.stay_with_you.say.1.accepted",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Okay, I'll stay with you.",
+                    },
+                    ["TL"] = {
+                        "Sige, mananatili ako sa iyo.",
+                    },
+                },
+                ["variantID"] = "accepted",
+            },
         },
         ["when"] = nil,
     },

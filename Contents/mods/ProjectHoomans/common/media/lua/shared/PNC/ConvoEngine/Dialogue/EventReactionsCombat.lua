@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "event_reactions_combat",
-        ["id"] = "semantic.combat.reaction.default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Good work. Keep watching the area.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Good work. Keep watching the area.",
+                                        "Threat's handled. Stay on your toes.",
+                                        "Nice job. Don't relax just yet.",
+                                        "Target down. Keep scanning the perimeter.",
+                                        "Handled. Watch your surroundings.",
+                                        "Good strike. Stay vigilant.",
+                                        "That one's finished. Check the corners.",
+                                        "Well done. Keep weapons at the ready.",
+                                        "Clear here. Eyes on the shadows.",
+                                        "Threat eliminated. Keep moving carefully.",
+                                    },
+                                    ["TL"] = {
+                                        "Magandang trabaho. Patuloy na bantayan ang paligid.",
+                                        "Naasikaso ang banta. Maging handa.",
+                                        "Mahusay. Huwag munang magpakampante.",
+                                        "Bagsak ang target. Patuloy na suriin ang paligid.",
+                                        "Naasikaso na. Bantayan ang paligid mo.",
+                                        "Magandang tama. Manatiling alerto.",
+                                        "Tapos na ang isang 'yon. Tignan ang mga sulok.",
+                                        "Magaling. Ihanda pa rin ang sandata.",
+                                        "Malinis dito. Tumingin sa mga anino.",
+                                        "Banta naalis na. Tuloy sa maingat na pagkilos.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Good work. Keep watching the area.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Good work. Keep watching the area.",
+                            "Threat's handled. Stay on your toes.",
+                            "Nice job. Don't relax just yet.",
+                            "Target down. Keep scanning the perimeter.",
+                            "Handled. Watch your surroundings.",
+                            "Good strike. Stay vigilant.",
+                            "That one's finished. Check the corners.",
+                            "Well done. Keep weapons at the ready.",
+                            "Clear here. Eyes on the shadows.",
+                            "Threat eliminated. Keep moving carefully.",
+                        },
+                        ["TL"] = {
+                            "Magandang trabaho. Patuloy na bantayan ang paligid.",
+                            "Naasikaso ang banta. Maging handa.",
+                            "Mahusay. Huwag munang magpakampante.",
+                            "Bagsak ang target. Patuloy na suriin ang paligid.",
+                            "Naasikaso na. Bantayan ang paligid mo.",
+                            "Magandang tama. Manatiling alerto.",
+                            "Tapos na ang isang 'yon. Tignan ang mga sulok.",
+                            "Magaling. Ihanda pa rin ang sandata.",
+                            "Malinis dito. Tumingin sa mga anino.",
+                            "Banta naalis na. Tuloy sa maingat na pagkilos.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "default",
-            ["sourceId"] = "semantic.combat.reaction.default",
+            ["sourceId"] = "combat.reaction.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.default",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/combat.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good work. Keep watching the area.",
-                            },
-                            ["TL"] = {
-                                "Magandang trabaho. Patuloy na bantayan ang paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat's handled. Stay on your toes.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso ang banta. Maging handa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nice job. Don't relax just yet.",
-                            },
-                            ["TL"] = {
-                                "Mahusay. Huwag munang magpakampante.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down. Keep scanning the perimeter.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang target. Patuloy na suriin ang paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled. Watch your surroundings.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso na. Bantayan ang paligid mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good strike. Stay vigilant.",
-                            },
-                            ["TL"] = {
-                                "Magandang tama. Manatiling alerto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That one's finished. Check the corners.",
-                            },
-                            ["TL"] = {
-                                "Tapos na ang isang 'yon. Tignan ang mga sulok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Well done. Keep weapons at the ready.",
-                            },
-                            ["TL"] = {
-                                "Magaling. Ihanda pa rin ang sandata.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear here. Eyes on the shadows.",
-                            },
-                            ["TL"] = {
-                                "Malinis dito. Tumingin sa mga anino.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat eliminated. Keep moving carefully.",
-                            },
-                            ["TL"] = {
-                                "Banta naalis na. Tuloy sa maingat na pagkilos.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Good work. Keep watching the area.",
+                                        "Threat's handled. Stay on your toes.",
+                                        "Nice job. Don't relax just yet.",
+                                        "Target down. Keep scanning the perimeter.",
+                                        "Handled. Watch your surroundings.",
+                                        "Good strike. Stay vigilant.",
+                                        "That one's finished. Check the corners.",
+                                        "Well done. Keep weapons at the ready.",
+                                        "Clear here. Eyes on the shadows.",
+                                        "Threat eliminated. Keep moving carefully.",
+                                    },
+                                    ["TL"] = {
+                                        "Magandang trabaho. Patuloy na bantayan ang paligid.",
+                                        "Naasikaso ang banta. Maging handa.",
+                                        "Mahusay. Huwag munang magpakampante.",
+                                        "Bagsak ang target. Patuloy na suriin ang paligid.",
+                                        "Naasikaso na. Bantayan ang paligid mo.",
+                                        "Magandang tama. Manatiling alerto.",
+                                        "Tapos na ang isang 'yon. Tignan ang mga sulok.",
+                                        "Magaling. Ihanda pa rin ang sandata.",
+                                        "Malinis dito. Tumingin sa mga anino.",
+                                        "Banta naalis na. Tuloy sa maingat na pagkilos.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Good work. Keep watching the area.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,20 +192,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Good work. Keep watching the area.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Good work. Keep watching the area.",
+                        "Threat's handled. Stay on your toes.",
+                        "Nice job. Don't relax just yet.",
+                        "Target down. Keep scanning the perimeter.",
+                        "Handled. Watch your surroundings.",
+                        "Good strike. Stay vigilant.",
+                        "That one's finished. Check the corners.",
+                        "Well done. Keep weapons at the ready.",
+                        "Clear here. Eyes on the shadows.",
+                        "Threat eliminated. Keep moving carefully.",
+                    },
+                    ["TL"] = {
+                        "Magandang trabaho. Patuloy na bantayan ang paligid.",
+                        "Naasikaso ang banta. Maging handa.",
+                        "Mahusay. Huwag munang magpakampante.",
+                        "Bagsak ang target. Patuloy na suriin ang paligid.",
+                        "Naasikaso na. Bantayan ang paligid mo.",
+                        "Magandang tama. Manatiling alerto.",
+                        "Tapos na ang isang 'yon. Tignan ang mga sulok.",
+                        "Magaling. Ihanda pa rin ang sandata.",
+                        "Malinis dito. Tumingin sa mga anino.",
+                        "Banta naalis na. Tuloy sa maingat na pagkilos.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "event_reactions_combat",
-        ["id"] = "semantic.combat.reaction.retreat",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.retreat",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I need a moment before I can swing again.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.retreat.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I need a moment before I can swing again.",
+                                        "Arms are heavy. Give me a second.",
+                                        "Falling back! Need to recover stamina.",
+                                        "Out of breath! Step back a bit.",
+                                        "Can't keep swinging like this. Backing up.",
+                                        "Give me space to breathe and reset.",
+                                        "Too exhausted to strike. Pulling back.",
+                                        "Need ten seconds to shake out my arms.",
+                                        "Step back! I'm completely winded.",
+                                        "Back up! Let me catch my breath.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko muna ng saglit bago makahataw ulit.",
+                                        "Mabigat ang mga braso ko. Bigyan mo ako ng saglit.",
+                                        "Aatras muna! Kailangang makabawi ng lakas.",
+                                        "Hinihingal ako! Umatras muna nang kaunti.",
+                                        "Hindi ko kayang tuloy-tuloy ang hataw. Aatras muna.",
+                                        "Bigyan mo ako ng puwang para makahinga.",
+                                        "Masyado akong pagod para humampas. Umuurong muna.",
+                                        "Kailangan ko ng sampung segundo para ipagpag ang braso ko.",
+                                        "Atras! Sagad na ang hingal ko.",
+                                        "Umatras! Pahingahin mo muna ako.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I need a moment before I can swing again.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.retreat.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I need a moment before I can swing again.",
+                            "Arms are heavy. Give me a second.",
+                            "Falling back! Need to recover stamina.",
+                            "Out of breath! Step back a bit.",
+                            "Can't keep swinging like this. Backing up.",
+                            "Give me space to breathe and reset.",
+                            "Too exhausted to strike. Pulling back.",
+                            "Need ten seconds to shake out my arms.",
+                            "Step back! I'm completely winded.",
+                            "Back up! Let me catch my breath.",
+                        },
+                        ["TL"] = {
+                            "Kailangan ko muna ng saglit bago makahataw ulit.",
+                            "Mabigat ang mga braso ko. Bigyan mo ako ng saglit.",
+                            "Aatras muna! Kailangang makabawi ng lakas.",
+                            "Hinihingal ako! Umatras muna nang kaunti.",
+                            "Hindi ko kayang tuloy-tuloy ang hataw. Aatras muna.",
+                            "Bigyan mo ako ng puwang para makahinga.",
+                            "Masyado akong pagod para humampas. Umuurong muna.",
+                            "Kailangan ko ng sampung segundo para ipagpag ang braso ko.",
+                            "Atras! Sagad na ang hingal ko.",
+                            "Umatras! Pahingahin mo muna ako.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.retreat",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "retreat",
-            ["sourceId"] = "semantic.combat.reaction.retreat",
+            ["sourceId"] = "combat.reaction.retreat",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_retreat.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,127 +340,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.retreat",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/combat.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need a moment before I can swing again.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko muna ng saglit bago makahataw ulit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Arms are heavy. Give me a second.",
-                            },
-                            ["TL"] = {
-                                "Mabigat ang mga braso ko. Bigyan mo ako ng saglit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Falling back! Need to recover stamina.",
-                            },
-                            ["TL"] = {
-                                "Aatras muna! Kailangang makabawi ng lakas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Out of breath! Step back a bit.",
-                            },
-                            ["TL"] = {
-                                "Hinihingal ako! Umatras muna nang kaunti.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't keep swinging like this. Backing up.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko kayang tuloy-tuloy ang hataw. Aatras muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Give me space to breathe and reset.",
-                            },
-                            ["TL"] = {
-                                "Bigyan mo ako ng puwang para makahinga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too exhausted to strike. Pulling back.",
-                            },
-                            ["TL"] = {
-                                "Masyado akong pagod para humampas. Umuurong muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Need ten seconds to shake out my arms.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng sampung segundo para ipagpag ang braso ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Step back! I'm completely winded.",
-                            },
-                            ["TL"] = {
-                                "Atras! Sagad na ang hingal ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Back up! Let me catch my breath.",
-                            },
-                            ["TL"] = {
-                                "Umatras! Pahingahin mo muna ako.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I need a moment before I can swing again.",
+                                        "Arms are heavy. Give me a second.",
+                                        "Falling back! Need to recover stamina.",
+                                        "Out of breath! Step back a bit.",
+                                        "Can't keep swinging like this. Backing up.",
+                                        "Give me space to breathe and reset.",
+                                        "Too exhausted to strike. Pulling back.",
+                                        "Need ten seconds to shake out my arms.",
+                                        "Step back! I'm completely winded.",
+                                        "Back up! Let me catch my breath.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko muna ng saglit bago makahataw ulit.",
+                                        "Mabigat ang mga braso ko. Bigyan mo ako ng saglit.",
+                                        "Aatras muna! Kailangang makabawi ng lakas.",
+                                        "Hinihingal ako! Umatras muna nang kaunti.",
+                                        "Hindi ko kayang tuloy-tuloy ang hataw. Aatras muna.",
+                                        "Bigyan mo ako ng puwang para makahinga.",
+                                        "Masyado akong pagod para humampas. Umuurong muna.",
+                                        "Kailangan ko ng sampung segundo para ipagpag ang braso ko.",
+                                        "Atras! Sagad na ang hingal ko.",
+                                        "Umatras! Pahingahin mo muna ako.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.retreat",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I need a moment before I can swing again.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.retreat.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -312,20 +421,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I need a moment before I can swing again.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.retreat.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I need a moment before I can swing again.",
+                        "Arms are heavy. Give me a second.",
+                        "Falling back! Need to recover stamina.",
+                        "Out of breath! Step back a bit.",
+                        "Can't keep swinging like this. Backing up.",
+                        "Give me space to breathe and reset.",
+                        "Too exhausted to strike. Pulling back.",
+                        "Need ten seconds to shake out my arms.",
+                        "Step back! I'm completely winded.",
+                        "Back up! Let me catch my breath.",
+                    },
+                    ["TL"] = {
+                        "Kailangan ko muna ng saglit bago makahataw ulit.",
+                        "Mabigat ang mga braso ko. Bigyan mo ako ng saglit.",
+                        "Aatras muna! Kailangang makabawi ng lakas.",
+                        "Hinihingal ako! Umatras muna nang kaunti.",
+                        "Hindi ko kayang tuloy-tuloy ang hataw. Aatras muna.",
+                        "Bigyan mo ako ng puwang para makahinga.",
+                        "Masyado akong pagod para humampas. Umuurong muna.",
+                        "Kailangan ko ng sampung segundo para ipagpag ang braso ko.",
+                        "Atras! Sagad na ang hingal ko.",
+                        "Umatras! Pahingahin mo muna ako.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "event_reactions_combat",
-        ["id"] = "semantic.combat.reaction.threat",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.threat",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That threat is down. Stay alert.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.threat.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That threat is down. Stay alert.",
+                                        "Threat neutralized. Don't drop your guard.",
+                                        "Target eliminated. Keep watching.",
+                                        "Danger's passed for now. Stay sharp.",
+                                        "Handled that hazard. Eyes open.",
+                                        "Threat's in the dirt. Scan the flanks.",
+                                        "Threat ceased. Maintain alertness.",
+                                        "Downed the contact. Watch your sector.",
+                                        "No more threat from that one. Stay ready.",
+                                        "Handled. Stay focused on remaining risks.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak na ang banta. Manatiling alerto.",
+                                        "Naalis na ang banta. Huwag ibaba ang depensa.",
+                                        "Target naalis na. Patuloy na magmatyag.",
+                                        "Lumipas na ang panganib pansamantala. Maging handa.",
+                                        "Nalutas ang panganib na 'yon. Buksan ang mata.",
+                                        "Nasa lupa na ang banta. Suriin ang gilid.",
+                                        "Tumigil na ang banta. Panatilihin ang pag-iingat.",
+                                        "Naitumba ang kalaban. Bantayan ang parte mo.",
+                                        "Wala nang panganib mula sa kanya. Maging handa.",
+                                        "Naayos na. Tutukan ang iba pang panganib.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That threat is down. Stay alert.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.threat.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That threat is down. Stay alert.",
+                            "Threat neutralized. Don't drop your guard.",
+                            "Target eliminated. Keep watching.",
+                            "Danger's passed for now. Stay sharp.",
+                            "Handled that hazard. Eyes open.",
+                            "Threat's in the dirt. Scan the flanks.",
+                            "Threat ceased. Maintain alertness.",
+                            "Downed the contact. Watch your sector.",
+                            "No more threat from that one. Stay ready.",
+                            "Handled. Stay focused on remaining risks.",
+                        },
+                        ["TL"] = {
+                            "Bagsak na ang banta. Manatiling alerto.",
+                            "Naalis na ang banta. Huwag ibaba ang depensa.",
+                            "Target naalis na. Patuloy na magmatyag.",
+                            "Lumipas na ang panganib pansamantala. Maging handa.",
+                            "Nalutas ang panganib na 'yon. Buksan ang mata.",
+                            "Nasa lupa na ang banta. Suriin ang gilid.",
+                            "Tumigil na ang banta. Panatilihin ang pag-iingat.",
+                            "Naitumba ang kalaban. Bantayan ang parte mo.",
+                            "Wala nang panganib mula sa kanya. Maging handa.",
+                            "Naayos na. Tutukan ang iba pang panganib.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.threat",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "threat",
-            ["sourceId"] = "semantic.combat.reaction.threat",
+            ["sourceId"] = "combat.reaction.threat",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_threat.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -339,127 +569,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.threat",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/combat.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That threat is down. Stay alert.",
-                            },
-                            ["TL"] = {
-                                "Bagsak na ang banta. Manatiling alerto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat neutralized. Don't drop your guard.",
-                            },
-                            ["TL"] = {
-                                "Naalis na ang banta. Huwag ibaba ang depensa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target eliminated. Keep watching.",
-                            },
-                            ["TL"] = {
-                                "Target naalis na. Patuloy na magmatyag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Danger's passed for now. Stay sharp.",
-                            },
-                            ["TL"] = {
-                                "Lumipas na ang panganib pansamantala. Maging handa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled that hazard. Eyes open.",
-                            },
-                            ["TL"] = {
-                                "Nalutas ang panganib na 'yon. Buksan ang mata.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat's in the dirt. Scan the flanks.",
-                            },
-                            ["TL"] = {
-                                "Nasa lupa na ang banta. Suriin ang gilid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat ceased. Maintain alertness.",
-                            },
-                            ["TL"] = {
-                                "Tumigil na ang banta. Panatilihin ang pag-iingat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Downed the contact. Watch your sector.",
-                            },
-                            ["TL"] = {
-                                "Naitumba ang kalaban. Bantayan ang parte mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No more threat from that one. Stay ready.",
-                            },
-                            ["TL"] = {
-                                "Wala nang panganib mula sa kanya. Maging handa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled. Stay focused on remaining risks.",
-                            },
-                            ["TL"] = {
-                                "Naayos na. Tutukan ang iba pang panganib.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That threat is down. Stay alert.",
+                                        "Threat neutralized. Don't drop your guard.",
+                                        "Target eliminated. Keep watching.",
+                                        "Danger's passed for now. Stay sharp.",
+                                        "Handled that hazard. Eyes open.",
+                                        "Threat's in the dirt. Scan the flanks.",
+                                        "Threat ceased. Maintain alertness.",
+                                        "Downed the contact. Watch your sector.",
+                                        "No more threat from that one. Stay ready.",
+                                        "Handled. Stay focused on remaining risks.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak na ang banta. Manatiling alerto.",
+                                        "Naalis na ang banta. Huwag ibaba ang depensa.",
+                                        "Target naalis na. Patuloy na magmatyag.",
+                                        "Lumipas na ang panganib pansamantala. Maging handa.",
+                                        "Nalutas ang panganib na 'yon. Buksan ang mata.",
+                                        "Nasa lupa na ang banta. Suriin ang gilid.",
+                                        "Tumigil na ang banta. Panatilihin ang pag-iingat.",
+                                        "Naitumba ang kalaban. Bantayan ang parte mo.",
+                                        "Wala nang panganib mula sa kanya. Maging handa.",
+                                        "Naayos na. Tutukan ang iba pang panganib.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.threat",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That threat is down. Stay alert.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.threat.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -468,6 +649,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That threat is down. Stay alert.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.threat.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That threat is down. Stay alert.",
+                        "Threat neutralized. Don't drop your guard.",
+                        "Target eliminated. Keep watching.",
+                        "Danger's passed for now. Stay sharp.",
+                        "Handled that hazard. Eyes open.",
+                        "Threat's in the dirt. Scan the flanks.",
+                        "Threat ceased. Maintain alertness.",
+                        "Downed the contact. Watch your sector.",
+                        "No more threat from that one. Stay ready.",
+                        "Handled. Stay focused on remaining risks.",
+                    },
+                    ["TL"] = {
+                        "Bagsak na ang banta. Manatiling alerto.",
+                        "Naalis na ang banta. Huwag ibaba ang depensa.",
+                        "Target naalis na. Patuloy na magmatyag.",
+                        "Lumipas na ang panganib pansamantala. Maging handa.",
+                        "Nalutas ang panganib na 'yon. Buksan ang mata.",
+                        "Nasa lupa na ang banta. Suriin ang gilid.",
+                        "Tumigil na ang banta. Panatilihin ang pag-iingat.",
+                        "Naitumba ang kalaban. Bantayan ang parte mo.",
+                        "Wala nang panganib mula sa kanya. Maging handa.",
+                        "Naayos na. Tutukan ang iba pang panganib.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.brave",
+  "id": "spear",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/brave.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Kept it right where I wanted it.",
+            "Direct thrust. Target down.",
+            "Distance held, kill confirmed.",
+            "Spear struck true. Advance.",
+            "Pinned down and finished. Move.",
+            "Clean breach from outside reach.",
+            "Neutralized at range. Proceed.",
+            "No risk taken. Push through.",
+            "Impaled. Path is clear.",
+            "Firm thrust to the skull. Done."
+          ],
+          "TL": [
+            "Napanatili ko siya sa tamang distansya.",
+            "Diretsong ulos. Bagsak ang target.",
+            "Distansya nahawakan, patay kumpirmado.",
+            "Tumagos ang sibat. Abante.",
+            "Itinarak at tinapos. Kilos.",
+            "Malinis na tama mula sa ligtas na layo.",
+            "Naitumba mula sa malayo. Tuloy.",
+            "Walang peligrong kinuha. Lusot.",
+            "Tinuhog. Malinis ang daan.",
+            "Matatag na saksak sa bungo. Tapos."
+          ]
+        }
+      }
+    ]
+  }
+}

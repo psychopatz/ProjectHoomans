@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "corpse.reaction",
   "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:event_reactions",
     "contentOwner": "projecthoomans.dialogue_content.events",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/corpse.json",
-    "responseTemplateID": "semantic.corpse.reaction.default",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Someone died here. We should remember that.",
-          "TL": "May namatay dito. Dapat nating alalahanin 'yon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Poor bastard. Didn't make it.",
-          "TL": "Kawawa naman. Hindi nakaligtas."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Another body in the dirt. World's unforgiving.",
-          "TL": "Isa na namang bangkay sa lupa. Malupit ang mundo."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "They fought hard, by the looks of it.",
-          "TL": "Lumaban nang husto, base sa hitsura."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Someone lost a life here. Tread with respect.",
-          "TL": "May nawalan ng buhay rito. Maglakad nang may galang."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Looks like they got trapped. Rest easy.",
-          "TL": "Mukhang naipit sila rito. Mamahinga ka na."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Could've been any of us. Keep walking.",
-          "TL": "Kahit sino sa atin pwedeng maging ganyan. Lakad na."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Another survivor cut down too early.",
-          "TL": "Isa na namang survivor ang pumanaw nang maaga."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Body's cold. Let's make sure we don't end up like this.",
-          "TL": "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Rest in peace, stranger. Let's keep moving.",
-          "TL": "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo."
+          "EN": [
+            "Someone died here. We should remember that.",
+            "Poor bastard. Didn't make it.",
+            "Another body in the dirt. World's unforgiving.",
+            "They fought hard, by the looks of it.",
+            "Someone lost a life here. Tread with respect.",
+            "Looks like they got trapped. Rest easy.",
+            "Could've been any of us. Keep walking.",
+            "Another survivor cut down too early.",
+            "Body's cold. Let's make sure we don't end up like this.",
+            "Rest in peace, stranger. Let's keep moving."
+          ],
+          "TL": [
+            "May namatay dito. Dapat nating alalahanin 'yon.",
+            "Kawawa naman. Hindi nakaligtas.",
+            "Isa na namang bangkay sa lupa. Malupit ang mundo.",
+            "Lumaban nang husto, base sa hitsura.",
+            "May nawalan ng buhay rito. Maglakad nang may galang.",
+            "Mukhang naipit sila rito. Mamahinga ka na.",
+            "Kahit sino sa atin pwedeng maging ganyan. Lakad na.",
+            "Isa na namang survivor ang pumanaw nang maaga.",
+            "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito.",
+            "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.corpse.reaction",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

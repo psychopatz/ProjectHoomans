@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.reply",
   "id": "return_home",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.command.reply.return_home"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Heading home.",
-          "TL": "Uuwi na ako."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Returning to our base now.",
-          "TL": "Pabalik na sa base natin ngayon."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Understood. Going back to safe ground.",
-          "TL": "Naiintindihan ko. Babalik sa ligtas na lugar."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "I'll head back to our shelter.",
-          "TL": "Babalik ako sa silungan natin."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Making my way back home.",
-          "TL": "Pauwi na ako ngayon."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Homeward bound. See you back at camp.",
-          "TL": "Pauwi na. Magkita tayo sa kampo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Understood. I will return to base.",
-          "TL": "Naintindihan. Babalik ako sa base."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Heading back to the compound.",
-          "TL": "Pabalik na sa himpilan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Heading home. Stay safe out here.",
-          "TL": "Pauwi na ako. Mag-ingat ka rito."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Returning to base coordinates.",
-          "TL": "Pabalik na sa mga coordinate ng base."
+          "EN": [
+            "Heading home.",
+            "Returning to our base now.",
+            "Understood. Going back to safe ground.",
+            "I'll head back to our shelter.",
+            "Making my way back home.",
+            "Homeward bound. See you back at camp.",
+            "Understood. I will return to base.",
+            "Heading back to the compound.",
+            "Heading home. Stay safe out here.",
+            "Returning to base coordinates."
+          ],
+          "TL": [
+            "Uuwi na ako.",
+            "Pabalik na sa base natin ngayon.",
+            "Naiintindihan ko. Babalik sa ligtas na lugar.",
+            "Babalik ako sa silungan natin.",
+            "Pauwi na ako ngayon.",
+            "Pauwi na. Magkita tayo sa kampo.",
+            "Naintindihan. Babalik ako sa base.",
+            "Pabalik na sa himpilan.",
+            "Pauwi na ako. Mag-ingat ka rito.",
+            "Pabalik na sa mga coordinate ng base."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.reply",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

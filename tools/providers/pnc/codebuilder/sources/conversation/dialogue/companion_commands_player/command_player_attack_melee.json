@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.player",
   "id": "attack_melee",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,34 +16,25 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
-    "responseTemplateID": "semantic.command.player.attack_melee"
+    "responseAct": "DIRECTIVE"
   },
-  "response": {
-    "act": "DIRECTIVE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "{addressee.name}, keep it close.",
-          "TL": "{addressee.name}, lumaban nang malapitan."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Take the front line, {addressee.name}.",
-          "TL": "Ikaw sa unahan, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "{addressee.name}, save your ammunition.",
-          "TL": "{addressee.name}, itabi ang bala."
+          "EN": [
+            "{addressee.name}, keep it close.",
+            "Take the front line, {addressee.name}.",
+            "{addressee.name}, save your ammunition."
+          ],
+          "TL": [
+            "{addressee.name}, lumaban nang malapitan.",
+            "Ikaw sa unahan, {addressee.name}.",
+            "{addressee.name}, itabi ang bala."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.player",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

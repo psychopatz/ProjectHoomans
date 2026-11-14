@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.gift.completed",
+        ["exchangeFamily"] = {
+            ["familyID"] = "gift.completed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Thank you for the gift.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.gift.completed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Thank you for the gift.",
+                                        "I appreciate this gesture. Thank you.",
+                                        "That's generous of you. Thanks.",
+                                        "Thank you! This will be put to good use.",
+                                        "A welcome surprise. Thank you, friend.",
+                                        "Much obliged for the gift.",
+                                        "I'm grateful for this. Thank you.",
+                                        "You didn't have to, but thanks a lot.",
+                                        "Received with gratitude. Thank you.",
+                                        "Thanks for thinking of me with this gift.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat sa regalo.",
+                                        "Salamat sa magandang kalooban. Maraming salamat.",
+                                        "Bukas-palad ka. Salamat.",
+                                        "Salamat! Magagamit ito nang maayos.",
+                                        "Magandang sorpresa. Salamat, kaibigan.",
+                                        "Maraming salamat sa regalo.",
+                                        "Nagpapasalamat ako rito. Salamat.",
+                                        "Di mo kailangang gawin, pero maraming salamat.",
+                                        "Tinatanggap kalakip ang pasasalamat. Salamat.",
+                                        "Salamat sa pag-alala sa akin sa regalong ito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "gift",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Thank you for the gift.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.gift.completed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thank you for the gift.",
+                            "I appreciate this gesture. Thank you.",
+                            "That's generous of you. Thanks.",
+                            "Thank you! This will be put to good use.",
+                            "A welcome surprise. Thank you, friend.",
+                            "Much obliged for the gift.",
+                            "I'm grateful for this. Thank you.",
+                            "You didn't have to, but thanks a lot.",
+                            "Received with gratitude. Thank you.",
+                            "Thanks for thinking of me with this gift.",
+                        },
+                        ["TL"] = {
+                            "Salamat sa regalo.",
+                            "Salamat sa magandang kalooban. Maraming salamat.",
+                            "Bukas-palad ka. Salamat.",
+                            "Salamat! Magagamit ito nang maayos.",
+                            "Magandang sorpresa. Salamat, kaibigan.",
+                            "Maraming salamat sa regalo.",
+                            "Nagpapasalamat ako rito. Salamat.",
+                            "Di mo kailangang gawin, pero maraming salamat.",
+                            "Tinatanggap kalakip ang pasasalamat. Salamat.",
+                            "Salamat sa pag-alala sa akin sa regalong ito.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "gift.completed",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "completed",
-            ["sourceId"] = "semantic.gift.completed",
+            ["sourceId"] = "gift.completed",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/gift_completed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.gift",
+        ["namespace"] = "gift",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.gift.completed",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you for the gift.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa regalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate this gesture. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa magandang kalooban. Maraming salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's generous of you. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Bukas-palad ka. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you! This will be put to good use.",
-                            },
-                            ["TL"] = {
-                                "Salamat! Magagamit ito nang maayos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A welcome surprise. Thank you, friend.",
-                            },
-                            ["TL"] = {
-                                "Magandang sorpresa. Salamat, kaibigan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Much obliged for the gift.",
-                            },
-                            ["TL"] = {
-                                "Maraming salamat sa regalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm grateful for this. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Nagpapasalamat ako rito. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You didn't have to, but thanks a lot.",
-                            },
-                            ["TL"] = {
-                                "Di mo kailangang gawin, pero maraming salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Received with gratitude. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggap kalakip ang pasasalamat. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for thinking of me with this gift.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pag-alala sa akin sa regalong ito.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Thank you for the gift.",
+                                        "I appreciate this gesture. Thank you.",
+                                        "That's generous of you. Thanks.",
+                                        "Thank you! This will be put to good use.",
+                                        "A welcome surprise. Thank you, friend.",
+                                        "Much obliged for the gift.",
+                                        "I'm grateful for this. Thank you.",
+                                        "You didn't have to, but thanks a lot.",
+                                        "Received with gratitude. Thank you.",
+                                        "Thanks for thinking of me with this gift.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat sa regalo.",
+                                        "Salamat sa magandang kalooban. Maraming salamat.",
+                                        "Bukas-palad ka. Salamat.",
+                                        "Salamat! Magagamit ito nang maayos.",
+                                        "Magandang sorpresa. Salamat, kaibigan.",
+                                        "Maraming salamat sa regalo.",
+                                        "Nagpapasalamat ako rito. Salamat.",
+                                        "Di mo kailangang gawin, pero maraming salamat.",
+                                        "Tinatanggap kalakip ang pasasalamat. Salamat.",
+                                        "Salamat sa pag-alala sa akin sa regalong ito.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "gift.completed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Thank you for the gift.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.gift.completed.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,20 +192,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Thank you for the gift.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.gift.completed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thank you for the gift.",
+                        "I appreciate this gesture. Thank you.",
+                        "That's generous of you. Thanks.",
+                        "Thank you! This will be put to good use.",
+                        "A welcome surprise. Thank you, friend.",
+                        "Much obliged for the gift.",
+                        "I'm grateful for this. Thank you.",
+                        "You didn't have to, but thanks a lot.",
+                        "Received with gratitude. Thank you.",
+                        "Thanks for thinking of me with this gift.",
+                    },
+                    ["TL"] = {
+                        "Salamat sa regalo.",
+                        "Salamat sa magandang kalooban. Maraming salamat.",
+                        "Bukas-palad ka. Salamat.",
+                        "Salamat! Magagamit ito nang maayos.",
+                        "Magandang sorpresa. Salamat, kaibigan.",
+                        "Maraming salamat sa regalo.",
+                        "Nagpapasalamat ako rito. Salamat.",
+                        "Di mo kailangang gawin, pero maraming salamat.",
+                        "Tinatanggap kalakip ang pasasalamat. Salamat.",
+                        "Salamat sa pag-alala sa akin sa regalong ito.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.gift.failed",
+        ["exchangeFamily"] = {
+            ["familyID"] = "gift.failed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I couldn't accept that gift.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.gift.failed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I couldn't accept that gift.",
+                                        "Something went wrong while transferring the gift.",
+                                        "Gift transfer failed. My hands were full.",
+                                        "Couldn't receive that right now.",
+                                        "Unable to take the gift into my inventory.",
+                                        "Transaction interrupted. Gift not taken.",
+                                        "Failed to receive the offering.",
+                                        "I dropped it or couldn't hold it.",
+                                        "Gift transfer could not be completed.",
+                                        "Couldn't take that from you.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko matanggap ang regalong iyan.",
+                                        "May nangyaring mali habang ipinapasa ang regalo.",
+                                        "Bigo ang paglipat ng regalo. Puno ang kamay ko.",
+                                        "Di matanggap 'yan sa ngayon.",
+                                        "Di mailagay ang regalo sa lalagyan ko.",
+                                        "Naabala ang pagbibigay. Di nakuha ang regalo.",
+                                        "Bigo sa pagtanggap ng alay.",
+                                        "Nahulog ko o di nahawakan.",
+                                        "Di natapos ang paglipat ng regalo.",
+                                        "Di ko nakuha 'yan mula sa 'yo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "gift",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I couldn't accept that gift.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.gift.failed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I couldn't accept that gift.",
+                            "Something went wrong while transferring the gift.",
+                            "Gift transfer failed. My hands were full.",
+                            "Couldn't receive that right now.",
+                            "Unable to take the gift into my inventory.",
+                            "Transaction interrupted. Gift not taken.",
+                            "Failed to receive the offering.",
+                            "I dropped it or couldn't hold it.",
+                            "Gift transfer could not be completed.",
+                            "Couldn't take that from you.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko matanggap ang regalong iyan.",
+                            "May nangyaring mali habang ipinapasa ang regalo.",
+                            "Bigo ang paglipat ng regalo. Puno ang kamay ko.",
+                            "Di matanggap 'yan sa ngayon.",
+                            "Di mailagay ang regalo sa lalagyan ko.",
+                            "Naabala ang pagbibigay. Di nakuha ang regalo.",
+                            "Bigo sa pagtanggap ng alay.",
+                            "Nahulog ko o di nahawakan.",
+                            "Di natapos ang paglipat ng regalo.",
+                            "Di ko nakuha 'yan mula sa 'yo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "gift.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "failed",
-            ["sourceId"] = "semantic.gift.failed",
+            ["sourceId"] = "gift.failed",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/gift_failed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.gift",
+        ["namespace"] = "gift",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,127 +340,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.gift.failed",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't accept that gift.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko matanggap ang regalong iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Something went wrong while transferring the gift.",
-                            },
-                            ["TL"] = {
-                                "May nangyaring mali habang ipinapasa ang regalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Gift transfer failed. My hands were full.",
-                            },
-                            ["TL"] = {
-                                "Bigo ang paglipat ng regalo. Puno ang kamay ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't receive that right now.",
-                            },
-                            ["TL"] = {
-                                "Di matanggap 'yan sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to take the gift into my inventory.",
-                            },
-                            ["TL"] = {
-                                "Di mailagay ang regalo sa lalagyan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Transaction interrupted. Gift not taken.",
-                            },
-                            ["TL"] = {
-                                "Naabala ang pagbibigay. Di nakuha ang regalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to receive the offering.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa pagtanggap ng alay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I dropped it or couldn't hold it.",
-                            },
-                            ["TL"] = {
-                                "Nahulog ko o di nahawakan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Gift transfer could not be completed.",
-                            },
-                            ["TL"] = {
-                                "Di natapos ang paglipat ng regalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't take that from you.",
-                            },
-                            ["TL"] = {
-                                "Di ko nakuha 'yan mula sa 'yo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I couldn't accept that gift.",
+                                        "Something went wrong while transferring the gift.",
+                                        "Gift transfer failed. My hands were full.",
+                                        "Couldn't receive that right now.",
+                                        "Unable to take the gift into my inventory.",
+                                        "Transaction interrupted. Gift not taken.",
+                                        "Failed to receive the offering.",
+                                        "I dropped it or couldn't hold it.",
+                                        "Gift transfer could not be completed.",
+                                        "Couldn't take that from you.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko matanggap ang regalong iyan.",
+                                        "May nangyaring mali habang ipinapasa ang regalo.",
+                                        "Bigo ang paglipat ng regalo. Puno ang kamay ko.",
+                                        "Di matanggap 'yan sa ngayon.",
+                                        "Di mailagay ang regalo sa lalagyan ko.",
+                                        "Naabala ang pagbibigay. Di nakuha ang regalo.",
+                                        "Bigo sa pagtanggap ng alay.",
+                                        "Nahulog ko o di nahawakan.",
+                                        "Di natapos ang paglipat ng regalo.",
+                                        "Di ko nakuha 'yan mula sa 'yo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "gift.failed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I couldn't accept that gift.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.gift.failed.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -312,20 +421,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I couldn't accept that gift.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.gift.failed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I couldn't accept that gift.",
+                        "Something went wrong while transferring the gift.",
+                        "Gift transfer failed. My hands were full.",
+                        "Couldn't receive that right now.",
+                        "Unable to take the gift into my inventory.",
+                        "Transaction interrupted. Gift not taken.",
+                        "Failed to receive the offering.",
+                        "I dropped it or couldn't hold it.",
+                        "Gift transfer could not be completed.",
+                        "Couldn't take that from you.",
+                    },
+                    ["TL"] = {
+                        "Hindi ko matanggap ang regalong iyan.",
+                        "May nangyaring mali habang ipinapasa ang regalo.",
+                        "Bigo ang paglipat ng regalo. Puno ang kamay ko.",
+                        "Di matanggap 'yan sa ngayon.",
+                        "Di mailagay ang regalo sa lalagyan ko.",
+                        "Naabala ang pagbibigay. Di nakuha ang regalo.",
+                        "Bigo sa pagtanggap ng alay.",
+                        "Nahulog ko o di nahawakan.",
+                        "Di natapos ang paglipat ng regalo.",
+                        "Di ko nakuha 'yan mula sa 'yo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.gift.pending",
+        ["exchangeFamily"] = {
+            ["familyID"] = "gift.pending",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll take a look at that gift.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.gift.pending.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll take a look at that gift.",
+                                        "Let's see what you brought.",
+                                        "Considering the gift now.",
+                                        "Inspecting what you have for me.",
+                                        "Hold on, looking at the offering.",
+                                        "I'll review the item you offered.",
+                                        "Checking out the gift.",
+                                        "Let me examine what this is.",
+                                        "Looking over your gift.",
+                                        "Give me a second to check this item.",
+                                    },
+                                    ["TL"] = {
+                                        "Titingnan ko ang regalong iyan.",
+                                        "Tingnan natin kung ano ang dala mo.",
+                                        "Tinitingnan ang regalo ngayon.",
+                                        "Sinusuri ang handog mo para sa akin.",
+                                        "Teka, tinitingnan ang iniaalok.",
+                                        "Susuriin ko ang bagay na inialok mo.",
+                                        "Tinitingnan ang regalo.",
+                                        "Hayaan mong tingnan ko kung ano ito.",
+                                        "Sinusuri ang regalo mo.",
+                                        "Bigyan mo ako ng sandali para tingnan ang gamit na ito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "gift",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll take a look at that gift.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.gift.pending.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll take a look at that gift.",
+                            "Let's see what you brought.",
+                            "Considering the gift now.",
+                            "Inspecting what you have for me.",
+                            "Hold on, looking at the offering.",
+                            "I'll review the item you offered.",
+                            "Checking out the gift.",
+                            "Let me examine what this is.",
+                            "Looking over your gift.",
+                            "Give me a second to check this item.",
+                        },
+                        ["TL"] = {
+                            "Titingnan ko ang regalong iyan.",
+                            "Tingnan natin kung ano ang dala mo.",
+                            "Tinitingnan ang regalo ngayon.",
+                            "Sinusuri ang handog mo para sa akin.",
+                            "Teka, tinitingnan ang iniaalok.",
+                            "Susuriin ko ang bagay na inialok mo.",
+                            "Tinitingnan ang regalo.",
+                            "Hayaan mong tingnan ko kung ano ito.",
+                            "Sinusuri ang regalo mo.",
+                            "Bigyan mo ako ng sandali para tingnan ang gamit na ito.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "gift.pending",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "pending",
-            ["sourceId"] = "semantic.gift.pending",
+            ["sourceId"] = "gift.pending",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/gift_pending.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.gift",
+        ["namespace"] = "gift",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -339,127 +569,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.gift.pending",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll take a look at that gift.",
-                            },
-                            ["TL"] = {
-                                "Titingnan ko ang regalong iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's see what you brought.",
-                            },
-                            ["TL"] = {
-                                "Tingnan natin kung ano ang dala mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Considering the gift now.",
-                            },
-                            ["TL"] = {
-                                "Tinitingnan ang regalo ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Inspecting what you have for me.",
-                            },
-                            ["TL"] = {
-                                "Sinusuri ang handog mo para sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hold on, looking at the offering.",
-                            },
-                            ["TL"] = {
-                                "Teka, tinitingnan ang iniaalok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll review the item you offered.",
-                            },
-                            ["TL"] = {
-                                "Susuriin ko ang bagay na inialok mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Checking out the gift.",
-                            },
-                            ["TL"] = {
-                                "Tinitingnan ang regalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let me examine what this is.",
-                            },
-                            ["TL"] = {
-                                "Hayaan mong tingnan ko kung ano ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Looking over your gift.",
-                            },
-                            ["TL"] = {
-                                "Sinusuri ang regalo mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Give me a second to check this item.",
-                            },
-                            ["TL"] = {
-                                "Bigyan mo ako ng sandali para tingnan ang gamit na ito.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll take a look at that gift.",
+                                        "Let's see what you brought.",
+                                        "Considering the gift now.",
+                                        "Inspecting what you have for me.",
+                                        "Hold on, looking at the offering.",
+                                        "I'll review the item you offered.",
+                                        "Checking out the gift.",
+                                        "Let me examine what this is.",
+                                        "Looking over your gift.",
+                                        "Give me a second to check this item.",
+                                    },
+                                    ["TL"] = {
+                                        "Titingnan ko ang regalong iyan.",
+                                        "Tingnan natin kung ano ang dala mo.",
+                                        "Tinitingnan ang regalo ngayon.",
+                                        "Sinusuri ang handog mo para sa akin.",
+                                        "Teka, tinitingnan ang iniaalok.",
+                                        "Susuriin ko ang bagay na inialok mo.",
+                                        "Tinitingnan ang regalo.",
+                                        "Hayaan mong tingnan ko kung ano ito.",
+                                        "Sinusuri ang regalo mo.",
+                                        "Bigyan mo ako ng sandali para tingnan ang gamit na ito.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "gift.pending",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll take a look at that gift.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.gift.pending.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -469,20 +650,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll take a look at that gift.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.gift.pending.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll take a look at that gift.",
+                        "Let's see what you brought.",
+                        "Considering the gift now.",
+                        "Inspecting what you have for me.",
+                        "Hold on, looking at the offering.",
+                        "I'll review the item you offered.",
+                        "Checking out the gift.",
+                        "Let me examine what this is.",
+                        "Looking over your gift.",
+                        "Give me a second to check this item.",
+                    },
+                    ["TL"] = {
+                        "Titingnan ko ang regalong iyan.",
+                        "Tingnan natin kung ano ang dala mo.",
+                        "Tinitingnan ang regalo ngayon.",
+                        "Sinusuri ang handog mo para sa akin.",
+                        "Teka, tinitingnan ang iniaalok.",
+                        "Susuriin ko ang bagay na inialok mo.",
+                        "Tinitingnan ang regalo.",
+                        "Hayaan mong tingnan ko kung ano ito.",
+                        "Sinusuri ang regalo mo.",
+                        "Bigyan mo ako ng sandali para tingnan ang gamit na ito.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.gift.rejected",
+        ["exchangeFamily"] = {
+            ["familyID"] = "gift.rejected",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can't accept that gift right now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.gift.rejected.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can't accept that gift right now.",
+                                        "Keep it. You need it more than I do.",
+                                        "I have no room for gifts in my pack.",
+                                        "I don't feel comfortable taking this from you.",
+                                        "Refusing this gift. We're not there yet.",
+                                        "Save your supplies. Don't waste them on me.",
+                                        "I cannot take that offering.",
+                                        "No thanks. I carry my own weight.",
+                                        "Gift rejected. Keep your belongings.",
+                                        "I won't accept that from you today.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko matanggap ang regalong iyan ngayon.",
+                                        "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
+                                        "Wala nang espasyo sa bag ko para sa mga regalo.",
+                                        "Hindi magaan sa loob ko na tanggapin ito sa 'yo.",
+                                        "Tinatanggihan ang regalo. Di pa tayo ganoon kalapit.",
+                                        "Itabi ang gamit mo. Huwag mong sayangin sa akin.",
+                                        "Di ko matatanggap ang alay na 'yan.",
+                                        "Hindi salamat. Kaya kong dalhin ang sarili ko.",
+                                        "Tinatanggihan ang regalo. Itago ang pag-aari mo.",
+                                        "Di ko tatanggapin 'yan mula sa 'yo ngayong araw.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "gift",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can't accept that gift right now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.gift.rejected.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can't accept that gift right now.",
+                            "Keep it. You need it more than I do.",
+                            "I have no room for gifts in my pack.",
+                            "I don't feel comfortable taking this from you.",
+                            "Refusing this gift. We're not there yet.",
+                            "Save your supplies. Don't waste them on me.",
+                            "I cannot take that offering.",
+                            "No thanks. I carry my own weight.",
+                            "Gift rejected. Keep your belongings.",
+                            "I won't accept that from you today.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko matanggap ang regalong iyan ngayon.",
+                            "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
+                            "Wala nang espasyo sa bag ko para sa mga regalo.",
+                            "Hindi magaan sa loob ko na tanggapin ito sa 'yo.",
+                            "Tinatanggihan ang regalo. Di pa tayo ganoon kalapit.",
+                            "Itabi ang gamit mo. Huwag mong sayangin sa akin.",
+                            "Di ko matatanggap ang alay na 'yan.",
+                            "Hindi salamat. Kaya kong dalhin ang sarili ko.",
+                            "Tinatanggihan ang regalo. Itago ang pag-aari mo.",
+                            "Di ko tatanggapin 'yan mula sa 'yo ngayong araw.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "gift.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "rejected",
-            ["sourceId"] = "semantic.gift.rejected",
+            ["sourceId"] = "gift.rejected",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/gift_rejected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.gift",
+        ["namespace"] = "gift",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -496,127 +798,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.gift.rejected",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't accept that gift right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko matanggap ang regalong iyan ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep it. You need it more than I do.",
-                            },
-                            ["TL"] = {
-                                "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I have no room for gifts in my pack.",
-                            },
-                            ["TL"] = {
-                                "Wala nang espasyo sa bag ko para sa mga regalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't feel comfortable taking this from you.",
-                            },
-                            ["TL"] = {
-                                "Hindi magaan sa loob ko na tanggapin ito sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refusing this gift. We're not there yet.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggihan ang regalo. Di pa tayo ganoon kalapit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Save your supplies. Don't waste them on me.",
-                            },
-                            ["TL"] = {
-                                "Itabi ang gamit mo. Huwag mong sayangin sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I cannot take that offering.",
-                            },
-                            ["TL"] = {
-                                "Di ko matatanggap ang alay na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No thanks. I carry my own weight.",
-                            },
-                            ["TL"] = {
-                                "Hindi salamat. Kaya kong dalhin ang sarili ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Gift rejected. Keep your belongings.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggihan ang regalo. Itago ang pag-aari mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I won't accept that from you today.",
-                            },
-                            ["TL"] = {
-                                "Di ko tatanggapin 'yan mula sa 'yo ngayong araw.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can't accept that gift right now.",
+                                        "Keep it. You need it more than I do.",
+                                        "I have no room for gifts in my pack.",
+                                        "I don't feel comfortable taking this from you.",
+                                        "Refusing this gift. We're not there yet.",
+                                        "Save your supplies. Don't waste them on me.",
+                                        "I cannot take that offering.",
+                                        "No thanks. I carry my own weight.",
+                                        "Gift rejected. Keep your belongings.",
+                                        "I won't accept that from you today.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko matanggap ang regalong iyan ngayon.",
+                                        "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
+                                        "Wala nang espasyo sa bag ko para sa mga regalo.",
+                                        "Hindi magaan sa loob ko na tanggapin ito sa 'yo.",
+                                        "Tinatanggihan ang regalo. Di pa tayo ganoon kalapit.",
+                                        "Itabi ang gamit mo. Huwag mong sayangin sa akin.",
+                                        "Di ko matatanggap ang alay na 'yan.",
+                                        "Hindi salamat. Kaya kong dalhin ang sarili ko.",
+                                        "Tinatanggihan ang regalo. Itago ang pag-aari mo.",
+                                        "Di ko tatanggapin 'yan mula sa 'yo ngayong araw.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "gift.rejected",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can't accept that gift right now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.gift.rejected.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -626,20 +879,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can't accept that gift right now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.gift.rejected.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can't accept that gift right now.",
+                        "Keep it. You need it more than I do.",
+                        "I have no room for gifts in my pack.",
+                        "I don't feel comfortable taking this from you.",
+                        "Refusing this gift. We're not there yet.",
+                        "Save your supplies. Don't waste them on me.",
+                        "I cannot take that offering.",
+                        "No thanks. I carry my own weight.",
+                        "Gift rejected. Keep your belongings.",
+                        "I won't accept that from you today.",
+                    },
+                    ["TL"] = {
+                        "Hindi ko matanggap ang regalong iyan ngayon.",
+                        "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
+                        "Wala nang espasyo sa bag ko para sa mga regalo.",
+                        "Hindi magaan sa loob ko na tanggapin ito sa 'yo.",
+                        "Tinatanggihan ang regalo. Di pa tayo ganoon kalapit.",
+                        "Itabi ang gamit mo. Huwag mong sayangin sa akin.",
+                        "Di ko matatanggap ang alay na 'yan.",
+                        "Hindi salamat. Kaya kong dalhin ang sarili ko.",
+                        "Tinatanggihan ang regalo. Itago ang pag-aari mo.",
+                        "Di ko tatanggapin 'yan mula sa 'yo ngayong araw.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.gift.selection_required",
+        ["exchangeFamily"] = {
+            ["familyID"] = "gift.selection_required",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I need to see what you brought me first.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.gift.selection_required.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I need to see what you brought me first.",
+                                        "What exactly are you offering me?",
+                                        "Select an item to gift before I decide.",
+                                        "Show me what you want to give.",
+                                        "Which item are you trying to hand over?",
+                                        "Pick the specific item first.",
+                                        "I can't take anything until you select it.",
+                                        "Show me what's in your hands.",
+                                        "What gift are we talking about? Choose one.",
+                                        "Specify the gift from your inventory.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko munang makita ang dala mo.",
+                                        "Ano nga ba ang iniaalok mo sa akin?",
+                                        "Pumili ng bagay na ireregalo bago ako magpasya.",
+                                        "Ipakita mo kung ano ang nais mong ibigay.",
+                                        "Aling gamit ba ang sinusubukan mong iabot?",
+                                        "Piliin muna ang partikular na gamit.",
+                                        "Wala akong matatanggap hangga't di mo pinipili.",
+                                        "Ipakita mo ang nasa mga kamay mo.",
+                                        "Anong regalo ba ang pinag-uusapan natin? Pumili ka.",
+                                        "Tukuyin ang regalo mula sa bag mo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "gift",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I need to see what you brought me first.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.gift.selection_required.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I need to see what you brought me first.",
+                            "What exactly are you offering me?",
+                            "Select an item to gift before I decide.",
+                            "Show me what you want to give.",
+                            "Which item are you trying to hand over?",
+                            "Pick the specific item first.",
+                            "I can't take anything until you select it.",
+                            "Show me what's in your hands.",
+                            "What gift are we talking about? Choose one.",
+                            "Specify the gift from your inventory.",
+                        },
+                        ["TL"] = {
+                            "Kailangan ko munang makita ang dala mo.",
+                            "Ano nga ba ang iniaalok mo sa akin?",
+                            "Pumili ng bagay na ireregalo bago ako magpasya.",
+                            "Ipakita mo kung ano ang nais mong ibigay.",
+                            "Aling gamit ba ang sinusubukan mong iabot?",
+                            "Piliin muna ang partikular na gamit.",
+                            "Wala akong matatanggap hangga't di mo pinipili.",
+                            "Ipakita mo ang nasa mga kamay mo.",
+                            "Anong regalo ba ang pinag-uusapan natin? Pumili ka.",
+                            "Tukuyin ang regalo mula sa bag mo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "gift.selection_required",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "selection_required",
-            ["sourceId"] = "semantic.gift.selection_required",
+            ["sourceId"] = "gift.selection_required",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/gift_selection_required.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.gift",
+        ["namespace"] = "gift",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -653,127 +1027,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.gift.selection_required",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need to see what you brought me first.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko munang makita ang dala mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What exactly are you offering me?",
-                            },
-                            ["TL"] = {
-                                "Ano nga ba ang iniaalok mo sa akin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Select an item to gift before I decide.",
-                            },
-                            ["TL"] = {
-                                "Pumili ng bagay na ireregalo bago ako magpasya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Show me what you want to give.",
-                            },
-                            ["TL"] = {
-                                "Ipakita mo kung ano ang nais mong ibigay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Which item are you trying to hand over?",
-                            },
-                            ["TL"] = {
-                                "Aling gamit ba ang sinusubukan mong iabot?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Pick the specific item first.",
-                            },
-                            ["TL"] = {
-                                "Piliin muna ang partikular na gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't take anything until you select it.",
-                            },
-                            ["TL"] = {
-                                "Wala akong matatanggap hangga't di mo pinipili.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Show me what's in your hands.",
-                            },
-                            ["TL"] = {
-                                "Ipakita mo ang nasa mga kamay mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What gift are we talking about? Choose one.",
-                            },
-                            ["TL"] = {
-                                "Anong regalo ba ang pinag-uusapan natin? Pumili ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Specify the gift from your inventory.",
-                            },
-                            ["TL"] = {
-                                "Tukuyin ang regalo mula sa bag mo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I need to see what you brought me first.",
+                                        "What exactly are you offering me?",
+                                        "Select an item to gift before I decide.",
+                                        "Show me what you want to give.",
+                                        "Which item are you trying to hand over?",
+                                        "Pick the specific item first.",
+                                        "I can't take anything until you select it.",
+                                        "Show me what's in your hands.",
+                                        "What gift are we talking about? Choose one.",
+                                        "Specify the gift from your inventory.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko munang makita ang dala mo.",
+                                        "Ano nga ba ang iniaalok mo sa akin?",
+                                        "Pumili ng bagay na ireregalo bago ako magpasya.",
+                                        "Ipakita mo kung ano ang nais mong ibigay.",
+                                        "Aling gamit ba ang sinusubukan mong iabot?",
+                                        "Piliin muna ang partikular na gamit.",
+                                        "Wala akong matatanggap hangga't di mo pinipili.",
+                                        "Ipakita mo ang nasa mga kamay mo.",
+                                        "Anong regalo ba ang pinag-uusapan natin? Pumili ka.",
+                                        "Tukuyin ang regalo mula sa bag mo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "gift.selection_required",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I need to see what you brought me first.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.gift.selection_required.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -783,20 +1108,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I need to see what you brought me first.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.gift.selection_required.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I need to see what you brought me first.",
+                        "What exactly are you offering me?",
+                        "Select an item to gift before I decide.",
+                        "Show me what you want to give.",
+                        "Which item are you trying to hand over?",
+                        "Pick the specific item first.",
+                        "I can't take anything until you select it.",
+                        "Show me what's in your hands.",
+                        "What gift are we talking about? Choose one.",
+                        "Specify the gift from your inventory.",
+                    },
+                    ["TL"] = {
+                        "Kailangan ko munang makita ang dala mo.",
+                        "Ano nga ba ang iniaalok mo sa akin?",
+                        "Pumili ng bagay na ireregalo bago ako magpasya.",
+                        "Ipakita mo kung ano ang nais mong ibigay.",
+                        "Aling gamit ba ang sinusubukan mong iabot?",
+                        "Piliin muna ang partikular na gamit.",
+                        "Wala akong matatanggap hangga't di mo pinipili.",
+                        "Ipakita mo ang nasa mga kamay mo.",
+                        "Anong regalo ba ang pinag-uusapan natin? Pumili ka.",
+                        "Tukuyin ang regalo mula sa bag mo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.consume.active",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.consume.active",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'm using that now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.consume.active.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'm using that now.",
+                                        "Currently using the item.",
+                                        "Applying it right now.",
+                                        "In the middle of consuming that.",
+                                        "Working through this item.",
+                                        "Taking this now. Give me a second.",
+                                        "Using the supplies as requested.",
+                                        "Consuming it right now.",
+                                        "Holding still to use this.",
+                                        "Using it. Almost done.",
+                                    },
+                                    ["TL"] = {
+                                        "Ginagamit ko na iyon ngayon.",
+                                        "Kasalukuyang ginagamit ang gamit.",
+                                        "Inilalapat na ngayon.",
+                                        "Kasalukuyang ginagamit iyan.",
+                                        "Ginagamit ang bagay na ito.",
+                                        "Ginagamit ko na ito. Bigyan mo ako ng sandali.",
+                                        "Ginagamit ang mga kagamitan ayon sa hiling.",
+                                        "Ginagamit ko na ngayon.",
+                                        "Nakahinto para gamitin ito.",
+                                        "Ginagamit na. Halos tapos na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.consume",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'm using that now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.consume.active.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'm using that now.",
+                            "Currently using the item.",
+                            "Applying it right now.",
+                            "In the middle of consuming that.",
+                            "Working through this item.",
+                            "Taking this now. Give me a second.",
+                            "Using the supplies as requested.",
+                            "Consuming it right now.",
+                            "Holding still to use this.",
+                            "Using it. Almost done.",
+                        },
+                        ["TL"] = {
+                            "Ginagamit ko na iyon ngayon.",
+                            "Kasalukuyang ginagamit ang gamit.",
+                            "Inilalapat na ngayon.",
+                            "Kasalukuyang ginagamit iyan.",
+                            "Ginagamit ang bagay na ito.",
+                            "Ginagamit ko na ito. Bigyan mo ako ng sandali.",
+                            "Ginagamit ang mga kagamitan ayon sa hiling.",
+                            "Ginagamit ko na ngayon.",
+                            "Nakahinto para gamitin ito.",
+                            "Ginagamit na. Halos tapos na.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.consume.active",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "active",
-            ["sourceId"] = "semantic.task.consume.active",
+            ["sourceId"] = "task.consume.active",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_consume_active.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.consume",
+        ["namespace"] = "task.consume",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -810,127 +1256,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.consume.active",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm using that now.",
-                            },
-                            ["TL"] = {
-                                "Ginagamit ko na iyon ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Currently using the item.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang ginagamit ang gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Applying it right now.",
-                            },
-                            ["TL"] = {
-                                "Inilalapat na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "In the middle of consuming that.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang ginagamit iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Working through this item.",
-                            },
-                            ["TL"] = {
-                                "Ginagamit ang bagay na ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taking this now. Give me a second.",
-                            },
-                            ["TL"] = {
-                                "Ginagamit ko na ito. Bigyan mo ako ng sandali.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Using the supplies as requested.",
-                            },
-                            ["TL"] = {
-                                "Ginagamit ang mga kagamitan ayon sa hiling.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Consuming it right now.",
-                            },
-                            ["TL"] = {
-                                "Ginagamit ko na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding still to use this.",
-                            },
-                            ["TL"] = {
-                                "Nakahinto para gamitin ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Using it. Almost done.",
-                            },
-                            ["TL"] = {
-                                "Ginagamit na. Halos tapos na.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'm using that now.",
+                                        "Currently using the item.",
+                                        "Applying it right now.",
+                                        "In the middle of consuming that.",
+                                        "Working through this item.",
+                                        "Taking this now. Give me a second.",
+                                        "Using the supplies as requested.",
+                                        "Consuming it right now.",
+                                        "Holding still to use this.",
+                                        "Using it. Almost done.",
+                                    },
+                                    ["TL"] = {
+                                        "Ginagamit ko na iyon ngayon.",
+                                        "Kasalukuyang ginagamit ang gamit.",
+                                        "Inilalapat na ngayon.",
+                                        "Kasalukuyang ginagamit iyan.",
+                                        "Ginagamit ang bagay na ito.",
+                                        "Ginagamit ko na ito. Bigyan mo ako ng sandali.",
+                                        "Ginagamit ang mga kagamitan ayon sa hiling.",
+                                        "Ginagamit ko na ngayon.",
+                                        "Nakahinto para gamitin ito.",
+                                        "Ginagamit na. Halos tapos na.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.consume.active",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'm using that now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.consume.active.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -940,20 +1337,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'm using that now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.consume.active.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'm using that now.",
+                        "Currently using the item.",
+                        "Applying it right now.",
+                        "In the middle of consuming that.",
+                        "Working through this item.",
+                        "Taking this now. Give me a second.",
+                        "Using the supplies as requested.",
+                        "Consuming it right now.",
+                        "Holding still to use this.",
+                        "Using it. Almost done.",
+                    },
+                    ["TL"] = {
+                        "Ginagamit ko na iyon ngayon.",
+                        "Kasalukuyang ginagamit ang gamit.",
+                        "Inilalapat na ngayon.",
+                        "Kasalukuyang ginagamit iyan.",
+                        "Ginagamit ang bagay na ito.",
+                        "Ginagamit ko na ito. Bigyan mo ako ng sandali.",
+                        "Ginagamit ang mga kagamitan ayon sa hiling.",
+                        "Ginagamit ko na ngayon.",
+                        "Nakahinto para gamitin ito.",
+                        "Ginagamit na. Halos tapos na.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.consume.admitted",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.consume.admitted",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll use that.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.consume.admitted.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll use that.",
+                                        "Understood. I will consume that item.",
+                                        "All right, I'll take that.",
+                                        "Good idea. I'll use it.",
+                                        "Got it. Taking that now.",
+                                        "I'll go ahead and apply that.",
+                                        "Understood. That will help.",
+                                        "Right. Using that item.",
+                                        "I'll use what you specified.",
+                                        "Sounds good. Consuming it.",
+                                    },
+                                    ["TL"] = {
+                                        "Gagamitin ko iyon.",
+                                        "Naintindihan. Gagamitin ko ang bagay na iyon.",
+                                        "Sige, gagamitin ko iyon.",
+                                        "Magandang ideya. Gagamitin ko.",
+                                        "Nakuha ko. Gagamitin na ngayon.",
+                                        "Sige, ilalapat ko iyan.",
+                                        "Naiintindihan ko. Makatutulong iyan.",
+                                        "Sige. Gagamitin ang gamit na 'yan.",
+                                        "Gagamitin ko ang tinukoy mo.",
+                                        "Maganda 'yan. Gagamitin na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.consume",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll use that.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.consume.admitted.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll use that.",
+                            "Understood. I will consume that item.",
+                            "All right, I'll take that.",
+                            "Good idea. I'll use it.",
+                            "Got it. Taking that now.",
+                            "I'll go ahead and apply that.",
+                            "Understood. That will help.",
+                            "Right. Using that item.",
+                            "I'll use what you specified.",
+                            "Sounds good. Consuming it.",
+                        },
+                        ["TL"] = {
+                            "Gagamitin ko iyon.",
+                            "Naintindihan. Gagamitin ko ang bagay na iyon.",
+                            "Sige, gagamitin ko iyon.",
+                            "Magandang ideya. Gagamitin ko.",
+                            "Nakuha ko. Gagamitin na ngayon.",
+                            "Sige, ilalapat ko iyan.",
+                            "Naiintindihan ko. Makatutulong iyan.",
+                            "Sige. Gagamitin ang gamit na 'yan.",
+                            "Gagamitin ko ang tinukoy mo.",
+                            "Maganda 'yan. Gagamitin na.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.consume.admitted",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "admitted",
-            ["sourceId"] = "semantic.task.consume.admitted",
+            ["sourceId"] = "task.consume.admitted",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_consume_admitted.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.consume",
+        ["namespace"] = "task.consume",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -967,127 +1485,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.consume.admitted",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll use that.",
-                            },
-                            ["TL"] = {
-                                "Gagamitin ko iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. I will consume that item.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Gagamitin ko ang bagay na iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right, I'll take that.",
-                            },
-                            ["TL"] = {
-                                "Sige, gagamitin ko iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good idea. I'll use it.",
-                            },
-                            ["TL"] = {
-                                "Magandang ideya. Gagamitin ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. Taking that now.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko. Gagamitin na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll go ahead and apply that.",
-                            },
-                            ["TL"] = {
-                                "Sige, ilalapat ko iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. That will help.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Makatutulong iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. Using that item.",
-                            },
-                            ["TL"] = {
-                                "Sige. Gagamitin ang gamit na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll use what you specified.",
-                            },
-                            ["TL"] = {
-                                "Gagamitin ko ang tinukoy mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds good. Consuming it.",
-                            },
-                            ["TL"] = {
-                                "Maganda 'yan. Gagamitin na.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll use that.",
+                                        "Understood. I will consume that item.",
+                                        "All right, I'll take that.",
+                                        "Good idea. I'll use it.",
+                                        "Got it. Taking that now.",
+                                        "I'll go ahead and apply that.",
+                                        "Understood. That will help.",
+                                        "Right. Using that item.",
+                                        "I'll use what you specified.",
+                                        "Sounds good. Consuming it.",
+                                    },
+                                    ["TL"] = {
+                                        "Gagamitin ko iyon.",
+                                        "Naintindihan. Gagamitin ko ang bagay na iyon.",
+                                        "Sige, gagamitin ko iyon.",
+                                        "Magandang ideya. Gagamitin ko.",
+                                        "Nakuha ko. Gagamitin na ngayon.",
+                                        "Sige, ilalapat ko iyan.",
+                                        "Naiintindihan ko. Makatutulong iyan.",
+                                        "Sige. Gagamitin ang gamit na 'yan.",
+                                        "Gagamitin ko ang tinukoy mo.",
+                                        "Maganda 'yan. Gagamitin na.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.consume.admitted",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll use that.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.consume.admitted.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1097,20 +1566,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll use that.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.consume.admitted.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll use that.",
+                        "Understood. I will consume that item.",
+                        "All right, I'll take that.",
+                        "Good idea. I'll use it.",
+                        "Got it. Taking that now.",
+                        "I'll go ahead and apply that.",
+                        "Understood. That will help.",
+                        "Right. Using that item.",
+                        "I'll use what you specified.",
+                        "Sounds good. Consuming it.",
+                    },
+                    ["TL"] = {
+                        "Gagamitin ko iyon.",
+                        "Naintindihan. Gagamitin ko ang bagay na iyon.",
+                        "Sige, gagamitin ko iyon.",
+                        "Magandang ideya. Gagamitin ko.",
+                        "Nakuha ko. Gagamitin na ngayon.",
+                        "Sige, ilalapat ko iyan.",
+                        "Naiintindihan ko. Makatutulong iyan.",
+                        "Sige. Gagamitin ang gamit na 'yan.",
+                        "Gagamitin ko ang tinukoy mo.",
+                        "Maganda 'yan. Gagamitin na.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.consume.completed",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.consume.completed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That's done.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.consume.completed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That's done.",
+                                        "Finished using that.",
+                                        "All used up. Feeling better.",
+                                        "Done. That helped out.",
+                                        "Finished consuming the item.",
+                                        "That's taken care of.",
+                                        "All done with that supply.",
+                                        "Consumed. Ready to move on.",
+                                        "Finished. Much needed.",
+                                        "Done. Put to good use.",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos na iyon.",
+                                        "Tapos nang gamitin iyon.",
+                                        "Naubos na. Mas maayos na ang pakiramdam.",
+                                        "Tapos na. Nakatulong iyon.",
+                                        "Natapos nang gamitin ang bagay.",
+                                        "Naasikaso na iyon.",
+                                        "Tapos na sa gamit na 'yon.",
+                                        "Nagamit na. Handa nang magpatuloy.",
+                                        "Tapos na. Kailangan ko talaga 'yon.",
+                                        "Tapos na. Nagamit nang maayos.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.consume",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That's done.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.consume.completed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That's done.",
+                            "Finished using that.",
+                            "All used up. Feeling better.",
+                            "Done. That helped out.",
+                            "Finished consuming the item.",
+                            "That's taken care of.",
+                            "All done with that supply.",
+                            "Consumed. Ready to move on.",
+                            "Finished. Much needed.",
+                            "Done. Put to good use.",
+                        },
+                        ["TL"] = {
+                            "Tapos na iyon.",
+                            "Tapos nang gamitin iyon.",
+                            "Naubos na. Mas maayos na ang pakiramdam.",
+                            "Tapos na. Nakatulong iyon.",
+                            "Natapos nang gamitin ang bagay.",
+                            "Naasikaso na iyon.",
+                            "Tapos na sa gamit na 'yon.",
+                            "Nagamit na. Handa nang magpatuloy.",
+                            "Tapos na. Kailangan ko talaga 'yon.",
+                            "Tapos na. Nagamit nang maayos.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.consume.completed",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "completed",
-            ["sourceId"] = "semantic.task.consume.completed",
+            ["sourceId"] = "task.consume.completed",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_consume_completed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.consume",
+        ["namespace"] = "task.consume",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1124,127 +1714,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.consume.completed",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's done.",
-                            },
-                            ["TL"] = {
-                                "Tapos na iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished using that.",
-                            },
-                            ["TL"] = {
-                                "Tapos nang gamitin iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All used up. Feeling better.",
-                            },
-                            ["TL"] = {
-                                "Naubos na. Mas maayos na ang pakiramdam.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. That helped out.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Nakatulong iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished consuming the item.",
-                            },
-                            ["TL"] = {
-                                "Natapos nang gamitin ang bagay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's taken care of.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso na iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All done with that supply.",
-                            },
-                            ["TL"] = {
-                                "Tapos na sa gamit na 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Consumed. Ready to move on.",
-                            },
-                            ["TL"] = {
-                                "Nagamit na. Handa nang magpatuloy.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished. Much needed.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Kailangan ko talaga 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. Put to good use.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Nagamit nang maayos.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That's done.",
+                                        "Finished using that.",
+                                        "All used up. Feeling better.",
+                                        "Done. That helped out.",
+                                        "Finished consuming the item.",
+                                        "That's taken care of.",
+                                        "All done with that supply.",
+                                        "Consumed. Ready to move on.",
+                                        "Finished. Much needed.",
+                                        "Done. Put to good use.",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos na iyon.",
+                                        "Tapos nang gamitin iyon.",
+                                        "Naubos na. Mas maayos na ang pakiramdam.",
+                                        "Tapos na. Nakatulong iyon.",
+                                        "Natapos nang gamitin ang bagay.",
+                                        "Naasikaso na iyon.",
+                                        "Tapos na sa gamit na 'yon.",
+                                        "Nagamit na. Handa nang magpatuloy.",
+                                        "Tapos na. Kailangan ko talaga 'yon.",
+                                        "Tapos na. Nagamit nang maayos.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.consume.completed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That's done.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.consume.completed.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1254,20 +1795,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That's done.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.consume.completed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That's done.",
+                        "Finished using that.",
+                        "All used up. Feeling better.",
+                        "Done. That helped out.",
+                        "Finished consuming the item.",
+                        "That's taken care of.",
+                        "All done with that supply.",
+                        "Consumed. Ready to move on.",
+                        "Finished. Much needed.",
+                        "Done. Put to good use.",
+                    },
+                    ["TL"] = {
+                        "Tapos na iyon.",
+                        "Tapos nang gamitin iyon.",
+                        "Naubos na. Mas maayos na ang pakiramdam.",
+                        "Tapos na. Nakatulong iyon.",
+                        "Natapos nang gamitin ang bagay.",
+                        "Naasikaso na iyon.",
+                        "Tapos na sa gamit na 'yon.",
+                        "Nagamit na. Handa nang magpatuloy.",
+                        "Tapos na. Kailangan ko talaga 'yon.",
+                        "Tapos na. Nagamit nang maayos.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.consume.failed",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.consume.failed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I couldn't use that.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.consume.failed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I couldn't use that.",
+                                        "Failed to consume that item.",
+                                        "Something interrupted me while trying to use that.",
+                                        "Couldn't finish using it.",
+                                        "Unable to apply that right now.",
+                                        "Using that failed. Something went wrong.",
+                                        "I lost hold of it or couldn't use it.",
+                                        "Couldn't consume it. Area wasn't secure.",
+                                        "Action interrupted. Item not consumed.",
+                                        "Failed to take that.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko nagamit iyon.",
+                                        "Bigo sa paggamit ng bagay na iyon.",
+                                        "May umabala sa akin habang sinusubukang gamitin iyon.",
+                                        "Di natapos gamitin.",
+                                        "Di mailapat iyan sa ngayon.",
+                                        "Pumalpak ang paggamit. May nangyaring mali.",
+                                        "Nabitawan ko o di nagamit.",
+                                        "Di nagamit. Di ligtas ang paligid.",
+                                        "Naabala ang kilos. Di nagamit ang bagay.",
+                                        "Bigo sa paggamit niyan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.consume",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I couldn't use that.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.consume.failed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I couldn't use that.",
+                            "Failed to consume that item.",
+                            "Something interrupted me while trying to use that.",
+                            "Couldn't finish using it.",
+                            "Unable to apply that right now.",
+                            "Using that failed. Something went wrong.",
+                            "I lost hold of it or couldn't use it.",
+                            "Couldn't consume it. Area wasn't secure.",
+                            "Action interrupted. Item not consumed.",
+                            "Failed to take that.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko nagamit iyon.",
+                            "Bigo sa paggamit ng bagay na iyon.",
+                            "May umabala sa akin habang sinusubukang gamitin iyon.",
+                            "Di natapos gamitin.",
+                            "Di mailapat iyan sa ngayon.",
+                            "Pumalpak ang paggamit. May nangyaring mali.",
+                            "Nabitawan ko o di nagamit.",
+                            "Di nagamit. Di ligtas ang paligid.",
+                            "Naabala ang kilos. Di nagamit ang bagay.",
+                            "Bigo sa paggamit niyan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.consume.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "failed",
-            ["sourceId"] = "semantic.task.consume.failed",
+            ["sourceId"] = "task.consume.failed",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_consume_failed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.consume",
+        ["namespace"] = "task.consume",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1281,127 +1943,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.consume.failed",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't use that.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko nagamit iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to consume that item.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa paggamit ng bagay na iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Something interrupted me while trying to use that.",
-                            },
-                            ["TL"] = {
-                                "May umabala sa akin habang sinusubukang gamitin iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't finish using it.",
-                            },
-                            ["TL"] = {
-                                "Di natapos gamitin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to apply that right now.",
-                            },
-                            ["TL"] = {
-                                "Di mailapat iyan sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Using that failed. Something went wrong.",
-                            },
-                            ["TL"] = {
-                                "Pumalpak ang paggamit. May nangyaring mali.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I lost hold of it or couldn't use it.",
-                            },
-                            ["TL"] = {
-                                "Nabitawan ko o di nagamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't consume it. Area wasn't secure.",
-                            },
-                            ["TL"] = {
-                                "Di nagamit. Di ligtas ang paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Action interrupted. Item not consumed.",
-                            },
-                            ["TL"] = {
-                                "Naabala ang kilos. Di nagamit ang bagay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to take that.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa paggamit niyan.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I couldn't use that.",
+                                        "Failed to consume that item.",
+                                        "Something interrupted me while trying to use that.",
+                                        "Couldn't finish using it.",
+                                        "Unable to apply that right now.",
+                                        "Using that failed. Something went wrong.",
+                                        "I lost hold of it or couldn't use it.",
+                                        "Couldn't consume it. Area wasn't secure.",
+                                        "Action interrupted. Item not consumed.",
+                                        "Failed to take that.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko nagamit iyon.",
+                                        "Bigo sa paggamit ng bagay na iyon.",
+                                        "May umabala sa akin habang sinusubukang gamitin iyon.",
+                                        "Di natapos gamitin.",
+                                        "Di mailapat iyan sa ngayon.",
+                                        "Pumalpak ang paggamit. May nangyaring mali.",
+                                        "Nabitawan ko o di nagamit.",
+                                        "Di nagamit. Di ligtas ang paligid.",
+                                        "Naabala ang kilos. Di nagamit ang bagay.",
+                                        "Bigo sa paggamit niyan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.consume.failed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I couldn't use that.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.consume.failed.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1411,20 +2024,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I couldn't use that.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.consume.failed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I couldn't use that.",
+                        "Failed to consume that item.",
+                        "Something interrupted me while trying to use that.",
+                        "Couldn't finish using it.",
+                        "Unable to apply that right now.",
+                        "Using that failed. Something went wrong.",
+                        "I lost hold of it or couldn't use it.",
+                        "Couldn't consume it. Area wasn't secure.",
+                        "Action interrupted. Item not consumed.",
+                        "Failed to take that.",
+                    },
+                    ["TL"] = {
+                        "Hindi ko nagamit iyon.",
+                        "Bigo sa paggamit ng bagay na iyon.",
+                        "May umabala sa akin habang sinusubukang gamitin iyon.",
+                        "Di natapos gamitin.",
+                        "Di mailapat iyan sa ngayon.",
+                        "Pumalpak ang paggamit. May nangyaring mali.",
+                        "Nabitawan ko o di nagamit.",
+                        "Di nagamit. Di ligtas ang paligid.",
+                        "Naabala ang kilos. Di nagamit ang bagay.",
+                        "Bigo sa paggamit niyan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.consume.rejected",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.consume.rejected",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can't use that right now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.consume.rejected.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can't use that right now.",
+                                        "I don't need to use that at the moment.",
+                                        "That's not suitable for me right now.",
+                                        "Unable to consume that. Not needed.",
+                                        "I can't use that under these conditions.",
+                                        "Save it for later. I don't need it now.",
+                                        "Refusing to consume that. Not appropriate.",
+                                        "I don't have a use for that right now.",
+                                        "Can't use that. Not the right time.",
+                                        "Consume order rejected.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko magamit iyon ngayon.",
+                                        "Di ko kailangang gamitin iyan sa sandaling ito.",
+                                        "Di angkop sa akin 'yan ngayon.",
+                                        "Di magagamit 'yan. Di kailangan.",
+                                        "Di ko magagamit 'yan sa ganitong kalagayan.",
+                                        "Itabi mo muna. Di ko kailangan ngayon.",
+                                        "Tumatangging gamitin 'yan. Di nararapat.",
+                                        "Wala akong paggagamitan niyan ngayon.",
+                                        "Di magagamit 'yan. Maling oras.",
+                                        "Tinatanggihan ang utos na gamitin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.consume",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can't use that right now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.consume.rejected.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can't use that right now.",
+                            "I don't need to use that at the moment.",
+                            "That's not suitable for me right now.",
+                            "Unable to consume that. Not needed.",
+                            "I can't use that under these conditions.",
+                            "Save it for later. I don't need it now.",
+                            "Refusing to consume that. Not appropriate.",
+                            "I don't have a use for that right now.",
+                            "Can't use that. Not the right time.",
+                            "Consume order rejected.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko magamit iyon ngayon.",
+                            "Di ko kailangang gamitin iyan sa sandaling ito.",
+                            "Di angkop sa akin 'yan ngayon.",
+                            "Di magagamit 'yan. Di kailangan.",
+                            "Di ko magagamit 'yan sa ganitong kalagayan.",
+                            "Itabi mo muna. Di ko kailangan ngayon.",
+                            "Tumatangging gamitin 'yan. Di nararapat.",
+                            "Wala akong paggagamitan niyan ngayon.",
+                            "Di magagamit 'yan. Maling oras.",
+                            "Tinatanggihan ang utos na gamitin.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.consume.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "rejected",
-            ["sourceId"] = "semantic.task.consume.rejected",
+            ["sourceId"] = "task.consume.rejected",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_consume_rejected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.consume",
+        ["namespace"] = "task.consume",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1438,127 +2172,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.consume.rejected",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't use that right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko magamit iyon ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't need to use that at the moment.",
-                            },
-                            ["TL"] = {
-                                "Di ko kailangang gamitin iyan sa sandaling ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's not suitable for me right now.",
-                            },
-                            ["TL"] = {
-                                "Di angkop sa akin 'yan ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to consume that. Not needed.",
-                            },
-                            ["TL"] = {
-                                "Di magagamit 'yan. Di kailangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't use that under these conditions.",
-                            },
-                            ["TL"] = {
-                                "Di ko magagamit 'yan sa ganitong kalagayan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Save it for later. I don't need it now.",
-                            },
-                            ["TL"] = {
-                                "Itabi mo muna. Di ko kailangan ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refusing to consume that. Not appropriate.",
-                            },
-                            ["TL"] = {
-                                "Tumatangging gamitin 'yan. Di nararapat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't have a use for that right now.",
-                            },
-                            ["TL"] = {
-                                "Wala akong paggagamitan niyan ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't use that. Not the right time.",
-                            },
-                            ["TL"] = {
-                                "Di magagamit 'yan. Maling oras.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Consume order rejected.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggihan ang utos na gamitin.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can't use that right now.",
+                                        "I don't need to use that at the moment.",
+                                        "That's not suitable for me right now.",
+                                        "Unable to consume that. Not needed.",
+                                        "I can't use that under these conditions.",
+                                        "Save it for later. I don't need it now.",
+                                        "Refusing to consume that. Not appropriate.",
+                                        "I don't have a use for that right now.",
+                                        "Can't use that. Not the right time.",
+                                        "Consume order rejected.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko magamit iyon ngayon.",
+                                        "Di ko kailangang gamitin iyan sa sandaling ito.",
+                                        "Di angkop sa akin 'yan ngayon.",
+                                        "Di magagamit 'yan. Di kailangan.",
+                                        "Di ko magagamit 'yan sa ganitong kalagayan.",
+                                        "Itabi mo muna. Di ko kailangan ngayon.",
+                                        "Tumatangging gamitin 'yan. Di nararapat.",
+                                        "Wala akong paggagamitan niyan ngayon.",
+                                        "Di magagamit 'yan. Maling oras.",
+                                        "Tinatanggihan ang utos na gamitin.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.consume.rejected",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can't use that right now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.consume.rejected.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1568,20 +2253,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can't use that right now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.consume.rejected.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can't use that right now.",
+                        "I don't need to use that at the moment.",
+                        "That's not suitable for me right now.",
+                        "Unable to consume that. Not needed.",
+                        "I can't use that under these conditions.",
+                        "Save it for later. I don't need it now.",
+                        "Refusing to consume that. Not appropriate.",
+                        "I don't have a use for that right now.",
+                        "Can't use that. Not the right time.",
+                        "Consume order rejected.",
+                    },
+                    ["TL"] = {
+                        "Hindi ko magamit iyon ngayon.",
+                        "Di ko kailangang gamitin iyan sa sandaling ito.",
+                        "Di angkop sa akin 'yan ngayon.",
+                        "Di magagamit 'yan. Di kailangan.",
+                        "Di ko magagamit 'yan sa ganitong kalagayan.",
+                        "Itabi mo muna. Di ko kailangan ngayon.",
+                        "Tumatangging gamitin 'yan. Di nararapat.",
+                        "Wala akong paggagamitan niyan ngayon.",
+                        "Di magagamit 'yan. Maling oras.",
+                        "Tinatanggihan ang utos na gamitin.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.drink.active",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.drink.active",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Taking a drink now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.drink.active.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Taking a drink now.",
+                                        "Drinking some water right now.",
+                                        "Quenching my thirst. Give me a second.",
+                                        "Currently having a drink.",
+                                        "Taking some fluids now.",
+                                        "Drinking. Needed this badly.",
+                                        "Getting some water in me.",
+                                        "Taking a quick drink.",
+                                        "Drinking now. Won't take long.",
+                                        "Having a drink as ordered.",
+                                    },
+                                    ["TL"] = {
+                                        "Umiinom na ako ngayon.",
+                                        "Umiinom ng kaunting tubig ngayon.",
+                                        "Pinapawi ang uhaw. Sandali lang.",
+                                        "Kasalukuyang umiinom.",
+                                        "Umiinom na ngayon.",
+                                        "Umiinom. Kailangang-kailangan ko ito.",
+                                        "Nagpapasok ng tubig sa katawan.",
+                                        "Umiinom nang mabilisan.",
+                                        "Umiinom na. Di magtatagal.",
+                                        "Umiinom ayon sa utos.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.drink",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Taking a drink now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.drink.active.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Taking a drink now.",
+                            "Drinking some water right now.",
+                            "Quenching my thirst. Give me a second.",
+                            "Currently having a drink.",
+                            "Taking some fluids now.",
+                            "Drinking. Needed this badly.",
+                            "Getting some water in me.",
+                            "Taking a quick drink.",
+                            "Drinking now. Won't take long.",
+                            "Having a drink as ordered.",
+                        },
+                        ["TL"] = {
+                            "Umiinom na ako ngayon.",
+                            "Umiinom ng kaunting tubig ngayon.",
+                            "Pinapawi ang uhaw. Sandali lang.",
+                            "Kasalukuyang umiinom.",
+                            "Umiinom na ngayon.",
+                            "Umiinom. Kailangang-kailangan ko ito.",
+                            "Nagpapasok ng tubig sa katawan.",
+                            "Umiinom nang mabilisan.",
+                            "Umiinom na. Di magtatagal.",
+                            "Umiinom ayon sa utos.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.drink.active",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "active",
-            ["sourceId"] = "semantic.task.drink.active",
+            ["sourceId"] = "task.drink.active",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_drink_active.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.drink",
+        ["namespace"] = "task.drink",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1595,127 +2401,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.drink.active",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taking a drink now.",
-                            },
-                            ["TL"] = {
-                                "Umiinom na ako ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Drinking some water right now.",
-                            },
-                            ["TL"] = {
-                                "Umiinom ng kaunting tubig ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Quenching my thirst. Give me a second.",
-                            },
-                            ["TL"] = {
-                                "Pinapawi ang uhaw. Sandali lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Currently having a drink.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang umiinom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taking some fluids now.",
-                            },
-                            ["TL"] = {
-                                "Umiinom na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Drinking. Needed this badly.",
-                            },
-                            ["TL"] = {
-                                "Umiinom. Kailangang-kailangan ko ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Getting some water in me.",
-                            },
-                            ["TL"] = {
-                                "Nagpapasok ng tubig sa katawan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taking a quick drink.",
-                            },
-                            ["TL"] = {
-                                "Umiinom nang mabilisan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Drinking now. Won't take long.",
-                            },
-                            ["TL"] = {
-                                "Umiinom na. Di magtatagal.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Having a drink as ordered.",
-                            },
-                            ["TL"] = {
-                                "Umiinom ayon sa utos.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Taking a drink now.",
+                                        "Drinking some water right now.",
+                                        "Quenching my thirst. Give me a second.",
+                                        "Currently having a drink.",
+                                        "Taking some fluids now.",
+                                        "Drinking. Needed this badly.",
+                                        "Getting some water in me.",
+                                        "Taking a quick drink.",
+                                        "Drinking now. Won't take long.",
+                                        "Having a drink as ordered.",
+                                    },
+                                    ["TL"] = {
+                                        "Umiinom na ako ngayon.",
+                                        "Umiinom ng kaunting tubig ngayon.",
+                                        "Pinapawi ang uhaw. Sandali lang.",
+                                        "Kasalukuyang umiinom.",
+                                        "Umiinom na ngayon.",
+                                        "Umiinom. Kailangang-kailangan ko ito.",
+                                        "Nagpapasok ng tubig sa katawan.",
+                                        "Umiinom nang mabilisan.",
+                                        "Umiinom na. Di magtatagal.",
+                                        "Umiinom ayon sa utos.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.drink.active",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Taking a drink now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.drink.active.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1725,20 +2482,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Taking a drink now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.drink.active.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Taking a drink now.",
+                        "Drinking some water right now.",
+                        "Quenching my thirst. Give me a second.",
+                        "Currently having a drink.",
+                        "Taking some fluids now.",
+                        "Drinking. Needed this badly.",
+                        "Getting some water in me.",
+                        "Taking a quick drink.",
+                        "Drinking now. Won't take long.",
+                        "Having a drink as ordered.",
+                    },
+                    ["TL"] = {
+                        "Umiinom na ako ngayon.",
+                        "Umiinom ng kaunting tubig ngayon.",
+                        "Pinapawi ang uhaw. Sandali lang.",
+                        "Kasalukuyang umiinom.",
+                        "Umiinom na ngayon.",
+                        "Umiinom. Kailangang-kailangan ko ito.",
+                        "Nagpapasok ng tubig sa katawan.",
+                        "Umiinom nang mabilisan.",
+                        "Umiinom na. Di magtatagal.",
+                        "Umiinom ayon sa utos.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.drink.admitted",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.drink.admitted",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll have a drink.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.drink.admitted.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll have a drink.",
+                                        "Understood. Getting some water.",
+                                        "I could use some water. Drinking now.",
+                                        "All right, I'll hydrate.",
+                                        "Good call. I was getting thirsty.",
+                                        "I'll take a drink from my supply.",
+                                        "Understood. Hydrating immediately.",
+                                        "Right. Taking a sip.",
+                                        "I'll drink that now.",
+                                        "Sounds good. Drinking.",
+                                    },
+                                    ["TL"] = {
+                                        "Iinom ako.",
+                                        "Naintindihan. Kukuha ng tubig.",
+                                        "Kailangan ko nga ng tubig. Iinom na.",
+                                        "Sige, magpapatubig ako.",
+                                        "Magandang paalala. Nauuhaw na nga ako.",
+                                        "Iinom ako mula sa baon ko.",
+                                        "Naiintindihan ko. Iinom agad.",
+                                        "Sige. Iinom nang kaunti.",
+                                        "Iinumin ko na iyan ngayon.",
+                                        "Maganda 'yan. Iinom na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.drink",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll have a drink.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.drink.admitted.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll have a drink.",
+                            "Understood. Getting some water.",
+                            "I could use some water. Drinking now.",
+                            "All right, I'll hydrate.",
+                            "Good call. I was getting thirsty.",
+                            "I'll take a drink from my supply.",
+                            "Understood. Hydrating immediately.",
+                            "Right. Taking a sip.",
+                            "I'll drink that now.",
+                            "Sounds good. Drinking.",
+                        },
+                        ["TL"] = {
+                            "Iinom ako.",
+                            "Naintindihan. Kukuha ng tubig.",
+                            "Kailangan ko nga ng tubig. Iinom na.",
+                            "Sige, magpapatubig ako.",
+                            "Magandang paalala. Nauuhaw na nga ako.",
+                            "Iinom ako mula sa baon ko.",
+                            "Naiintindihan ko. Iinom agad.",
+                            "Sige. Iinom nang kaunti.",
+                            "Iinumin ko na iyan ngayon.",
+                            "Maganda 'yan. Iinom na.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.drink.admitted",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "admitted",
-            ["sourceId"] = "semantic.task.drink.admitted",
+            ["sourceId"] = "task.drink.admitted",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_drink_admitted.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.drink",
+        ["namespace"] = "task.drink",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1752,127 +2630,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.drink.admitted",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll have a drink.",
-                            },
-                            ["TL"] = {
-                                "Iinom ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Getting some water.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Kukuha ng tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I could use some water. Drinking now.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko nga ng tubig. Iinom na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right, I'll hydrate.",
-                            },
-                            ["TL"] = {
-                                "Sige, magpapatubig ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good call. I was getting thirsty.",
-                            },
-                            ["TL"] = {
-                                "Magandang paalala. Nauuhaw na nga ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll take a drink from my supply.",
-                            },
-                            ["TL"] = {
-                                "Iinom ako mula sa baon ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Hydrating immediately.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Iinom agad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. Taking a sip.",
-                            },
-                            ["TL"] = {
-                                "Sige. Iinom nang kaunti.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll drink that now.",
-                            },
-                            ["TL"] = {
-                                "Iinumin ko na iyan ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds good. Drinking.",
-                            },
-                            ["TL"] = {
-                                "Maganda 'yan. Iinom na.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll have a drink.",
+                                        "Understood. Getting some water.",
+                                        "I could use some water. Drinking now.",
+                                        "All right, I'll hydrate.",
+                                        "Good call. I was getting thirsty.",
+                                        "I'll take a drink from my supply.",
+                                        "Understood. Hydrating immediately.",
+                                        "Right. Taking a sip.",
+                                        "I'll drink that now.",
+                                        "Sounds good. Drinking.",
+                                    },
+                                    ["TL"] = {
+                                        "Iinom ako.",
+                                        "Naintindihan. Kukuha ng tubig.",
+                                        "Kailangan ko nga ng tubig. Iinom na.",
+                                        "Sige, magpapatubig ako.",
+                                        "Magandang paalala. Nauuhaw na nga ako.",
+                                        "Iinom ako mula sa baon ko.",
+                                        "Naiintindihan ko. Iinom agad.",
+                                        "Sige. Iinom nang kaunti.",
+                                        "Iinumin ko na iyan ngayon.",
+                                        "Maganda 'yan. Iinom na.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.drink.admitted",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll have a drink.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.drink.admitted.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1882,20 +2711,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll have a drink.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.drink.admitted.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll have a drink.",
+                        "Understood. Getting some water.",
+                        "I could use some water. Drinking now.",
+                        "All right, I'll hydrate.",
+                        "Good call. I was getting thirsty.",
+                        "I'll take a drink from my supply.",
+                        "Understood. Hydrating immediately.",
+                        "Right. Taking a sip.",
+                        "I'll drink that now.",
+                        "Sounds good. Drinking.",
+                    },
+                    ["TL"] = {
+                        "Iinom ako.",
+                        "Naintindihan. Kukuha ng tubig.",
+                        "Kailangan ko nga ng tubig. Iinom na.",
+                        "Sige, magpapatubig ako.",
+                        "Magandang paalala. Nauuhaw na nga ako.",
+                        "Iinom ako mula sa baon ko.",
+                        "Naiintindihan ko. Iinom agad.",
+                        "Sige. Iinom nang kaunti.",
+                        "Iinumin ko na iyan ngayon.",
+                        "Maganda 'yan. Iinom na.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.drink.completed",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.drink.completed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Much better. Thirst is gone.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.drink.completed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Much better. Thirst is gone.",
+                                        "Finished drinking. Feeling refreshed.",
+                                        "That hit the spot. Done drinking.",
+                                        "Hydrated and ready to move.",
+                                        "Finished that drink.",
+                                        "Done. Throat isn't parched anymore.",
+                                        "All drank. Ready for action.",
+                                        "Finished having a drink.",
+                                        "Done drinking. Let's keep going.",
+                                        "Hydration complete.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas maayos na. Wala na ang uhaw.",
+                                        "Tapos nang uminom. Maginhawa na ang pakiramdam.",
+                                        "Eksakto 'yon. Tapos nang uminom.",
+                                        "May sapat nang tubig at handang kumilos.",
+                                        "Naubos na ang inumin.",
+                                        "Tapos na. Di na tuyo ang lalamunan ko.",
+                                        "Nainom na lahat. Handa na sa aksyon.",
+                                        "Natapos nang uminom.",
+                                        "Tapos nang uminom. Tuloy na tayo.",
+                                        "Kumpleto na ang pag-inom.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.drink",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Much better. Thirst is gone.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.drink.completed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Much better. Thirst is gone.",
+                            "Finished drinking. Feeling refreshed.",
+                            "That hit the spot. Done drinking.",
+                            "Hydrated and ready to move.",
+                            "Finished that drink.",
+                            "Done. Throat isn't parched anymore.",
+                            "All drank. Ready for action.",
+                            "Finished having a drink.",
+                            "Done drinking. Let's keep going.",
+                            "Hydration complete.",
+                        },
+                        ["TL"] = {
+                            "Mas maayos na. Wala na ang uhaw.",
+                            "Tapos nang uminom. Maginhawa na ang pakiramdam.",
+                            "Eksakto 'yon. Tapos nang uminom.",
+                            "May sapat nang tubig at handang kumilos.",
+                            "Naubos na ang inumin.",
+                            "Tapos na. Di na tuyo ang lalamunan ko.",
+                            "Nainom na lahat. Handa na sa aksyon.",
+                            "Natapos nang uminom.",
+                            "Tapos nang uminom. Tuloy na tayo.",
+                            "Kumpleto na ang pag-inom.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.drink.completed",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "completed",
-            ["sourceId"] = "semantic.task.drink.completed",
+            ["sourceId"] = "task.drink.completed",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_drink_completed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.drink",
+        ["namespace"] = "task.drink",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1909,127 +2859,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.drink.completed",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Much better. Thirst is gone.",
-                            },
-                            ["TL"] = {
-                                "Mas maayos na. Wala na ang uhaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished drinking. Feeling refreshed.",
-                            },
-                            ["TL"] = {
-                                "Tapos nang uminom. Maginhawa na ang pakiramdam.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That hit the spot. Done drinking.",
-                            },
-                            ["TL"] = {
-                                "Eksakto 'yon. Tapos nang uminom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hydrated and ready to move.",
-                            },
-                            ["TL"] = {
-                                "May sapat nang tubig at handang kumilos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished that drink.",
-                            },
-                            ["TL"] = {
-                                "Naubos na ang inumin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. Throat isn't parched anymore.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Di na tuyo ang lalamunan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All drank. Ready for action.",
-                            },
-                            ["TL"] = {
-                                "Nainom na lahat. Handa na sa aksyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished having a drink.",
-                            },
-                            ["TL"] = {
-                                "Natapos nang uminom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done drinking. Let's keep going.",
-                            },
-                            ["TL"] = {
-                                "Tapos nang uminom. Tuloy na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hydration complete.",
-                            },
-                            ["TL"] = {
-                                "Kumpleto na ang pag-inom.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Much better. Thirst is gone.",
+                                        "Finished drinking. Feeling refreshed.",
+                                        "That hit the spot. Done drinking.",
+                                        "Hydrated and ready to move.",
+                                        "Finished that drink.",
+                                        "Done. Throat isn't parched anymore.",
+                                        "All drank. Ready for action.",
+                                        "Finished having a drink.",
+                                        "Done drinking. Let's keep going.",
+                                        "Hydration complete.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas maayos na. Wala na ang uhaw.",
+                                        "Tapos nang uminom. Maginhawa na ang pakiramdam.",
+                                        "Eksakto 'yon. Tapos nang uminom.",
+                                        "May sapat nang tubig at handang kumilos.",
+                                        "Naubos na ang inumin.",
+                                        "Tapos na. Di na tuyo ang lalamunan ko.",
+                                        "Nainom na lahat. Handa na sa aksyon.",
+                                        "Natapos nang uminom.",
+                                        "Tapos nang uminom. Tuloy na tayo.",
+                                        "Kumpleto na ang pag-inom.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.drink.completed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Much better. Thirst is gone.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.drink.completed.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2039,20 +2940,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Much better. Thirst is gone.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.drink.completed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Much better. Thirst is gone.",
+                        "Finished drinking. Feeling refreshed.",
+                        "That hit the spot. Done drinking.",
+                        "Hydrated and ready to move.",
+                        "Finished that drink.",
+                        "Done. Throat isn't parched anymore.",
+                        "All drank. Ready for action.",
+                        "Finished having a drink.",
+                        "Done drinking. Let's keep going.",
+                        "Hydration complete.",
+                    },
+                    ["TL"] = {
+                        "Mas maayos na. Wala na ang uhaw.",
+                        "Tapos nang uminom. Maginhawa na ang pakiramdam.",
+                        "Eksakto 'yon. Tapos nang uminom.",
+                        "May sapat nang tubig at handang kumilos.",
+                        "Naubos na ang inumin.",
+                        "Tapos na. Di na tuyo ang lalamunan ko.",
+                        "Nainom na lahat. Handa na sa aksyon.",
+                        "Natapos nang uminom.",
+                        "Tapos nang uminom. Tuloy na tayo.",
+                        "Kumpleto na ang pag-inom.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.drink.failed",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.drink.failed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I couldn't get a drink.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.drink.failed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I couldn't get a drink.",
+                                        "Failed to drink. Container was empty or tainted.",
+                                        "Couldn't drink that. It wasn't clean water.",
+                                        "I was interrupted before I could drink.",
+                                        "Unable to have a drink right now.",
+                                        "Spilled it or couldn't reach it. Drinking failed.",
+                                        "Water container is dry.",
+                                        "Couldn't drink. Threat forced me to stop.",
+                                        "Action failed. Still thirsty.",
+                                        "Failed to take a drink.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ako nakainom.",
+                                        "Bigo sa pag-inom. Walang laman o marumi ang lalagyan.",
+                                        "Di mainom 'yon. Di malinis na tubig.",
+                                        "Naabala ako bago ako nakainom.",
+                                        "Di makainom sa ngayon.",
+                                        "Natapon o di naabot. Pumalpak ang pag-inom.",
+                                        "Tuyot ang lalagyan ng tubig.",
+                                        "Di nakainom. Napilitang huminto dahil sa banta.",
+                                        "Bigo ang kilos. Nauuhaw pa rin.",
+                                        "Bigo sa pag-inom.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.drink",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I couldn't get a drink.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.drink.failed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I couldn't get a drink.",
+                            "Failed to drink. Container was empty or tainted.",
+                            "Couldn't drink that. It wasn't clean water.",
+                            "I was interrupted before I could drink.",
+                            "Unable to have a drink right now.",
+                            "Spilled it or couldn't reach it. Drinking failed.",
+                            "Water container is dry.",
+                            "Couldn't drink. Threat forced me to stop.",
+                            "Action failed. Still thirsty.",
+                            "Failed to take a drink.",
+                        },
+                        ["TL"] = {
+                            "Hindi ako nakainom.",
+                            "Bigo sa pag-inom. Walang laman o marumi ang lalagyan.",
+                            "Di mainom 'yon. Di malinis na tubig.",
+                            "Naabala ako bago ako nakainom.",
+                            "Di makainom sa ngayon.",
+                            "Natapon o di naabot. Pumalpak ang pag-inom.",
+                            "Tuyot ang lalagyan ng tubig.",
+                            "Di nakainom. Napilitang huminto dahil sa banta.",
+                            "Bigo ang kilos. Nauuhaw pa rin.",
+                            "Bigo sa pag-inom.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.drink.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "failed",
-            ["sourceId"] = "semantic.task.drink.failed",
+            ["sourceId"] = "task.drink.failed",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_drink_failed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.drink",
+        ["namespace"] = "task.drink",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2066,127 +3088,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.drink.failed",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't get a drink.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako nakainom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to drink. Container was empty or tainted.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa pag-inom. Walang laman o marumi ang lalagyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't drink that. It wasn't clean water.",
-                            },
-                            ["TL"] = {
-                                "Di mainom 'yon. Di malinis na tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I was interrupted before I could drink.",
-                            },
-                            ["TL"] = {
-                                "Naabala ako bago ako nakainom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to have a drink right now.",
-                            },
-                            ["TL"] = {
-                                "Di makainom sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Spilled it or couldn't reach it. Drinking failed.",
-                            },
-                            ["TL"] = {
-                                "Natapon o di naabot. Pumalpak ang pag-inom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Water container is dry.",
-                            },
-                            ["TL"] = {
-                                "Tuyot ang lalagyan ng tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't drink. Threat forced me to stop.",
-                            },
-                            ["TL"] = {
-                                "Di nakainom. Napilitang huminto dahil sa banta.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Action failed. Still thirsty.",
-                            },
-                            ["TL"] = {
-                                "Bigo ang kilos. Nauuhaw pa rin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to take a drink.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa pag-inom.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I couldn't get a drink.",
+                                        "Failed to drink. Container was empty or tainted.",
+                                        "Couldn't drink that. It wasn't clean water.",
+                                        "I was interrupted before I could drink.",
+                                        "Unable to have a drink right now.",
+                                        "Spilled it or couldn't reach it. Drinking failed.",
+                                        "Water container is dry.",
+                                        "Couldn't drink. Threat forced me to stop.",
+                                        "Action failed. Still thirsty.",
+                                        "Failed to take a drink.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ako nakainom.",
+                                        "Bigo sa pag-inom. Walang laman o marumi ang lalagyan.",
+                                        "Di mainom 'yon. Di malinis na tubig.",
+                                        "Naabala ako bago ako nakainom.",
+                                        "Di makainom sa ngayon.",
+                                        "Natapon o di naabot. Pumalpak ang pag-inom.",
+                                        "Tuyot ang lalagyan ng tubig.",
+                                        "Di nakainom. Napilitang huminto dahil sa banta.",
+                                        "Bigo ang kilos. Nauuhaw pa rin.",
+                                        "Bigo sa pag-inom.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.drink.failed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I couldn't get a drink.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.drink.failed.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2196,20 +3169,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I couldn't get a drink.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.drink.failed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I couldn't get a drink.",
+                        "Failed to drink. Container was empty or tainted.",
+                        "Couldn't drink that. It wasn't clean water.",
+                        "I was interrupted before I could drink.",
+                        "Unable to have a drink right now.",
+                        "Spilled it or couldn't reach it. Drinking failed.",
+                        "Water container is dry.",
+                        "Couldn't drink. Threat forced me to stop.",
+                        "Action failed. Still thirsty.",
+                        "Failed to take a drink.",
+                    },
+                    ["TL"] = {
+                        "Hindi ako nakainom.",
+                        "Bigo sa pag-inom. Walang laman o marumi ang lalagyan.",
+                        "Di mainom 'yon. Di malinis na tubig.",
+                        "Naabala ako bago ako nakainom.",
+                        "Di makainom sa ngayon.",
+                        "Natapon o di naabot. Pumalpak ang pag-inom.",
+                        "Tuyot ang lalagyan ng tubig.",
+                        "Di nakainom. Napilitang huminto dahil sa banta.",
+                        "Bigo ang kilos. Nauuhaw pa rin.",
+                        "Bigo sa pag-inom.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.drink.rejected",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.drink.rejected",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'm not thirsty right now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.drink.rejected.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'm not thirsty right now.",
+                                        "I don't need to drink at the moment.",
+                                        "I'm fully hydrated. Saving the water.",
+                                        "Can't drink right now. Too dangerous to pause.",
+                                        "Refusing to drink that water. It looks tainted.",
+                                        "I have plenty of fluids. Don't need to drink.",
+                                        "No need for a drink yet.",
+                                        "I'll save our clean water for later.",
+                                        "Drink order rejected. Not parched.",
+                                        "Can't drink that right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ako nauuhaw ngayon.",
+                                        "Di ko kailangang uminom sa sandaling ito.",
+                                        "Busog pa ako sa tubig. Itatabi ang inumin.",
+                                        "Di pwedeng uminom ngayon. Masyadong mapanganib huminto.",
+                                        "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado.",
+                                        "Marami pa akong tubig sa katawan. Di kailangang uminom.",
+                                        "Wala pang pangangailangan sa inumin.",
+                                        "Itatabi ko ang malinis na tubig mamaya.",
+                                        "Tinatanggihan ang pag-inom. Di ako uhaw.",
+                                        "Di ko maiinom 'yan ngayon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.drink",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'm not thirsty right now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.drink.rejected.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'm not thirsty right now.",
+                            "I don't need to drink at the moment.",
+                            "I'm fully hydrated. Saving the water.",
+                            "Can't drink right now. Too dangerous to pause.",
+                            "Refusing to drink that water. It looks tainted.",
+                            "I have plenty of fluids. Don't need to drink.",
+                            "No need for a drink yet.",
+                            "I'll save our clean water for later.",
+                            "Drink order rejected. Not parched.",
+                            "Can't drink that right now.",
+                        },
+                        ["TL"] = {
+                            "Hindi ako nauuhaw ngayon.",
+                            "Di ko kailangang uminom sa sandaling ito.",
+                            "Busog pa ako sa tubig. Itatabi ang inumin.",
+                            "Di pwedeng uminom ngayon. Masyadong mapanganib huminto.",
+                            "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado.",
+                            "Marami pa akong tubig sa katawan. Di kailangang uminom.",
+                            "Wala pang pangangailangan sa inumin.",
+                            "Itatabi ko ang malinis na tubig mamaya.",
+                            "Tinatanggihan ang pag-inom. Di ako uhaw.",
+                            "Di ko maiinom 'yan ngayon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.drink.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "rejected",
-            ["sourceId"] = "semantic.task.drink.rejected",
+            ["sourceId"] = "task.drink.rejected",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_drink_rejected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.drink",
+        ["namespace"] = "task.drink",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2223,127 +3317,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.drink.rejected",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm not thirsty right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako nauuhaw ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't need to drink at the moment.",
-                            },
-                            ["TL"] = {
-                                "Di ko kailangang uminom sa sandaling ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm fully hydrated. Saving the water.",
-                            },
-                            ["TL"] = {
-                                "Busog pa ako sa tubig. Itatabi ang inumin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't drink right now. Too dangerous to pause.",
-                            },
-                            ["TL"] = {
-                                "Di pwedeng uminom ngayon. Masyadong mapanganib huminto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refusing to drink that water. It looks tainted.",
-                            },
-                            ["TL"] = {
-                                "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I have plenty of fluids. Don't need to drink.",
-                            },
-                            ["TL"] = {
-                                "Marami pa akong tubig sa katawan. Di kailangang uminom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No need for a drink yet.",
-                            },
-                            ["TL"] = {
-                                "Wala pang pangangailangan sa inumin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll save our clean water for later.",
-                            },
-                            ["TL"] = {
-                                "Itatabi ko ang malinis na tubig mamaya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Drink order rejected. Not parched.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggihan ang pag-inom. Di ako uhaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't drink that right now.",
-                            },
-                            ["TL"] = {
-                                "Di ko maiinom 'yan ngayon.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'm not thirsty right now.",
+                                        "I don't need to drink at the moment.",
+                                        "I'm fully hydrated. Saving the water.",
+                                        "Can't drink right now. Too dangerous to pause.",
+                                        "Refusing to drink that water. It looks tainted.",
+                                        "I have plenty of fluids. Don't need to drink.",
+                                        "No need for a drink yet.",
+                                        "I'll save our clean water for later.",
+                                        "Drink order rejected. Not parched.",
+                                        "Can't drink that right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ako nauuhaw ngayon.",
+                                        "Di ko kailangang uminom sa sandaling ito.",
+                                        "Busog pa ako sa tubig. Itatabi ang inumin.",
+                                        "Di pwedeng uminom ngayon. Masyadong mapanganib huminto.",
+                                        "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado.",
+                                        "Marami pa akong tubig sa katawan. Di kailangang uminom.",
+                                        "Wala pang pangangailangan sa inumin.",
+                                        "Itatabi ko ang malinis na tubig mamaya.",
+                                        "Tinatanggihan ang pag-inom. Di ako uhaw.",
+                                        "Di ko maiinom 'yan ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.drink.rejected",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'm not thirsty right now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.drink.rejected.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2353,20 +3398,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'm not thirsty right now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.drink.rejected.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'm not thirsty right now.",
+                        "I don't need to drink at the moment.",
+                        "I'm fully hydrated. Saving the water.",
+                        "Can't drink right now. Too dangerous to pause.",
+                        "Refusing to drink that water. It looks tainted.",
+                        "I have plenty of fluids. Don't need to drink.",
+                        "No need for a drink yet.",
+                        "I'll save our clean water for later.",
+                        "Drink order rejected. Not parched.",
+                        "Can't drink that right now.",
+                    },
+                    ["TL"] = {
+                        "Hindi ako nauuhaw ngayon.",
+                        "Di ko kailangang uminom sa sandaling ito.",
+                        "Busog pa ako sa tubig. Itatabi ang inumin.",
+                        "Di pwedeng uminom ngayon. Masyadong mapanganib huminto.",
+                        "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado.",
+                        "Marami pa akong tubig sa katawan. Di kailangang uminom.",
+                        "Wala pang pangangailangan sa inumin.",
+                        "Itatabi ko ang malinis na tubig mamaya.",
+                        "Tinatanggihan ang pag-inom. Di ako uhaw.",
+                        "Di ko maiinom 'yan ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.eat.active",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.eat.active",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Eating now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.eat.active.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Eating now.",
+                                        "Having a bite right now.",
+                                        "Chewing through some food. Give me a moment.",
+                                        "Currently eating.",
+                                        "Getting some calories in me.",
+                                        "Eating my rations now.",
+                                        "Taking a meal break as instructed.",
+                                        "Eating. Needed the energy.",
+                                        "Having some food now.",
+                                        "Eating quietly. Won't be long.",
+                                    },
+                                    ["TL"] = {
+                                        "Kumakain na ako ngayon.",
+                                        "Kumakain ng kaunti ngayon.",
+                                        "Kumakain ng pagkain. Sandali lang.",
+                                        "Kasalukuyang kumakain.",
+                                        "Nagpapasok ng lakas sa katawan.",
+                                        "Kinakain ang baong pagkain ngayon.",
+                                        "Kumakain ayon sa utos.",
+                                        "Kumakain. Kailangan ko ng lakas.",
+                                        "Kumakain na ngayon.",
+                                        "Kumakain nang tahimik. Saglit lang ito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.eat",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Eating now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.eat.active.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Eating now.",
+                            "Having a bite right now.",
+                            "Chewing through some food. Give me a moment.",
+                            "Currently eating.",
+                            "Getting some calories in me.",
+                            "Eating my rations now.",
+                            "Taking a meal break as instructed.",
+                            "Eating. Needed the energy.",
+                            "Having some food now.",
+                            "Eating quietly. Won't be long.",
+                        },
+                        ["TL"] = {
+                            "Kumakain na ako ngayon.",
+                            "Kumakain ng kaunti ngayon.",
+                            "Kumakain ng pagkain. Sandali lang.",
+                            "Kasalukuyang kumakain.",
+                            "Nagpapasok ng lakas sa katawan.",
+                            "Kinakain ang baong pagkain ngayon.",
+                            "Kumakain ayon sa utos.",
+                            "Kumakain. Kailangan ko ng lakas.",
+                            "Kumakain na ngayon.",
+                            "Kumakain nang tahimik. Saglit lang ito.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.eat.active",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "active",
-            ["sourceId"] = "semantic.task.eat.active",
+            ["sourceId"] = "task.eat.active",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat_active.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.eat",
+        ["namespace"] = "task.eat",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2380,127 +3546,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.eat.active",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eating now.",
-                            },
-                            ["TL"] = {
-                                "Kumakain na ako ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Having a bite right now.",
-                            },
-                            ["TL"] = {
-                                "Kumakain ng kaunti ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Chewing through some food. Give me a moment.",
-                            },
-                            ["TL"] = {
-                                "Kumakain ng pagkain. Sandali lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Currently eating.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang kumakain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Getting some calories in me.",
-                            },
-                            ["TL"] = {
-                                "Nagpapasok ng lakas sa katawan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eating my rations now.",
-                            },
-                            ["TL"] = {
-                                "Kinakain ang baong pagkain ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taking a meal break as instructed.",
-                            },
-                            ["TL"] = {
-                                "Kumakain ayon sa utos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eating. Needed the energy.",
-                            },
-                            ["TL"] = {
-                                "Kumakain. Kailangan ko ng lakas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Having some food now.",
-                            },
-                            ["TL"] = {
-                                "Kumakain na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eating quietly. Won't be long.",
-                            },
-                            ["TL"] = {
-                                "Kumakain nang tahimik. Saglit lang ito.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Eating now.",
+                                        "Having a bite right now.",
+                                        "Chewing through some food. Give me a moment.",
+                                        "Currently eating.",
+                                        "Getting some calories in me.",
+                                        "Eating my rations now.",
+                                        "Taking a meal break as instructed.",
+                                        "Eating. Needed the energy.",
+                                        "Having some food now.",
+                                        "Eating quietly. Won't be long.",
+                                    },
+                                    ["TL"] = {
+                                        "Kumakain na ako ngayon.",
+                                        "Kumakain ng kaunti ngayon.",
+                                        "Kumakain ng pagkain. Sandali lang.",
+                                        "Kasalukuyang kumakain.",
+                                        "Nagpapasok ng lakas sa katawan.",
+                                        "Kinakain ang baong pagkain ngayon.",
+                                        "Kumakain ayon sa utos.",
+                                        "Kumakain. Kailangan ko ng lakas.",
+                                        "Kumakain na ngayon.",
+                                        "Kumakain nang tahimik. Saglit lang ito.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.eat.active",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Eating now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.eat.active.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2510,20 +3627,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Eating now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.eat.active.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Eating now.",
+                        "Having a bite right now.",
+                        "Chewing through some food. Give me a moment.",
+                        "Currently eating.",
+                        "Getting some calories in me.",
+                        "Eating my rations now.",
+                        "Taking a meal break as instructed.",
+                        "Eating. Needed the energy.",
+                        "Having some food now.",
+                        "Eating quietly. Won't be long.",
+                    },
+                    ["TL"] = {
+                        "Kumakain na ako ngayon.",
+                        "Kumakain ng kaunti ngayon.",
+                        "Kumakain ng pagkain. Sandali lang.",
+                        "Kasalukuyang kumakain.",
+                        "Nagpapasok ng lakas sa katawan.",
+                        "Kinakain ang baong pagkain ngayon.",
+                        "Kumakain ayon sa utos.",
+                        "Kumakain. Kailangan ko ng lakas.",
+                        "Kumakain na ngayon.",
+                        "Kumakain nang tahimik. Saglit lang ito.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.eat.admitted",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.eat.admitted",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll eat that.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.eat.admitted.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll eat that.",
+                                        "Understood. Getting something to eat.",
+                                        "Good call. My stomach was growling.",
+                                        "All right, I'll eat some food.",
+                                        "Taking a bite to keep my strength up.",
+                                        "Understood. Eating now.",
+                                        "I'll consume those rations.",
+                                        "Right. Time for a meal.",
+                                        "I'll eat what you designated.",
+                                        "Sounds good. Grabbing food.",
+                                    },
+                                    ["TL"] = {
+                                        "Kakainin ko iyon.",
+                                        "Naintindihan. Kukuha ng makakain.",
+                                        "Magandang paalala. Kumakalam na ang tiyan ko.",
+                                        "Sige, kakain ako ng pagkain.",
+                                        "Kakain para mapanatili ang lakas.",
+                                        "Naiintindihan ko. Kakain na.",
+                                        "Kakainin ko ang mga rasyong 'yan.",
+                                        "Sige. Oras na para kumain.",
+                                        "Kakainin ko ang tinukoy mo.",
+                                        "Maganda 'yan. Kukuha ng pagkain.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.eat",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll eat that.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.eat.admitted.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll eat that.",
+                            "Understood. Getting something to eat.",
+                            "Good call. My stomach was growling.",
+                            "All right, I'll eat some food.",
+                            "Taking a bite to keep my strength up.",
+                            "Understood. Eating now.",
+                            "I'll consume those rations.",
+                            "Right. Time for a meal.",
+                            "I'll eat what you designated.",
+                            "Sounds good. Grabbing food.",
+                        },
+                        ["TL"] = {
+                            "Kakainin ko iyon.",
+                            "Naintindihan. Kukuha ng makakain.",
+                            "Magandang paalala. Kumakalam na ang tiyan ko.",
+                            "Sige, kakain ako ng pagkain.",
+                            "Kakain para mapanatili ang lakas.",
+                            "Naiintindihan ko. Kakain na.",
+                            "Kakainin ko ang mga rasyong 'yan.",
+                            "Sige. Oras na para kumain.",
+                            "Kakainin ko ang tinukoy mo.",
+                            "Maganda 'yan. Kukuha ng pagkain.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.eat.admitted",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "admitted",
-            ["sourceId"] = "semantic.task.eat.admitted",
+            ["sourceId"] = "task.eat.admitted",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat_admitted.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.eat",
+        ["namespace"] = "task.eat",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2537,127 +3775,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.eat.admitted",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll eat that.",
-                            },
-                            ["TL"] = {
-                                "Kakainin ko iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Getting something to eat.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Kukuha ng makakain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good call. My stomach was growling.",
-                            },
-                            ["TL"] = {
-                                "Magandang paalala. Kumakalam na ang tiyan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right, I'll eat some food.",
-                            },
-                            ["TL"] = {
-                                "Sige, kakain ako ng pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taking a bite to keep my strength up.",
-                            },
-                            ["TL"] = {
-                                "Kakain para mapanatili ang lakas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Eating now.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Kakain na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll consume those rations.",
-                            },
-                            ["TL"] = {
-                                "Kakainin ko ang mga rasyong 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. Time for a meal.",
-                            },
-                            ["TL"] = {
-                                "Sige. Oras na para kumain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll eat what you designated.",
-                            },
-                            ["TL"] = {
-                                "Kakainin ko ang tinukoy mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds good. Grabbing food.",
-                            },
-                            ["TL"] = {
-                                "Maganda 'yan. Kukuha ng pagkain.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll eat that.",
+                                        "Understood. Getting something to eat.",
+                                        "Good call. My stomach was growling.",
+                                        "All right, I'll eat some food.",
+                                        "Taking a bite to keep my strength up.",
+                                        "Understood. Eating now.",
+                                        "I'll consume those rations.",
+                                        "Right. Time for a meal.",
+                                        "I'll eat what you designated.",
+                                        "Sounds good. Grabbing food.",
+                                    },
+                                    ["TL"] = {
+                                        "Kakainin ko iyon.",
+                                        "Naintindihan. Kukuha ng makakain.",
+                                        "Magandang paalala. Kumakalam na ang tiyan ko.",
+                                        "Sige, kakain ako ng pagkain.",
+                                        "Kakain para mapanatili ang lakas.",
+                                        "Naiintindihan ko. Kakain na.",
+                                        "Kakainin ko ang mga rasyong 'yan.",
+                                        "Sige. Oras na para kumain.",
+                                        "Kakainin ko ang tinukoy mo.",
+                                        "Maganda 'yan. Kukuha ng pagkain.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.eat.admitted",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll eat that.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.eat.admitted.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2667,20 +3856,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll eat that.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.eat.admitted.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll eat that.",
+                        "Understood. Getting something to eat.",
+                        "Good call. My stomach was growling.",
+                        "All right, I'll eat some food.",
+                        "Taking a bite to keep my strength up.",
+                        "Understood. Eating now.",
+                        "I'll consume those rations.",
+                        "Right. Time for a meal.",
+                        "I'll eat what you designated.",
+                        "Sounds good. Grabbing food.",
+                    },
+                    ["TL"] = {
+                        "Kakainin ko iyon.",
+                        "Naintindihan. Kukuha ng makakain.",
+                        "Magandang paalala. Kumakalam na ang tiyan ko.",
+                        "Sige, kakain ako ng pagkain.",
+                        "Kakain para mapanatili ang lakas.",
+                        "Naiintindihan ko. Kakain na.",
+                        "Kakainin ko ang mga rasyong 'yan.",
+                        "Sige. Oras na para kumain.",
+                        "Kakainin ko ang tinukoy mo.",
+                        "Maganda 'yan. Kukuha ng pagkain.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.eat.completed",
+        ["exchangeFamily"] = {
+            ["familyID"] = "task.eat.completed",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Finished eating. Feeling much better.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.task.eat.completed.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Finished eating. Feeling much better.",
+                                        "That food helped a lot. Done.",
+                                        "Done eating. Energy restored.",
+                                        "Stomach is full. Ready to move.",
+                                        "Finished that meal.",
+                                        "All eaten. Good to keep going.",
+                                        "Done. That tasted better than expected.",
+                                        "Meal completed.",
+                                        "Finished eating. Back on task.",
+                                        "Rations finished. Strength is back.",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos nang kumain. Mas maayos na ang pakiramdam.",
+                                        "Nakatulong nang malaki ang pagkain. Tapos na.",
+                                        "Tapos nang kumain. Bumalik na ang lakas.",
+                                        "Busog na ang tiyan. Handa nang kumilos.",
+                                        "Natapos na ang pagkain.",
+                                        "Naubos na. Maayos na para magpatuloy.",
+                                        "Tapos na. Mas masarap kaysa inasahan ko.",
+                                        "Kumpleto na ang pagkain.",
+                                        "Tapos nang kumain. Balik sa trabaho.",
+                                        "Naubos ang rasyon. Nagbalik ang lakas.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "task.eat",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Finished eating. Feeling much better.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.task.eat.completed.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Finished eating. Feeling much better.",
+                            "That food helped a lot. Done.",
+                            "Done eating. Energy restored.",
+                            "Stomach is full. Ready to move.",
+                            "Finished that meal.",
+                            "All eaten. Good to keep going.",
+                            "Done. That tasted better than expected.",
+                            "Meal completed.",
+                            "Finished eating. Back on task.",
+                            "Rations finished. Strength is back.",
+                        },
+                        ["TL"] = {
+                            "Tapos nang kumain. Mas maayos na ang pakiramdam.",
+                            "Nakatulong nang malaki ang pagkain. Tapos na.",
+                            "Tapos nang kumain. Bumalik na ang lakas.",
+                            "Busog na ang tiyan. Handa nang kumilos.",
+                            "Natapos na ang pagkain.",
+                            "Naubos na. Maayos na para magpatuloy.",
+                            "Tapos na. Mas masarap kaysa inasahan ko.",
+                            "Kumpleto na ang pagkain.",
+                            "Tapos nang kumain. Balik sa trabaho.",
+                            "Naubos ang rasyon. Nagbalik ang lakas.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "task.eat.completed",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "completed",
-            ["sourceId"] = "semantic.task.eat.completed",
+            ["sourceId"] = "task.eat.completed",
             ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat_completed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.eat",
+        ["namespace"] = "task.eat",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2694,127 +4004,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.eat.completed",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished eating. Feeling much better.",
-                            },
-                            ["TL"] = {
-                                "Tapos nang kumain. Mas maayos na ang pakiramdam.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That food helped a lot. Done.",
-                            },
-                            ["TL"] = {
-                                "Nakatulong nang malaki ang pagkain. Tapos na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done eating. Energy restored.",
-                            },
-                            ["TL"] = {
-                                "Tapos nang kumain. Bumalik na ang lakas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stomach is full. Ready to move.",
-                            },
-                            ["TL"] = {
-                                "Busog na ang tiyan. Handa nang kumilos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished that meal.",
-                            },
-                            ["TL"] = {
-                                "Natapos na ang pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All eaten. Good to keep going.",
-                            },
-                            ["TL"] = {
-                                "Naubos na. Maayos na para magpatuloy.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. That tasted better than expected.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Mas masarap kaysa inasahan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Meal completed.",
-                            },
-                            ["TL"] = {
-                                "Kumpleto na ang pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished eating. Back on task.",
-                            },
-                            ["TL"] = {
-                                "Tapos nang kumain. Balik sa trabaho.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Rations finished. Strength is back.",
-                            },
-                            ["TL"] = {
-                                "Naubos ang rasyon. Nagbalik ang lakas.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Finished eating. Feeling much better.",
+                                        "That food helped a lot. Done.",
+                                        "Done eating. Energy restored.",
+                                        "Stomach is full. Ready to move.",
+                                        "Finished that meal.",
+                                        "All eaten. Good to keep going.",
+                                        "Done. That tasted better than expected.",
+                                        "Meal completed.",
+                                        "Finished eating. Back on task.",
+                                        "Rations finished. Strength is back.",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos nang kumain. Mas maayos na ang pakiramdam.",
+                                        "Nakatulong nang malaki ang pagkain. Tapos na.",
+                                        "Tapos nang kumain. Bumalik na ang lakas.",
+                                        "Busog na ang tiyan. Handa nang kumilos.",
+                                        "Natapos na ang pagkain.",
+                                        "Naubos na. Maayos na para magpatuloy.",
+                                        "Tapos na. Mas masarap kaysa inasahan ko.",
+                                        "Kumpleto na ang pagkain.",
+                                        "Tapos nang kumain. Balik sa trabaho.",
+                                        "Naubos ang rasyon. Nagbalik ang lakas.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "task.eat.completed",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Finished eating. Feeling much better.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.task.eat.completed.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2824,2203 +4085,40 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.eat.failed",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "failed",
-            ["sourceId"] = "semantic.task.eat.failed",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat_failed.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.eat",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.eat.failed",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't eat that.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko nakain iyon.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Finished eating. Feeling much better.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.task.eat.completed.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Finished eating. Feeling much better.",
+                        "That food helped a lot. Done.",
+                        "Done eating. Energy restored.",
+                        "Stomach is full. Ready to move.",
+                        "Finished that meal.",
+                        "All eaten. Good to keep going.",
+                        "Done. That tasted better than expected.",
+                        "Meal completed.",
+                        "Finished eating. Back on task.",
+                        "Rations finished. Strength is back.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to eat. The food was rotten or spoiled.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa pagkain. Bulok o panis ang pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't eat that. It smelled dangerous.",
-                            },
-                            ["TL"] = {
-                                "Di makain 'yon. Amoy delikado.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I was interrupted while trying to eat.",
-                            },
-                            ["TL"] = {
-                                "Naabala ako habang sumusubok kumain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to eat right now. Area under threat.",
-                            },
-                            ["TL"] = {
-                                "Di makakain ngayon. May banta sa lugar.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eating failed. Food was ruined.",
-                            },
-                            ["TL"] = {
-                                "Pumalpak ang pagkain. Nasira ang pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't stomach that item.",
-                            },
-                            ["TL"] = {
-                                "Di matunawan sa bagay na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped or lost the food before eating.",
-                            },
-                            ["TL"] = {
-                                "Nahulog o nawala ang pagkain bago nakain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Action failed. Still starving.",
-                            },
-                            ["TL"] = {
-                                "Bigo ang kilos. Gutom pa rin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to consume meal.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa pagtapos ng pagkain.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Tapos nang kumain. Mas maayos na ang pakiramdam.",
+                        "Nakatulong nang malaki ang pagkain. Tapos na.",
+                        "Tapos nang kumain. Bumalik na ang lakas.",
+                        "Busog na ang tiyan. Handa nang kumilos.",
+                        "Natapos na ang pagkain.",
+                        "Naubos na. Maayos na para magpatuloy.",
+                        "Tapos na. Mas masarap kaysa inasahan ko.",
+                        "Kumpleto na ang pagkain.",
+                        "Tapos nang kumain. Balik sa trabaho.",
+                        "Naubos ang rasyon. Nagbalik ang lakas.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat_failed.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.eat.rejected",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "rejected",
-            ["sourceId"] = "semantic.task.eat.rejected",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat_rejected.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.eat",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.eat.rejected",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm not hungry right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako nagugutom ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't need food at the moment.",
-                            },
-                            ["TL"] = {
-                                "Di ko kailangan ng pagkain sa sandaling ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm already completely full.",
-                            },
-                            ["TL"] = {
-                                "Busog na busog pa ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Save the food. I don't need to eat yet.",
-                            },
-                            ["TL"] = {
-                                "Itabi ang pagkain. Di ko pa kailangang kumain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refusing to eat that. Looks unwholesome.",
-                            },
-                            ["TL"] = {
-                                "Tumatangging kainin 'yan. Mukhang marumi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't eat right now. Too tense.",
-                            },
-                            ["TL"] = {
-                                "Di makakain ngayon. Masyadong tensiyonado.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I have enough energy. Keeping rations safe.",
-                            },
-                            ["TL"] = {
-                                "May sapat pa akong lakas. Itatabi ang rasyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No need for a meal yet.",
-                            },
-                            ["TL"] = {
-                                "Wala pang pangangailangan sa pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eat order rejected. Stomach is satisfied.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggihan ang utos na kumain. Busog ang tiyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't eat that right now.",
-                            },
-                            ["TL"] = {
-                                "Di ko makakain 'yan ngayon.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat_rejected.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.fetch.active",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "active",
-            ["sourceId"] = "semantic.task.fetch.active",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_active.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.fetch",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.fetch.active",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm working on that now.",
-                            },
-                            ["TL"] = {
-                                "Inaayos ko na iyon ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Retrieving the item now.",
-                            },
-                            ["TL"] = {
-                                "Kinukuha na ang gamit ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "On my way to pick that up.",
-                            },
-                            ["TL"] = {
-                                "Papunta na para pulutin iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Currently fetching the supplies.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang kinukuha ang mga gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving toward the item.",
-                            },
-                            ["TL"] = {
-                                "Papatungo sa kinaroroonan ng bagay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Grabbing it now. Won't take long.",
-                            },
-                            ["TL"] = {
-                                "Kukunin na ngayon. Mabilis lang ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fetching as ordered.",
-                            },
-                            ["TL"] = {
-                                "Kinukuha ayon sa utos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm searching for and grabbing that item.",
-                            },
-                            ["TL"] = {
-                                "Hinahanap at kinukuha ko ang bagay na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "In transit to fetch the goods.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang naglalakad para kunin ang gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Retrieval in progress.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang kinukuha.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_active.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.fetch.admitted",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "admitted",
-            ["sourceId"] = "semantic.task.fetch.admitted",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_admitted.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.fetch",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.fetch.admitted",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll fetch that.",
-                            },
-                            ["TL"] = {
-                                "Kukunin ko iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. I will retrieve the item.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Kukunin ko ang gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll go grab that for you.",
-                            },
-                            ["TL"] = {
-                                "Pupuntahan ko para kunin 'yan para sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "On it. Fetching the supplies.",
-                            },
-                            ["TL"] = {
-                                "Inaasikaso na. Kukunin ang mga kagamitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right away. Going to pick it up.",
-                            },
-                            ["TL"] = {
-                                "Agad-agad. Pupulutin ko 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. I'll bring it back.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Ibabalik ko rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll secure that item.",
-                            },
-                            ["TL"] = {
-                                "Kukunin ko ang gamit na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heading out to fetch it.",
-                            },
-                            ["TL"] = {
-                                "Lalabas para kunin iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got the order. Fetching.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ang utos. Kukunin na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds good. Retrieving it now.",
-                            },
-                            ["TL"] = {
-                                "Maganda 'yan. Kukunin na ngayon.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_admitted.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.fetch.completed",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "completed",
-            ["sourceId"] = "semantic.task.fetch.completed",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_completed.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.fetch",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.fetch.completed",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Here you go.",
-                            },
-                            ["TL"] = {
-                                "Heto na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Retrieved the item. Here it is.",
-                            },
-                            ["TL"] = {
-                                "Nakuha na ang gamit. Heto na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got what you asked for.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko ang hiningi mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fetched and delivered.",
-                            },
-                            ["TL"] = {
-                                "Nakuha at naihatid na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Here are the goods.",
-                            },
-                            ["TL"] = {
-                                "Heto ang mga kagamitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Task completed. Item secured.",
-                            },
-                            ["TL"] = {
-                                "Tapos na ang gawain. Nakuha ang gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All fetched. Safe in hand.",
-                            },
-                            ["TL"] = {
-                                "Nakuha na lahat. Hawak ko na nang ligtas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Here it is. One piece.",
-                            },
-                            ["TL"] = {
-                                "Heto na. Buo pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Delivery made. What's next?",
-                            },
-                            ["TL"] = {
-                                "Naihatid na. Ano ang susunod?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Retrieved as requested.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ayon sa hiling.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_completed.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.fetch.failed",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "failed",
-            ["sourceId"] = "semantic.task.fetch.failed",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_failed.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.fetch",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.fetch.failed",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't fetch that.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko nakuha iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to retrieve the item.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa pagkuha ng gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The item wasn't there or was destroyed.",
-                            },
-                            ["TL"] = {
-                                "Wala roon ang gamit o kaya'y nasira na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Way was blocked. Couldn't reach it.",
-                            },
-                            ["TL"] = {
-                                "May harang sa daan. Di ko naabot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hostiles prevented me from grabbing it.",
-                            },
-                            ["TL"] = {
-                                "Pumigil ang mga kalaban sa pagkuha ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to fetch that from that container.",
-                            },
-                            ["TL"] = {
-                                "Di makuha 'yon mula sa lalagyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Lost access to the item. Fetch failed.",
-                            },
-                            ["TL"] = {
-                                "Nawalan ng daan sa gamit. Bigo ang pagkuha.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't find what you were pointing to.",
-                            },
-                            ["TL"] = {
-                                "Di ko nahanap ang itinuturo mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Inventory full or path obstructed. Failed.",
-                            },
-                            ["TL"] = {
-                                "Puno ang bag o may harang sa daan. Bigo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Couldn't get to the target item.",
-                            },
-                            ["TL"] = {
-                                "Di makarating sa puntiryang gamit.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_failed.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.fetch.rejected",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "rejected",
-            ["sourceId"] = "semantic.task.fetch.rejected",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_rejected.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.fetch",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.fetch.rejected",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't fetch that right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko makuha iyon ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's in a death trap. I'm not fetching it.",
-                            },
-                            ["TL"] = {
-                                "Nasa bitag ng kamatayan 'yan. Di ko kukunin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too far or too dangerous. Refusing to fetch.",
-                            },
-                            ["TL"] = {
-                                "Masyadong malayo o mapanganib. Tumatangging kunin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "My hands and pack are completely full.",
-                            },
-                            ["TL"] = {
-                                "Puno na ang kamay at bag ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I won't risk my neck for that junk.",
-                            },
-                            ["TL"] = {
-                                "Di ko isusugal ang buhay ko para sa basurang 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't retrieve that under current conditions.",
-                            },
-                            ["TL"] = {
-                                "Di makukuha 'yan sa kasalukuyang kalagayan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't have the carrying capacity right now.",
-                            },
-                            ["TL"] = {
-                                "Wala na akong espasyong paglalagyan ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fetch order rejected. Pick it up yourself.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggihan ang pagkuha. Pulutin mo nang kusa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to comply. Item is out of bounds.",
-                            },
-                            ["TL"] = {
-                                "Di makasusunod. Di abot ang bagay na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't fetch that for you.",
-                            },
-                            ["TL"] = {
-                                "Di ko makukuha 'yan para sa 'yo.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_fetch_rejected.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.give.active",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "active",
-            ["sourceId"] = "semantic.task.give.active",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_active.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.give",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.give.active",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handing that over now.",
-                            },
-                            ["TL"] = {
-                                "Iniaabot ko na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Passing the item to you right now.",
-                            },
-                            ["TL"] = {
-                                "Ipinapasa ko na ang gamit sa 'yo ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Transferring the supplies.",
-                            },
-                            ["TL"] = {
-                                "Inililipat na ang mga kagamitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Giving this to you now.",
-                            },
-                            ["TL"] = {
-                                "Ibinibigay ko na ito sa 'yo ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Currently handing it over.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang iniaabot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Reaching out to give you the item.",
-                            },
-                            ["TL"] = {
-                                "Inaabot para ibigay sa 'yo ang gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Giving you what was asked.",
-                            },
-                            ["TL"] = {
-                                "Ibinibigay sa 'yo ang hiningi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "In the middle of the handoff.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang nag-aabot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handing it off now. Take hold.",
-                            },
-                            ["TL"] = {
-                                "Iniaabot na. Hawakan mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Giving it as ordered.",
-                            },
-                            ["TL"] = {
-                                "Ibinibigay ayon sa utos.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_active.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.give.admitted",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "admitted",
-            ["sourceId"] = "semantic.task.give.admitted",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_admitted.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.give",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.give.admitted",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll give that to you.",
-                            },
-                            ["TL"] = {
-                                "Ibibigay ko iyon sa iyo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Handing it over.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Iniaabot na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Here, I'll pass that to you.",
-                            },
-                            ["TL"] = {
-                                "Heto, ipapasa ko 'yan sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. I'll give you the item.",
-                            },
-                            ["TL"] = {
-                                "Sige. Ibibigay ko sa 'yo ang gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sure thing. Passing it over.",
-                            },
-                            ["TL"] = {
-                                "Walang anuman. Ipinapasa na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. You can have it.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Pwede mong kunin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll transfer that to your pack.",
-                            },
-                            ["TL"] = {
-                                "Ililipat ko 'yan sa bag mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. Handing it over.",
-                            },
-                            ["TL"] = {
-                                "Sige. Iniaabot na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll give you what you requested.",
-                            },
-                            ["TL"] = {
-                                "Ibibigay ko ang hiniling mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds good. Giving it now.",
-                            },
-                            ["TL"] = {
-                                "Maganda 'yan. Ibibigay na ngayon.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_admitted.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.give.completed",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "completed",
-            ["sourceId"] = "semantic.task.give.completed",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_completed.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.give",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.give.completed",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "There you go.",
-                            },
-                            ["TL"] = {
-                                "Heto na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handed over safely.",
-                            },
-                            ["TL"] = {
-                                "Naibigay na nang ligtas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's yours now.",
-                            },
-                            ["TL"] = {
-                                "Nasa sa 'yo na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Transfer complete.",
-                            },
-                            ["TL"] = {
-                                "Tapos na ang paglipat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All given. Take good care of it.",
-                            },
-                            ["TL"] = {
-                                "Naibigay na lahat. Ingatan mo 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. It's in your hands.",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Nasa mga kamay mo na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handoff finished.",
-                            },
-                            ["TL"] = {
-                                "Tapos na ang pag-aabot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Given as requested.",
-                            },
-                            ["TL"] = {
-                                "Naibigay ayon sa hiling.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Item is officially yours.",
-                            },
-                            ["TL"] = {
-                                "Sa 'yo na ang gamit opisyal.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Completed the handoff.",
-                            },
-                            ["TL"] = {
-                                "Natapos ang pag-aabot.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_completed.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.give.failed",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "failed",
-            ["sourceId"] = "semantic.task.give.failed",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_failed.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.give",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.give.failed",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't give that to you.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko naibigay iyon sa iyo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handoff failed. You were out of reach.",
-                            },
-                            ["TL"] = {
-                                "Pumalpak ang pag-aabot. Masyado kang malayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Your hands or pack were full. Couldn't give it.",
-                            },
-                            ["TL"] = {
-                                "Puno ang kamay o bag mo. Di maibigay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Action interrupted. Item not given.",
-                            },
-                            ["TL"] = {
-                                "Naabala ang kilos. Di naibigay ang gamit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to transfer the item to you.",
-                            },
-                            ["TL"] = {
-                                "Di mailipat ang gamit sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Failed to hand it over. Something got in the way.",
-                            },
-                            ["TL"] = {
-                                "Bigo sa pag-aabot. May humarang sa pagitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I couldn't complete the give action.",
-                            },
-                            ["TL"] = {
-                                "Di ko natapos ang pagbibigay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped it during the exchange.",
-                            },
-                            ["TL"] = {
-                                "Nahulog habang nagpapalitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Give task failed.",
-                            },
-                            ["TL"] = {
-                                "Bigo ang gawaing magbigay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Could not give that item.",
-                            },
-                            ["TL"] = {
-                                "Hindi naibigay ang bagay na 'yan.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_failed.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.give.rejected",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "rejected",
-            ["sourceId"] = "semantic.task.give.rejected",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_rejected.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.give",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.give.rejected",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't give that to you right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko maibibigay iyon sa iyo ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need that item to survive. Can't spare it.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko 'yan para mabuhay. Di ko maipamimigay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That is vital to my loadout. I won't give it away.",
-                            },
-                            ["TL"] = {
-                                "Mahalaga 'yan sa gamit ko. Di ko ipamimigay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refusing to hand that over.",
-                            },
-                            ["TL"] = {
-                                "Tumatangging iabot 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't have that item to give.",
-                            },
-                            ["TL"] = {
-                                "Wala sa akin ang gamit na 'yan para ibigay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't give that up under these circumstances.",
-                            },
-                            ["TL"] = {
-                                "Di ko maibibigay 'yan sa ganitong kalagayan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's not something I can part with.",
-                            },
-                            ["TL"] = {
-                                "Hindi bagay 'yan na kaya kong bitiwan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Give order rejected. I'm keeping this.",
-                            },
-                            ["TL"] = {
-                                "Tinatanggihan ang pagbibigay. Itatabi ko ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I won't give that item away.",
-                            },
-                            ["TL"] = {
-                                "Di ko ipamimigay ang bagay na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not giving that. Ask for something else.",
-                            },
-                            ["TL"] = {
-                                "Di ibibigay 'yan. Humingi ka ng iba.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_give_rejected.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.refill.active",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "active",
-            ["sourceId"] = "semantic.task.refill.active",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_active.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.refill",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.refill.active",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/refill.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refilling the container now.",
-                            },
-                            ["TL"] = {
-                                "Nilalagyan ng laman ang lalagyan ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Currently filling up on water.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang nagpapasok ng tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Topping off the fluids right now.",
-                            },
-                            ["TL"] = {
-                                "Pinupuno ang inumin ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Working on refilling the bottle.",
-                            },
-                            ["TL"] = {
-                                "Pinupuno ang bote.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Gathering water into the container.",
-                            },
-                            ["TL"] = {
-                                "Kumukuha ng tubig sa lalagyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "In the middle of refilling.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang nagpupuno.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refilling as instructed.",
-                            },
-                            ["TL"] = {
-                                "Nagpupuno ayon sa utos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Collecting clean water now.",
-                            },
-                            ["TL"] = {
-                                "Kumukuha ng malinis na tubig ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Topping it up. Give me a moment.",
-                            },
-                            ["TL"] = {
-                                "Pinupuno ito. Sandali lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Refill in progress.",
-                            },
-                            ["TL"] = {
-                                "Kasalukuyang nagpupuno.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_active.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_lifecycle",
-        ["id"] = "semantic.task.refill.admitted",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "admitted",
-            ["sourceId"] = "semantic.task.refill.admitted",
-            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_admitted.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
-        ["namespace"] = "semantic.task.refill",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:task_lifecycle",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseTemplateID"] = "semantic.task.refill.admitted",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/refill.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll refill that.",
-                            },
-                            ["TL"] = {
-                                "Lalagyan ko ng laman iyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Topping up the water supply.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Pupunuin ang supply ng tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll go get the bottles filled.",
-                            },
-                            ["TL"] = {
-                                "Pupunta ako para punuin ang mga bote.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right, refilling the containers.",
-                            },
-                            ["TL"] = {
-                                "Sige, pupunuin ang mga lalagyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good call. We need full canteens.",
-                            },
-                            ["TL"] = {
-                                "Magandang paalala. Kailangan natin ng punong sisidlan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll take it to the water source.",
-                            },
-                            ["TL"] = {
-                                "Dadalhin ko sa pinagkukunan ng tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Refilling immediately.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Pupunuin agad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. Getting fresh water.",
-                            },
-                            ["TL"] = {
-                                "Sige. Kukuha ng sariwang tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll refill what's empty.",
-                            },
-                            ["TL"] = {
-                                "Pupunuin ko ang walang laman.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds good. Heading to refill.",
-                            },
-                            ["TL"] = {
-                                "Maganda 'yan. Pupunta para magpuno.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_admitted.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
         },
         ["when"] = nil,
     },

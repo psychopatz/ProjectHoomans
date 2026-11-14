@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.acquaintance",
   "id": "sunset",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/neutral/acquaintance/sunset",
-    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.sunset"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.sunset",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "Hey. Been a long day?",
           "TL": "Hey. Isang mahabang araw?"
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "Good timing. I was about to settle in.",
           "TL": "Magandang timing. Malapit na akong tumira."
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "There you are. Find anything useful today?",
           "TL": "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?"
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "The day's winding down. What's up?",
           "TL": "Palubog na ang araw. Anong meron?"
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "You look tired. Everything okay?",
           "TL": "Mukha kang pagod. Ayos ka lang ba?"
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.acquaintance",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Hey. Been a long day?",
+            "Good timing. I was about to settle in.",
+            "There you are. Find anything useful today?",
+            "The day's winding down. What's up?",
+            "You look tired. Everything okay?"
+          ],
+          "TL": [
+            "Hey. Isang mahabang araw?",
+            "Magandang timing. Malapit na akong tumira.",
+            "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?",
+            "Palubog na ang araw. Anong meron?",
+            "Mukha kang pagod. Ayos ka lang ba?"
+          ]
+        }
+      }
+    ]
+  }
 }

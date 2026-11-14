@@ -1,27 +1,27 @@
 {
-  "id": "miss",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.backstory.follow_up.miss",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "question.backstory.follow_up",
+  "id": "miss",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "MISS",
+  "metadata": {
+    "responsePoolID": "question.backstory.follow_up.miss",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "MISS"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.backstory.follow_up.miss.authored",
-        "metadata": {
-          "fallback": "Sometimes. I still think about that part of my life.",
-          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss"
-        },
+        "id": "question.backstory.follow_up.miss.authored",
         "text": {
           "EN": "Sometimes. I still think about that part of my life.",
           "TL": "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko."
+        },
+        "metadata": {
+          "fallback": "Sometimes. I still think about that part of my life.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss"
         }
       }
     ]
-  },
-  "namespace": "semantic.question.backstory.follow_up",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

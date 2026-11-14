@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "quest.clinic_supplies.accept",
+  "id": "queued",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:quest_content",
     "contentOwner": "projecthoomans.dialogue_content.quest",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
-    "responseTemplateID": "semantic.quest.clinic_supplies.accept.queued",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'll bring the clinic supplies.",
-          "TL": "Dadalahin ko ang mga suplay ng klinika."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I've got the clinic supply run on my list.",
-          "TL": "Nasa listahan ko na ang pagkuha ng suplay para sa klinika."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I'll gather the medical gear as soon as I can.",
-          "TL": "Kukunin ko ang mga gamot sa lalong madaling panahon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Count on me for the clinic supplies.",
-          "TL": "Asahan mo ako sa mga suplay ng klinika."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I'll track down those medical items for you.",
-          "TL": "Hahanapin ko ang mga gamot na 'yon para sa'yo."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Queued up. I'll secure those clinic supplies.",
-          "TL": "Nakalista na. Kukunin ko ang mga suplay sa klinika."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I'm on it. I'll deliver the clinic supplies.",
-          "TL": "Ako na bahala. Ihahatid ko ang mga suplay ng klinika."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Medical supplies are queued. I'll get them.",
-          "TL": "Nakatala na ang mga medikal na suplay. Kukunin ko."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "I'll fetch what the clinic needs.",
-          "TL": "Kukunin ko kung ano ang kailangan ng klinika."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Accepted. I'll bring back those clinic supplies.",
-          "TL": "Tinanggap ko na. Dadalhin ko pabalik ang mga suplay sa klinika."
+          "EN": [
+            "I'll bring the clinic supplies.",
+            "I've got the clinic supply run on my list.",
+            "I'll gather the medical gear as soon as I can.",
+            "Count on me for the clinic supplies.",
+            "I'll track down those medical items for you.",
+            "Queued up. I'll secure those clinic supplies.",
+            "I'm on it. I'll deliver the clinic supplies.",
+            "Medical supplies are queued. I'll get them.",
+            "I'll fetch what the clinic needs.",
+            "Accepted. I'll bring back those clinic supplies."
+          ],
+          "TL": [
+            "Dadalahin ko ang mga suplay ng klinika.",
+            "Nasa listahan ko na ang pagkuha ng suplay para sa klinika.",
+            "Kukunin ko ang mga gamot sa lalong madaling panahon.",
+            "Asahan mo ako sa mga suplay ng klinika.",
+            "Hahanapin ko ang mga gamot na 'yon para sa'yo.",
+            "Nakalista na. Kukunin ko ang mga suplay sa klinika.",
+            "Ako na bahala. Ihahatid ko ang mga suplay ng klinika.",
+            "Nakatala na ang mga medikal na suplay. Kukunin ko.",
+            "Kukunin ko kung ano ang kailangan ng klinika.",
+            "Tinanggap ko na. Dadalhin ko pabalik ang mga suplay sa klinika."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.quest.clinic_supplies.accept.queued",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

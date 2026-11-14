@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.fetch",
   "id": "rejected",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
-    "responseTemplateID": "semantic.task.fetch.rejected",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I can't fetch that right now.",
-          "TL": "Hindi ko makuha iyon ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "That's in a death trap. I'm not fetching it.",
-          "TL": "Nasa bitag ng kamatayan 'yan. Di ko kukunin."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Too far or too dangerous. Refusing to fetch.",
-          "TL": "Masyadong malayo o mapanganib. Tumatangging kunin."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "My hands and pack are completely full.",
-          "TL": "Puno na ang kamay at bag ko."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I won't risk my neck for that junk.",
-          "TL": "Di ko isusugal ang buhay ko para sa basurang 'yan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Can't retrieve that under current conditions.",
-          "TL": "Di makukuha 'yan sa kasalukuyang kalagayan."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I don't have the carrying capacity right now.",
-          "TL": "Wala na akong espasyong paglalagyan ngayon."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Fetch order rejected. Pick it up yourself.",
-          "TL": "Tinatanggihan ang pagkuha. Pulutin mo nang kusa."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Unable to comply. Item is out of bounds.",
-          "TL": "Di makasusunod. Di abot ang bagay na 'yan."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "I can't fetch that for you.",
-          "TL": "Di ko makukuha 'yan para sa 'yo."
+          "EN": [
+            "I can't fetch that right now.",
+            "That's in a death trap. I'm not fetching it.",
+            "Too far or too dangerous. Refusing to fetch.",
+            "My hands and pack are completely full.",
+            "I won't risk my neck for that junk.",
+            "Can't retrieve that under current conditions.",
+            "I don't have the carrying capacity right now.",
+            "Fetch order rejected. Pick it up yourself.",
+            "Unable to comply. Item is out of bounds.",
+            "I can't fetch that for you."
+          ],
+          "TL": [
+            "Hindi ko makuha iyon ngayon.",
+            "Nasa bitag ng kamatayan 'yan. Di ko kukunin.",
+            "Masyadong malayo o mapanganib. Tumatangging kunin.",
+            "Puno na ang kamay at bag ko.",
+            "Di ko isusugal ang buhay ko para sa basurang 'yan.",
+            "Di makukuha 'yan sa kasalukuyang kalagayan.",
+            "Wala na akong espasyong paglalagyan ngayon.",
+            "Tinatanggihan ang pagkuha. Pulutin mo nang kusa.",
+            "Di makasusunod. Di abot ang bagay na 'yan.",
+            "Di ko makukuha 'yan para sa 'yo."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.fetch",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

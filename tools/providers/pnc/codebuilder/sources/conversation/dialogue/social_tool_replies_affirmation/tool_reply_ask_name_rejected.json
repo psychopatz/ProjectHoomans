@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply.ask_name",
+  "id": "rejected",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.ask_name.rejected.1.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-        "responseTemplateID": "semantic.tool_reply.ask_name.rejected.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I am not ready to share that yet.",
-              "TL": "Hindi pa ako handang sabihin iyan sa ngayon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "We don't know each other well enough for names.",
-              "TL": "Hindi pa tayo lubos na magkakilala para sa mga pangalan."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Names are a luxury for trusted folks. Keep your distance.",
-              "TL": "Para lang sa pinagkakatiwalaan ang pangalan. Lumayo ka muna."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I prefer to remain anonymous for now.",
-              "TL": "Mas gusto kong manatiling walang pangalan sa ngayon."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Not sharing my name with someone I just met.",
-              "TL": "Hindi ko ibinabahagi ang pangalan ko sa kakatagpo ko lang."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "You don't need my name to deal with me.",
-              "TL": "Hindi mo kailangan ang pangalan ko para makipag-usap sa akin."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I keep my identity to myself out here. Back off.",
-              "TL": "Itinatago ko ang pagkakakilanlan ko dito. Umatras ka."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "That information stays private between me and my people.",
-              "TL": "Pribado ang impormasyong 'yan sa akin at sa mga kasama ko."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I'm not in the habit of giving names to armed strangers.",
-              "TL": "Hindi ako sanay magbigay ng pangalan sa mga armadong di-kilala."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "No names today. Let's keep things strictly professional.",
-              "TL": "Walang pangalan ngayon. Panatilihin nating pormal ang lahat."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I am not ready to share that yet.",
+              "We don't know each other well enough for names.",
+              "Names are a luxury for trusted folks. Keep your distance.",
+              "I prefer to remain anonymous for now.",
+              "Not sharing my name with someone I just met.",
+              "You don't need my name to deal with me.",
+              "I keep my identity to myself out here. Back off.",
+              "That information stays private between me and my people.",
+              "I'm not in the habit of giving names to armed strangers.",
+              "No names today. Let's keep things strictly professional."
+            ],
+            "TL": [
+              "Hindi pa ako handang sabihin iyan sa ngayon.",
+              "Hindi pa tayo lubos na magkakilala para sa mga pangalan.",
+              "Para lang sa pinagkakatiwalaan ang pangalan. Lumayo ka muna.",
+              "Mas gusto kong manatiling walang pangalan sa ngayon.",
+              "Hindi ko ibinabahagi ang pangalan ko sa kakatagpo ko lang.",
+              "Hindi mo kailangan ang pangalan ko para makipag-usap sa akin.",
+              "Itinatago ko ang pagkakakilanlan ko dito. Umatras ka.",
+              "Pribado ang impormasyong 'yan sa akin at sa mga kasama ko.",
+              "Hindi ako sanay magbigay ng pangalan sa mga armadong di-kilala.",
+              "Walang pangalan ngayon. Panatilihin nating pormal ang lahat."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.ask_name.rejected.2.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-        "responseTemplateID": "semantic.tool_reply.ask_name.rejected.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Ask me again when we know each other better.",
-              "TL": "Tanungin mo ako ulit kapag mas magkakilala na tayo."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Prove you're trustworthy first, then ask again.",
-              "TL": "Patunayan mo munang mapagkakatiwalaan ka, bago ka magtanong ulit."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "We'll get to names after we survive a while together.",
-              "TL": "Pag-uusapan natin ang mga pangalan kapag nagkasama na tayo nang matagal."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Not yet. Maybe down the road if you don't shoot me.",
-              "TL": "Hindi pa ngayon. Baka sa susunod kung hindi mo ako babarilin."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Give it some time. I don't give away who I am so easily.",
-              "TL": "Bigyan mo muna ng panahon. Hindi ko basta-basta ibinibigay kung sino ako."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Come back after you've shown you can be trusted.",
-              "TL": "Bumalik ka kapag naipakita mo nang maaasahan ka."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Let's see if we both make it through the week first.",
-              "TL": "Tingnan muna natin kung pareho tayong tatagal ngayong linggo."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Trust takes time out here. Ask me another day.",
-              "TL": "Matagal mabuo ang tiwala rito. Tanungin mo ako sa ibang araw."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Hold on to that question until we've traded a few times.",
-              "TL": "Itabi mo muna ang tanong na 'yan hanggang sa makailang palitan tayo."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Too soon for personal details. Let's wait a bit.",
-              "TL": "Masyado pang maaga para sa personal na bagay. Maghintay tayo nang kaunti."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Ask me again when we know each other better.",
+              "Prove you're trustworthy first, then ask again.",
+              "We'll get to names after we survive a while together.",
+              "Not yet. Maybe down the road if you don't shoot me.",
+              "Give it some time. I don't give away who I am so easily.",
+              "Come back after you've shown you can be trusted.",
+              "Let's see if we both make it through the week first.",
+              "Trust takes time out here. Ask me another day.",
+              "Hold on to that question until we've traded a few times.",
+              "Too soon for personal details. Let's wait a bit."
+            ],
+            "TL": [
+              "Tanungin mo ako ulit kapag mas magkakilala na tayo.",
+              "Patunayan mo munang mapagkakatiwalaan ka, bago ka magtanong ulit.",
+              "Pag-uusapan natin ang mga pangalan kapag nagkasama na tayo nang matagal.",
+              "Hindi pa ngayon. Baka sa susunod kung hindi mo ako babarilin.",
+              "Bigyan mo muna ng panahon. Hindi ko basta-basta ibinibigay kung sino ako.",
+              "Bumalik ka kapag naipakita mo nang maaasahan ka.",
+              "Tingnan muna natin kung pareho tayong tatagal ngayong linggo.",
+              "Matagal mabuo ang tiwala rito. Tanungin mo ako sa ibang araw.",
+              "Itabi mo muna ang tanong na 'yan hanggang sa makailang palitan tayo.",
+              "Masyado pang maaga para sa personal na bagay. Maghintay tayo nang kaunti."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

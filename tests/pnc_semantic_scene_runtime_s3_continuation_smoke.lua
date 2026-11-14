@@ -62,7 +62,7 @@ end
 local commonOutput = {
     speech = {
         dialogueAct = "ACKNOWLEDGE",
-        contentTemplateID = "semantic.social.acknowledged",
+        contentTemplateID = "social.acknowledged",
     },
 }
 
@@ -76,7 +76,7 @@ register({
     outputs = {
         speech = {
             dialogueAct = "ASK_FOLLOWUP",
-            contentTemplateID = "semantic.interaction.memory.followup",
+            contentTemplateID = "interaction.memory.followup",
         },
     },
     continuation = {
@@ -121,7 +121,7 @@ register({
     outputs = {
         speech = {
             dialogueAct = "ASK_FOLLOWUP",
-            contentTemplateID = "semantic.interaction.memory.followup",
+            contentTemplateID = "interaction.memory.followup",
         },
     },
     continuation = {
@@ -148,7 +148,7 @@ register({
     outputs = {
         speech = {
             dialogueAct = "ANSWER",
-            contentTemplateID = "semantic.interaction.news.acknowledge",
+            contentTemplateID = "interaction.news.acknowledge",
         },
     },
     continuation = { mode = "terminate" },
@@ -171,7 +171,7 @@ register({
     outputs = {
         speech = {
             dialogueAct = "PROPOSE",
-            contentTemplateID = "semantic.social.hostile_boundary",
+            contentTemplateID = "social.hostile_boundary",
         },
     },
     continuation = {

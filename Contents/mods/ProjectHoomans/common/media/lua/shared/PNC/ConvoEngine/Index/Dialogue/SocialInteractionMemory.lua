@@ -1,110 +1,39 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.interaction.memory.acknowledge.guarded"] = {
+    ["interaction.memory.acknowledge"] = {
+        ["dependents"] = {
+            "behavior.acknowledge_memory",
+        },
         ["domain"] = "social_interaction_memory",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
         },
-        ["id"] = "semantic.interaction.memory.acknowledge.guarded",
+        ["id"] = "interaction.memory.acknowledge",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
     },
-    ["semantic.interaction.memory.acknowledge.neutral"] = {
+    ["interaction.memory.acknowledge_flavor"] = {
+        ["dependents"] = {
+            "behavior.acknowledge_memory",
+        },
         ["domain"] = "social_interaction_memory",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
         },
-        ["id"] = "semantic.interaction.memory.acknowledge.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
-    },
-    ["semantic.interaction.memory.acknowledge.terse"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.acknowledge.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
-    },
-    ["semantic.interaction.memory.acknowledge.warm"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.acknowledge.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
-    },
-    ["semantic.interaction.memory.acknowledge_flavor.guarded"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.guarded",
+        ["id"] = "interaction.memory.acknowledge_flavor",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
     },
-    ["semantic.interaction.memory.acknowledge_flavor.neutral"] = {
+    ["interaction.memory.followup"] = {
+        ["dependents"] = {
+            "behavior.ask_memory_followup",
+            "behavior.scene_news_followup",
+        },
         ["domain"] = "social_interaction_memory",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
         },
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
-    },
-    ["semantic.interaction.memory.acknowledge_flavor.terse"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
-    },
-    ["semantic.interaction.memory.acknowledge_flavor.warm"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.acknowledge_flavor.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
-    },
-    ["semantic.interaction.memory.followup.guarded"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.followup.guarded",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
-    },
-    ["semantic.interaction.memory.followup.neutral"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.followup.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
-    },
-    ["semantic.interaction.memory.followup.terse"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.followup.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
-    },
-    ["semantic.interaction.memory.followup.warm"] = {
-        ["domain"] = "social_interaction_memory",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
-        },
-        ["id"] = "semantic.interaction.memory.followup.warm",
+        ["id"] = "interaction.memory.followup",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
     },

@@ -1,0 +1,92 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.aggressive",
+  "id": "firearm_high_named",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "slots": {
+    "weapon": "entity.item"
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "This {slot.weapon.name} still shoots straight.",
+              "Nothing beats this {slot.weapon.name} when it counts.",
+              "Good old {slot.weapon.name}. Never lets me down.",
+              "Told you this {slot.weapon.name} has stopping power.",
+              "That {slot.weapon.name} put it right in the dirt.",
+              "Clean work with the {slot.weapon.name}.",
+              "This {slot.weapon.name} punched right through.",
+              "Glad I had this {slot.weapon.name} ready.",
+              "One round from this {slot.weapon.name} is all it takes.",
+              "The {slot.weapon.name} tore right through its skull."
+            ],
+            "TL": [
+              "Tuwid pa ring bumaril itong {slot.weapon.name}.",
+              "Walang tatalo sa {slot.weapon.name} na 'to kapag kailangan.",
+              "Maaasahang {slot.weapon.name}. Hindi ako binibigo.",
+              "Sabi ko sa'yo may lakas pumigil itong {slot.weapon.name}.",
+              "Ibinagsak agad ng {slot.weapon.name} sa lupa.",
+              "Malinis na trabaho gamit ang {slot.weapon.name}.",
+              "Tumagos agad itong {slot.weapon.name}.",
+              "Mabuti na lang at handa itong {slot.weapon.name}.",
+              "Isang bala lang mula sa {slot.weapon.name} na 'to, sapat na.",
+              "Winasak ng {slot.weapon.name} ang bungo nito."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Right where I wanted it. Down.",
+              "Dropped it in one shot. Beautiful.",
+              "Right between the eyes. Got him.",
+              "That's how you put one down.",
+              "Dead on arrival. Love it.",
+              "Drilled that one clean.",
+              "Saw the opening and took it.",
+              "Dropped like a stone.",
+              "Target down. Who's next?",
+              "Put that lead right where it hurts."
+            ],
+            "TL": [
+              "Eksakto sa gusto ko. Bagsak.",
+              "Bumagsak sa isang putok. Ayos.",
+              "Sa pagitan mismo ng mga mata. Sapul.",
+              "Ganyan magpabagsak ng isa.",
+              "Tigok agad. Ayos.",
+              "Sapul na sapul ang isang 'yon.",
+              "Nakakita ng butas at tinamaan agad.",
+              "Bumagsak na parang bato.",
+              "Bagsak ang target. Sino susunod?",
+              "Ipinasok ang tingga sa dapat kalagyan."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

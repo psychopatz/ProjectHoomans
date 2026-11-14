@@ -1,9 +1,13 @@
 {
-  "id": "utterance",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.companion_camp_here",
+  "id": "utterance",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.companion_camp_here.utterance",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.companion_camp_here.utterance",
@@ -12,14 +16,17 @@
           "TL": "Magkampo tayo rito."
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "Let's camp here.",
-    "TL": "Magkampo tayo rito."
-  },
-  "namespace": "ui.suggestion.companion_camp_here",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Let's camp here.",
+          "TL": "Magkampo tayo rito."
+        }
+      }
+    ]
+  }
 }

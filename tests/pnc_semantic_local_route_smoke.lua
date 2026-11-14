@@ -339,15 +339,20 @@ T.equal(offlineGreetingAccepted, true,
     "greeting remains local when the provider is disabled")
 local weatherFallbacks = {
     ["Hey there. Wet one today."] = true,
-    ["Rain's not letting up."] = true,
-    ["Keep dry if you can."] = true,
+    ["Rain's not letting up anytime soon."] = true,
+    ["Keep dry if you can out there."] = true,
+    ["Miserable weather, but we're still kicking."] = true,
+    ["Ground's completely soaked out there."] = true,
+    ["Cold rain like this makes everything harder."] = true,
     ["Watch your footing in this mud."] = true,
+    ["Rain makes it hard to hear them coming. Stay alert."] = true,
+    ["Good day to stay under a solid roof if you've got one."] = true,
+    ["At least the rain washes away the tracks. Stay dry."] = true,
 }
 T.truthy(weatherFallbacks[queued[8].payload.fallback],
     "provider-disabled greeting still uses the bounded local response pool")
-T.truthy(string.find(queued[8].payload.translationKey or "",
-    "conversation.content.semantic.flow.greeting.opening.rain.neutral.",
-    1, true),
+T.equal(queued[8].payload.translationKey,
+    "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain",
     "provider-disabled greeting retains canonical content provenance")
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "provider-disabled greeting remains on the deterministic route")

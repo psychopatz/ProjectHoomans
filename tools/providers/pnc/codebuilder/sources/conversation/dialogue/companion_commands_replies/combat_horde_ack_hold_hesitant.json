@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.horde.ack",
   "id": "hold_hesitant",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.combat.horde.ack.hold_hesitant"
+    "responseAct": "ACK"
   },
-  "response": {
-    "act": "ACK",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Okay. Holding here.",
-          "TL": "Sige. Dito muna ako."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Staying put. I hope they don't see us.",
-          "TL": "Dito lang ako. Sana di nila tayo makita."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Holding position... please be quiet.",
-          "TL": "Hawak ang pwesto... pakiusap tumahimik."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Holding ground. Heart's pounding.",
-          "TL": "Hawak ang pwesto. Lumalakas ang tibok ng puso ko."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I'll wait here, but let's be careful.",
-          "TL": "Maghihintay ako rito, pero mag-ingat tayo."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Staying still. Don't make a sound.",
-          "TL": "Walang kikilos. Huwag gagawa ng tunog."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Holding... waiting for your call.",
-          "TL": "Hawak muna... naghihintay sa utos mo."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Keeping low. I hope this works.",
-          "TL": "Nakayuko. Sana magtagumpay ito."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Holding here. Watching their claws.",
-          "TL": "Hawak dito. Binabantayan ang kuko nila."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Understood... staying frozen right here.",
-          "TL": "Naintindihan... di gagalaw dito mismo."
+          "EN": [
+            "Okay. Holding here.",
+            "Staying put. I hope they don't see us.",
+            "Holding position... please be quiet.",
+            "Holding ground. Heart's pounding.",
+            "I'll wait here, but let's be careful.",
+            "Staying still. Don't make a sound.",
+            "Holding... waiting for your call.",
+            "Keeping low. I hope this works.",
+            "Holding here. Watching their claws.",
+            "Understood... staying frozen right here."
+          ],
+          "TL": [
+            "Sige. Dito muna ako.",
+            "Dito lang ako. Sana di nila tayo makita.",
+            "Hawak ang pwesto... pakiusap tumahimik.",
+            "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
+            "Maghihintay ako rito, pero mag-ingat tayo.",
+            "Walang kikilos. Huwag gagawa ng tunog.",
+            "Hawak muna... naghihintay sa utos mo.",
+            "Nakayuko. Sana magtagumpay ito.",
+            "Hawak dito. Binabantayan ang kuko nila.",
+            "Naintindihan... di gagalaw dito mismo."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.horde.ack",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

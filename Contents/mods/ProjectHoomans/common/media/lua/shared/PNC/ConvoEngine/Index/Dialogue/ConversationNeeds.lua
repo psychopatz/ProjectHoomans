@@ -1,120 +1,111 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.question.needs.offer.fatigue.neutral"] = {
+    ["question.needs.offer.fatigue"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.offer.fatigue.neutral",
+        ["id"] = "question.needs.offer.fatigue",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
     },
-    ["semantic.question.needs.offer.hunger.guarded"] = {
+    ["question.needs.offer.hunger"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.offer.hunger.guarded",
+        ["id"] = "question.needs.offer.hunger",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
     },
-    ["semantic.question.needs.offer.hunger.neutral"] = {
+    ["question.needs.offer.thirst"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.offer.hunger.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
-    },
-    ["semantic.question.needs.offer.hunger.terse"] = {
-        ["domain"] = "conversation_needs",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        },
-        ["id"] = "semantic.question.needs.offer.hunger.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
-    },
-    ["semantic.question.needs.offer.hunger.warm"] = {
-        ["domain"] = "conversation_needs",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        },
-        ["id"] = "semantic.question.needs.offer.hunger.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
-    },
-    ["semantic.question.needs.offer.thirst.neutral"] = {
-        ["domain"] = "conversation_needs",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        },
-        ["id"] = "semantic.question.needs.offer.thirst.neutral",
+        ["id"] = "question.needs.offer.thirst",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_thirst.json",
     },
-    ["semantic.question.needs.offer.unknown.neutral"] = {
+    ["question.needs.offer.unknown"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.offer.unknown.neutral",
+        ["id"] = "question.needs.offer.unknown",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_unknown.json",
     },
-    ["semantic.question.needs.proposal.hunger.neutral"] = {
+    ["question.needs.proposal.hunger"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.proposal.hunger.neutral",
+        ["id"] = "question.needs.proposal.hunger",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs.proposal",
+        },
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_hunger.json",
     },
-    ["semantic.question.needs.proposal.thirst.neutral"] = {
+    ["question.needs.proposal.thirst"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.proposal.thirst.neutral",
+        ["id"] = "question.needs.proposal.thirst",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs.proposal",
+        },
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_thirst.json",
     },
-    ["semantic.question.needs.proposal.unknown.neutral"] = {
+    ["question.needs.proposal.unknown"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.proposal.unknown.neutral",
+        ["id"] = "question.needs.proposal.unknown",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs.proposal",
+        },
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_unknown.json",
     },
-    ["semantic.question.needs.quantity.hunger.neutral"] = {
+    ["question.needs.quantity.hunger"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.quantity.hunger.neutral",
+        ["id"] = "question.needs.quantity.hunger",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs.quantity",
+        },
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_hunger.json",
     },
-    ["semantic.question.needs.quantity.thirst.neutral"] = {
+    ["question.needs.quantity.thirst"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.quantity.thirst.neutral",
+        ["id"] = "question.needs.quantity.thirst",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs.quantity",
+        },
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_thirst.json",
     },
-    ["semantic.question.needs.quantity.unknown.neutral"] = {
+    ["question.needs.quantity.unknown"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationNeeds",
         },
-        ["id"] = "semantic.question.needs.quantity.unknown.neutral",
+        ["id"] = "question.needs.quantity.unknown",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs.quantity",
+        },
         ["source"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_unknown.json",
     },
 }

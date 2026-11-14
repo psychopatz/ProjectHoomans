@@ -74,7 +74,7 @@ local function resolveIdentityQuestion(ir, state, context)
     elseif Internal.IdentityKnown(context)
     then
         return {
-            templateID = "semantic.question.identity.known",
+            templateID = "question.identity.known",
             fallback = identityText(context) .. " We already know each other.",
             args = copyArgs({
                 npcName = context.npcFullName or context.npcName,
@@ -90,7 +90,7 @@ local function resolveIdentityQuestion(ir, state, context)
             .. " What's your name?"
     end
     return {
-        templateID = "semantic.question.identity",
+        templateID = "question.identity",
         fallback = text,
         args = copyArgs({
             npcName = context and (context.npcFullName or context.npcName),

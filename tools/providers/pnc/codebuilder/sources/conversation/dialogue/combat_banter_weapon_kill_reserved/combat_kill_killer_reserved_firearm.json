@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.reserved",
+  "id": "firearm",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/reserved.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Hit.",
+            "Down.",
+            "Target neutral.",
+            "One round.",
+            "Clear.",
+            "Eliminated.",
+            "Dropped.",
+            "Shot connected.",
+            "Neutralized.",
+            "Done."
+          ],
+          "TL": [
+            "Tinamaan.",
+            "Bagsak.",
+            "Target bagsak.",
+            "Isang bala.",
+            "Malinis.",
+            "Tanggal.",
+            "Naitumba.",
+            "Tumama ang putok.",
+            "Naalis.",
+            "Tapos."
+          ]
+        }
+      }
+    ]
+  }
+}

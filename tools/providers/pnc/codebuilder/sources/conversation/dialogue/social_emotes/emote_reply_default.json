@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.reply",
+  "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-    "responseTemplateID": "semantic.emote.reply.default",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I hear you.",
-          "TL": "Narinig kita."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Got it.",
-          "TL": "Nakuha ko."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Understood.",
-          "TL": "Naiintindihan ko."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Fair enough.",
-          "TL": "May punto ka."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I see you.",
-          "TL": "Nakikita kita."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Right back at you.",
-          "TL": "Pabalik din sa 'yo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Acknowledged.",
-          "TL": "Kinikilala ko."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Noted.",
-          "TL": "Tala ko na."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "All right.",
-          "TL": "Sige."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Message received.",
-          "TL": "Mensahe nakuha."
+          "EN": [
+            "I hear you.",
+            "Got it.",
+            "Understood.",
+            "Fair enough.",
+            "I see you.",
+            "Right back at you.",
+            "Acknowledged.",
+            "Noted.",
+            "All right.",
+            "Message received."
+          ],
+          "TL": [
+            "Narinig kita.",
+            "Nakuha ko.",
+            "Naiintindihan ko.",
+            "May punto ka.",
+            "Nakikita kita.",
+            "Pabalik din sa 'yo.",
+            "Kinikilala ko.",
+            "Tala ko na.",
+            "Sige.",
+            "Mensahe nakuha."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.reply.default",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

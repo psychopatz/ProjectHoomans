@@ -45,12 +45,21 @@ local function plan(poolID, act, templateID, topic)
     }
 end
 
+local function canonicalTemplateID(rawID)
+    local value = tostring(rawID or "")
+    if string.sub(value, 1, 9) == "semantic." then
+        return string.sub(value, 10)
+    end
+    return value
+end
+
 local function distressPool(poolID, act)
     local variants = {}
     local function add(id, when, priority)
-        local templateID = poolID .. "." .. id
+        local variantID = poolID .. "." .. id
+        local templateID = canonicalTemplateID(variantID)
         variants[#variants + 1] = {
-            id = templateID,
+            id = variantID,
             templateID = templateID,
             when = when,
             priority = priority,
@@ -76,33 +85,33 @@ Catalog.Register("semantic.medical.distress.teammate", {
     variants = {
         {
             id = "semantic.medical.distress.teammate.missing",
-            templateID = "semantic.medical.distress.teammate.missing",
+            templateID = "medical.distress.teammate.missing",
             when = { medicalBandageStatus = "missing" },
             priority = 5,
             plan = plan(
                 "semantic.medical.distress.teammate",
                 "REACT",
-                "semantic.medical.distress.teammate.missing"
+                "medical.distress.teammate.missing"
             ),
         },
         {
             id = "semantic.medical.distress.teammate.found",
-            templateID = "semantic.medical.distress.teammate.found",
+            templateID = "medical.distress.teammate.found",
             when = { medicalBandageStatus = "found" },
             priority = 5,
             plan = plan(
                 "semantic.medical.distress.teammate",
                 "REACT",
-                "semantic.medical.distress.teammate.found"
+                "medical.distress.teammate.found"
             ),
         },
         {
             id = "semantic.medical.distress.teammate.default",
-            templateID = "semantic.medical.distress.teammate.default",
+            templateID = "medical.distress.teammate.default",
             plan = plan(
                 "semantic.medical.distress.teammate",
                 "REACT",
-                "semantic.medical.distress.teammate.default"
+                "medical.distress.teammate.default"
             ),
         },
     },
@@ -112,23 +121,23 @@ Catalog.Register("semantic.medical.distress.treatment", {
     variants = {
         {
             id = "semantic.medical.distress.treatment.bandage",
-            templateID = "semantic.medical.distress.treatment.bandage",
+            templateID = "medical.distress.treatment.bandage",
             when = { downedNeed = "bandage" },
             priority = 3,
             plan = plan(
                 "semantic.medical.distress.treatment",
                 "ACK",
-                "semantic.medical.distress.treatment.bandage",
+                "medical.distress.treatment.bandage",
                 "medical"
             ),
         },
         {
             id = "semantic.medical.distress.treatment.default",
-            templateID = "semantic.medical.distress.treatment.default",
+            templateID = "medical.distress.treatment.default",
             plan = plan(
                 "semantic.medical.distress.treatment",
                 "ACK",
-                "semantic.medical.distress.treatment.default",
+                "medical.distress.treatment.default",
                 "medical"
             ),
         },

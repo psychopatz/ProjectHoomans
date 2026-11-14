@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.member",
   "id": "dusk",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/member/dusk",
-    "textDomain": "pnc.psdl.social.greetings.member.dusk"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.member.dusk",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "Evening. Perimeter looks clear.",
           "TL": "Gabi. Mukhang malinaw ang perimeter."
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "Need me for something before night watch?",
           "TL": "Kailangan mo ba ako bago ang pagbabantay sa gabi?"
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "We're all still here. I'll call that a good day.",
           "TL": "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw."
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "Keep it quiet. The others are settling down.",
           "TL": "Manahimik ka. Umayos na yung iba."
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "I can take first watch if you need the rest.",
           "TL": "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.member",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Evening. Perimeter looks clear.",
+            "Need me for something before night watch?",
+            "We're all still here. I'll call that a good day.",
+            "Keep it quiet. The others are settling down.",
+            "I can take first watch if you need the rest."
+          ],
+          "TL": [
+            "Gabi. Mukhang malinaw ang perimeter.",
+            "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+            "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+            "Manahimik ka. Umayos na yung iba.",
+            "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
+          ]
+        }
+      }
+    ]
+  }
 }

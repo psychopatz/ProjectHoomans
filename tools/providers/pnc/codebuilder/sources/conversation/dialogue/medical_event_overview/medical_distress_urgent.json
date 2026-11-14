@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress",
   "id": "urgent",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/overview.json",
-    "responseTemplateID": "semantic.medical.distress.urgent",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I am hurt! I need help now!",
-          "TL": "Sugatan ako! Kailangan ko ng tulong ngayon na!"
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.02"
-        },
-        "text": {
-          "EN": "Emergency! I need immediate medical attention!",
-          "TL": "Kagipitan! Kailangan ko ng agarang gamot ngayon din!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.03"
-        },
-        "text": {
-          "EN": "Hit bad! Come over here right now!",
-          "TL": "Grabe ang tama ko! Halika rito ngayon din!"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.04"
-        },
-        "text": {
-          "EN": "Urgent! I'm bleeding and falling down!",
-          "TL": "Apurahan! Dumurugo ako at bumabagsak!"
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.05"
-        },
-        "text": {
-          "EN": "I need aid this second! Hurry!",
-          "TL": "Kailangan ko ng gamot sa segundong ito! Bilis!"
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.06"
-        },
-        "text": {
-          "EN": "Severe injury! Drop what you're doing and help me!",
-          "TL": "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.07"
-        },
-        "text": {
-          "EN": "I won't last long without treatment! Now!",
-          "TL": "Hindi ako magtatagal nang walang gamot! Ngayon na!"
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.08"
-        },
-        "text": {
-          "EN": "Critical wound! Bandage me now!",
-          "TL": "Kritikal na sugat! Bendahan mo ako ngayon din!"
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.09"
-        },
-        "text": {
-          "EN": "I'm going down hard! Medic, help me!",
-          "TL": "Bumabagsak na ako! Saklolo, tulungan mo ako!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.urgent.neutral.10"
-        },
-        "text": {
-          "EN": "Urgent distress! Someone patch me up right now!",
-          "TL": "Apurahang saklolo! May magbenda sa akin ngayon din!"
+          "EN": [
+            "I am hurt! I need help now!",
+            "Emergency! I need immediate medical attention!",
+            "Hit bad! Come over here right now!",
+            "Urgent! I'm bleeding and falling down!",
+            "I need aid this second! Hurry!",
+            "Severe injury! Drop what you're doing and help me!",
+            "I won't last long without treatment! Now!",
+            "Critical wound! Bandage me now!",
+            "I'm going down hard! Medic, help me!",
+            "Urgent distress! Someone patch me up right now!"
+          ],
+          "TL": [
+            "Sugatan ako! Kailangan ko ng tulong ngayon na!",
+            "Kagipitan! Kailangan ko ng agarang gamot ngayon din!",
+            "Grabe ang tama ko! Halika rito ngayon din!",
+            "Apurahan! Dumurugo ako at bumabagsak!",
+            "Kailangan ko ng gamot sa segundong ito! Bilis!",
+            "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!",
+            "Hindi ako magtatagal nang walang gamot! Ngayon na!",
+            "Kritikal na sugat! Bendahan mo ako ngayon din!",
+            "Bumabagsak na ako! Saklolo, tulungan mo ako!",
+            "Apurahang saklolo! May magbenda sa akin ngayon din!"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

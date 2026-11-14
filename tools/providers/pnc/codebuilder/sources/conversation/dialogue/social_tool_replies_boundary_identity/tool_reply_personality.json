@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "personality",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.personality.1.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/personality.json",
-        "responseTemplateID": "semantic.tool_reply.personality.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "That is just how I am wired.",
-              "TL": "Ganyan talaga ang pagkakagawa sa akin."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Take me or leave me, that is who I am.",
-              "TL": "Tanggapin mo man o hindi, 'yan talaga ako."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "I have always been like this. It keeps me alive.",
-              "TL": "Matagal na akong ganito. Nakatulong 'to para mabuhay ako."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Not going to apologize for how I operate.",
-              "TL": "Hindi ako hihingi ng tawad sa kung paano ako kumilos."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Everyone is built differently out here.",
-              "TL": "Iba-iba ang hubog ng bawat isa rito."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "It is what it is. I am not changing overnight.",
-              "TL": "Ganoon talaga. Hindi ako magbabago nang biglaan."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "That is just my nature.",
-              "TL": "Kaugalian ko na talaga 'yan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I am too old to pretend to be someone else.",
-              "TL": "Masyado na akong matanda para magpanggap na iba."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Like it or not, this is me.",
-              "TL": "Gusto mo man o hindi, ako ito."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I do things my own way. Has not failed me yet.",
-              "TL": "Kanya-kanyang diskarte. Hindi pa naman ako binibigo nito."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/personality.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "That is just how I am wired.",
+              "Take me or leave me, that is who I am.",
+              "I have always been like this. It keeps me alive.",
+              "Not going to apologize for how I operate.",
+              "Everyone is built differently out here.",
+              "It is what it is. I am not changing overnight.",
+              "That is just my nature.",
+              "I am too old to pretend to be someone else.",
+              "Like it or not, this is me.",
+              "I do things my own way. Has not failed me yet."
+            ],
+            "TL": [
+              "Ganyan talaga ang pagkakagawa sa akin.",
+              "Tanggapin mo man o hindi, 'yan talaga ako.",
+              "Matagal na akong ganito. Nakatulong 'to para mabuhay ako.",
+              "Hindi ako hihingi ng tawad sa kung paano ako kumilos.",
+              "Iba-iba ang hubog ng bawat isa rito.",
+              "Ganoon talaga. Hindi ako magbabago nang biglaan.",
+              "Kaugalian ko na talaga 'yan.",
+              "Masyado na akong matanda para magpanggap na iba.",
+              "Gusto mo man o hindi, ako ito.",
+              "Kanya-kanyang diskarte. Hindi pa naman ako binibigo nito."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.personality.2.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/personality.json",
-        "responseTemplateID": "semantic.tool_reply.personality.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "The world changed. I changed with it.",
-              "TL": "Nagbago ang mundo. Nagbago rin ako kasabay nito."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "You adapt or you end up dead. This is who I had to become.",
-              "TL": "Makibagay ka o mamamatay ka. Ito ang kinailangan kong kahinatnan."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Survival hardens people. I am no exception.",
-              "TL": "Nagpapatigas ng loob ang kaligtasan. Hindi ako naiiba roon."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I used to be different before all this fell apart.",
-              "TL": "Iba ako dati bago gumuho ang lahat ng ito."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "You learn to live with who you become out here.",
-              "TL": "Matututo kang mamuhay kasama ang taong kinahinatnan mo rito."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "This world does not leave much room for soft edges.",
-              "TL": "Walang puwang sa mundong ito ang labis na lambot."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I became what I needed to be to see tomorrow.",
-              "TL": "Naging kung ano ang kinailangan para makita ang bukas."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "We are all shaped by what we had to survive.",
-              "TL": "Nahubog tayong lahat sa mga pinagdaanan nating hirap."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Hard times make hard survivors.",
-              "TL": "Ang mahihirap na panahon ay gumagawa ng matitibay na tao."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I did what I had to. It made me who I am now.",
-              "TL": "Ginawa ko ang kinailangan. Iyon ang bumuo sa akin ngayon."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "The world changed. I changed with it.",
+              "You adapt or you end up dead. This is who I had to become.",
+              "Survival hardens people. I am no exception.",
+              "I used to be different before all this fell apart.",
+              "You learn to live with who you become out here.",
+              "This world does not leave much room for soft edges.",
+              "I became what I needed to be to see tomorrow.",
+              "We are all shaped by what we had to survive.",
+              "Hard times make hard survivors.",
+              "I did what I had to. It made me who I am now."
+            ],
+            "TL": [
+              "Nagbago ang mundo. Nagbago rin ako kasabay nito.",
+              "Makibagay ka o mamamatay ka. Ito ang kinailangan kong kahinatnan.",
+              "Nagpapatigas ng loob ang kaligtasan. Hindi ako naiiba roon.",
+              "Iba ako dati bago gumuho ang lahat ng ito.",
+              "Matututo kang mamuhay kasama ang taong kinahinatnan mo rito.",
+              "Walang puwang sa mundong ito ang labis na lambot.",
+              "Naging kung ano ang kinailangan para makita ang bukas.",
+              "Nahubog tayong lahat sa mga pinagdaanan nating hirap.",
+              "Ang mahihirap na panahon ay gumagawa ng matitibay na tao.",
+              "Ginawa ko ang kinailangan. Iyon ang bumuo sa akin ngayon."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

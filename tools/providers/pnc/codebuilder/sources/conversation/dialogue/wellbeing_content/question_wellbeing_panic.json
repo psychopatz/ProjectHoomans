@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "question.wellbeing",
+  "id": "panic",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:wellbeing_content",
     "contentOwner": "projecthoomans.dialogue_content.wellbeing",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/emotional.json",
-    "responseTemplateID": "semantic.question.wellbeing.panic",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'm pretty shaken up right now.",
-          "TL": "Nanginginig pa rin ako ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "My heart is pounding out of my chest.",
-          "TL": "Napakabilis ng tibok ng puso ko sa kaba."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "That was way too close. Need a minute to breathe.",
-          "TL": "Muntik na 'yon. Kailangan ko ng sandali para kumalma."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Trying to keep my hands from shaking.",
-          "TL": "Pinipigilan ko ang panginginig ng mga kamay ko."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Terrified, if I'm being honest with you.",
-          "TL": "Natatakot ako, kung sasabihin ko ang totoo."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Felt like my heart was going to stop back there.",
-          "TL": "Pakiramdam ko hihinto na ang puso ko kanina."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Need to catch my breath and calm my nerves.",
-          "TL": "Kailangang huminga nang malalim at pakalmahin ang sarili."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Adrenaline is surging. Hard to think straight.",
-          "TL": "Mataas pa ang adrenaline ko. Hirap mag-isip nang tuwid."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Still feeling the panic creeping up on me.",
-          "TL": "Nararamdaman ko pa rin ang takot na gumagapang sa akin."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Give me a second to get my head together.",
-          "TL": "Bigyan mo ako ng ilang sandali para makabawi ng katinuan."
+          "EN": [
+            "I'm pretty shaken up right now.",
+            "My heart is pounding out of my chest.",
+            "That was way too close. Need a minute to breathe.",
+            "Trying to keep my hands from shaking.",
+            "Terrified, if I'm being honest with you.",
+            "Felt like my heart was going to stop back there.",
+            "Need to catch my breath and calm my nerves.",
+            "Adrenaline is surging. Hard to think straight.",
+            "Still feeling the panic creeping up on me.",
+            "Give me a second to get my head together."
+          ],
+          "TL": [
+            "Nanginginig pa rin ako ngayon.",
+            "Napakabilis ng tibok ng puso ko sa kaba.",
+            "Muntik na 'yon. Kailangan ko ng sandali para kumalma.",
+            "Pinipigilan ko ang panginginig ng mga kamay ko.",
+            "Natatakot ako, kung sasabihin ko ang totoo.",
+            "Pakiramdam ko hihinto na ang puso ko kanina.",
+            "Kailangang huminga nang malalim at pakalmahin ang sarili.",
+            "Mataas pa ang adrenaline ko. Hirap mag-isip nang tuwid.",
+            "Nararamdaman ko pa rin ang takot na gumagapang sa akin.",
+            "Bigyan mo ako ng ilang sandali para makabawi ng katinuan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.question.wellbeing.panic",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

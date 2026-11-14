@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.projectalife.encounter",
+  "id": "hostile",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.projectalife.encounter.hostile",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "That group looks hostile. Keep cover between us and them.",
-          "TL": "That group looks hostile. Keep cover between us and them."
+          "EN": [
+            "That group looks hostile. Keep cover between us and them."
+          ],
+          "TL": [
+            "That group looks hostile. Keep cover between us and them."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.projectalife.encounter.hostile",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

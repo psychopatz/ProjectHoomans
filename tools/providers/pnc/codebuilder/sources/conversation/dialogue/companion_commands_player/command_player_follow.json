@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.player",
   "id": "follow",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,34 +16,25 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
-    "responseTemplateID": "semantic.command.player.follow"
+    "responseAct": "DIRECTIVE"
   },
-  "response": {
-    "act": "DIRECTIVE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "{addressee.name}, on me.",
-          "TL": "{addressee.name}, sumunod kayo sa akin."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Stay close, {addressee.name}.",
-          "TL": "Manatili kayong malapit, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "{addressee.name}, let's move.",
-          "TL": "{addressee.name}, umalis na tayo."
+          "EN": [
+            "{addressee.name}, on me.",
+            "Stay close, {addressee.name}.",
+            "{addressee.name}, let's move."
+          ],
+          "TL": [
+            "{addressee.name}, sumunod kayo sa akin.",
+            "Manatili kayong malapit, {addressee.name}.",
+            "{addressee.name}, umalis na tayo."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.player",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

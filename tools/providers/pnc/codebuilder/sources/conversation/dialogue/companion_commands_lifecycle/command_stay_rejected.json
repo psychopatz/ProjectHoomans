@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.stay",
   "id": "rejected",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
-    "responseTemplateID": "semantic.command.stay.rejected"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I can't stay here right now.",
-          "TL": "Hindi ako makapananatili rito ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Too dangerous to stay put. We need to keep moving.",
-          "TL": "Masyadong mapanganib manatili rito. Kailangang gumalaw."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I won't stay in an open kill zone.",
-          "TL": "Di ako tatayo sa bukas na lugar na pugad ng patayan."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Staying here is suicide. I'm coming with you.",
-          "TL": "Pagpapakamatay ang manatili rito. Sasama ako sa 'yo."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I refuse to hold this spot without adequate cover.",
-          "TL": "Tumatanggi akong humawak dito nang walang maayos na silong."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Cannot stay here. The perimeter is totally exposed.",
-          "TL": "Di makapanatili rito. Masyadong kita ang paligid."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I'm not standing like a target. I have to move.",
-          "TL": "Di ako tatayong parang target. Kailangan kong gumalaw."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Unable to hold position. Hostiles are too close.",
-          "TL": "Di mahawakan ang pwesto. Masyadong malapit ang kalaban."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "I won't stay behind while you need backup.",
-          "TL": "Di ako maiiwan habang kailangan mo ng saklolo."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Stay order rejected. We must relocate.",
-          "TL": "Tinatanggihan ang pananatili. Kailangan nating lumipat."
+          "EN": [
+            "I can't stay here right now.",
+            "Too dangerous to stay put. We need to keep moving.",
+            "I won't stay in an open kill zone.",
+            "Staying here is suicide. I'm coming with you.",
+            "I refuse to hold this spot without adequate cover.",
+            "Cannot stay here. The perimeter is totally exposed.",
+            "I'm not standing like a target. I have to move.",
+            "Unable to hold position. Hostiles are too close.",
+            "I won't stay behind while you need backup.",
+            "Stay order rejected. We must relocate."
+          ],
+          "TL": [
+            "Hindi ako makapananatili rito ngayon.",
+            "Masyadong mapanganib manatili rito. Kailangang gumalaw.",
+            "Di ako tatayo sa bukas na lugar na pugad ng patayan.",
+            "Pagpapakamatay ang manatili rito. Sasama ako sa 'yo.",
+            "Tumatanggi akong humawak dito nang walang maayos na silong.",
+            "Di makapanatili rito. Masyadong kita ang paligid.",
+            "Di ako tatayong parang target. Kailangan kong gumalaw.",
+            "Di mahawakan ang pwesto. Masyadong malapit ang kalaban.",
+            "Di ako maiiwan habang kailangan mo ng saklolo.",
+            "Tinatanggihan ang pananatili. Kailangan nating lumipat."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.stay",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.lover",
   "id": "twilight",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/special/lover/twilight",
-    "textDomain": "pnc.psdl.social.greetings.special.lover.twilight"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.special.lover.twilight",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "Can't sleep? Neither can I.",
           "TL": "Hindi makatulog? Hindi ko rin kaya."
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "It's all right. I'm here.",
           "TL": "ayos lang. nandito ako."
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "Come sit with me. We can keep watch together.",
           "TL": "Halika upo sa akin. Maaari tayong magbantay nang magkasama."
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "You scared me walking around this late.",
           "TL": "Tinakot mo ako sa paglalakad nang ganito kagabi."
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "Stay close tonight. I mean it.",
           "TL": "Manatili kang malapit ngayong gabi. Seryoso ako."
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.lover",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Can't sleep? Neither can I.",
+            "It's all right. I'm here.",
+            "Come sit with me. We can keep watch together.",
+            "You scared me walking around this late.",
+            "Stay close tonight. I mean it."
+          ],
+          "TL": [
+            "Hindi makatulog? Hindi ko rin kaya.",
+            "ayos lang. nandito ako.",
+            "Halika upo sa akin. Maaari tayong magbantay nang magkasama.",
+            "Tinakot mo ako sa paglalakad nang ganito kagabi.",
+            "Manatili kang malapit ngayong gabi. Seryoso ako."
+          ]
+        }
+      }
+    ]
+  }
 }

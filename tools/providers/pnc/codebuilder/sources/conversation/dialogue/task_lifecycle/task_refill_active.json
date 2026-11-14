@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.refill",
   "id": "active",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/refill.json",
-    "responseTemplateID": "semantic.task.refill.active",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Refilling the container now.",
-          "TL": "Nilalagyan ng laman ang lalagyan ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Currently filling up on water.",
-          "TL": "Kasalukuyang nagpapasok ng tubig."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Topping off the fluids right now.",
-          "TL": "Pinupuno ang inumin ngayon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Working on refilling the bottle.",
-          "TL": "Pinupuno ang bote."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Gathering water into the container.",
-          "TL": "Kumukuha ng tubig sa lalagyan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "In the middle of refilling.",
-          "TL": "Kasalukuyang nagpupuno."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Refilling as instructed.",
-          "TL": "Nagpupuno ayon sa utos."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Collecting clean water now.",
-          "TL": "Kumukuha ng malinis na tubig ngayon."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Topping it up. Give me a moment.",
-          "TL": "Pinupuno ito. Sandali lang."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Refill in progress.",
-          "TL": "Kasalukuyang nagpupuno."
+          "EN": [
+            "Refilling the container now.",
+            "Currently filling up on water.",
+            "Topping off the fluids right now.",
+            "Working on refilling the bottle.",
+            "Gathering water into the container.",
+            "In the middle of refilling.",
+            "Refilling as instructed.",
+            "Collecting clean water now.",
+            "Topping it up. Give me a moment.",
+            "Refill in progress."
+          ],
+          "TL": [
+            "Nilalagyan ng laman ang lalagyan ngayon.",
+            "Kasalukuyang nagpapasok ng tubig.",
+            "Pinupuno ang inumin ngayon.",
+            "Pinupuno ang bote.",
+            "Kumukuha ng tubig sa lalagyan.",
+            "Kasalukuyang nagpupuno.",
+            "Nagpupuno ayon sa utos.",
+            "Kumukuha ng malinis na tubig ngayon.",
+            "Pinupuno ito. Sandali lang.",
+            "Kasalukuyang nagpupuno."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.refill",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

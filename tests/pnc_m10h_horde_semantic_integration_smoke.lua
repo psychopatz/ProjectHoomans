@@ -104,6 +104,11 @@ PNC = {
             end,
             Snapshot = function(value) return value end,
         },
+        SocialContext = {
+            ResolveNPCType = function() return "companion" end,
+        },
+    },
+    ConvoEngine = {
         CombatBanterArbiter = {
             Reserve = function()
                 reserveCount = reserveCount + 1
@@ -124,9 +129,6 @@ PNC = {
                     offerIDs = {},
                 }
             end,
-        },
-        SocialContext = {
-            ResolveNPCType = function() return "companion" end,
         },
         InteractionSceneAdopters = {
             OnHordeTransition = function(_record, spec)

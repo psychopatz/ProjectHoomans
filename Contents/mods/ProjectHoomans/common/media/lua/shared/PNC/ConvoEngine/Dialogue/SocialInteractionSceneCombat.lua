@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "social_interaction_scene_combat",
-        ["id"] = "semantic.combat.tactical_spatial.hostile.clock.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.tactical_spatial.hostile.clock",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hostiles at {scene.clock}!",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.tactical_spatial.hostile.clock.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hostiles at {scene.clock}!",
+                                        "Shooters at {scene.clock}! Take cover!",
+                                        "Enemy fighters spotted at {scene.clock}!",
+                                        "Gunmen at {scene.clock}! Watch your head!",
+                                        "Hostiles moving in from {scene.clock}!",
+                                        "Armed enemies at {scene.clock}!",
+                                        "Contact! Hostiles at {scene.clock}!",
+                                        "Check {scene.clock}! Armed hostiles!",
+                                        "Enemy squad at {scene.clock}!",
+                                        "Threat at {scene.clock}! Hostiles!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga kalaban sa {scene.clock}!",
+                                        "May mga baril sa {scene.clock}! Magtago!",
+                                        "May mga kalabang manlalaban sa {scene.clock}!",
+                                        "May mga armadong tao sa {scene.clock}! Yumuko ka!",
+                                        "Mga kalaban lumalapit mula sa {scene.clock}!",
+                                        "May armadong mga kalaban sa {scene.clock}!",
+                                        "May engkuwentro! Mga kalaban sa {scene.clock}!",
+                                        "Tingnan ang {scene.clock}! May armadong kalaban!",
+                                        "Grupo ng kalaban sa {scene.clock}!",
+                                        "Banta sa {scene.clock}! Mga kalaban!",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.tactical_spatial.hostile",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Hostiles at {scene.clock}!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.tactical_spatial.hostile.clock.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hostiles at {scene.clock}!",
+                            "Shooters at {scene.clock}! Take cover!",
+                            "Enemy fighters spotted at {scene.clock}!",
+                            "Gunmen at {scene.clock}! Watch your head!",
+                            "Hostiles moving in from {scene.clock}!",
+                            "Armed enemies at {scene.clock}!",
+                            "Contact! Hostiles at {scene.clock}!",
+                            "Check {scene.clock}! Armed hostiles!",
+                            "Enemy squad at {scene.clock}!",
+                            "Threat at {scene.clock}! Hostiles!",
+                        },
+                        ["TL"] = {
+                            "Mga kalaban sa {scene.clock}!",
+                            "May mga baril sa {scene.clock}! Magtago!",
+                            "May mga kalabang manlalaban sa {scene.clock}!",
+                            "May mga armadong tao sa {scene.clock}! Yumuko ka!",
+                            "Mga kalaban lumalapit mula sa {scene.clock}!",
+                            "May armadong mga kalaban sa {scene.clock}!",
+                            "May engkuwentro! Mga kalaban sa {scene.clock}!",
+                            "Tingnan ang {scene.clock}! May armadong kalaban!",
+                            "Grupo ng kalaban sa {scene.clock}!",
+                            "Banta sa {scene.clock}! Mga kalaban!",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.tactical_spatial.hostile.clock",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.combat.tactical_spatial.hostile.clock.neutral",
+            ["localId"] = "clock",
+            ["sourceId"] = "combat.tactical_spatial.hostile.clock",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
-        ["namespace"] = "semantic.combat.tactical_spatial.hostile.clock",
+        ["namespace"] = "combat.tactical_spatial.hostile",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.combat.tactical_spatial.hostile.clock",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/combat/tactical_spatial.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hostiles at {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "Mga kalaban sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Shooters at {scene.clock}! Take cover!",
-                            },
-                            ["TL"] = {
-                                "May mga baril sa {scene.clock}! Magtago!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Enemy fighters spotted at {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "May mga kalabang manlalaban sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Gunmen at {scene.clock}! Watch your head!",
-                            },
-                            ["TL"] = {
-                                "May mga armadong tao sa {scene.clock}! Yumuko ka!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hostiles moving in from {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "Mga kalaban lumalapit mula sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Armed enemies at {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "May armadong mga kalaban sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Contact! Hostiles at {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "May engkuwentro! Mga kalaban sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Check {scene.clock}! Armed hostiles!",
-                            },
-                            ["TL"] = {
-                                "Tingnan ang {scene.clock}! May armadong kalaban!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Enemy squad at {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "Grupo ng kalaban sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat at {scene.clock}! Hostiles!",
-                            },
-                            ["TL"] = {
-                                "Banta sa {scene.clock}! Mga kalaban!",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hostiles at {scene.clock}!",
+                                        "Shooters at {scene.clock}! Take cover!",
+                                        "Enemy fighters spotted at {scene.clock}!",
+                                        "Gunmen at {scene.clock}! Watch your head!",
+                                        "Hostiles moving in from {scene.clock}!",
+                                        "Armed enemies at {scene.clock}!",
+                                        "Contact! Hostiles at {scene.clock}!",
+                                        "Check {scene.clock}! Armed hostiles!",
+                                        "Enemy squad at {scene.clock}!",
+                                        "Threat at {scene.clock}! Hostiles!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga kalaban sa {scene.clock}!",
+                                        "May mga baril sa {scene.clock}! Magtago!",
+                                        "May mga kalabang manlalaban sa {scene.clock}!",
+                                        "May mga armadong tao sa {scene.clock}! Yumuko ka!",
+                                        "Mga kalaban lumalapit mula sa {scene.clock}!",
+                                        "May armadong mga kalaban sa {scene.clock}!",
+                                        "May engkuwentro! Mga kalaban sa {scene.clock}!",
+                                        "Tingnan ang {scene.clock}! May armadong kalaban!",
+                                        "Grupo ng kalaban sa {scene.clock}!",
+                                        "Banta sa {scene.clock}! Mga kalaban!",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.tactical_spatial.hostile.clock",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Hostiles at {scene.clock}!",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.tactical_spatial.hostile.clock.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,20 +192,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Hostiles at {scene.clock}!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.tactical_spatial.hostile.clock.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hostiles at {scene.clock}!",
+                        "Shooters at {scene.clock}! Take cover!",
+                        "Enemy fighters spotted at {scene.clock}!",
+                        "Gunmen at {scene.clock}! Watch your head!",
+                        "Hostiles moving in from {scene.clock}!",
+                        "Armed enemies at {scene.clock}!",
+                        "Contact! Hostiles at {scene.clock}!",
+                        "Check {scene.clock}! Armed hostiles!",
+                        "Enemy squad at {scene.clock}!",
+                        "Threat at {scene.clock}! Hostiles!",
+                    },
+                    ["TL"] = {
+                        "Mga kalaban sa {scene.clock}!",
+                        "May mga baril sa {scene.clock}! Magtago!",
+                        "May mga kalabang manlalaban sa {scene.clock}!",
+                        "May mga armadong tao sa {scene.clock}! Yumuko ka!",
+                        "Mga kalaban lumalapit mula sa {scene.clock}!",
+                        "May armadong mga kalaban sa {scene.clock}!",
+                        "May engkuwentro! Mga kalaban sa {scene.clock}!",
+                        "Tingnan ang {scene.clock}! May armadong kalaban!",
+                        "Grupo ng kalaban sa {scene.clock}!",
+                        "Banta sa {scene.clock}! Mga kalaban!",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_interaction_scene_combat",
-        ["id"] = "semantic.combat.tactical_spatial.hostile.coarse.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.tactical_spatial.hostile.coarse",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hostiles {scene.relative}!",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.tactical_spatial.hostile.coarse.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hostiles {scene.relative}!",
+                                        "Armed fighters {scene.relative}!",
+                                        "Enemy movement {scene.relative}!",
+                                        "Take cover, hostiles {scene.relative}!",
+                                        "Gunfire expected {scene.relative}! Hostiles!",
+                                        "Watch out {scene.relative}, armed hostiles!",
+                                        "Enemy survivors spotted {scene.relative}!",
+                                        "Contact {scene.relative}! Keep low!",
+                                        "Check {scene.relative}! Hostiles advancing!",
+                                        "Incoming attack {scene.relative}!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga kalaban {scene.relative}!",
+                                        "May armadong mga tao {scene.relative}!",
+                                        "Galaw ng kalaban {scene.relative}!",
+                                        "Magtago, may mga kalaban {scene.relative}!",
+                                        "Maghanda sa putukan {scene.relative}! Mga kalaban!",
+                                        "Mag-ingat {scene.relative}, may mga armadong kalaban!",
+                                        "May kalabang nakaligtas {scene.relative}!",
+                                        "May kalaban {scene.relative}! Yumuko!",
+                                        "Tingnan {scene.relative}! Sumusulong ang kalaban!",
+                                        "Paparating na atake {scene.relative}!",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.tactical_spatial.hostile",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Hostiles {scene.relative}!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.tactical_spatial.hostile.coarse.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hostiles {scene.relative}!",
+                            "Armed fighters {scene.relative}!",
+                            "Enemy movement {scene.relative}!",
+                            "Take cover, hostiles {scene.relative}!",
+                            "Gunfire expected {scene.relative}! Hostiles!",
+                            "Watch out {scene.relative}, armed hostiles!",
+                            "Enemy survivors spotted {scene.relative}!",
+                            "Contact {scene.relative}! Keep low!",
+                            "Check {scene.relative}! Hostiles advancing!",
+                            "Incoming attack {scene.relative}!",
+                        },
+                        ["TL"] = {
+                            "Mga kalaban {scene.relative}!",
+                            "May armadong mga tao {scene.relative}!",
+                            "Galaw ng kalaban {scene.relative}!",
+                            "Magtago, may mga kalaban {scene.relative}!",
+                            "Maghanda sa putukan {scene.relative}! Mga kalaban!",
+                            "Mag-ingat {scene.relative}, may mga armadong kalaban!",
+                            "May kalabang nakaligtas {scene.relative}!",
+                            "May kalaban {scene.relative}! Yumuko!",
+                            "Tingnan {scene.relative}! Sumusulong ang kalaban!",
+                            "Paparating na atake {scene.relative}!",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.tactical_spatial.hostile.coarse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.combat.tactical_spatial.hostile.coarse.neutral",
+            ["localId"] = "coarse",
+            ["sourceId"] = "combat.tactical_spatial.hostile.coarse",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
-        ["namespace"] = "semantic.combat.tactical_spatial.hostile.coarse",
+        ["namespace"] = "combat.tactical_spatial.hostile",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,127 +340,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.combat.tactical_spatial.hostile.coarse",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/combat/tactical_spatial.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hostiles {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Mga kalaban {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Armed fighters {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "May armadong mga tao {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Enemy movement {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Galaw ng kalaban {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take cover, hostiles {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Magtago, may mga kalaban {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Gunfire expected {scene.relative}! Hostiles!",
-                            },
-                            ["TL"] = {
-                                "Maghanda sa putukan {scene.relative}! Mga kalaban!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch out {scene.relative}, armed hostiles!",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat {scene.relative}, may mga armadong kalaban!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Enemy survivors spotted {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "May kalabang nakaligtas {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Contact {scene.relative}! Keep low!",
-                            },
-                            ["TL"] = {
-                                "May kalaban {scene.relative}! Yumuko!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Check {scene.relative}! Hostiles advancing!",
-                            },
-                            ["TL"] = {
-                                "Tingnan {scene.relative}! Sumusulong ang kalaban!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Incoming attack {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Paparating na atake {scene.relative}!",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hostiles {scene.relative}!",
+                                        "Armed fighters {scene.relative}!",
+                                        "Enemy movement {scene.relative}!",
+                                        "Take cover, hostiles {scene.relative}!",
+                                        "Gunfire expected {scene.relative}! Hostiles!",
+                                        "Watch out {scene.relative}, armed hostiles!",
+                                        "Enemy survivors spotted {scene.relative}!",
+                                        "Contact {scene.relative}! Keep low!",
+                                        "Check {scene.relative}! Hostiles advancing!",
+                                        "Incoming attack {scene.relative}!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga kalaban {scene.relative}!",
+                                        "May armadong mga tao {scene.relative}!",
+                                        "Galaw ng kalaban {scene.relative}!",
+                                        "Magtago, may mga kalaban {scene.relative}!",
+                                        "Maghanda sa putukan {scene.relative}! Mga kalaban!",
+                                        "Mag-ingat {scene.relative}, may mga armadong kalaban!",
+                                        "May kalabang nakaligtas {scene.relative}!",
+                                        "May kalaban {scene.relative}! Yumuko!",
+                                        "Tingnan {scene.relative}! Sumusulong ang kalaban!",
+                                        "Paparating na atake {scene.relative}!",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.tactical_spatial.hostile.coarse",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Hostiles {scene.relative}!",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.tactical_spatial.hostile.coarse.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -312,20 +421,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Hostiles {scene.relative}!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.tactical_spatial.hostile.coarse.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hostiles {scene.relative}!",
+                        "Armed fighters {scene.relative}!",
+                        "Enemy movement {scene.relative}!",
+                        "Take cover, hostiles {scene.relative}!",
+                        "Gunfire expected {scene.relative}! Hostiles!",
+                        "Watch out {scene.relative}, armed hostiles!",
+                        "Enemy survivors spotted {scene.relative}!",
+                        "Contact {scene.relative}! Keep low!",
+                        "Check {scene.relative}! Hostiles advancing!",
+                        "Incoming attack {scene.relative}!",
+                    },
+                    ["TL"] = {
+                        "Mga kalaban {scene.relative}!",
+                        "May armadong mga tao {scene.relative}!",
+                        "Galaw ng kalaban {scene.relative}!",
+                        "Magtago, may mga kalaban {scene.relative}!",
+                        "Maghanda sa putukan {scene.relative}! Mga kalaban!",
+                        "Mag-ingat {scene.relative}, may mga armadong kalaban!",
+                        "May kalabang nakaligtas {scene.relative}!",
+                        "May kalaban {scene.relative}! Yumuko!",
+                        "Tingnan {scene.relative}! Sumusulong ang kalaban!",
+                        "Paparating na atake {scene.relative}!",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_interaction_scene_combat",
-        ["id"] = "semantic.combat.tactical_spatial.zombie.clock.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.tactical_spatial.zombie.clock",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Zombies, {scene.clock}!",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.tactical_spatial.zombie.clock.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Zombies, {scene.clock}!",
+                                        "Dead coming in from {scene.clock}!",
+                                        "Watch {scene.clock}, walkers spotted!",
+                                        "Zombies at {scene.clock}! Get ready!",
+                                        "Movement at {scene.clock}, it's dead heads!",
+                                        "Incoming zombies from {scene.clock}!",
+                                        "Eyes on {scene.clock}! Walkers approaching!",
+                                        "Check {scene.clock}, we've got zombies!",
+                                        "Zombies moving in fast at {scene.clock}!",
+                                        "Target at {scene.clock}! Zombies!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga zombie, {scene.clock}!",
+                                        "May mga patay na parating mula sa {scene.clock}!",
+                                        "Bantayan ang {scene.clock}, may mga walker!",
+                                        "Mga zombie sa {scene.clock}! Humanda!",
+                                        "May galaw sa {scene.clock}, mga zombie 'yan!",
+                                        "Paparating na mga zombie galing sa {scene.clock}!",
+                                        "Tumingin sa {scene.clock}! May lumalapit na mga walker!",
+                                        "Tingnan ang {scene.clock}, may mga zombie tayo!",
+                                        "Mabilis na lumalapit ang mga zombie sa {scene.clock}!",
+                                        "Puntirya sa {scene.clock}! Mga zombie!",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.tactical_spatial.zombie",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Zombies, {scene.clock}!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.tactical_spatial.zombie.clock.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Zombies, {scene.clock}!",
+                            "Dead coming in from {scene.clock}!",
+                            "Watch {scene.clock}, walkers spotted!",
+                            "Zombies at {scene.clock}! Get ready!",
+                            "Movement at {scene.clock}, it's dead heads!",
+                            "Incoming zombies from {scene.clock}!",
+                            "Eyes on {scene.clock}! Walkers approaching!",
+                            "Check {scene.clock}, we've got zombies!",
+                            "Zombies moving in fast at {scene.clock}!",
+                            "Target at {scene.clock}! Zombies!",
+                        },
+                        ["TL"] = {
+                            "Mga zombie, {scene.clock}!",
+                            "May mga patay na parating mula sa {scene.clock}!",
+                            "Bantayan ang {scene.clock}, may mga walker!",
+                            "Mga zombie sa {scene.clock}! Humanda!",
+                            "May galaw sa {scene.clock}, mga zombie 'yan!",
+                            "Paparating na mga zombie galing sa {scene.clock}!",
+                            "Tumingin sa {scene.clock}! May lumalapit na mga walker!",
+                            "Tingnan ang {scene.clock}, may mga zombie tayo!",
+                            "Mabilis na lumalapit ang mga zombie sa {scene.clock}!",
+                            "Puntirya sa {scene.clock}! Mga zombie!",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.tactical_spatial.zombie.clock",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.combat.tactical_spatial.zombie.clock.neutral",
+            ["localId"] = "clock",
+            ["sourceId"] = "combat.tactical_spatial.zombie.clock",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
-        ["namespace"] = "semantic.combat.tactical_spatial.zombie.clock",
+        ["namespace"] = "combat.tactical_spatial.zombie",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -339,127 +569,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.combat.tactical_spatial.zombie.clock",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/combat/tactical_spatial.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Zombies, {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "Mga zombie, {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead coming in from {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "May mga patay na parating mula sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch {scene.clock}, walkers spotted!",
-                            },
-                            ["TL"] = {
-                                "Bantayan ang {scene.clock}, may mga walker!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Zombies at {scene.clock}! Get ready!",
-                            },
-                            ["TL"] = {
-                                "Mga zombie sa {scene.clock}! Humanda!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Movement at {scene.clock}, it's dead heads!",
-                            },
-                            ["TL"] = {
-                                "May galaw sa {scene.clock}, mga zombie 'yan!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Incoming zombies from {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "Paparating na mga zombie galing sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eyes on {scene.clock}! Walkers approaching!",
-                            },
-                            ["TL"] = {
-                                "Tumingin sa {scene.clock}! May lumalapit na mga walker!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Check {scene.clock}, we've got zombies!",
-                            },
-                            ["TL"] = {
-                                "Tingnan ang {scene.clock}, may mga zombie tayo!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Zombies moving in fast at {scene.clock}!",
-                            },
-                            ["TL"] = {
-                                "Mabilis na lumalapit ang mga zombie sa {scene.clock}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target at {scene.clock}! Zombies!",
-                            },
-                            ["TL"] = {
-                                "Puntirya sa {scene.clock}! Mga zombie!",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Zombies, {scene.clock}!",
+                                        "Dead coming in from {scene.clock}!",
+                                        "Watch {scene.clock}, walkers spotted!",
+                                        "Zombies at {scene.clock}! Get ready!",
+                                        "Movement at {scene.clock}, it's dead heads!",
+                                        "Incoming zombies from {scene.clock}!",
+                                        "Eyes on {scene.clock}! Walkers approaching!",
+                                        "Check {scene.clock}, we've got zombies!",
+                                        "Zombies moving in fast at {scene.clock}!",
+                                        "Target at {scene.clock}! Zombies!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga zombie, {scene.clock}!",
+                                        "May mga patay na parating mula sa {scene.clock}!",
+                                        "Bantayan ang {scene.clock}, may mga walker!",
+                                        "Mga zombie sa {scene.clock}! Humanda!",
+                                        "May galaw sa {scene.clock}, mga zombie 'yan!",
+                                        "Paparating na mga zombie galing sa {scene.clock}!",
+                                        "Tumingin sa {scene.clock}! May lumalapit na mga walker!",
+                                        "Tingnan ang {scene.clock}, may mga zombie tayo!",
+                                        "Mabilis na lumalapit ang mga zombie sa {scene.clock}!",
+                                        "Puntirya sa {scene.clock}! Mga zombie!",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.tactical_spatial.zombie.clock",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Zombies, {scene.clock}!",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.tactical_spatial.zombie.clock.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -469,20 +650,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Zombies, {scene.clock}!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.tactical_spatial.zombie.clock.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Zombies, {scene.clock}!",
+                        "Dead coming in from {scene.clock}!",
+                        "Watch {scene.clock}, walkers spotted!",
+                        "Zombies at {scene.clock}! Get ready!",
+                        "Movement at {scene.clock}, it's dead heads!",
+                        "Incoming zombies from {scene.clock}!",
+                        "Eyes on {scene.clock}! Walkers approaching!",
+                        "Check {scene.clock}, we've got zombies!",
+                        "Zombies moving in fast at {scene.clock}!",
+                        "Target at {scene.clock}! Zombies!",
+                    },
+                    ["TL"] = {
+                        "Mga zombie, {scene.clock}!",
+                        "May mga patay na parating mula sa {scene.clock}!",
+                        "Bantayan ang {scene.clock}, may mga walker!",
+                        "Mga zombie sa {scene.clock}! Humanda!",
+                        "May galaw sa {scene.clock}, mga zombie 'yan!",
+                        "Paparating na mga zombie galing sa {scene.clock}!",
+                        "Tumingin sa {scene.clock}! May lumalapit na mga walker!",
+                        "Tingnan ang {scene.clock}, may mga zombie tayo!",
+                        "Mabilis na lumalapit ang mga zombie sa {scene.clock}!",
+                        "Puntirya sa {scene.clock}! Mga zombie!",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_interaction_scene_combat",
-        ["id"] = "semantic.combat.tactical_spatial.zombie.coarse.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.tactical_spatial.zombie.coarse",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Zombies {scene.relative}!",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.tactical_spatial.zombie.coarse.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Zombies {scene.relative}!",
+                                        "Watch out, dead heads {scene.relative}!",
+                                        "Walkers approaching {scene.relative}!",
+                                        "Look {scene.relative}! Zombies!",
+                                        "Incoming dead {scene.relative}!",
+                                        "Zombies closing in {scene.relative}!",
+                                        "Eyes {scene.relative}, we've got walkers!",
+                                        "Dead heads spotted {scene.relative}!",
+                                        "Check {scene.relative}! Swarm incoming!",
+                                        "Danger {scene.relative}! Zombies!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga zombie {scene.relative}!",
+                                        "Mag-ingat, may mga patay {scene.relative}!",
+                                        "May mga walker na papalapit {scene.relative}!",
+                                        "Tumingin {scene.relative}! Mga zombie!",
+                                        "Paparating na mga patay {scene.relative}!",
+                                        "Lumalapit ang mga zombie {scene.relative}!",
+                                        "Tumingin {scene.relative}, may mga walker tayo!",
+                                        "May nakitang mga zombie {scene.relative}!",
+                                        "Suriin {scene.relative}! May paparating na kawan!",
+                                        "Panganib {scene.relative}! Mga zombie!",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.tactical_spatial.zombie",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Zombies {scene.relative}!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.tactical_spatial.zombie.coarse.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Zombies {scene.relative}!",
+                            "Watch out, dead heads {scene.relative}!",
+                            "Walkers approaching {scene.relative}!",
+                            "Look {scene.relative}! Zombies!",
+                            "Incoming dead {scene.relative}!",
+                            "Zombies closing in {scene.relative}!",
+                            "Eyes {scene.relative}, we've got walkers!",
+                            "Dead heads spotted {scene.relative}!",
+                            "Check {scene.relative}! Swarm incoming!",
+                            "Danger {scene.relative}! Zombies!",
+                        },
+                        ["TL"] = {
+                            "Mga zombie {scene.relative}!",
+                            "Mag-ingat, may mga patay {scene.relative}!",
+                            "May mga walker na papalapit {scene.relative}!",
+                            "Tumingin {scene.relative}! Mga zombie!",
+                            "Paparating na mga patay {scene.relative}!",
+                            "Lumalapit ang mga zombie {scene.relative}!",
+                            "Tumingin {scene.relative}, may mga walker tayo!",
+                            "May nakitang mga zombie {scene.relative}!",
+                            "Suriin {scene.relative}! May paparating na kawan!",
+                            "Panganib {scene.relative}! Mga zombie!",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.tactical_spatial.zombie.coarse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.combat.tactical_spatial.zombie.coarse.neutral",
+            ["localId"] = "coarse",
+            ["sourceId"] = "combat.tactical_spatial.zombie.coarse",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
-        ["namespace"] = "semantic.combat.tactical_spatial.zombie.coarse",
+        ["namespace"] = "combat.tactical_spatial.zombie",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -496,127 +798,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.combat.tactical_spatial.zombie.coarse",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/combat/tactical_spatial.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Zombies {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Mga zombie {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch out, dead heads {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat, may mga patay {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Walkers approaching {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "May mga walker na papalapit {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Look {scene.relative}! Zombies!",
-                            },
-                            ["TL"] = {
-                                "Tumingin {scene.relative}! Mga zombie!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Incoming dead {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Paparating na mga patay {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Zombies closing in {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "Lumalapit ang mga zombie {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eyes {scene.relative}, we've got walkers!",
-                            },
-                            ["TL"] = {
-                                "Tumingin {scene.relative}, may mga walker tayo!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead heads spotted {scene.relative}!",
-                            },
-                            ["TL"] = {
-                                "May nakitang mga zombie {scene.relative}!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Check {scene.relative}! Swarm incoming!",
-                            },
-                            ["TL"] = {
-                                "Suriin {scene.relative}! May paparating na kawan!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Danger {scene.relative}! Zombies!",
-                            },
-                            ["TL"] = {
-                                "Panganib {scene.relative}! Mga zombie!",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Zombies {scene.relative}!",
+                                        "Watch out, dead heads {scene.relative}!",
+                                        "Walkers approaching {scene.relative}!",
+                                        "Look {scene.relative}! Zombies!",
+                                        "Incoming dead {scene.relative}!",
+                                        "Zombies closing in {scene.relative}!",
+                                        "Eyes {scene.relative}, we've got walkers!",
+                                        "Dead heads spotted {scene.relative}!",
+                                        "Check {scene.relative}! Swarm incoming!",
+                                        "Danger {scene.relative}! Zombies!",
+                                    },
+                                    ["TL"] = {
+                                        "Mga zombie {scene.relative}!",
+                                        "Mag-ingat, may mga patay {scene.relative}!",
+                                        "May mga walker na papalapit {scene.relative}!",
+                                        "Tumingin {scene.relative}! Mga zombie!",
+                                        "Paparating na mga patay {scene.relative}!",
+                                        "Lumalapit ang mga zombie {scene.relative}!",
+                                        "Tumingin {scene.relative}, may mga walker tayo!",
+                                        "May nakitang mga zombie {scene.relative}!",
+                                        "Suriin {scene.relative}! May paparating na kawan!",
+                                        "Panganib {scene.relative}! Mga zombie!",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.tactical_spatial.zombie.coarse",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Zombies {scene.relative}!",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.tactical_spatial.zombie.coarse.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -625,6 +878,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Zombies {scene.relative}!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.tactical_spatial.zombie.coarse.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Zombies {scene.relative}!",
+                        "Watch out, dead heads {scene.relative}!",
+                        "Walkers approaching {scene.relative}!",
+                        "Look {scene.relative}! Zombies!",
+                        "Incoming dead {scene.relative}!",
+                        "Zombies closing in {scene.relative}!",
+                        "Eyes {scene.relative}, we've got walkers!",
+                        "Dead heads spotted {scene.relative}!",
+                        "Check {scene.relative}! Swarm incoming!",
+                        "Danger {scene.relative}! Zombies!",
+                    },
+                    ["TL"] = {
+                        "Mga zombie {scene.relative}!",
+                        "Mag-ingat, may mga patay {scene.relative}!",
+                        "May mga walker na papalapit {scene.relative}!",
+                        "Tumingin {scene.relative}! Mga zombie!",
+                        "Paparating na mga patay {scene.relative}!",
+                        "Lumalapit ang mga zombie {scene.relative}!",
+                        "Tumingin {scene.relative}, may mga walker tayo!",
+                        "May nakitang mga zombie {scene.relative}!",
+                        "Suriin {scene.relative}! May paparating na kawan!",
+                        "Panganib {scene.relative}! Mga zombie!",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

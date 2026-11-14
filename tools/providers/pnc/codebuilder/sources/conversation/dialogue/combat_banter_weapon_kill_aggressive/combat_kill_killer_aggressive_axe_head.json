@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.aggressive",
+  "id": "axe_head",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Split that rotten head wide open.",
+            "Axe bit deep right into the skull.",
+            "Cleft in two. Stay in the dirt.",
+            "Buried the axe right between its ears.",
+            "Heavy swing. Done for good.",
+            "Crushed the crown with one chop.",
+            "That skull never stood a chance.",
+            "Broke right through bone.",
+            "Split it down to the neck.",
+            "One hard chop and it's over."
+          ],
+          "TL": [
+            "Biyak na biyak ang bulok na ulo.",
+            "Bumaon nang malalim ang palakol sa bungo.",
+            "Biyak sa dalawa. Manatili ka sa lupa.",
+            "Ibaon ang palakol sa gitna ng tenga nito.",
+            "Mabigat na hataw. Tapos magpakailanman.",
+            "Durog ang tuktok sa isang taga.",
+            "Walang laban ang bungong 'yon.",
+            "Bumasag diretso sa buto.",
+            "Biyak hanggang leeg.",
+            "Isang malakas na taga at tapos na."
+          ]
+        }
+      }
+    ]
+  }
+}

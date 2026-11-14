@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "leader_loss",
   "id": "colonist",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:event_reactions",
     "contentOwner": "projecthoomans.dialogue_content.events",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/leader_loss.json",
-    "responseTemplateID": "semantic.leader_loss.colonist",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Our leader is gone. We keep the group together.",
-          "TL": "Wala na ang pinuno natin. Panatilihin nating buo ang grupo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "The leader fell, but the colony endures.",
-          "TL": "Bumagsak ang pinuno, pero mananatili ang kolonya."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "We must maintain order. The group cannot collapse.",
-          "TL": "Kailangan nating panatilihin ang kaayusan. Hindi dapat bumagsak ang grupo."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Our founder is dead, but our camp will survive.",
-          "TL": "Patay na ang nagtatag sa atin, pero mabubuhay ang kampo natin."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Stay organized. We carry on their work.",
-          "TL": "Manatiling organisado. Ipagpatuloy natin ang nasimulan nila."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "A terrible loss, but our community must stand firm.",
-          "TL": "Matinding kawalan, pero kailangang tumindig ang komunidad natin."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Don't panic. We keep rations and duties moving.",
-          "TL": "Huwag mag-panic. Tuloy ang rasyon at mga tungkulin."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "The colony needs everyone focused right now.",
-          "TL": "Kailangan ng kolonya ang pokus ng lahat ngayon din."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "We built this together. We keep it standing together.",
-          "TL": "Sabay natin 'tong binuo. Sabay natin 'tong pananatilihing nakatayo."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Leadership may change, but the settlement survives.",
-          "TL": "Maaaring magbago ang pamumuno, pero mabubuhay ang paninirahan."
+          "EN": [
+            "Our leader is gone. We keep the group together.",
+            "The leader fell, but the colony endures.",
+            "We must maintain order. The group cannot collapse.",
+            "Our founder is dead, but our camp will survive.",
+            "Stay organized. We carry on their work.",
+            "A terrible loss, but our community must stand firm.",
+            "Don't panic. We keep rations and duties moving.",
+            "The colony needs everyone focused right now.",
+            "We built this together. We keep it standing together.",
+            "Leadership may change, but the settlement survives."
+          ],
+          "TL": [
+            "Wala na ang pinuno natin. Panatilihin nating buo ang grupo.",
+            "Bumagsak ang pinuno, pero mananatili ang kolonya.",
+            "Kailangan nating panatilihin ang kaayusan. Hindi dapat bumagsak ang grupo.",
+            "Patay na ang nagtatag sa atin, pero mabubuhay ang kampo natin.",
+            "Manatiling organisado. Ipagpatuloy natin ang nasimulan nila.",
+            "Matinding kawalan, pero kailangang tumindig ang komunidad natin.",
+            "Huwag mag-panic. Tuloy ang rasyon at mga tungkulin.",
+            "Kailangan ng kolonya ang pokus ng lahat ngayon din.",
+            "Sabay natin 'tong binuo. Sabay natin 'tong pananatilihing nakatayo.",
+            "Maaaring magbago ang pamumuno, pero mabubuhay ang paninirahan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.leader_loss",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

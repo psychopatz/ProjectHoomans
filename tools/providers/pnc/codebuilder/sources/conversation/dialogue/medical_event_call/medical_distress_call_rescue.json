@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.call",
   "id": "rescue",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/call.json",
-    "responseTemplateID": "semantic.medical.distress.call.rescue",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I'm trapped here! I need help over here!",
-          "TL": "Naipit ako rito! Kailangan ko ng tulong dito!"
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.02"
-        },
-        "text": {
-          "EN": "Can't move on my own! Pull me out!",
-          "TL": "Hindi ako makagalaw mag-isa! Hilahin mo ako palabas!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.03"
-        },
-        "text": {
-          "EN": "Pinned down and injured! Come get me!",
-          "TL": "Naiipit at sugatan! Halika kunin mo ako!"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.04"
-        },
-        "text": {
-          "EN": "Over here! Don't leave me stranded!",
-          "TL": "Dito! Huwag niyo akong iwang nastranded!"
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.05"
-        },
-        "text": {
-          "EN": "I'm stuck behind rubble! Need someone to clear it!",
-          "TL": "Naipit ako sa likod ng guho! May kailangang mag-alis nito!"
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.06"
-        },
-        "text": {
-          "EN": "Can't crawl any further! Help me!",
-          "TL": "Hindi na ako makagapang pa! Tulungan mo ako!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.07"
-        },
-        "text": {
-          "EN": "I'm over here, behind cover! Pull me back!",
-          "TL": "Nandito ako sa kublihan! Hilahin mo ako pabalik!"
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.08"
-        },
-        "text": {
-          "EN": "Rescue me, please! They're getting closer!",
-          "TL": "Saklolohan mo ako, pakiusap! Papalapit na sila!"
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.09"
-        },
-        "text": {
-          "EN": "I need extraction! Can't walk out of here!",
-          "TL": "Kailangan ko ng tulong makalabas! Hindi ako makakalakad!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.rescue.neutral.10"
-        },
-        "text": {
-          "EN": "Help me get out! My leg is broken!",
-          "TL": "Tulungan mo akong makalabas! Bali ang binti ko!"
+          "EN": [
+            "I'm trapped here! I need help over here!",
+            "Can't move on my own! Pull me out!",
+            "Pinned down and injured! Come get me!",
+            "Over here! Don't leave me stranded!",
+            "I'm stuck behind rubble! Need someone to clear it!",
+            "Can't crawl any further! Help me!",
+            "I'm over here, behind cover! Pull me back!",
+            "Rescue me, please! They're getting closer!",
+            "I need extraction! Can't walk out of here!",
+            "Help me get out! My leg is broken!"
+          ],
+          "TL": [
+            "Naipit ako rito! Kailangan ko ng tulong dito!",
+            "Hindi ako makagalaw mag-isa! Hilahin mo ako palabas!",
+            "Naiipit at sugatan! Halika kunin mo ako!",
+            "Dito! Huwag niyo akong iwang nastranded!",
+            "Naipit ako sa likod ng guho! May kailangang mag-alis nito!",
+            "Hindi na ako makagapang pa! Tulungan mo ako!",
+            "Nandito ako sa kublihan! Hilahin mo ako pabalik!",
+            "Saklolohan mo ako, pakiusap! Papalapit na sila!",
+            "Kailangan ko ng tulong makalabas! Hindi ako makakalakad!",
+            "Tulungan mo akong makalabas! Bali ang binti ko!"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.call",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

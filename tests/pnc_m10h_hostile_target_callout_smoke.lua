@@ -67,6 +67,8 @@ PNC = {
                 }
             end,
         },
+    },
+    ConvoEngine = {
         CombatBanterArbiter = {
             Reserve = function()
                 reserveCalls = reserveCalls + 1

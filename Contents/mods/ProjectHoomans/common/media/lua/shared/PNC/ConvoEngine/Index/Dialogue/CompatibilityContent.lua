@@ -1,245 +1,245 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.integration.bandits.hooman_hurt.colonist.neutral"] = {
+    ["integration.bandits.hooman_hurt.colonist"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.bandits.hooman_hurt.colonist.neutral",
+        ["id"] = "integration.bandits.hooman_hurt.colonist",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
     },
-    ["semantic.integration.bandits.hooman_hurt.default.neutral"] = {
+    ["integration.bandits.hooman_hurt.default"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.bandits.hooman_hurt.default.neutral",
+        ["id"] = "integration.bandits.hooman_hurt.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
     },
-    ["semantic.integration.bandits.hooman_hurt.family.neutral"] = {
+    ["integration.bandits.hooman_hurt.family"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.bandits.hooman_hurt.family.neutral",
+        ["id"] = "integration.bandits.hooman_hurt.family",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
     },
-    ["semantic.integration.bandits.hooman_hurt.lover.neutral"] = {
+    ["integration.bandits.hooman_hurt.lover"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.bandits.hooman_hurt.lover.neutral",
+        ["id"] = "integration.bandits.hooman_hurt.lover",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
     },
-    ["semantic.integration.companion_dogs.feed.female.neutral"] = {
+    ["integration.companion_dogs.feed.female"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.companion_dogs.feed.female.neutral",
+        ["id"] = "integration.companion_dogs.feed.female",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
     },
-    ["semantic.integration.companion_dogs.feed.male.neutral"] = {
+    ["integration.companion_dogs.feed.male"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.companion_dogs.feed.male.neutral",
+        ["id"] = "integration.companion_dogs.feed.male",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
     },
-    ["semantic.integration.companion_dogs.feed.unknown.neutral"] = {
+    ["integration.companion_dogs.feed.unknown"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.companion_dogs.feed.unknown.neutral",
+        ["id"] = "integration.companion_dogs.feed.unknown",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
     },
-    ["semantic.integration.companion_dogs.greeting.female.neutral"] = {
+    ["integration.companion_dogs.greeting.female"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.companion_dogs.greeting.female.neutral",
+        ["id"] = "integration.companion_dogs.greeting.female",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
     },
-    ["semantic.integration.companion_dogs.greeting.male.neutral"] = {
+    ["integration.companion_dogs.greeting.male"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.companion_dogs.greeting.male.neutral",
+        ["id"] = "integration.companion_dogs.greeting.male",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
     },
-    ["semantic.integration.companion_dogs.greeting.unknown.neutral"] = {
+    ["integration.companion_dogs.greeting.unknown"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.companion_dogs.greeting.unknown.neutral",
+        ["id"] = "integration.companion_dogs.greeting.unknown",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
     },
-    ["semantic.integration.necroa.mask_warning.colonist.neutral"] = {
+    ["integration.necroa.mask_warning.colonist"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.necroa.mask_warning.colonist.neutral",
+        ["id"] = "integration.necroa.mask_warning.colonist",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
     },
-    ["semantic.integration.necroa.mask_warning.default.neutral"] = {
+    ["integration.necroa.mask_warning.default"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.necroa.mask_warning.default.neutral",
+        ["id"] = "integration.necroa.mask_warning.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
     },
-    ["semantic.integration.necroa.mask_warning.family.neutral"] = {
+    ["integration.necroa.mask_warning.family"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.necroa.mask_warning.family.neutral",
+        ["id"] = "integration.necroa.mask_warning.family",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
     },
-    ["semantic.integration.necroa.player_mask_removed.default.neutral"] = {
+    ["integration.necroa.player_mask_removed.default"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.necroa.player_mask_removed.default.neutral",
+        ["id"] = "integration.necroa.player_mask_removed.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
     },
-    ["semantic.integration.necroa.player_mask_removed.hostile.neutral"] = {
+    ["integration.necroa.player_mask_removed.hostile"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.necroa.player_mask_removed.hostile.neutral",
+        ["id"] = "integration.necroa.player_mask_removed.hostile",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
     },
-    ["semantic.integration.necroa.player_mask_removed.lover.neutral"] = {
+    ["integration.necroa.player_mask_removed.lover"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.necroa.player_mask_removed.lover.neutral",
+        ["id"] = "integration.necroa.player_mask_removed.lover",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
     },
-    ["semantic.integration.projectalife.encounter.friendly.neutral"] = {
+    ["integration.projectalife.encounter.friendly"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.encounter.friendly.neutral",
+        ["id"] = "integration.projectalife.encounter.friendly",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter.json",
     },
-    ["semantic.integration.projectalife.encounter.hostile.neutral"] = {
+    ["integration.projectalife.encounter.hostile"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.encounter.hostile.neutral",
+        ["id"] = "integration.projectalife.encounter.hostile",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter_hostile.json",
     },
-    ["semantic.integration.projectalife.encounter.unknown.neutral"] = {
+    ["integration.projectalife.encounter.unknown"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.encounter.unknown.neutral",
+        ["id"] = "integration.projectalife.encounter.unknown",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter_unknown.json",
     },
-    ["semantic.integration.projectalife.faction.hostile.neutral"] = {
+    ["integration.projectalife.faction.hostile"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.faction.hostile.neutral",
+        ["id"] = "integration.projectalife.faction.hostile",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_hostile.json",
     },
-    ["semantic.integration.projectalife.faction.incoming.neutral"] = {
+    ["integration.projectalife.faction.incoming"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.faction.incoming.neutral",
+        ["id"] = "integration.projectalife.faction.incoming",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_incoming.json",
     },
-    ["semantic.integration.projectalife.faction.outgoing.neutral"] = {
+    ["integration.projectalife.faction.outgoing"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.faction.outgoing.neutral",
+        ["id"] = "integration.projectalife.faction.outgoing",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_outgoing.json",
     },
-    ["semantic.integration.projectalife.meta.aircraft.heli.neutral"] = {
+    ["integration.projectalife.meta.aircraft.heli"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.meta.aircraft.heli.neutral",
+        ["id"] = "integration.projectalife.meta.aircraft.heli",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_aircraft_heli.json",
     },
-    ["semantic.integration.projectalife.meta.aircraft.military.neutral"] = {
+    ["integration.projectalife.meta.aircraft.military"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.meta.aircraft.military.neutral",
+        ["id"] = "integration.projectalife.meta.aircraft.military",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_aircraft_military.json",
     },
-    ["semantic.integration.projectalife.meta.ambience.neutral"] = {
+    ["integration.projectalife.meta.ambience"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.meta.ambience.neutral",
+        ["id"] = "integration.projectalife.meta.ambience",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
     },
-    ["semantic.integration.projectalife.meta.crash.neutral"] = {
+    ["integration.projectalife.meta.crash"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.meta.crash.neutral",
+        ["id"] = "integration.projectalife.meta.crash",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_crash.json",
     },
-    ["semantic.integration.projectalife.meta.gunfire.neutral"] = {
+    ["integration.projectalife.meta.gunfire"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "semantic.integration.projectalife.meta.gunfire.neutral",
+        ["id"] = "integration.projectalife.meta.gunfire",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
     },

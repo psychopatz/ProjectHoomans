@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_witness_cold",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/cold.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Don't expect applause.",
+              "Basic survival. Nothing to celebrate.",
+              "You did what was expected. Move.",
+              "One kill doesn't earn a trophy.",
+              "A child could swing that weapon. Walk.",
+              "Don't smirk. Keep walking.",
+              "That was the minimum requirement.",
+              "You hit it. Congratulations on living.",
+              "Save the pride for when we're safe.",
+              "Routine takedown. Move on."
+            ],
+            "TL": [
+              "Huwag kang umasa ng palakpak.",
+              "Pangkaraniwang kaligtasan. Walang ipagdiriwang.",
+              "Ginawa mo ang inaasahan. Kilos.",
+              "Ang isang patay ay hindi para ipagmalaki.",
+              "Kahit bata kayang ihataw ang sandatang 'yan. Lakad.",
+              "Huwag kang ngumisi. Magpatuloy sa paglalakad.",
+              "Iyon ang pinakamababang kailangan.",
+              "Tinamaan mo. Binabati kita sa pananatiling buhay.",
+              "Itago ang yabang kapag ligtas na tayo.",
+              "Pangkaraniwang patay. Tuloy."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "You killed one. So what?",
+              "One corpse among millions. Step over.",
+              "That was one. There are thousands more.",
+              "Do not admire your work. Advance.",
+              "A rotten corpse fell. Big deal.",
+              "Don't pause over it. Keep moving.",
+              "One less dead body standing. Next.",
+              "You survived a contact. Keep walking.",
+              "It was in the way. It fell. Move.",
+              "Hardly impressive. Keep your weapon ready."
+            ],
+            "TL": [
+              "Napatay mo ang isa. Ano ngayon?",
+              "Isang bangkay sa milyun-milyon. Hakbangan.",
+              "Isa lang 'yan. May libu-libo pa.",
+              "Huwag mong hangaan ang gawa mo. Sulong.",
+              "Bumagsak ang isang bulok. Ano naman.",
+              "Huwag kang tumigil diyan. Kilos.",
+              "Bawas ang isang nakatayong bangkay. Sunod.",
+              "Nakaligtas ka sa isang engkwentro. Lakad.",
+              "Nakaharang, bumagsak. Kilos.",
+              "Hindi nakakahanga. Ihanda ang sandata mo."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Fine. One less.",
+              "Acceptable. Keep moving.",
+              "One obstacle eliminated.",
+              "Target down. Sufficient.",
+              "Threat neutralized. Proceed.",
+              "One down. March on.",
+              "Handled. Next sector.",
+              "Done. Do not linger.",
+              "Adequate strike. Keep the pace.",
+              "Casualty verified. Step forward."
+            ],
+            "TL": [
+              "Sige. Isa na lang ang nabawas.",
+              "Pwede na. Tuloy ang lakad.",
+              "Isang sagabal ang naalis.",
+              "Bagsak ang target. Sapat na.",
+              "Banta naalis na. Magpatuloy.",
+              "Isang bagsak. Magmartsa.",
+              "Naasikaso. Susunod na bahagi.",
+              "Tapos. Huwag magtagal.",
+              "Sapat na tama. Panatilihin ang bilis.",
+              "Kumpirmadong biktima. Hakbang pasulong."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

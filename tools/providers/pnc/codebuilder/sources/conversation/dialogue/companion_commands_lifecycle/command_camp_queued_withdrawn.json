@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.camp.queued",
   "id": "withdrawn",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
-    "responseTemplateID": "semantic.command.camp.queued.withdrawn"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'll set up camp there.",
-          "TL": "Magtatayo ako ng kampo roon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Fine. Heading over to camp.",
-          "TL": "Sige. Pupunta roon para magkampo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Understood. Camping.",
-          "TL": "Naintindihan. Magkakampo."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "If you say so. I'll make camp.",
-          "TL": "Kung sinasabi mo. Magtatayo ako ng kampo."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Going to set it up now.",
-          "TL": "Pupunta para itayo ngayon."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "All right. Pitching shelter.",
-          "TL": "Sige. Magtatayo ng silong."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I'll do it.",
-          "TL": "Gagawin ko."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Making camp. Leave me to it.",
-          "TL": "Nagtatayo ng kampo. Hayaan mo na ako rito."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Fine. Camping there.",
-          "TL": "Sige. Magkakampo roon."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Heard. Setting up.",
-          "TL": "Narinig ko. Nagtatayo na."
+          "EN": [
+            "I'll set up camp there.",
+            "Fine. Heading over to camp.",
+            "Understood. Camping.",
+            "If you say so. I'll make camp.",
+            "Going to set it up now.",
+            "All right. Pitching shelter.",
+            "I'll do it.",
+            "Making camp. Leave me to it.",
+            "Fine. Camping there.",
+            "Heard. Setting up."
+          ],
+          "TL": [
+            "Magtatayo ako ng kampo roon.",
+            "Sige. Pupunta roon para magkampo.",
+            "Naintindihan. Magkakampo.",
+            "Kung sinasabi mo. Magtatayo ako ng kampo.",
+            "Pupunta para itayo ngayon.",
+            "Sige. Magtatayo ng silong.",
+            "Gagawin ko.",
+            "Nagtatayo ng kampo. Hayaan mo na ako rito.",
+            "Sige. Magkakampo roon.",
+            "Narinig ko. Nagtatayo na."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.camp.queued",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

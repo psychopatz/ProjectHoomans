@@ -13,7 +13,7 @@ local canonicalContentStyleFamily = {
 }
 
 return {
-    ["semantic.flow.greeting.opening.default"] = {
+    ["flow.greeting.opening.default"] = {
         neutral = {
             key = "UI_PNC_Conversation_Semantic_RealizationGreetingNeutral",
             fallback = "Hello. Good to see you.",
@@ -31,7 +31,7 @@ return {
             fallback = "State your business. Keep your distance.",
         },
     },
-    ["semantic.flow.greeting.opening.friendly"] = {
+    ["flow.greeting.opening.friendly"] = {
         neutral = {
             key = "UI_PNC_Conversation_Semantic_RealizationGreetingNeutral",
             fallback = "Hello. Good to see you.",
@@ -49,7 +49,7 @@ return {
             fallback = "State your business. Keep your distance.",
         },
     },
-    ["semantic.flow.greeting.opening.question.default"] = {
+    ["flow.greeting.opening.question.default"] = {
         neutral = {
             key = "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionNeutral",
             fallback = "How have you been?",
@@ -67,7 +67,7 @@ return {
             fallback = "How are things?",
         },
     },
-    ["semantic.flow.greeting.opening.question.friendly"] = {
+    ["flow.greeting.opening.question.friendly"] = {
         neutral = {
             key = "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionNeutral",
             fallback = "How have you been?",
@@ -85,24 +85,24 @@ return {
             fallback = "How are things?",
         },
     },
-    ["semantic.question.wellbeing.default"] = canonicalContentStyleFamily,
-    ["semantic.question.wellbeing.injured"] = canonicalContentStyleFamily,
-    ["semantic.question.wellbeing.dataset.getting_by"] = phraseFamily(
+    ["question.wellbeing.default"] = canonicalContentStyleFamily,
+    ["question.wellbeing.injured"] = canonicalContentStyleFamily,
+    ["question.wellbeing.dataset.getting_by"] = phraseFamily(
         "WellbeingGettingBy", "I'm getting by, one day at a time. How about you?",
         "I'm getting by. Thanks for asking.", "Getting by.",
         "I'm getting by. Leave it there."
     ),
-    ["semantic.question.medical_bite.positive"] = phraseFamily(
+    ["question.medical_bite.positive"] = phraseFamily(
         "MedicalBitePositive", "Yes, I've been bitten.",
         "Yes. I've been bitten, and I appreciate you checking.",
         "Yes. I've been bitten.", "Yes. I've been bitten. That's all."
     ),
-    ["semantic.question.medical_bite.negative"] = phraseFamily(
+    ["question.medical_bite.negative"] = phraseFamily(
         "MedicalBiteNegative", "No, I don't have a recorded bite.",
         "No, I don't have a recorded bite. Thanks for checking.",
         "No bite.", "No bite. Leave it there."
     ),
-    ["semantic.question.medical_bite.unknown"] = phraseFamily(
+    ["question.medical_bite.unknown"] = phraseFamily(
         "MedicalBiteUnknown", "I can't confirm whether I've been bitten.",
         "I can't confirm it, but thanks for checking.", "Can't confirm.",
         "I can't confirm that. Don't press me."

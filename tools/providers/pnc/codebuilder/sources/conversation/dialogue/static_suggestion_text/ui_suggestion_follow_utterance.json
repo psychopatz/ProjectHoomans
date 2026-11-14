@@ -1,9 +1,13 @@
 {
-  "id": "utterance",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.follow",
+  "id": "utterance",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.follow.utterance",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.follow.utterance",
@@ -12,14 +16,17 @@
           "TL": "Sumunod ka sa akin."
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "Follow me.",
-    "TL": "Sumunod ka sa akin."
-  },
-  "namespace": "ui.suggestion.follow",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Follow me.",
+          "TL": "Sumunod ka sa akin."
+        }
+      }
+    ]
+  }
 }

@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "medical_event_teammate",
-        ["id"] = "semantic.medical.distress.teammate.default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "medical.distress.teammate.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "They are hurt! Stay with them while I cover you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.medical.distress.teammate.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "They are hurt! Stay with them while I cover you.",
+                                        "Our companion is down! Tend to them, I've got guard.",
+                                        "They're injured! Get them patched up while I watch.",
+                                        "Check on them right now! I'll hold off the threats.",
+                                        "They took a hit! See to their wounds, I'm watching.",
+                                        "Partner is wounded! Apply first aid, I've got your back.",
+                                        "They're bleeding! Patch them while I keep perimeter.",
+                                        "Help them up! I'll keep the lane clear.",
+                                        "They need attention! Administer aid, I'll protect you both.",
+                                        "Our friend is hurt! Help them, I'm standing sentry.",
+                                    },
+                                    ["TL"] = {
+                                        "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo.",
+                                        "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo.",
+                                        "Sugatan sila! Bendahan mo habang nagmamasid ako.",
+                                        "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban.",
+                                        "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako.",
+                                        "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo.",
+                                        "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid.",
+                                        "Tulungan mo silang tumayo! Lilinisin ko ang daanan.",
+                                        "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa.",
+                                        "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "medical.distress.teammate",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "They are hurt! Stay with them while I cover you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.distress.teammate.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "They are hurt! Stay with them while I cover you.",
+                            "Our companion is down! Tend to them, I've got guard.",
+                            "They're injured! Get them patched up while I watch.",
+                            "Check on them right now! I'll hold off the threats.",
+                            "They took a hit! See to their wounds, I'm watching.",
+                            "Partner is wounded! Apply first aid, I've got your back.",
+                            "They're bleeding! Patch them while I keep perimeter.",
+                            "Help them up! I'll keep the lane clear.",
+                            "They need attention! Administer aid, I'll protect you both.",
+                            "Our friend is hurt! Help them, I'm standing sentry.",
+                        },
+                        ["TL"] = {
+                            "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo.",
+                            "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo.",
+                            "Sugatan sila! Bendahan mo habang nagmamasid ako.",
+                            "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban.",
+                            "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako.",
+                            "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo.",
+                            "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid.",
+                            "Tulungan mo silang tumayo! Lilinisin ko ang daanan.",
+                            "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa.",
+                            "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "medical.distress.teammate.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "default",
-            ["sourceId"] = "semantic.medical.distress.teammate.default",
+            ["sourceId"] = "medical.distress.teammate.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
-        ["namespace"] = "semantic.medical.distress.teammate",
+        ["namespace"] = "medical.distress.teammate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -24,167 +110,78 @@ return {
         ["payload"] = {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
-                ["responseTemplateID"] = "semantic.medical.distress.teammate.default",
+                ["responseAct"] = "MEDICAL_RESPONSE",
                 ["sourceSurface"] = "content/event/medical/teammate.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "MEDICAL_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.01",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "They are hurt! Stay with them while I cover you.",
-                            },
-                            ["TL"] = {
-                                "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.02",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Our companion is down! Tend to them, I've got guard.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.03",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're injured! Get them patched up while I watch.",
-                            },
-                            ["TL"] = {
-                                "Sugatan sila! Bendahan mo habang nagmamasid ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.04",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Check on them right now! I'll hold off the threats.",
-                            },
-                            ["TL"] = {
-                                "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.05",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "They took a hit! See to their wounds, I'm watching.",
-                            },
-                            ["TL"] = {
-                                "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.06",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Partner is wounded! Apply first aid, I've got your back.",
-                            },
-                            ["TL"] = {
-                                "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.07",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're bleeding! Patch them while I keep perimeter.",
-                            },
-                            ["TL"] = {
-                                "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.08",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Help them up! I'll keep the lane clear.",
-                            },
-                            ["TL"] = {
-                                "Tulungan mo silang tumayo! Lilinisin ko ang daanan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.09",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "They need attention! Administer aid, I'll protect you both.",
-                            },
-                            ["TL"] = {
-                                "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.default.neutral.10",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Our friend is hurt! Help them, I'm standing sentry.",
-                            },
-                            ["TL"] = {
-                                "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "They are hurt! Stay with them while I cover you.",
+                                        "Our companion is down! Tend to them, I've got guard.",
+                                        "They're injured! Get them patched up while I watch.",
+                                        "Check on them right now! I'll hold off the threats.",
+                                        "They took a hit! See to their wounds, I'm watching.",
+                                        "Partner is wounded! Apply first aid, I've got your back.",
+                                        "They're bleeding! Patch them while I keep perimeter.",
+                                        "Help them up! I'll keep the lane clear.",
+                                        "They need attention! Administer aid, I'll protect you both.",
+                                        "Our friend is hurt! Help them, I'm standing sentry.",
+                                    },
+                                    ["TL"] = {
+                                        "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo.",
+                                        "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo.",
+                                        "Sugatan sila! Bendahan mo habang nagmamasid ako.",
+                                        "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban.",
+                                        "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako.",
+                                        "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo.",
+                                        "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid.",
+                                        "Tulungan mo silang tumayo! Lilinisin ko ang daanan.",
+                                        "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa.",
+                                        "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "MEDICAL_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "medical.distress.teammate.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "They are hurt! Stay with them while I cover you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.medical.distress.teammate.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -194,20 +191,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "They are hurt! Stay with them while I cover you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.distress.teammate.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "They are hurt! Stay with them while I cover you.",
+                        "Our companion is down! Tend to them, I've got guard.",
+                        "They're injured! Get them patched up while I watch.",
+                        "Check on them right now! I'll hold off the threats.",
+                        "They took a hit! See to their wounds, I'm watching.",
+                        "Partner is wounded! Apply first aid, I've got your back.",
+                        "They're bleeding! Patch them while I keep perimeter.",
+                        "Help them up! I'll keep the lane clear.",
+                        "They need attention! Administer aid, I'll protect you both.",
+                        "Our friend is hurt! Help them, I'm standing sentry.",
+                    },
+                    ["TL"] = {
+                        "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo.",
+                        "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo.",
+                        "Sugatan sila! Bendahan mo habang nagmamasid ako.",
+                        "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban.",
+                        "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako.",
+                        "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo.",
+                        "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid.",
+                        "Tulungan mo silang tumayo! Lilinisin ko ang daanan.",
+                        "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa.",
+                        "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "medical_event_teammate",
-        ["id"] = "semantic.medical.distress.teammate.found",
+        ["exchangeFamily"] = {
+            ["familyID"] = "medical.distress.teammate.found",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I found a bandage for them. Hold still while I patch them up.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.medical.distress.teammate.found.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I found a bandage for them. Hold still while I patch them up.",
+                                        "Got a dressing right here. Wrapping the wound now.",
+                                        "Found medical supplies! Hold on, I'm dressing the injury.",
+                                        "I've got clean cloth. Hold steady while I bind it.",
+                                        "Located a bandage. Applying pressure to their cut now.",
+                                        "I've got medical wrap. Don't squirm, I'm securing it.",
+                                        "Found supplies for them. Wrapping it up tightly now.",
+                                        "Got the bandage ready. Applying it to the laceration.",
+                                        "I have aid gear. Hold still, you'll be stable in a minute.",
+                                        "Bandage in hand! Dressing their wounds right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila.",
+                                        "May pambenda ako rito. Binabalot ko na ang sugat ngayon.",
+                                        "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala.",
+                                        "May malinis akong tela. Manatiling nakapirmi habang itinatali ko.",
+                                        "May nahanap na benda. Dinidiinan ko na ang hiwa nila.",
+                                        "May medical wrap ako. Huwag kang pumalag, inaayos ko na.",
+                                        "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit.",
+                                        "Handa na ang benda. Nilalapat ko na sa sugat.",
+                                        "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad.",
+                                        "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "medical.distress.teammate",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I found a bandage for them. Hold still while I patch them up.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.distress.teammate.found.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I found a bandage for them. Hold still while I patch them up.",
+                            "Got a dressing right here. Wrapping the wound now.",
+                            "Found medical supplies! Hold on, I'm dressing the injury.",
+                            "I've got clean cloth. Hold steady while I bind it.",
+                            "Located a bandage. Applying pressure to their cut now.",
+                            "I've got medical wrap. Don't squirm, I'm securing it.",
+                            "Found supplies for them. Wrapping it up tightly now.",
+                            "Got the bandage ready. Applying it to the laceration.",
+                            "I have aid gear. Hold still, you'll be stable in a minute.",
+                            "Bandage in hand! Dressing their wounds right now.",
+                        },
+                        ["TL"] = {
+                            "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila.",
+                            "May pambenda ako rito. Binabalot ko na ang sugat ngayon.",
+                            "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala.",
+                            "May malinis akong tela. Manatiling nakapirmi habang itinatali ko.",
+                            "May nahanap na benda. Dinidiinan ko na ang hiwa nila.",
+                            "May medical wrap ako. Huwag kang pumalag, inaayos ko na.",
+                            "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit.",
+                            "Handa na ang benda. Nilalapat ko na sa sugat.",
+                            "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad.",
+                            "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "medical.distress.teammate.found",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "found",
-            ["sourceId"] = "semantic.medical.distress.teammate.found",
+            ["sourceId"] = "medical.distress.teammate.found",
             ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_found.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
-        ["namespace"] = "semantic.medical.distress.teammate",
+        ["namespace"] = "medical.distress.teammate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -220,167 +338,78 @@ return {
         ["payload"] = {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
-                ["responseTemplateID"] = "semantic.medical.distress.teammate.found",
+                ["responseAct"] = "MEDICAL_RESPONSE",
                 ["sourceSurface"] = "content/event/medical/teammate.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "MEDICAL_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.01",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I found a bandage for them. Hold still while I patch them up.",
-                            },
-                            ["TL"] = {
-                                "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.02",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got a dressing right here. Wrapping the wound now.",
-                            },
-                            ["TL"] = {
-                                "May pambenda ako rito. Binabalot ko na ang sugat ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.03",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Found medical supplies! Hold on, I'm dressing the injury.",
-                            },
-                            ["TL"] = {
-                                "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.04",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I've got clean cloth. Hold steady while I bind it.",
-                            },
-                            ["TL"] = {
-                                "May malinis akong tela. Manatiling nakapirmi habang itinatali ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.05",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Located a bandage. Applying pressure to their cut now.",
-                            },
-                            ["TL"] = {
-                                "May nahanap na benda. Dinidiinan ko na ang hiwa nila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.06",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I've got medical wrap. Don't squirm, I'm securing it.",
-                            },
-                            ["TL"] = {
-                                "May medical wrap ako. Huwag kang pumalag, inaayos ko na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.07",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Found supplies for them. Wrapping it up tightly now.",
-                            },
-                            ["TL"] = {
-                                "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.08",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got the bandage ready. Applying it to the laceration.",
-                            },
-                            ["TL"] = {
-                                "Handa na ang benda. Nilalapat ko na sa sugat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.09",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I have aid gear. Hold still, you'll be stable in a minute.",
-                            },
-                            ["TL"] = {
-                                "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.found.neutral.10",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Bandage in hand! Dressing their wounds right now.",
-                            },
-                            ["TL"] = {
-                                "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I found a bandage for them. Hold still while I patch them up.",
+                                        "Got a dressing right here. Wrapping the wound now.",
+                                        "Found medical supplies! Hold on, I'm dressing the injury.",
+                                        "I've got clean cloth. Hold steady while I bind it.",
+                                        "Located a bandage. Applying pressure to their cut now.",
+                                        "I've got medical wrap. Don't squirm, I'm securing it.",
+                                        "Found supplies for them. Wrapping it up tightly now.",
+                                        "Got the bandage ready. Applying it to the laceration.",
+                                        "I have aid gear. Hold still, you'll be stable in a minute.",
+                                        "Bandage in hand! Dressing their wounds right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila.",
+                                        "May pambenda ako rito. Binabalot ko na ang sugat ngayon.",
+                                        "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala.",
+                                        "May malinis akong tela. Manatiling nakapirmi habang itinatali ko.",
+                                        "May nahanap na benda. Dinidiinan ko na ang hiwa nila.",
+                                        "May medical wrap ako. Huwag kang pumalag, inaayos ko na.",
+                                        "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit.",
+                                        "Handa na ang benda. Nilalapat ko na sa sugat.",
+                                        "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad.",
+                                        "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "MEDICAL_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "medical.distress.teammate.found",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I found a bandage for them. Hold still while I patch them up.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.medical.distress.teammate.found.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -390,20 +419,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I found a bandage for them. Hold still while I patch them up.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.distress.teammate.found.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I found a bandage for them. Hold still while I patch them up.",
+                        "Got a dressing right here. Wrapping the wound now.",
+                        "Found medical supplies! Hold on, I'm dressing the injury.",
+                        "I've got clean cloth. Hold steady while I bind it.",
+                        "Located a bandage. Applying pressure to their cut now.",
+                        "I've got medical wrap. Don't squirm, I'm securing it.",
+                        "Found supplies for them. Wrapping it up tightly now.",
+                        "Got the bandage ready. Applying it to the laceration.",
+                        "I have aid gear. Hold still, you'll be stable in a minute.",
+                        "Bandage in hand! Dressing their wounds right now.",
+                    },
+                    ["TL"] = {
+                        "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila.",
+                        "May pambenda ako rito. Binabalot ko na ang sugat ngayon.",
+                        "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala.",
+                        "May malinis akong tela. Manatiling nakapirmi habang itinatali ko.",
+                        "May nahanap na benda. Dinidiinan ko na ang hiwa nila.",
+                        "May medical wrap ako. Huwag kang pumalag, inaayos ko na.",
+                        "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit.",
+                        "Handa na ang benda. Nilalapat ko na sa sugat.",
+                        "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad.",
+                        "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "medical_event_teammate",
-        ["id"] = "semantic.medical.distress.teammate.missing",
+        ["exchangeFamily"] = {
+            ["familyID"] = "medical.distress.teammate.missing",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I am out of bandages! Can someone spare one for them?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.medical.distress.teammate.missing.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I am out of bandages! Can someone spare one for them?",
+                                        "No more medical cloth! Does anyone have a bandage?!",
+                                        "My pack is empty of dressings! Help them, quick!",
+                                        "I can't treat this wound without supplies! Check your packs!",
+                                        "We're out of first aid! Who has a clean rag?!",
+                                        "I don't have what I need to stop their bleeding! Find supplies!",
+                                        "Zero bandages left! Someone hand me medical gear!",
+                                        "I'm empty-handed! We need bandages for our friend now!",
+                                        "No antiseptic, no bandages. Search the drawers, fast!",
+                                        "I can't patch them up alone! Who has medical tools?!",
+                                    },
+                                    ["TL"] = {
+                                        "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?",
+                                        "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!",
+                                        "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!",
+                                        "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!",
+                                        "Wala na tayong first aid! Sino may malinis na basahan?!",
+                                        "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!",
+                                        "Ubos na ang benda! May mag-abot sa akin ng panggamot!",
+                                        "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!",
+                                        "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!",
+                                        "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "medical.distress.teammate",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I am out of bandages! Can someone spare one for them?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.distress.teammate.missing.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I am out of bandages! Can someone spare one for them?",
+                            "No more medical cloth! Does anyone have a bandage?!",
+                            "My pack is empty of dressings! Help them, quick!",
+                            "I can't treat this wound without supplies! Check your packs!",
+                            "We're out of first aid! Who has a clean rag?!",
+                            "I don't have what I need to stop their bleeding! Find supplies!",
+                            "Zero bandages left! Someone hand me medical gear!",
+                            "I'm empty-handed! We need bandages for our friend now!",
+                            "No antiseptic, no bandages. Search the drawers, fast!",
+                            "I can't patch them up alone! Who has medical tools?!",
+                        },
+                        ["TL"] = {
+                            "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?",
+                            "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!",
+                            "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!",
+                            "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!",
+                            "Wala na tayong first aid! Sino may malinis na basahan?!",
+                            "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!",
+                            "Ubos na ang benda! May mag-abot sa akin ng panggamot!",
+                            "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!",
+                            "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!",
+                            "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "medical.distress.teammate.missing",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "missing",
-            ["sourceId"] = "semantic.medical.distress.teammate.missing",
+            ["sourceId"] = "medical.distress.teammate.missing",
             ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_missing.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
-        ["namespace"] = "semantic.medical.distress.teammate",
+        ["namespace"] = "medical.distress.teammate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -416,167 +566,78 @@ return {
         ["payload"] = {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
-                ["responseTemplateID"] = "semantic.medical.distress.teammate.missing",
+                ["responseAct"] = "MEDICAL_RESPONSE",
                 ["sourceSurface"] = "content/event/medical/teammate.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "MEDICAL_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.01",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am out of bandages! Can someone spare one for them?",
-                            },
-                            ["TL"] = {
-                                "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.02",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "No more medical cloth! Does anyone have a bandage?!",
-                            },
-                            ["TL"] = {
-                                "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.03",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "My pack is empty of dressings! Help them, quick!",
-                            },
-                            ["TL"] = {
-                                "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.04",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't treat this wound without supplies! Check your packs!",
-                            },
-                            ["TL"] = {
-                                "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.05",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "We're out of first aid! Who has a clean rag?!",
-                            },
-                            ["TL"] = {
-                                "Wala na tayong first aid! Sino may malinis na basahan?!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.06",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't have what I need to stop their bleeding! Find supplies!",
-                            },
-                            ["TL"] = {
-                                "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.07",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Zero bandages left! Someone hand me medical gear!",
-                            },
-                            ["TL"] = {
-                                "Ubos na ang benda! May mag-abot sa akin ng panggamot!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.08",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm empty-handed! We need bandages for our friend now!",
-                            },
-                            ["TL"] = {
-                                "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.09",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "No antiseptic, no bandages. Search the drawers, fast!",
-                            },
-                            ["TL"] = {
-                                "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.teammate.missing.neutral.10",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't patch them up alone! Who has medical tools?!",
-                            },
-                            ["TL"] = {
-                                "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I am out of bandages! Can someone spare one for them?",
+                                        "No more medical cloth! Does anyone have a bandage?!",
+                                        "My pack is empty of dressings! Help them, quick!",
+                                        "I can't treat this wound without supplies! Check your packs!",
+                                        "We're out of first aid! Who has a clean rag?!",
+                                        "I don't have what I need to stop their bleeding! Find supplies!",
+                                        "Zero bandages left! Someone hand me medical gear!",
+                                        "I'm empty-handed! We need bandages for our friend now!",
+                                        "No antiseptic, no bandages. Search the drawers, fast!",
+                                        "I can't patch them up alone! Who has medical tools?!",
+                                    },
+                                    ["TL"] = {
+                                        "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?",
+                                        "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!",
+                                        "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!",
+                                        "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!",
+                                        "Wala na tayong first aid! Sino may malinis na basahan?!",
+                                        "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!",
+                                        "Ubos na ang benda! May mag-abot sa akin ng panggamot!",
+                                        "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!",
+                                        "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!",
+                                        "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "MEDICAL_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "medical.distress.teammate.missing",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I am out of bandages! Can someone spare one for them?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.medical.distress.teammate.missing.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -585,6 +646,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I am out of bandages! Can someone spare one for them?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.distress.teammate.missing.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I am out of bandages! Can someone spare one for them?",
+                        "No more medical cloth! Does anyone have a bandage?!",
+                        "My pack is empty of dressings! Help them, quick!",
+                        "I can't treat this wound without supplies! Check your packs!",
+                        "We're out of first aid! Who has a clean rag?!",
+                        "I don't have what I need to stop their bleeding! Find supplies!",
+                        "Zero bandages left! Someone hand me medical gear!",
+                        "I'm empty-handed! We need bandages for our friend now!",
+                        "No antiseptic, no bandages. Search the drawers, fast!",
+                        "I can't patch them up alone! Who has medical tools?!",
+                    },
+                    ["TL"] = {
+                        "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?",
+                        "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!",
+                        "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!",
+                        "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!",
+                        "Wala na tayong first aid! Sino may malinis na basahan?!",
+                        "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!",
+                        "Ubos na ang benda! May mag-abot sa akin ng panggamot!",
+                        "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!",
+                        "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!",
+                        "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

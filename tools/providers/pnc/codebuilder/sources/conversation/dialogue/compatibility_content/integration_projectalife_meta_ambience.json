@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.projectalife.meta",
+  "id": "ambience",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.projectalife.meta.ambience",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I do not like that sound. Stay close.",
-          "TL": "I do not like that sound. Stay close."
+          "EN": [
+            "I do not like that sound. Stay close."
+          ],
+          "TL": [
+            "I do not like that sound. Stay close."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.projectalife.meta.ambience",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

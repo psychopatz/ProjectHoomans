@@ -106,7 +106,7 @@ local RESPONSE_TEMPLATES = {
         fallback = "Let me check what I have.",
     },
     SOCIAL_ACKNOWLEDGED = {
-        templateID = "semantic.social.acknowledged",
+        templateID = "social.acknowledged",
         fallback = "Understood.",
     },
     GREET_ACKNOWLEDGED = {
@@ -118,11 +118,11 @@ local RESPONSE_TEMPLATES = {
         fallback = "I'd really like one. Could I have it?",
     },
     GIFT_SELECTION_REQUIRED = {
-        templateID = "semantic.gift.selection_required",
+        templateID = "gift.selection_required",
         fallback = "Oh? What did you bring me?",
     },
     GIFT_OFFER_DISPATCHED = {
-        templateID = "semantic.gift.pending",
+        templateID = "gift.pending",
         fallback = "",
     },
     GIFT_CONSENT_DECLINED = {
@@ -138,7 +138,7 @@ local RESPONSE_TEMPLATES = {
         fallback = "",
     },
     GOSSIP_RECEIVED = {
-        templateID = "semantic.gossip.unknown",
+        templateID = "gossip.unknown",
         fallback = "I haven't heard anything about that yet.",
     },
     HOSTILE_REMARK_RECEIVED = {

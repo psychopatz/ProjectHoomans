@@ -1,546 +1,140 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "navigation",
+  "id": "subject_change",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:navigation",
+    "sourceSurface": "content/navigation.json",
+    "responseAct": "NAVIGATION_RESPONSE"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "All right. What did you want to talk about?",
+            "Sure, what else did you want to discuss?",
+            "Changing subject. What's on your mind?",
+            "What other topic would you like to cover?",
+            "I'm open. What did you want to talk about next?",
+            "Understood. What else is on your mind?",
+            "Switching gears. What's the next matter?",
+            "Go ahead with what you wanted to say.",
+            "Sure thing. What did you want to bring up?",
+            "What's the next topic?"
+          ],
+          "TL": [
+            "Sige. Ano ang gusto mong pag-usapan?",
+            "Sige, ano pa ang gusto mong pag-usapan?",
+            "Paglipat ng usapan. Ano'ng nasa isip mo?",
+            "Anong iba pang paksa ang gusto mong talakayin?",
+            "Bukas ako. Ano'ng gusto mong pag-usapan kasunod?",
+            "Naintindihan ko. Ano pa ang nasa isip mo?",
+            "Lilipat tayo ng usapan. Ano'ng susunod na bagay?",
+            "Sige lang sa kung ano ang gusto mong sabihin.",
+            "Walang anuman. Ano ang gusto mong talakayin?",
+            "Ano ang susunod na paksa?"
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.subject_change",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "All right. What is it?",
+            "Changing topics? Fine, make it quick.",
+            "What else do you want to bring up?",
+            "Switching subjects. What now?",
+            "Go ahead, but keep your head on a swivel.",
+            "Different topic? Keep it relevant to surviving.",
+            "What else? We don't have all day.",
+            "Say what you need to say.",
+            "New subject? What is it?",
+            "Listening, but don't waste time."
+          ],
+          "TL": [
+            "Sige. Ano iyon?",
+            "Ibang usapan? Sige, bilisan mo.",
+            "Ano pa ang gusto mong banggitin?",
+            "Lilipat ng paksa. Ano ngayon?",
+            "Sige lang, pero patuloy na magmatyag.",
+            "Ibang paksa? Siguraduhing may kinalaman sa kaligtasan.",
+            "Ano pa? Wala tayong buong araw.",
+            "Sabihin mo ang dapat mong sabihin.",
+            "Bagong usapan? Ano 'yon?",
+            "Nakikinig ako, pero huwag mag-aksaya ng oras."
+          ]
+        }
       },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.01"
-            },
-            "text": {
-              "EN": "All right. What did you want to talk about?",
-              "TL": "Sige. Ano ang gusto mong pag-usapan?"
-            }
-          },
-          {
-            "id": "neutral.02",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.02"
-            },
-            "text": {
-              "EN": "Sure, what else did you want to discuss?",
-              "TL": "Sige, ano pa ang gusto mong pag-usapan?"
-            }
-          },
-          {
-            "id": "neutral.03",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.03"
-            },
-            "text": {
-              "EN": "Changing subject. What's on your mind?",
-              "TL": "Paglipat ng usapan. Ano'ng nasa isip mo?"
-            }
-          },
-          {
-            "id": "neutral.04",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.04"
-            },
-            "text": {
-              "EN": "What other topic would you like to cover?",
-              "TL": "Anong iba pang paksa ang gusto mong talakayin?"
-            }
-          },
-          {
-            "id": "neutral.05",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.05"
-            },
-            "text": {
-              "EN": "I'm open. What did you want to talk about next?",
-              "TL": "Bukas ako. Ano'ng gusto mong pag-usapan kasunod?"
-            }
-          },
-          {
-            "id": "neutral.06",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.06"
-            },
-            "text": {
-              "EN": "Understood. What else is on your mind?",
-              "TL": "Naintindihan ko. Ano pa ang nasa isip mo?"
-            }
-          },
-          {
-            "id": "neutral.07",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.07"
-            },
-            "text": {
-              "EN": "Switching gears. What's the next matter?",
-              "TL": "Lilipat tayo ng usapan. Ano'ng susunod na bagay?"
-            }
-          },
-          {
-            "id": "neutral.08",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.08"
-            },
-            "text": {
-              "EN": "Go ahead with what you wanted to say.",
-              "TL": "Sige lang sa kung ano ang gusto mong sabihin."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.09"
-            },
-            "text": {
-              "EN": "Sure thing. What did you want to bring up?",
-              "TL": "Walang anuman. Ano ang gusto mong talakayin?"
-            }
-          },
-          {
-            "id": "neutral.10",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.subject_change.neutral.10"
-            },
-            "text": {
-              "EN": "What's the next topic?",
-              "TL": "Ano ang susunod na paksa?"
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "What else?",
+            "Next topic?",
+            "What now?",
+            "Go on.",
+            "Different topic?",
+            "What is it?",
+            "Speak.",
+            "Next?",
+            "Listening.",
+            "Say it."
+          ],
+          "TL": [
+            "Ano pa?",
+            "Susunod na paksa?",
+            "Ano ngayon?",
+            "Sige.",
+            "Ibang usapan?",
+            "Ano 'yon?",
+            "Salita.",
+            "Susunod?",
+            "Nakikinig.",
+            "Sabihin mo."
+          ]
+        }
       },
-      "namespace": "semantic.navigation.subject_change"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.subject_change",
-        "style": "warm"
-      },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "warm.01",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.01"
-            },
-            "text": {
-              "EN": "Sure. What did you want to talk about?",
-              "TL": "Sige. Ano ang gusto mong pag-usapan?"
-            }
-          },
-          {
-            "id": "warm.02",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.02"
-            },
-            "text": {
-              "EN": "I'd love to chat about whatever you like.",
-              "TL": "Gusto kong makipag-usap tungkol sa kahit anong naisin mo."
-            }
-          },
-          {
-            "id": "warm.03",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.03"
-            },
-            "text": {
-              "EN": "What else would you like to talk through, friend?",
-              "TL": "Ano pa ang gusto mong pag-usapan natin, kaibigan?"
-            }
-          },
-          {
-            "id": "warm.04",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.04"
-            },
-            "text": {
-              "EN": "Always happy to hear what's on your mind.",
-              "TL": "Laging masayang marinig kung ano'ng nasa isip mo."
-            }
-          },
-          {
-            "id": "warm.05",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.05"
-            },
-            "text": {
-              "EN": "Sure thing! What other thoughts do you have?",
-              "TL": "Oo naman! Ano pa ang mga iniisip mo?"
-            }
-          },
-          {
-            "id": "warm.06",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.06"
-            },
-            "text": {
-              "EN": "Take your time. What should we talk about next?",
-              "TL": "Huwag magmadali. Ano'ng susunod nating pag-uusapan?"
-            }
-          },
-          {
-            "id": "warm.07",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.07"
-            },
-            "text": {
-              "EN": "I'm glad to discuss whatever matters to you.",
-              "TL": "Masaya akong pag-usapan ang anumang mahalaga sa'yo."
-            }
-          },
-          {
-            "id": "warm.08",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.08"
-            },
-            "text": {
-              "EN": "Go right ahead, I'm listening closely.",
-              "TL": "Sige lang, nakikinig ako nang mabuti."
-            }
-          },
-          {
-            "id": "warm.09",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.09"
-            },
-            "text": {
-              "EN": "What else is on your heart today?",
-              "TL": "Ano pa ang nasa puso mo ngayon?"
-            }
-          },
-          {
-            "id": "warm.10",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.subject_change.warm.10"
-            },
-            "text": {
-              "EN": "I'm right here with you. What's next?",
-              "TL": "Nandito lang ako kasama mo. Ano'ng susunod?"
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.navigation.subject_change"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.subject_change",
-        "style": "terse"
-      },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "terse.01",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.01"
-            },
-            "text": {
-              "EN": "What else?",
-              "TL": "Ano pa?"
-            }
-          },
-          {
-            "id": "terse.02",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.02"
-            },
-            "text": {
-              "EN": "Next topic?",
-              "TL": "Susunod na paksa?"
-            }
-          },
-          {
-            "id": "terse.03",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.03"
-            },
-            "text": {
-              "EN": "What now?",
-              "TL": "Ano ngayon?"
-            }
-          },
-          {
-            "id": "terse.04",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.04"
-            },
-            "text": {
-              "EN": "Go on.",
-              "TL": "Sige."
-            }
-          },
-          {
-            "id": "terse.05",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.05"
-            },
-            "text": {
-              "EN": "Different topic?",
-              "TL": "Ibang usapan?"
-            }
-          },
-          {
-            "id": "terse.06",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.06"
-            },
-            "text": {
-              "EN": "What is it?",
-              "TL": "Ano 'yon?"
-            }
-          },
-          {
-            "id": "terse.07",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.07"
-            },
-            "text": {
-              "EN": "Speak.",
-              "TL": "Salita."
-            }
-          },
-          {
-            "id": "terse.08",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.08"
-            },
-            "text": {
-              "EN": "Next?",
-              "TL": "Susunod?"
-            }
-          },
-          {
-            "id": "terse.09",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.09"
-            },
-            "text": {
-              "EN": "Listening.",
-              "TL": "Nakikinig."
-            }
-          },
-          {
-            "id": "terse.10",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.subject_change.terse.10"
-            },
-            "text": {
-              "EN": "Say it.",
-              "TL": "Sabihin mo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.navigation.subject_change"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.subject_change",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.01"
-            },
-            "text": {
-              "EN": "All right. What is it?",
-              "TL": "Sige. Ano iyon?"
-            }
-          },
-          {
-            "id": "guarded.02",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.02"
-            },
-            "text": {
-              "EN": "Changing topics? Fine, make it quick.",
-              "TL": "Ibang usapan? Sige, bilisan mo."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.03"
-            },
-            "text": {
-              "EN": "What else do you want to bring up?",
-              "TL": "Ano pa ang gusto mong banggitin?"
-            }
-          },
-          {
-            "id": "guarded.04",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.04"
-            },
-            "text": {
-              "EN": "Switching subjects. What now?",
-              "TL": "Lilipat ng paksa. Ano ngayon?"
-            }
-          },
-          {
-            "id": "guarded.05",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.05"
-            },
-            "text": {
-              "EN": "Go ahead, but keep your head on a swivel.",
-              "TL": "Sige lang, pero patuloy na magmatyag."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.06"
-            },
-            "text": {
-              "EN": "Different topic? Keep it relevant to surviving.",
-              "TL": "Ibang paksa? Siguraduhing may kinalaman sa kaligtasan."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.07"
-            },
-            "text": {
-              "EN": "What else? We don't have all day.",
-              "TL": "Ano pa? Wala tayong buong araw."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.08"
-            },
-            "text": {
-              "EN": "Say what you need to say.",
-              "TL": "Sabihin mo ang dapat mong sabihin."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.09"
-            },
-            "text": {
-              "EN": "New subject? What is it?",
-              "TL": "Bagong usapan? Ano 'yon?"
-            }
-          },
-          {
-            "id": "guarded.10",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.subject_change.guarded.10"
-            },
-            "text": {
-              "EN": "Listening, but don't waste time.",
-              "TL": "Nakikinig ako, pero huwag mag-aksaya ng oras."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.navigation.subject_change"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "Sure. What did you want to talk about?",
+            "I'd love to chat about whatever you like.",
+            "What else would you like to talk through, friend?",
+            "Always happy to hear what's on your mind.",
+            "Sure thing! What other thoughts do you have?",
+            "Take your time. What should we talk about next?",
+            "I'm glad to discuss whatever matters to you.",
+            "Go right ahead, I'm listening closely.",
+            "What else is on your heart today?",
+            "I'm right here with you. What's next?"
+          ],
+          "TL": [
+            "Sige. Ano ang gusto mong pag-usapan?",
+            "Gusto kong makipag-usap tungkol sa kahit anong naisin mo.",
+            "Ano pa ang gusto mong pag-usapan natin, kaibigan?",
+            "Laging masayang marinig kung ano'ng nasa isip mo.",
+            "Oo naman! Ano pa ang mga iniisip mo?",
+            "Huwag magmadali. Ano'ng susunod nating pag-uusapan?",
+            "Masaya akong pag-usapan ang anumang mahalaga sa'yo.",
+            "Sige lang, nakikinig ako nang mabuti.",
+            "Ano pa ang nasa puso mo ngayon?",
+            "Nandito lang ako kasama mo. Ano'ng susunod?"
+          ]
+        }
+      }
+    ]
+  }
 }

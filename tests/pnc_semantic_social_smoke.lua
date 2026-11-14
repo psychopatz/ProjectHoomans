@@ -249,7 +249,7 @@ local withdrawn = Policy.Decide(insult, state, {
         social = { style = "withdrawn" },
     },
 })
-T.equal(withdrawn.response.templateID, "semantic.social.hostile_withdrawn",
+T.equal(withdrawn.response.templateID, "social.hostile_withdrawn",
     "hostile response can use NPC social style")
 
 local selfReflection = Policy.Decide(selfMockery, state, {
@@ -299,7 +299,7 @@ T.equal(identityQuestionDecision.branch, "QUESTION_RECEIVED",
     "identity question remains a question while starting the exchange")
 local identityQuestionText = identityQuestionDecision.response.fallback or ""
 T.equal(identityQuestionDecision.response.templateID,
-    "semantic.question.identity.known",
+    "question.identity.known",
     "known identity uses the production known-identity response")
 T.truthy(string.find(identityQuestionText, "Mara", 1, true),
     "known identity response names the NPC")

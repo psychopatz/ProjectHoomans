@@ -1,183 +1,132 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.question.wellbeing.dataset.getting_by.guarded"] = {
+    ["question.wellbeing.dataset.getting_by"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.dataset.getting_by.guarded",
+        ["id"] = "question.wellbeing.dataset.getting_by",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
     },
-    ["semantic.question.wellbeing.dataset.getting_by.neutral"] = {
+    ["question.wellbeing.default"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.dataset.getting_by.neutral",
+        ["id"] = "question.wellbeing.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
-    },
-    ["semantic.question.wellbeing.dataset.getting_by.terse"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["related"] = {
+            "question.wellbeing",
         },
-        ["id"] = "semantic.question.wellbeing.dataset.getting_by.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
-    },
-    ["semantic.question.wellbeing.dataset.getting_by.warm"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
-        },
-        ["id"] = "semantic.question.wellbeing.dataset.getting_by.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
-    },
-    ["semantic.question.wellbeing.default.guarded"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
-        },
-        ["id"] = "semantic.question.wellbeing.default.guarded",
-        ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
     },
-    ["semantic.question.wellbeing.default.neutral"] = {
+    ["question.wellbeing.fatigue"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.default.neutral",
+        ["id"] = "question.wellbeing.fatigue",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
-    },
-    ["semantic.question.wellbeing.default.terse"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["related"] = {
+            "question.wellbeing",
         },
-        ["id"] = "semantic.question.wellbeing.default.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
-    },
-    ["semantic.question.wellbeing.default.warm"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
-        },
-        ["id"] = "semantic.question.wellbeing.default.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
-    },
-    ["semantic.question.wellbeing.fatigue.neutral"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
-        },
-        ["id"] = "semantic.question.wellbeing.fatigue.neutral",
-        ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue.json",
     },
-    ["semantic.question.wellbeing.fatigue_alt.neutral"] = {
+    ["question.wellbeing.fatigue_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.fatigue_alt.neutral",
+        ["id"] = "question.wellbeing.fatigue_alt",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.wellbeing",
+        },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue_alt.json",
     },
-    ["semantic.question.wellbeing.hunger.neutral"] = {
+    ["question.wellbeing.hunger"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.hunger.neutral",
+        ["id"] = "question.wellbeing.hunger",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.wellbeing",
+        },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger.json",
     },
-    ["semantic.question.wellbeing.hunger_alt.neutral"] = {
+    ["question.wellbeing.hunger_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.hunger_alt.neutral",
+        ["id"] = "question.wellbeing.hunger_alt",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.wellbeing",
+        },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger_alt.json",
     },
-    ["semantic.question.wellbeing.injured.guarded"] = {
+    ["question.wellbeing.injured"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.injured.guarded",
+        ["id"] = "question.wellbeing.injured",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.wellbeing",
+        },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
     },
-    ["semantic.question.wellbeing.injured.neutral"] = {
+    ["question.wellbeing.panic"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.injured.neutral",
+        ["id"] = "question.wellbeing.panic",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
-    },
-    ["semantic.question.wellbeing.injured.terse"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["related"] = {
+            "question.wellbeing",
         },
-        ["id"] = "semantic.question.wellbeing.injured.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
-    },
-    ["semantic.question.wellbeing.injured.warm"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
-        },
-        ["id"] = "semantic.question.wellbeing.injured.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
-    },
-    ["semantic.question.wellbeing.panic.neutral"] = {
-        ["domain"] = "wellbeing_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
-        },
-        ["id"] = "semantic.question.wellbeing.panic.neutral",
-        ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_panic.json",
     },
-    ["semantic.question.wellbeing.stress.neutral"] = {
+    ["question.wellbeing.stress"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.stress.neutral",
+        ["id"] = "question.wellbeing.stress",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.wellbeing",
+        },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_stress.json",
     },
-    ["semantic.question.wellbeing.thirst.neutral"] = {
+    ["question.wellbeing.thirst"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/WellbeingContent",
         },
-        ["id"] = "semantic.question.wellbeing.thirst.neutral",
+        ["id"] = "question.wellbeing.thirst",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.wellbeing",
+        },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
     },
-    ["semantic.question.wellbeing.thirst_alt.neutral"] = {
+    ["question.wellbeing.thirst_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent__5728baa5",
         },
-        ["id"] = "semantic.question.wellbeing.thirst_alt.neutral",
+        ["id"] = "question.wellbeing.thirst_alt",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.wellbeing",
+        },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst_alt.json",
     },
 }

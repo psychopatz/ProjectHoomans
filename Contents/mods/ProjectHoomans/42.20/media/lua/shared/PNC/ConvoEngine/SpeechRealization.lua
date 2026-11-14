@@ -16,11 +16,15 @@ local Style = PNC.ConvoEngine.SpeechStyleContext
     or require "PNC/ConvoEngine/SpeechStyleContext"
 local UtterancePlan = PNC.ConvoEngine.UtterancePlan
     or require "PNC/ConvoEngine/UtterancePlan"
-local phraseRegistry
+local cachedRegistry
 do
     local ok, value = pcall(require,
         "PNC/ConvoEngine/Registry")
-    if ok and type(value) == "table" then phraseRegistry = value end
+    if ok and type(value) == "table" then cachedRegistry = value end
+end
+local function activeRegistry()
+    return (PNC and PNC.ConvoEngine and PNC.ConvoEngine.Registry)
+        or cachedRegistry
 end
 local COVERAGE = {
     { family = "greeting", supported = { "neutral", "warm", "terse", "guarded" } },
@@ -82,6 +86,7 @@ local function phraseActorID(context)
 end
 
 local function selectPhrase(templateID, styleVariant, context, salt, localSelections)
+    local phraseRegistry = activeRegistry()
     if type(phraseRegistry) ~= "table"
         or type(phraseRegistry.FamilyFor) ~= "function"
     then
@@ -90,6 +95,24 @@ local function selectPhrase(templateID, styleVariant, context, salt, localSelect
     local family, phrases, selectedStyle = phraseRegistry.FamilyFor(
         templateID, styleVariant
     )
+    if type(family) ~= "table" or type(phrases) ~= "table" or #phrases == 0 then
+        local ConvoPlanFamily = PNC.ConvoEngine and PNC.ConvoEngine.ConvoPlanFamily or nil
+        if type(ConvoPlanFamily) ~= "table" then
+            local ok, loaded = pcall(
+                require,
+                "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
+            )
+            if ok and type(loaded) == "table" then ConvoPlanFamily = loaded end
+        end
+        if type(ConvoPlanFamily) == "table"
+            and type(ConvoPlanFamily.install) == "function"
+        then
+            ConvoPlanFamily.install(templateID)
+            family, phrases, selectedStyle = phraseRegistry.FamilyFor(
+                templateID, styleVariant
+            )
+        end
+    end
     if type(family) ~= "table" or type(phrases) ~= "table" or #phrases == 0 then
         return nil
     end
@@ -155,6 +178,7 @@ local function selectPhrase(templateID, styleVariant, context, salt, localSelect
 end
 
 function Realization.PhraseCoverage()
+    local phraseRegistry = activeRegistry()
     if type(phraseRegistry) ~= "table" then return {} end
     return copy({
         schema = phraseRegistry.SCHEMA,
@@ -165,6 +189,7 @@ function Realization.PhraseCoverage()
 end
 
 function Realization.GetFamilyKeys()
+    local phraseRegistry = activeRegistry()
     local keys = {}
     if phraseRegistry and type(phraseRegistry.PHRASE_FAMILIES) == "table" then
         for k in pairs(phraseRegistry.PHRASE_FAMILIES) do
@@ -268,9 +293,11 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     if not phrase then return segment, nil end
 
     local output = copy(segment)
+    local resolvedTemplateID = (phrase.translationKey ~= "" and phrase.translationKey)
+        or segment.templateID
     output.args = copy(segment.args or {})
     output.semanticTemplateID = segment.templateID
-    output.templateID = phrase.translationKey
+    output.templateID = resolvedTemplateID
     output.fallback = phrase.fallback
     output.realizationFamily = segment.templateID
     output.realizationVariant = tostring(
@@ -288,7 +315,7 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     end
 
     return output, {
-        templateID = phrase.translationKey,
+        templateID = resolvedTemplateID,
         fallback = phrase.fallback,
         family = segment.templateID,
         variant = output.realizationVariant,
@@ -406,7 +433,7 @@ function Realization.Apply(response, context)
     )) or response.selectionID
 
     if response.selectionID == "semantic.refuse.default" then
-        blocked["semantic.social.acknowledged"] = true
+        blocked["social.acknowledged"] = true
     end
 
     output.speechStyleContext = Style.PublicView(style)

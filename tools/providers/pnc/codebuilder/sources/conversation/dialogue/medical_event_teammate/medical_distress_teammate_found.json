@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.teammate",
   "id": "found",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/teammate.json",
-    "responseTemplateID": "semantic.medical.distress.teammate.found",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I found a bandage for them. Hold still while I patch them up.",
-          "TL": "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.02"
-        },
-        "text": {
-          "EN": "Got a dressing right here. Wrapping the wound now.",
-          "TL": "May pambenda ako rito. Binabalot ko na ang sugat ngayon."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.03"
-        },
-        "text": {
-          "EN": "Found medical supplies! Hold on, I'm dressing the injury.",
-          "TL": "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.04"
-        },
-        "text": {
-          "EN": "I've got clean cloth. Hold steady while I bind it.",
-          "TL": "May malinis akong tela. Manatiling nakapirmi habang itinatali ko."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.05"
-        },
-        "text": {
-          "EN": "Located a bandage. Applying pressure to their cut now.",
-          "TL": "May nahanap na benda. Dinidiinan ko na ang hiwa nila."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.06"
-        },
-        "text": {
-          "EN": "I've got medical wrap. Don't squirm, I'm securing it.",
-          "TL": "May medical wrap ako. Huwag kang pumalag, inaayos ko na."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.07"
-        },
-        "text": {
-          "EN": "Found supplies for them. Wrapping it up tightly now.",
-          "TL": "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.08"
-        },
-        "text": {
-          "EN": "Got the bandage ready. Applying it to the laceration.",
-          "TL": "Handa na ang benda. Nilalapat ko na sa sugat."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.09"
-        },
-        "text": {
-          "EN": "I have aid gear. Hold still, you'll be stable in a minute.",
-          "TL": "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.found.neutral.10"
-        },
-        "text": {
-          "EN": "Bandage in hand! Dressing their wounds right now.",
-          "TL": "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila."
+          "EN": [
+            "I found a bandage for them. Hold still while I patch them up.",
+            "Got a dressing right here. Wrapping the wound now.",
+            "Found medical supplies! Hold on, I'm dressing the injury.",
+            "I've got clean cloth. Hold steady while I bind it.",
+            "Located a bandage. Applying pressure to their cut now.",
+            "I've got medical wrap. Don't squirm, I'm securing it.",
+            "Found supplies for them. Wrapping it up tightly now.",
+            "Got the bandage ready. Applying it to the laceration.",
+            "I have aid gear. Hold still, you'll be stable in a minute.",
+            "Bandage in hand! Dressing their wounds right now."
+          ],
+          "TL": [
+            "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila.",
+            "May pambenda ako rito. Binabalot ko na ang sugat ngayon.",
+            "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala.",
+            "May malinis akong tela. Manatiling nakapirmi habang itinatali ko.",
+            "May nahanap na benda. Dinidiinan ko na ang hiwa nila.",
+            "May medical wrap ako. Huwag kang pumalag, inaayos ko na.",
+            "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit.",
+            "Handa na ang benda. Nilalapat ko na sa sugat.",
+            "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad.",
+            "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.teammate",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

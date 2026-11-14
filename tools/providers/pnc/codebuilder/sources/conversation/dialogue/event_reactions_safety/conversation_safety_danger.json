@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "conversation.safety",
   "id": "danger",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:event_reactions",
     "contentOwner": "projecthoomans.dialogue_content.events",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/safety.json",
-    "responseTemplateID": "semantic.conversation.safety.danger",
-    "style": "neutral"
+    "responseAct": "WARN"
   },
-  "response": {
-    "act": "WARN",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Watch out. We need to move now.",
-          "TL": "Mag-ingat. Kailangan nating kumilos ngayon din."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Danger close! Move, move!",
-          "TL": "Malapit ang panganib! Kilos, kilos!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Not safe here. Clear out now.",
-          "TL": "Hindi ligtas dito. Lumikas na ngayon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Look around! We need to leave this spot.",
-          "TL": "Tumingin ka sa paligid! Kailangan nating umalis dito."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Infected coming! Get into cover right now.",
-          "TL": "Paparating ang mga infected! Magtago na ngayon din."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Trouble's right on us. Relocate immediately.",
-          "TL": "Nandito na ang gulo. Lumipat agad."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Heads up! We're in the open and exposed.",
-          "TL": "Ulo niyo! Lantad tayo sa bukas na lugar."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Drop what you're doing, we have to move.",
-          "TL": "Bitawan ang ginagawa mo, kailangan nating tumakbo."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Danger! Don't freeze up, run!",
-          "TL": "Panganib! Huwag kang matulala, takbo!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Move now! We're getting cornered.",
-          "TL": "Kilos na! Naiipit na tayo."
+          "EN": [
+            "Watch out. We need to move now.",
+            "Danger close! Move, move!",
+            "Not safe here. Clear out now.",
+            "Look around! We need to leave this spot.",
+            "Infected coming! Get into cover right now.",
+            "Trouble's right on us. Relocate immediately.",
+            "Heads up! We're in the open and exposed.",
+            "Drop what you're doing, we have to move.",
+            "Danger! Don't freeze up, run!",
+            "Move now! We're getting cornered."
+          ],
+          "TL": [
+            "Mag-ingat. Kailangan nating kumilos ngayon din.",
+            "Malapit ang panganib! Kilos, kilos!",
+            "Hindi ligtas dito. Lumikas na ngayon.",
+            "Tumingin ka sa paligid! Kailangan nating umalis dito.",
+            "Paparating ang mga infected! Magtago na ngayon din.",
+            "Nandito na ang gulo. Lumipat agad.",
+            "Ulo niyo! Lantad tayo sa bukas na lugar.",
+            "Bitawan ang ginagawa mo, kailangan nating tumakbo.",
+            "Panganib! Huwag kang matulala, takbo!",
+            "Kilos na! Naiipit na tayo."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.conversation.safety",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

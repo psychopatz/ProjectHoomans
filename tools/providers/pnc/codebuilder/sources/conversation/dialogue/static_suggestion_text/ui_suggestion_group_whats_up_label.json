@@ -1,9 +1,13 @@
 {
-  "id": "label",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.group.whats_up",
+  "id": "label",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.group.whats_up.label",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.group.whats_up.label",
@@ -12,14 +16,17 @@
           "TL": "Ano ang balita"
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "What's up",
-    "TL": "Ano ang balita"
-  },
-  "namespace": "ui.suggestion.group.whats_up",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "What's up",
+          "TL": "Ano ang balita"
+        }
+      }
+    ]
+  }
 }

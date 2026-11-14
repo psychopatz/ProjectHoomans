@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.human_kill",
+  "id": "cold",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.combat_human",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/cold.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One less problem.",
+              "Ammunition well spent.",
+              "He made his calculation and failed.",
+              "Threat terminated efficiently.",
+              "No further resistance from this one.",
+              "He chose to fight. Result was inevitable.",
+              "Target eliminated without incident.",
+              "Hostile ceased functioning.",
+              "One shooter off the board.",
+              "Dead. Expected outcome."
+            ],
+            "TL": [
+              "Isang problema ang nabawas.",
+              "Maayos na nagamit ang bala.",
+              "Nagkamali siya sa kalkula niya.",
+              "Mabilis na tinapos ang banta.",
+              "Wala nang laban mula sa isang 'to.",
+              "Pinili niyang lumaban. Inaasahan ang naging resulta.",
+              "Naalis ang target nang walang aberya.",
+              "Tumigil sa paggalaw ang kalaban.",
+              "Bawas ang isang bumaril sa talaan.",
+              "Patay. Inaasahang kalalabasan."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "He's dead. Move.",
+              "Corpse is of no concern. Step forward.",
+              "Leave him where he fell. Advance.",
+              "Casualty confirmed. Continue the route.",
+              "Do not stare. Keep moving.",
+              "Body is neutralized. March on.",
+              "He is irrelevant now. Step over.",
+              "Target inactive. Proceed immediately.",
+              "Nothing left to witness here. Move.",
+              "Down. Keep your focus on living targets."
+            ],
+            "TL": [
+              "Patay na siya. Kilos.",
+              "Walang silbi ang bangkay. Abante.",
+              "Iwan kung saan bumagsak. Sulong.",
+              "Patay kumpirmado. Ipagpatuloy ang ruta.",
+              "Huwag tumitig. Tuloy sa paglakad.",
+              "Naitumba na ang katawan. Magmartsa.",
+              "Wala na siyang halaga ngayon. Hakbangan.",
+              "Hindi na aktibo ang target. Magpatuloy agad.",
+              "Wala nang panonoorin dito. Kilos.",
+              "Bagsak. Tutukan ang mga buhay pang kalaban."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Finished. Check the others.",
+              "Target expired. Search remaining hostiles.",
+              "One confirmed kill. Check their positions.",
+              "Handled. Now account for the rest.",
+              "Done here. Shift focus to secondary contacts.",
+              "He is dead. Check the perimeter for his group.",
+              "Casualty verified. Confirm no further threats.",
+              "Finished. Look for reinforcements.",
+              "Threat neutralized. Scan surrounding cover.",
+              "One eliminated. Assess the remainder."
+            ],
+            "TL": [
+              "Tapos na. Tingnan ang iba.",
+              "Patay na ang target. Hanapin ang iba pang kalaban.",
+              "Isang kumpirmadong patay. Tignan ang mga posisyon nila.",
+              "Naasikaso na. Bilangin naman ang natitira.",
+              "Tapos na rito. Ilipat ang pansin sa iba.",
+              "Patay na siya. Tignan ang paligid kung nasaan ang grupo niya.",
+              "Kumpirmadong biktima. Tiyaking wala nang banta.",
+              "Tapos na. Maghanap ng posibleng saklolo.",
+              "Banta naalis. Suriin ang mga kublihan sa paligid.",
+              "Isa ang tinanggal. Suriin ang natitira."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

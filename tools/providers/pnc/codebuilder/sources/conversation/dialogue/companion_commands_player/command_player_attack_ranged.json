@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.player",
   "id": "attack_ranged",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,34 +16,25 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
-    "responseTemplateID": "semantic.command.player.attack_ranged"
+    "responseAct": "DIRECTIVE"
   },
-  "response": {
-    "act": "DIRECTIVE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "{addressee.name}, keep your distance.",
-          "TL": "{addressee.name}, panatilihin ang distansya."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Give us ranged cover, {addressee.name}.",
-          "TL": "Takpan kami mula sa malayo, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "{addressee.name}, engage from a safe distance.",
-          "TL": "{addressee.name}, lumaban mula sa ligtas na layo."
+          "EN": [
+            "{addressee.name}, keep your distance.",
+            "Give us ranged cover, {addressee.name}.",
+            "{addressee.name}, engage from a safe distance."
+          ],
+          "TL": [
+            "{addressee.name}, panatilihin ang distansya.",
+            "Takpan kami mula sa malayo, {addressee.name}.",
+            "{addressee.name}, lumaban mula sa ligtas na layo."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.player",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

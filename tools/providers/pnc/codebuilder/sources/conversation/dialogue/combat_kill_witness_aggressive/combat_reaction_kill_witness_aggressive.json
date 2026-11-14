@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_witness_aggressive",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/aggressive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Nice. Hit the next one.",
+              "Good strike! Take down another.",
+              "Solid hit! Keep swinging.",
+              "Dropped 'em! Who's next in line?",
+              "Beautiful kill! Take the next one out.",
+              "That skull shattered! Don't stop now.",
+              "Down it goes! Next target is yours.",
+              "Great shot! Press the attack.",
+              "Tore right through it! Keep going.",
+              "Hard hit! Line up the next one."
+            ],
+            "TL": [
+              "Ayos. Sunod naman.",
+              "Magandang tama! Magpabagsak pa ng isa.",
+              "Solidong palo! Tuloy ang hataw.",
+              "Ibinagsak mo! Sino'ng susunod sa pila?",
+              "Gandang patay! Itumba ang kasunod.",
+              "Basag ang bungo! Huwag kang titigil ngayon.",
+              "Bagsak na! Sa'yo ang susunod na target.",
+              "Galing ng tira! Tuloy ang pagsugod.",
+              "Tumagos agad! Tuloy lang.",
+              "Malakas na tama! Ihanda ang kasunod."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "That's how you do it. Keep going.",
+              "Textbook hit. Don't lose that momentum.",
+              "That's how we put them down. Keep pushing.",
+              "Hell of a blow! Don't let up.",
+              "Crushed it! Keep that fire burning.",
+              "Right in the dirt! Keep moving forward.",
+              "That's the way! Tear through them.",
+              "Brutal! Keep swinging like that.",
+              "Put down hard. Don't stop now.",
+              "That's what they get! Move to the next."
+            ],
+            "TL": [
+              "Ganyan dapat. Tuloy lang.",
+              "Perpektong tama. Huwag mawalan ng bwelo.",
+              "Ganyan magpabagsak sa kanila. Tuloy ang sugod.",
+              "Napakalakas na hampas! Huwag magpabaya.",
+              "Dinurog mo! Panatilihin ang bagsik mo.",
+              "Diretso sa lupa! Tuloy sa pasulong.",
+              "Ganyan nga! Ubusin sila.",
+              "Mabangis! Tuloy lang sa ganyang paghataw.",
+              "Ibinagsak nang todo. Huwag hihinto ngayon.",
+              "Bagay sa kanila 'yan! Lipat sa susunod."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Good kill. Don't let up.",
+              "Clean drop. Keep up the pressure.",
+              "Nice work! Stay aggressive.",
+              "Downed him. Don't give them an inch.",
+              "Great hit. Keep charging.",
+              "That one's history. Stay on the offense.",
+              "Solid work. Don't slow down.",
+              "Good kill. Make every strike count.",
+              "Down for good. Stay locked in.",
+              "Took it right out. Keep pushing."
+            ],
+            "TL": [
+              "Maganda. Huwag kang titigil.",
+              "Malinis na bagsak. Tuloy ang diin.",
+              "Magandang trabaho! Maging mabagsik.",
+              "Bumagsak na. Huwag silang bigyan ng puwang.",
+              "Magandang tama. Tuloy sa pag-atake.",
+              "Burado na ang isang 'yon. Manatili sa pag-atake.",
+              "Solido. Huwag magbagal.",
+              "Magandang patay. Sulitin ang bawat hampas.",
+              "Bagsak magpakailanman. Manatiling nakatutok.",
+              "Tinapos agad. Tuloy ang sulong."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

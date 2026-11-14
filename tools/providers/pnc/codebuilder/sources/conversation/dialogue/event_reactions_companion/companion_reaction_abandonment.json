@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "companion.reaction",
   "id": "abandonment",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:event_reactions",
     "contentOwner": "projecthoomans.dialogue_content.events",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/companion.json",
-    "responseTemplateID": "semantic.companion.reaction.abandonment",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Stay with me next time. We watch each other's backs.",
-          "TL": "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Don't leave me behind like that. We survive together.",
-          "TL": "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I almost got swarmed when you ran off. Stick close.",
-          "TL": "Halos makuyog ako no'ng umalis ka. Dumikit ka lang."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "We're a team. Don't take off on your own.",
-          "TL": "Magkasama tayo. Huwag kang aalis nang mag-isa."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Where did you go?! You can't just vanish.",
-          "TL": "Saan ka pumunta?! Hindi ka pwedeng mawala na lang."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Next time, warn me before you leave.",
-          "TL": "Sa susunod, sabihan mo ako bago ka umalis."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Thought I was on my own out there. Stay together.",
-          "TL": "Akala ko naiwan na akong mag-isa. Magsama tayo."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Leaving your partner gets people killed. Keep near.",
-          "TL": "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Glad you're back, but don't ditch me again.",
-          "TL": "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Stick with me. We're stronger as a pair.",
-          "TL": "Sumabay ka sa akin. Mas malakas tayo kapag magkasama."
+          "EN": [
+            "Stay with me next time. We watch each other's backs.",
+            "Don't leave me behind like that. We survive together.",
+            "I almost got swarmed when you ran off. Stick close.",
+            "We're a team. Don't take off on your own.",
+            "Where did you go?! You can't just vanish.",
+            "Next time, warn me before you leave.",
+            "Thought I was on my own out there. Stay together.",
+            "Leaving your partner gets people killed. Keep near.",
+            "Glad you're back, but don't ditch me again.",
+            "Stick with me. We're stronger as a pair."
+          ],
+          "TL": [
+            "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod.",
+            "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay.",
+            "Halos makuyog ako no'ng umalis ka. Dumikit ka lang.",
+            "Magkasama tayo. Huwag kang aalis nang mag-isa.",
+            "Saan ka pumunta?! Hindi ka pwedeng mawala na lang.",
+            "Sa susunod, sabihan mo ako bago ka umalis.",
+            "Akala ko naiwan na akong mag-isa. Magsama tayo.",
+            "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka.",
+            "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit.",
+            "Sumabay ka sa akin. Mas malakas tayo kapag magkasama."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.companion.reaction",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

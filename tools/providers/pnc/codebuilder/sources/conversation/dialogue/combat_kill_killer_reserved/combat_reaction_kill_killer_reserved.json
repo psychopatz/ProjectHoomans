@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_killer_reserved",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/reserved.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Down.",
+              "Eliminated.",
+              "Dead.",
+              "Handled.",
+              "Dropped.",
+              "Target down.",
+              "Neutralized.",
+              "Done.",
+              "Fell.",
+              "Ceased."
+            ],
+            "TL": [
+              "Patay.",
+              "Naalis.",
+              "Bagsak.",
+              "Naasikaso.",
+              "Tumba.",
+              "Bagsak ang target.",
+              "Naitumba.",
+              "Tapos.",
+              "Nalugmok.",
+              "Tumigil."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Got it.",
+              "Took it.",
+              "Hit.",
+              "Finished.",
+              "Cleared.",
+              "Taken care of.",
+              "Struck.",
+              "Resolved.",
+              "Dealt with.",
+              "Connected."
+            ],
+            "TL": [
+              "Nakuha ko.",
+              "Tinamaan ko.",
+              "Sapul.",
+              "Yari.",
+              "Malinis.",
+              "Naayos na.",
+              "Tinamaan.",
+              "Tapos na.",
+              "Nalutas.",
+              "Tumama."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Clear.",
+              "Path open.",
+              "Secure.",
+              "Nothing here.",
+              "Clean.",
+              "No contacts.",
+              "Lane clear.",
+              "Safe.",
+              "Open.",
+              "Quiet now."
+            ],
+            "TL": [
+              "Malinis.",
+              "Bukas ang daan.",
+              "Ligtas.",
+              "Walang anuman dito.",
+              "Maayos.",
+              "Walang kalaban.",
+              "Malinis ang linya.",
+              "Ayos.",
+              "Bukas.",
+              "Tahimik na."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

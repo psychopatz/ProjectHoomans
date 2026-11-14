@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.shaken",
+  "id": "blade_head",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/shaken.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Oh God... there's blood everywhere.",
+            "It's in pieces... I need a second.",
+            "The smell... God, I think I'm gonna be sick.",
+            "I can still feel the crunch...",
+            "It came right at me... had to cut it.",
+            "Hands won't stop trembling...",
+            "Is it really dead? Look at it...",
+            "That was horrible... but it's over.",
+            "God, I hate doing this...",
+            "Head's gone... let's just step back."
+          ],
+          "TL": [
+            "Diyos ko... may dugo kahit saan.",
+            "Pira-piraso na... kailangan ko ng saglit.",
+            "Ang amoy... Diyos ko, masusuka yata ako.",
+            "Ramdam ko pa rin ang lagutok...",
+            "Diretso sa akin... kailangan kong hiwain.",
+            "Ayaw tumigil ng panginginig ng mga kamay ko...",
+            "Patay na ba talaga? Tingnan mo...",
+            "Kakila-kilabot 'yon... pero tapos na.",
+            "Diyos ko, ayaw na ayaw kong ginagawa 'to...",
+            "Wala nang ulo... umatras muna tayo."
+          ]
+        }
+      }
+    ]
+  }
+}

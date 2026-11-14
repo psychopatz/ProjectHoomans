@@ -1,15 +1,15 @@
 -- Generated; do not edit by hand.
 return {
     {
-        ["domain"] = "accept",
-        ["id"] = "semantic.accept",
+        ["domain"] = "general",
+        ["id"] = "accept",
         ["variants"] = {
             {
                 ["dialogueAct"] = "ACCEPT",
                 ["fallback"] = "Okay, I'll get started.",
-                ["id"] = "semantic.accept.dataset.pending_started",
+                ["id"] = "accept.dataset.pending_started",
                 ["priority"] = 1,
-                ["templateID"] = "semantic.accept.dataset.pending_started",
+                ["templateID"] = "accept.dataset.pending_started",
                 ["translations"] = {
                     ["EN"] = {
                         "Okay, I'll get started.",
@@ -25,9 +25,9 @@ return {
             {
                 ["dialogueAct"] = "ACCEPT",
                 ["fallback"] = "All right. I can take care of that.",
-                ["id"] = "semantic.accept.dataset.pending_care",
+                ["id"] = "accept.dataset.pending_care",
                 ["priority"] = 1,
-                ["templateID"] = "semantic.accept.dataset.pending_care",
+                ["templateID"] = "accept.dataset.pending_care",
                 ["translations"] = {
                     ["EN"] = {
                         "All right. I can take care of that.",
@@ -43,14 +43,14 @@ return {
         },
     },
     {
-        ["domain"] = "compliment",
-        ["id"] = "semantic.compliment",
+        ["domain"] = "general",
+        ["id"] = "compliment",
         ["variants"] = {
             {
                 ["dialogueAct"] = "COMPLIMENT",
                 ["fallback"] = "That's kind of you. I appreciate it.",
-                ["id"] = "semantic.compliment.dataset.kind_of_you",
-                ["templateID"] = "semantic.compliment.dataset.kind_of_you",
+                ["id"] = "compliment.dataset.kind_of_you",
+                ["templateID"] = "compliment.dataset.kind_of_you",
                 ["translations"] = {
                     ["EN"] = {
                         "That's kind of you. I appreciate it.",
@@ -63,8 +63,8 @@ return {
             {
                 ["dialogueAct"] = "COMPLIMENT",
                 ["fallback"] = "Aw, thank you. That means a lot.",
-                ["id"] = "semantic.compliment.dataset.means_a_lot",
-                ["templateID"] = "semantic.compliment.dataset.means_a_lot",
+                ["id"] = "compliment.dataset.means_a_lot",
+                ["templateID"] = "compliment.dataset.means_a_lot",
                 ["translations"] = {
                     ["EN"] = {
                         "Aw, thank you. That means a lot.",
@@ -77,13 +77,13 @@ return {
         },
     },
     {
-        ["domain"] = "flow",
-        ["id"] = "semantic.flow.weather.raining",
+        ["domain"] = "weather",
+        ["id"] = "flow.weather.raining",
         ["variants"] = {
             {
                 ["dialogueAct"] = "RAINING",
                 ["fallback"] = "It is raining right now. We can return to that proposal when you are ready.",
-                ["id"] = "semantic.flow.weather.raining.dataset.contextual_switch",
+                ["id"] = "flow.weather.raining.dataset.contextual_switch",
                 ["plan"] = {
                     ["dialogueAct"] = "WEATHER_REPORT",
                     ["groundedFactRefs"] = {
@@ -134,14 +134,14 @@ return {
         },
     },
     {
-        ["domain"] = "greeting",
-        ["id"] = "semantic.greeting",
+        ["domain"] = "general",
+        ["id"] = "greeting",
         ["variants"] = {
             {
                 ["dialogueAct"] = "GREETING",
                 ["fallback"] = "Hey. How are you holding up?",
-                ["id"] = "semantic.greeting.dataset.holding_up",
-                ["templateID"] = "semantic.greeting.dataset.holding_up",
+                ["id"] = "greeting.dataset.holding_up",
+                ["templateID"] = "greeting.dataset.holding_up",
                 ["translations"] = {
                     ["EN"] = {
                         "Hey. How are you holding up?",
@@ -154,8 +154,8 @@ return {
             {
                 ["dialogueAct"] = "GREETING",
                 ["fallback"] = "Good to see you again.",
-                ["id"] = "semantic.greeting.dataset.good_to_see",
-                ["templateID"] = "semantic.greeting.dataset.good_to_see",
+                ["id"] = "greeting.dataset.good_to_see",
+                ["templateID"] = "greeting.dataset.good_to_see",
                 ["translations"] = {
                     ["EN"] = {
                         "Good to see you again.",
@@ -168,8 +168,8 @@ return {
             {
                 ["dialogueAct"] = "GREETING",
                 ["fallback"] = "Hey. How are things going?",
-                ["id"] = "semantic.greeting.dataset.how_things",
-                ["templateID"] = "semantic.greeting.dataset.how_things",
+                ["id"] = "greeting.dataset.how_things",
+                ["templateID"] = "greeting.dataset.how_things",
                 ["translations"] = {
                     ["EN"] = {
                         "Hey. How are things going?",
@@ -182,15 +182,15 @@ return {
         },
     },
     {
-        ["domain"] = "offer",
-        ["id"] = "semantic.offer",
+        ["domain"] = "general",
+        ["id"] = "offer",
         ["variants"] = {
             {
                 ["dialogueAct"] = "OFFER",
                 ["fallback"] = "That would help a lot. Could I have some?",
-                ["id"] = "semantic.offer.dataset.hungry_share",
+                ["id"] = "offer.dataset.hungry_share",
                 ["priority"] = 2,
-                ["templateID"] = "semantic.offer.dataset.hungry_share",
+                ["templateID"] = "offer.dataset.hungry_share",
                 ["translations"] = {
                     ["EN"] = {
                         "That would help a lot. Could I have some?",
@@ -212,9 +212,9 @@ return {
             {
                 ["dialogueAct"] = "OFFER",
                 ["fallback"] = "I'd appreciate a bite. Would you share?",
-                ["id"] = "semantic.offer.dataset.hungry_appreciate",
+                ["id"] = "offer.dataset.hungry_appreciate",
                 ["priority"] = 2,
-                ["templateID"] = "semantic.offer.dataset.hungry_appreciate",
+                ["templateID"] = "offer.dataset.hungry_appreciate",
                 ["translations"] = {
                     ["EN"] = {
                         "I'd appreciate a bite. Would you share?",
@@ -236,14 +236,14 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.activity",
+        ["domain"] = "activity",
+        ["id"] = "question.activity",
         ["variants"] = {
             {
                 ["dialogueAct"] = "ACTIVITY",
                 ["fallback"] = "Just doing what I can to keep things moving.",
-                ["id"] = "semantic.question.activity.dataset.keep_moving",
-                ["templateID"] = "semantic.question.activity.dataset.keep_moving",
+                ["id"] = "question.activity.dataset.keep_moving",
+                ["templateID"] = "question.activity.dataset.keep_moving",
                 ["translations"] = {
                     ["EN"] = {
                         "Just doing what I can to keep things moving.",
@@ -256,8 +256,8 @@ return {
             {
                 ["dialogueAct"] = "ACTIVITY",
                 ["fallback"] = "A little bit of everything.",
-                ["id"] = "semantic.question.activity.dataset.bit_of_everything",
-                ["templateID"] = "semantic.question.activity.dataset.bit_of_everything",
+                ["id"] = "question.activity.dataset.bit_of_everything",
+                ["templateID"] = "question.activity.dataset.bit_of_everything",
                 ["translations"] = {
                     ["EN"] = {
                         "A little bit of everything.",
@@ -270,8 +270,8 @@ return {
             {
                 ["dialogueAct"] = "ACTIVITY",
                 ["fallback"] = "Just taking care of what needs doing.",
-                ["id"] = "semantic.question.activity.dataset.taking_care",
-                ["templateID"] = "semantic.question.activity.dataset.taking_care",
+                ["id"] = "question.activity.dataset.taking_care",
+                ["templateID"] = "question.activity.dataset.taking_care",
                 ["translations"] = {
                     ["EN"] = {
                         "Just taking care of what needs doing.",
@@ -284,13 +284,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.ambiguous",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.ambiguous",
         ["variants"] = {
             {
                 ["dialogueAct"] = "AMBIGUOUS",
                 ["fallback"] = "Which part of my past do you mean?",
-                ["id"] = "semantic.question.backstory.ambiguous.authored",
+                ["id"] = "question.backstory.ambiguous.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous",
                 ["translations"] = {
                     ["EN"] = {
@@ -304,13 +304,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.follow_up.location",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.follow_up.location",
         ["variants"] = {
             {
                 ["dialogueAct"] = "LOCATION",
                 ["fallback"] = "I remember that part of my life, but I don't have more detail about where it was.",
-                ["id"] = "semantic.question.backstory.follow_up.location.authored",
+                ["id"] = "question.backstory.follow_up.location.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
                 ["translations"] = {
                     ["EN"] = {
@@ -324,13 +324,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.follow_up.miss",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.follow_up.miss",
         ["variants"] = {
             {
                 ["dialogueAct"] = "MISS",
                 ["fallback"] = "Sometimes. I still think about that part of my life.",
-                ["id"] = "semantic.question.backstory.follow_up.miss.authored",
+                ["id"] = "question.backstory.follow_up.miss.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
                 ["translations"] = {
                     ["EN"] = {
@@ -344,13 +344,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known",
         ["variants"] = {
             {
                 ["dialogueAct"] = "KNOWN",
                 ["fallback"] = "Before all this, I was %1.",
-                ["id"] = "semantic.question.backstory.known.authored",
+                ["id"] = "question.backstory.known.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -367,13 +367,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known.education",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known.education",
         ["variants"] = {
             {
                 ["dialogueAct"] = "EDUCATION",
                 ["fallback"] = "I studied %1.",
-                ["id"] = "semantic.question.backstory.known.education.authored",
+                ["id"] = "question.backstory.known.education.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -390,13 +390,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known.family_background",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known.family_background",
         ["variants"] = {
             {
                 ["dialogueAct"] = "FAMILY_BACKGROUND",
                 ["fallback"] = "My family was %1.",
-                ["id"] = "semantic.question.backstory.known.family_background.authored",
+                ["id"] = "question.backstory.known.family_background.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -413,13 +413,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known.fear",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known.fear",
         ["variants"] = {
             {
                 ["dialogueAct"] = "FEAR",
                 ["fallback"] = "I have always been afraid of %1.",
-                ["id"] = "semantic.question.backstory.known.fear.authored",
+                ["id"] = "question.backstory.known.fear.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -436,13 +436,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known.former_job",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known.former_job",
         ["variants"] = {
             {
                 ["dialogueAct"] = "FORMER_JOB",
                 ["fallback"] = "I worked as %1 before all this.",
-                ["id"] = "semantic.question.backstory.known.former_job.authored",
+                ["id"] = "question.backstory.known.former_job.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -459,13 +459,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known.hobby",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known.hobby",
         ["variants"] = {
             {
                 ["dialogueAct"] = "HOBBY",
                 ["fallback"] = "I used to enjoy %1.",
-                ["id"] = "semantic.question.backstory.known.hobby.authored",
+                ["id"] = "question.backstory.known.hobby.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -482,13 +482,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known.hometown",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known.hometown",
         ["variants"] = {
             {
                 ["dialogueAct"] = "HOMETOWN",
                 ["fallback"] = "I grew up in %1.",
-                ["id"] = "semantic.question.backstory.known.hometown.authored",
+                ["id"] = "question.backstory.known.hometown.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -505,13 +505,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.known.tragedy",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.known.tragedy",
         ["variants"] = {
             {
                 ["dialogueAct"] = "TRAGEDY",
                 ["fallback"] = "Something happened: %1.",
-                ["id"] = "semantic.question.backstory.known.tragedy.authored",
+                ["id"] = "question.backstory.known.tragedy.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -528,13 +528,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.refusal",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.refusal",
         ["variants"] = {
             {
                 ["dialogueAct"] = "REFUSAL",
                 ["fallback"] = "I'm not ready to talk about that yet.",
-                ["id"] = "semantic.question.backstory.refusal.authored",
+                ["id"] = "question.backstory.refusal.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal",
                 ["translations"] = {
                     ["EN"] = {
@@ -548,13 +548,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.backstory.suspected",
+        ["domain"] = "backstory",
+        ["id"] = "question.backstory.suspected",
         ["variants"] = {
             {
                 ["dialogueAct"] = "SUSPECTED",
                 ["fallback"] = "I think it was %1, but I could be mistaken.",
-                ["id"] = "semantic.question.backstory.suspected.authored",
+                ["id"] = "question.backstory.suspected.authored",
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
@@ -571,83 +571,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.identity",
-        ["variants"] = {
-            {
-                ["dialogueAct"] = "IDENTITY",
-                ["fallback"] = "I keep my name to myself until I know someone better. What should I call you?",
-                ["id"] = "semantic.question.identity.dataset.stranger_alt_1",
-                ["templateID"] = "semantic.question.identity.stranger_alt_1",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I keep my name to myself until I know someone better. What should I call you?",
-                    },
-                    ["TL"] = {
-                        "I keep my name to myself until I know someone better. What should I call you?",
-                    },
-                },
-            },
-            {
-                ["dialogueAct"] = "IDENTITY",
-                ["fallback"] = "Let's get to know each other first. What do people call you?",
-                ["id"] = "semantic.question.identity.dataset.stranger_alt_2",
-                ["templateID"] = "semantic.question.identity.stranger_alt_2",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Let's get to know each other first. What do people call you?",
-                    },
-                    ["TL"] = {
-                        "Let's get to know each other first. What do people call you?",
-                    },
-                },
-            },
-            {
-                ["dialogueAct"] = "IDENTITY",
-                ["fallback"] = "I don't trust you enough to share my name. Who are you, really?",
-                ["id"] = "semantic.question.identity.dataset.wary_alt_1",
-                ["priority"] = 2,
-                ["templateID"] = "semantic.question.identity.wary_alt_1",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I don't trust you enough to share my name. Who are you, really?",
-                    },
-                    ["TL"] = {
-                        "I don't trust you enough to share my name. Who are you, really?",
-                    },
-                },
-                ["when"] = {
-                    ["identityTrust"] = "untrustworthy",
-                },
-            },
-            {
-                ["dialogueAct"] = "IDENTITY",
-                ["fallback"] = "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                ["id"] = "semantic.question.identity.dataset.wary_alt_2",
-                ["priority"] = 2,
-                ["templateID"] = "semantic.question.identity.wary_alt_2",
-                ["translations"] = {
-                    ["EN"] = {
-                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                    },
-                    ["TL"] = {
-                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                    },
-                },
-                ["when"] = {
-                    ["identityTrust"] = "untrustworthy",
-                },
-            },
-        },
-    },
-    {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.needs.proposal",
+        ["domain"] = "needs",
+        ["id"] = "question.needs.proposal",
         ["variants"] = {
             {
                 ["dialogueAct"] = "PROPOSAL",
                 ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
-                ["id"] = "semantic.question.needs.proposal.dataset.thirst",
+                ["id"] = "question.needs.proposal.dataset.thirst",
                 ["plan"] = {
                     ["dialogueAct"] = "PROMISE_ACKNOWLEDGEMENT",
                     ["groundedFactRefs"] = {
@@ -703,13 +633,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.needs.quantity",
+        ["domain"] = "needs",
+        ["id"] = "question.needs.quantity",
         ["variants"] = {
             {
                 ["dialogueAct"] = "QUANTITY",
                 ["fallback"] = "I can confirm water is a need, but which item do you mean?",
-                ["id"] = "semantic.question.needs.quantity.dataset.clarify_thirst",
+                ["id"] = "question.needs.quantity.dataset.clarify_thirst",
                 ["plan"] = {
                     ["dialogueAct"] = "ASK_CLARIFICATION",
                     ["groundedFactRefs"] = {
@@ -760,14 +690,14 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.wellbeing",
+        ["domain"] = "wellbeing",
+        ["id"] = "question.wellbeing",
         ["variants"] = {
             {
                 ["dialogueAct"] = "WELLBEING",
                 ["fallback"] = "I'm hanging in there. Thanks for asking.",
-                ["id"] = "semantic.question.wellbeing.dataset.hanging_in",
-                ["templateID"] = "semantic.question.wellbeing.dataset.hanging_in",
+                ["id"] = "question.wellbeing.dataset.hanging_in",
+                ["templateID"] = "question.wellbeing.dataset.hanging_in",
                 ["translations"] = {
                     ["EN"] = {
                         "I'm hanging in there. Thanks for asking.",
@@ -780,8 +710,8 @@ return {
             {
                 ["dialogueAct"] = "WELLBEING",
                 ["fallback"] = "Doing okay, all things considered.",
-                ["id"] = "semantic.question.wellbeing.dataset.all_things_considered",
-                ["templateID"] = "semantic.question.wellbeing.dataset.all_things_considered",
+                ["id"] = "question.wellbeing.dataset.all_things_considered",
+                ["templateID"] = "question.wellbeing.dataset.all_things_considered",
                 ["translations"] = {
                     ["EN"] = {
                         "Doing okay, all things considered.",
@@ -794,8 +724,8 @@ return {
             {
                 ["dialogueAct"] = "WELLBEING",
                 ["fallback"] = "I'm getting by, one day at a time. How about you?",
-                ["id"] = "semantic.question.wellbeing.dataset.getting_by",
-                ["templateID"] = "semantic.question.wellbeing.dataset.getting_by",
+                ["id"] = "question.wellbeing.dataset.getting_by",
+                ["templateID"] = "question.wellbeing.dataset.getting_by",
                 ["translations"] = {
                     ["EN"] = {
                         "I'm getting by, one day at a time. How about you?",
@@ -808,9 +738,9 @@ return {
             {
                 ["dialogueAct"] = "WELLBEING",
                 ["fallback"] = "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                ["id"] = "semantic.question.wellbeing.dataset.hungry",
+                ["id"] = "question.wellbeing.dataset.hungry",
                 ["priority"] = 2,
-                ["templateID"] = "semantic.question.wellbeing.dataset.hungry",
+                ["templateID"] = "question.wellbeing.dataset.hungry",
                 ["translations"] = {
                     ["EN"] = {
                         "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
@@ -832,9 +762,9 @@ return {
             {
                 ["dialogueAct"] = "WELLBEING",
                 ["fallback"] = "I'm pretty thirsty. If you have water, could you spare some?",
-                ["id"] = "semantic.question.wellbeing.dataset.thirsty",
+                ["id"] = "question.wellbeing.dataset.thirsty",
                 ["priority"] = 3,
-                ["templateID"] = "semantic.question.wellbeing.dataset.thirsty",
+                ["templateID"] = "question.wellbeing.dataset.thirsty",
                 ["translations"] = {
                     ["EN"] = {
                         "I'm pretty thirsty. If you have water, could you spare some?",
@@ -856,9 +786,9 @@ return {
             {
                 ["dialogueAct"] = "WELLBEING",
                 ["fallback"] = "I'm tired, though I can manage for now.",
-                ["id"] = "semantic.question.wellbeing.dataset.tired",
+                ["id"] = "question.wellbeing.dataset.tired",
                 ["priority"] = 2,
-                ["templateID"] = "semantic.question.wellbeing.dataset.tired",
+                ["templateID"] = "question.wellbeing.dataset.tired",
                 ["translations"] = {
                     ["EN"] = {
                         "I'm tired, though I can manage for now.",
@@ -880,13 +810,13 @@ return {
         },
     },
     {
-        ["domain"] = "question",
-        ["id"] = "semantic.question.wellbeing.unknown",
+        ["domain"] = "wellbeing",
+        ["id"] = "question.wellbeing.unknown",
         ["variants"] = {
             {
                 ["dialogueAct"] = "UNKNOWN",
                 ["fallback"] = "I can tell something is off, but I do not know what caused it yet.",
-                ["id"] = "semantic.question.wellbeing.unknown.dataset.causal_followup",
+                ["id"] = "question.wellbeing.unknown.dataset.causal_followup",
                 ["plan"] = {
                     ["dialogueAct"] = "ASK_CLARIFICATION",
                     ["groundedFactRefs"] = {
@@ -937,15 +867,15 @@ return {
         },
     },
     {
-        ["domain"] = "refuse",
-        ["id"] = "semantic.refuse",
+        ["domain"] = "general",
+        ["id"] = "refuse",
         ["variants"] = {
             {
                 ["dialogueAct"] = "REFUSE",
                 ["fallback"] = "I can't take that on right now.",
-                ["id"] = "semantic.refuse.dataset.pending_unavailable",
+                ["id"] = "refuse.dataset.pending_unavailable",
                 ["priority"] = 1,
-                ["templateID"] = "semantic.refuse.dataset.pending_unavailable",
+                ["templateID"] = "refuse.dataset.pending_unavailable",
                 ["translations"] = {
                     ["EN"] = {
                         "I can't take that on right now.",
@@ -961,9 +891,9 @@ return {
             {
                 ["dialogueAct"] = "REFUSE",
                 ["fallback"] = "Not this time. I have enough to manage.",
-                ["id"] = "semantic.refuse.dataset.pending_enough",
+                ["id"] = "refuse.dataset.pending_enough",
                 ["priority"] = 1,
-                ["templateID"] = "semantic.refuse.dataset.pending_enough",
+                ["templateID"] = "refuse.dataset.pending_enough",
                 ["translations"] = {
                     ["EN"] = {
                         "Not this time. I have enough to manage.",
@@ -979,14 +909,14 @@ return {
         },
     },
     {
-        ["domain"] = "thanks",
-        ["id"] = "semantic.thanks",
+        ["domain"] = "general",
+        ["id"] = "thanks",
         ["variants"] = {
             {
                 ["dialogueAct"] = "THANKS",
                 ["fallback"] = "No problem at all.",
-                ["id"] = "semantic.thanks.dataset.no_problem",
-                ["templateID"] = "semantic.thanks.dataset.no_problem",
+                ["id"] = "thanks.dataset.no_problem",
+                ["templateID"] = "thanks.dataset.no_problem",
                 ["translations"] = {
                     ["EN"] = {
                         "No problem at all.",
@@ -999,8 +929,8 @@ return {
             {
                 ["dialogueAct"] = "THANKS",
                 ["fallback"] = "Anytime.",
-                ["id"] = "semantic.thanks.dataset.anytime",
-                ["templateID"] = "semantic.thanks.dataset.anytime",
+                ["id"] = "thanks.dataset.anytime",
+                ["templateID"] = "thanks.dataset.anytime",
                 ["translations"] = {
                     ["EN"] = {
                         "Anytime.",
@@ -1013,8 +943,8 @@ return {
             {
                 ["dialogueAct"] = "THANKS",
                 ["fallback"] = "Glad I could help.",
-                ["id"] = "semantic.thanks.dataset.glady",
-                ["templateID"] = "semantic.thanks.dataset.glady",
+                ["id"] = "thanks.dataset.glady",
+                ["templateID"] = "thanks.dataset.glady",
                 ["translations"] = {
                     ["EN"] = {
                         "Glad I could help.",

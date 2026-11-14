@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.eat",
   "id": "active",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-    "responseTemplateID": "semantic.task.eat.active",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Eating now.",
-          "TL": "Kumakain na ako ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Having a bite right now.",
-          "TL": "Kumakain ng kaunti ngayon."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Chewing through some food. Give me a moment.",
-          "TL": "Kumakain ng pagkain. Sandali lang."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Currently eating.",
-          "TL": "Kasalukuyang kumakain."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Getting some calories in me.",
-          "TL": "Nagpapasok ng lakas sa katawan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Eating my rations now.",
-          "TL": "Kinakain ang baong pagkain ngayon."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Taking a meal break as instructed.",
-          "TL": "Kumakain ayon sa utos."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Eating. Needed the energy.",
-          "TL": "Kumakain. Kailangan ko ng lakas."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Having some food now.",
-          "TL": "Kumakain na ngayon."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Eating quietly. Won't be long.",
-          "TL": "Kumakain nang tahimik. Saglit lang ito."
+          "EN": [
+            "Eating now.",
+            "Having a bite right now.",
+            "Chewing through some food. Give me a moment.",
+            "Currently eating.",
+            "Getting some calories in me.",
+            "Eating my rations now.",
+            "Taking a meal break as instructed.",
+            "Eating. Needed the energy.",
+            "Having some food now.",
+            "Eating quietly. Won't be long."
+          ],
+          "TL": [
+            "Kumakain na ako ngayon.",
+            "Kumakain ng kaunti ngayon.",
+            "Kumakain ng pagkain. Sandali lang.",
+            "Kasalukuyang kumakain.",
+            "Nagpapasok ng lakas sa katawan.",
+            "Kinakain ang baong pagkain ngayon.",
+            "Kumakain ayon sa utos.",
+            "Kumakain. Kailangan ko ng lakas.",
+            "Kumakain na ngayon.",
+            "Kumakain nang tahimik. Saglit lang ito."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.eat",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

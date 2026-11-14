@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.refill",
   "id": "admitted",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/refill.json",
-    "responseTemplateID": "semantic.task.refill.admitted",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'll refill that.",
-          "TL": "Lalagyan ko ng laman iyon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Understood. Topping up the water supply.",
-          "TL": "Naintindihan. Pupunuin ang supply ng tubig."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I'll go get the bottles filled.",
-          "TL": "Pupunta ako para punuin ang mga bote."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "All right, refilling the containers.",
-          "TL": "Sige, pupunuin ang mga lalagyan."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Good call. We need full canteens.",
-          "TL": "Magandang paalala. Kailangan natin ng punong sisidlan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "I'll take it to the water source.",
-          "TL": "Dadalhin ko sa pinagkukunan ng tubig."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Understood. Refilling immediately.",
-          "TL": "Naiintindihan ko. Pupunuin agad."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Right. Getting fresh water.",
-          "TL": "Sige. Kukuha ng sariwang tubig."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "I'll refill what's empty.",
-          "TL": "Pupunuin ko ang walang laman."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Sounds good. Heading to refill.",
-          "TL": "Maganda 'yan. Pupunta para magpuno."
+          "EN": [
+            "I'll refill that.",
+            "Understood. Topping up the water supply.",
+            "I'll go get the bottles filled.",
+            "All right, refilling the containers.",
+            "Good call. We need full canteens.",
+            "I'll take it to the water source.",
+            "Understood. Refilling immediately.",
+            "Right. Getting fresh water.",
+            "I'll refill what's empty.",
+            "Sounds good. Heading to refill."
+          ],
+          "TL": [
+            "Lalagyan ko ng laman iyon.",
+            "Naintindihan. Pupunuin ang supply ng tubig.",
+            "Pupunta ako para punuin ang mga bote.",
+            "Sige, pupunuin ang mga lalagyan.",
+            "Magandang paalala. Kailangan natin ng punong sisidlan.",
+            "Dadalhin ko sa pinagkukunan ng tubig.",
+            "Naiintindihan ko. Pupunuin agad.",
+            "Sige. Kukuha ng sariwang tubig.",
+            "Pupunuin ko ang walang laman.",
+            "Maganda 'yan. Pupunta para magpuno."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.refill",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

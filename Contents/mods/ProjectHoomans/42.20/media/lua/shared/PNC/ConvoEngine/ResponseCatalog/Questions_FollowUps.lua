@@ -8,7 +8,7 @@ Catalog.Register("semantic.question.wellbeing.unknown", {
     variants = {
         {
             id = "semantic.question.wellbeing.unknown",
-            templateID = "semantic.question.wellbeing.unknown",
+            templateID = "question.wellbeing.unknown",
             fallback = "I'm not sure how I'm doing right now.",
         },
     },

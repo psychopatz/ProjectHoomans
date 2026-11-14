@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.player",
+  "id": "wavebye",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,35 +16,25 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-    "responseTemplateID": "semantic.emote.player.wavebye",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Take care, {addressee.name}.",
-          "TL": "Mag-ingat, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "See you around, {addressee.name}.",
-          "TL": "Kita tayo, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Stay safe, {addressee.name}.",
-          "TL": "Manatiling ligtas, {addressee.name}."
+          "EN": [
+            "Take care, {addressee.name}.",
+            "See you around, {addressee.name}.",
+            "Stay safe, {addressee.name}."
+          ],
+          "TL": [
+            "Mag-ingat, {addressee.name}.",
+            "Kita tayo, {addressee.name}.",
+            "Manatiling ligtas, {addressee.name}."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.player.wavebye",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

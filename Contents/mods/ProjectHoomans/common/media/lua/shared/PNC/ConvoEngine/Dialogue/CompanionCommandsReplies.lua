@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.avoid_default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.avoid_default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Copy. We go around.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.avoid_default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Copy. We go around.",
+                                        "Understood. Avoiding the swarm.",
+                                        "Bypassing the horde.",
+                                        "Taking the side path. Quietly.",
+                                        "Copy that. Staying out of their sight line.",
+                                        "We'll detour around them.",
+                                        "Understood. No engagement.",
+                                        "Steering clear of the horde.",
+                                        "Copy. Slipping past the dead.",
+                                        "Avoiding contact. Lead the way.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Iikot tayo.",
+                                        "Naintindihan. Iiwasan ang kawan.",
+                                        "Lalampasan ang kawan sa malayo.",
+                                        "Dadaan sa gilid. Nang tahimik.",
+                                        "Kopyado. Lalayo sa paningin nila.",
+                                        "Iikot tayo sa paligid nila.",
+                                        "Naiintindihan ko. Walang labanang magaganap.",
+                                        "Lalayo sa kawan.",
+                                        "Sige. Papalusot sa mga patay.",
+                                        "Iiwas sa engkwentro. Ituro ang daan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Copy. We go around.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.avoid_default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Copy. We go around.",
+                            "Understood. Avoiding the swarm.",
+                            "Bypassing the horde.",
+                            "Taking the side path. Quietly.",
+                            "Copy that. Staying out of their sight line.",
+                            "We'll detour around them.",
+                            "Understood. No engagement.",
+                            "Steering clear of the horde.",
+                            "Copy. Slipping past the dead.",
+                            "Avoiding contact. Lead the way.",
+                        },
+                        ["TL"] = {
+                            "Sige. Iikot tayo.",
+                            "Naintindihan. Iiwasan ang kawan.",
+                            "Lalampasan ang kawan sa malayo.",
+                            "Dadaan sa gilid. Nang tahimik.",
+                            "Kopyado. Lalayo sa paningin nila.",
+                            "Iikot tayo sa paligid nila.",
+                            "Naiintindihan ko. Walang labanang magaganap.",
+                            "Lalayo sa kawan.",
+                            "Sige. Papalusot sa mga patay.",
+                            "Iiwas sa engkwentro. Ituro ang daan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.avoid_default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "avoid_default",
-            ["sourceId"] = "semantic.combat.horde.ack.avoid_default",
+            ["sourceId"] = "combat.horde.ack.avoid_default",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_avoid_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,126 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.avoid_default",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Copy. We go around.",
-                            },
-                            ["TL"] = {
-                                "Sige. Iikot tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Avoiding the swarm.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Iiwasan ang kawan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Bypassing the horde.",
-                            },
-                            ["TL"] = {
-                                "Lalampasan ang kawan sa malayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taking the side path. Quietly.",
-                            },
-                            ["TL"] = {
-                                "Dadaan sa gilid. Nang tahimik.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Copy that. Staying out of their sight line.",
-                            },
-                            ["TL"] = {
-                                "Kopyado. Lalayo sa paningin nila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We'll detour around them.",
-                            },
-                            ["TL"] = {
-                                "Iikot tayo sa paligid nila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. No engagement.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Walang labanang magaganap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Steering clear of the horde.",
-                            },
-                            ["TL"] = {
-                                "Lalayo sa kawan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Copy. Slipping past the dead.",
-                            },
-                            ["TL"] = {
-                                "Sige. Papalusot sa mga patay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Avoiding contact. Lead the way.",
-                            },
-                            ["TL"] = {
-                                "Iiwas sa engkwentro. Ituro ang daan.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Copy. We go around.",
+                                        "Understood. Avoiding the swarm.",
+                                        "Bypassing the horde.",
+                                        "Taking the side path. Quietly.",
+                                        "Copy that. Staying out of their sight line.",
+                                        "We'll detour around them.",
+                                        "Understood. No engagement.",
+                                        "Steering clear of the horde.",
+                                        "Copy. Slipping past the dead.",
+                                        "Avoiding contact. Lead the way.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Iikot tayo.",
+                                        "Naintindihan. Iiwasan ang kawan.",
+                                        "Lalampasan ang kawan sa malayo.",
+                                        "Dadaan sa gilid. Nang tahimik.",
+                                        "Kopyado. Lalayo sa paningin nila.",
+                                        "Iikot tayo sa paligid nila.",
+                                        "Naiintindihan ko. Walang labanang magaganap.",
+                                        "Lalayo sa kawan.",
+                                        "Sige. Papalusot sa mga patay.",
+                                        "Iiwas sa engkwentro. Ituro ang daan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.avoid_default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Copy. We go around.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.avoid_default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -154,20 +192,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Copy. We go around.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.avoid_default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Copy. We go around.",
+                        "Understood. Avoiding the swarm.",
+                        "Bypassing the horde.",
+                        "Taking the side path. Quietly.",
+                        "Copy that. Staying out of their sight line.",
+                        "We'll detour around them.",
+                        "Understood. No engagement.",
+                        "Steering clear of the horde.",
+                        "Copy. Slipping past the dead.",
+                        "Avoiding contact. Lead the way.",
+                    },
+                    ["TL"] = {
+                        "Sige. Iikot tayo.",
+                        "Naintindihan. Iiwasan ang kawan.",
+                        "Lalampasan ang kawan sa malayo.",
+                        "Dadaan sa gilid. Nang tahimik.",
+                        "Kopyado. Lalayo sa paningin nila.",
+                        "Iikot tayo sa paligid nila.",
+                        "Naiintindihan ko. Walang labanang magaganap.",
+                        "Lalayo sa kawan.",
+                        "Sige. Papalusot sa mga patay.",
+                        "Iiwas sa engkwentro. Ituro ang daan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.avoid_relief",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.avoid_relief",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Good. Let's go around.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.avoid_relief.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Good. Let's go around.",
+                                        "Thank goodness. That pack was massive.",
+                                        "Glad you made that call. Slipping away.",
+                                        "Smart move. We live to fight another hour.",
+                                        "Relieved to hear that. Detouring now.",
+                                        "Good choice. Keep it quiet as we skirt past.",
+                                        "Much better than dying out here. Moving around.",
+                                        "Sigh of relief. Let's keep our heads down.",
+                                        "Glad we're avoiding that bloodbath. Lead on.",
+                                        "Safe decision. Taking the alternate route.",
+                                    },
+                                    ["TL"] = {
+                                        "Mabuti. Umikot tayo.",
+                                        "Salamat sa Diyos. Napakalaki ng kawang 'yon.",
+                                        "Mabuti at nagpasya ka ng ganoon. Tatakas na tayo.",
+                                        "Matalinong desisyon. Mabubuhay pa tayo sa susunod na oras.",
+                                        "Gumaan ang loob ko nang marinig 'yan. Iikot na ngayon.",
+                                        "Magandang pasya. Manahimik habang lumalampas.",
+                                        "Mas maganda kaysa mamatay dito. Iikot na tayo.",
+                                        "Nakahinga nang maluwag. Yumuko tayo.",
+                                        "Mabuti at iniwasan natin ang katayang 'yon. Mauna ka na.",
+                                        "Ligtas na pasya. Dadaan sa ibang ruta.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Good. Let's go around.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.avoid_relief.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Good. Let's go around.",
+                            "Thank goodness. That pack was massive.",
+                            "Glad you made that call. Slipping away.",
+                            "Smart move. We live to fight another hour.",
+                            "Relieved to hear that. Detouring now.",
+                            "Good choice. Keep it quiet as we skirt past.",
+                            "Much better than dying out here. Moving around.",
+                            "Sigh of relief. Let's keep our heads down.",
+                            "Glad we're avoiding that bloodbath. Lead on.",
+                            "Safe decision. Taking the alternate route.",
+                        },
+                        ["TL"] = {
+                            "Mabuti. Umikot tayo.",
+                            "Salamat sa Diyos. Napakalaki ng kawang 'yon.",
+                            "Mabuti at nagpasya ka ng ganoon. Tatakas na tayo.",
+                            "Matalinong desisyon. Mabubuhay pa tayo sa susunod na oras.",
+                            "Gumaan ang loob ko nang marinig 'yan. Iikot na ngayon.",
+                            "Magandang pasya. Manahimik habang lumalampas.",
+                            "Mas maganda kaysa mamatay dito. Iikot na tayo.",
+                            "Nakahinga nang maluwag. Yumuko tayo.",
+                            "Mabuti at iniwasan natin ang katayang 'yon. Mauna ka na.",
+                            "Ligtas na pasya. Dadaan sa ibang ruta.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.avoid_relief",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "avoid_relief",
-            ["sourceId"] = "semantic.combat.horde.ack.avoid_relief",
+            ["sourceId"] = "combat.horde.ack.avoid_relief",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_avoid_relief.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -181,126 +340,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.avoid_relief",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good. Let's go around.",
-                            },
-                            ["TL"] = {
-                                "Mabuti. Umikot tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank goodness. That pack was massive.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa Diyos. Napakalaki ng kawang 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad you made that call. Slipping away.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nagpasya ka ng ganoon. Tatakas na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Smart move. We live to fight another hour.",
-                            },
-                            ["TL"] = {
-                                "Matalinong desisyon. Mabubuhay pa tayo sa susunod na oras.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Relieved to hear that. Detouring now.",
-                            },
-                            ["TL"] = {
-                                "Gumaan ang loob ko nang marinig 'yan. Iikot na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good choice. Keep it quiet as we skirt past.",
-                            },
-                            ["TL"] = {
-                                "Magandang pasya. Manahimik habang lumalampas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Much better than dying out here. Moving around.",
-                            },
-                            ["TL"] = {
-                                "Mas maganda kaysa mamatay dito. Iikot na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sigh of relief. Let's keep our heads down.",
-                            },
-                            ["TL"] = {
-                                "Nakahinga nang maluwag. Yumuko tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad we're avoiding that bloodbath. Lead on.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at iniwasan natin ang katayang 'yon. Mauna ka na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Safe decision. Taking the alternate route.",
-                            },
-                            ["TL"] = {
-                                "Ligtas na pasya. Dadaan sa ibang ruta.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Good. Let's go around.",
+                                        "Thank goodness. That pack was massive.",
+                                        "Glad you made that call. Slipping away.",
+                                        "Smart move. We live to fight another hour.",
+                                        "Relieved to hear that. Detouring now.",
+                                        "Good choice. Keep it quiet as we skirt past.",
+                                        "Much better than dying out here. Moving around.",
+                                        "Sigh of relief. Let's keep our heads down.",
+                                        "Glad we're avoiding that bloodbath. Lead on.",
+                                        "Safe decision. Taking the alternate route.",
+                                    },
+                                    ["TL"] = {
+                                        "Mabuti. Umikot tayo.",
+                                        "Salamat sa Diyos. Napakalaki ng kawang 'yon.",
+                                        "Mabuti at nagpasya ka ng ganoon. Tatakas na tayo.",
+                                        "Matalinong desisyon. Mabubuhay pa tayo sa susunod na oras.",
+                                        "Gumaan ang loob ko nang marinig 'yan. Iikot na ngayon.",
+                                        "Magandang pasya. Manahimik habang lumalampas.",
+                                        "Mas maganda kaysa mamatay dito. Iikot na tayo.",
+                                        "Nakahinga nang maluwag. Yumuko tayo.",
+                                        "Mabuti at iniwasan natin ang katayang 'yon. Mauna ka na.",
+                                        "Ligtas na pasya. Dadaan sa ibang ruta.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.avoid_relief",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Good. Let's go around.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.avoid_relief.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -310,20 +421,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Good. Let's go around.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.avoid_relief.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Good. Let's go around.",
+                        "Thank goodness. That pack was massive.",
+                        "Glad you made that call. Slipping away.",
+                        "Smart move. We live to fight another hour.",
+                        "Relieved to hear that. Detouring now.",
+                        "Good choice. Keep it quiet as we skirt past.",
+                        "Much better than dying out here. Moving around.",
+                        "Sigh of relief. Let's keep our heads down.",
+                        "Glad we're avoiding that bloodbath. Lead on.",
+                        "Safe decision. Taking the alternate route.",
+                    },
+                    ["TL"] = {
+                        "Mabuti. Umikot tayo.",
+                        "Salamat sa Diyos. Napakalaki ng kawang 'yon.",
+                        "Mabuti at nagpasya ka ng ganoon. Tatakas na tayo.",
+                        "Matalinong desisyon. Mabubuhay pa tayo sa susunod na oras.",
+                        "Gumaan ang loob ko nang marinig 'yan. Iikot na ngayon.",
+                        "Magandang pasya. Manahimik habang lumalampas.",
+                        "Mas maganda kaysa mamatay dito. Iikot na tayo.",
+                        "Nakahinga nang maluwag. Yumuko tayo.",
+                        "Mabuti at iniwasan natin ang katayang 'yon. Mauna ka na.",
+                        "Ligtas na pasya. Dadaan sa ibang ruta.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.engage_default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.engage_default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'm with you. Let's go.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.engage_default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'm with you. Let's go.",
+                                        "Engaging now. Watch your side.",
+                                        "Right behind you into the fight.",
+                                        "Understood. We fight together.",
+                                        "Moving in to strike.",
+                                        "Let's clear the way.",
+                                        "Ready for combat. Let's do this.",
+                                        "On it. Target locked.",
+                                        "Moving forward to engage.",
+                                        "With you all the way. Let's strike.",
+                                    },
+                                    ["TL"] = {
+                                        "Kasama mo ako. Tara.",
+                                        "Lalaban na ngayon. Bantayan ang tagiliran.",
+                                        "Nasa likod mo papunta sa laban.",
+                                        "Naintindihan. Sabay tayong lalaban.",
+                                        "Lalapit para humampas.",
+                                        "Hawiin natin ang daan.",
+                                        "Handa sa laban. Gawin na natin ito.",
+                                        "Inaasikaso na. Nakatutok sa kalaban.",
+                                        "Susulong para lumaban.",
+                                        "Kasama mo sa buong laban. Sumugod na tayo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'm with you. Let's go.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.engage_default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'm with you. Let's go.",
+                            "Engaging now. Watch your side.",
+                            "Right behind you into the fight.",
+                            "Understood. We fight together.",
+                            "Moving in to strike.",
+                            "Let's clear the way.",
+                            "Ready for combat. Let's do this.",
+                            "On it. Target locked.",
+                            "Moving forward to engage.",
+                            "With you all the way. Let's strike.",
+                        },
+                        ["TL"] = {
+                            "Kasama mo ako. Tara.",
+                            "Lalaban na ngayon. Bantayan ang tagiliran.",
+                            "Nasa likod mo papunta sa laban.",
+                            "Naintindihan. Sabay tayong lalaban.",
+                            "Lalapit para humampas.",
+                            "Hawiin natin ang daan.",
+                            "Handa sa laban. Gawin na natin ito.",
+                            "Inaasikaso na. Nakatutok sa kalaban.",
+                            "Susulong para lumaban.",
+                            "Kasama mo sa buong laban. Sumugod na tayo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.engage_default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "engage_default",
-            ["sourceId"] = "semantic.combat.horde.ack.engage_default",
+            ["sourceId"] = "combat.horde.ack.engage_default",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_engage_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -337,126 +569,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.engage_default",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm with you. Let's go.",
-                            },
-                            ["TL"] = {
-                                "Kasama mo ako. Tara.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Engaging now. Watch your side.",
-                            },
-                            ["TL"] = {
-                                "Lalaban na ngayon. Bantayan ang tagiliran.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right behind you into the fight.",
-                            },
-                            ["TL"] = {
-                                "Nasa likod mo papunta sa laban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. We fight together.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Sabay tayong lalaban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving in to strike.",
-                            },
-                            ["TL"] = {
-                                "Lalapit para humampas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's clear the way.",
-                            },
-                            ["TL"] = {
-                                "Hawiin natin ang daan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ready for combat. Let's do this.",
-                            },
-                            ["TL"] = {
-                                "Handa sa laban. Gawin na natin ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "On it. Target locked.",
-                            },
-                            ["TL"] = {
-                                "Inaasikaso na. Nakatutok sa kalaban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving forward to engage.",
-                            },
-                            ["TL"] = {
-                                "Susulong para lumaban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "With you all the way. Let's strike.",
-                            },
-                            ["TL"] = {
-                                "Kasama mo sa buong laban. Sumugod na tayo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'm with you. Let's go.",
+                                        "Engaging now. Watch your side.",
+                                        "Right behind you into the fight.",
+                                        "Understood. We fight together.",
+                                        "Moving in to strike.",
+                                        "Let's clear the way.",
+                                        "Ready for combat. Let's do this.",
+                                        "On it. Target locked.",
+                                        "Moving forward to engage.",
+                                        "With you all the way. Let's strike.",
+                                    },
+                                    ["TL"] = {
+                                        "Kasama mo ako. Tara.",
+                                        "Lalaban na ngayon. Bantayan ang tagiliran.",
+                                        "Nasa likod mo papunta sa laban.",
+                                        "Naintindihan. Sabay tayong lalaban.",
+                                        "Lalapit para humampas.",
+                                        "Hawiin natin ang daan.",
+                                        "Handa sa laban. Gawin na natin ito.",
+                                        "Inaasikaso na. Nakatutok sa kalaban.",
+                                        "Susulong para lumaban.",
+                                        "Kasama mo sa buong laban. Sumugod na tayo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.engage_default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'm with you. Let's go.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.engage_default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -466,20 +650,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'm with you. Let's go.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.engage_default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'm with you. Let's go.",
+                        "Engaging now. Watch your side.",
+                        "Right behind you into the fight.",
+                        "Understood. We fight together.",
+                        "Moving in to strike.",
+                        "Let's clear the way.",
+                        "Ready for combat. Let's do this.",
+                        "On it. Target locked.",
+                        "Moving forward to engage.",
+                        "With you all the way. Let's strike.",
+                    },
+                    ["TL"] = {
+                        "Kasama mo ako. Tara.",
+                        "Lalaban na ngayon. Bantayan ang tagiliran.",
+                        "Nasa likod mo papunta sa laban.",
+                        "Naintindihan. Sabay tayong lalaban.",
+                        "Lalapit para humampas.",
+                        "Hawiin natin ang daan.",
+                        "Handa sa laban. Gawin na natin ito.",
+                        "Inaasikaso na. Nakatutok sa kalaban.",
+                        "Susulong para lumaban.",
+                        "Kasama mo sa buong laban. Sumugod na tayo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.engage_eager",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.engage_eager",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Ready to strike! Let's take them down.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.engage_eager.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Ready to strike! Let's take them down.",
+                                        "Let's go! I've got your back.",
+                                        "Ready when you are! Charge!",
+                                        "Line them up! We can clear this whole pack.",
+                                        "Eager and armed. Let's do some damage.",
+                                        "I'm ready to fight! Moving in!",
+                                        "Let's smash through them together!",
+                                        "Weapon's ready. Let's take the field!",
+                                        "Full speed ahead! They won't know what hit them.",
+                                        "Hell yeah! Let's wipe them out.",
+                                    },
+                                    ["TL"] = {
+                                        "Handa nang humampas! Patumbahin natin sila.",
+                                        "Tara na! Hawak ko ang likod mo.",
+                                        "Handa na ako kapag handa ka na! Sugod!",
+                                        "Pilahin sila! Kaya nating ubusin ang buong kawan.",
+                                        "Sabik at armado. Manalanta na tayo.",
+                                        "Handa na akong lumaban! Susulong na!",
+                                        "Durogin natin sila nang sabay!",
+                                        "Handa ang armas. Angkinin natin ang labanan!",
+                                        "Buong bilis pasulong! Di nila malalaman ang tumama sa kanila.",
+                                        "Oo naman! Ubusin natin sila.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Ready to strike! Let's take them down.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.engage_eager.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Ready to strike! Let's take them down.",
+                            "Let's go! I've got your back.",
+                            "Ready when you are! Charge!",
+                            "Line them up! We can clear this whole pack.",
+                            "Eager and armed. Let's do some damage.",
+                            "I'm ready to fight! Moving in!",
+                            "Let's smash through them together!",
+                            "Weapon's ready. Let's take the field!",
+                            "Full speed ahead! They won't know what hit them.",
+                            "Hell yeah! Let's wipe them out.",
+                        },
+                        ["TL"] = {
+                            "Handa nang humampas! Patumbahin natin sila.",
+                            "Tara na! Hawak ko ang likod mo.",
+                            "Handa na ako kapag handa ka na! Sugod!",
+                            "Pilahin sila! Kaya nating ubusin ang buong kawan.",
+                            "Sabik at armado. Manalanta na tayo.",
+                            "Handa na akong lumaban! Susulong na!",
+                            "Durogin natin sila nang sabay!",
+                            "Handa ang armas. Angkinin natin ang labanan!",
+                            "Buong bilis pasulong! Di nila malalaman ang tumama sa kanila.",
+                            "Oo naman! Ubusin natin sila.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.engage_eager",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "engage_eager",
-            ["sourceId"] = "semantic.combat.horde.ack.engage_eager",
+            ["sourceId"] = "combat.horde.ack.engage_eager",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_engage_eager.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -493,126 +798,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.engage_eager",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ready to strike! Let's take them down.",
-                            },
-                            ["TL"] = {
-                                "Handa nang humampas! Patumbahin natin sila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's go! I've got your back.",
-                            },
-                            ["TL"] = {
-                                "Tara na! Hawak ko ang likod mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ready when you are! Charge!",
-                            },
-                            ["TL"] = {
-                                "Handa na ako kapag handa ka na! Sugod!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Line them up! We can clear this whole pack.",
-                            },
-                            ["TL"] = {
-                                "Pilahin sila! Kaya nating ubusin ang buong kawan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eager and armed. Let's do some damage.",
-                            },
-                            ["TL"] = {
-                                "Sabik at armado. Manalanta na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm ready to fight! Moving in!",
-                            },
-                            ["TL"] = {
-                                "Handa na akong lumaban! Susulong na!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's smash through them together!",
-                            },
-                            ["TL"] = {
-                                "Durogin natin sila nang sabay!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Weapon's ready. Let's take the field!",
-                            },
-                            ["TL"] = {
-                                "Handa ang armas. Angkinin natin ang labanan!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Full speed ahead! They won't know what hit them.",
-                            },
-                            ["TL"] = {
-                                "Buong bilis pasulong! Di nila malalaman ang tumama sa kanila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hell yeah! Let's wipe them out.",
-                            },
-                            ["TL"] = {
-                                "Oo naman! Ubusin natin sila.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Ready to strike! Let's take them down.",
+                                        "Let's go! I've got your back.",
+                                        "Ready when you are! Charge!",
+                                        "Line them up! We can clear this whole pack.",
+                                        "Eager and armed. Let's do some damage.",
+                                        "I'm ready to fight! Moving in!",
+                                        "Let's smash through them together!",
+                                        "Weapon's ready. Let's take the field!",
+                                        "Full speed ahead! They won't know what hit them.",
+                                        "Hell yeah! Let's wipe them out.",
+                                    },
+                                    ["TL"] = {
+                                        "Handa nang humampas! Patumbahin natin sila.",
+                                        "Tara na! Hawak ko ang likod mo.",
+                                        "Handa na ako kapag handa ka na! Sugod!",
+                                        "Pilahin sila! Kaya nating ubusin ang buong kawan.",
+                                        "Sabik at armado. Manalanta na tayo.",
+                                        "Handa na akong lumaban! Susulong na!",
+                                        "Durogin natin sila nang sabay!",
+                                        "Handa ang armas. Angkinin natin ang labanan!",
+                                        "Buong bilis pasulong! Di nila malalaman ang tumama sa kanila.",
+                                        "Oo naman! Ubusin natin sila.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.engage_eager",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Ready to strike! Let's take them down.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.engage_eager.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -622,20 +879,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Ready to strike! Let's take them down.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.engage_eager.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Ready to strike! Let's take them down.",
+                        "Let's go! I've got your back.",
+                        "Ready when you are! Charge!",
+                        "Line them up! We can clear this whole pack.",
+                        "Eager and armed. Let's do some damage.",
+                        "I'm ready to fight! Moving in!",
+                        "Let's smash through them together!",
+                        "Weapon's ready. Let's take the field!",
+                        "Full speed ahead! They won't know what hit them.",
+                        "Hell yeah! Let's wipe them out.",
+                    },
+                    ["TL"] = {
+                        "Handa nang humampas! Patumbahin natin sila.",
+                        "Tara na! Hawak ko ang likod mo.",
+                        "Handa na ako kapag handa ka na! Sugod!",
+                        "Pilahin sila! Kaya nating ubusin ang buong kawan.",
+                        "Sabik at armado. Manalanta na tayo.",
+                        "Handa na akong lumaban! Susulong na!",
+                        "Durogin natin sila nang sabay!",
+                        "Handa ang armas. Angkinin natin ang labanan!",
+                        "Buong bilis pasulong! Di nila malalaman ang tumama sa kanila.",
+                        "Oo naman! Ubusin natin sila.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.engage_hesitant",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.engage_hesitant",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "If you say so... alright. I'm with you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.engage_hesitant.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "If you say so... alright. I'm with you.",
+                                        "This is reckless, but I won't abandon you.",
+                                        "I have a bad feeling about this, but I'm in.",
+                                        "Watch my back... here we go.",
+                                        "I hope you know what you're doing. Moving in.",
+                                        "Not loving these odds, but I'll fight beside you.",
+                                        "Hesitant, but committed. Stay close.",
+                                        "Alright... just don't let them flank us.",
+                                        "Stepping into the meat grinder. Let's make it out alive.",
+                                        "Okay... I trust your blade. Let's go.",
+                                    },
+                                    ["TL"] = {
+                                        "Kung sinasabi mo... sige. Kasama mo ako.",
+                                        "Kapusukan ito, pero hindi kita iiwan.",
+                                        "Masama ang kutob ko rito, pero sasama ako.",
+                                        "Bantayan mo ang likod ko... heto na tayo.",
+                                        "Sana alam mo ang ginagawa mo. Susulong na.",
+                                        "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
+                                        "Nag-aalangan, pero sasabak. Dumikit ka.",
+                                        "Sige... huwag mo lang silang hayaang pumaligid.",
+                                        "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
+                                        "Sige... tiwala ako sa talim mo. Tara.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "If you say so... alright. I'm with you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.engage_hesitant.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "If you say so... alright. I'm with you.",
+                            "This is reckless, but I won't abandon you.",
+                            "I have a bad feeling about this, but I'm in.",
+                            "Watch my back... here we go.",
+                            "I hope you know what you're doing. Moving in.",
+                            "Not loving these odds, but I'll fight beside you.",
+                            "Hesitant, but committed. Stay close.",
+                            "Alright... just don't let them flank us.",
+                            "Stepping into the meat grinder. Let's make it out alive.",
+                            "Okay... I trust your blade. Let's go.",
+                        },
+                        ["TL"] = {
+                            "Kung sinasabi mo... sige. Kasama mo ako.",
+                            "Kapusukan ito, pero hindi kita iiwan.",
+                            "Masama ang kutob ko rito, pero sasama ako.",
+                            "Bantayan mo ang likod ko... heto na tayo.",
+                            "Sana alam mo ang ginagawa mo. Susulong na.",
+                            "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
+                            "Nag-aalangan, pero sasabak. Dumikit ka.",
+                            "Sige... huwag mo lang silang hayaang pumaligid.",
+                            "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
+                            "Sige... tiwala ako sa talim mo. Tara.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.engage_hesitant",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "engage_hesitant",
-            ["sourceId"] = "semantic.combat.horde.ack.engage_hesitant",
+            ["sourceId"] = "combat.horde.ack.engage_hesitant",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_engage_hesitant.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -649,126 +1027,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.engage_hesitant",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "If you say so... alright. I'm with you.",
-                            },
-                            ["TL"] = {
-                                "Kung sinasabi mo... sige. Kasama mo ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "This is reckless, but I won't abandon you.",
-                            },
-                            ["TL"] = {
-                                "Kapusukan ito, pero hindi kita iiwan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I have a bad feeling about this, but I'm in.",
-                            },
-                            ["TL"] = {
-                                "Masama ang kutob ko rito, pero sasama ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch my back... here we go.",
-                            },
-                            ["TL"] = {
-                                "Bantayan mo ang likod ko... heto na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hope you know what you're doing. Moving in.",
-                            },
-                            ["TL"] = {
-                                "Sana alam mo ang ginagawa mo. Susulong na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not loving these odds, but I'll fight beside you.",
-                            },
-                            ["TL"] = {
-                                "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hesitant, but committed. Stay close.",
-                            },
-                            ["TL"] = {
-                                "Nag-aalangan, pero sasabak. Dumikit ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Alright... just don't let them flank us.",
-                            },
-                            ["TL"] = {
-                                "Sige... huwag mo lang silang hayaang pumaligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stepping into the meat grinder. Let's make it out alive.",
-                            },
-                            ["TL"] = {
-                                "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay... I trust your blade. Let's go.",
-                            },
-                            ["TL"] = {
-                                "Sige... tiwala ako sa talim mo. Tara.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "If you say so... alright. I'm with you.",
+                                        "This is reckless, but I won't abandon you.",
+                                        "I have a bad feeling about this, but I'm in.",
+                                        "Watch my back... here we go.",
+                                        "I hope you know what you're doing. Moving in.",
+                                        "Not loving these odds, but I'll fight beside you.",
+                                        "Hesitant, but committed. Stay close.",
+                                        "Alright... just don't let them flank us.",
+                                        "Stepping into the meat grinder. Let's make it out alive.",
+                                        "Okay... I trust your blade. Let's go.",
+                                    },
+                                    ["TL"] = {
+                                        "Kung sinasabi mo... sige. Kasama mo ako.",
+                                        "Kapusukan ito, pero hindi kita iiwan.",
+                                        "Masama ang kutob ko rito, pero sasama ako.",
+                                        "Bantayan mo ang likod ko... heto na tayo.",
+                                        "Sana alam mo ang ginagawa mo. Susulong na.",
+                                        "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
+                                        "Nag-aalangan, pero sasabak. Dumikit ka.",
+                                        "Sige... huwag mo lang silang hayaang pumaligid.",
+                                        "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
+                                        "Sige... tiwala ako sa talim mo. Tara.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.engage_hesitant",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "If you say so... alright. I'm with you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.engage_hesitant.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -778,20 +1108,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "If you say so... alright. I'm with you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.engage_hesitant.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "If you say so... alright. I'm with you.",
+                        "This is reckless, but I won't abandon you.",
+                        "I have a bad feeling about this, but I'm in.",
+                        "Watch my back... here we go.",
+                        "I hope you know what you're doing. Moving in.",
+                        "Not loving these odds, but I'll fight beside you.",
+                        "Hesitant, but committed. Stay close.",
+                        "Alright... just don't let them flank us.",
+                        "Stepping into the meat grinder. Let's make it out alive.",
+                        "Okay... I trust your blade. Let's go.",
+                    },
+                    ["TL"] = {
+                        "Kung sinasabi mo... sige. Kasama mo ako.",
+                        "Kapusukan ito, pero hindi kita iiwan.",
+                        "Masama ang kutob ko rito, pero sasama ako.",
+                        "Bantayan mo ang likod ko... heto na tayo.",
+                        "Sana alam mo ang ginagawa mo. Susulong na.",
+                        "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
+                        "Nag-aalangan, pero sasabak. Dumikit ka.",
+                        "Sige... huwag mo lang silang hayaang pumaligid.",
+                        "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
+                        "Sige... tiwala ako sa talim mo. Tara.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.engage_reserved",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.engage_reserved",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Alright. Moving.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.engage_reserved.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Alright. Moving.",
+                                        "Advancing cautiously.",
+                                        "Understood. Engaging the horde.",
+                                        "In position. Moving to attack.",
+                                        "Weapon drawn. Advancing in formation.",
+                                        "Calculated engagement. Let's do this clean.",
+                                        "Order received. Stepping up to fight.",
+                                        "Keeping rhythm. Engaging targets.",
+                                        "Moving into range. Weapons up.",
+                                        "Understood. Entering the fray.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Galaw.",
+                                        "Susulong nang maingat.",
+                                        "Naintindihan. Lalabanan ang kawan.",
+                                        "Nasa pwesto. Kikilos para umatake.",
+                                        "Nakahugot ang armas. Susulong sa pormasyon.",
+                                        "Planadong paglusob. Gawin nating malinis.",
+                                        "Utos natanggap. Tatayo para lumaban.",
+                                        "Panatilihin ang ritmo. Lalabanan ang puntirya.",
+                                        "Pumapasok sa sakop. Itaas ang armas.",
+                                        "Naiintindihan ko. Papatungo na sa bakbakan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Alright. Moving.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.engage_reserved.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Alright. Moving.",
+                            "Advancing cautiously.",
+                            "Understood. Engaging the horde.",
+                            "In position. Moving to attack.",
+                            "Weapon drawn. Advancing in formation.",
+                            "Calculated engagement. Let's do this clean.",
+                            "Order received. Stepping up to fight.",
+                            "Keeping rhythm. Engaging targets.",
+                            "Moving into range. Weapons up.",
+                            "Understood. Entering the fray.",
+                        },
+                        ["TL"] = {
+                            "Sige. Galaw.",
+                            "Susulong nang maingat.",
+                            "Naintindihan. Lalabanan ang kawan.",
+                            "Nasa pwesto. Kikilos para umatake.",
+                            "Nakahugot ang armas. Susulong sa pormasyon.",
+                            "Planadong paglusob. Gawin nating malinis.",
+                            "Utos natanggap. Tatayo para lumaban.",
+                            "Panatilihin ang ritmo. Lalabanan ang puntirya.",
+                            "Pumapasok sa sakop. Itaas ang armas.",
+                            "Naiintindihan ko. Papatungo na sa bakbakan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.engage_reserved",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "engage_reserved",
-            ["sourceId"] = "semantic.combat.horde.ack.engage_reserved",
+            ["sourceId"] = "combat.horde.ack.engage_reserved",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_engage_reserved.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -805,126 +1256,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.engage_reserved",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Alright. Moving.",
-                            },
-                            ["TL"] = {
-                                "Sige. Galaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Advancing cautiously.",
-                            },
-                            ["TL"] = {
-                                "Susulong nang maingat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Engaging the horde.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Lalabanan ang kawan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "In position. Moving to attack.",
-                            },
-                            ["TL"] = {
-                                "Nasa pwesto. Kikilos para umatake.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Weapon drawn. Advancing in formation.",
-                            },
-                            ["TL"] = {
-                                "Nakahugot ang armas. Susulong sa pormasyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Calculated engagement. Let's do this clean.",
-                            },
-                            ["TL"] = {
-                                "Planadong paglusob. Gawin nating malinis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Order received. Stepping up to fight.",
-                            },
-                            ["TL"] = {
-                                "Utos natanggap. Tatayo para lumaban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keeping rhythm. Engaging targets.",
-                            },
-                            ["TL"] = {
-                                "Panatilihin ang ritmo. Lalabanan ang puntirya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving into range. Weapons up.",
-                            },
-                            ["TL"] = {
-                                "Pumapasok sa sakop. Itaas ang armas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Entering the fray.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Papatungo na sa bakbakan.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Alright. Moving.",
+                                        "Advancing cautiously.",
+                                        "Understood. Engaging the horde.",
+                                        "In position. Moving to attack.",
+                                        "Weapon drawn. Advancing in formation.",
+                                        "Calculated engagement. Let's do this clean.",
+                                        "Order received. Stepping up to fight.",
+                                        "Keeping rhythm. Engaging targets.",
+                                        "Moving into range. Weapons up.",
+                                        "Understood. Entering the fray.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Galaw.",
+                                        "Susulong nang maingat.",
+                                        "Naintindihan. Lalabanan ang kawan.",
+                                        "Nasa pwesto. Kikilos para umatake.",
+                                        "Nakahugot ang armas. Susulong sa pormasyon.",
+                                        "Planadong paglusob. Gawin nating malinis.",
+                                        "Utos natanggap. Tatayo para lumaban.",
+                                        "Panatilihin ang ritmo. Lalabanan ang puntirya.",
+                                        "Pumapasok sa sakop. Itaas ang armas.",
+                                        "Naiintindihan ko. Papatungo na sa bakbakan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.engage_reserved",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Alright. Moving.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.engage_reserved.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -934,20 +1337,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Alright. Moving.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.engage_reserved.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Alright. Moving.",
+                        "Advancing cautiously.",
+                        "Understood. Engaging the horde.",
+                        "In position. Moving to attack.",
+                        "Weapon drawn. Advancing in formation.",
+                        "Calculated engagement. Let's do this clean.",
+                        "Order received. Stepping up to fight.",
+                        "Keeping rhythm. Engaging targets.",
+                        "Moving into range. Weapons up.",
+                        "Understood. Entering the fray.",
+                    },
+                    ["TL"] = {
+                        "Sige. Galaw.",
+                        "Susulong nang maingat.",
+                        "Naintindihan. Lalabanan ang kawan.",
+                        "Nasa pwesto. Kikilos para umatake.",
+                        "Nakahugot ang armas. Susulong sa pormasyon.",
+                        "Planadong paglusob. Gawin nating malinis.",
+                        "Utos natanggap. Tatayo para lumaban.",
+                        "Panatilihin ang ritmo. Lalabanan ang puntirya.",
+                        "Pumapasok sa sakop. Itaas ang armas.",
+                        "Naiintindihan ko. Papatungo na sa bakbakan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.hold_default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.hold_default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Holding for now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.hold_default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Holding for now.",
+                                        "Holding position. Watching the herd.",
+                                        "Staying put until you signal.",
+                                        "Understood. Standing by.",
+                                        "Holding ground right here.",
+                                        "Position held. Awaiting order.",
+                                        "Holding. Observing threat movement.",
+                                        "Steady in place.",
+                                        "Maintaining position.",
+                                        "Holding. Let's see what they do.",
+                                    },
+                                    ["TL"] = {
+                                        "Hinto muna tayo.",
+                                        "Hawak ang pwesto. Binabantayan ang kawan.",
+                                        "Dito lang hanggang sumenyas ka.",
+                                        "Naiintindihan ko. Nakahanda.",
+                                        "Hawak ang lupa dito mismo.",
+                                        "Nasa pwesto. Naghihintay ng utos.",
+                                        "Hawak muna. Minamasid ang galaw ng banta.",
+                                        "Matatag sa pwesto.",
+                                        "Pinananatili ang posisyon.",
+                                        "Tigil muna. Tingnan natin ang gagawin nila.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Holding for now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.hold_default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Holding for now.",
+                            "Holding position. Watching the herd.",
+                            "Staying put until you signal.",
+                            "Understood. Standing by.",
+                            "Holding ground right here.",
+                            "Position held. Awaiting order.",
+                            "Holding. Observing threat movement.",
+                            "Steady in place.",
+                            "Maintaining position.",
+                            "Holding. Let's see what they do.",
+                        },
+                        ["TL"] = {
+                            "Hinto muna tayo.",
+                            "Hawak ang pwesto. Binabantayan ang kawan.",
+                            "Dito lang hanggang sumenyas ka.",
+                            "Naiintindihan ko. Nakahanda.",
+                            "Hawak ang lupa dito mismo.",
+                            "Nasa pwesto. Naghihintay ng utos.",
+                            "Hawak muna. Minamasid ang galaw ng banta.",
+                            "Matatag sa pwesto.",
+                            "Pinananatili ang posisyon.",
+                            "Tigil muna. Tingnan natin ang gagawin nila.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.hold_default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "hold_default",
-            ["sourceId"] = "semantic.combat.horde.ack.hold_default",
+            ["sourceId"] = "combat.horde.ack.hold_default",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_hold_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -961,126 +1485,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.hold_default",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding for now.",
-                            },
-                            ["TL"] = {
-                                "Hinto muna tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding position. Watching the herd.",
-                            },
-                            ["TL"] = {
-                                "Hawak ang pwesto. Binabantayan ang kawan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Staying put until you signal.",
-                            },
-                            ["TL"] = {
-                                "Dito lang hanggang sumenyas ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Standing by.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Nakahanda.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding ground right here.",
-                            },
-                            ["TL"] = {
-                                "Hawak ang lupa dito mismo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Position held. Awaiting order.",
-                            },
-                            ["TL"] = {
-                                "Nasa pwesto. Naghihintay ng utos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding. Observing threat movement.",
-                            },
-                            ["TL"] = {
-                                "Hawak muna. Minamasid ang galaw ng banta.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Steady in place.",
-                            },
-                            ["TL"] = {
-                                "Matatag sa pwesto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Maintaining position.",
-                            },
-                            ["TL"] = {
-                                "Pinananatili ang posisyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding. Let's see what they do.",
-                            },
-                            ["TL"] = {
-                                "Tigil muna. Tingnan natin ang gagawin nila.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Holding for now.",
+                                        "Holding position. Watching the herd.",
+                                        "Staying put until you signal.",
+                                        "Understood. Standing by.",
+                                        "Holding ground right here.",
+                                        "Position held. Awaiting order.",
+                                        "Holding. Observing threat movement.",
+                                        "Steady in place.",
+                                        "Maintaining position.",
+                                        "Holding. Let's see what they do.",
+                                    },
+                                    ["TL"] = {
+                                        "Hinto muna tayo.",
+                                        "Hawak ang pwesto. Binabantayan ang kawan.",
+                                        "Dito lang hanggang sumenyas ka.",
+                                        "Naiintindihan ko. Nakahanda.",
+                                        "Hawak ang lupa dito mismo.",
+                                        "Nasa pwesto. Naghihintay ng utos.",
+                                        "Hawak muna. Minamasid ang galaw ng banta.",
+                                        "Matatag sa pwesto.",
+                                        "Pinananatili ang posisyon.",
+                                        "Tigil muna. Tingnan natin ang gagawin nila.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.hold_default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Holding for now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.hold_default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1090,20 +1566,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Holding for now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.hold_default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Holding for now.",
+                        "Holding position. Watching the herd.",
+                        "Staying put until you signal.",
+                        "Understood. Standing by.",
+                        "Holding ground right here.",
+                        "Position held. Awaiting order.",
+                        "Holding. Observing threat movement.",
+                        "Steady in place.",
+                        "Maintaining position.",
+                        "Holding. Let's see what they do.",
+                    },
+                    ["TL"] = {
+                        "Hinto muna tayo.",
+                        "Hawak ang pwesto. Binabantayan ang kawan.",
+                        "Dito lang hanggang sumenyas ka.",
+                        "Naiintindihan ko. Nakahanda.",
+                        "Hawak ang lupa dito mismo.",
+                        "Nasa pwesto. Naghihintay ng utos.",
+                        "Hawak muna. Minamasid ang galaw ng banta.",
+                        "Matatag sa pwesto.",
+                        "Pinananatili ang posisyon.",
+                        "Tigil muna. Tingnan natin ang gagawin nila.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.hold_eager",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.hold_eager",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Holding. Say when.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.hold_eager.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Holding. Say when.",
+                                        "Ready on your mark! Holding position.",
+                                        "Coiled like a spring. Just give the word.",
+                                        "Holding fire, but twitching to go.",
+                                        "Ready to pounce. Standing by.",
+                                        "I'm locked on! Say the word and I strike.",
+                                        "Holding here. Don't make me wait too long!",
+                                        "Ready and waiting! Give the signal.",
+                                        "Poised to attack. Holding ground.",
+                                        "Just say the word. I'm ready.",
+                                    },
+                                    ["TL"] = {
+                                        "Hawak muna. Sabihin mo kung kailan.",
+                                        "Handa sa hudyat mo! Hawak ang pwesto.",
+                                        "Nakahandang sumugod. Sabihin mo lang.",
+                                        "Tigil-putok, pero sabik nang sumugod.",
+                                        "Handang lumundag. Naghihintay.",
+                                        "Nakatutok na! Sabihin mo lang at aatake ako.",
+                                        "Dito muna. Huwag mo akong paghintayin nang matagal!",
+                                        "Handa at naghihintay! Ibigay ang senyas.",
+                                        "Handang sumugod. Hawak ang lupa.",
+                                        "Sabihin mo lang. Handa na ako.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Holding. Say when.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.hold_eager.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Holding. Say when.",
+                            "Ready on your mark! Holding position.",
+                            "Coiled like a spring. Just give the word.",
+                            "Holding fire, but twitching to go.",
+                            "Ready to pounce. Standing by.",
+                            "I'm locked on! Say the word and I strike.",
+                            "Holding here. Don't make me wait too long!",
+                            "Ready and waiting! Give the signal.",
+                            "Poised to attack. Holding ground.",
+                            "Just say the word. I'm ready.",
+                        },
+                        ["TL"] = {
+                            "Hawak muna. Sabihin mo kung kailan.",
+                            "Handa sa hudyat mo! Hawak ang pwesto.",
+                            "Nakahandang sumugod. Sabihin mo lang.",
+                            "Tigil-putok, pero sabik nang sumugod.",
+                            "Handang lumundag. Naghihintay.",
+                            "Nakatutok na! Sabihin mo lang at aatake ako.",
+                            "Dito muna. Huwag mo akong paghintayin nang matagal!",
+                            "Handa at naghihintay! Ibigay ang senyas.",
+                            "Handang sumugod. Hawak ang lupa.",
+                            "Sabihin mo lang. Handa na ako.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.hold_eager",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "hold_eager",
-            ["sourceId"] = "semantic.combat.horde.ack.hold_eager",
+            ["sourceId"] = "combat.horde.ack.hold_eager",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_hold_eager.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1117,126 +1714,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.hold_eager",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding. Say when.",
-                            },
-                            ["TL"] = {
-                                "Hawak muna. Sabihin mo kung kailan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ready on your mark! Holding position.",
-                            },
-                            ["TL"] = {
-                                "Handa sa hudyat mo! Hawak ang pwesto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Coiled like a spring. Just give the word.",
-                            },
-                            ["TL"] = {
-                                "Nakahandang sumugod. Sabihin mo lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding fire, but twitching to go.",
-                            },
-                            ["TL"] = {
-                                "Tigil-putok, pero sabik nang sumugod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ready to pounce. Standing by.",
-                            },
-                            ["TL"] = {
-                                "Handang lumundag. Naghihintay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm locked on! Say the word and I strike.",
-                            },
-                            ["TL"] = {
-                                "Nakatutok na! Sabihin mo lang at aatake ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding here. Don't make me wait too long!",
-                            },
-                            ["TL"] = {
-                                "Dito muna. Huwag mo akong paghintayin nang matagal!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ready and waiting! Give the signal.",
-                            },
-                            ["TL"] = {
-                                "Handa at naghihintay! Ibigay ang senyas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Poised to attack. Holding ground.",
-                            },
-                            ["TL"] = {
-                                "Handang sumugod. Hawak ang lupa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just say the word. I'm ready.",
-                            },
-                            ["TL"] = {
-                                "Sabihin mo lang. Handa na ako.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Holding. Say when.",
+                                        "Ready on your mark! Holding position.",
+                                        "Coiled like a spring. Just give the word.",
+                                        "Holding fire, but twitching to go.",
+                                        "Ready to pounce. Standing by.",
+                                        "I'm locked on! Say the word and I strike.",
+                                        "Holding here. Don't make me wait too long!",
+                                        "Ready and waiting! Give the signal.",
+                                        "Poised to attack. Holding ground.",
+                                        "Just say the word. I'm ready.",
+                                    },
+                                    ["TL"] = {
+                                        "Hawak muna. Sabihin mo kung kailan.",
+                                        "Handa sa hudyat mo! Hawak ang pwesto.",
+                                        "Nakahandang sumugod. Sabihin mo lang.",
+                                        "Tigil-putok, pero sabik nang sumugod.",
+                                        "Handang lumundag. Naghihintay.",
+                                        "Nakatutok na! Sabihin mo lang at aatake ako.",
+                                        "Dito muna. Huwag mo akong paghintayin nang matagal!",
+                                        "Handa at naghihintay! Ibigay ang senyas.",
+                                        "Handang sumugod. Hawak ang lupa.",
+                                        "Sabihin mo lang. Handa na ako.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.hold_eager",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Holding. Say when.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.hold_eager.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1246,20 +1795,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Holding. Say when.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.hold_eager.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Holding. Say when.",
+                        "Ready on your mark! Holding position.",
+                        "Coiled like a spring. Just give the word.",
+                        "Holding fire, but twitching to go.",
+                        "Ready to pounce. Standing by.",
+                        "I'm locked on! Say the word and I strike.",
+                        "Holding here. Don't make me wait too long!",
+                        "Ready and waiting! Give the signal.",
+                        "Poised to attack. Holding ground.",
+                        "Just say the word. I'm ready.",
+                    },
+                    ["TL"] = {
+                        "Hawak muna. Sabihin mo kung kailan.",
+                        "Handa sa hudyat mo! Hawak ang pwesto.",
+                        "Nakahandang sumugod. Sabihin mo lang.",
+                        "Tigil-putok, pero sabik nang sumugod.",
+                        "Handang lumundag. Naghihintay.",
+                        "Nakatutok na! Sabihin mo lang at aatake ako.",
+                        "Dito muna. Huwag mo akong paghintayin nang matagal!",
+                        "Handa at naghihintay! Ibigay ang senyas.",
+                        "Handang sumugod. Hawak ang lupa.",
+                        "Sabihin mo lang. Handa na ako.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.combat.horde.ack.hold_hesitant",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.ack.hold_hesitant",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Okay. Holding here.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.ack.hold_hesitant.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Okay. Holding here.",
+                                        "Staying put. I hope they don't see us.",
+                                        "Holding position... please be quiet.",
+                                        "Holding ground. Heart's pounding.",
+                                        "I'll wait here, but let's be careful.",
+                                        "Staying still. Don't make a sound.",
+                                        "Holding... waiting for your call.",
+                                        "Keeping low. I hope this works.",
+                                        "Holding here. Watching their claws.",
+                                        "Understood... staying frozen right here.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Dito muna ako.",
+                                        "Dito lang ako. Sana di nila tayo makita.",
+                                        "Hawak ang pwesto... pakiusap tumahimik.",
+                                        "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
+                                        "Maghihintay ako rito, pero mag-ingat tayo.",
+                                        "Walang kikilos. Huwag gagawa ng tunog.",
+                                        "Hawak muna... naghihintay sa utos mo.",
+                                        "Nakayuko. Sana magtagumpay ito.",
+                                        "Hawak dito. Binabantayan ang kuko nila.",
+                                        "Naintindihan... di gagalaw dito mismo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.ack",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Okay. Holding here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.ack.hold_hesitant.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Okay. Holding here.",
+                            "Staying put. I hope they don't see us.",
+                            "Holding position... please be quiet.",
+                            "Holding ground. Heart's pounding.",
+                            "I'll wait here, but let's be careful.",
+                            "Staying still. Don't make a sound.",
+                            "Holding... waiting for your call.",
+                            "Keeping low. I hope this works.",
+                            "Holding here. Watching their claws.",
+                            "Understood... staying frozen right here.",
+                        },
+                        ["TL"] = {
+                            "Sige. Dito muna ako.",
+                            "Dito lang ako. Sana di nila tayo makita.",
+                            "Hawak ang pwesto... pakiusap tumahimik.",
+                            "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
+                            "Maghihintay ako rito, pero mag-ingat tayo.",
+                            "Walang kikilos. Huwag gagawa ng tunog.",
+                            "Hawak muna... naghihintay sa utos mo.",
+                            "Nakayuko. Sana magtagumpay ito.",
+                            "Hawak dito. Binabantayan ang kuko nila.",
+                            "Naintindihan... di gagalaw dito mismo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.ack.hold_hesitant",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "hold_hesitant",
-            ["sourceId"] = "semantic.combat.horde.ack.hold_hesitant",
+            ["sourceId"] = "combat.horde.ack.hold_hesitant",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_hold_hesitant.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.combat.horde.ack",
+        ["namespace"] = "combat.horde.ack",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1273,126 +1943,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.ack.hold_hesitant",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay. Holding here.",
-                            },
-                            ["TL"] = {
-                                "Sige. Dito muna ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Staying put. I hope they don't see us.",
-                            },
-                            ["TL"] = {
-                                "Dito lang ako. Sana di nila tayo makita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding position... please be quiet.",
-                            },
-                            ["TL"] = {
-                                "Hawak ang pwesto... pakiusap tumahimik.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding ground. Heart's pounding.",
-                            },
-                            ["TL"] = {
-                                "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll wait here, but let's be careful.",
-                            },
-                            ["TL"] = {
-                                "Maghihintay ako rito, pero mag-ingat tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Staying still. Don't make a sound.",
-                            },
-                            ["TL"] = {
-                                "Walang kikilos. Huwag gagawa ng tunog.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding... waiting for your call.",
-                            },
-                            ["TL"] = {
-                                "Hawak muna... naghihintay sa utos mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keeping low. I hope this works.",
-                            },
-                            ["TL"] = {
-                                "Nakayuko. Sana magtagumpay ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding here. Watching their claws.",
-                            },
-                            ["TL"] = {
-                                "Hawak dito. Binabantayan ang kuko nila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood... staying frozen right here.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan... di gagalaw dito mismo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Okay. Holding here.",
+                                        "Staying put. I hope they don't see us.",
+                                        "Holding position... please be quiet.",
+                                        "Holding ground. Heart's pounding.",
+                                        "I'll wait here, but let's be careful.",
+                                        "Staying still. Don't make a sound.",
+                                        "Holding... waiting for your call.",
+                                        "Keeping low. I hope this works.",
+                                        "Holding here. Watching their claws.",
+                                        "Understood... staying frozen right here.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Dito muna ako.",
+                                        "Dito lang ako. Sana di nila tayo makita.",
+                                        "Hawak ang pwesto... pakiusap tumahimik.",
+                                        "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
+                                        "Maghihintay ako rito, pero mag-ingat tayo.",
+                                        "Walang kikilos. Huwag gagawa ng tunog.",
+                                        "Hawak muna... naghihintay sa utos mo.",
+                                        "Nakayuko. Sana magtagumpay ito.",
+                                        "Hawak dito. Binabantayan ang kuko nila.",
+                                        "Naintindihan... di gagalaw dito mismo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.ack.hold_hesitant",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Okay. Holding here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.ack.hold_hesitant.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1402,20 +2024,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Okay. Holding here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.ack.hold_hesitant.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Okay. Holding here.",
+                        "Staying put. I hope they don't see us.",
+                        "Holding position... please be quiet.",
+                        "Holding ground. Heart's pounding.",
+                        "I'll wait here, but let's be careful.",
+                        "Staying still. Don't make a sound.",
+                        "Holding... waiting for your call.",
+                        "Keeping low. I hope this works.",
+                        "Holding here. Watching their claws.",
+                        "Understood... staying frozen right here.",
+                    },
+                    ["TL"] = {
+                        "Sige. Dito muna ako.",
+                        "Dito lang ako. Sana di nila tayo makita.",
+                        "Hawak ang pwesto... pakiusap tumahimik.",
+                        "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
+                        "Maghihintay ako rito, pero mag-ingat tayo.",
+                        "Walang kikilos. Huwag gagawa ng tunog.",
+                        "Hawak muna... naghihintay sa utos mo.",
+                        "Nakayuko. Sana magtagumpay ito.",
+                        "Hawak dito. Binabantayan ang kuko nila.",
+                        "Naintindihan... di gagalaw dito mismo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.attack_auto",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.attack_auto",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll handle it.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.attack_auto.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll handle it.",
+                                        "Engaging as needed.",
+                                        "I'll choose my targets.",
+                                        "Free to engage. Understood.",
+                                        "I'll fight whatever comes close.",
+                                        "On it. I'll take them down as they come.",
+                                        "Standard combat stance. Understood.",
+                                        "I'll defend myself and support you.",
+                                        "Attacking at discretion.",
+                                        "Understood. Engaging threats automatically.",
+                                    },
+                                    ["TL"] = {
+                                        "Ako na ang bahala.",
+                                        "Lalabanan kapag kinakailangan.",
+                                        "Pipiliin ko ang mga puntirya ko.",
+                                        "Malaya nang lumaban. Naintindihan.",
+                                        "Lalabanan ko ang anumang lumapit.",
+                                        "Inaasikaso na. Patutumbahin ko sila habang dumarating.",
+                                        "Pangkaraniwang tindig sa laban. Naintindihan.",
+                                        "Ipagtatanggol ko ang sarili at tutulungan kita.",
+                                        "Aatake ayon sa sitwasyon.",
+                                        "Naiintindihan ko. Kusang aatake sa mga banta.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll handle it.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.attack_auto.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll handle it.",
+                            "Engaging as needed.",
+                            "I'll choose my targets.",
+                            "Free to engage. Understood.",
+                            "I'll fight whatever comes close.",
+                            "On it. I'll take them down as they come.",
+                            "Standard combat stance. Understood.",
+                            "I'll defend myself and support you.",
+                            "Attacking at discretion.",
+                            "Understood. Engaging threats automatically.",
+                        },
+                        ["TL"] = {
+                            "Ako na ang bahala.",
+                            "Lalabanan kapag kinakailangan.",
+                            "Pipiliin ko ang mga puntirya ko.",
+                            "Malaya nang lumaban. Naintindihan.",
+                            "Lalabanan ko ang anumang lumapit.",
+                            "Inaasikaso na. Patutumbahin ko sila habang dumarating.",
+                            "Pangkaraniwang tindig sa laban. Naintindihan.",
+                            "Ipagtatanggol ko ang sarili at tutulungan kita.",
+                            "Aatake ayon sa sitwasyon.",
+                            "Naiintindihan ko. Kusang aatake sa mga banta.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.attack_auto",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "attack_auto",
-            ["sourceId"] = "semantic.command.reply.attack_auto",
+            ["sourceId"] = "command.reply.attack_auto",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_attack_auto.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1429,126 +2172,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.attack_auto",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll handle it.",
-                            },
-                            ["TL"] = {
-                                "Ako na ang bahala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Engaging as needed.",
-                            },
-                            ["TL"] = {
-                                "Lalabanan kapag kinakailangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll choose my targets.",
-                            },
-                            ["TL"] = {
-                                "Pipiliin ko ang mga puntirya ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Free to engage. Understood.",
-                            },
-                            ["TL"] = {
-                                "Malaya nang lumaban. Naintindihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll fight whatever comes close.",
-                            },
-                            ["TL"] = {
-                                "Lalabanan ko ang anumang lumapit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "On it. I'll take them down as they come.",
-                            },
-                            ["TL"] = {
-                                "Inaasikaso na. Patutumbahin ko sila habang dumarating.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Standard combat stance. Understood.",
-                            },
-                            ["TL"] = {
-                                "Pangkaraniwang tindig sa laban. Naintindihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll defend myself and support you.",
-                            },
-                            ["TL"] = {
-                                "Ipagtatanggol ko ang sarili at tutulungan kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Attacking at discretion.",
-                            },
-                            ["TL"] = {
-                                "Aatake ayon sa sitwasyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Engaging threats automatically.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Kusang aatake sa mga banta.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll handle it.",
+                                        "Engaging as needed.",
+                                        "I'll choose my targets.",
+                                        "Free to engage. Understood.",
+                                        "I'll fight whatever comes close.",
+                                        "On it. I'll take them down as they come.",
+                                        "Standard combat stance. Understood.",
+                                        "I'll defend myself and support you.",
+                                        "Attacking at discretion.",
+                                        "Understood. Engaging threats automatically.",
+                                    },
+                                    ["TL"] = {
+                                        "Ako na ang bahala.",
+                                        "Lalabanan kapag kinakailangan.",
+                                        "Pipiliin ko ang mga puntirya ko.",
+                                        "Malaya nang lumaban. Naintindihan.",
+                                        "Lalabanan ko ang anumang lumapit.",
+                                        "Inaasikaso na. Patutumbahin ko sila habang dumarating.",
+                                        "Pangkaraniwang tindig sa laban. Naintindihan.",
+                                        "Ipagtatanggol ko ang sarili at tutulungan kita.",
+                                        "Aatake ayon sa sitwasyon.",
+                                        "Naiintindihan ko. Kusang aatake sa mga banta.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.attack_auto",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll handle it.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.attack_auto.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1558,20 +2253,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll handle it.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.attack_auto.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll handle it.",
+                        "Engaging as needed.",
+                        "I'll choose my targets.",
+                        "Free to engage. Understood.",
+                        "I'll fight whatever comes close.",
+                        "On it. I'll take them down as they come.",
+                        "Standard combat stance. Understood.",
+                        "I'll defend myself and support you.",
+                        "Attacking at discretion.",
+                        "Understood. Engaging threats automatically.",
+                    },
+                    ["TL"] = {
+                        "Ako na ang bahala.",
+                        "Lalabanan kapag kinakailangan.",
+                        "Pipiliin ko ang mga puntirya ko.",
+                        "Malaya nang lumaban. Naintindihan.",
+                        "Lalabanan ko ang anumang lumapit.",
+                        "Inaasikaso na. Patutumbahin ko sila habang dumarating.",
+                        "Pangkaraniwang tindig sa laban. Naintindihan.",
+                        "Ipagtatanggol ko ang sarili at tutulungan kita.",
+                        "Aatake ayon sa sitwasyon.",
+                        "Naiintindihan ko. Kusang aatake sa mga banta.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.attack_melee",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.attack_melee",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Going in close.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.attack_melee.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Going in close.",
+                                        "Melee ready. Closing the distance.",
+                                        "I'll take them hand-to-hand.",
+                                        "Blade and blunt ready.",
+                                        "Saving ammo. Taking them up close.",
+                                        "Going in with melee.",
+                                        "I'll crack some skulls up front.",
+                                        "Melee weapon drawn.",
+                                        "Moving into striking range.",
+                                        "Understood. Close-quarters combat.",
+                                    },
+                                    ["TL"] = {
+                                        "Lalapit ako.",
+                                        "Handa ang pambugbog. Lalapit na ako.",
+                                        "Lalabanan ko sila nang malapitan.",
+                                        "Handa ang talim at pamalo.",
+                                        "Magtitipid ng bala. Lalapitan ko sila.",
+                                        "Lulusob nang malapitan.",
+                                        "Babaliin ko ang bungo nila sa unahan.",
+                                        "Nakahugot na ang panlaban nang malapitan.",
+                                        "Pumupwesto na sa abot ng hampas.",
+                                        "Naintindihan. Malapitang bakbakan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Going in close.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.attack_melee.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Going in close.",
+                            "Melee ready. Closing the distance.",
+                            "I'll take them hand-to-hand.",
+                            "Blade and blunt ready.",
+                            "Saving ammo. Taking them up close.",
+                            "Going in with melee.",
+                            "I'll crack some skulls up front.",
+                            "Melee weapon drawn.",
+                            "Moving into striking range.",
+                            "Understood. Close-quarters combat.",
+                        },
+                        ["TL"] = {
+                            "Lalapit ako.",
+                            "Handa ang pambugbog. Lalapit na ako.",
+                            "Lalabanan ko sila nang malapitan.",
+                            "Handa ang talim at pamalo.",
+                            "Magtitipid ng bala. Lalapitan ko sila.",
+                            "Lulusob nang malapitan.",
+                            "Babaliin ko ang bungo nila sa unahan.",
+                            "Nakahugot na ang panlaban nang malapitan.",
+                            "Pumupwesto na sa abot ng hampas.",
+                            "Naintindihan. Malapitang bakbakan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.attack_melee",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "attack_melee",
-            ["sourceId"] = "semantic.command.reply.attack_melee",
+            ["sourceId"] = "command.reply.attack_melee",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_attack_melee.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1585,126 +2401,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.attack_melee",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Going in close.",
-                            },
-                            ["TL"] = {
-                                "Lalapit ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Melee ready. Closing the distance.",
-                            },
-                            ["TL"] = {
-                                "Handa ang pambugbog. Lalapit na ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll take them hand-to-hand.",
-                            },
-                            ["TL"] = {
-                                "Lalabanan ko sila nang malapitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Blade and blunt ready.",
-                            },
-                            ["TL"] = {
-                                "Handa ang talim at pamalo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Saving ammo. Taking them up close.",
-                            },
-                            ["TL"] = {
-                                "Magtitipid ng bala. Lalapitan ko sila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Going in with melee.",
-                            },
-                            ["TL"] = {
-                                "Lulusob nang malapitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll crack some skulls up front.",
-                            },
-                            ["TL"] = {
-                                "Babaliin ko ang bungo nila sa unahan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Melee weapon drawn.",
-                            },
-                            ["TL"] = {
-                                "Nakahugot na ang panlaban nang malapitan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving into striking range.",
-                            },
-                            ["TL"] = {
-                                "Pumupwesto na sa abot ng hampas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Close-quarters combat.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Malapitang bakbakan.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Going in close.",
+                                        "Melee ready. Closing the distance.",
+                                        "I'll take them hand-to-hand.",
+                                        "Blade and blunt ready.",
+                                        "Saving ammo. Taking them up close.",
+                                        "Going in with melee.",
+                                        "I'll crack some skulls up front.",
+                                        "Melee weapon drawn.",
+                                        "Moving into striking range.",
+                                        "Understood. Close-quarters combat.",
+                                    },
+                                    ["TL"] = {
+                                        "Lalapit ako.",
+                                        "Handa ang pambugbog. Lalapit na ako.",
+                                        "Lalabanan ko sila nang malapitan.",
+                                        "Handa ang talim at pamalo.",
+                                        "Magtitipid ng bala. Lalapitan ko sila.",
+                                        "Lulusob nang malapitan.",
+                                        "Babaliin ko ang bungo nila sa unahan.",
+                                        "Nakahugot na ang panlaban nang malapitan.",
+                                        "Pumupwesto na sa abot ng hampas.",
+                                        "Naintindihan. Malapitang bakbakan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.attack_melee",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Going in close.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.attack_melee.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1714,20 +2482,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Going in close.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.attack_melee.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Going in close.",
+                        "Melee ready. Closing the distance.",
+                        "I'll take them hand-to-hand.",
+                        "Blade and blunt ready.",
+                        "Saving ammo. Taking them up close.",
+                        "Going in with melee.",
+                        "I'll crack some skulls up front.",
+                        "Melee weapon drawn.",
+                        "Moving into striking range.",
+                        "Understood. Close-quarters combat.",
+                    },
+                    ["TL"] = {
+                        "Lalapit ako.",
+                        "Handa ang pambugbog. Lalapit na ako.",
+                        "Lalabanan ko sila nang malapitan.",
+                        "Handa ang talim at pamalo.",
+                        "Magtitipid ng bala. Lalapitan ko sila.",
+                        "Lulusob nang malapitan.",
+                        "Babaliin ko ang bungo nila sa unahan.",
+                        "Nakahugot na ang panlaban nang malapitan.",
+                        "Pumupwesto na sa abot ng hampas.",
+                        "Naintindihan. Malapitang bakbakan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.attack_none",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.attack_none",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll avoid trouble.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.attack_none.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll avoid trouble.",
+                                        "Holding fire. Keeping passive.",
+                                        "Staying out of fights.",
+                                        "Understood. Ceasing all attacks.",
+                                        "I won't provoke anything.",
+                                        "Keeping my weapon stowed.",
+                                        "Pacifist stance. Understood.",
+                                        "I'll steer clear of hostiles.",
+                                        "Standing down from combat.",
+                                        "No attacking. Got it.",
+                                    },
+                                    ["TL"] = {
+                                        "Iiwas ako sa gulo.",
+                                        "Tigil-putok. Mananatiling tahimik.",
+                                        "Lalayo ako sa anumang labanan.",
+                                        "Naiintindihan ko. Ititigil ang lahat ng atake.",
+                                        "Wala akong gagalawin o pupukawin.",
+                                        "Nakatago ang armas ko.",
+                                        "Tahimik na paninindigan. Naintindihan.",
+                                        "Iiwas ako sa mga kalaban.",
+                                        "Uuurong sa laban.",
+                                        "Walang aatake. Nakuha ko.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll avoid trouble.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.attack_none.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll avoid trouble.",
+                            "Holding fire. Keeping passive.",
+                            "Staying out of fights.",
+                            "Understood. Ceasing all attacks.",
+                            "I won't provoke anything.",
+                            "Keeping my weapon stowed.",
+                            "Pacifist stance. Understood.",
+                            "I'll steer clear of hostiles.",
+                            "Standing down from combat.",
+                            "No attacking. Got it.",
+                        },
+                        ["TL"] = {
+                            "Iiwas ako sa gulo.",
+                            "Tigil-putok. Mananatiling tahimik.",
+                            "Lalayo ako sa anumang labanan.",
+                            "Naiintindihan ko. Ititigil ang lahat ng atake.",
+                            "Wala akong gagalawin o pupukawin.",
+                            "Nakatago ang armas ko.",
+                            "Tahimik na paninindigan. Naintindihan.",
+                            "Iiwas ako sa mga kalaban.",
+                            "Uuurong sa laban.",
+                            "Walang aatake. Nakuha ko.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.attack_none",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "attack_none",
-            ["sourceId"] = "semantic.command.reply.attack_none",
+            ["sourceId"] = "command.reply.attack_none",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_attack_none.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1741,126 +2630,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.attack_none",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll avoid trouble.",
-                            },
-                            ["TL"] = {
-                                "Iiwas ako sa gulo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding fire. Keeping passive.",
-                            },
-                            ["TL"] = {
-                                "Tigil-putok. Mananatiling tahimik.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Staying out of fights.",
-                            },
-                            ["TL"] = {
-                                "Lalayo ako sa anumang labanan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Ceasing all attacks.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Ititigil ang lahat ng atake.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I won't provoke anything.",
-                            },
-                            ["TL"] = {
-                                "Wala akong gagalawin o pupukawin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keeping my weapon stowed.",
-                            },
-                            ["TL"] = {
-                                "Nakatago ang armas ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Pacifist stance. Understood.",
-                            },
-                            ["TL"] = {
-                                "Tahimik na paninindigan. Naintindihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll steer clear of hostiles.",
-                            },
-                            ["TL"] = {
-                                "Iiwas ako sa mga kalaban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Standing down from combat.",
-                            },
-                            ["TL"] = {
-                                "Uuurong sa laban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No attacking. Got it.",
-                            },
-                            ["TL"] = {
-                                "Walang aatake. Nakuha ko.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll avoid trouble.",
+                                        "Holding fire. Keeping passive.",
+                                        "Staying out of fights.",
+                                        "Understood. Ceasing all attacks.",
+                                        "I won't provoke anything.",
+                                        "Keeping my weapon stowed.",
+                                        "Pacifist stance. Understood.",
+                                        "I'll steer clear of hostiles.",
+                                        "Standing down from combat.",
+                                        "No attacking. Got it.",
+                                    },
+                                    ["TL"] = {
+                                        "Iiwas ako sa gulo.",
+                                        "Tigil-putok. Mananatiling tahimik.",
+                                        "Lalayo ako sa anumang labanan.",
+                                        "Naiintindihan ko. Ititigil ang lahat ng atake.",
+                                        "Wala akong gagalawin o pupukawin.",
+                                        "Nakatago ang armas ko.",
+                                        "Tahimik na paninindigan. Naintindihan.",
+                                        "Iiwas ako sa mga kalaban.",
+                                        "Uuurong sa laban.",
+                                        "Walang aatake. Nakuha ko.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.attack_none",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll avoid trouble.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.attack_none.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1870,20 +2711,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll avoid trouble.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.attack_none.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll avoid trouble.",
+                        "Holding fire. Keeping passive.",
+                        "Staying out of fights.",
+                        "Understood. Ceasing all attacks.",
+                        "I won't provoke anything.",
+                        "Keeping my weapon stowed.",
+                        "Pacifist stance. Understood.",
+                        "I'll steer clear of hostiles.",
+                        "Standing down from combat.",
+                        "No attacking. Got it.",
+                    },
+                    ["TL"] = {
+                        "Iiwas ako sa gulo.",
+                        "Tigil-putok. Mananatiling tahimik.",
+                        "Lalayo ako sa anumang labanan.",
+                        "Naiintindihan ko. Ititigil ang lahat ng atake.",
+                        "Wala akong gagalawin o pupukawin.",
+                        "Nakatago ang armas ko.",
+                        "Tahimik na paninindigan. Naintindihan.",
+                        "Iiwas ako sa mga kalaban.",
+                        "Uuurong sa laban.",
+                        "Walang aatake. Nakuha ko.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.attack_ranged",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.attack_ranged",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'll cover you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.attack_ranged.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll cover you.",
+                                        "Ranged weapon ready. Watching the distance.",
+                                        "Providing covering fire.",
+                                        "I'll pick them off from here.",
+                                        "Sights aligned. Firing at range.",
+                                        "Keeping my distance and shooting.",
+                                        "Understood. Overwatching with ranged fire.",
+                                        "Ready on the trigger. Staying back.",
+                                        "Covering the field from back here.",
+                                        "Ranged attack stance confirmed.",
+                                    },
+                                    ["TL"] = {
+                                        "Bibigyan kita ng takip.",
+                                        "Handa ang baril. Binabantayan ang malayo.",
+                                        "Magbibigay ng suportang putok.",
+                                        "Isa-isa ko silang titirahin mula rito.",
+                                        "Nakatutok na ang paningin. Babaril sa malayo.",
+                                        "Lalayo ako at magpapaputok.",
+                                        "Naintindihan. Magbabantay gamit ang baril.",
+                                        "Nasa gatilyo ang daliri. Mananatili sa likod.",
+                                        "Tatakpan ko ang lugar mula rito.",
+                                        "Kumpirmado ang malayuang pag-atake.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I'll cover you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.attack_ranged.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll cover you.",
+                            "Ranged weapon ready. Watching the distance.",
+                            "Providing covering fire.",
+                            "I'll pick them off from here.",
+                            "Sights aligned. Firing at range.",
+                            "Keeping my distance and shooting.",
+                            "Understood. Overwatching with ranged fire.",
+                            "Ready on the trigger. Staying back.",
+                            "Covering the field from back here.",
+                            "Ranged attack stance confirmed.",
+                        },
+                        ["TL"] = {
+                            "Bibigyan kita ng takip.",
+                            "Handa ang baril. Binabantayan ang malayo.",
+                            "Magbibigay ng suportang putok.",
+                            "Isa-isa ko silang titirahin mula rito.",
+                            "Nakatutok na ang paningin. Babaril sa malayo.",
+                            "Lalayo ako at magpapaputok.",
+                            "Naintindihan. Magbabantay gamit ang baril.",
+                            "Nasa gatilyo ang daliri. Mananatili sa likod.",
+                            "Tatakpan ko ang lugar mula rito.",
+                            "Kumpirmado ang malayuang pag-atake.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.attack_ranged",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "attack_ranged",
-            ["sourceId"] = "semantic.command.reply.attack_ranged",
+            ["sourceId"] = "command.reply.attack_ranged",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_attack_ranged.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1897,126 +2859,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.attack_ranged",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll cover you.",
-                            },
-                            ["TL"] = {
-                                "Bibigyan kita ng takip.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ranged weapon ready. Watching the distance.",
-                            },
-                            ["TL"] = {
-                                "Handa ang baril. Binabantayan ang malayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Providing covering fire.",
-                            },
-                            ["TL"] = {
-                                "Magbibigay ng suportang putok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll pick them off from here.",
-                            },
-                            ["TL"] = {
-                                "Isa-isa ko silang titirahin mula rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sights aligned. Firing at range.",
-                            },
-                            ["TL"] = {
-                                "Nakatutok na ang paningin. Babaril sa malayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keeping my distance and shooting.",
-                            },
-                            ["TL"] = {
-                                "Lalayo ako at magpapaputok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Overwatching with ranged fire.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Magbabantay gamit ang baril.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ready on the trigger. Staying back.",
-                            },
-                            ["TL"] = {
-                                "Nasa gatilyo ang daliri. Mananatili sa likod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Covering the field from back here.",
-                            },
-                            ["TL"] = {
-                                "Tatakpan ko ang lugar mula rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ranged attack stance confirmed.",
-                            },
-                            ["TL"] = {
-                                "Kumpirmado ang malayuang pag-atake.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll cover you.",
+                                        "Ranged weapon ready. Watching the distance.",
+                                        "Providing covering fire.",
+                                        "I'll pick them off from here.",
+                                        "Sights aligned. Firing at range.",
+                                        "Keeping my distance and shooting.",
+                                        "Understood. Overwatching with ranged fire.",
+                                        "Ready on the trigger. Staying back.",
+                                        "Covering the field from back here.",
+                                        "Ranged attack stance confirmed.",
+                                    },
+                                    ["TL"] = {
+                                        "Bibigyan kita ng takip.",
+                                        "Handa ang baril. Binabantayan ang malayo.",
+                                        "Magbibigay ng suportang putok.",
+                                        "Isa-isa ko silang titirahin mula rito.",
+                                        "Nakatutok na ang paningin. Babaril sa malayo.",
+                                        "Lalayo ako at magpapaputok.",
+                                        "Naintindihan. Magbabantay gamit ang baril.",
+                                        "Nasa gatilyo ang daliri. Mananatili sa likod.",
+                                        "Tatakpan ko ang lugar mula rito.",
+                                        "Kumpirmado ang malayuang pag-atake.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.attack_ranged",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'll cover you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.attack_ranged.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2026,20 +2940,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I'll cover you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.attack_ranged.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll cover you.",
+                        "Ranged weapon ready. Watching the distance.",
+                        "Providing covering fire.",
+                        "I'll pick them off from here.",
+                        "Sights aligned. Firing at range.",
+                        "Keeping my distance and shooting.",
+                        "Understood. Overwatching with ranged fire.",
+                        "Ready on the trigger. Staying back.",
+                        "Covering the field from back here.",
+                        "Ranged attack stance confirmed.",
+                    },
+                    ["TL"] = {
+                        "Bibigyan kita ng takip.",
+                        "Handa ang baril. Binabantayan ang malayo.",
+                        "Magbibigay ng suportang putok.",
+                        "Isa-isa ko silang titirahin mula rito.",
+                        "Nakatutok na ang paningin. Babaril sa malayo.",
+                        "Lalayo ako at magpapaputok.",
+                        "Naintindihan. Magbabantay gamit ang baril.",
+                        "Nasa gatilyo ang daliri. Mananatili sa likod.",
+                        "Tatakpan ko ang lugar mula rito.",
+                        "Kumpirmado ang malayuang pag-atake.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.camp",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.camp",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "We'll make camp here.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.camp.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "We'll make camp here.",
+                                        "Setting up camp in this spot.",
+                                        "Understood. Resting here.",
+                                        "This place works for a camp. Securing it.",
+                                        "Making camp. Let's get comfortable.",
+                                        "Good spot to bed down.",
+                                        "Camp established. I'll settle in.",
+                                        "Understood. Dropping gear and resting.",
+                                        "Setting watches and bedding down here.",
+                                        "Camp confirmed. Staying put.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkakampo tayo rito.",
+                                        "Magtatayo ng kampo sa pwestong ito.",
+                                        "Naintindihan. Magpapahinga rito.",
+                                        "Pwede ang lugar na ito para magkampo. Seselyuhan ito.",
+                                        "Nagtatayo ng kampo. Magpahinga na tayo.",
+                                        "Magandang lugar para matulog.",
+                                        "Naitayo na ang kampo. Aayos na ako ng pwesto.",
+                                        "Naiintindihan ko. Ibaba ang gamit at magpahinga.",
+                                        "Magtatalaga ng bantay at matutulog dito.",
+                                        "Kumpirmadong kampo. Mananatili rito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "We'll make camp here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.camp.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "We'll make camp here.",
+                            "Setting up camp in this spot.",
+                            "Understood. Resting here.",
+                            "This place works for a camp. Securing it.",
+                            "Making camp. Let's get comfortable.",
+                            "Good spot to bed down.",
+                            "Camp established. I'll settle in.",
+                            "Understood. Dropping gear and resting.",
+                            "Setting watches and bedding down here.",
+                            "Camp confirmed. Staying put.",
+                        },
+                        ["TL"] = {
+                            "Magkakampo tayo rito.",
+                            "Magtatayo ng kampo sa pwestong ito.",
+                            "Naintindihan. Magpapahinga rito.",
+                            "Pwede ang lugar na ito para magkampo. Seselyuhan ito.",
+                            "Nagtatayo ng kampo. Magpahinga na tayo.",
+                            "Magandang lugar para matulog.",
+                            "Naitayo na ang kampo. Aayos na ako ng pwesto.",
+                            "Naiintindihan ko. Ibaba ang gamit at magpahinga.",
+                            "Magtatalaga ng bantay at matutulog dito.",
+                            "Kumpirmadong kampo. Mananatili rito.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.camp",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "camp",
-            ["sourceId"] = "semantic.command.reply.camp",
+            ["sourceId"] = "command.reply.camp",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_camp.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2053,126 +3088,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.camp",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We'll make camp here.",
-                            },
-                            ["TL"] = {
-                                "Magkakampo tayo rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Setting up camp in this spot.",
-                            },
-                            ["TL"] = {
-                                "Magtatayo ng kampo sa pwestong ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Resting here.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Magpapahinga rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "This place works for a camp. Securing it.",
-                            },
-                            ["TL"] = {
-                                "Pwede ang lugar na ito para magkampo. Seselyuhan ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Making camp. Let's get comfortable.",
-                            },
-                            ["TL"] = {
-                                "Nagtatayo ng kampo. Magpahinga na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good spot to bed down.",
-                            },
-                            ["TL"] = {
-                                "Magandang lugar para matulog.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Camp established. I'll settle in.",
-                            },
-                            ["TL"] = {
-                                "Naitayo na ang kampo. Aayos na ako ng pwesto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Dropping gear and resting.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Ibaba ang gamit at magpahinga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Setting watches and bedding down here.",
-                            },
-                            ["TL"] = {
-                                "Magtatalaga ng bantay at matutulog dito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Camp confirmed. Staying put.",
-                            },
-                            ["TL"] = {
-                                "Kumpirmadong kampo. Mananatili rito.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "We'll make camp here.",
+                                        "Setting up camp in this spot.",
+                                        "Understood. Resting here.",
+                                        "This place works for a camp. Securing it.",
+                                        "Making camp. Let's get comfortable.",
+                                        "Good spot to bed down.",
+                                        "Camp established. I'll settle in.",
+                                        "Understood. Dropping gear and resting.",
+                                        "Setting watches and bedding down here.",
+                                        "Camp confirmed. Staying put.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkakampo tayo rito.",
+                                        "Magtatayo ng kampo sa pwestong ito.",
+                                        "Naintindihan. Magpapahinga rito.",
+                                        "Pwede ang lugar na ito para magkampo. Seselyuhan ito.",
+                                        "Nagtatayo ng kampo. Magpahinga na tayo.",
+                                        "Magandang lugar para matulog.",
+                                        "Naitayo na ang kampo. Aayos na ako ng pwesto.",
+                                        "Naiintindihan ko. Ibaba ang gamit at magpahinga.",
+                                        "Magtatalaga ng bantay at matutulog dito.",
+                                        "Kumpirmadong kampo. Mananatili rito.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.camp",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "We'll make camp here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.camp.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2182,20 +3169,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "We'll make camp here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.camp.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "We'll make camp here.",
+                        "Setting up camp in this spot.",
+                        "Understood. Resting here.",
+                        "This place works for a camp. Securing it.",
+                        "Making camp. Let's get comfortable.",
+                        "Good spot to bed down.",
+                        "Camp established. I'll settle in.",
+                        "Understood. Dropping gear and resting.",
+                        "Setting watches and bedding down here.",
+                        "Camp confirmed. Staying put.",
+                    },
+                    ["TL"] = {
+                        "Magkakampo tayo rito.",
+                        "Magtatayo ng kampo sa pwestong ito.",
+                        "Naintindihan. Magpapahinga rito.",
+                        "Pwede ang lugar na ito para magkampo. Seselyuhan ito.",
+                        "Nagtatayo ng kampo. Magpahinga na tayo.",
+                        "Magandang lugar para matulog.",
+                        "Naitayo na ang kampo. Aayos na ako ng pwesto.",
+                        "Naiintindihan ko. Ibaba ang gamit at magpahinga.",
+                        "Magtatalaga ng bantay at matutulog dito.",
+                        "Kumpirmadong kampo. Mananatili rito.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.camp_rejected",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.camp_rejected",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can't find a safe room or campfire nearby.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.camp_rejected.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can't find a safe room or campfire nearby.",
+                                        "Not safe enough to camp here.",
+                                        "We need walls or fire before we can camp.",
+                                        "Too exposed. Find better shelter first.",
+                                        "I refuse to sleep in the open like this.",
+                                        "Can't camp here. It's crawling with danger.",
+                                        "Find a secure room before we bed down.",
+                                        "No cover, no heat. We can't camp here.",
+                                        "Invalid camping spot. We need real shelter.",
+                                        "We'd get killed sleeping here. Find a safer building.",
+                                    },
+                                    ["TL"] = {
+                                        "Wala akong makitang ligtas na silid o apoy dito.",
+                                        "Hindi sapat ang ligtas ng lugar para magkampo rito.",
+                                        "Kailangan natin ng pader o apoy bago magkampo.",
+                                        "Masyadong bukas. Humanap muna ng mas maayos na silungan.",
+                                        "Ayokong matulog sa bukas na lugar nang ganito.",
+                                        "Hindi pwedeng magkampo rito. Napakaraming panganib.",
+                                        "Maghanap ng ligtas na kwarto bago tayo matulog.",
+                                        "Walang silong, walang init. Di tayo pwedeng magkampo rito.",
+                                        "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan.",
+                                        "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can't find a safe room or campfire nearby.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.camp_rejected.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can't find a safe room or campfire nearby.",
+                            "Not safe enough to camp here.",
+                            "We need walls or fire before we can camp.",
+                            "Too exposed. Find better shelter first.",
+                            "I refuse to sleep in the open like this.",
+                            "Can't camp here. It's crawling with danger.",
+                            "Find a secure room before we bed down.",
+                            "No cover, no heat. We can't camp here.",
+                            "Invalid camping spot. We need real shelter.",
+                            "We'd get killed sleeping here. Find a safer building.",
+                        },
+                        ["TL"] = {
+                            "Wala akong makitang ligtas na silid o apoy dito.",
+                            "Hindi sapat ang ligtas ng lugar para magkampo rito.",
+                            "Kailangan natin ng pader o apoy bago magkampo.",
+                            "Masyadong bukas. Humanap muna ng mas maayos na silungan.",
+                            "Ayokong matulog sa bukas na lugar nang ganito.",
+                            "Hindi pwedeng magkampo rito. Napakaraming panganib.",
+                            "Maghanap ng ligtas na kwarto bago tayo matulog.",
+                            "Walang silong, walang init. Di tayo pwedeng magkampo rito.",
+                            "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan.",
+                            "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.camp_rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "camp_rejected",
-            ["sourceId"] = "semantic.command.reply.camp_rejected",
+            ["sourceId"] = "command.reply.camp_rejected",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_camp_rejected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2209,126 +3317,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.camp_rejected",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't find a safe room or campfire nearby.",
-                            },
-                            ["TL"] = {
-                                "Wala akong makitang ligtas na silid o apoy dito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not safe enough to camp here.",
-                            },
-                            ["TL"] = {
-                                "Hindi sapat ang ligtas ng lugar para magkampo rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We need walls or fire before we can camp.",
-                            },
-                            ["TL"] = {
-                                "Kailangan natin ng pader o apoy bago magkampo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too exposed. Find better shelter first.",
-                            },
-                            ["TL"] = {
-                                "Masyadong bukas. Humanap muna ng mas maayos na silungan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I refuse to sleep in the open like this.",
-                            },
-                            ["TL"] = {
-                                "Ayokong matulog sa bukas na lugar nang ganito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't camp here. It's crawling with danger.",
-                            },
-                            ["TL"] = {
-                                "Hindi pwedeng magkampo rito. Napakaraming panganib.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Find a secure room before we bed down.",
-                            },
-                            ["TL"] = {
-                                "Maghanap ng ligtas na kwarto bago tayo matulog.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No cover, no heat. We can't camp here.",
-                            },
-                            ["TL"] = {
-                                "Walang silong, walang init. Di tayo pwedeng magkampo rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Invalid camping spot. We need real shelter.",
-                            },
-                            ["TL"] = {
-                                "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We'd get killed sleeping here. Find a safer building.",
-                            },
-                            ["TL"] = {
-                                "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can't find a safe room or campfire nearby.",
+                                        "Not safe enough to camp here.",
+                                        "We need walls or fire before we can camp.",
+                                        "Too exposed. Find better shelter first.",
+                                        "I refuse to sleep in the open like this.",
+                                        "Can't camp here. It's crawling with danger.",
+                                        "Find a secure room before we bed down.",
+                                        "No cover, no heat. We can't camp here.",
+                                        "Invalid camping spot. We need real shelter.",
+                                        "We'd get killed sleeping here. Find a safer building.",
+                                    },
+                                    ["TL"] = {
+                                        "Wala akong makitang ligtas na silid o apoy dito.",
+                                        "Hindi sapat ang ligtas ng lugar para magkampo rito.",
+                                        "Kailangan natin ng pader o apoy bago magkampo.",
+                                        "Masyadong bukas. Humanap muna ng mas maayos na silungan.",
+                                        "Ayokong matulog sa bukas na lugar nang ganito.",
+                                        "Hindi pwedeng magkampo rito. Napakaraming panganib.",
+                                        "Maghanap ng ligtas na kwarto bago tayo matulog.",
+                                        "Walang silong, walang init. Di tayo pwedeng magkampo rito.",
+                                        "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan.",
+                                        "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.camp_rejected",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can't find a safe room or campfire nearby.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.camp_rejected.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2338,20 +3398,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can't find a safe room or campfire nearby.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.camp_rejected.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can't find a safe room or campfire nearby.",
+                        "Not safe enough to camp here.",
+                        "We need walls or fire before we can camp.",
+                        "Too exposed. Find better shelter first.",
+                        "I refuse to sleep in the open like this.",
+                        "Can't camp here. It's crawling with danger.",
+                        "Find a secure room before we bed down.",
+                        "No cover, no heat. We can't camp here.",
+                        "Invalid camping spot. We need real shelter.",
+                        "We'd get killed sleeping here. Find a safer building.",
+                    },
+                    ["TL"] = {
+                        "Wala akong makitang ligtas na silid o apoy dito.",
+                        "Hindi sapat ang ligtas ng lugar para magkampo rito.",
+                        "Kailangan natin ng pader o apoy bago magkampo.",
+                        "Masyadong bukas. Humanap muna ng mas maayos na silungan.",
+                        "Ayokong matulog sa bukas na lugar nang ganito.",
+                        "Hindi pwedeng magkampo rito. Napakaraming panganib.",
+                        "Maghanap ng ligtas na kwarto bago tayo matulog.",
+                        "Walang silong, walang init. Di tayo pwedeng magkampo rito.",
+                        "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan.",
+                        "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.follow",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.follow",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Right behind you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.follow.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Right behind you.",
+                                        "Following your lead.",
+                                        "I'm with you. Lead on.",
+                                        "Right on your heels.",
+                                        "Understood. Sticking close.",
+                                        "Following. Watch our front.",
+                                        "I'll follow your pace.",
+                                        "Right with you.",
+                                        "Moving with you now.",
+                                        "Lead the way. I'm right behind.",
+                                    },
+                                    ["TL"] = {
+                                        "Susunod ako sa iyo.",
+                                        "Sumusunod sa pangunguna mo.",
+                                        "Kasama mo ako. Mauna ka na.",
+                                        "Nasa likod mo lang ako.",
+                                        "Naintindihan. Didikit ako.",
+                                        "Sumusunod na. Bantayan ang unahan natin.",
+                                        "Sasabay ako sa bilis mo.",
+                                        "Kasabay mo na ako.",
+                                        "Kumikilos na kasabay mo ngayon.",
+                                        "Ituro ang daan. Kasunod mo lang ako.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Right behind you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.follow.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Right behind you.",
+                            "Following your lead.",
+                            "I'm with you. Lead on.",
+                            "Right on your heels.",
+                            "Understood. Sticking close.",
+                            "Following. Watch our front.",
+                            "I'll follow your pace.",
+                            "Right with you.",
+                            "Moving with you now.",
+                            "Lead the way. I'm right behind.",
+                        },
+                        ["TL"] = {
+                            "Susunod ako sa iyo.",
+                            "Sumusunod sa pangunguna mo.",
+                            "Kasama mo ako. Mauna ka na.",
+                            "Nasa likod mo lang ako.",
+                            "Naintindihan. Didikit ako.",
+                            "Sumusunod na. Bantayan ang unahan natin.",
+                            "Sasabay ako sa bilis mo.",
+                            "Kasabay mo na ako.",
+                            "Kumikilos na kasabay mo ngayon.",
+                            "Ituro ang daan. Kasunod mo lang ako.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.follow",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "follow",
-            ["sourceId"] = "semantic.command.reply.follow",
+            ["sourceId"] = "command.reply.follow",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_follow.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2365,126 +3546,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.follow",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right behind you.",
-                            },
-                            ["TL"] = {
-                                "Susunod ako sa iyo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Following your lead.",
-                            },
-                            ["TL"] = {
-                                "Sumusunod sa pangunguna mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm with you. Lead on.",
-                            },
-                            ["TL"] = {
-                                "Kasama mo ako. Mauna ka na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right on your heels.",
-                            },
-                            ["TL"] = {
-                                "Nasa likod mo lang ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Sticking close.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Didikit ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Following. Watch our front.",
-                            },
-                            ["TL"] = {
-                                "Sumusunod na. Bantayan ang unahan natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll follow your pace.",
-                            },
-                            ["TL"] = {
-                                "Sasabay ako sa bilis mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right with you.",
-                            },
-                            ["TL"] = {
-                                "Kasabay mo na ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving with you now.",
-                            },
-                            ["TL"] = {
-                                "Kumikilos na kasabay mo ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Lead the way. I'm right behind.",
-                            },
-                            ["TL"] = {
-                                "Ituro ang daan. Kasunod mo lang ako.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Right behind you.",
+                                        "Following your lead.",
+                                        "I'm with you. Lead on.",
+                                        "Right on your heels.",
+                                        "Understood. Sticking close.",
+                                        "Following. Watch our front.",
+                                        "I'll follow your pace.",
+                                        "Right with you.",
+                                        "Moving with you now.",
+                                        "Lead the way. I'm right behind.",
+                                    },
+                                    ["TL"] = {
+                                        "Susunod ako sa iyo.",
+                                        "Sumusunod sa pangunguna mo.",
+                                        "Kasama mo ako. Mauna ka na.",
+                                        "Nasa likod mo lang ako.",
+                                        "Naintindihan. Didikit ako.",
+                                        "Sumusunod na. Bantayan ang unahan natin.",
+                                        "Sasabay ako sa bilis mo.",
+                                        "Kasabay mo na ako.",
+                                        "Kumikilos na kasabay mo ngayon.",
+                                        "Ituro ang daan. Kasunod mo lang ako.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.follow",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Right behind you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.follow.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2494,20 +3627,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Right behind you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.follow.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Right behind you.",
+                        "Following your lead.",
+                        "I'm with you. Lead on.",
+                        "Right on your heels.",
+                        "Understood. Sticking close.",
+                        "Following. Watch our front.",
+                        "I'll follow your pace.",
+                        "Right with you.",
+                        "Moving with you now.",
+                        "Lead the way. I'm right behind.",
+                    },
+                    ["TL"] = {
+                        "Susunod ako sa iyo.",
+                        "Sumusunod sa pangunguna mo.",
+                        "Kasama mo ako. Mauna ka na.",
+                        "Nasa likod mo lang ako.",
+                        "Naintindihan. Didikit ako.",
+                        "Sumusunod na. Bantayan ang unahan natin.",
+                        "Sasabay ako sa bilis mo.",
+                        "Kasabay mo na ako.",
+                        "Kumikilos na kasabay mo ngayon.",
+                        "Ituro ang daan. Kasunod mo lang ako.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.generic_rejected",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.reply.generic_rejected",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can't do that right now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.command.reply.generic_rejected.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can't do that right now.",
+                                        "That's not possible in this situation.",
+                                        "Unable to comply with that order.",
+                                        "I can't carry that out.",
+                                        "Not going to happen right now.",
+                                        "I don't have the means to do that.",
+                                        "That order doesn't make sense right now.",
+                                        "Can't do it. Find another way.",
+                                        "I'm tied up or unable to fulfill that.",
+                                        "Negative on that request.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko iyan magagawa ngayon.",
+                                        "Hindi 'yan posible sa sitwasyong ito.",
+                                        "Hindi makakasunod sa utos na 'yan.",
+                                        "Hindi ko kayang isakatuparan 'yan.",
+                                        "Hindi mangyayari 'yan sa ngayon.",
+                                        "Wala akong kakayahan para gawin 'yan.",
+                                        "Walang saysay ang utos na 'yan sa ngayon.",
+                                        "Di kaya. Humanap ng ibang paraan.",
+                                        "Abala ako o hindi ko magagawa 'yan.",
+                                        "Hindi maaari ang hiling na 'yan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "command.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can't do that right now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.reply.generic_rejected.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can't do that right now.",
+                            "That's not possible in this situation.",
+                            "Unable to comply with that order.",
+                            "I can't carry that out.",
+                            "Not going to happen right now.",
+                            "I don't have the means to do that.",
+                            "That order doesn't make sense right now.",
+                            "Can't do it. Find another way.",
+                            "I'm tied up or unable to fulfill that.",
+                            "Negative on that request.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko iyan magagawa ngayon.",
+                            "Hindi 'yan posible sa sitwasyong ito.",
+                            "Hindi makakasunod sa utos na 'yan.",
+                            "Hindi ko kayang isakatuparan 'yan.",
+                            "Hindi mangyayari 'yan sa ngayon.",
+                            "Wala akong kakayahan para gawin 'yan.",
+                            "Walang saysay ang utos na 'yan sa ngayon.",
+                            "Di kaya. Humanap ng ibang paraan.",
+                            "Abala ako o hindi ko magagawa 'yan.",
+                            "Hindi maaari ang hiling na 'yan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "command.reply.generic_rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "generic_rejected",
-            ["sourceId"] = "semantic.command.reply.generic_rejected",
+            ["sourceId"] = "command.reply.generic_rejected",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_generic_rejected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
+        ["namespace"] = "command.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2521,126 +3775,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.generic_rejected",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't do that right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko iyan magagawa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's not possible in this situation.",
-                            },
-                            ["TL"] = {
-                                "Hindi 'yan posible sa sitwasyong ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unable to comply with that order.",
-                            },
-                            ["TL"] = {
-                                "Hindi makakasunod sa utos na 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't carry that out.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko kayang isakatuparan 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not going to happen right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi mangyayari 'yan sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't have the means to do that.",
-                            },
-                            ["TL"] = {
-                                "Wala akong kakayahan para gawin 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That order doesn't make sense right now.",
-                            },
-                            ["TL"] = {
-                                "Walang saysay ang utos na 'yan sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't do it. Find another way.",
-                            },
-                            ["TL"] = {
-                                "Di kaya. Humanap ng ibang paraan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm tied up or unable to fulfill that.",
-                            },
-                            ["TL"] = {
-                                "Abala ako o hindi ko magagawa 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Negative on that request.",
-                            },
-                            ["TL"] = {
-                                "Hindi maaari ang hiling na 'yan.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can't do that right now.",
+                                        "That's not possible in this situation.",
+                                        "Unable to comply with that order.",
+                                        "I can't carry that out.",
+                                        "Not going to happen right now.",
+                                        "I don't have the means to do that.",
+                                        "That order doesn't make sense right now.",
+                                        "Can't do it. Find another way.",
+                                        "I'm tied up or unable to fulfill that.",
+                                        "Negative on that request.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko iyan magagawa ngayon.",
+                                        "Hindi 'yan posible sa sitwasyong ito.",
+                                        "Hindi makakasunod sa utos na 'yan.",
+                                        "Hindi ko kayang isakatuparan 'yan.",
+                                        "Hindi mangyayari 'yan sa ngayon.",
+                                        "Wala akong kakayahan para gawin 'yan.",
+                                        "Walang saysay ang utos na 'yan sa ngayon.",
+                                        "Di kaya. Humanap ng ibang paraan.",
+                                        "Abala ako o hindi ko magagawa 'yan.",
+                                        "Hindi maaari ang hiling na 'yan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.reply.generic_rejected",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can't do that right now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.reply.generic_rejected.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2650,317 +3856,40 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.return_home",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "return_home",
-            ["sourceId"] = "semantic.command.reply.return_home",
-            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_return_home.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:companion_commands",
-                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.return_home",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-            },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heading home.",
-                            },
-                            ["TL"] = {
-                                "Uuwi na ako.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can't do that right now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.reply.generic_rejected.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can't do that right now.",
+                        "That's not possible in this situation.",
+                        "Unable to comply with that order.",
+                        "I can't carry that out.",
+                        "Not going to happen right now.",
+                        "I don't have the means to do that.",
+                        "That order doesn't make sense right now.",
+                        "Can't do it. Find another way.",
+                        "I'm tied up or unable to fulfill that.",
+                        "Negative on that request.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Returning to our base now.",
-                            },
-                            ["TL"] = {
-                                "Pabalik na sa base natin ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Going back to safe ground.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Babalik sa ligtas na lugar.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll head back to our shelter.",
-                            },
-                            ["TL"] = {
-                                "Babalik ako sa silungan natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Making my way back home.",
-                            },
-                            ["TL"] = {
-                                "Pauwi na ako ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Homeward bound. See you back at camp.",
-                            },
-                            ["TL"] = {
-                                "Pauwi na. Magkita tayo sa kampo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. I will return to base.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Babalik ako sa base.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heading back to the compound.",
-                            },
-                            ["TL"] = {
-                                "Pabalik na sa himpilan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heading home. Stay safe out here.",
-                            },
-                            ["TL"] = {
-                                "Pauwi na ako. Mag-ingat ka rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Returning to base coordinates.",
-                            },
-                            ["TL"] = {
-                                "Pabalik na sa mga coordinate ng base.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Hindi ko iyan magagawa ngayon.",
+                        "Hindi 'yan posible sa sitwasyong ito.",
+                        "Hindi makakasunod sa utos na 'yan.",
+                        "Hindi ko kayang isakatuparan 'yan.",
+                        "Hindi mangyayari 'yan sa ngayon.",
+                        "Wala akong kakayahan para gawin 'yan.",
+                        "Walang saysay ang utos na 'yan sa ngayon.",
+                        "Di kaya. Humanap ng ibang paraan.",
+                        "Abala ako o hindi ko magagawa 'yan.",
+                        "Hindi maaari ang hiling na 'yan.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_return_home.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "companion_commands_replies",
-        ["id"] = "semantic.command.reply.stay",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "stay",
-            ["sourceId"] = "semantic.command.reply.stay",
-            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_stay.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
-        ["namespace"] = "semantic.command.reply",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:companion_commands",
-                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.reply.stay",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-            },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll stay here.",
-                            },
-                            ["TL"] = {
-                                "Mananatili ako rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding position right here.",
-                            },
-                            ["TL"] = {
-                                "Hawak ko ang pwestong ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll keep watch in this spot.",
-                            },
-                            ["TL"] = {
-                                "Magbabantay ako sa lugar na 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Standing firm.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Nakatayo rito nang matatag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I won't budge from this area.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako aalis sa lugar na ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding ground until you return.",
-                            },
-                            ["TL"] = {
-                                "Bantay dito hanggang sa bumalik ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Staying put. Keep safe.",
-                            },
-                            ["TL"] = {
-                                "Dito lang ako. Mag-ingat ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Guarding this position.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Babantayan ang pwestong ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll stay right here.",
-                            },
-                            ["TL"] = {
-                                "Dito lang ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Holding this spot. Don't take too long.",
-                            },
-                            ["TL"] = {
-                                "Hawak ko ang pwesto. Huwag kang magtatagal.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_stay.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
         },
         ["when"] = nil,
     },

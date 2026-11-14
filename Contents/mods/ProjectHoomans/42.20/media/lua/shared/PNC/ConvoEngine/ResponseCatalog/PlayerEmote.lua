@@ -6,6 +6,10 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- chooses the semantic act; SpeechRealization applies the authored phrase.
 
 local Catalog = PNC.ConvoEngine.ResponseCatalog
+local ConvoPlanFamily = require
+    "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
+
+local CONTENT_OWNER = "projecthoomans.dialogue_content.commands_emotes"
 
 local DEFINITIONS = {
     {
@@ -54,14 +58,19 @@ local variants = {}
 local index
 local definition
 local realizationID
+local templateID
 
 for index = 1, #DEFINITIONS do
     definition = DEFINITIONS[index]
     realizationID = "semantic.emote.player." .. definition.action
+    templateID = "emote.player." .. definition.action
+    ConvoPlanFamily.install(templateID, {
+        defaultContentOwner = CONTENT_OWNER,
+    })
     variants[#variants + 1] = {
         id = realizationID,
-        templateID = realizationID,
-        contentOwner = "projecthoomans.dialogue_content.commands_emotes",
+        templateID = templateID,
+        contentOwner = CONTENT_OWNER,
         dialogueAct = definition.act,
         topic = definition.topic,
         when = { action = definition.action },
@@ -73,7 +82,7 @@ for index = 1, #DEFINITIONS do
             turns = {
                 {
                     segments = {
-                        { kind = "translation", templateID = realizationID },
+                        { kind = "translation", templateID = templateID },
                     },
                 },
             },

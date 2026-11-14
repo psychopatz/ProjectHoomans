@@ -229,7 +229,7 @@ local function validateBehavior(definition)
         local speech = outputs.speech
         if type(speech) ~= "table"
             or not validToken(speech.dialogueAct)
-            or not validID(speech.contentTemplateID, "semantic.")
+            or not validID(speech.contentTemplateID, "")
         then
             return false, "behavior_speech_output_invalid"
         end
@@ -257,7 +257,7 @@ local function validateBehavior(definition)
             or nil
         if type(flavor) ~= "table"
             or not validToken(presentationAct)
-            or not validID(flavor.contentTemplateID, "semantic.")
+            or not validID(flavor.contentTemplateID, "")
         then
             return false, "behavior_flavor_output_invalid"
         end

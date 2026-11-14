@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.horde.ack",
   "id": "engage_reserved",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.combat.horde.ack.engage_reserved"
+    "responseAct": "ACK"
   },
-  "response": {
-    "act": "ACK",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Alright. Moving.",
-          "TL": "Sige. Galaw."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Advancing cautiously.",
-          "TL": "Susulong nang maingat."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Understood. Engaging the horde.",
-          "TL": "Naintindihan. Lalabanan ang kawan."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "In position. Moving to attack.",
-          "TL": "Nasa pwesto. Kikilos para umatake."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Weapon drawn. Advancing in formation.",
-          "TL": "Nakahugot ang armas. Susulong sa pormasyon."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Calculated engagement. Let's do this clean.",
-          "TL": "Planadong paglusob. Gawin nating malinis."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Order received. Stepping up to fight.",
-          "TL": "Utos natanggap. Tatayo para lumaban."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Keeping rhythm. Engaging targets.",
-          "TL": "Panatilihin ang ritmo. Lalabanan ang puntirya."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Moving into range. Weapons up.",
-          "TL": "Pumapasok sa sakop. Itaas ang armas."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Understood. Entering the fray.",
-          "TL": "Naiintindihan ko. Papatungo na sa bakbakan."
+          "EN": [
+            "Alright. Moving.",
+            "Advancing cautiously.",
+            "Understood. Engaging the horde.",
+            "In position. Moving to attack.",
+            "Weapon drawn. Advancing in formation.",
+            "Calculated engagement. Let's do this clean.",
+            "Order received. Stepping up to fight.",
+            "Keeping rhythm. Engaging targets.",
+            "Moving into range. Weapons up.",
+            "Understood. Entering the fray."
+          ],
+          "TL": [
+            "Sige. Galaw.",
+            "Susulong nang maingat.",
+            "Naintindihan. Lalabanan ang kawan.",
+            "Nasa pwesto. Kikilos para umatake.",
+            "Nakahugot ang armas. Susulong sa pormasyon.",
+            "Planadong paglusob. Gawin nating malinis.",
+            "Utos natanggap. Tatayo para lumaban.",
+            "Panatilihin ang ritmo. Lalabanan ang puntirya.",
+            "Pumapasok sa sakop. Itaas ang armas.",
+            "Naiintindihan ko. Papatungo na sa bakbakan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.horde.ack",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

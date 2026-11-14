@@ -26,7 +26,9 @@ local function semanticTranslationKey(response)
     if string.sub(templateID, 1, 21) == "conversation.content." then
         return templateID
     end
-    if templateID == "semantic.question.identity" then
+    if templateID == "question.identity"
+        or templateID == "semantic.question.identity"
+    then
         local fallback = tostring(response and response.fallback or "")
         if string.find(string.lower(fallback), "liars", 1, true) then
             return "UI_PNC_Conversation_Semantic_QuestionIdentityWary"
@@ -36,21 +38,21 @@ local function semanticTranslationKey(response)
         end
         return "UI_PNC_Conversation_Semantic_QuestionIdentity"
     end
-    if templateID == "semantic.question.identity.known" then
+    if templateID == "question.identity.known" then
         return "UI_PNC_Conversation_Semantic_QuestionIdentityKnown"
     end
-    if templateID == "semantic.question.backstory.known" then
+    if templateID == "question.backstory.known" then
         local args = response and response.args
         return BACKSTORY_KINDS[args and args.kind]
             or "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown"
     end
-    if templateID == "semantic.question.backstory.suspected" then
+    if templateID == "question.backstory.suspected" then
         return "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected"
     end
-    if templateID == "semantic.question.backstory.ambiguous" then
+    if templateID == "question.backstory.ambiguous" then
         return "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous"
     end
-    if templateID == "semantic.question.backstory.refusal" then
+    if templateID == "question.backstory.refusal" then
         return "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"
     end
     return keys[templateID]

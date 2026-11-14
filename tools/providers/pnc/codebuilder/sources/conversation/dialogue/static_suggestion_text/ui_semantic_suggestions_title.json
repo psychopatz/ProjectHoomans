@@ -1,9 +1,13 @@
 {
-  "id": "title",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.semantic_suggestions",
+  "id": "title",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "semantic_suggestions.title",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "semantic_suggestions.title",
@@ -12,14 +16,17 @@
           "TL": "MGA MUNGKAHING PANG-USAP"
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "CONTEXTUAL SUGGESTIONS",
-    "TL": "MGA MUNGKAHING PANG-USAP"
-  },
-  "namespace": "ui.semantic_suggestions",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "CONTEXTUAL SUGGESTIONS",
+          "TL": "MGA MUNGKAHING PANG-USAP"
+        }
+      }
+    ]
+  }
 }

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.eat",
   "id": "admitted",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
-    "responseTemplateID": "semantic.task.eat.admitted",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'll eat that.",
-          "TL": "Kakainin ko iyon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Understood. Getting something to eat.",
-          "TL": "Naintindihan. Kukuha ng makakain."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Good call. My stomach was growling.",
-          "TL": "Magandang paalala. Kumakalam na ang tiyan ko."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "All right, I'll eat some food.",
-          "TL": "Sige, kakain ako ng pagkain."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Taking a bite to keep my strength up.",
-          "TL": "Kakain para mapanatili ang lakas."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Understood. Eating now.",
-          "TL": "Naiintindihan ko. Kakain na."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I'll consume those rations.",
-          "TL": "Kakainin ko ang mga rasyong 'yan."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Right. Time for a meal.",
-          "TL": "Sige. Oras na para kumain."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "I'll eat what you designated.",
-          "TL": "Kakainin ko ang tinukoy mo."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Sounds good. Grabbing food.",
-          "TL": "Maganda 'yan. Kukuha ng pagkain."
+          "EN": [
+            "I'll eat that.",
+            "Understood. Getting something to eat.",
+            "Good call. My stomach was growling.",
+            "All right, I'll eat some food.",
+            "Taking a bite to keep my strength up.",
+            "Understood. Eating now.",
+            "I'll consume those rations.",
+            "Right. Time for a meal.",
+            "I'll eat what you designated.",
+            "Sounds good. Grabbing food."
+          ],
+          "TL": [
+            "Kakainin ko iyon.",
+            "Naintindihan. Kukuha ng makakain.",
+            "Magandang paalala. Kumakalam na ang tiyan ko.",
+            "Sige, kakain ako ng pagkain.",
+            "Kakain para mapanatili ang lakas.",
+            "Naiintindihan ko. Kakain na.",
+            "Kakainin ko ang mga rasyong 'yan.",
+            "Sige. Oras na para kumain.",
+            "Kakainin ko ang tinukoy mo.",
+            "Maganda 'yan. Kukuha ng pagkain."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.eat",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

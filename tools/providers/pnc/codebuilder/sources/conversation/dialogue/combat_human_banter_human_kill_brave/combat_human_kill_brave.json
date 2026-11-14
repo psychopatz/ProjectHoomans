@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.human_kill",
+  "id": "brave",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.combat_human",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/brave.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Threat's down. Stay sharp.",
+              "Shooter neutralized. Hold position.",
+              "Target down. Scan the perimeter.",
+              "He's eliminated. Maintain alertness.",
+              "Gunman is down. Stay behind cover.",
+              "Hostile neutralized. Check your angles.",
+              "Confirmed kill. Keep your discipline.",
+              "He took his shot and lost. Stay ready.",
+              "Threat extinguished. Eyes on the high ground.",
+              "Done. Stay in formation."
+            ],
+            "TL": [
+              "Bagsak ang banta. Magmatyag.",
+              "Bumaril naalis na. Hawakan ang pwesto.",
+              "Bagsak ang target. Suriin ang paligid.",
+              "Naalis na siya. Manatiling alerto.",
+              "Bagsak ang armadong tao. Manatili sa kublihan.",
+              "Kalaban naalis na. Tignan ang mga anggulo mo.",
+              "Kumpirmadong patay. Panatilihin ang disiplina.",
+              "Sumubok siya at natalo. Manatiling handa.",
+              "Banta nawala na. Bantayan ang mataas na lugar.",
+              "Tapos. Manatili sa pormasyon."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "He's done. Watch the rest.",
+              "That one's down. Focus on any survivors.",
+              "One less rifle against us. Watch the flanks.",
+              "Hostile down. Don't let your guard down.",
+              "He won't be firing again. Check the bushes.",
+              "Downed. Scan for secondary shooters.",
+              "He's finished. Keep watching the tree line.",
+              "Target ceased. Search the area.",
+              "One enemy down. Expect more.",
+              "Confirmed casualty. Keep the pressure on."
+            ],
+            "TL": [
+              "Tapos na siya. Bantayan ang iba.",
+              "Bagsak na ang isang 'yon. Tutukan kung may iba pa.",
+              "Bawas ang isang baril laban sa atin. Bantayan ang gilid.",
+              "Bagsak ang kalaban. Huwag ibaba ang depensa.",
+              "Hindi na siya puputok ulit. Tignan ang damuhan.",
+              "Bagsak. Maghanap ng pangalawang bumaril.",
+              "Tapos na siya. Bantayan pa rin ang kakahuyan.",
+              "Tumigil na ang target. Halughugin ang lugar.",
+              "Isang kalaban ang naitumba. Asahang may iba pa.",
+              "Kumpirmadong patay. Ipagpatuloy ang pag-iingat."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Down. Don't freeze up now.",
+              "He's dead. Keep moving, don't stall.",
+              "Kill confirmed. Stay in the fight.",
+              "He's on the ground. Keep your head clear.",
+              "Target down. Don't let adrenaline take over.",
+              "Dead. Breathe and scan your sector.",
+              "Threat removed. Stay proactive.",
+              "He's finished. Keep momentum going.",
+              "Eliminated. Don't look at the body, look ahead.",
+              "Threat neutralized. Move when ready."
+            ],
+            "TL": [
+              "Bagsak. Huwag kang titigil ngayon.",
+              "Patay na siya. Kilos lang, huwag matulala.",
+              "Kumpirmadong patay. Manatili sa laban.",
+              "Nasa lupa na siya. Panatilihing malinaw ang isip.",
+              "Bagsak ang target. Huwag magpadala sa kaba.",
+              "Patay. Huminga at suriin ang parte mo.",
+              "Banta naalis na. Manatiling mabilis umaksyon.",
+              "Tapos na siya. Huwag mawalan ng bwelo.",
+              "Naalis na. Huwag tingnan ang bangkay, tumingin sa unahan.",
+              "Banta naalis. Kilos kapag handa na."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

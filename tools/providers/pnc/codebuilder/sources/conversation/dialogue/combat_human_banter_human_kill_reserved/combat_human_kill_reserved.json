@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.human_kill",
+  "id": "reserved",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.combat_human",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/reserved.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "He's down.",
+              "Hostile down.",
+              "Shooter eliminated.",
+              "Dead.",
+              "Threat removed.",
+              "Finished.",
+              "Downed.",
+              "No more fire from him.",
+              "Target down.",
+              "Ceased."
+            ],
+            "TL": [
+              "Bagsak na siya.",
+              "Kalaban bagsak.",
+              "Bumaril naalis.",
+              "Patay.",
+              "Banta naalis.",
+              "Tapos na.",
+              "Naitumba.",
+              "Wala nang putok mula sa kanya.",
+              "Target bagsak.",
+              "Tumigil."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Done.",
+              "Over.",
+              "Confirmed.",
+              "Handled.",
+              "Dealt with.",
+              "Expired.",
+              "Neutralized.",
+              "Finished off.",
+              "Resolved.",
+              "Cleared."
+            ],
+            "TL": [
+              "Tapos.",
+              "Yari.",
+              "Kumpirmado.",
+              "Naasikaso.",
+              "Nalutas.",
+              "Wala na.",
+              "Naalis.",
+              "Tinapos na.",
+              "Tapos na 'to.",
+              "Naayos."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Clear.",
+              "Area secure.",
+              "Threat cleared.",
+              "Sector clear.",
+              "No movement.",
+              "Quiet.",
+              "All clear here.",
+              "Safe for now.",
+              "Clear lane.",
+              "Nothing moving."
+            ],
+            "TL": [
+              "Malinis.",
+              "Ligtas ang paligid.",
+              "Banta tinanggal.",
+              "Malinis ang parte na 'to.",
+              "Walang galaw.",
+              "Tahimik.",
+              "Malinis lahat dito.",
+              "Ligtas pansamantala.",
+              "Bukas na daan.",
+              "Walang gumagalaw."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

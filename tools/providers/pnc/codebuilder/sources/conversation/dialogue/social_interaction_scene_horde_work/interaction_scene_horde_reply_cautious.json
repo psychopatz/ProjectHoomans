@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "interaction.scene",
+  "id": "horde_reply_cautious",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Too many. We should pull back.",
+            "The odds are terrible. Let's retreat and find another way.",
+            "Fighting here is a death sentence. Fall back.",
+            "We don't have the ammunition or stamina for this. Pull back.",
+            "Better to live and fight another day. Let's withdraw.",
+            "We're completely outmatched. Retreat orderly.",
+            "Back up slowly. Don't make sudden noises.",
+            "Let's slip away while they haven't locked onto us.",
+            "Too risky. We need to withdraw immediately.",
+            "I agree with retreating. Turn around and move quietly."
+          ],
+          "TL": [
+            "Sobra sila. Dapat umatras tayo.",
+            "Napakasama ng tsansa. Umatras tayo at maghanap ng ibang daan.",
+            "Kamatayan ang lumaban dito. Umatras na.",
+            "Kulang tayo sa bala at lakas para rito. Umatras.",
+            "Mas mabuting mabuhay para lumaban sa ibang araw. Umatras tayo.",
+            "Lupig tayo sa dami nila. Umatras nang maayos.",
+            "Umatras nang dahan-dahan. Huwag gumawa ng ingay.",
+            "Tumakas na tayo habang hindi pa sila nakapokus sa atin.",
+            "Masyadong mapanganib. Kailangan nating umatras agad.",
+            "Sang-ayon akong umatras. Lumingon at lumakad nang tahimik."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
-        "responseTemplateID": "semantic.interaction.scene.horde_reply_cautious",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Bad odds. Give them space.",
+            "Fighting that pack is suicide. Withdraw in formation.",
+            "Step back quietly. Do not alert the rear flank.",
+            "Keep your weapon raised, but reverse your footsteps.",
+            "We have zero tactical advantage. We fall back immediately.",
+            "Don't let adrenaline make you stupid. We withdraw.",
+            "Back away into the shadows. Let them wander past.",
+            "I refuse to be butchered in an open field. Retreat.",
+            "Keep low and retreat to the last secure building.",
+            "Orderly withdrawal. If anyone runs screaming, they're dead."
+          ],
+          "TL": [
+            "Masama ang tsansa. Lumayo tayo.",
+            "Pagpapakamatay ang labanang 'yan. Umatras nang may pormasyon.",
+            "Umatras nang tahimik. Huwag gisingin ang nasa likod.",
+            "Itaas ang armas, pero ihakbang pabalik ang paa.",
+            "Wala tayong kalamangan sa posisyon. Aatras tayo agad.",
+            "Huwag magpadala sa kaba at maging tanga. Aatras tayo.",
+            "Umatras sa dilim. Hayaang lumampas sila.",
+            "Ayokong malapa sa bukas na damuhan. Umatras.",
+            "Yumuko at umatras sa huling ligtas na gusali.",
+            "Maayos na pag-atras. Kapag may nagpanic at sumigaw, patay 'yon."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Too many. We should pull back.",
-              "TL": "Sobra sila. Dapat umatras tayo."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "The odds are terrible. Let's retreat and find another way.",
-              "TL": "Napakasama ng tsansa. Umatras tayo at maghanap ng ibang daan."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Fighting here is a death sentence. Fall back.",
-              "TL": "Kamatayan ang lumaban dito. Umatras na."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "We don't have the ammunition or stamina for this. Pull back.",
-              "TL": "Kulang tayo sa bala at lakas para rito. Umatras."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Better to live and fight another day. Let's withdraw.",
-              "TL": "Mas mabuting mabuhay para lumaban sa ibang araw. Umatras tayo."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "We're completely outmatched. Retreat orderly.",
-              "TL": "Lupig tayo sa dami nila. Umatras nang maayos."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Back up slowly. Don't make sudden noises.",
-              "TL": "Umatras nang dahan-dahan. Huwag gumawa ng ingay."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Let's slip away while they haven't locked onto us.",
-              "TL": "Tumakas na tayo habang hindi pa sila nakapokus sa atin."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Too risky. We need to withdraw immediately.",
-              "TL": "Masyadong mapanganib. Kailangan nating umatras agad."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I agree with retreating. Turn around and move quietly.",
-              "TL": "Sang-ayon akong umatras. Lumingon at lumakad nang tahimik."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Pull back.",
+            "Too many. Run.",
+            "Retreat.",
+            "Fall back now.",
+            "Bad odds. Leave.",
+            "Out. Now.",
+            "Back up.",
+            "Not here. Move.",
+            "Escape.",
+            "Away."
+          ],
+          "TL": [
+            "Umatras.",
+            "Sobra sila. Takbo.",
+            "Urong.",
+            "Atras na ngayon.",
+            "Masamang tsansa. Alis.",
+            "Labas. Ngayon.",
+            "Umatras.",
+            "Huwag dito. Kilos.",
+            "Takas.",
+            "Malayo."
+          ]
+        }
       },
-      "namespace": "semantic.interaction.scene.horde_reply_cautious"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
-        "responseTemplateID": "semantic.interaction.scene.horde_reply_cautious",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "I'd rather get us out of this alive. Pull back.",
-              "TL": "Mas gusto kong makaalis tayong buhay. Umatras tayo."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "I care too much about you to risk this. Let's retreat, friend.",
-              "TL": "Masyado kitang pinahahalagahan para isugal ito. Umatras tayo, kaibigan."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Please, let's fall back together. We don't have to die here.",
-              "TL": "Pakiusap, sabay tayong umatras. Di natin kailangang mamatay rito."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "I need you alive, partner. Turn around, let's go.",
-              "TL": "Kailangan kitang buhay, kasama. Lumingon ka, tara na."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Let's save our strength for our people back home. Retreat.",
-              "TL": "Itabi natin ang lakas natin para sa kasama sa kampo. Umatras."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "Take my hand if you need to, but we have to pull back now.",
-              "TL": "Hawakan mo ang kamay ko kung kailangan, pero aatras na tayo ngayon."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "There's no shame in living to fight tomorrow. Fall back with me.",
-              "TL": "Walang kahihiyan sa pananatiling buhay. Umatras ka kasama ko."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "Let's back away gently, together. I've got you.",
-              "TL": "Umatras tayo nang marahan, nang magkasama. Hawak kita."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "We can find supplies elsewhere. Let's keep each other safe and run.",
-              "TL": "Makakahanap tayo ng gamit sa iba. Manatiling ligtas at tumakbo."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "I'm not leaving without you, so let's both back up right now.",
-              "TL": "Di ako aalis nang wala ka, kaya umatras tayong pareho ngayon."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.horde_reply_cautious"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
-        "responseTemplateID": "semantic.interaction.scene.horde_reply_cautious",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Pull back.",
-              "TL": "Umatras."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Too many. Run.",
-              "TL": "Sobra sila. Takbo."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Retreat.",
-              "TL": "Urong."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Fall back now.",
-              "TL": "Atras na ngayon."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Bad odds. Leave.",
-              "TL": "Masamang tsansa. Alis."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Out. Now.",
-              "TL": "Labas. Ngayon."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Back up.",
-              "TL": "Umatras."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Not here. Move.",
-              "TL": "Huwag dito. Kilos."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Escape.",
-              "TL": "Takas."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Away.",
-              "TL": "Malayo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.horde_reply_cautious"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
-        "responseTemplateID": "semantic.interaction.scene.horde_reply_cautious",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "Bad odds. Give them space.",
-              "TL": "Masama ang tsansa. Lumayo tayo."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "Fighting that pack is suicide. Withdraw in formation.",
-              "TL": "Pagpapakamatay ang labanang 'yan. Umatras nang may pormasyon."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "Step back quietly. Do not alert the rear flank.",
-              "TL": "Umatras nang tahimik. Huwag gisingin ang nasa likod."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "Keep your weapon raised, but reverse your footsteps.",
-              "TL": "Itaas ang armas, pero ihakbang pabalik ang paa."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "We have zero tactical advantage. We fall back immediately.",
-              "TL": "Wala tayong kalamangan sa posisyon. Aatras tayo agad."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Don't let adrenaline make you stupid. We withdraw.",
-              "TL": "Huwag magpadala sa kaba at maging tanga. Aatras tayo."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "Back away into the shadows. Let them wander past.",
-              "TL": "Umatras sa dilim. Hayaang lumampas sila."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "I refuse to be butchered in an open field. Retreat.",
-              "TL": "Ayokong malapa sa bukas na damuhan. Umatras."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "Keep low and retreat to the last secure building.",
-              "TL": "Yumuko at umatras sa huling ligtas na gusali."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "Orderly withdrawal. If anyone runs screaming, they're dead.",
-              "TL": "Maayos na pag-atras. Kapag may nagpanic at sumigaw, patay 'yon."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.horde_reply_cautious"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "I'd rather get us out of this alive. Pull back.",
+            "I care too much about you to risk this. Let's retreat, friend.",
+            "Please, let's fall back together. We don't have to die here.",
+            "I need you alive, partner. Turn around, let's go.",
+            "Let's save our strength for our people back home. Retreat.",
+            "Take my hand if you need to, but we have to pull back now.",
+            "There's no shame in living to fight tomorrow. Fall back with me.",
+            "Let's back away gently, together. I've got you.",
+            "We can find supplies elsewhere. Let's keep each other safe and run.",
+            "I'm not leaving without you, so let's both back up right now."
+          ],
+          "TL": [
+            "Mas gusto kong makaalis tayong buhay. Umatras tayo.",
+            "Masyado kitang pinahahalagahan para isugal ito. Umatras tayo, kaibigan.",
+            "Pakiusap, sabay tayong umatras. Di natin kailangang mamatay rito.",
+            "Kailangan kitang buhay, kasama. Lumingon ka, tara na.",
+            "Itabi natin ang lakas natin para sa kasama sa kampo. Umatras.",
+            "Hawakan mo ang kamay ko kung kailangan, pero aatras na tayo ngayon.",
+            "Walang kahihiyan sa pananatiling buhay. Umatras ka kasama ko.",
+            "Umatras tayo nang marahan, nang magkasama. Hawak kita.",
+            "Makakahanap tayo ng gamit sa iba. Manatiling ligtas at tumakbo.",
+            "Di ako aalis nang wala ka, kaya umatras tayong pareho ngayon."
+          ]
+        }
+      }
+    ]
+  }
 }

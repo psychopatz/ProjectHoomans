@@ -1,74 +1,74 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.medical.distress.call.bandage"] = {
+    ["medical.distress.call.bandage"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.bandage",
+        ["id"] = "medical.distress.call.bandage",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bandage.json",
     },
-    ["semantic.medical.distress.call.bleedout"] = {
+    ["medical.distress.call.bleedout"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.bleedout",
+        ["id"] = "medical.distress.call.bleedout",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bleedout.json",
     },
-    ["semantic.medical.distress.call.default"] = {
+    ["medical.distress.call.default"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.default",
+        ["id"] = "medical.distress.call.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_default.json",
     },
-    ["semantic.medical.distress.call.dehydration"] = {
+    ["medical.distress.call.dehydration"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.dehydration",
+        ["id"] = "medical.distress.call.dehydration",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_dehydration.json",
     },
-    ["semantic.medical.distress.call.exhaustion"] = {
+    ["medical.distress.call.exhaustion"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.exhaustion",
+        ["id"] = "medical.distress.call.exhaustion",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_exhaustion.json",
     },
-    ["semantic.medical.distress.call.mercy"] = {
+    ["medical.distress.call.mercy"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.mercy",
+        ["id"] = "medical.distress.call.mercy",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_mercy.json",
     },
-    ["semantic.medical.distress.call.rescue"] = {
+    ["medical.distress.call.rescue"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.rescue",
+        ["id"] = "medical.distress.call.rescue",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_rescue.json",
     },
-    ["semantic.medical.distress.call.starvation"] = {
+    ["medical.distress.call.starvation"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventCall",
         },
-        ["id"] = "semantic.medical.distress.call.starvation",
+        ["id"] = "medical.distress.call.starvation",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_starvation.json",
     },

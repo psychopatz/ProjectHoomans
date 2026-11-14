@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "interaction.scene",
+  "id": "task_work_completed",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/work.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "That's done. One less thing to worry about.",
+            "Finished the task. All wrapped up.",
+            "Job is complete. What's next?",
+            "That takes care of that assignment.",
+            "All done here. Everything looks in order.",
+            "Task is completed to the best of my ability.",
+            "Wrapped that up. Ready for the next priority.",
+            "Done. That should hold up fine.",
+            "The work is finished. Moving on.",
+            "Completed. Duty handled."
+          ],
+          "TL": [
+            "Tapos na. Isang alalahanin ang nabawas.",
+            "Tapos na ang gawain. Ayos na ang lahat.",
+            "Tapos na ang trabaho. Ano ang susunod?",
+            "Naasikaso na ang tungkuling iyon.",
+            "Tapos na ang lahat dito. Maayos ang kalagayan.",
+            "Natapos ang gawain sa abot ng aking makakaya.",
+            "Tapos na iyon. Handa na para sa susunod na prayoridad.",
+            "Tapos na. Maayos ang magiging tibay niyan.",
+            "Tapos na ang trabaho. Magpatuloy na.",
+            "Kumpleto na. Naasikaso ang tungkulin."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/work.json",
-        "responseTemplateID": "semantic.interaction.scene.task_work_completed",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Task is done. I'm taking a breather.",
+            "Finished. Inspect it if you want to be sure.",
+            "It's completed. Now keep your eyes open.",
+            "That job is handled. Back to guarding the perimeter.",
+            "Finished my duty. Nobody snuck up on us, right?",
+            "Done. Let's make sure it wasn't for nothing.",
+            "Work is complete. Back on defensive watch.",
+            "It's finished. Keep quiet and stay alert.",
+            "Task completed. Don't waste the resources I secured.",
+            "Done. What's the next threat we need to manage?"
+          ],
+          "TL": [
+            "Tapos na ang gawain. Magpapahinga muna ako.",
+            "Tapos na. Suriin mo kung nais mong makatiyak.",
+            "Tapos na ito. Ngayon buksan mo ang mga mata mo.",
+            "Naasikaso na ang trabaho. Balik sa pagbabantay ng paligid.",
+            "Tapos na ang tungkulin ko. Walang nakalapit sa atin, di ba?",
+            "Tapos na. Tiyakin nating hindi nasayang ang pagod.",
+            "Tapos na ang trabaho. Balik sa pagbabantay.",
+            "Tapos na. Manatiling tahimik at alisto.",
+            "Gawain natapos. Huwag mong sayangin ang naasikaso ko.",
+            "Tapos na. Ano ang susunod na banta na dapat harapin?"
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "That's done. One less thing to worry about.",
-              "TL": "Tapos na. Isang alalahanin ang nabawas."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Finished the task. All wrapped up.",
-              "TL": "Tapos na ang gawain. Ayos na ang lahat."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Job is complete. What's next?",
-              "TL": "Tapos na ang trabaho. Ano ang susunod?"
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "That takes care of that assignment.",
-              "TL": "Naasikaso na ang tungkuling iyon."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "All done here. Everything looks in order.",
-              "TL": "Tapos na ang lahat dito. Maayos ang kalagayan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Task is completed to the best of my ability.",
-              "TL": "Natapos ang gawain sa abot ng aking makakaya."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Wrapped that up. Ready for the next priority.",
-              "TL": "Tapos na iyon. Handa na para sa susunod na prayoridad."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Done. That should hold up fine.",
-              "TL": "Tapos na. Maayos ang magiging tibay niyan."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "The work is finished. Moving on.",
-              "TL": "Tapos na ang trabaho. Magpatuloy na."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Completed. Duty handled.",
-              "TL": "Kumpleto na. Naasikaso ang tungkulin."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Done.",
+            "Finished.",
+            "Completed.",
+            "Handled.",
+            "Sorted.",
+            "All set.",
+            "Wrapped up.",
+            "Next?",
+            "Cleared.",
+            "Ready."
+          ],
+          "TL": [
+            "Tapos na.",
+            "Tapos.",
+            "Kumpleto.",
+            "Naasikaso na.",
+            "Ayos na.",
+            "Handa na.",
+            "Tapos na lahat.",
+            "Susunod?",
+            "Malinaw na.",
+            "Handa na."
+          ]
+        }
       },
-      "namespace": "semantic.interaction.scene.task_work_completed"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/work.json",
-        "responseTemplateID": "semantic.interaction.scene.task_work_completed",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "All finished! Glad I could help get this done.",
-              "TL": "Tapos na ang lahat! Mabuti at nakatulong akong tapusin ito."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "That's taken care of, friend. Turned out great!",
-              "TL": "Naasikaso na 'yon, kaibigan. Naging napakaganda ng resulta!"
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Proud to have this knocked out for the camp.",
-              "TL": "Ipinagmamalaki kong natapos ito para sa kampo."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "Finished! We're making our home a little better every day.",
-              "TL": "Tapos na! Pinapaganda natin ang tirahan natin araw-araw."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Done and dusted! Let me know if you need another hand.",
-              "TL": "Tapos at malinis na! Sabihan mo lang ako kung kailangan mo pa ng tulong."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "Completed with care. Hope it meets your expectations, partner.",
-              "TL": "Tinapos nang buong puso. Sana pumasa sa pamantayan mo, kasama."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "That was tough, but we did it! All finished.",
-              "TL": "Mabigat 'yon, pero kinaya natin! Tapos na ang lahat."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "One more step toward surviving comfortably. All done!",
-              "TL": "Isa na namang hakbang para maging maginhawa rito. Tapos na!"
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "Done! Happy to do my part for our people.",
-              "TL": "Tapos na! Masayang gawin ang parte ko para sa kasamahan natin."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "All set! Feels good to get something productive accomplished.",
-              "TL": "Handa na! Masarap sa pakiramdam na may natapos na kapaki-pakinabang."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.task_work_completed"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/work.json",
-        "responseTemplateID": "semantic.interaction.scene.task_work_completed",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Done.",
-              "TL": "Tapos na."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Finished.",
-              "TL": "Tapos."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Completed.",
-              "TL": "Kumpleto."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Handled.",
-              "TL": "Naasikaso na."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Sorted.",
-              "TL": "Ayos na."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "All set.",
-              "TL": "Handa na."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Wrapped up.",
-              "TL": "Tapos na lahat."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Next?",
-              "TL": "Susunod?"
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Cleared.",
-              "TL": "Malinaw na."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Ready.",
-              "TL": "Handa na."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.task_work_completed"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/work.json",
-        "responseTemplateID": "semantic.interaction.scene.task_work_completed",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "Task is done. I'm taking a breather.",
-              "TL": "Tapos na ang gawain. Magpapahinga muna ako."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "Finished. Inspect it if you want to be sure.",
-              "TL": "Tapos na. Suriin mo kung nais mong makatiyak."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "It's completed. Now keep your eyes open.",
-              "TL": "Tapos na ito. Ngayon buksan mo ang mga mata mo."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "That job is handled. Back to guarding the perimeter.",
-              "TL": "Naasikaso na ang trabaho. Balik sa pagbabantay ng paligid."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "Finished my duty. Nobody snuck up on us, right?",
-              "TL": "Tapos na ang tungkulin ko. Walang nakalapit sa atin, di ba?"
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Done. Let's make sure it wasn't for nothing.",
-              "TL": "Tapos na. Tiyakin nating hindi nasayang ang pagod."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "Work is complete. Back on defensive watch.",
-              "TL": "Tapos na ang trabaho. Balik sa pagbabantay."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "It's finished. Keep quiet and stay alert.",
-              "TL": "Tapos na. Manatiling tahimik at alisto."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "Task completed. Don't waste the resources I secured.",
-              "TL": "Gawain natapos. Huwag mong sayangin ang naasikaso ko."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "Done. What's the next threat we need to manage?",
-              "TL": "Tapos na. Ano ang susunod na banta na dapat harapin?"
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.task_work_completed"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "All finished! Glad I could help get this done.",
+            "That's taken care of, friend. Turned out great!",
+            "Proud to have this knocked out for the camp.",
+            "Finished! We're making our home a little better every day.",
+            "Done and dusted! Let me know if you need another hand.",
+            "Completed with care. Hope it meets your expectations, partner.",
+            "That was tough, but we did it! All finished.",
+            "One more step toward surviving comfortably. All done!",
+            "Done! Happy to do my part for our people.",
+            "All set! Feels good to get something productive accomplished."
+          ],
+          "TL": [
+            "Tapos na ang lahat! Mabuti at nakatulong akong tapusin ito.",
+            "Naasikaso na 'yon, kaibigan. Naging napakaganda ng resulta!",
+            "Ipinagmamalaki kong natapos ito para sa kampo.",
+            "Tapos na! Pinapaganda natin ang tirahan natin araw-araw.",
+            "Tapos at malinis na! Sabihan mo lang ako kung kailangan mo pa ng tulong.",
+            "Tinapos nang buong puso. Sana pumasa sa pamantayan mo, kasama.",
+            "Mabigat 'yon, pero kinaya natin! Tapos na ang lahat.",
+            "Isa na namang hakbang para maging maginhawa rito. Tapos na!",
+            "Tapos na! Masayang gawin ang parte ko para sa kasamahan natin.",
+            "Handa na! Masarap sa pakiramdam na may natapos na kapaki-pakinabang."
+          ]
+        }
+      }
+    ]
+  }
 }

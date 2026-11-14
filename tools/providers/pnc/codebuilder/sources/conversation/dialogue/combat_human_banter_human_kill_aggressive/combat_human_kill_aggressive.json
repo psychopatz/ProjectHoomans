@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.human_kill",
+  "id": "aggressive",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.combat_human",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/aggressive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "He's down. Keep pushing.",
+              "Took him out. Don't let up.",
+              "That one's finished. Push their line.",
+              "Down in the dirt. Keep firing.",
+              "One dead. Press the advantage.",
+              "Dropped him. Don't give them room to breathe.",
+              "He thought he had us. Keep moving.",
+              "Tore him down. Forward.",
+              "Scratch that bastard. Keep pressing.",
+              "He's bleeding out. Advance on them."
+            ],
+            "TL": [
+              "Bagsak na siya. Tuloy ang laban.",
+              "Naitumba ko na. Huwag kayong titigil.",
+              "Tapos na ang isang 'yon. Wasakin ang linya nila.",
+              "Nalugmok sa lupa. Tuloy ang putok.",
+              "Isang patay. Samantalahin ang pagkakataon.",
+              "Ibinagsak ko siya. Huwag silang bigyan ng puwang.",
+              "Akala niya kaya tayo. Tuloy lang.",
+              "Winasak ko na. Pasulong.",
+              "Bawas ang tarantado. Tuloy ang pasok.",
+              "Umaagos ang dugo niya. Sugurin sila."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One less bastard shooting at us.",
+              "That's for trying to kill us.",
+              "Should've stayed in your hole.",
+              "He drew down on us. Now he's dead.",
+              "Another shooter down.",
+              "That'll teach 'em to ambush us.",
+              "Good riddance to that one.",
+              "Picked the wrong crew to fight.",
+              "He got what he was asking for.",
+              "Dead where he stood."
+            ],
+            "TL": [
+              "Isang tarantado na lang ang hindi babaril sa atin.",
+              "Para 'yan sa pagsubok mong patayin kami.",
+              "Dapat nanatili ka na lang sa lungga mo.",
+              "Tinutukan niya tayo. Ngayon patay na siya.",
+              "Bagsak ang isa pang bumaril.",
+              "Matututo silang huwag tayong tambangan.",
+              "Mabuti nga sa kanya.",
+              "Maling grupo ang kinalaban mo.",
+              "Nakuha niya ang hinahanap niya.",
+              "Patay kung saan siya nakatayo."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Threat's dead. Eyes up.",
+              "Dead. Who else wants some?",
+              "Target eliminated. Keep scanning.",
+              "Down. Check for friends.",
+              "That one's history. Eyes open.",
+              "Dropped him cold. Next target.",
+              "He's done. Watch your sectors.",
+              "Put him down. Stay ready.",
+              "No more trouble from that one.",
+              "Finished him. Stay locked in."
+            ],
+            "TL": [
+              "Patay na ang banta. Magmatyag.",
+              "Patay na. Sino pa ang susunod?",
+              "Target naalis. Tuloy ang pagmamasid.",
+              "Bagsak. Tignan kung may kasama pa.",
+              "Burado na ang isang 'yon. Manatiling gising.",
+              "Bagsak nang walang buhay. Susunod na target.",
+              "Tapos na siya. Bantayan ang bawat sulok.",
+              "Ibinagsak ko na. Maging handa.",
+              "Wala nang aberya mula sa kanya.",
+              "Tinapos ko na siya. Huwag mawala sa pokus."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

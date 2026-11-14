@@ -1,9 +1,13 @@
 {
-  "id": "label",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.group.utilities",
+  "id": "label",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.group.utilities.label",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.group.utilities.label",
@@ -12,14 +16,17 @@
           "TL": "Mga gamit sa usapan"
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "Conversation utilities",
-    "TL": "Mga gamit sa usapan"
-  },
-  "namespace": "ui.suggestion.group.utilities",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Conversation utilities",
+          "TL": "Mga gamit sa usapan"
+        }
+      }
+    ]
+  }
 }

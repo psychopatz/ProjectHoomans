@@ -1,182 +1,47 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.question.whats_up.busy.guarded"] = {
+    ["question.whats_up.busy"] = {
         ["domain"] = "conversation_whats_up",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
         },
-        ["id"] = "semantic.question.whats_up.busy.guarded",
+        ["id"] = "question.whats_up.busy",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
     },
-    ["semantic.question.whats_up.busy.neutral"] = {
+    ["question.whats_up.default"] = {
         ["domain"] = "conversation_whats_up",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
         },
-        ["id"] = "semantic.question.whats_up.busy.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
-    },
-    ["semantic.question.whats_up.busy.terse"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.busy.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
-    },
-    ["semantic.question.whats_up.busy.warm"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.busy.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
-    },
-    ["semantic.question.whats_up.default.guarded"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.default.guarded",
+        ["id"] = "question.whats_up.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
     },
-    ["semantic.question.whats_up.default.neutral"] = {
+    ["question.whats_up.default_alt"] = {
         ["domain"] = "conversation_whats_up",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
         },
-        ["id"] = "semantic.question.whats_up.default.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
-    },
-    ["semantic.question.whats_up.default.terse"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.default.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
-    },
-    ["semantic.question.whats_up.default.warm"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.default.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
-    },
-    ["semantic.question.whats_up.default_alt.guarded"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.default_alt.guarded",
+        ["id"] = "question.whats_up.default_alt",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
     },
-    ["semantic.question.whats_up.default_alt.neutral"] = {
+    ["question.whats_up.traveling"] = {
         ["domain"] = "conversation_whats_up",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
         },
-        ["id"] = "semantic.question.whats_up.default_alt.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
-    },
-    ["semantic.question.whats_up.default_alt.terse"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.default_alt.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
-    },
-    ["semantic.question.whats_up.default_alt.warm"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.default_alt.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
-    },
-    ["semantic.question.whats_up.traveling.guarded"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.traveling.guarded",
+        ["id"] = "question.whats_up.traveling",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
     },
-    ["semantic.question.whats_up.traveling.neutral"] = {
+    ["question.whats_up.weather"] = {
         ["domain"] = "conversation_whats_up",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
         },
-        ["id"] = "semantic.question.whats_up.traveling.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
-    },
-    ["semantic.question.whats_up.traveling.terse"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.traveling.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
-    },
-    ["semantic.question.whats_up.traveling.warm"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.traveling.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
-    },
-    ["semantic.question.whats_up.weather.guarded"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.weather.guarded",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
-    },
-    ["semantic.question.whats_up.weather.neutral"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.weather.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
-    },
-    ["semantic.question.whats_up.weather.terse"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.weather.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
-    },
-    ["semantic.question.whats_up.weather.warm"] = {
-        ["domain"] = "conversation_whats_up",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
-        },
-        ["id"] = "semantic.question.whats_up.weather.warm",
+        ["id"] = "question.whats_up.weather",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
     },

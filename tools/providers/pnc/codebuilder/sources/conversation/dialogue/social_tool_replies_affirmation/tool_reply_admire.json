@@ -1,291 +1,122 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "admire",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.admire.1.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/admire.json",
-        "responseTemplateID": "semantic.tool_reply.admire.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I appreciate that more than you know.",
-              "TL": "Mas pinahahalagahan ko iyan kaysa sa iniisip mo."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "That means a great deal to me.",
-              "TL": "Malaking bagay iyan para sa akin."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Thank you. That means a lot out here.",
-              "TL": "Salamat. Malaking tulong ang marinig iyan dito."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I do not hear that often. Thank you.",
-              "TL": "Bihira kong marinig 'yan. Maraming salamat."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Hearing that really helps keep me going.",
-              "TL": "Ang marinig 'yan ay nakakatulong sa pagpapatuloy ko."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I am grateful for your words.",
-              "TL": "Nagpapasalamat ako sa iyong mga salita."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "That is very kind. Thank you.",
-              "TL": "Napakabait mo naman. Salamat."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I try my best. It is good to know you see that.",
-              "TL": "Ginagawa ko ang makakaya ko. Mabuting malaman na nakikita mo 'yon."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I appreciate the respect.",
-              "TL": "Salamat sa respeto."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "That really touches me. Thanks.",
-              "TL": "Tumatagos talaga sa akin 'yan. Salamat."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/admire.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I appreciate that more than you know.",
+              "That means a great deal to me.",
+              "Thank you. That means a lot out here.",
+              "I do not hear that often. Thank you.",
+              "Hearing that really helps keep me going.",
+              "I am grateful for your words.",
+              "That is very kind. Thank you.",
+              "I try my best. It is good to know you see that.",
+              "I appreciate the respect.",
+              "That really touches me. Thanks."
+            ],
+            "TL": [
+              "Mas pinahahalagahan ko iyan kaysa sa iniisip mo.",
+              "Malaking bagay iyan para sa akin.",
+              "Salamat. Malaking tulong ang marinig iyan dito.",
+              "Bihira kong marinig 'yan. Maraming salamat.",
+              "Ang marinig 'yan ay nakakatulong sa pagpapatuloy ko.",
+              "Nagpapasalamat ako sa iyong mga salita.",
+              "Napakabait mo naman. Salamat.",
+              "Ginagawa ko ang makakaya ko. Mabuting malaman na nakikita mo 'yon.",
+              "Salamat sa respeto.",
+              "Tumatagos talaga sa akin 'yan. Salamat."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.admire.2.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/admire.json",
-        "responseTemplateID": "semantic.tool_reply.admire.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "That is kind of you to say.",
-              "TL": "Mabait sa 'yo ang magsabi niyan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Thank you. You did not have to say that, but thanks.",
-              "TL": "Salamat. Hindi mo naman kailangang sabihin, pero salamat pa rin."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "I appreciate the thought.",
-              "TL": "Salamat sa magandang kaisipan."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "You are generous with your words.",
-              "TL": "Bukas-palad ka sa iyong papuri."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "That is good of you to say.",
-              "TL": "Mabuting tao ka para sabihin 'yan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I take that as high praise.",
-              "TL": "Itinuturing ko 'yang mataas na papuri."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Thanks. I appreciate the courtesy.",
-              "TL": "Salamat. Pinahahalagahan ko ang galang mo."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "It is nice to hear something decent for once.",
-              "TL": "Masarap makarinig ng maayos na salita paminsan-minsan."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Thank you for saying so.",
-              "TL": "Salamat sa pagsasabi niyan."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "That is good to hear.",
-              "TL": "Magandang marinig 'yan."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "That is kind of you to say.",
+              "Thank you. You did not have to say that, but thanks.",
+              "I appreciate the thought.",
+              "You are generous with your words.",
+              "That is good of you to say.",
+              "I take that as high praise.",
+              "Thanks. I appreciate the courtesy.",
+              "It is nice to hear something decent for once.",
+              "Thank you for saying so.",
+              "That is good to hear."
+            ],
+            "TL": [
+              "Mabait sa 'yo ang magsabi niyan.",
+              "Salamat. Hindi mo naman kailangang sabihin, pero salamat pa rin.",
+              "Salamat sa magandang kaisipan.",
+              "Bukas-palad ka sa iyong papuri.",
+              "Mabuting tao ka para sabihin 'yan.",
+              "Itinuturing ko 'yang mataas na papuri.",
+              "Salamat. Pinahahalagahan ko ang galang mo.",
+              "Masarap makarinig ng maayos na salita paminsan-minsan.",
+              "Salamat sa pagsasabi niyan.",
+              "Magandang marinig 'yan."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.admire.3.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/admire.json",
-        "responseTemplateID": "semantic.tool_reply.admire.3",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "You see more in me than most people do.",
-              "TL": "Mas marami kang nakikita sa akin kaysa sa karamihan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Most folks out here would never notice that. Thanks.",
-              "TL": "Karamihan ng tao rito ay hindi 'yan mapapansin. Salamat."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "It is rare to find someone who actually pays attention.",
-              "TL": "Bihira makahanap ng taong talagang nagmamasid."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I am glad someone recognizes what I put into this.",
-              "TL": "Mabuti naman at may nakakapansin sa pagsusumikap ko."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "You have a good eye. I appreciate that.",
-              "TL": "Matalas ang mata mo. Salamat."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Not many people look closely enough to see that.",
-              "TL": "Kakaunti lang ang taong tumitingin nang malalim para makita 'yan."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "That means something coming from you.",
-              "TL": "May bigat 'yan lalo't nanggaling sa 'yo."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I did not expect you to see that. Thank you.",
-              "TL": "Hindi ko inasahang mapapansin mo 'yon. Salamat."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "You give me credit where others would not.",
-              "TL": "Binibigyan mo ako ng tiwala kung saan ang iba ay hindi."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I appreciate that you see what I am trying to do.",
-              "TL": "Salamat dahil naiintindihan mo ang sinusubukan kong gawin."
-            }
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "You see more in me than most people do.",
+              "Most folks out here would never notice that. Thanks.",
+              "It is rare to find someone who actually pays attention.",
+              "I am glad someone recognizes what I put into this.",
+              "You have a good eye. I appreciate that.",
+              "Not many people look closely enough to see that.",
+              "That means something coming from you.",
+              "I did not expect you to see that. Thank you.",
+              "You give me credit where others would not.",
+              "I appreciate that you see what I am trying to do."
+            ],
+            "TL": [
+              "Mas marami kang nakikita sa akin kaysa sa karamihan.",
+              "Karamihan ng tao rito ay hindi 'yan mapapansin. Salamat.",
+              "Bihira makahanap ng taong talagang nagmamasid.",
+              "Mabuti naman at may nakakapansin sa pagsusumikap ko.",
+              "Matalas ang mata mo. Salamat.",
+              "Kakaunti lang ang taong tumitingin nang malalim para makita 'yan.",
+              "May bigat 'yan lalo't nanggaling sa 'yo.",
+              "Hindi ko inasahang mapapansin mo 'yon. Salamat.",
+              "Binibigyan mo ako ng tiwala kung saan ang iba ay hindi.",
+              "Salamat dahil naiintindihan mo ang sinusubukan kong gawin."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

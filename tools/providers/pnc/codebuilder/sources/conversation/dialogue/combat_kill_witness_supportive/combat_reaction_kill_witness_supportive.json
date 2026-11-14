@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_witness_supportive",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/supportive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Good one. You okay?",
+              "Nice drop. Did it touch you?",
+              "Great hit. Are you feeling alright?",
+              "You got it! Take a quick breath.",
+              "Well done. You hurt at all?",
+              "Clean take down. You holding up?",
+              "Good work. I'm right here with you.",
+              "Got him! You safe on your side?",
+              "Nice work putting that down. You alright?",
+              "Dropped it cleanly. Tell me if you need help."
+            ],
+            "TL": [
+              "Ayos. Okay ka lang?",
+              "Magandang bagsak. Nahawakan ka ba no'n?",
+              "Magandang hampas. Maayos ba pakiramdam mo?",
+              "Nakuha mo! Huminga ka muna sandali.",
+              "Mahusay. May masakit ba sa'yo?",
+              "Malinis na pagpabagsak. Nakakayanan mo ba?",
+              "Magandang gawa. Nandito lang ako kasama mo.",
+              "Naitumba mo! Ligtas ka riyan sa tabi mo?",
+              "Magaling ang pagpapabagsak no'n. Ayos ka lang?",
+              "Bumagsak nang maayos. Sabihin mo kung kailangan mo ng tulong."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Nice hit. Stay close to me.",
+              "Great strike. Don't wander away.",
+              "Good kill. Stick close to my side.",
+              "You took care of it. Stay near.",
+              "Well handled. Keep on my shoulder.",
+              "Solid hit. Let's stay together.",
+              "You dropped it. Tighten the formation.",
+              "Nice swing. Keep within reach.",
+              "Downed. Don't step too far ahead.",
+              "Good work. Stick by me while we clear."
+            ],
+            "TL": [
+              "Maganda 'yon. Dito ka lang malapit.",
+              "Magandang hampas. Huwag kang lalayo.",
+              "Magandang patay. Dumikit ka sa tabi ko.",
+              "Inasikaso mo na. Manatili sa malapit.",
+              "Maayos na napigilan. Manatili sa balikat ko.",
+              "Solidong tama. Magsama tayo.",
+              "Naibagsak mo. Higpitan ang hanay.",
+              "Magandang hataw. Manatili sa abot-kamay.",
+              "Bagsak. Huwag lalayo nang sobra sa unahan.",
+              "Magandang trabaho. Dumikit sa akin habang naglilinis."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "You got it. I'm with you.",
+              "Good takedown. I've got your back.",
+              "You dropped that threat. I'm right behind you.",
+              "Nice work! You can count on me.",
+              "You finished it. I'm watching our rear.",
+              "Solid kill. We make a good team.",
+              "You took him down. We're in this together.",
+              "Handled cleanly. I'll cover your flank.",
+              "Good strike. I've got you covered.",
+              "You got that one. I'm right here."
+            ],
+            "TL": [
+              "Napatumba mo. Kasama mo ako.",
+              "Magandang pagtumba. Hawak ko ang likod mo.",
+              "Naibagsak mo ang banta. Nasa likod mo lang ako.",
+              "Magaling! Makakaasa ka sa akin.",
+              "Tinapos mo na. Binabantayan ko ang likod natin.",
+              "Solidong patay. Maganda tayong magkasama.",
+              "Ibinagsak mo siya. Magkasama tayo rito.",
+              "Malinis na naasikaso. Sasalagin ko ang gilid mo.",
+              "Magandang tama. Nakabantay ako sa'yo.",
+              "Nakuha mo 'yon. Nandito lang ako."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

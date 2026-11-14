@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.shaken",
+  "id": "unarmed",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/shaken.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Oh God. I did that with my hands.",
+            "I had to shove it down... my bare hands.",
+            "It almost bit me. Look at my arms shaking.",
+            "I need a weapon. I can't do that again.",
+            "I felt its teeth scrape near my jacket.",
+            "Stomped on its head... God forgive me.",
+            "That was pure desperation.",
+            "My hands are bruised... but I'm alive.",
+            "Never want to be that close again.",
+            "It's dead... I pushed it off and stomped."
+          ],
+          "TL": [
+            "Diyos ko. Kamay ko lang ang ginamit ko.",
+            "Kinailangan kong itulak pabagsak... mga kamay ko lang.",
+            "Halos makagat ako. Tingnan mo ang nanginginig kong braso.",
+            "Kailangan ko ng sandata. Hindi ko na mauulit 'yon.",
+            "Naramdaman ko ang ngipin nito malapit sa jacket ko.",
+            "Tinapakan ko ang ulo... patawarin ako ng Diyos.",
+            "Dala lang 'yon ng matinding takot.",
+            "Pasa-pasa ang mga kamay ko... pero buhay pa ako.",
+            "Ayoko nang mapalapit nang gano'n kailanman.",
+            "Patay na... itinulak ko at tinapakan."
+          ]
+        }
+      }
+    ]
+  }
+}

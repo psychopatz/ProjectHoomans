@@ -1,27 +1,27 @@
 {
-  "id": "location",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.backstory.follow_up.location",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "question.backstory.follow_up",
+  "id": "location",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "LOCATION",
+  "metadata": {
+    "responsePoolID": "question.backstory.follow_up.location",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "LOCATION"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.backstory.follow_up.location.authored",
-        "metadata": {
-          "fallback": "I remember that part of my life, but I don't have more detail about where it was.",
-          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation"
-        },
+        "id": "question.backstory.follow_up.location.authored",
         "text": {
           "EN": "I remember that part of my life, but I don't have more detail about where it was.",
           "TL": "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon."
+        },
+        "metadata": {
+          "fallback": "I remember that part of my life, but I don't have more detail about where it was.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation"
         }
       }
     ]
-  },
-  "namespace": "semantic.question.backstory.follow_up",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

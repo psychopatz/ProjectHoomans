@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_kill_killer_reserved",
-        ["id"] = "semantic.combat.reaction.kill_killer_reserved_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.kill_killer_reserved",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Down.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Down.",
+                                        "Eliminated.",
+                                        "Dead.",
+                                        "Handled.",
+                                        "Dropped.",
+                                        "Target down.",
+                                        "Neutralized.",
+                                        "Done.",
+                                        "Fell.",
+                                        "Ceased.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay.",
+                                        "Naalis.",
+                                        "Bagsak.",
+                                        "Naasikaso.",
+                                        "Tumba.",
+                                        "Bagsak ang target.",
+                                        "Naitumba.",
+                                        "Tapos.",
+                                        "Nalugmok.",
+                                        "Tumigil.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Got it.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Got it.",
+                                        "Took it.",
+                                        "Hit.",
+                                        "Finished.",
+                                        "Cleared.",
+                                        "Taken care of.",
+                                        "Struck.",
+                                        "Resolved.",
+                                        "Dealt with.",
+                                        "Connected.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko.",
+                                        "Tinamaan ko.",
+                                        "Sapul.",
+                                        "Yari.",
+                                        "Malinis.",
+                                        "Naayos na.",
+                                        "Tinamaan.",
+                                        "Tapos na.",
+                                        "Nalutas.",
+                                        "Tumama.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Clear.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Clear.",
+                                        "Path open.",
+                                        "Secure.",
+                                        "Nothing here.",
+                                        "Clean.",
+                                        "No contacts.",
+                                        "Lane clear.",
+                                        "Safe.",
+                                        "Open.",
+                                        "Quiet now.",
+                                    },
+                                    ["TL"] = {
+                                        "Malinis.",
+                                        "Bukas ang daan.",
+                                        "Ligtas.",
+                                        "Walang anuman dito.",
+                                        "Maayos.",
+                                        "Walang kalaban.",
+                                        "Malinis ang linya.",
+                                        "Ayos.",
+                                        "Bukas.",
+                                        "Tahimik na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Down.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Down.",
+                            "Eliminated.",
+                            "Dead.",
+                            "Handled.",
+                            "Dropped.",
+                            "Target down.",
+                            "Neutralized.",
+                            "Done.",
+                            "Fell.",
+                            "Ceased.",
+                        },
+                        ["TL"] = {
+                            "Patay.",
+                            "Naalis.",
+                            "Bagsak.",
+                            "Naasikaso.",
+                            "Tumba.",
+                            "Bagsak ang target.",
+                            "Naitumba.",
+                            "Tapos.",
+                            "Nalugmok.",
+                            "Tumigil.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Got it.",
+                            "Took it.",
+                            "Hit.",
+                            "Finished.",
+                            "Cleared.",
+                            "Taken care of.",
+                            "Struck.",
+                            "Resolved.",
+                            "Dealt with.",
+                            "Connected.",
+                        },
+                        ["TL"] = {
+                            "Nakuha ko.",
+                            "Tinamaan ko.",
+                            "Sapul.",
+                            "Yari.",
+                            "Malinis.",
+                            "Naayos na.",
+                            "Tinamaan.",
+                            "Tapos na.",
+                            "Nalutas.",
+                            "Tumama.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Clear.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Clear.",
+                            "Path open.",
+                            "Secure.",
+                            "Nothing here.",
+                            "Clean.",
+                            "No contacts.",
+                            "Lane clear.",
+                            "Safe.",
+                            "Open.",
+                            "Quiet now.",
+                        },
+                        ["TL"] = {
+                            "Malinis.",
+                            "Bukas ang daan.",
+                            "Ligtas.",
+                            "Walang anuman dito.",
+                            "Maayos.",
+                            "Walang kalaban.",
+                            "Malinis ang linya.",
+                            "Ayos.",
+                            "Bukas.",
+                            "Tahimik na.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.kill_killer_reserved",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "kill_killer_reserved_01",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_reserved_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved_01.json",
+            ["localId"] = "kill_killer_reserved",
+            ["sourceId"] = "combat.reaction.kill_killer_reserved",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerReserved",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_reserved_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/reserved.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down.",
-                            },
-                            ["TL"] = {
-                                "Patay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eliminated.",
-                            },
-                            ["TL"] = {
-                                "Naalis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead.",
-                            },
-                            ["TL"] = {
-                                "Bagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Down.",
+                                        "Eliminated.",
+                                        "Dead.",
+                                        "Handled.",
+                                        "Dropped.",
+                                        "Target down.",
+                                        "Neutralized.",
+                                        "Done.",
+                                        "Fell.",
+                                        "Ceased.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay.",
+                                        "Naalis.",
+                                        "Bagsak.",
+                                        "Naasikaso.",
+                                        "Tumba.",
+                                        "Bagsak ang target.",
+                                        "Naitumba.",
+                                        "Tapos.",
+                                        "Nalugmok.",
+                                        "Tumigil.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped.",
-                            },
-                            ["TL"] = {
-                                "Tumba.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang target.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Neutralized.",
-                            },
-                            ["TL"] = {
-                                "Naitumba.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done.",
-                            },
-                            ["TL"] = {
-                                "Tapos.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Got it.",
+                                        "Took it.",
+                                        "Hit.",
+                                        "Finished.",
+                                        "Cleared.",
+                                        "Taken care of.",
+                                        "Struck.",
+                                        "Resolved.",
+                                        "Dealt with.",
+                                        "Connected.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko.",
+                                        "Tinamaan ko.",
+                                        "Sapul.",
+                                        "Yari.",
+                                        "Malinis.",
+                                        "Naayos na.",
+                                        "Tinamaan.",
+                                        "Tapos na.",
+                                        "Nalutas.",
+                                        "Tumama.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fell.",
-                            },
-                            ["TL"] = {
-                                "Nalugmok.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Clear.",
+                                        "Path open.",
+                                        "Secure.",
+                                        "Nothing here.",
+                                        "Clean.",
+                                        "No contacts.",
+                                        "Lane clear.",
+                                        "Safe.",
+                                        "Open.",
+                                        "Quiet now.",
+                                    },
+                                    ["TL"] = {
+                                        "Malinis.",
+                                        "Bukas ang daan.",
+                                        "Ligtas.",
+                                        "Walang anuman dito.",
+                                        "Maayos.",
+                                        "Walang kalaban.",
+                                        "Malinis ang linya.",
+                                        "Ayos.",
+                                        "Bukas.",
+                                        "Tahimik na.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ceased.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.kill_killer_reserved",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Tumigil.",
-                            },
+                            ["fallback"] = "Down.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.kill_killer_reserved.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_killer_reserved",
-        ["id"] = "semantic.combat.reaction.kill_killer_reserved_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_killer_reserved_02",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_reserved_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerReserved",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_reserved_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/reserved.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Down.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Down.",
+                        "Eliminated.",
+                        "Dead.",
+                        "Handled.",
+                        "Dropped.",
+                        "Target down.",
+                        "Neutralized.",
+                        "Done.",
+                        "Fell.",
+                        "Ceased.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Took it.",
-                            },
-                            ["TL"] = {
-                                "Tinamaan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hit.",
-                            },
-                            ["TL"] = {
-                                "Sapul.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished.",
-                            },
-                            ["TL"] = {
-                                "Yari.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Cleared.",
-                            },
-                            ["TL"] = {
-                                "Malinis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Taken care of.",
-                            },
-                            ["TL"] = {
-                                "Naayos na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Struck.",
-                            },
-                            ["TL"] = {
-                                "Tinamaan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Resolved.",
-                            },
-                            ["TL"] = {
-                                "Tapos na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dealt with.",
-                            },
-                            ["TL"] = {
-                                "Nalutas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Connected.",
-                            },
-                            ["TL"] = {
-                                "Tumama.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Patay.",
+                        "Naalis.",
+                        "Bagsak.",
+                        "Naasikaso.",
+                        "Tumba.",
+                        "Bagsak ang target.",
+                        "Naitumba.",
+                        "Tapos.",
+                        "Nalugmok.",
+                        "Tumigil.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_killer_reserved",
-        ["id"] = "semantic.combat.reaction.kill_killer_reserved_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_killer_reserved_03",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_reserved_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerReserved",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_reserved_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/reserved.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear.",
-                            },
-                            ["TL"] = {
-                                "Malinis.",
-                            },
-                        },
+            {
+                ["fallback"] = "Got it.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Got it.",
+                        "Took it.",
+                        "Hit.",
+                        "Finished.",
+                        "Cleared.",
+                        "Taken care of.",
+                        "Struck.",
+                        "Resolved.",
+                        "Dealt with.",
+                        "Connected.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Path open.",
-                            },
-                            ["TL"] = {
-                                "Bukas ang daan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Secure.",
-                            },
-                            ["TL"] = {
-                                "Ligtas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nothing here.",
-                            },
-                            ["TL"] = {
-                                "Walang anuman dito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clean.",
-                            },
-                            ["TL"] = {
-                                "Maayos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No contacts.",
-                            },
-                            ["TL"] = {
-                                "Walang kalaban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Lane clear.",
-                            },
-                            ["TL"] = {
-                                "Malinis ang linya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Safe.",
-                            },
-                            ["TL"] = {
-                                "Ayos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Open.",
-                            },
-                            ["TL"] = {
-                                "Bukas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Quiet now.",
-                            },
-                            ["TL"] = {
-                                "Tahimik na.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Nakuha ko.",
+                        "Tinamaan ko.",
+                        "Sapul.",
+                        "Yari.",
+                        "Malinis.",
+                        "Naayos na.",
+                        "Tinamaan.",
+                        "Tapos na.",
+                        "Nalutas.",
+                        "Tumama.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "Clear.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_reserved.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Clear.",
+                        "Path open.",
+                        "Secure.",
+                        "Nothing here.",
+                        "Clean.",
+                        "No contacts.",
+                        "Lane clear.",
+                        "Safe.",
+                        "Open.",
+                        "Quiet now.",
+                    },
+                    ["TL"] = {
+                        "Malinis.",
+                        "Bukas ang daan.",
+                        "Ligtas.",
+                        "Walang anuman dito.",
+                        "Maayos.",
+                        "Walang kalaban.",
+                        "Malinis ang linya.",
+                        "Ayos.",
+                        "Bukas.",
+                        "Tahimik na.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

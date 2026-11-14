@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.update",
   "id": "mercy",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/update.json",
-    "responseTemplateID": "semantic.medical.distress.update.mercy",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I am still down. Please do not finish me.",
-          "TL": "Bagsak pa rin ako. Pakiusap huwag mo akong tapusin."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.02"
-        },
-        "text": {
-          "EN": "Still helpless here. Spare my life, please.",
-          "TL": "Walang laban pa rin dito. Buhayin mo ako, pakiusap."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.03"
-        },
-        "text": {
-          "EN": "I'm still no threat to you. Please have mercy.",
-          "TL": "Wala pa rin akong banta sa'yo. Pakiusap maawa ka."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.04"
-        },
-        "text": {
-          "EN": "Still begging for survival. Don't hurt me.",
-          "TL": "Nagmamakaawa pa rin para mabuhay. Huwag mo akong saktan."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.05"
-        },
-        "text": {
-          "EN": "Plea remains: spare me and let me crawl away.",
-          "TL": "Hiling ko pa rin: buhayin mo ako at hayaang gumapang palayo."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.06"
-        },
-        "text": {
-          "EN": "I surrender completely. Please do not execute me.",
-          "TL": "Sumusuko ako nang buo. Pakiusap huwag mo akong patayin."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.07"
-        },
-        "text": {
-          "EN": "Still at your mercy. Please keep that weapon away.",
-          "TL": "Nasa awa mo pa rin ako. Pakiusap ilayo mo ang sandata na 'yan."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.08"
-        },
-        "text": {
-          "EN": "I have surrendered. Don't strike a downed person.",
-          "TL": "Sumuko na ako. Huwag kang manakit ng taong nakahandusay."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.09"
-        },
-        "text": {
-          "EN": "Please honor your mercy. Don't kill me.",
-          "TL": "Pakiusap tuparin mo ang awa mo. Huwag mo akong patayin."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.update.mercy.neutral.10"
-        },
-        "text": {
-          "EN": "Still alive, still pleading. Let me survive this.",
-          "TL": "Buhay pa, nagmamakaawa pa rin. Hayaan mo akong makaraos dito."
+          "EN": [
+            "I am still down. Please do not finish me.",
+            "Still helpless here. Spare my life, please.",
+            "I'm still no threat to you. Please have mercy.",
+            "Still begging for survival. Don't hurt me.",
+            "Plea remains: spare me and let me crawl away.",
+            "I surrender completely. Please do not execute me.",
+            "Still at your mercy. Please keep that weapon away.",
+            "I have surrendered. Don't strike a downed person.",
+            "Please honor your mercy. Don't kill me.",
+            "Still alive, still pleading. Let me survive this."
+          ],
+          "TL": [
+            "Bagsak pa rin ako. Pakiusap huwag mo akong tapusin.",
+            "Walang laban pa rin dito. Buhayin mo ako, pakiusap.",
+            "Wala pa rin akong banta sa'yo. Pakiusap maawa ka.",
+            "Nagmamakaawa pa rin para mabuhay. Huwag mo akong saktan.",
+            "Hiling ko pa rin: buhayin mo ako at hayaang gumapang palayo.",
+            "Sumusuko ako nang buo. Pakiusap huwag mo akong patayin.",
+            "Nasa awa mo pa rin ako. Pakiusap ilayo mo ang sandata na 'yan.",
+            "Sumuko na ako. Huwag kang manakit ng taong nakahandusay.",
+            "Pakiusap tuparin mo ang awa mo. Huwag mo akong patayin.",
+            "Buhay pa, nagmamakaawa pa rin. Hayaan mo akong makaraos dito."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.update",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

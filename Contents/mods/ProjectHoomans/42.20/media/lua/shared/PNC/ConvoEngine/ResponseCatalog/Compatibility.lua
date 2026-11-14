@@ -86,7 +86,7 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
             "colonist",
             { socialRole = "colonist" },
             4,
-            "semantic.compat.bandits.hooman_hurt.colonist",
+            "integration.bandits.hooman_hurt.colonist",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -96,7 +96,7 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
             "lover",
             { socialRole = "lover" },
             4,
-            "semantic.compat.bandits.hooman_hurt.lover",
+            "integration.bandits.hooman_hurt.lover",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -106,7 +106,7 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
             "family",
             { socialRole = "family" },
             4,
-            "semantic.compat.bandits.hooman_hurt.family",
+            "integration.bandits.hooman_hurt.family",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -116,7 +116,7 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
             "default",
             nil,
             0,
-            "semantic.compat.bandits.hooman_hurt.default",
+            "integration.bandits.hooman_hurt.default",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -144,21 +144,21 @@ Catalog.Register("semantic.compat.necroa.mask_warning", {
             "family",
             { socialRole = "family" },
             4,
-            "semantic.compat.necroa.mask_warning.family"
+            "integration.necroa.mask_warning.family"
         ),
         necroaVariant(
             "semantic.compat.necroa.mask_warning",
             "colonist",
             { socialRole = "colonist" },
             4,
-            "semantic.compat.necroa.mask_warning.colonist"
+            "integration.necroa.mask_warning.colonist"
         ),
         necroaVariant(
             "semantic.compat.necroa.mask_warning",
             "default",
             nil,
             0,
-            "semantic.compat.necroa.mask_warning.default"
+            "integration.necroa.mask_warning.default"
         ),
     },
 })
@@ -170,21 +170,21 @@ Catalog.Register("semantic.compat.necroa.player_mask_removed", {
             "hostile",
             { socialRole = "hostile" },
             4,
-            "semantic.compat.necroa.player_mask_removed.hostile"
+            "integration.necroa.player_mask_removed.hostile"
         ),
         necroaVariant(
             "semantic.compat.necroa.player_mask_removed",
             "lover",
             { socialRole = "lover" },
             4,
-            "semantic.compat.necroa.player_mask_removed.lover"
+            "integration.necroa.player_mask_removed.lover"
         ),
         necroaVariant(
             "semantic.compat.necroa.player_mask_removed",
             "default",
             nil,
             0,
-            "semantic.compat.necroa.player_mask_removed.default"
+            "integration.necroa.player_mask_removed.default"
         ),
     },
 })
@@ -207,27 +207,27 @@ Catalog.Register("semantic.compat.projectalife.meta", {
         projectMeta(
             "gunfire",
             "gunfire",
-            "semantic.compat.projectalife.meta.gunfire"
+            "integration.projectalife.meta.gunfire"
         ),
         projectMeta(
             "aircraft",
             "heli",
-            "semantic.compat.projectalife.meta.aircraft.heli"
+            "integration.projectalife.meta.aircraft.heli"
         ),
         projectMeta(
             "military",
             "military",
-            "semantic.compat.projectalife.meta.aircraft.military"
+            "integration.projectalife.meta.aircraft.military"
         ),
         projectMeta(
             "crash",
             "crash",
-            "semantic.compat.projectalife.meta.crash"
+            "integration.projectalife.meta.crash"
         ),
         projectMeta(
             "ambience",
             "ambience",
-            "semantic.compat.projectalife.meta.ambience"
+            "integration.projectalife.meta.ambience"
         ),
     },
 })
@@ -250,17 +250,17 @@ Catalog.Register("semantic.compat.projectalife.encounter", {
         projectEncounter(
             "friendly",
             "friendly",
-            "semantic.compat.projectalife.encounter.friendly"
+            "integration.projectalife.encounter.friendly"
         ),
         projectEncounter(
             "hostile",
             { "hostile", "careful" },
-            "semantic.compat.projectalife.encounter.hostile"
+            "integration.projectalife.encounter.hostile"
         ),
         projectEncounter(
             "unknown",
             { "unknown", "neutral" },
-            "semantic.compat.projectalife.encounter.unknown",
+            "integration.projectalife.encounter.unknown",
             1
         ),
     },
@@ -290,21 +290,21 @@ Catalog.Register("semantic.compat.projectalife.faction", {
             "projectalife_faction_stance",
             { "hostile", "careful" },
             nil,
-            "semantic.compat.projectalife.faction.hostile"
+            "integration.projectalife.faction.hostile"
         ),
         projectFaction(
             "incoming",
             "projectalife_faction_conflict",
             nil,
             "incoming",
-            "semantic.compat.projectalife.faction.incoming"
+            "integration.projectalife.faction.incoming"
         ),
         projectFaction(
             "outgoing",
             "projectalife_faction_conflict",
             nil,
             "outgoing",
-            "semantic.compat.projectalife.faction.outgoing"
+            "integration.projectalife.faction.outgoing"
         ),
     },
 })
@@ -328,19 +328,19 @@ Catalog.Register("semantic.compat.companion_dogs.greeting", {
             "semantic.compat.companion_dogs.greeting",
             "male",
             "male",
-            "semantic.compat.companion_dogs.greeting.male"
+            "integration.companion_dogs.greeting.male"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.greeting",
             "female",
             "female",
-            "semantic.compat.companion_dogs.greeting.female"
+            "integration.companion_dogs.greeting.female"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.greeting",
             "unknown",
             "unknown",
-            "semantic.compat.companion_dogs.greeting.unknown"
+            "integration.companion_dogs.greeting.unknown"
         ),
     },
 })
@@ -351,19 +351,19 @@ Catalog.Register("semantic.compat.companion_dogs.feed", {
             "semantic.compat.companion_dogs.feed",
             "male",
             "male",
-            "semantic.compat.companion_dogs.feed.male"
+            "integration.companion_dogs.feed.male"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.feed",
             "female",
             "female",
-            "semantic.compat.companion_dogs.feed.female"
+            "integration.companion_dogs.feed.female"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.feed",
             "unknown",
             "unknown",
-            "semantic.compat.companion_dogs.feed.unknown"
+            "integration.companion_dogs.feed.unknown"
         ),
     },
 })

@@ -1,546 +1,140 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "navigation",
+  "id": "camp",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:navigation",
+    "sourceSurface": "content/navigation.json",
+    "responseAct": "NAVIGATION_RESPONSE"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Where should we set up?",
+            "Which location are you considering for camp?",
+            "Where do you want to establish our rest site?",
+            "Where are we making camp today?",
+            "Point out the spot you have in mind.",
+            "Where should we pitch our camp?",
+            "Which area looks suitable for stopping?",
+            "Where do you want to place the campsite?",
+            "Tell me where you want to settle down.",
+            "Where are we setting our base for the night?"
+          ],
+          "TL": [
+            "Saan tayo pupuwesto?",
+            "Aling lokasyon ang iniisip mo para sa kampo?",
+            "Saan mo gustong itayo ang pahingahan natin?",
+            "Saan tayo magtatayo ng kampo ngayon?",
+            "Ituro mo ang pwestong nasa isip mo.",
+            "Saan natin ilalatag ang kampo?",
+            "Aling lugar ang mukhang angkop para huminto?",
+            "Saan mo gustong ilagay ang campsite?",
+            "Sabihin mo kung saan mo gustong tumigil.",
+            "Saan natin itatayo ang base natin para sa gabi?"
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.camp",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Where do you want to risk it?",
+            "Which spot are you eyeing? Better be defendable.",
+            "Make sure it has more than one exit.",
+            "Where do you want to hole up? Don't pick a trap.",
+            "Which site? I don't want us cornered.",
+            "Pick carefully. A bad camp gets us killed.",
+            "Where? I need to see the choke points first.",
+            "Where are you planning to bed down? Watch the perimeter.",
+            "Show me where. I'll inspect the sightlines.",
+            "Where? We need high ground or solid barricades."
+          ],
+          "TL": [
+            "Saan mo gustong makipagsapalaran?",
+            "Aling pwesto ang tinitignan mo? Dapat kayang depensahan.",
+            "Siguraduhing may higit sa isang labasan.",
+            "Saan mo gustong magtago? Huwag sa bitag.",
+            "Aling lugar? Ayaw kong maipit tayo.",
+            "Pumili nang maigi. Ang maling kampo ay ikamamatay natin.",
+            "Saan? Kailangan kong makita ang mga harang muna.",
+            "Saan mo balak matulog? Bantayan ang paligid.",
+            "Ituro mo kung saan. Susuriin ko ang tanawin.",
+            "Saan? Kailangan natin ng mataas na lugar o matatag na barikada."
+          ]
+        }
       },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.01"
-            },
-            "text": {
-              "EN": "Where should we set up?",
-              "TL": "Saan tayo pupuwesto?"
-            }
-          },
-          {
-            "id": "neutral.02",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.02"
-            },
-            "text": {
-              "EN": "Which location are you considering for camp?",
-              "TL": "Aling lokasyon ang iniisip mo para sa kampo?"
-            }
-          },
-          {
-            "id": "neutral.03",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.03"
-            },
-            "text": {
-              "EN": "Where do you want to establish our rest site?",
-              "TL": "Saan mo gustong itayo ang pahingahan natin?"
-            }
-          },
-          {
-            "id": "neutral.04",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.04"
-            },
-            "text": {
-              "EN": "Where are we making camp today?",
-              "TL": "Saan tayo magtatayo ng kampo ngayon?"
-            }
-          },
-          {
-            "id": "neutral.05",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.05"
-            },
-            "text": {
-              "EN": "Point out the spot you have in mind.",
-              "TL": "Ituro mo ang pwestong nasa isip mo."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.06"
-            },
-            "text": {
-              "EN": "Where should we pitch our camp?",
-              "TL": "Saan natin ilalatag ang kampo?"
-            }
-          },
-          {
-            "id": "neutral.07",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.07"
-            },
-            "text": {
-              "EN": "Which area looks suitable for stopping?",
-              "TL": "Aling lugar ang mukhang angkop para huminto?"
-            }
-          },
-          {
-            "id": "neutral.08",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.08"
-            },
-            "text": {
-              "EN": "Where do you want to place the campsite?",
-              "TL": "Saan mo gustong ilagay ang campsite?"
-            }
-          },
-          {
-            "id": "neutral.09",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.09"
-            },
-            "text": {
-              "EN": "Tell me where you want to settle down.",
-              "TL": "Sabihin mo kung saan mo gustong tumigil."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "metadata": {
-              "style": "neutral",
-              "textKey": "semantic.navigation.camp.neutral.10"
-            },
-            "text": {
-              "EN": "Where are we setting our base for the night?",
-              "TL": "Saan natin itatayo ang base natin para sa gabi?"
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Where?",
+            "Which spot?",
+            "Camp where?",
+            "Location?",
+            "Point it out.",
+            "Which site?",
+            "Where to?",
+            "Name the spot.",
+            "Where at?",
+            "Show me."
+          ],
+          "TL": [
+            "Saan?",
+            "Aling pwesto?",
+            "Saan magkakampo?",
+            "Lokasyon?",
+            "Ituro mo.",
+            "Aling lugar?",
+            "Saan papunta?",
+            "Pangalanan ang pwesto.",
+            "Saan banda?",
+            "Ipakita mo."
+          ]
+        }
       },
-      "namespace": "semantic.navigation.camp"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.camp",
-        "style": "warm"
-      },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "warm.01",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.01"
-            },
-            "text": {
-              "EN": "Where should we set up camp?",
-              "TL": "Saan tayo magtatayo ng kampo?"
-            }
-          },
-          {
-            "id": "warm.02",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.02"
-            },
-            "text": {
-              "EN": "Where would you like us to settle down, friend?",
-              "TL": "Saan mo gustong huminto tayo, kaibigan?"
-            }
-          },
-          {
-            "id": "warm.03",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.03"
-            },
-            "text": {
-              "EN": "Found a cozy spot for us to rest?",
-              "TL": "May nahanap ka bang maaliwalas na lugar para makapagpahinga?"
-            }
-          },
-          {
-            "id": "warm.04",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.04"
-            },
-            "text": {
-              "EN": "Where shall we make our camp today?",
-              "TL": "Saan natin gagawin ang kampo natin ngayon?"
-            }
-          },
-          {
-            "id": "warm.05",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.05"
-            },
-            "text": {
-              "EN": "I'm happy to camp wherever you feel safe.",
-              "TL": "Masaya akong magkampo kahit saan basta ligtas ka."
-            }
-          },
-          {
-            "id": "warm.06",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.06"
-            },
-            "text": {
-              "EN": "Lead on to our camp spot. I'm right with you.",
-              "TL": "Manguna ka sa campsite natin. Kasama mo ako."
-            }
-          },
-          {
-            "id": "warm.07",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.07"
-            },
-            "text": {
-              "EN": "Where do you think we can rest easy tonight?",
-              "TL": "Saan sa tingin mo tayo makakapagpahinga nang mapayapa ngayong gabi?"
-            }
-          },
-          {
-            "id": "warm.08",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.08"
-            },
-            "text": {
-              "EN": "Any spot you choose works for me.",
-              "TL": "Kahit anong pwestong piliin mo, ayos sa akin."
-            }
-          },
-          {
-            "id": "warm.09",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.09"
-            },
-            "text": {
-              "EN": "Let's find somewhere warm and secure to camp.",
-              "TL": "Maghanap tayo ng maaliwalas at ligtas na lugar para magkampo."
-            }
-          },
-          {
-            "id": "warm.10",
-            "metadata": {
-              "style": "warm",
-              "textKey": "semantic.navigation.camp.warm.10"
-            },
-            "text": {
-              "EN": "Where would you like to put down our packs?",
-              "TL": "Saan mo gustong ibaba ang mga gamit natin?"
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.navigation.camp"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.camp",
-        "style": "terse"
-      },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "terse.01",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.01"
-            },
-            "text": {
-              "EN": "Where?",
-              "TL": "Saan?"
-            }
-          },
-          {
-            "id": "terse.02",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.02"
-            },
-            "text": {
-              "EN": "Which spot?",
-              "TL": "Aling pwesto?"
-            }
-          },
-          {
-            "id": "terse.03",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.03"
-            },
-            "text": {
-              "EN": "Camp where?",
-              "TL": "Saan magkakampo?"
-            }
-          },
-          {
-            "id": "terse.04",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.04"
-            },
-            "text": {
-              "EN": "Location?",
-              "TL": "Lokasyon?"
-            }
-          },
-          {
-            "id": "terse.05",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.05"
-            },
-            "text": {
-              "EN": "Point it out.",
-              "TL": "Ituro mo."
-            }
-          },
-          {
-            "id": "terse.06",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.06"
-            },
-            "text": {
-              "EN": "Which site?",
-              "TL": "Aling lugar?"
-            }
-          },
-          {
-            "id": "terse.07",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.07"
-            },
-            "text": {
-              "EN": "Where to?",
-              "TL": "Saan papunta?"
-            }
-          },
-          {
-            "id": "terse.08",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.08"
-            },
-            "text": {
-              "EN": "Name the spot.",
-              "TL": "Pangalanan ang pwesto."
-            }
-          },
-          {
-            "id": "terse.09",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.09"
-            },
-            "text": {
-              "EN": "Where at?",
-              "TL": "Saan banda?"
-            }
-          },
-          {
-            "id": "terse.10",
-            "metadata": {
-              "style": "terse",
-              "textKey": "semantic.navigation.camp.terse.10"
-            },
-            "text": {
-              "EN": "Show me.",
-              "TL": "Ipakita mo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.navigation.camp"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:navigation",
-        "sourceSurface": "content/navigation.json",
-        "responseTemplateID": "semantic.navigation.camp",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "NAVIGATION_RESPONSE",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.01"
-            },
-            "text": {
-              "EN": "Where do you want to risk it?",
-              "TL": "Saan mo gustong makipagsapalaran?"
-            }
-          },
-          {
-            "id": "guarded.02",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.02"
-            },
-            "text": {
-              "EN": "Which spot are you eyeing? Better be defendable.",
-              "TL": "Aling pwesto ang tinitignan mo? Dapat kayang depensahan."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.03"
-            },
-            "text": {
-              "EN": "Make sure it has more than one exit.",
-              "TL": "Siguraduhing may higit sa isang labasan."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.04"
-            },
-            "text": {
-              "EN": "Where do you want to hole up? Don't pick a trap.",
-              "TL": "Saan mo gustong magtago? Huwag sa bitag."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.05"
-            },
-            "text": {
-              "EN": "Which site? I don't want us cornered.",
-              "TL": "Aling lugar? Ayaw kong maipit tayo."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.06"
-            },
-            "text": {
-              "EN": "Pick carefully. A bad camp gets us killed.",
-              "TL": "Pumili nang maigi. Ang maling kampo ay ikamamatay natin."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.07"
-            },
-            "text": {
-              "EN": "Where? I need to see the choke points first.",
-              "TL": "Saan? Kailangan kong makita ang mga harang muna."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.08"
-            },
-            "text": {
-              "EN": "Where are you planning to bed down? Watch the perimeter.",
-              "TL": "Saan mo balak matulog? Bantayan ang paligid."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.09"
-            },
-            "text": {
-              "EN": "Show me where. I'll inspect the sightlines.",
-              "TL": "Ituro mo kung saan. Susuriin ko ang tanawin."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "metadata": {
-              "style": "guarded",
-              "textKey": "semantic.navigation.camp.guarded.10"
-            },
-            "text": {
-              "EN": "Where? We need high ground or solid barricades.",
-              "TL": "Saan? Kailangan natin ng mataas na lugar o matatag na barikada."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.navigation.camp"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "Where should we set up camp?",
+            "Where would you like us to settle down, friend?",
+            "Found a cozy spot for us to rest?",
+            "Where shall we make our camp today?",
+            "I'm happy to camp wherever you feel safe.",
+            "Lead on to our camp spot. I'm right with you.",
+            "Where do you think we can rest easy tonight?",
+            "Any spot you choose works for me.",
+            "Let's find somewhere warm and secure to camp.",
+            "Where would you like to put down our packs?"
+          ],
+          "TL": [
+            "Saan tayo magtatayo ng kampo?",
+            "Saan mo gustong huminto tayo, kaibigan?",
+            "May nahanap ka bang maaliwalas na lugar para makapagpahinga?",
+            "Saan natin gagawin ang kampo natin ngayon?",
+            "Masaya akong magkampo kahit saan basta ligtas ka.",
+            "Manguna ka sa campsite natin. Kasama mo ako.",
+            "Saan sa tingin mo tayo makakapagpahinga nang mapayapa ngayong gabi?",
+            "Kahit anong pwestong piliin mo, ayos sa akin.",
+            "Maghanap tayo ng maaliwalas at ligtas na lugar para magkampo.",
+            "Saan mo gustong ibaba ang mga gamit natin?"
+          ]
+        }
+      }
+    ]
+  }
 }

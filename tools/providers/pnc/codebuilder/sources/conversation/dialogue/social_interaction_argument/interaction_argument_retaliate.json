@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "interaction.argument",
+  "id": "retaliate",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/retaliate.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "You're really testing me right now.",
+            "Don't push your luck any further.",
+            "You're out of line, and I won't stand for it.",
+            "You started this, but I'll finish it if I have to.",
+            "You're making a massive mistake talking to me like that.",
+            "Think very carefully about what you say next.",
+            "I've had about enough of your disrespect.",
+            "You're crossing a boundary you can't walk back.",
+            "Back down before this escalates completely.",
+            "I'm answering in kind: knock it off."
+          ],
+          "TL": [
+            "Talagang sinusubok mo ang pasensya ko ngayon.",
+            "Huwag mo nang isugal pa ang suwerte mo.",
+            "Sumusobra ka na, at hindi ako papayag diyan.",
+            "Ikaw ang nagsimula, pero tatapusin ko kung kailangan.",
+            "Napakalaking pagkakamali ang kausapin ako nang ganyan.",
+            "Pag-isipan mong mabuti ang susunod mong sasabihin.",
+            "Sapat na ang pambabastos mo sa akin.",
+            "Tumatawid ka sa hangganang hindi mo na mababawi.",
+            "Umatras ka bago pa tuluyang magkagulo.",
+            "Sasagutin kita nang patas: itigil mo na 'yan."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/retaliate.json",
-        "responseTemplateID": "semantic.interaction.argument.retaliate",
-        "style": "guarded"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Say that again and see how far it gets you.",
+            "You want to push this? I will push back harder.",
+            "Don't make threats you can't survive.",
+            "Try me. See what happens to you.",
+            "You're digging your own grave with that talk.",
+            "Keep running that mouth and find out.",
+            "I'm not the one to mess with out here.",
+            "Push one more inch and we have bloodshed.",
+            "Say it one more time. I dare you.",
+            "You will regret crossing me."
+          ],
+          "TL": [
+            "Sabihin mo ulit at tingnan natin kung saan ka aabot.",
+            "Gusto mong isagad ito? Mas malakas akong gaganti.",
+            "Huwag kang magbanta ng hindi mo kayang maligtasan.",
+            "Subukan mo ako. Tingnan mo kung anong mangyayari sa 'yo.",
+            "Hinuhukay mo ang sarili mong libingan sa salitang 'yan.",
+            "Sige, magpatuloy ka sa kadadaldal at nang malaman mo.",
+            "Hindi ako ang taong dapat mong ginagalit dito.",
+            "Sumulong ka pa nang isang pulgada at magkakadugo.",
+            "Ulitin mo pa nang isang beses. Hinahamon kita.",
+            "Pagsisisihan mo ang pagbangga sa akin."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "Say that again and see how far it gets you.",
-              "TL": "Sabihin mo ulit at tingnan natin kung saan ka aabot."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "You want to push this? I will push back harder.",
-              "TL": "Gusto mong isagad ito? Mas malakas akong gaganti."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "Don't make threats you can't survive.",
-              "TL": "Huwag kang magbanta ng hindi mo kayang maligtasan."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "Try me. See what happens to you.",
-              "TL": "Subukan mo ako. Tingnan mo kung anong mangyayari sa 'yo."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "You're digging your own grave with that talk.",
-              "TL": "Hinuhukay mo ang sarili mong libingan sa salitang 'yan."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Keep running that mouth and find out.",
-              "TL": "Sige, magpatuloy ka sa kadadaldal at nang malaman mo."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "I'm not the one to mess with out here.",
-              "TL": "Hindi ako ang taong dapat mong ginagalit dito."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "Push one more inch and we have bloodshed.",
-              "TL": "Sumulong ka pa nang isang pulgada at magkakadugo."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "Say it one more time. I dare you.",
-              "TL": "Ulitin mo pa nang isang beses. Hinahamon kita."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "You will regret crossing me.",
-              "TL": "Pagsisisihan mo ang pagbangga sa akin."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Keep talking.",
+            "Try it.",
+            "Dare you.",
+            "Push me.",
+            "Wrong move.",
+            "Big mistake.",
+            "Last chance.",
+            "Bring it.",
+            "Don't test me.",
+            "Watch yourself."
+          ],
+          "TL": [
+            "Sige, magsalita ka pa.",
+            "Subukan mo.",
+            "Hamon ko sa 'yo.",
+            "Itulak mo ako.",
+            "Maling hakbang.",
+            "Malaking pagkakamali.",
+            "Huling pagkakataon.",
+            "Sige, ilabas mo.",
+            "Huwag mo akong subukan.",
+            "Mag-ingat ka."
+          ]
+        }
       },
-      "namespace": "semantic.interaction.argument.retaliate"
-    },
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/retaliate.json",
-        "responseTemplateID": "semantic.interaction.argument.retaliate",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "You're really testing me right now.",
-              "TL": "Talagang sinusubok mo ang pasensya ko ngayon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Don't push your luck any further.",
-              "TL": "Huwag mo nang isugal pa ang suwerte mo."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "You're out of line, and I won't stand for it.",
-              "TL": "Sumusobra ka na, at hindi ako papayag diyan."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "You started this, but I'll finish it if I have to.",
-              "TL": "Ikaw ang nagsimula, pero tatapusin ko kung kailangan."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "You're making a massive mistake talking to me like that.",
-              "TL": "Napakalaking pagkakamali ang kausapin ako nang ganyan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Think very carefully about what you say next.",
-              "TL": "Pag-isipan mong mabuti ang susunod mong sasabihin."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I've had about enough of your disrespect.",
-              "TL": "Sapat na ang pambabastos mo sa akin."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "You're crossing a boundary you can't walk back.",
-              "TL": "Tumatawid ka sa hangganang hindi mo na mababawi."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Back down before this escalates completely.",
-              "TL": "Umatras ka bago pa tuluyang magkagulo."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I'm answering in kind: knock it off.",
-              "TL": "Sasagutin kita nang patas: itigil mo na 'yan."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.argument.retaliate"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/retaliate.json",
-        "responseTemplateID": "semantic.interaction.argument.retaliate",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Keep talking.",
-              "TL": "Sige, magsalita ka pa."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Try it.",
-              "TL": "Subukan mo."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Dare you.",
-              "TL": "Hamon ko sa 'yo."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Push me.",
-              "TL": "Itulak mo ako."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Wrong move.",
-              "TL": "Maling hakbang."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Big mistake.",
-              "TL": "Malaking pagkakamali."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Last chance.",
-              "TL": "Huling pagkakataon."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Bring it.",
-              "TL": "Sige, ilabas mo."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Don't test me.",
-              "TL": "Huwag mo akong subukan."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Watch yourself.",
-              "TL": "Mag-ingat ka."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.argument.retaliate"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/retaliate.json",
-        "responseTemplateID": "semantic.interaction.argument.retaliate",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "You're pushing this too far.",
-              "TL": "Sobra na ang ginagawa mo."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "I've been patient with you, but you're crossing the line.",
-              "TL": "Matiisin ako sa 'yo, pero lumalagpas ka na."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Don't make me treat you like a stranger.",
-              "TL": "Huwag mo akong piliting tratuhin ka na parang estranghero."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "I didn't think you would turn on me like this.",
-              "TL": "Di ko akalaing kakalabanin mo ako nang ganito."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "You're hurting someone who actually cared about you.",
-              "TL": "Sinasaktan mo ang taong may tunay na malasakit sa 'yo."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "Stop pushing me away with this cruelty.",
-              "TL": "Tigilan mo ang pagtataboy sa akin gamit ang lupit na 'yan."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "If you keep attacking me, I will protect myself.",
-              "TL": "Kung patuloy mo akong aatakihin, ipagtatanggol ko ang sarili ko."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "You're throwing our bond away right in front of me.",
-              "TL": "Itinatapon mo ang samahan natin mismo sa harap ko."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "I expected better from you. Don't push me further.",
-              "TL": "Umasa ako ng mas maayos sa 'yo. Huwag mo na akong itulak."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "Check yourself. I won't just stand here and take abuse.",
-              "TL": "Ayusin mo sarili mo. Di ako tatayo lang dito para magpaabuso."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.argument.retaliate"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "You're pushing this too far.",
+            "I've been patient with you, but you're crossing the line.",
+            "Don't make me treat you like a stranger.",
+            "I didn't think you would turn on me like this.",
+            "You're hurting someone who actually cared about you.",
+            "Stop pushing me away with this cruelty.",
+            "If you keep attacking me, I will protect myself.",
+            "You're throwing our bond away right in front of me.",
+            "I expected better from you. Don't push me further.",
+            "Check yourself. I won't just stand here and take abuse."
+          ],
+          "TL": [
+            "Sobra na ang ginagawa mo.",
+            "Matiisin ako sa 'yo, pero lumalagpas ka na.",
+            "Huwag mo akong piliting tratuhin ka na parang estranghero.",
+            "Di ko akalaing kakalabanin mo ako nang ganito.",
+            "Sinasaktan mo ang taong may tunay na malasakit sa 'yo.",
+            "Tigilan mo ang pagtataboy sa akin gamit ang lupit na 'yan.",
+            "Kung patuloy mo akong aatakihin, ipagtatanggol ko ang sarili ko.",
+            "Itinatapon mo ang samahan natin mismo sa harap ko.",
+            "Umasa ako ng mas maayos sa 'yo. Huwag mo na akong itulak.",
+            "Ayusin mo sarili mo. Di ako tatayo lang dito para magpaabuso."
+          ]
+        }
+      }
+    ]
+  }
 }

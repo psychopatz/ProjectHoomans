@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "queued_praise",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.queued_praise.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_praise.json",
-        "responseTemplateID": "semantic.tool_reply.queued_praise.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I hear you.",
-              "TL": "Narinig kita."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I hear your praise.",
-              "TL": "Naririnig ko ang papuri mo."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Heard and appreciated.",
-              "TL": "Narinig at pinahahalagahan."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I hear what you said about my work.",
-              "TL": "Narinig ko ang sinabi mo sa trabaho ko."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Got that positive feedback.",
-              "TL": "Nakuha ko ang magandang puna."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I hear you clearly. Thanks.",
-              "TL": "Naririnig kita nang malinaw. Salamat."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Praise heard. Good to know.",
-              "TL": "Narinig ang papuri. Mabuting malaman."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I hear the support.",
-              "TL": "Naririnig ko ang suporta."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Heard. Glad to help.",
-              "TL": "Narinig. Masayang tumulong."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I hear you. We did good.",
-              "TL": "Narinig kita. Maganda ang nagawa natin."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_praise.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I hear you.",
+              "I hear your praise.",
+              "Heard and appreciated.",
+              "I hear what you said about my work.",
+              "Got that positive feedback.",
+              "I hear you clearly. Thanks.",
+              "Praise heard. Good to know.",
+              "I hear the support.",
+              "Heard. Glad to help.",
+              "I hear you. We did good."
+            ],
+            "TL": [
+              "Narinig kita.",
+              "Naririnig ko ang papuri mo.",
+              "Narinig at pinahahalagahan.",
+              "Narinig ko ang sinabi mo sa trabaho ko.",
+              "Nakuha ko ang magandang puna.",
+              "Naririnig kita nang malinaw. Salamat.",
+              "Narinig ang papuri. Mabuting malaman.",
+              "Naririnig ko ang suporta.",
+              "Narinig. Masayang tumulong.",
+              "Narinig kita. Maganda ang nagawa natin."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.queued_praise.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_praise.json",
-        "responseTemplateID": "semantic.tool_reply.queued_praise.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I will remember that.",
-              "TL": "Tandaan ko iyan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I'll keep that positive note in mind.",
-              "TL": "Isasaisip ko ang magandang sinabi mo."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "I won't forget that you recognized my effort.",
-              "TL": "Di ko malilimutan na kinilala mo ang pagod ko."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "That will stay with me. Thanks.",
-              "TL": "Mananatili sa akin 'yan. Salamat."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "I'll remember you said that when times get tough.",
-              "TL": "Tandaan ko 'yan kapag naging mahirap ang panahon."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Remembered and valued.",
-              "TL": "Tanda ko at pinahahalagahan."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I will hold onto that praise.",
-              "TL": "Iingatan ko ang papuring 'yan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "That sticks in my memory. Thank you.",
-              "TL": "Tumatatak 'yan sa alaala ko. Salamat."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I'll remember your good words.",
-              "TL": "Tatandaan ko ang mabubuti mong salita."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Noted in my heart. Thanks.",
-              "TL": "Nakatatak sa puso ko. Salamat."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I will remember that.",
+              "I'll keep that positive note in mind.",
+              "I won't forget that you recognized my effort.",
+              "That will stay with me. Thanks.",
+              "I'll remember you said that when times get tough.",
+              "Remembered and valued.",
+              "I will hold onto that praise.",
+              "That sticks in my memory. Thank you.",
+              "I'll remember your good words.",
+              "Noted in my heart. Thanks."
+            ],
+            "TL": [
+              "Tandaan ko iyan.",
+              "Isasaisip ko ang magandang sinabi mo.",
+              "Di ko malilimutan na kinilala mo ang pagod ko.",
+              "Mananatili sa akin 'yan. Salamat.",
+              "Tandaan ko 'yan kapag naging mahirap ang panahon.",
+              "Tanda ko at pinahahalagahan.",
+              "Iingatan ko ang papuring 'yan.",
+              "Tumatatak 'yan sa alaala ko. Salamat.",
+              "Tatandaan ko ang mabubuti mong salita.",
+              "Nakatatak sa puso ko. Salamat."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

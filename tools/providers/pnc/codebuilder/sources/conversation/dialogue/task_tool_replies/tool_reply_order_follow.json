@@ -1,291 +1,122 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "order_follow",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_follow.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_follow.json",
-        "responseTemplateID": "semantic.tool_reply.order_follow.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "All right. I am with you.",
-              "TL": "Sige. Sasama ako sa iyo."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I'm right behind you.",
-              "TL": "Nasa likod mo lang ako."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Following your lead.",
-              "TL": "Sumusunod sa pangunguna mo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Understood. Moving out together.",
-              "TL": "Naintindihan. Sabay tayong lalakad."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "With you all the way.",
-              "TL": "Kasama mo sa buong daan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Sticking close behind.",
-              "TL": "Didikit ako sa likod mo."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "On your heels. Let's move.",
-              "TL": "Nasa likod mo lang. Kilos na."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Right with you, partner.",
-              "TL": "Kasabay mo na ako, kasama."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Following as ordered.",
-              "TL": "Sumusunod ayon sa utos."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Moving in lockstep with you.",
-              "TL": "Kasabay sa bawat hakbang mo."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_follow.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "All right. I am with you.",
+              "I'm right behind you.",
+              "Following your lead.",
+              "Understood. Moving out together.",
+              "With you all the way.",
+              "Sticking close behind.",
+              "On your heels. Let's move.",
+              "Right with you, partner.",
+              "Following as ordered.",
+              "Moving in lockstep with you."
+            ],
+            "TL": [
+              "Sige. Sasama ako sa iyo.",
+              "Nasa likod mo lang ako.",
+              "Sumusunod sa pangunguna mo.",
+              "Naintindihan. Sabay tayong lalakad.",
+              "Kasama mo sa buong daan.",
+              "Didikit ako sa likod mo.",
+              "Nasa likod mo lang. Kilos na.",
+              "Kasabay mo na ako, kasama.",
+              "Sumusunod ayon sa utos.",
+              "Kasabay sa bawat hakbang mo."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_follow.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_follow.json",
-        "responseTemplateID": "semantic.tool_reply.order_follow.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Lead the way.",
-              "TL": "Ituro ang daan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "You lead, I follow.",
-              "TL": "Ikaw ang mauna, susunod ako."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "After you. Watch our front.",
-              "TL": "Kasunod mo ako. Bantayan ang unahan natin."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Take point. I've got your rear.",
-              "TL": "Mauna ka sa harap. Hawak ko ang likod mo."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Lead on. I'm ready.",
-              "TL": "Mauna na. Handa na ako."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Show the path. I'm right behind.",
-              "TL": "Ipakita ang daan. Nasa likod mo lang ako."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Lead the way. Eyes sharp.",
-              "TL": "Ituro ang daan. Matalas ang paningin."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "You take the front, partner.",
-              "TL": "Ikaw ang mauna sa harap, kasama."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Point the direction and walk.",
-              "TL": "Ituro ang direksyon at lumakad."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Lead the way out.",
-              "TL": "Ituro ang daan palabas."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Lead the way.",
+              "You lead, I follow.",
+              "After you. Watch our front.",
+              "Take point. I've got your rear.",
+              "Lead on. I'm ready.",
+              "Show the path. I'm right behind.",
+              "Lead the way. Eyes sharp.",
+              "You take the front, partner.",
+              "Point the direction and walk.",
+              "Lead the way out."
+            ],
+            "TL": [
+              "Ituro ang daan.",
+              "Ikaw ang mauna, susunod ako.",
+              "Kasunod mo ako. Bantayan ang unahan natin.",
+              "Mauna ka sa harap. Hawak ko ang likod mo.",
+              "Mauna na. Handa na ako.",
+              "Ipakita ang daan. Nasa likod mo lang ako.",
+              "Ituro ang daan. Matalas ang paningin.",
+              "Ikaw ang mauna sa harap, kasama.",
+              "Ituro ang direksyon at lumakad.",
+              "Ituro ang daan palabas."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_follow.3",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_follow.json",
-        "responseTemplateID": "semantic.tool_reply.order_follow.3",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I will stay close.",
-              "TL": "Mananatili akong malapit."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Won't let you out of my sight.",
-              "TL": "Di kita iwawala sa paningin ko."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Sticking right by your side.",
-              "TL": "Didikit ako sa tabi mo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Keeping tight formation with you.",
-              "TL": "Didikit sa pormasyon kasama mo."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Close proximity confirmed.",
-              "TL": "Kumpirmadong malapit lang."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I'll match your pace and stay near.",
-              "TL": "Sasabayan ko ang bilis mo at mananatiling malapit."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Right beside you. Don't worry.",
-              "TL": "Nasa tabi mo lang. Huwag mag-alala."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Staying within arm's reach.",
-              "TL": "Nasa abot-kamay lang ako."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I won't lag behind.",
-              "TL": "Hindi ako magpapahuli."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Staying close behind you.",
-              "TL": "Mananatiling malapit sa likod mo."
-            }
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I will stay close.",
+              "Won't let you out of my sight.",
+              "Sticking right by your side.",
+              "Keeping tight formation with you.",
+              "Close proximity confirmed.",
+              "I'll match your pace and stay near.",
+              "Right beside you. Don't worry.",
+              "Staying within arm's reach.",
+              "I won't lag behind.",
+              "Staying close behind you."
+            ],
+            "TL": [
+              "Mananatili akong malapit.",
+              "Di kita iwawala sa paningin ko.",
+              "Didikit ako sa tabi mo.",
+              "Didikit sa pormasyon kasama mo.",
+              "Kumpirmadong malapit lang.",
+              "Sasabayan ko ang bilis mo at mananatiling malapit.",
+              "Nasa tabi mo lang. Huwag mag-alala.",
+              "Nasa abot-kamay lang ako.",
+              "Hindi ako magpapahuli.",
+              "Mananatiling malapit sa likod mo."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

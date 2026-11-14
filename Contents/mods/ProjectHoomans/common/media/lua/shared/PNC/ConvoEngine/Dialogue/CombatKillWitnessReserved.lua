@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_kill_witness_reserved",
-        ["id"] = "semantic.combat.reaction.kill_witness_reserved_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.kill_witness_reserved",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "One down.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "One down.",
+                                        "Down.",
+                                        "Hit.",
+                                        "Dropped.",
+                                        "Eliminated.",
+                                        "Dead.",
+                                        "Finished.",
+                                        "Ceased.",
+                                        "One less.",
+                                        "Target down.",
+                                    },
+                                    ["TL"] = {
+                                        "Isa na.",
+                                        "Bagsak.",
+                                        "Tinamaan.",
+                                        "Naitumba.",
+                                        "Naalis.",
+                                        "Patay.",
+                                        "Tapos.",
+                                        "Tumigil.",
+                                        "Bawas isa.",
+                                        "Target bagsak.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Good.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Good.",
+                                        "Clean.",
+                                        "Handled.",
+                                        "Solid.",
+                                        "Done.",
+                                        "Fine.",
+                                        "Alright.",
+                                        "Resolved.",
+                                        "Effective.",
+                                        "Cleared.",
+                                    },
+                                    ["TL"] = {
+                                        "Ayos.",
+                                        "Malinis.",
+                                        "Naasikaso.",
+                                        "Solido.",
+                                        "Yari.",
+                                        "Sige.",
+                                        "Mabuti.",
+                                        "Tapos.",
+                                        "Mabisa.",
+                                        "Nalinis.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Keep moving.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Keep moving.",
+                                        "Move.",
+                                        "Forward.",
+                                        "Next.",
+                                        "Walk.",
+                                        "Proceed.",
+                                        "Step through.",
+                                        "Push.",
+                                        "Don't stop.",
+                                        "Keep going.",
+                                    },
+                                    ["TL"] = {
+                                        "Tuloy.",
+                                        "Galaw.",
+                                        "Sulong.",
+                                        "Sunod.",
+                                        "Lakad.",
+                                        "Abante.",
+                                        "Lusot.",
+                                        "Paspas.",
+                                        "Huwag hinto.",
+                                        "Tuloy lang.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "One down.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "One down.",
+                            "Down.",
+                            "Hit.",
+                            "Dropped.",
+                            "Eliminated.",
+                            "Dead.",
+                            "Finished.",
+                            "Ceased.",
+                            "One less.",
+                            "Target down.",
+                        },
+                        ["TL"] = {
+                            "Isa na.",
+                            "Bagsak.",
+                            "Tinamaan.",
+                            "Naitumba.",
+                            "Naalis.",
+                            "Patay.",
+                            "Tapos.",
+                            "Tumigil.",
+                            "Bawas isa.",
+                            "Target bagsak.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Good.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Good.",
+                            "Clean.",
+                            "Handled.",
+                            "Solid.",
+                            "Done.",
+                            "Fine.",
+                            "Alright.",
+                            "Resolved.",
+                            "Effective.",
+                            "Cleared.",
+                        },
+                        ["TL"] = {
+                            "Ayos.",
+                            "Malinis.",
+                            "Naasikaso.",
+                            "Solido.",
+                            "Yari.",
+                            "Sige.",
+                            "Mabuti.",
+                            "Tapos.",
+                            "Mabisa.",
+                            "Nalinis.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Keep moving.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Keep moving.",
+                            "Move.",
+                            "Forward.",
+                            "Next.",
+                            "Walk.",
+                            "Proceed.",
+                            "Step through.",
+                            "Push.",
+                            "Don't stop.",
+                            "Keep going.",
+                        },
+                        ["TL"] = {
+                            "Tuloy.",
+                            "Galaw.",
+                            "Sulong.",
+                            "Sunod.",
+                            "Lakad.",
+                            "Abante.",
+                            "Lusot.",
+                            "Paspas.",
+                            "Huwag hinto.",
+                            "Tuloy lang.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.kill_witness_reserved",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "kill_witness_reserved_01",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_reserved_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_01.json",
+            ["localId"] = "kill_witness_reserved",
+            ["sourceId"] = "combat.reaction.kill_witness_reserved",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_reserved_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/reserved.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One down.",
-                            },
-                            ["TL"] = {
-                                "Isa na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down.",
-                            },
-                            ["TL"] = {
-                                "Bagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hit.",
-                            },
-                            ["TL"] = {
-                                "Tinamaan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped.",
-                            },
-                            ["TL"] = {
-                                "Naitumba.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "One down.",
+                                        "Down.",
+                                        "Hit.",
+                                        "Dropped.",
+                                        "Eliminated.",
+                                        "Dead.",
+                                        "Finished.",
+                                        "Ceased.",
+                                        "One less.",
+                                        "Target down.",
+                                    },
+                                    ["TL"] = {
+                                        "Isa na.",
+                                        "Bagsak.",
+                                        "Tinamaan.",
+                                        "Naitumba.",
+                                        "Naalis.",
+                                        "Patay.",
+                                        "Tapos.",
+                                        "Tumigil.",
+                                        "Bawas isa.",
+                                        "Target bagsak.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eliminated.",
-                            },
-                            ["TL"] = {
-                                "Naalis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead.",
-                            },
-                            ["TL"] = {
-                                "Patay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished.",
-                            },
-                            ["TL"] = {
-                                "Tapos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Ceased.",
-                            },
-                            ["TL"] = {
-                                "Tumigil.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Good.",
+                                        "Clean.",
+                                        "Handled.",
+                                        "Solid.",
+                                        "Done.",
+                                        "Fine.",
+                                        "Alright.",
+                                        "Resolved.",
+                                        "Effective.",
+                                        "Cleared.",
+                                    },
+                                    ["TL"] = {
+                                        "Ayos.",
+                                        "Malinis.",
+                                        "Naasikaso.",
+                                        "Solido.",
+                                        "Yari.",
+                                        "Sige.",
+                                        "Mabuti.",
+                                        "Tapos.",
+                                        "Mabisa.",
+                                        "Nalinis.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less.",
-                            },
-                            ["TL"] = {
-                                "Bawas isa.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Keep moving.",
+                                        "Move.",
+                                        "Forward.",
+                                        "Next.",
+                                        "Walk.",
+                                        "Proceed.",
+                                        "Step through.",
+                                        "Push.",
+                                        "Don't stop.",
+                                        "Keep going.",
+                                    },
+                                    ["TL"] = {
+                                        "Tuloy.",
+                                        "Galaw.",
+                                        "Sulong.",
+                                        "Sunod.",
+                                        "Lakad.",
+                                        "Abante.",
+                                        "Lusot.",
+                                        "Paspas.",
+                                        "Huwag hinto.",
+                                        "Tuloy lang.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.kill_witness_reserved",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Target bagsak.",
-                            },
+                            ["fallback"] = "One down.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.kill_witness_reserved.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_witness_reserved",
-        ["id"] = "semantic.combat.reaction.kill_witness_reserved_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_witness_reserved_02",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_reserved_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_reserved_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/reserved.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good.",
-                            },
-                            ["TL"] = {
-                                "Ayos.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "One down.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "One down.",
+                        "Down.",
+                        "Hit.",
+                        "Dropped.",
+                        "Eliminated.",
+                        "Dead.",
+                        "Finished.",
+                        "Ceased.",
+                        "One less.",
+                        "Target down.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clean.",
-                            },
-                            ["TL"] = {
-                                "Malinis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Solid.",
-                            },
-                            ["TL"] = {
-                                "Solido.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done.",
-                            },
-                            ["TL"] = {
-                                "Yari.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fine.",
-                            },
-                            ["TL"] = {
-                                "Sige.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Alright.",
-                            },
-                            ["TL"] = {
-                                "Mabuti.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Resolved.",
-                            },
-                            ["TL"] = {
-                                "Tapos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Effective.",
-                            },
-                            ["TL"] = {
-                                "Mabisa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Cleared.",
-                            },
-                            ["TL"] = {
-                                "Nalinis.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Isa na.",
+                        "Bagsak.",
+                        "Tinamaan.",
+                        "Naitumba.",
+                        "Naalis.",
+                        "Patay.",
+                        "Tapos.",
+                        "Tumigil.",
+                        "Bawas isa.",
+                        "Target bagsak.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_witness_reserved",
-        ["id"] = "semantic.combat.reaction.kill_witness_reserved_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_witness_reserved_03",
-            ["sourceId"] = "semantic.combat.reaction.kill_witness_reserved_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_reserved_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/reserved.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep moving.",
-                            },
-                            ["TL"] = {
-                                "Tuloy.",
-                            },
-                        },
+            {
+                ["fallback"] = "Good.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Good.",
+                        "Clean.",
+                        "Handled.",
+                        "Solid.",
+                        "Done.",
+                        "Fine.",
+                        "Alright.",
+                        "Resolved.",
+                        "Effective.",
+                        "Cleared.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Move.",
-                            },
-                            ["TL"] = {
-                                "Galaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Forward.",
-                            },
-                            ["TL"] = {
-                                "Sulong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Next.",
-                            },
-                            ["TL"] = {
-                                "Sunod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Walk.",
-                            },
-                            ["TL"] = {
-                                "Lakad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Proceed.",
-                            },
-                            ["TL"] = {
-                                "Abante.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Step through.",
-                            },
-                            ["TL"] = {
-                                "Lusot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Push.",
-                            },
-                            ["TL"] = {
-                                "Paspas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't stop.",
-                            },
-                            ["TL"] = {
-                                "Huwag hinto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep going.",
-                            },
-                            ["TL"] = {
-                                "Tuloy lang.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Ayos.",
+                        "Malinis.",
+                        "Naasikaso.",
+                        "Solido.",
+                        "Yari.",
+                        "Sige.",
+                        "Mabuti.",
+                        "Tapos.",
+                        "Mabisa.",
+                        "Nalinis.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "Keep moving.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_witness_reserved.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Keep moving.",
+                        "Move.",
+                        "Forward.",
+                        "Next.",
+                        "Walk.",
+                        "Proceed.",
+                        "Step through.",
+                        "Push.",
+                        "Don't stop.",
+                        "Keep going.",
+                    },
+                    ["TL"] = {
+                        "Tuloy.",
+                        "Galaw.",
+                        "Sulong.",
+                        "Sunod.",
+                        "Lakad.",
+                        "Abante.",
+                        "Lusot.",
+                        "Paspas.",
+                        "Huwag hinto.",
+                        "Tuloy lang.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

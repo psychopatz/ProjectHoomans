@@ -1,291 +1,122 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "order_camp",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_camp.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_camp.json",
-        "responseTemplateID": "semantic.tool_reply.order_camp.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "All right. We will make camp here.",
-              "TL": "Sige. Magkakampo tayo rito."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Setting up camp right in this spot.",
-              "TL": "Magtatayo ng kampo sa mismong pwestong ito."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Understood. Establishing camp.",
-              "TL": "Naintindihan. Itatayo ang kampo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Camp order received. Pitching shelter.",
-              "TL": "Natanggap ang utos magkampo. Maglalatag ng silong."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Good place to bed down. Making camp.",
-              "TL": "Magandang tulugan ito. Magkakampo."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Understood. Securing the campsite.",
-              "TL": "Naiintindihan ko. Seselyuhan ang kampo."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Right. Making camp here.",
-              "TL": "Sige. Magtatayo ng kampo rito."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "On it. Setting up our camp.",
-              "TL": "Inaasikaso na. Itatayo ang kampo natin."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Camp routine initiated.",
-              "TL": "Sinisimulan na ang pagtatayo ng kampo."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Copy that. We camp here.",
-              "TL": "Kopyado. Dito tayo magkakampo."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_camp.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "All right. We will make camp here.",
+              "Setting up camp right in this spot.",
+              "Understood. Establishing camp.",
+              "Camp order received. Pitching shelter.",
+              "Good place to bed down. Making camp.",
+              "Understood. Securing the campsite.",
+              "Right. Making camp here.",
+              "On it. Setting up our camp.",
+              "Camp routine initiated.",
+              "Copy that. We camp here."
+            ],
+            "TL": [
+              "Sige. Magkakampo tayo rito.",
+              "Magtatayo ng kampo sa mismong pwestong ito.",
+              "Naintindihan. Itatayo ang kampo.",
+              "Natanggap ang utos magkampo. Maglalatag ng silong.",
+              "Magandang tulugan ito. Magkakampo.",
+              "Naiintindihan ko. Seselyuhan ang kampo.",
+              "Sige. Magtatayo ng kampo rito.",
+              "Inaasikaso na. Itatayo ang kampo natin.",
+              "Sinisimulan na ang pagtatayo ng kampo.",
+              "Kopyado. Dito tayo magkakampo."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_camp.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_camp.json",
-        "responseTemplateID": "semantic.tool_reply.order_camp.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I will settle in here for now.",
-              "TL": "Aayos muna ako ng pwesto rito sa ngayon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Dropping my pack and settling down.",
-              "TL": "Ibababa ang bag at magpapahinga."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Settling in. Let me know if anything changes.",
-              "TL": "Nakaayos na. Sabihan ako kapag may nagbago."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Finding a comfortable corner right here.",
-              "TL": "Naghahanap ng komportableng sulok dito."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "I'll rest my legs and settle in.",
-              "TL": "Ipapahinga ang mga binti at mananatili rito."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Settling into position. Feels decent.",
-              "TL": "Pumupwesto na. Mukhang maayos naman."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Unpacking light gear and settling here.",
-              "TL": "Maglalapag ng gamit at aayos ng higaan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Settling in for the watch.",
-              "TL": "Nakaayos na para sa pagbabantay."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "All right, I'll make myself at home here.",
-              "TL": "Sige, magpapahinga ako na parang nasa bahay."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Settling down. Staying alert.",
-              "TL": "Nagpapahinga na. Mananatiling alisto."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I will settle in here for now.",
+              "Dropping my pack and settling down.",
+              "Settling in. Let me know if anything changes.",
+              "Finding a comfortable corner right here.",
+              "I'll rest my legs and settle in.",
+              "Settling into position. Feels decent.",
+              "Unpacking light gear and settling here.",
+              "Settling in for the watch.",
+              "All right, I'll make myself at home here.",
+              "Settling down. Staying alert."
+            ],
+            "TL": [
+              "Aayos muna ako ng pwesto rito sa ngayon.",
+              "Ibababa ang bag at magpapahinga.",
+              "Nakaayos na. Sabihan ako kapag may nagbago.",
+              "Naghahanap ng komportableng sulok dito.",
+              "Ipapahinga ang mga binti at mananatili rito.",
+              "Pumupwesto na. Mukhang maayos naman.",
+              "Maglalapag ng gamit at aayos ng higaan.",
+              "Nakaayos na para sa pagbabantay.",
+              "Sige, magpapahinga ako na parang nasa bahay.",
+              "Nagpapahinga na. Mananatiling alisto."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_camp.3",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_camp.json",
-        "responseTemplateID": "semantic.tool_reply.order_camp.3",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Understood. I will stay here and take care of my needs.",
-              "TL": "Naintindihan. Mananatili ako rito at aasikasuhin ang mga pangangailangan ko."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I'll tend to my wounds and rest up here.",
-              "TL": "Gagamutin ko ang mga sugat at magpapahinga rito."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Taking care of hunger and thirst in camp.",
-              "TL": "Aasikasuhin ang gutom at uhaw sa kampo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I'll patch up my gear and eat a meal here.",
-              "TL": "Aayusin ko ang gamit at kakain dito."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Good. I needed time to sort myself out.",
-              "TL": "Mabuti. Kailangan ko ng oras para ayusin ang sarili ko."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Handling my personal upkeep while we camp.",
-              "TL": "Aasikasuhin ang pansariling kalagayan habang nagkakampo."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Resting, eating, and recovering strength.",
-              "TL": "Nagpapahinga, kumakain, at nagpapalakas muli."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I'll use this camp time to recover.",
-              "TL": "Gagamitin ko ang oras sa kampo para magpagaling."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Taking care of myself while holding camp.",
-              "TL": "Aalagaan ang sarili habang nagbabantay sa kampo."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Understood. Time for self-maintenance.",
-              "TL": "Naiintindihan ko. Oras na para mag-ayos ng katawan."
-            }
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Understood. I will stay here and take care of my needs.",
+              "I'll tend to my wounds and rest up here.",
+              "Taking care of hunger and thirst in camp.",
+              "I'll patch up my gear and eat a meal here.",
+              "Good. I needed time to sort myself out.",
+              "Handling my personal upkeep while we camp.",
+              "Resting, eating, and recovering strength.",
+              "I'll use this camp time to recover.",
+              "Taking care of myself while holding camp.",
+              "Understood. Time for self-maintenance."
+            ],
+            "TL": [
+              "Naintindihan. Mananatili ako rito at aasikasuhin ang mga pangangailangan ko.",
+              "Gagamutin ko ang mga sugat at magpapahinga rito.",
+              "Aasikasuhin ang gutom at uhaw sa kampo.",
+              "Aayusin ko ang gamit at kakain dito.",
+              "Mabuti. Kailangan ko ng oras para ayusin ang sarili ko.",
+              "Aasikasuhin ang pansariling kalagayan habang nagkakampo.",
+              "Nagpapahinga, kumakain, at nagpapalakas muli.",
+              "Gagamitin ko ang oras sa kampo para magpagaling.",
+              "Aalagaan ang sarili habang nagbabantay sa kampo.",
+              "Naiintindihan ko. Oras na para mag-ayos ng katawan."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

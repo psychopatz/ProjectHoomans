@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.call",
   "id": "bleedout",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/call.json",
-    "responseTemplateID": "semantic.medical.distress.call.bleedout",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I'm bleeding out! I need a tourniquet or bandage now!",
-          "TL": "Nauubusan ako ng dugo! Kailangan ko ng benda ngayon din!"
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.02"
-        },
-        "text": {
-          "EN": "Dying here! The blood won't stop flowing!",
-          "TL": "Nalalagutan ako ng hininga! Ayaw tumigil ng agos ng dugo!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.03"
-        },
-        "text": {
-          "EN": "I'm losing too much blood... getting cold!",
-          "TL": "Masyadong maraming dugo ang nawawala... nilalamig na ako!"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.04"
-        },
-        "text": {
-          "EN": "Hit an artery! Put pressure on this right now!",
-          "TL": "Tinamaan ang ugat! Diinan mo 'to ngayon din!"
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.05"
-        },
-        "text": {
-          "EN": "Everything's going dark... stop the bleeding, please!",
-          "TL": "Dumidilim ang paningin ko... patigilin mo ang dugo, pakiusap!"
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.06"
-        },
-        "text": {
-          "EN": "I'm bleeding through my clothes! Help me!",
-          "TL": "Bumabaon ang dugo sa damit ko! Tulungan mo ako!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.07"
-        },
-        "text": {
-          "EN": "Blood everywhere... please, I don't want to die here!",
-          "TL": "Nagkalat ang dugo... pakiusap, ayaw kong mamatay rito!"
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.08"
-        },
-        "text": {
-          "EN": "Losing consciousness... plug this wound!",
-          "TL": "Nawawalan ako ng malay... tapalan mo ang sugat na 'to!"
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.09"
-        },
-        "text": {
-          "EN": "Hurry! I'm bleeding out on the dirt!",
-          "TL": "Bilis! Nauubusan ako ng dugo sa lupa!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.bleedout.neutral.10"
-        },
-        "text": {
-          "EN": "Can't feel my fingers... stop the blood!",
-          "TL": "Hindi ko na maramdaman ang daliri ko... patigilin ang dugo!"
+          "EN": [
+            "I'm bleeding out! I need a tourniquet or bandage now!",
+            "Dying here! The blood won't stop flowing!",
+            "I'm losing too much blood... getting cold!",
+            "Hit an artery! Put pressure on this right now!",
+            "Everything's going dark... stop the bleeding, please!",
+            "I'm bleeding through my clothes! Help me!",
+            "Blood everywhere... please, I don't want to die here!",
+            "Losing consciousness... plug this wound!",
+            "Hurry! I'm bleeding out on the dirt!",
+            "Can't feel my fingers... stop the blood!"
+          ],
+          "TL": [
+            "Nauubusan ako ng dugo! Kailangan ko ng benda ngayon din!",
+            "Nalalagutan ako ng hininga! Ayaw tumigil ng agos ng dugo!",
+            "Masyadong maraming dugo ang nawawala... nilalamig na ako!",
+            "Tinamaan ang ugat! Diinan mo 'to ngayon din!",
+            "Dumidilim ang paningin ko... patigilin mo ang dugo, pakiusap!",
+            "Bumabaon ang dugo sa damit ko! Tulungan mo ako!",
+            "Nagkalat ang dugo... pakiusap, ayaw kong mamatay rito!",
+            "Nawawalan ako ng malay... tapalan mo ang sugat na 'to!",
+            "Bilis! Nauubusan ako ng dugo sa lupa!",
+            "Hindi ko na maramdaman ang daliri ko... patigilin ang dugo!"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.call",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.shaken",
+  "id": "firearm_low",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/shaken.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Jesus... I actually hit it.",
+            "My hands are shaking... but it's down.",
+            "Did I get it? God, I think it's dead.",
+            "That was way too close...",
+            "I panicked and fired... thank God.",
+            "Is it dead? Please tell me it's dead.",
+            "Heart's beating out of my chest...",
+            "I didn't think that shot would land.",
+            "It's down... don't let another one get close.",
+            "God... that sound... it's finally quiet."
+          ],
+          "TL": [
+            "Diyos ko... tinamaan ko talaga.",
+            "Nanginginig ang mga kamay ko... pero bagsak na.",
+            "Napatay ko ba? Diyos ko, sa tingin ko patay na.",
+            "Masyadong malapit 'yon...",
+            "Nag-panic ako at bumaril... salamat sa Diyos.",
+            "Patay na ba? Sabihin mo sa akin kung patay na.",
+            "Lulukso ang puso ko sa kaba...",
+            "Hindi ko akalaing tatama ang putok na 'yon.",
+            "Bagsak na... huwag mong hayaang may makalapit pang iba.",
+            "Diyos ko... ang tunog na 'yon... tahimik na rin sa wakas."
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,74 +1,26 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.interaction.world_event.warning.guarded"] = {
+    ["interaction.world_event.warning"] = {
+        ["dependents"] = {
+            "behavior.world_event_warn",
+        },
         ["domain"] = "social",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/Social",
         },
-        ["id"] = "semantic.interaction.world_event.warning.guarded",
+        ["id"] = "interaction.world_event.warning",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/social/interaction_world_event_warning.json",
     },
-    ["semantic.interaction.world_event.warning.neutral"] = {
+    ["interaction.world_event.warning_flavor"] = {
+        ["dependents"] = {
+            "behavior.world_event_warn",
+        },
         ["domain"] = "social",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/Social",
         },
-        ["id"] = "semantic.interaction.world_event.warning.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/social/interaction_world_event_warning.json",
-    },
-    ["semantic.interaction.world_event.warning.terse"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/Social",
-        },
-        ["id"] = "semantic.interaction.world_event.warning.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/social/interaction_world_event_warning.json",
-    },
-    ["semantic.interaction.world_event.warning.warm"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/Social",
-        },
-        ["id"] = "semantic.interaction.world_event.warning.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/social/interaction_world_event_warning.json",
-    },
-    ["semantic.interaction.world_event.warning_flavor.guarded"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/Social",
-        },
-        ["id"] = "semantic.interaction.world_event.warning_flavor.guarded",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/social/interaction_world_event_warning_flavor.json",
-    },
-    ["semantic.interaction.world_event.warning_flavor.neutral"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/Social",
-        },
-        ["id"] = "semantic.interaction.world_event.warning_flavor.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/social/interaction_world_event_warning_flavor.json",
-    },
-    ["semantic.interaction.world_event.warning_flavor.terse"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/Social",
-        },
-        ["id"] = "semantic.interaction.world_event.warning_flavor.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/social/interaction_world_event_warning_flavor.json",
-    },
-    ["semantic.interaction.world_event.warning_flavor.warm"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/Social",
-        },
-        ["id"] = "semantic.interaction.world_event.warning_flavor.warm",
+        ["id"] = "interaction.world_event.warning_flavor",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/social/interaction_world_event_warning_flavor.json",
     },

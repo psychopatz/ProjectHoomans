@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.player",
+  "id": "wavehi",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,35 +16,25 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-    "responseTemplateID": "semantic.emote.player.wavehi",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Hey, {addressee.name}.",
-          "TL": "Uy, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Good to see you, {addressee.name}.",
-          "TL": "Mabuti at nakita kita, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Morning, {addressee.name}.",
-          "TL": "Magandang umaga, {addressee.name}."
+          "EN": [
+            "Hey, {addressee.name}.",
+            "Good to see you, {addressee.name}.",
+            "Morning, {addressee.name}."
+          ],
+          "TL": [
+            "Uy, {addressee.name}.",
+            "Mabuti at nakita kita, {addressee.name}.",
+            "Magandang umaga, {addressee.name}."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.player.wavehi",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

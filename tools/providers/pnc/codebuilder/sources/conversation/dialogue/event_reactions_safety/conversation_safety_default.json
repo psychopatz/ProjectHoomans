@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "conversation.safety",
   "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:event_reactions",
     "contentOwner": "projecthoomans.dialogue_content.events",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/safety.json",
-    "responseTemplateID": "semantic.conversation.safety.default",
-    "style": "neutral"
+    "responseAct": "WARN"
   },
-  "response": {
-    "act": "WARN",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Stay alert.",
-          "TL": "Manatiling alerto."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Keep your eyes peeled.",
-          "TL": "Buksan ang mga mata."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Watch our surroundings.",
-          "TL": "Bantayan ang paligid natin."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Don't let your guard down.",
-          "TL": "Huwag ibaba ang depensa."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Stay sharp out here.",
-          "TL": "Maging handa rito sa labas."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Keep quiet and listen.",
-          "TL": "Tumahimik at makinig."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Keep checking the corners.",
-          "TL": "Tignan palagi ang mga sulok."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Stay cautious.",
-          "TL": "Mag-ingat palagi."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Eyes front and back.",
-          "TL": "Tumingin sa harap at likod."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Stay focused.",
-          "TL": "Manatiling nakapokus."
+          "EN": [
+            "Stay alert.",
+            "Keep your eyes peeled.",
+            "Watch our surroundings.",
+            "Don't let your guard down.",
+            "Stay sharp out here.",
+            "Keep quiet and listen.",
+            "Keep checking the corners.",
+            "Stay cautious.",
+            "Eyes front and back.",
+            "Stay focused."
+          ],
+          "TL": [
+            "Manatiling alerto.",
+            "Buksan ang mga mata.",
+            "Bantayan ang paligid natin.",
+            "Huwag ibaba ang depensa.",
+            "Maging handa rito sa labas.",
+            "Tumahimik at makinig.",
+            "Tignan palagi ang mga sulok.",
+            "Mag-ingat palagi.",
+            "Tumingin sa harap at likod.",
+            "Manatiling nakapokus."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.conversation.safety",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

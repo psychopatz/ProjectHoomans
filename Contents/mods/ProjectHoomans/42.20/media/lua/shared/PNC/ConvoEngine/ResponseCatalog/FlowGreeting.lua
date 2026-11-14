@@ -46,7 +46,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
     variants = {
         {
             id = "semantic.flow.greeting.opening.rain",
-            templateID = "semantic.flow.greeting.opening.rain",
+            templateID = "flow.greeting.opening.rain",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { raining = true },
             priority = 3,
@@ -61,7 +61,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                         segments = {
                             {
                                 kind = "translation",
-                                templateID = "semantic.flow.greeting.opening.rain",
+                                templateID = "flow.greeting.opening.rain",
                             },
                         },
                     },
@@ -72,7 +72,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                         segments = {
                             {
                                 kind = "translation",
-                                templateID = "semantic.flow.greeting.opening.question.default",
+                                templateID = "flow.greeting.opening.question.default",
                             },
                         },
                     },
@@ -81,7 +81,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
         },
         {
             id = "semantic.flow.greeting.opening.friendly",
-            templateID = "semantic.flow.greeting.opening.friendly",
+            templateID = "flow.greeting.opening.friendly",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { socialStyle = "friendly" },
             priority = 2,
@@ -97,7 +97,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                             {
                                 kind = "translation",
                                 templateID =
-                                    "semantic.flow.greeting.opening.friendly",
+                                    "flow.greeting.opening.friendly",
                             },
                         },
                     },
@@ -109,7 +109,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                             {
                                 kind = "translation",
                                 templateID =
-                                    "semantic.flow.greeting.opening.question.friendly",
+                                    "flow.greeting.opening.question.friendly",
                             },
                         },
                     },
@@ -118,7 +118,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
         },
         {
             id = "semantic.flow.greeting.opening.default",
-            templateID = "semantic.flow.greeting.opening.default",
+            templateID = "flow.greeting.opening.default",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             plan = {
                 dialogueAct = "GREETING_OPENING",
@@ -132,7 +132,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                             {
                                 kind = "translation",
                                 templateID =
-                                    "semantic.flow.greeting.opening.default",
+                                    "flow.greeting.opening.default",
                             },
                         },
                     },
@@ -144,7 +144,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                             {
                                 kind = "translation",
                                 templateID =
-                                    "semantic.flow.greeting.opening.question.default",
+                                    "flow.greeting.opening.question.default",
                             },
                         },
                     },
@@ -158,13 +158,13 @@ Catalog.Register("semantic.flow.greeting.followup", {
     variants = {
         {
             id = "semantic.flow.greeting.followup.friendly",
-            templateID = "semantic.flow.greeting.followup.friendly",
+            templateID = "flow.greeting.followup.friendly",
             when = { socialStyle = "friendly" },
             priority = 2,
         },
         {
             id = "semantic.flow.greeting.followup.default",
-            templateID = "semantic.flow.greeting.followup.default",
+            templateID = "flow.greeting.followup.default",
         },
     },
 })

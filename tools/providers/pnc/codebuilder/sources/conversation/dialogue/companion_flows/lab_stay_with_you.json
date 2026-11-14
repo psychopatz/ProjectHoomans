@@ -1,6 +1,14 @@
 {
-  "id": "stay_with_you",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "pnc.lab",
+  "id": "stay_with_you",
+  "owner": "ProjectHoomans",
+  "on": {
+    "action": "STAY",
+    "intent": "REQUEST",
+    "speechAct": "REQUEST"
+  },
   "metadata": {
     "capability": "pnc:companion.stay",
     "confidence": 0.99,
@@ -22,7 +30,7 @@
     },
     "originalOwner": "SemanticLab",
     "priority": 170,
-    "responsePoolID": "semantic.lab.stay.with.you",
+    "responsePoolID": "lab.stay.with.you",
     "sourceProfile": "conversation.source.projecthoomans.8378f35867",
     "triggers": [
       {
@@ -39,29 +47,21 @@
       "positives": [
         "stay with you"
       ]
-    }
+    },
+    "responseAct": "FLOW_RESPONSE"
   },
-  "on": {
-    "action": "STAY",
-    "intent": "REQUEST",
-    "speechAct": "REQUEST"
-  },
-  "owner": "ProjectHoomans",
-  "response": {
-    "act": "FLOW_RESPONSE",
+  "say": {
     "variants": [
       {
         "id": "accepted",
-        "metadata": {
-          "templateID": "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted"
-        },
         "text": {
           "EN": "Okay, I'll stay with you.",
           "TL": "Sige, mananatili ako sa iyo."
+        },
+        "metadata": {
+          "templateID": "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted"
         }
       }
     ]
-  },
-  "namespace": "pnc.lab",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

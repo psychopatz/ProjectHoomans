@@ -1,21 +1,17 @@
 {
-  "id": "offer",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.offer",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "id": "offer",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "OFFER",
+  "metadata": {
+    "responsePoolID": "offer",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "OFFER"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.offer.dataset.hungry_share",
-        "metadata": {
-          "fallback": "That would help a lot. Could I have some?",
-          "priority": 2,
-          "templateID": "semantic.offer.dataset.hungry_share"
-        },
+        "id": "offer.dataset.hungry_share",
         "text": {
           "EN": "That would help a lot. Could I have some?",
           "TL": "That would help a lot. Could I have some?"
@@ -38,15 +34,15 @@
               ]
             }
           ]
+        },
+        "metadata": {
+          "fallback": "That would help a lot. Could I have some?",
+          "priority": 2,
+          "templateID": "offer.dataset.hungry_share"
         }
       },
       {
-        "id": "semantic.offer.dataset.hungry_appreciate",
-        "metadata": {
-          "fallback": "I'd appreciate a bite. Would you share?",
-          "priority": 2,
-          "templateID": "semantic.offer.dataset.hungry_appreciate"
-        },
+        "id": "offer.dataset.hungry_appreciate",
         "text": {
           "EN": "I'd appreciate a bite. Would you share?",
           "TL": "I'd appreciate a bite. Would you share?"
@@ -69,10 +65,13 @@
               ]
             }
           ]
+        },
+        "metadata": {
+          "fallback": "I'd appreciate a bite. Would you share?",
+          "priority": 2,
+          "templateID": "offer.dataset.hungry_appreciate"
         }
       }
     ]
-  },
-  "namespace": "semantic",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

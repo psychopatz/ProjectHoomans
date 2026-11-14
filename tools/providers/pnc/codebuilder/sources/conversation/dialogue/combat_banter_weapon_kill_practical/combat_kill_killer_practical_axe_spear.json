@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.practical",
+  "id": "axe_spear",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/practical.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Good reach. Keep the line.",
+            "Kept our distance. That worked.",
+            "Leverage did the work. Push ahead.",
+            "Safe distance maintained. Next.",
+            "Good weapon range. Watch the side.",
+            "Clean penetration. Check haft condition.",
+            "Hit before it closed in. Form up.",
+            "Distance kept us safe. Continue.",
+            "Controlled engagement. Move forward.",
+            "Reach kept teeth off us. Proceed."
+          ],
+          "TL": [
+            "Maganda ang abot. Panatilihin ang linya.",
+            "Nanatili sa ligtas na layo. Epektibo 'yon.",
+            "Lakas at abot ang tumapos. Sulong.",
+            "Ligtas na distansya napanatili. Sunod.",
+            "Magandang distansya ng sandata. Bantayan ang gilid.",
+            "Malinis na bumaon. Tignan ang hawakan.",
+            "Tinamaan bago makalapit. Ayusin ang hanay.",
+            "Ligtas tayo dahil sa distansya. Magpatuloy.",
+            "Kontroladong engkwentro. Pasulong.",
+            "Nailayo ang mga ngipin dahil sa abot. Tuloy."
+          ]
+        }
+      }
+    ]
+  }
+}

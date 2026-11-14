@@ -1,49 +1,48 @@
 {
-  "id": "greeting",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.greeting",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "id": "greeting",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "GREETING",
+  "metadata": {
+    "responsePoolID": "greeting",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "GREETING"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.greeting.dataset.holding_up",
-        "metadata": {
-          "fallback": "Hey. How are you holding up?",
-          "templateID": "semantic.greeting.dataset.holding_up"
-        },
+        "id": "greeting.dataset.holding_up",
         "text": {
           "EN": "Hey. How are you holding up?",
           "TL": "Hey. How are you holding up?"
+        },
+        "metadata": {
+          "fallback": "Hey. How are you holding up?",
+          "templateID": "greeting.dataset.holding_up"
         }
       },
       {
-        "id": "semantic.greeting.dataset.good_to_see",
-        "metadata": {
-          "fallback": "Good to see you again.",
-          "templateID": "semantic.greeting.dataset.good_to_see"
-        },
+        "id": "greeting.dataset.good_to_see",
         "text": {
           "EN": "Good to see you again.",
           "TL": "Good to see you again."
+        },
+        "metadata": {
+          "fallback": "Good to see you again.",
+          "templateID": "greeting.dataset.good_to_see"
         }
       },
       {
-        "id": "semantic.greeting.dataset.how_things",
-        "metadata": {
-          "fallback": "Hey. How are things going?",
-          "templateID": "semantic.greeting.dataset.how_things"
-        },
+        "id": "greeting.dataset.how_things",
         "text": {
           "EN": "Hey. How are things going?",
           "TL": "Hey. How are things going?"
+        },
+        "metadata": {
+          "fallback": "Hey. How are things going?",
+          "templateID": "greeting.dataset.how_things"
         }
       }
     ]
-  },
-  "namespace": "semantic",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.stay.queued",
   "id": "repeated",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
-    "responseTemplateID": "semantic.command.stay.queued.repeated"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'm already staying here.",
-          "TL": "Nananatili na ako rito."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Still holding this spot. Haven't budged.",
-          "TL": "Hawak pa rin ang pwesto. Di gumagalaw."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I'm already staying put, don't worry.",
-          "TL": "Dito na nga ako, huwag kang mag-alala."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Haven't moved an inch. Still right here.",
-          "TL": "Di gumalaw kahit isang pulgada. Narito pa rin."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Still guarding this exact position.",
-          "TL": "Binabantayan pa rin ang mismong posisyong ito."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "I heard you before. I'm staying right here.",
-          "TL": "Narinig na kita kanina. Dito lang ako."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Already holding ground. Go on.",
-          "TL": "Hawak na ang lupa. Sige na."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Still staying here. No need to remind me.",
-          "TL": "Nananatili pa rin dito. Di na kailangang ipaalala."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "I'm rooted right here. Keep moving.",
-          "TL": "Nakatuntong na ako rito. Tuloy ka na."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Already staying. I'm watching the area.",
-          "TL": "Nandito na nga. Binabantayan ko ang lugar."
+          "EN": [
+            "I'm already staying here.",
+            "Still holding this spot. Haven't budged.",
+            "I'm already staying put, don't worry.",
+            "Haven't moved an inch. Still right here.",
+            "Still guarding this exact position.",
+            "I heard you before. I'm staying right here.",
+            "Already holding ground. Go on.",
+            "Still staying here. No need to remind me.",
+            "I'm rooted right here. Keep moving.",
+            "Already staying. I'm watching the area."
+          ],
+          "TL": [
+            "Nananatili na ako rito.",
+            "Hawak pa rin ang pwesto. Di gumagalaw.",
+            "Dito na nga ako, huwag kang mag-alala.",
+            "Di gumalaw kahit isang pulgada. Narito pa rin.",
+            "Binabantayan pa rin ang mismong posisyong ito.",
+            "Narinig na kita kanina. Dito lang ako.",
+            "Hawak na ang lupa. Sige na.",
+            "Nananatili pa rin dito. Di na kailangang ipaalala.",
+            "Nakatuntong na ako rito. Tuloy ka na.",
+            "Nandito na nga. Binabantayan ko ang lugar."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.stay.queued",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

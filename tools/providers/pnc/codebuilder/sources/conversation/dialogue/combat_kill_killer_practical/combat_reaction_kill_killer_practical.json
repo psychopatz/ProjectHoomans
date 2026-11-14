@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_killer_practical",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/practical.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Got it. Check the area.",
+              "Threat down. Scan before looting.",
+              "Target neutralized. Check the perimeter.",
+              "Downed. Clear your angles.",
+              "Handled that one. Watch for flankers.",
+              "Dead. Scan 360 degrees.",
+              "Got him. Don't drop your guard.",
+              "Down. Check behind the door.",
+              "Finished. Verify no more movement.",
+              "Target down. Look around before relaxing."
+            ],
+            "TL": [
+              "Nakuha ko. Suriin ang paligid.",
+              "Bagsak ang banta. Magmasid muna bago maghalughog.",
+              "Naalis ang target. Suriin ang paligid.",
+              "Bagsak. Linisin ang mga anggulo.",
+              "Naasikaso ko 'yon. Bantayan ang mga nasa tabi.",
+              "Patay na. Magmasid sa buong paligid.",
+              "Nakuha ko na siya. Huwag ibaba ang depensa.",
+              "Bagsak. Tignan sa likod ng pinto.",
+              "Tapos na. Tiyaking wala nang gumagalaw.",
+              "Bagsak ang target. Tumingin sa paligid bago magpahinga."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One down. Let's keep moving.",
+              "Handled one. Don't linger here.",
+              "Threat dead. Keep momentum going.",
+              "One eliminated. Push to the objective.",
+              "Down. Step through before noise travels.",
+              "Got one. Move to the next room.",
+              "One corpse. Don't stay in the open.",
+              "Finished. Let's make distance.",
+              "Target down. Keep moving along the wall.",
+              "Downed. Advance quietly."
+            ],
+            "TL": [
+              "Isa na. Tuloy tayo.",
+              "Inasikaso ang isa. Huwag magtagal dito.",
+              "Patay ang banta. Panatilihin ang bwelo.",
+              "Isa ang tinanggal. Sulong sa layunin.",
+              "Bagsak. Lumakad bago kumalat ang ingay.",
+              "Nakuha ang isa. Lipat sa susunod na kwarto.",
+              "Isang bangkay. Huwag manatili sa lantad na lugar.",
+              "Tapos na. Lumayo na tayo rito.",
+              "Bagsak ang target. Sumabay sa pader sa paglakad.",
+              "Bagsak. Pasulong nang tahimik."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "It's clear here. Watch for more.",
+              "Downed. Expect company soon.",
+              "Dead. Noise might draw more.",
+              "One kill confirmed. Listen for footsteps.",
+              "Target cleared. Eyes on the shadows.",
+              "Finished. Sound could bring stragglers.",
+              "Down. Watch all doorways.",
+              "Threat eliminated. Scan the next lane.",
+              "Clean kill. Be ready for the next one.",
+              "Downed it. Keep listening."
+            ],
+            "TL": [
+              "Malinis dito. Bantayan ang iba.",
+              "Bagsak. Asahang may kasunod 'yan.",
+              "Patay na. Baka umakit ng iba ang tunog.",
+              "Isang patay kumpirmado. Makinig sa mga yabag.",
+              "Target naalis na. Tumingin sa mga anino.",
+              "Tapos na. Baka may dumating na mga naiwan.",
+              "Bagsak. Bantayan ang bawat pintuan.",
+              "Banta naalis. Suriin ang susunod na daan.",
+              "Malinis na patay. Maging handa sa kasunod.",
+              "Naibagsak ko na. Patuloy na makinig."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question.wellbeing",
+  "id": "default",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:wellbeing_content",
+    "contentOwner": "projecthoomans.dialogue_content.wellbeing",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/general.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "I'm okay. How about you?",
+            "Doing alright. How are you holding up?",
+            "Not bad at all. How's your day going?",
+            "I'm doing fine. Hope things are quiet for you.",
+            "Pretty good, considering. You doing alright?",
+            "Still here and kicking. How about yourself?",
+            "Things are stable enough on my end. You?",
+            "I'm managing well. Hope you're staying safe.",
+            "Can't complain too much today. How're you?",
+            "Holding steady. How have you been holding up?"
+          ],
+          "TL": [
+            "Okay naman ako. Ikaw, kumusta?",
+            "Maayos naman. Paano mo nakakayanan?",
+            "Hindi naman masama. Kumusta ang araw mo?",
+            "Maayos naman ako. Sana payapa rin sa parte mo.",
+            "Medyo maganda naman ang lagay. Maayos ka rin ba?",
+            "Nandito pa rin at lumalaban. Kumusta ka naman?",
+            "Medyo maayos naman ang sitwasyon sa akin. Ikaw?",
+            "Maayos akong nakakaraos. Sana ligtas ka rin.",
+            "Hindi masyadong makapagreklamo ngayon. Kumusta ka?",
+            "Matatag pa rin. Kumusta ang pag-iingat mo?"
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:wellbeing_content",
-        "contentOwner": "projecthoomans.dialogue_content.wellbeing",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/general.json",
-        "responseTemplateID": "semantic.question.wellbeing.default",
-        "style": "guarded"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "I'm managing. Don't press me.",
+            "I'm fine. Keep your focus on your own work.",
+            "No problems here. That's all you get.",
+            "I can look after myself. No need to inquire.",
+            "Doing what needs doing. Back off a bit.",
+            "I don't discuss personal matters easily.",
+            "Healthy enough to defend myself. That's enough.",
+            "Nothing to complain about to strangers.",
+            "I'm alright. Mind your own perimeter.",
+            "Alive and alert. Leave it at that."
+          ],
+          "TL": [
+            "Kinakaya ko. Huwag mo nang ipilit.",
+            "Ayos lang ako. Ituon mo ang pansin sa sarili mong gawain.",
+            "Walang problema rito. Iyon lang ang masasabi ko.",
+            "Kaya kong alagaan ang sarili ko. Huwag nang magtanong.",
+            "Ginagawa ang kailangang gawin. Lumayo ka nang kaunti.",
+            "Hindi ako basta-basta nagkukuwento tungkol sa sarili ko.",
+            "Kaya ko pang ipagtanggol ang sarili ko. Sapat na 'yon.",
+            "Walang dapat ireklamo sa mga hindi ko kakilala.",
+            "Ayos lang ako. Bantayan mo ang sarili mong parte.",
+            "Buhay at alerto. Hanggang doon na lang."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "I'm managing. Don't press me.",
-              "TL": "Kinakaya ko. Huwag mo nang ipilit."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "I'm fine. Keep your focus on your own work.",
-              "TL": "Ayos lang ako. Ituon mo ang pansin sa sarili mong gawain."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "No problems here. That's all you get.",
-              "TL": "Walang problema rito. Iyon lang ang masasabi ko."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "I can look after myself. No need to inquire.",
-              "TL": "Kaya kong alagaan ang sarili ko. Huwag nang magtanong."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "Doing what needs doing. Back off a bit.",
-              "TL": "Ginagawa ang kailangang gawin. Lumayo ka nang kaunti."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "I don't discuss personal matters easily.",
-              "TL": "Hindi ako basta-basta nagkukuwento tungkol sa sarili ko."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "Healthy enough to defend myself. That's enough.",
-              "TL": "Kaya ko pang ipagtanggol ang sarili ko. Sapat na 'yon."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "Nothing to complain about to strangers.",
-              "TL": "Walang dapat ireklamo sa mga hindi ko kakilala."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "I'm alright. Mind your own perimeter.",
-              "TL": "Ayos lang ako. Bantayan mo ang sarili mong parte."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "Alive and alert. Leave it at that.",
-              "TL": "Buhay at alerto. Hanggang doon na lang."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "I'm okay.",
+            "Doing fine.",
+            "All good.",
+            "Holding up.",
+            "No issues.",
+            "Steady.",
+            "Still on my feet.",
+            "Fine.",
+            "Alive.",
+            "Managing fine."
+          ],
+          "TL": [
+            "Ayos lang ako.",
+            "Maayos naman.",
+            "Lahat maayos.",
+            "Kinakaya.",
+            "Walang problema.",
+            "Matatag.",
+            "Nakatayo pa.",
+            "Ayos.",
+            "Buhay.",
+            "Maayos ang lagay."
+          ]
+        }
       },
-      "namespace": "semantic.question.wellbeing.default"
-    },
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:wellbeing_content",
-        "contentOwner": "projecthoomans.dialogue_content.wellbeing",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/general.json",
-        "responseTemplateID": "semantic.question.wellbeing.default",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I'm okay. How about you?",
-              "TL": "Okay naman ako. Ikaw, kumusta?"
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Doing alright. How are you holding up?",
-              "TL": "Maayos naman. Paano mo nakakayanan?"
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Not bad at all. How's your day going?",
-              "TL": "Hindi naman masama. Kumusta ang araw mo?"
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I'm doing fine. Hope things are quiet for you.",
-              "TL": "Maayos naman ako. Sana payapa rin sa parte mo."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Pretty good, considering. You doing alright?",
-              "TL": "Medyo maganda naman ang lagay. Maayos ka rin ba?"
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Still here and kicking. How about yourself?",
-              "TL": "Nandito pa rin at lumalaban. Kumusta ka naman?"
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Things are stable enough on my end. You?",
-              "TL": "Medyo maayos naman ang sitwasyon sa akin. Ikaw?"
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I'm managing well. Hope you're staying safe.",
-              "TL": "Maayos akong nakakaraos. Sana ligtas ka rin."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Can't complain too much today. How're you?",
-              "TL": "Hindi masyadong makapagreklamo ngayon. Kumusta ka?"
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Holding steady. How have you been holding up?",
-              "TL": "Matatag pa rin. Kumusta ang pag-iingat mo?"
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.question.wellbeing.default"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:wellbeing_content",
-        "contentOwner": "projecthoomans.dialogue_content.wellbeing",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/general.json",
-        "responseTemplateID": "semantic.question.wellbeing.default",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "I'm okay.",
-              "TL": "Ayos lang ako."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Doing fine.",
-              "TL": "Maayos naman."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "All good.",
-              "TL": "Lahat maayos."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Holding up.",
-              "TL": "Kinakaya."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "No issues.",
-              "TL": "Walang problema."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Steady.",
-              "TL": "Matatag."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Still on my feet.",
-              "TL": "Nakatayo pa."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Fine.",
-              "TL": "Ayos."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Alive.",
-              "TL": "Buhay."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Managing fine.",
-              "TL": "Maayos ang lagay."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.question.wellbeing.default"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:wellbeing_content",
-        "contentOwner": "projecthoomans.dialogue_content.wellbeing",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/general.json",
-        "responseTemplateID": "semantic.question.wellbeing.default",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "I'm doing okay. Thanks for asking.",
-              "TL": "Ayos lang ako. Salamat sa pagtatanong."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "Doing well! It really warms my heart that you asked.",
-              "TL": "Maayos ako! Nakakagaan ng loob na nagtanong ka."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Feeling pretty good today. How about yourself?",
-              "TL": "Maganda ang pakiramdam ko ngayon. Kumusta ka naman?"
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "I'm hanging in there, friend. Glad to see you around.",
-              "TL": "Kumakapit pa rin, kaibigan. Masayang makita ka rito."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Doing much better now that I see a friendly face.",
-              "TL": "Mas gumaan ang pakiramdam ko ngayong nakakita ako ng kaibigan."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "All is well on my side. Thank you for looking out for me.",
-              "TL": "Maayos ang lahat sa akin. Salamat sa pag-alala mo sa akin."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "Holding strong. Your support means a lot out here.",
-              "TL": "Matatag pa rin. Malaking tulong ang suporta mo rito."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "Doing great today, thank you. Hope you are as well.",
-              "TL": "Napakaganda ng araw ko, salamat. Sana ikaw rin."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "I'm in good spirits today. It's lovely seeing you.",
-              "TL": "Maganda ang disposisyon ko ngayon. Masarap kang makita."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "Doing just fine. Let's make sure we both stay that way.",
-              "TL": "Maayos naman ako. Siguraduhin nating pareho tayong ligtas."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.question.wellbeing.default"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "I'm doing okay. Thanks for asking.",
+            "Doing well! It really warms my heart that you asked.",
+            "Feeling pretty good today. How about yourself?",
+            "I'm hanging in there, friend. Glad to see you around.",
+            "Doing much better now that I see a friendly face.",
+            "All is well on my side. Thank you for looking out for me.",
+            "Holding strong. Your support means a lot out here.",
+            "Doing great today, thank you. Hope you are as well.",
+            "I'm in good spirits today. It's lovely seeing you.",
+            "Doing just fine. Let's make sure we both stay that way."
+          ],
+          "TL": [
+            "Ayos lang ako. Salamat sa pagtatanong.",
+            "Maayos ako! Nakakagaan ng loob na nagtanong ka.",
+            "Maganda ang pakiramdam ko ngayon. Kumusta ka naman?",
+            "Kumakapit pa rin, kaibigan. Masayang makita ka rito.",
+            "Mas gumaan ang pakiramdam ko ngayong nakakita ako ng kaibigan.",
+            "Maayos ang lahat sa akin. Salamat sa pag-alala mo sa akin.",
+            "Matatag pa rin. Malaking tulong ang suporta mo rito.",
+            "Napakaganda ng araw ko, salamat. Sana ikaw rin.",
+            "Maganda ang disposisyon ko ngayon. Masarap kang makita.",
+            "Maayos naman ako. Siguraduhin nating pareho tayong ligtas."
+          ]
+        }
+      }
+    ]
+  }
 }

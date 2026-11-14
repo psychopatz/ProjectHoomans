@@ -2,16 +2,297 @@
 return {
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.conversation.acknowledged.default.guarded",
+        ["exchangeFamily"] = {
+            ["familyID"] = "conversation.acknowledged.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "All right. Ask if you want to talk more.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.conversation.acknowledged.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "All right. Ask if you want to talk more.",
+                                        "Understood. Let me know if you need anything else.",
+                                        "Sounds good. We can pick this up later.",
+                                        "Got it. Let's get back to what we were doing.",
+                                        "Fair enough. Holler if something comes up.",
+                                        "All right. We're on the same page.",
+                                        "Understood. Take care.",
+                                        "Clear. We'll talk again soon.",
+                                        "Got it. I'm around if you need to talk.",
+                                        "Right. We'll leave it there for now.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Magtanong ka kung gusto mo pang mag-usap.",
+                                        "Naiintindihan ko. Sabihan mo ako kung may kailangan ka pa.",
+                                        "Mabuti. Pwede nating ipagpatuloy ito mamaya.",
+                                        "Nakuha ko. Balik na tayo sa ginagawa natin.",
+                                        "Makatwiran. Tawagin mo ako kapag may nangyari.",
+                                        "Sige. Pareho tayo ng iniisip.",
+                                        "Naintindihan. Mag-ingat ka.",
+                                        "Malinaw. Mag-uusap tayong muli mamaya.",
+                                        "Nakuha ko. Narito lang ako kung kailangan mong makipag-usap.",
+                                        "Sige. Dito muna tayo magtapos sa ngayon.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Understood. We'll leave it there.",
+                                ["id"] = "guarded",
+                                ["templateID"] = "convo.conversation.acknowledged.default.say.1.guarded",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Understood. We'll leave it there.",
+                                        "Heard. That's enough talk for now.",
+                                        "Message received. Keep your distance.",
+                                        "Got it. Let's keep our heads on our shoulders.",
+                                        "I heard what you said. Leaving it at that.",
+                                        "All right. Eyes open.",
+                                        "I take your point. Let's stay alert.",
+                                        "Clear enough. No more discussion needed.",
+                                        "Understood. Keep sharp.",
+                                        "Noted. Back to watching the perimeter.",
+                                    },
+                                    ["TL"] = {
+                                        "Naiintindihan ko. Tama na iyon.",
+                                        "Narinig ko. Sapat na ang usapan sa ngayon.",
+                                        "Nakuha ko. Manatili ka sa puwesto mo.",
+                                        "Naintindihan. Mag-ingat na lang tayo sa paligid.",
+                                        "Narinig ko ang sinabi mo. Iiwan ko na roon.",
+                                        "Sige. Buksan ang mga mata.",
+                                        "Nakuha ko ang punto mo. Manatiling alisto.",
+                                        "Malinaw na. Hindi na kailangan ng karagdagang usapan.",
+                                        "Naintindihan. Maging alerto.",
+                                        "Tala ko na. Balik sa pagbabantay.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "All right.",
+                                ["id"] = "terse",
+                                ["templateID"] = "convo.conversation.acknowledged.default.say.1.terse",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "All right.",
+                                        "Understood.",
+                                        "Heard.",
+                                        "Got it.",
+                                        "Right.",
+                                        "Done.",
+                                        "Clear.",
+                                        "Good.",
+                                        "Okay.",
+                                        "Noted.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige.",
+                                        "Naintindihan.",
+                                        "Narinig ko.",
+                                        "Nakuha ko.",
+                                        "Tama.",
+                                        "Tapos.",
+                                        "Malinaw.",
+                                        "Mabuti.",
+                                        "Sige na.",
+                                        "Tala ko na.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "All right. I'm here if you want to talk more.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.conversation.acknowledged.default.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "All right. I'm here if you want to talk more.",
+                                        "Glad we talked. Holler anytime you need to chat.",
+                                        "I hear you loud and clear. Take care of yourself.",
+                                        "Good talking with you. We'll catch up again soon.",
+                                        "Understood. Always good to touch base with you.",
+                                        "Anytime you want to talk, you know where to find me.",
+                                        "Got it. Stay safe out there today.",
+                                        "Always happy to listen. Take it easy.",
+                                        "All right. Glad we got that sorted out together.",
+                                        "Thanks for taking the time to talk. Catch you later.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Narito ako kung gusto mo pang mag-usap.",
+                                        "Mabuti at nagkausap tayo. Tawagin mo lang ako kahit kailan.",
+                                        "Narinig kita nang malinaw. Ingatan mo ang sarili mo.",
+                                        "Masarap kang makausap. Magkuwentuhan ulit tayo mamaya.",
+                                        "Naintindihan ko. Laging magandang makipag-ugnayan sa 'yo.",
+                                        "Kahit kailan mo gustong mag-usap, alam mo kung nasaan ako.",
+                                        "Nakuha ko. Mag-ingat ka sa labas ngayong araw.",
+                                        "Lagi akong handang makinig. Dahan-dahan lang.",
+                                        "Sige. Mabuti at naayos natin 'yan nang magkasama.",
+                                        "Salamat sa paglalaan ng oras para mag-usap. Kita tayo mamaya.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "conversation.acknowledged",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "All right. Ask if you want to talk more.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.conversation.acknowledged.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "All right. Ask if you want to talk more.",
+                            "Understood. Let me know if you need anything else.",
+                            "Sounds good. We can pick this up later.",
+                            "Got it. Let's get back to what we were doing.",
+                            "Fair enough. Holler if something comes up.",
+                            "All right. We're on the same page.",
+                            "Understood. Take care.",
+                            "Clear. We'll talk again soon.",
+                            "Got it. I'm around if you need to talk.",
+                            "Right. We'll leave it there for now.",
+                        },
+                        ["TL"] = {
+                            "Sige. Magtanong ka kung gusto mo pang mag-usap.",
+                            "Naiintindihan ko. Sabihan mo ako kung may kailangan ka pa.",
+                            "Mabuti. Pwede nating ipagpatuloy ito mamaya.",
+                            "Nakuha ko. Balik na tayo sa ginagawa natin.",
+                            "Makatwiran. Tawagin mo ako kapag may nangyari.",
+                            "Sige. Pareho tayo ng iniisip.",
+                            "Naintindihan. Mag-ingat ka.",
+                            "Malinaw. Mag-uusap tayong muli mamaya.",
+                            "Nakuha ko. Narito lang ako kung kailangan mong makipag-usap.",
+                            "Sige. Dito muna tayo magtapos sa ngayon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Understood. We'll leave it there.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.conversation.acknowledged.default.say.1.guarded",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Understood. We'll leave it there.",
+                            "Heard. That's enough talk for now.",
+                            "Message received. Keep your distance.",
+                            "Got it. Let's keep our heads on our shoulders.",
+                            "I heard what you said. Leaving it at that.",
+                            "All right. Eyes open.",
+                            "I take your point. Let's stay alert.",
+                            "Clear enough. No more discussion needed.",
+                            "Understood. Keep sharp.",
+                            "Noted. Back to watching the perimeter.",
+                        },
+                        ["TL"] = {
+                            "Naiintindihan ko. Tama na iyon.",
+                            "Narinig ko. Sapat na ang usapan sa ngayon.",
+                            "Nakuha ko. Manatili ka sa puwesto mo.",
+                            "Naintindihan. Mag-ingat na lang tayo sa paligid.",
+                            "Narinig ko ang sinabi mo. Iiwan ko na roon.",
+                            "Sige. Buksan ang mga mata.",
+                            "Nakuha ko ang punto mo. Manatiling alisto.",
+                            "Malinaw na. Hindi na kailangan ng karagdagang usapan.",
+                            "Naintindihan. Maging alerto.",
+                            "Tala ko na. Balik sa pagbabantay.",
+                        },
+                    },
+                    ["variantID"] = "guarded",
+                },
+                {
+                    ["fallback"] = "All right.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.conversation.acknowledged.default.say.1.terse",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "All right.",
+                            "Understood.",
+                            "Heard.",
+                            "Got it.",
+                            "Right.",
+                            "Done.",
+                            "Clear.",
+                            "Good.",
+                            "Okay.",
+                            "Noted.",
+                        },
+                        ["TL"] = {
+                            "Sige.",
+                            "Naintindihan.",
+                            "Narinig ko.",
+                            "Nakuha ko.",
+                            "Tama.",
+                            "Tapos.",
+                            "Malinaw.",
+                            "Mabuti.",
+                            "Sige na.",
+                            "Tala ko na.",
+                        },
+                    },
+                    ["variantID"] = "terse",
+                },
+                {
+                    ["fallback"] = "All right. I'm here if you want to talk more.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.conversation.acknowledged.default.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "All right. I'm here if you want to talk more.",
+                            "Glad we talked. Holler anytime you need to chat.",
+                            "I hear you loud and clear. Take care of yourself.",
+                            "Good talking with you. We'll catch up again soon.",
+                            "Understood. Always good to touch base with you.",
+                            "Anytime you want to talk, you know where to find me.",
+                            "Got it. Stay safe out there today.",
+                            "Always happy to listen. Take it easy.",
+                            "All right. Glad we got that sorted out together.",
+                            "Thanks for taking the time to talk. Catch you later.",
+                        },
+                        ["TL"] = {
+                            "Sige. Narito ako kung gusto mo pang mag-usap.",
+                            "Mabuti at nagkausap tayo. Tawagin mo lang ako kahit kailan.",
+                            "Narinig kita nang malinaw. Ingatan mo ang sarili mo.",
+                            "Masarap kang makausap. Magkuwentuhan ulit tayo mamaya.",
+                            "Naintindihan ko. Laging magandang makipag-ugnayan sa 'yo.",
+                            "Kahit kailan mo gustong mag-usap, alam mo kung nasaan ako.",
+                            "Nakuha ko. Mag-ingat ka sa labas ngayong araw.",
+                            "Lagi akong handang makinig. Dahan-dahan lang.",
+                            "Sige. Mabuti at naayos natin 'yan nang magkasama.",
+                            "Salamat sa paglalaan ng oras para mag-usap. Kita tayo mamaya.",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "conversation.acknowledged.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "guarded",
-            ["sourceId"] = "semantic.conversation.acknowledged.default.guarded",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[0]",
+            ["localId"] = "default",
+            ["sourceId"] = "conversation.acknowledged.default",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.conversation.acknowledged.default",
+        ["namespace"] = "conversation.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +306,165 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.conversation.acknowledged.default",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_conversation.json",
-                ["style"] = "guarded",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "guarded.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. We'll leave it there.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "All right. Ask if you want to talk more.",
+                                        "Understood. Let me know if you need anything else.",
+                                        "Sounds good. We can pick this up later.",
+                                        "Got it. Let's get back to what we were doing.",
+                                        "Fair enough. Holler if something comes up.",
+                                        "All right. We're on the same page.",
+                                        "Understood. Take care.",
+                                        "Clear. We'll talk again soon.",
+                                        "Got it. I'm around if you need to talk.",
+                                        "Right. We'll leave it there for now.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Magtanong ka kung gusto mo pang mag-usap.",
+                                        "Naiintindihan ko. Sabihan mo ako kung may kailangan ka pa.",
+                                        "Mabuti. Pwede nating ipagpatuloy ito mamaya.",
+                                        "Nakuha ko. Balik na tayo sa ginagawa natin.",
+                                        "Makatwiran. Tawagin mo ako kapag may nangyari.",
+                                        "Sige. Pareho tayo ng iniisip.",
+                                        "Naintindihan. Mag-ingat ka.",
+                                        "Malinaw. Mag-uusap tayong muli mamaya.",
+                                        "Nakuha ko. Narito lang ako kung kailangan mong makipag-usap.",
+                                        "Sige. Dito muna tayo magtapos sa ngayon.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Naiintindihan ko. Tama na iyon.",
+                            {
+                                ["id"] = "guarded",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Understood. We'll leave it there.",
+                                        "Heard. That's enough talk for now.",
+                                        "Message received. Keep your distance.",
+                                        "Got it. Let's keep our heads on our shoulders.",
+                                        "I heard what you said. Leaving it at that.",
+                                        "All right. Eyes open.",
+                                        "I take your point. Let's stay alert.",
+                                        "Clear enough. No more discussion needed.",
+                                        "Understood. Keep sharp.",
+                                        "Noted. Back to watching the perimeter.",
+                                    },
+                                    ["TL"] = {
+                                        "Naiintindihan ko. Tama na iyon.",
+                                        "Narinig ko. Sapat na ang usapan sa ngayon.",
+                                        "Nakuha ko. Manatili ka sa puwesto mo.",
+                                        "Naintindihan. Mag-ingat na lang tayo sa paligid.",
+                                        "Narinig ko ang sinabi mo. Iiwan ko na roon.",
+                                        "Sige. Buksan ang mga mata.",
+                                        "Nakuha ko ang punto mo. Manatiling alisto.",
+                                        "Malinaw na. Hindi na kailangan ng karagdagang usapan.",
+                                        "Naintindihan. Maging alerto.",
+                                        "Tala ko na. Balik sa pagbabantay.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heard. That's enough talk for now.",
+                            {
+                                ["id"] = "terse",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "All right.",
+                                        "Understood.",
+                                        "Heard.",
+                                        "Got it.",
+                                        "Right.",
+                                        "Done.",
+                                        "Clear.",
+                                        "Good.",
+                                        "Okay.",
+                                        "Noted.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige.",
+                                        "Naintindihan.",
+                                        "Narinig ko.",
+                                        "Nakuha ko.",
+                                        "Tama.",
+                                        "Tapos.",
+                                        "Malinaw.",
+                                        "Mabuti.",
+                                        "Sige na.",
+                                        "Tala ko na.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Narinig ko. Sapat na ang usapan sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Message received. Keep your distance.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko. Manatili ka sa puwesto mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. Let's keep our heads on our shoulders.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Mag-ingat na lang tayo sa paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I heard what you said. Leaving it at that.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko ang sinabi mo. Iiwan ko na roon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. Eyes open.",
-                            },
-                            ["TL"] = {
-                                "Sige. Buksan ang mga mata.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I take your point. Let's stay alert.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko ang punto mo. Manatiling alisto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear enough. No more discussion needed.",
-                            },
-                            ["TL"] = {
-                                "Malinaw na. Hindi na kailangan ng karagdagang usapan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Keep sharp.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Maging alerto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted. Back to watching the perimeter.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na. Balik sa pagbabantay.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "All right. I'm here if you want to talk more.",
+                                        "Glad we talked. Holler anytime you need to chat.",
+                                        "I hear you loud and clear. Take care of yourself.",
+                                        "Good talking with you. We'll catch up again soon.",
+                                        "Understood. Always good to touch base with you.",
+                                        "Anytime you want to talk, you know where to find me.",
+                                        "Got it. Stay safe out there today.",
+                                        "Always happy to listen. Take it easy.",
+                                        "All right. Glad we got that sorted out together.",
+                                        "Thanks for taking the time to talk. Catch you later.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige. Narito ako kung gusto mo pang mag-usap.",
+                                        "Mabuti at nagkausap tayo. Tawagin mo lang ako kahit kailan.",
+                                        "Narinig kita nang malinaw. Ingatan mo ang sarili mo.",
+                                        "Masarap kang makausap. Magkuwentuhan ulit tayo mamaya.",
+                                        "Naintindihan ko. Laging magandang makipag-ugnayan sa 'yo.",
+                                        "Kahit kailan mo gustong mag-usap, alam mo kung nasaan ako.",
+                                        "Nakuha ko. Mag-ingat ka sa labas ngayong araw.",
+                                        "Lagi akong handang makinig. Dahan-dahan lang.",
+                                        "Sige. Mabuti at naayos natin 'yan nang magkasama.",
+                                        "Salamat sa paglalaan ng oras para mag-usap. Kita tayo mamaya.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "conversation.acknowledged.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "All right. Ask if you want to talk more.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.conversation.acknowledged.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,491 +474,212 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "All right. Ask if you want to talk more.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.conversation.acknowledged.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "All right. Ask if you want to talk more.",
+                        "Understood. Let me know if you need anything else.",
+                        "Sounds good. We can pick this up later.",
+                        "Got it. Let's get back to what we were doing.",
+                        "Fair enough. Holler if something comes up.",
+                        "All right. We're on the same page.",
+                        "Understood. Take care.",
+                        "Clear. We'll talk again soon.",
+                        "Got it. I'm around if you need to talk.",
+                        "Right. We'll leave it there for now.",
+                    },
+                    ["TL"] = {
+                        "Sige. Magtanong ka kung gusto mo pang mag-usap.",
+                        "Naiintindihan ko. Sabihan mo ako kung may kailangan ka pa.",
+                        "Mabuti. Pwede nating ipagpatuloy ito mamaya.",
+                        "Nakuha ko. Balik na tayo sa ginagawa natin.",
+                        "Makatwiran. Tawagin mo ako kapag may nangyari.",
+                        "Sige. Pareho tayo ng iniisip.",
+                        "Naintindihan. Mag-ingat ka.",
+                        "Malinaw. Mag-uusap tayong muli mamaya.",
+                        "Nakuha ko. Narito lang ako kung kailangan mong makipag-usap.",
+                        "Sige. Dito muna tayo magtapos sa ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Understood. We'll leave it there.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.conversation.acknowledged.default.say.1.guarded",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Understood. We'll leave it there.",
+                        "Heard. That's enough talk for now.",
+                        "Message received. Keep your distance.",
+                        "Got it. Let's keep our heads on our shoulders.",
+                        "I heard what you said. Leaving it at that.",
+                        "All right. Eyes open.",
+                        "I take your point. Let's stay alert.",
+                        "Clear enough. No more discussion needed.",
+                        "Understood. Keep sharp.",
+                        "Noted. Back to watching the perimeter.",
+                    },
+                    ["TL"] = {
+                        "Naiintindihan ko. Tama na iyon.",
+                        "Narinig ko. Sapat na ang usapan sa ngayon.",
+                        "Nakuha ko. Manatili ka sa puwesto mo.",
+                        "Naintindihan. Mag-ingat na lang tayo sa paligid.",
+                        "Narinig ko ang sinabi mo. Iiwan ko na roon.",
+                        "Sige. Buksan ang mga mata.",
+                        "Nakuha ko ang punto mo. Manatiling alisto.",
+                        "Malinaw na. Hindi na kailangan ng karagdagang usapan.",
+                        "Naintindihan. Maging alerto.",
+                        "Tala ko na. Balik sa pagbabantay.",
+                    },
+                },
+                ["variantID"] = "guarded",
+            },
+            {
+                ["fallback"] = "All right.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.conversation.acknowledged.default.say.1.terse",
+                ["translations"] = {
+                    ["EN"] = {
+                        "All right.",
+                        "Understood.",
+                        "Heard.",
+                        "Got it.",
+                        "Right.",
+                        "Done.",
+                        "Clear.",
+                        "Good.",
+                        "Okay.",
+                        "Noted.",
+                    },
+                    ["TL"] = {
+                        "Sige.",
+                        "Naintindihan.",
+                        "Narinig ko.",
+                        "Nakuha ko.",
+                        "Tama.",
+                        "Tapos.",
+                        "Malinaw.",
+                        "Mabuti.",
+                        "Sige na.",
+                        "Tala ko na.",
+                    },
+                },
+                ["variantID"] = "terse",
+            },
+            {
+                ["fallback"] = "All right. I'm here if you want to talk more.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.conversation.acknowledged.default.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "All right. I'm here if you want to talk more.",
+                        "Glad we talked. Holler anytime you need to chat.",
+                        "I hear you loud and clear. Take care of yourself.",
+                        "Good talking with you. We'll catch up again soon.",
+                        "Understood. Always good to touch base with you.",
+                        "Anytime you want to talk, you know where to find me.",
+                        "Got it. Stay safe out there today.",
+                        "Always happy to listen. Take it easy.",
+                        "All right. Glad we got that sorted out together.",
+                        "Thanks for taking the time to talk. Catch you later.",
+                    },
+                    ["TL"] = {
+                        "Sige. Narito ako kung gusto mo pang mag-usap.",
+                        "Mabuti at nagkausap tayo. Tawagin mo lang ako kahit kailan.",
+                        "Narinig kita nang malinaw. Ingatan mo ang sarili mo.",
+                        "Masarap kang makausap. Magkuwentuhan ulit tayo mamaya.",
+                        "Naintindihan ko. Laging magandang makipag-ugnayan sa 'yo.",
+                        "Kahit kailan mo gustong mag-usap, alam mo kung nasaan ako.",
+                        "Nakuha ko. Mag-ingat ka sa labas ngayong araw.",
+                        "Lagi akong handang makinig. Dahan-dahan lang.",
+                        "Sige. Mabuti at naayos natin 'yan nang magkasama.",
+                        "Salamat sa paglalaan ng oras para mag-usap. Kita tayo mamaya.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.conversation.acknowledged.default.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.conversation.acknowledged.default.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.conversation.acknowledged.default",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.conversation.acknowledged.default",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_conversation.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. Ask if you want to talk more.",
-                            },
-                            ["TL"] = {
-                                "Sige. Magtanong ka kung gusto mo pang mag-usap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Let me know if you need anything else.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Sabihan mo ako kung may kailangan ka pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds good. We can pick this up later.",
-                            },
-                            ["TL"] = {
-                                "Mabuti. Pwede nating ipagpatuloy ito mamaya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. Let's get back to what we were doing.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko. Balik na tayo sa ginagawa natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fair enough. Holler if something comes up.",
-                            },
-                            ["TL"] = {
-                                "Makatwiran. Tawagin mo ako kapag may nangyari.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. We're on the same page.",
-                            },
-                            ["TL"] = {
-                                "Sige. Pareho tayo ng iniisip.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Take care.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Mag-ingat ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear. We'll talk again soon.",
-                            },
-                            ["TL"] = {
-                                "Malinaw. Mag-uusap tayong muli mamaya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. I'm around if you need to talk.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko. Narito lang ako kung kailangan mong makipag-usap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. We'll leave it there for now.",
-                            },
-                            ["TL"] = {
-                                "Sige. Dito muna tayo magtapos sa ngayon.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.clap",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Well done, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.clap.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Well done, {addressee.name}.",
+                                        "That's worth celebrating, {addressee.name}.",
+                                        "Nice work, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Magaling, {addressee.name}.",
+                                        "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
+                                        "Mahusay na trabaho, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.conversation.acknowledged.default.terse",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "terse",
-            ["sourceId"] = "semantic.conversation.acknowledged.default.terse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[2]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.conversation.acknowledged.default",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.conversation.acknowledged.default",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_conversation.json",
-                ["style"] = "terse",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "terse.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right.",
-                            },
-                            ["TL"] = {
-                                "Sige.",
-                            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Well done, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.clap.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Well done, {addressee.name}.",
+                            "That's worth celebrating, {addressee.name}.",
+                            "Nice work, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Magaling, {addressee.name}.",
+                            "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
+                            "Mahusay na trabaho, {addressee.name}.",
                         },
                     },
-                    {
-                        ["id"] = "terse.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heard.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right.",
-                            },
-                            ["TL"] = {
-                                "Tama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done.",
-                            },
-                            ["TL"] = {
-                                "Tapos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear.",
-                            },
-                            ["TL"] = {
-                                "Malinaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good.",
-                            },
-                            ["TL"] = {
-                                "Mabuti.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Okay.",
-                            },
-                            ["TL"] = {
-                                "Sige na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na.",
-                            },
-                        },
-                    },
+                    ["variantID"] = "neutral",
                 },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.conversation.acknowledged.default.warm",
+        ["id"] = "emote.player.clap",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.conversation.acknowledged.default.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[3]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.conversation.acknowledged.default",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.conversation.acknowledged.default",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_conversation.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. I'm here if you want to talk more.",
-                            },
-                            ["TL"] = {
-                                "Sige. Narito ako kung gusto mo pang mag-usap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad we talked. Holler anytime you need to chat.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nagkausap tayo. Tawagin mo lang ako kahit kailan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear you loud and clear. Take care of yourself.",
-                            },
-                            ["TL"] = {
-                                "Narinig kita nang malinaw. Ingatan mo ang sarili mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good talking with you. We'll catch up again soon.",
-                            },
-                            ["TL"] = {
-                                "Masarap kang makausap. Magkuwentuhan ulit tayo mamaya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Always good to touch base with you.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan ko. Laging magandang makipag-ugnayan sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Anytime you want to talk, you know where to find me.",
-                            },
-                            ["TL"] = {
-                                "Kahit kailan mo gustong mag-usap, alam mo kung nasaan ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. Stay safe out there today.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko. Mag-ingat ka sa labas ngayong araw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Always happy to listen. Take it easy.",
-                            },
-                            ["TL"] = {
-                                "Lagi akong handang makinig. Dahan-dahan lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. Glad we got that sorted out together.",
-                            },
-                            ["TL"] = {
-                                "Sige. Mabuti at naayos natin 'yan nang magkasama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for taking the time to talk. Catch you later.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa paglalaan ng oras para mag-usap. Kita tayo mamaya.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.clap.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.clap.neutral",
+            ["localId"] = "clap",
+            ["sourceId"] = "emote.player.clap",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_clap.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.clap",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -653,50 +693,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.clap",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Well done, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Magaling, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's worth celebrating, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nice work, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Mahusay na trabaho, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Well done, {addressee.name}.",
+                                        "That's worth celebrating, {addressee.name}.",
+                                        "Nice work, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Magaling, {addressee.name}.",
+                                        "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
+                                        "Mahusay na trabaho, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.clap",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Well done, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.clap.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -706,20 +760,99 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Well done, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.clap.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Well done, {addressee.name}.",
+                        "That's worth celebrating, {addressee.name}.",
+                        "Nice work, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Magaling, {addressee.name}.",
+                        "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
+                        "Mahusay na trabaho, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.insult.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.insult",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Back off, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.insult.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Back off, {addressee.name}.",
+                                        "You're asking for trouble, {addressee.name}.",
+                                        "Keep your distance, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Lumayo ka, {addressee.name}.",
+                                        "Naghahanap ka ng gulo, {addressee.name}.",
+                                        "Panatilihin ang distansya, {addressee.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Back off, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.insult.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Back off, {addressee.name}.",
+                            "You're asking for trouble, {addressee.name}.",
+                            "Keep your distance, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Lumayo ka, {addressee.name}.",
+                            "Naghahanap ka ng gulo, {addressee.name}.",
+                            "Panatilihin ang distansya, {addressee.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.player.insult",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.insult.neutral",
+            ["localId"] = "insult",
+            ["sourceId"] = "emote.player.insult",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_insult.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.insult",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -733,50 +866,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.insult",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Back off, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Lumayo ka, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're asking for trouble, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Naghahanap ka ng gulo, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep your distance, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Panatilihin ang distansya, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Back off, {addressee.name}.",
+                                        "You're asking for trouble, {addressee.name}.",
+                                        "Keep your distance, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Lumayo ka, {addressee.name}.",
+                                        "Naghahanap ka ng gulo, {addressee.name}.",
+                                        "Panatilihin ang distansya, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.insult",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Back off, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.insult.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -786,20 +933,99 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Back off, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.insult.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Back off, {addressee.name}.",
+                        "You're asking for trouble, {addressee.name}.",
+                        "Keep your distance, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Lumayo ka, {addressee.name}.",
+                        "Naghahanap ka ng gulo, {addressee.name}.",
+                        "Panatilihin ang distansya, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.salute.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.salute",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Respect, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.salute.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Respect, {addressee.name}.",
+                                        "I see you, {addressee.name}.",
+                                        "Stay sharp, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Paggalang, {addressee.name}.",
+                                        "Nakikita kita, {addressee.name}.",
+                                        "Manatiling alerto, {addressee.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Respect, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.salute.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Respect, {addressee.name}.",
+                            "I see you, {addressee.name}.",
+                            "Stay sharp, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Paggalang, {addressee.name}.",
+                            "Nakikita kita, {addressee.name}.",
+                            "Manatiling alerto, {addressee.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.player.salute",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.salute.neutral",
+            ["localId"] = "salute",
+            ["sourceId"] = "emote.player.salute",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_salute.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.salute",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -813,50 +1039,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.salute",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Respect, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Paggalang, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I see you, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Nakikita kita, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay sharp, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Manatiling alerto, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Respect, {addressee.name}.",
+                                        "I see you, {addressee.name}.",
+                                        "Stay sharp, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Paggalang, {addressee.name}.",
+                                        "Nakikita kita, {addressee.name}.",
+                                        "Manatiling alerto, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.salute",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Respect, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.salute.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -866,20 +1106,99 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Respect, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.salute.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Respect, {addressee.name}.",
+                        "I see you, {addressee.name}.",
+                        "Stay sharp, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Paggalang, {addressee.name}.",
+                        "Nakikita kita, {addressee.name}.",
+                        "Manatiling alerto, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.thankyou.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.thankyou",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Thanks, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.thankyou.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Thanks, {addressee.name}.",
+                                        "I appreciate that, {addressee.name}.",
+                                        "You have my thanks, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat, {addressee.name}.",
+                                        "Pinahahalagahan ko iyan, {addressee.name}.",
+                                        "Salamat sa iyo, {addressee.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Thanks, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.thankyou.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thanks, {addressee.name}.",
+                            "I appreciate that, {addressee.name}.",
+                            "You have my thanks, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Salamat, {addressee.name}.",
+                            "Pinahahalagahan ko iyan, {addressee.name}.",
+                            "Salamat sa iyo, {addressee.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.player.thankyou",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.thankyou.neutral",
+            ["localId"] = "thankyou",
+            ["sourceId"] = "emote.player.thankyou",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thankyou.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.thankyou",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -893,50 +1212,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.thankyou",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Salamat, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I appreciate that, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Pinahahalagahan ko iyan, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You have my thanks, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa iyo, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Thanks, {addressee.name}.",
+                                        "I appreciate that, {addressee.name}.",
+                                        "You have my thanks, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat, {addressee.name}.",
+                                        "Pinahahalagahan ko iyan, {addressee.name}.",
+                                        "Salamat sa iyo, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.thankyou",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Thanks, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.thankyou.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -946,20 +1279,99 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Thanks, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.thankyou.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thanks, {addressee.name}.",
+                        "I appreciate that, {addressee.name}.",
+                        "You have my thanks, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Salamat, {addressee.name}.",
+                        "Pinahahalagahan ko iyan, {addressee.name}.",
+                        "Salamat sa iyo, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.thumbsdown.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.thumbsdown",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "No. That's not good enough, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.thumbsdown.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "No. That's not good enough, {addressee.name}.",
+                                        "I don't like that, {addressee.name}.",
+                                        "Try again, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi. Hindi sapat iyan, {addressee.name}.",
+                                        "Hindi ko gusto iyan, {addressee.name}.",
+                                        "Subukan muli, {addressee.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "No. That's not good enough, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.thumbsdown.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "No. That's not good enough, {addressee.name}.",
+                            "I don't like that, {addressee.name}.",
+                            "Try again, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Hindi. Hindi sapat iyan, {addressee.name}.",
+                            "Hindi ko gusto iyan, {addressee.name}.",
+                            "Subukan muli, {addressee.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.player.thumbsdown",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.thumbsdown.neutral",
+            ["localId"] = "thumbsdown",
+            ["sourceId"] = "emote.player.thumbsdown",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsdown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.thumbsdown",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -973,50 +1385,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.thumbsdown",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No. That's not good enough, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Hindi. Hindi sapat iyan, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't like that, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko gusto iyan, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Try again, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Subukan muli, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "No. That's not good enough, {addressee.name}.",
+                                        "I don't like that, {addressee.name}.",
+                                        "Try again, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi. Hindi sapat iyan, {addressee.name}.",
+                                        "Hindi ko gusto iyan, {addressee.name}.",
+                                        "Subukan muli, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.thumbsdown",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "No. That's not good enough, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.thumbsdown.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1026,20 +1452,99 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "No. That's not good enough, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.thumbsdown.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "No. That's not good enough, {addressee.name}.",
+                        "I don't like that, {addressee.name}.",
+                        "Try again, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Hindi. Hindi sapat iyan, {addressee.name}.",
+                        "Hindi ko gusto iyan, {addressee.name}.",
+                        "Subukan muli, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.thumbsup.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.thumbsup",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Good work, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.thumbsup.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Good work, {addressee.name}.",
+                                        "That's what I like to see, {addressee.name}.",
+                                        "Keep it up, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Mahusay, {addressee.name}.",
+                                        "Iyan ang gusto kong makita, {addressee.name}.",
+                                        "Ipagpatuloy mo, {addressee.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Good work, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.thumbsup.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Good work, {addressee.name}.",
+                            "That's what I like to see, {addressee.name}.",
+                            "Keep it up, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Mahusay, {addressee.name}.",
+                            "Iyan ang gusto kong makita, {addressee.name}.",
+                            "Ipagpatuloy mo, {addressee.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.player.thumbsup",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.thumbsup.neutral",
+            ["localId"] = "thumbsup",
+            ["sourceId"] = "emote.player.thumbsup",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsup.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.thumbsup",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1053,50 +1558,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.thumbsup",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good work, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Mahusay, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's what I like to see, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Iyan ang gusto kong makita, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep it up, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Ipagpatuloy mo, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Good work, {addressee.name}.",
+                                        "That's what I like to see, {addressee.name}.",
+                                        "Keep it up, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Mahusay, {addressee.name}.",
+                                        "Iyan ang gusto kong makita, {addressee.name}.",
+                                        "Ipagpatuloy mo, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.thumbsup",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Good work, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.thumbsup.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1106,20 +1625,99 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Good work, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.thumbsup.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Good work, {addressee.name}.",
+                        "That's what I like to see, {addressee.name}.",
+                        "Keep it up, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Mahusay, {addressee.name}.",
+                        "Iyan ang gusto kong makita, {addressee.name}.",
+                        "Ipagpatuloy mo, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.wavebye.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.wavebye",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Take care, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.wavebye.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Take care, {addressee.name}.",
+                                        "See you around, {addressee.name}.",
+                                        "Stay safe, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Mag-ingat, {addressee.name}.",
+                                        "Kita tayo, {addressee.name}.",
+                                        "Manatiling ligtas, {addressee.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Take care, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.wavebye.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Take care, {addressee.name}.",
+                            "See you around, {addressee.name}.",
+                            "Stay safe, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Mag-ingat, {addressee.name}.",
+                            "Kita tayo, {addressee.name}.",
+                            "Manatiling ligtas, {addressee.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.player.wavebye",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.wavebye.neutral",
+            ["localId"] = "wavebye",
+            ["sourceId"] = "emote.player.wavebye",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavebye.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.wavebye",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1133,50 +1731,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.wavebye",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take care, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "See you around, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Kita tayo, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay safe, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Manatiling ligtas, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Take care, {addressee.name}.",
+                                        "See you around, {addressee.name}.",
+                                        "Stay safe, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Mag-ingat, {addressee.name}.",
+                                        "Kita tayo, {addressee.name}.",
+                                        "Manatiling ligtas, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.wavebye",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Take care, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.wavebye.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1186,20 +1798,99 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Take care, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.wavebye.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Take care, {addressee.name}.",
+                        "See you around, {addressee.name}.",
+                        "Stay safe, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Mag-ingat, {addressee.name}.",
+                        "Kita tayo, {addressee.name}.",
+                        "Manatiling ligtas, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.player.wavehi.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.player.wavehi",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hey, {addressee.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.player.wavehi.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hey, {addressee.name}.",
+                                        "Good to see you, {addressee.name}.",
+                                        "Morning, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Uy, {addressee.name}.",
+                                        "Mabuti at nakita kita, {addressee.name}.",
+                                        "Magandang umaga, {addressee.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.player",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Hey, {addressee.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.player.wavehi.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hey, {addressee.name}.",
+                            "Good to see you, {addressee.name}.",
+                            "Morning, {addressee.name}.",
+                        },
+                        ["TL"] = {
+                            "Uy, {addressee.name}.",
+                            "Mabuti at nakita kita, {addressee.name}.",
+                            "Magandang umaga, {addressee.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.player.wavehi",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.player.wavehi.neutral",
+            ["localId"] = "wavehi",
+            ["sourceId"] = "emote.player.wavehi",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavehi.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.player.wavehi",
+        ["namespace"] = "emote.player",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1213,50 +1904,64 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.player.wavehi",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Uy, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to see you, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nakita kita, {addressee.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Morning, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Magandang umaga, {addressee.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hey, {addressee.name}.",
+                                        "Good to see you, {addressee.name}.",
+                                        "Morning, {addressee.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Uy, {addressee.name}.",
+                                        "Mabuti at nakita kita, {addressee.name}.",
+                                        "Magandang umaga, {addressee.name}.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.player.wavehi",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Hey, {addressee.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.player.wavehi.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1266,20 +1971,192 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Hey, {addressee.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.player.wavehi.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hey, {addressee.name}.",
+                        "Good to see you, {addressee.name}.",
+                        "Morning, {addressee.name}.",
+                    },
+                    ["TL"] = {
+                        "Uy, {addressee.name}.",
+                        "Mabuti at nakita kita, {addressee.name}.",
+                        "Magandang umaga, {addressee.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.clap.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.reply.clap",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Thanks.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.reply.clap.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Thanks.",
+                                        "Appreciate the applause.",
+                                        "Just doing what had to be done.",
+                                        "Glad you liked it.",
+                                        "Much appreciated.",
+                                        "All in a day's work.",
+                                        "Thanks. Good to know it landed well.",
+                                        "Appreciate it.",
+                                        "Thanks. Let's keep the momentum going.",
+                                        "Thank you for the encouragement.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat.",
+                                        "Salamat sa palakpak.",
+                                        "Ginawa lang ang kailangang gawin.",
+                                        "Mabuti at nagustuhan mo.",
+                                        "Maraming salamat.",
+                                        "Bahagi lang 'yan ng araw-araw na trabaho.",
+                                        "Salamat. Mabuting malaman na maayos ang dating.",
+                                        "Salamat.",
+                                        "Salamat. Tuloy lang natin ang sigla.",
+                                        "Salamat sa pampalakas ng loob.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "You're too kind.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.emote.reply.clap.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're too kind.",
+                                        "Thanks! That really puts a smile on my face.",
+                                        "Appreciate the cheer! We make a solid team.",
+                                        "Thank you! Couldn't have done it without good company.",
+                                        "Haha, thanks! Glad to bring some light into the day.",
+                                        "That makes me feel good. Thank you!",
+                                        "You're awesome. Thanks for the cheer.",
+                                        "Appreciate the love! Let's keep winning.",
+                                        "Thanks a bunch! That means a lot to me.",
+                                        "Haha, bowing now! Thanks, friend.",
+                                    },
+                                    ["TL"] = {
+                                        "Napakabait mo naman.",
+                                        "Salamat! Napangiti talaga ako roon.",
+                                        "Salamat sa suporta! Matibay tayong grupo.",
+                                        "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
+                                        "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
+                                        "Napakasarap sa pakiramdam niyan. Salamat!",
+                                        "Ang galing mo. Salamat sa pagpalakpak.",
+                                        "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
+                                        "Maraming salamat! Malaking bagay 'yan sa akin.",
+                                        "Haha, yumuyukod na ako! Salamat, kaibigan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Thanks.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.clap.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thanks.",
+                            "Appreciate the applause.",
+                            "Just doing what had to be done.",
+                            "Glad you liked it.",
+                            "Much appreciated.",
+                            "All in a day's work.",
+                            "Thanks. Good to know it landed well.",
+                            "Appreciate it.",
+                            "Thanks. Let's keep the momentum going.",
+                            "Thank you for the encouragement.",
+                        },
+                        ["TL"] = {
+                            "Salamat.",
+                            "Salamat sa palakpak.",
+                            "Ginawa lang ang kailangang gawin.",
+                            "Mabuti at nagustuhan mo.",
+                            "Maraming salamat.",
+                            "Bahagi lang 'yan ng araw-araw na trabaho.",
+                            "Salamat. Mabuting malaman na maayos ang dating.",
+                            "Salamat.",
+                            "Salamat. Tuloy lang natin ang sigla.",
+                            "Salamat sa pampalakas ng loob.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "You're too kind.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.clap.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're too kind.",
+                            "Thanks! That really puts a smile on my face.",
+                            "Appreciate the cheer! We make a solid team.",
+                            "Thank you! Couldn't have done it without good company.",
+                            "Haha, thanks! Glad to bring some light into the day.",
+                            "That makes me feel good. Thank you!",
+                            "You're awesome. Thanks for the cheer.",
+                            "Appreciate the love! Let's keep winning.",
+                            "Thanks a bunch! That means a lot to me.",
+                            "Haha, bowing now! Thanks, friend.",
+                        },
+                        ["TL"] = {
+                            "Napakabait mo naman.",
+                            "Salamat! Napangiti talaga ako roon.",
+                            "Salamat sa suporta! Matibay tayong grupo.",
+                            "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
+                            "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
+                            "Napakasarap sa pakiramdam niyan. Salamat!",
+                            "Ang galing mo. Salamat sa pagpalakpak.",
+                            "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
+                            "Maraming salamat! Malaking bagay 'yan sa akin.",
+                            "Haha, yumuyukod na ako! Salamat, kaibigan.",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "emote.reply.clap",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.clap.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json#records[0]",
+            ["localId"] = "clap",
+            ["sourceId"] = "emote.reply.clap",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.clap",
+        ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1293,127 +2170,107 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.clap",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Thanks.",
+                                        "Appreciate the applause.",
+                                        "Just doing what had to be done.",
+                                        "Glad you liked it.",
+                                        "Much appreciated.",
+                                        "All in a day's work.",
+                                        "Thanks. Good to know it landed well.",
+                                        "Appreciate it.",
+                                        "Thanks. Let's keep the momentum going.",
+                                        "Thank you for the encouragement.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat.",
+                                        "Salamat sa palakpak.",
+                                        "Ginawa lang ang kailangang gawin.",
+                                        "Mabuti at nagustuhan mo.",
+                                        "Maraming salamat.",
+                                        "Bahagi lang 'yan ng araw-araw na trabaho.",
+                                        "Salamat. Mabuting malaman na maayos ang dating.",
+                                        "Salamat.",
+                                        "Salamat. Tuloy lang natin ang sigla.",
+                                        "Salamat sa pampalakas ng loob.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Appreciate the applause.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa palakpak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just doing what had to be done.",
-                            },
-                            ["TL"] = {
-                                "Ginawa lang ang kailangang gawin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad you liked it.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nagustuhan mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Much appreciated.",
-                            },
-                            ["TL"] = {
-                                "Maraming salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All in a day's work.",
-                            },
-                            ["TL"] = {
-                                "Bahagi lang 'yan ng araw-araw na trabaho.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. Good to know it landed well.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Mabuting malaman na maayos ang dating.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Appreciate it.",
-                            },
-                            ["TL"] = {
-                                "Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks. Let's keep the momentum going.",
-                            },
-                            ["TL"] = {
-                                "Salamat. Tuloy lang natin ang sigla.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you for the encouragement.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pampalakas ng loob.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're too kind.",
+                                        "Thanks! That really puts a smile on my face.",
+                                        "Appreciate the cheer! We make a solid team.",
+                                        "Thank you! Couldn't have done it without good company.",
+                                        "Haha, thanks! Glad to bring some light into the day.",
+                                        "That makes me feel good. Thank you!",
+                                        "You're awesome. Thanks for the cheer.",
+                                        "Appreciate the love! Let's keep winning.",
+                                        "Thanks a bunch! That means a lot to me.",
+                                        "Haha, bowing now! Thanks, friend.",
+                                    },
+                                    ["TL"] = {
+                                        "Napakabait mo naman.",
+                                        "Salamat! Napangiti talaga ako roon.",
+                                        "Salamat sa suporta! Matibay tayong grupo.",
+                                        "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
+                                        "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
+                                        "Napakasarap sa pakiramdam niyan. Salamat!",
+                                        "Ang galing mo. Salamat sa pagpalakpak.",
+                                        "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
+                                        "Maraming salamat! Malaking bagay 'yan sa akin.",
+                                        "Haha, yumuyukod na ako! Salamat, kaibigan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.reply.clap",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Thanks.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.reply.clap.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1423,177 +2280,174 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Thanks.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.clap.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thanks.",
+                        "Appreciate the applause.",
+                        "Just doing what had to be done.",
+                        "Glad you liked it.",
+                        "Much appreciated.",
+                        "All in a day's work.",
+                        "Thanks. Good to know it landed well.",
+                        "Appreciate it.",
+                        "Thanks. Let's keep the momentum going.",
+                        "Thank you for the encouragement.",
+                    },
+                    ["TL"] = {
+                        "Salamat.",
+                        "Salamat sa palakpak.",
+                        "Ginawa lang ang kailangang gawin.",
+                        "Mabuti at nagustuhan mo.",
+                        "Maraming salamat.",
+                        "Bahagi lang 'yan ng araw-araw na trabaho.",
+                        "Salamat. Mabuting malaman na maayos ang dating.",
+                        "Salamat.",
+                        "Salamat. Tuloy lang natin ang sigla.",
+                        "Salamat sa pampalakas ng loob.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "You're too kind.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.clap.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're too kind.",
+                        "Thanks! That really puts a smile on my face.",
+                        "Appreciate the cheer! We make a solid team.",
+                        "Thank you! Couldn't have done it without good company.",
+                        "Haha, thanks! Glad to bring some light into the day.",
+                        "That makes me feel good. Thank you!",
+                        "You're awesome. Thanks for the cheer.",
+                        "Appreciate the love! Let's keep winning.",
+                        "Thanks a bunch! That means a lot to me.",
+                        "Haha, bowing now! Thanks, friend.",
+                    },
+                    ["TL"] = {
+                        "Napakabait mo naman.",
+                        "Salamat! Napangiti talaga ako roon.",
+                        "Salamat sa suporta! Matibay tayong grupo.",
+                        "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
+                        "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
+                        "Napakasarap sa pakiramdam niyan. Salamat!",
+                        "Ang galing mo. Salamat sa pagpalakpak.",
+                        "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
+                        "Maraming salamat! Malaking bagay 'yan sa akin.",
+                        "Haha, yumuyukod na ako! Salamat, kaibigan.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.clap.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.emote.reply.clap.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.clap",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.clap",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're too kind.",
-                            },
-                            ["TL"] = {
-                                "Napakabait mo naman.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks! That really puts a smile on my face.",
-                            },
-                            ["TL"] = {
-                                "Salamat! Napangiti talaga ako roon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Appreciate the cheer! We make a solid team.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa suporta! Matibay tayong grupo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you! Couldn't have done it without good company.",
-                            },
-                            ["TL"] = {
-                                "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Haha, thanks! Glad to bring some light into the day.",
-                            },
-                            ["TL"] = {
-                                "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That makes me feel good. Thank you!",
-                            },
-                            ["TL"] = {
-                                "Napakasarap sa pakiramdam niyan. Salamat!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're awesome. Thanks for the cheer.",
-                            },
-                            ["TL"] = {
-                                "Ang galing mo. Salamat sa pagpalakpak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Appreciate the love! Let's keep winning.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks a bunch! That means a lot to me.",
-                            },
-                            ["TL"] = {
-                                "Maraming salamat! Malaking bagay 'yan sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Haha, bowing now! Thanks, friend.",
-                            },
-                            ["TL"] = {
-                                "Haha, yumuyukod na ako! Salamat, kaibigan.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.reply.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I hear you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.reply.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I hear you.",
+                                        "Got it.",
+                                        "Understood.",
+                                        "Fair enough.",
+                                        "I see you.",
+                                        "Right back at you.",
+                                        "Acknowledged.",
+                                        "Noted.",
+                                        "All right.",
+                                        "Message received.",
+                                    },
+                                    ["TL"] = {
+                                        "Narinig kita.",
+                                        "Nakuha ko.",
+                                        "Naiintindihan ko.",
+                                        "May punto ka.",
+                                        "Nakikita kita.",
+                                        "Pabalik din sa 'yo.",
+                                        "Kinikilala ko.",
+                                        "Tala ko na.",
+                                        "Sige.",
+                                        "Mensahe nakuha.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I hear you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I hear you.",
+                            "Got it.",
+                            "Understood.",
+                            "Fair enough.",
+                            "I see you.",
+                            "Right back at you.",
+                            "Acknowledged.",
+                            "Noted.",
+                            "All right.",
+                            "Message received.",
+                        },
+                        ["TL"] = {
+                            "Narinig kita.",
+                            "Nakuha ko.",
+                            "Naiintindihan ko.",
+                            "May punto ka.",
+                            "Nakikita kita.",
+                            "Pabalik din sa 'yo.",
+                            "Kinikilala ko.",
+                            "Tala ko na.",
+                            "Sige.",
+                            "Mensahe nakuha.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.default.neutral",
+        ["id"] = "emote.reply.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.default.neutral",
+            ["localId"] = "default",
+            ["sourceId"] = "emote.reply.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.default",
+        ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1607,127 +2461,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.default",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear you.",
-                            },
-                            ["TL"] = {
-                                "Narinig kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fair enough.",
-                            },
-                            ["TL"] = {
-                                "May punto ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I see you.",
-                            },
-                            ["TL"] = {
-                                "Nakikita kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right back at you.",
-                            },
-                            ["TL"] = {
-                                "Pabalik din sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Acknowledged.",
-                            },
-                            ["TL"] = {
-                                "Kinikilala ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right.",
-                            },
-                            ["TL"] = {
-                                "Sige.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Message received.",
-                            },
-                            ["TL"] = {
-                                "Mensahe nakuha.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I hear you.",
+                                        "Got it.",
+                                        "Understood.",
+                                        "Fair enough.",
+                                        "I see you.",
+                                        "Right back at you.",
+                                        "Acknowledged.",
+                                        "Noted.",
+                                        "All right.",
+                                        "Message received.",
+                                    },
+                                    ["TL"] = {
+                                        "Narinig kita.",
+                                        "Nakuha ko.",
+                                        "Naiintindihan ko.",
+                                        "May punto ka.",
+                                        "Nakikita kita.",
+                                        "Pabalik din sa 'yo.",
+                                        "Kinikilala ko.",
+                                        "Tala ko na.",
+                                        "Sige.",
+                                        "Mensahe nakuha.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.reply.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I hear you.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.reply.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1737,20 +2542,206 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I hear you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I hear you.",
+                        "Got it.",
+                        "Understood.",
+                        "Fair enough.",
+                        "I see you.",
+                        "Right back at you.",
+                        "Acknowledged.",
+                        "Noted.",
+                        "All right.",
+                        "Message received.",
+                    },
+                    ["TL"] = {
+                        "Narinig kita.",
+                        "Nakuha ko.",
+                        "Naiintindihan ko.",
+                        "May punto ka.",
+                        "Nakikita kita.",
+                        "Pabalik din sa 'yo.",
+                        "Kinikilala ko.",
+                        "Tala ko na.",
+                        "Sige.",
+                        "Mensahe nakuha.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.insult.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.reply.insult",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Keep it respectful.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.reply.insult.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Keep it respectful.",
+                                        "Save that attitude for the dead.",
+                                        "Not in the mood for that.",
+                                        "Watch yourself.",
+                                        "Keep your hands and words to yourself.",
+                                        "Don't start something out here.",
+                                        "Grow up. We have real threats to worry about.",
+                                        "Not amused.",
+                                        "Check yourself before you cause trouble.",
+                                        "I'm ignoring that for now. Don't push it.",
+                                    },
+                                    ["TL"] = {
+                                        "Maging magalang ka.",
+                                        "Itabi mo ang ugaling 'yan para sa mga patay.",
+                                        "Wala ako sa mood para diyan.",
+                                        "Mag-ingat ka.",
+                                        "Itago mo sa sarili mo ang mga salita mo.",
+                                        "Huwag kang magsimula ng gulo rito.",
+                                        "Magpakatanda ka. May mga totoong panganib tayong kinakaharap.",
+                                        "Hindi nakatutuwa.",
+                                        "Pagsabihan mo ang sarili mo bago ka makagawa ng gulo.",
+                                        "Pinalalampas ko muna 'yan. Huwag mong sagarin.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "You're lucky I know you.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.emote.reply.insult.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're lucky I know you.",
+                                        "Very funny. Don't make a habit of it.",
+                                        "I'll let that slide because it's you.",
+                                        "Haha, watch it, or I might just get even.",
+                                        "Good thing we're friends, or we'd have words.",
+                                        "You always like testing my patience, don't you?",
+                                        "Play nice. I know you're just messing around.",
+                                        "You're pushing your luck, but I'll allow it this once.",
+                                        "Only you could get away with saying that to me.",
+                                        "Haha, all right, point taken, smart-mouth.",
+                                    },
+                                    ["TL"] = {
+                                        "Suwerte ka dahil kilala kita.",
+                                        "Nakakatawa. Huwag mong gagawing bisyo 'yan.",
+                                        "Palalampasin ko 'yan dahil ikaw 'yan.",
+                                        "Haha, mag-ingat ka, baka gumanti ako.",
+                                        "Mabuti na lang magkaibigan tayo, kundi magkakatuusan tayo.",
+                                        "Gusto mo talagang sinusubukan ang pasensya ko, 'no?",
+                                        "Mag-ayos ka. Alam kong nagbibiro ka lang.",
+                                        "Sinusugal mo ang suwerte mo, pero papayagan ko muna ngayon.",
+                                        "Ikaw lang ang makalulusot sa pagsasabi niyan sa akin.",
+                                        "Haha, sige na, nakuha ko na, pilosopo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Keep it respectful.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.insult.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Keep it respectful.",
+                            "Save that attitude for the dead.",
+                            "Not in the mood for that.",
+                            "Watch yourself.",
+                            "Keep your hands and words to yourself.",
+                            "Don't start something out here.",
+                            "Grow up. We have real threats to worry about.",
+                            "Not amused.",
+                            "Check yourself before you cause trouble.",
+                            "I'm ignoring that for now. Don't push it.",
+                        },
+                        ["TL"] = {
+                            "Maging magalang ka.",
+                            "Itabi mo ang ugaling 'yan para sa mga patay.",
+                            "Wala ako sa mood para diyan.",
+                            "Mag-ingat ka.",
+                            "Itago mo sa sarili mo ang mga salita mo.",
+                            "Huwag kang magsimula ng gulo rito.",
+                            "Magpakatanda ka. May mga totoong panganib tayong kinakaharap.",
+                            "Hindi nakatutuwa.",
+                            "Pagsabihan mo ang sarili mo bago ka makagawa ng gulo.",
+                            "Pinalalampas ko muna 'yan. Huwag mong sagarin.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "You're lucky I know you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.insult.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're lucky I know you.",
+                            "Very funny. Don't make a habit of it.",
+                            "I'll let that slide because it's you.",
+                            "Haha, watch it, or I might just get even.",
+                            "Good thing we're friends, or we'd have words.",
+                            "You always like testing my patience, don't you?",
+                            "Play nice. I know you're just messing around.",
+                            "You're pushing your luck, but I'll allow it this once.",
+                            "Only you could get away with saying that to me.",
+                            "Haha, all right, point taken, smart-mouth.",
+                        },
+                        ["TL"] = {
+                            "Suwerte ka dahil kilala kita.",
+                            "Nakakatawa. Huwag mong gagawing bisyo 'yan.",
+                            "Palalampasin ko 'yan dahil ikaw 'yan.",
+                            "Haha, mag-ingat ka, baka gumanti ako.",
+                            "Mabuti na lang magkaibigan tayo, kundi magkakatuusan tayo.",
+                            "Gusto mo talagang sinusubukan ang pasensya ko, 'no?",
+                            "Mag-ayos ka. Alam kong nagbibiro ka lang.",
+                            "Sinusugal mo ang suwerte mo, pero papayagan ko muna ngayon.",
+                            "Ikaw lang ang makalulusot sa pagsasabi niyan sa akin.",
+                            "Haha, sige na, nakuha ko na, pilosopo.",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "emote.reply.insult",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.insult.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json#records[0]",
+            ["localId"] = "insult",
+            ["sourceId"] = "emote.reply.insult",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.insult",
+        ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1764,127 +2755,107 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.insult",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep it respectful.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Keep it respectful.",
+                                        "Save that attitude for the dead.",
+                                        "Not in the mood for that.",
+                                        "Watch yourself.",
+                                        "Keep your hands and words to yourself.",
+                                        "Don't start something out here.",
+                                        "Grow up. We have real threats to worry about.",
+                                        "Not amused.",
+                                        "Check yourself before you cause trouble.",
+                                        "I'm ignoring that for now. Don't push it.",
+                                    },
+                                    ["TL"] = {
+                                        "Maging magalang ka.",
+                                        "Itabi mo ang ugaling 'yan para sa mga patay.",
+                                        "Wala ako sa mood para diyan.",
+                                        "Mag-ingat ka.",
+                                        "Itago mo sa sarili mo ang mga salita mo.",
+                                        "Huwag kang magsimula ng gulo rito.",
+                                        "Magpakatanda ka. May mga totoong panganib tayong kinakaharap.",
+                                        "Hindi nakatutuwa.",
+                                        "Pagsabihan mo ang sarili mo bago ka makagawa ng gulo.",
+                                        "Pinalalampas ko muna 'yan. Huwag mong sagarin.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Maging magalang ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Save that attitude for the dead.",
-                            },
-                            ["TL"] = {
-                                "Itabi mo ang ugaling 'yan para sa mga patay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not in the mood for that.",
-                            },
-                            ["TL"] = {
-                                "Wala ako sa mood para diyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch yourself.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep your hands and words to yourself.",
-                            },
-                            ["TL"] = {
-                                "Itago mo sa sarili mo ang mga salita mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't start something out here.",
-                            },
-                            ["TL"] = {
-                                "Huwag kang magsimula ng gulo rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Grow up. We have real threats to worry about.",
-                            },
-                            ["TL"] = {
-                                "Magpakatanda ka. May mga totoong panganib tayong kinakaharap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not amused.",
-                            },
-                            ["TL"] = {
-                                "Hindi nakatutuwa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Check yourself before you cause trouble.",
-                            },
-                            ["TL"] = {
-                                "Pagsabihan mo ang sarili mo bago ka makagawa ng gulo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm ignoring that for now. Don't push it.",
-                            },
-                            ["TL"] = {
-                                "Pinalalampas ko muna 'yan. Huwag mong sagarin.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're lucky I know you.",
+                                        "Very funny. Don't make a habit of it.",
+                                        "I'll let that slide because it's you.",
+                                        "Haha, watch it, or I might just get even.",
+                                        "Good thing we're friends, or we'd have words.",
+                                        "You always like testing my patience, don't you?",
+                                        "Play nice. I know you're just messing around.",
+                                        "You're pushing your luck, but I'll allow it this once.",
+                                        "Only you could get away with saying that to me.",
+                                        "Haha, all right, point taken, smart-mouth.",
+                                    },
+                                    ["TL"] = {
+                                        "Suwerte ka dahil kilala kita.",
+                                        "Nakakatawa. Huwag mong gagawing bisyo 'yan.",
+                                        "Palalampasin ko 'yan dahil ikaw 'yan.",
+                                        "Haha, mag-ingat ka, baka gumanti ako.",
+                                        "Mabuti na lang magkaibigan tayo, kundi magkakatuusan tayo.",
+                                        "Gusto mo talagang sinusubukan ang pasensya ko, 'no?",
+                                        "Mag-ayos ka. Alam kong nagbibiro ka lang.",
+                                        "Sinusugal mo ang suwerte mo, pero papayagan ko muna ngayon.",
+                                        "Ikaw lang ang makalulusot sa pagsasabi niyan sa akin.",
+                                        "Haha, sige na, nakuha ko na, pilosopo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.reply.insult",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Keep it respectful.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.reply.insult.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1894,20 +2865,239 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Keep it respectful.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.insult.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Keep it respectful.",
+                        "Save that attitude for the dead.",
+                        "Not in the mood for that.",
+                        "Watch yourself.",
+                        "Keep your hands and words to yourself.",
+                        "Don't start something out here.",
+                        "Grow up. We have real threats to worry about.",
+                        "Not amused.",
+                        "Check yourself before you cause trouble.",
+                        "I'm ignoring that for now. Don't push it.",
+                    },
+                    ["TL"] = {
+                        "Maging magalang ka.",
+                        "Itabi mo ang ugaling 'yan para sa mga patay.",
+                        "Wala ako sa mood para diyan.",
+                        "Mag-ingat ka.",
+                        "Itago mo sa sarili mo ang mga salita mo.",
+                        "Huwag kang magsimula ng gulo rito.",
+                        "Magpakatanda ka. May mga totoong panganib tayong kinakaharap.",
+                        "Hindi nakatutuwa.",
+                        "Pagsabihan mo ang sarili mo bago ka makagawa ng gulo.",
+                        "Pinalalampas ko muna 'yan. Huwag mong sagarin.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "You're lucky I know you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.insult.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're lucky I know you.",
+                        "Very funny. Don't make a habit of it.",
+                        "I'll let that slide because it's you.",
+                        "Haha, watch it, or I might just get even.",
+                        "Good thing we're friends, or we'd have words.",
+                        "You always like testing my patience, don't you?",
+                        "Play nice. I know you're just messing around.",
+                        "You're pushing your luck, but I'll allow it this once.",
+                        "Only you could get away with saying that to me.",
+                        "Haha, all right, point taken, smart-mouth.",
+                    },
+                    ["TL"] = {
+                        "Suwerte ka dahil kilala kita.",
+                        "Nakakatawa. Huwag mong gagawing bisyo 'yan.",
+                        "Palalampasin ko 'yan dahil ikaw 'yan.",
+                        "Haha, mag-ingat ka, baka gumanti ako.",
+                        "Mabuti na lang magkaibigan tayo, kundi magkakatuusan tayo.",
+                        "Gusto mo talagang sinusubukan ang pasensya ko, 'no?",
+                        "Mag-ayos ka. Alam kong nagbibiro ka lang.",
+                        "Sinusugal mo ang suwerte mo, pero papayagan ko muna ngayon.",
+                        "Ikaw lang ang makalulusot sa pagsasabi niyan sa akin.",
+                        "Haha, sige na, nakuha ko na, pilosopo.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.insult.warm",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.reply.salute",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Stay sharp.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.reply.salute.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Stay sharp.",
+                                        "Keep your guard up.",
+                                        "Eyes forward.",
+                                        "At ease.",
+                                        "Stay safe out there.",
+                                        "Watch your six.",
+                                        "Salute returned.",
+                                        "Keep moving and stay vigilant.",
+                                        "Understood. Stay ready.",
+                                        "Stand firm.",
+                                    },
+                                    ["TL"] = {
+                                        "Manatiling alerto.",
+                                        "Huwag ibaba ang bantay.",
+                                        "Tumingin sa unahan.",
+                                        "Magpahinga.",
+                                        "Mag-ingat ka sa labas.",
+                                        "Bantayan mo ang likod mo.",
+                                        "Ganti ang pagsaludo.",
+                                        "Patuloy na lumakad at maging mapagmatyag.",
+                                        "Naintindihan. Maging laging handa.",
+                                        "Magpakatatag.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Always. Stay safe out there.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.emote.reply.salute.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Always. Stay safe out there.",
+                                        "Salute to you too, friend.",
+                                        "Right back at you. Let's make it back in one piece.",
+                                        "Honored to stand with you.",
+                                        "Keep your head down and stay alive for me.",
+                                        "Good to have you beside me out here.",
+                                        "Salute returned with respect, partner.",
+                                        "We watch each other's backs. Always.",
+                                        "Take care of yourself today. I mean it.",
+                                        "Stay strong out there. We'll get through this.",
+                                    },
+                                    ["TL"] = {
+                                        "Palagi. Mag-ingat ka sa labas.",
+                                        "Saludo rin sa 'yo, kaibigan.",
+                                        "Pabalik din sa 'yo. Tiyakin nating makababalik tayo nang buo.",
+                                        "Ikinararangal kong makatabi ka sa laban.",
+                                        "Yumuko ka sa panganib at manatiling buhay para sa akin.",
+                                        "Mabuting kasama kita rito.",
+                                        "May kasamang respeto ang ganting saludo ko, kasama.",
+                                        "Binabantayan natin ang likod ng isa't isa. Palagi.",
+                                        "Ingatan mo ang sarili mo ngayong araw. Seryoso ako.",
+                                        "Magpakatatag ka sa labas. Malalampasan natin ito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Stay sharp.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.salute.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Stay sharp.",
+                            "Keep your guard up.",
+                            "Eyes forward.",
+                            "At ease.",
+                            "Stay safe out there.",
+                            "Watch your six.",
+                            "Salute returned.",
+                            "Keep moving and stay vigilant.",
+                            "Understood. Stay ready.",
+                            "Stand firm.",
+                        },
+                        ["TL"] = {
+                            "Manatiling alerto.",
+                            "Huwag ibaba ang bantay.",
+                            "Tumingin sa unahan.",
+                            "Magpahinga.",
+                            "Mag-ingat ka sa labas.",
+                            "Bantayan mo ang likod mo.",
+                            "Ganti ang pagsaludo.",
+                            "Patuloy na lumakad at maging mapagmatyag.",
+                            "Naintindihan. Maging laging handa.",
+                            "Magpakatatag.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Always. Stay safe out there.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.salute.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Always. Stay safe out there.",
+                            "Salute to you too, friend.",
+                            "Right back at you. Let's make it back in one piece.",
+                            "Honored to stand with you.",
+                            "Keep your head down and stay alive for me.",
+                            "Good to have you beside me out here.",
+                            "Salute returned with respect, partner.",
+                            "We watch each other's backs. Always.",
+                            "Take care of yourself today. I mean it.",
+                            "Stay strong out there. We'll get through this.",
+                        },
+                        ["TL"] = {
+                            "Palagi. Mag-ingat ka sa labas.",
+                            "Saludo rin sa 'yo, kaibigan.",
+                            "Pabalik din sa 'yo. Tiyakin nating makababalik tayo nang buo.",
+                            "Ikinararangal kong makatabi ka sa laban.",
+                            "Yumuko ka sa panganib at manatiling buhay para sa akin.",
+                            "Mabuting kasama kita rito.",
+                            "May kasamang respeto ang ganting saludo ko, kasama.",
+                            "Binabantayan natin ang likod ng isa't isa. Palagi.",
+                            "Ingatan mo ang sarili mo ngayong araw. Seryoso ako.",
+                            "Magpakatatag ka sa labas. Malalampasan natin ito.",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "emote.reply.salute",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.emote.reply.insult.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json#records[1]",
+            ["localId"] = "salute",
+            ["sourceId"] = "emote.reply.salute",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.insult",
+        ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1921,441 +3111,107 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.insult",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "warm",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're lucky I know you.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Stay sharp.",
+                                        "Keep your guard up.",
+                                        "Eyes forward.",
+                                        "At ease.",
+                                        "Stay safe out there.",
+                                        "Watch your six.",
+                                        "Salute returned.",
+                                        "Keep moving and stay vigilant.",
+                                        "Understood. Stay ready.",
+                                        "Stand firm.",
+                                    },
+                                    ["TL"] = {
+                                        "Manatiling alerto.",
+                                        "Huwag ibaba ang bantay.",
+                                        "Tumingin sa unahan.",
+                                        "Magpahinga.",
+                                        "Mag-ingat ka sa labas.",
+                                        "Bantayan mo ang likod mo.",
+                                        "Ganti ang pagsaludo.",
+                                        "Patuloy na lumakad at maging mapagmatyag.",
+                                        "Naintindihan. Maging laging handa.",
+                                        "Magpakatatag.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Suwerte ka dahil kilala kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Very funny. Don't make a habit of it.",
-                            },
-                            ["TL"] = {
-                                "Nakakatawa. Huwag mong gagawing bisyo 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll let that slide because it's you.",
-                            },
-                            ["TL"] = {
-                                "Palalampasin ko 'yan dahil ikaw 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Haha, watch it, or I might just get even.",
-                            },
-                            ["TL"] = {
-                                "Haha, mag-ingat ka, baka gumanti ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good thing we're friends, or we'd have words.",
-                            },
-                            ["TL"] = {
-                                "Mabuti na lang magkaibigan tayo, kundi magkakatuusan tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You always like testing my patience, don't you?",
-                            },
-                            ["TL"] = {
-                                "Gusto mo talagang sinusubukan ang pasensya ko, 'no?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Play nice. I know you're just messing around.",
-                            },
-                            ["TL"] = {
-                                "Mag-ayos ka. Alam kong nagbibiro ka lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're pushing your luck, but I'll allow it this once.",
-                            },
-                            ["TL"] = {
-                                "Sinusugal mo ang suwerte mo, pero papayagan ko muna ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Only you could get away with saying that to me.",
-                            },
-                            ["TL"] = {
-                                "Ikaw lang ang makalulusot sa pagsasabi niyan sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Haha, all right, point taken, smart-mouth.",
-                            },
-                            ["TL"] = {
-                                "Haha, sige na, nakuha ko na, pilosopo.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Always. Stay safe out there.",
+                                        "Salute to you too, friend.",
+                                        "Right back at you. Let's make it back in one piece.",
+                                        "Honored to stand with you.",
+                                        "Keep your head down and stay alive for me.",
+                                        "Good to have you beside me out here.",
+                                        "Salute returned with respect, partner.",
+                                        "We watch each other's backs. Always.",
+                                        "Take care of yourself today. I mean it.",
+                                        "Stay strong out there. We'll get through this.",
+                                    },
+                                    ["TL"] = {
+                                        "Palagi. Mag-ingat ka sa labas.",
+                                        "Saludo rin sa 'yo, kaibigan.",
+                                        "Pabalik din sa 'yo. Tiyakin nating makababalik tayo nang buo.",
+                                        "Ikinararangal kong makatabi ka sa laban.",
+                                        "Yumuko ka sa panganib at manatiling buhay para sa akin.",
+                                        "Mabuting kasama kita rito.",
+                                        "May kasamang respeto ang ganting saludo ko, kasama.",
+                                        "Binabantayan natin ang likod ng isa't isa. Palagi.",
+                                        "Ingatan mo ang sarili mo ngayong araw. Seryoso ako.",
+                                        "Magpakatatag ka sa labas. Malalampasan natin ito.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
         },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.salute.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.salute.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.salute",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.salute",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay sharp.",
-                            },
-                            ["TL"] = {
-                                "Manatiling alerto.",
-                            },
-                        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.reply.salute",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep your guard up.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Huwag ibaba ang bantay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eyes forward.",
-                            },
-                            ["TL"] = {
-                                "Tumingin sa unahan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "At ease.",
-                            },
-                            ["TL"] = {
-                                "Magpahinga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay safe out there.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat ka sa labas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch your six.",
-                            },
-                            ["TL"] = {
-                                "Bantayan mo ang likod mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Salute returned.",
-                            },
-                            ["TL"] = {
-                                "Ganti ang pagsaludo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep moving and stay vigilant.",
-                            },
-                            ["TL"] = {
-                                "Patuloy na lumakad at maging mapagmatyag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Stay ready.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Maging laging handa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stand firm.",
-                            },
-                            ["TL"] = {
-                                "Magpakatatag.",
-                            },
+                            ["fallback"] = "Stay sharp.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.reply.salute.say_1",
                         },
                     },
                 },
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.salute.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.emote.reply.salute.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.salute",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.salute",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Always. Stay safe out there.",
-                            },
-                            ["TL"] = {
-                                "Palagi. Mag-ingat ka sa labas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Salute to you too, friend.",
-                            },
-                            ["TL"] = {
-                                "Saludo rin sa 'yo, kaibigan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right back at you. Let's make it back in one piece.",
-                            },
-                            ["TL"] = {
-                                "Pabalik din sa 'yo. Tiyakin nating makababalik tayo nang buo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Honored to stand with you.",
-                            },
-                            ["TL"] = {
-                                "Ikinararangal kong makatabi ka sa laban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep your head down and stay alive for me.",
-                            },
-                            ["TL"] = {
-                                "Yumuko ka sa panganib at manatiling buhay para sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to have you beside me out here.",
-                            },
-                            ["TL"] = {
-                                "Mabuting kasama kita rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Salute returned with respect, partner.",
-                            },
-                            ["TL"] = {
-                                "May kasamang respeto ang ganting saludo ko, kasama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We watch each other's backs. Always.",
-                            },
-                            ["TL"] = {
-                                "Binabantayan natin ang likod ng isa't isa. Palagi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take care of yourself today. I mean it.",
-                            },
-                            ["TL"] = {
-                                "Ingatan mo ang sarili mo ngayong araw. Seryoso ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay strong out there. We'll get through this.",
-                            },
-                            ["TL"] = {
-                                "Magpakatatag ka sa labas. Malalampasan natin ito.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
         },
         ["slots"] = {
         },
@@ -2365,20 +3221,239 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Stay sharp.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.salute.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Stay sharp.",
+                        "Keep your guard up.",
+                        "Eyes forward.",
+                        "At ease.",
+                        "Stay safe out there.",
+                        "Watch your six.",
+                        "Salute returned.",
+                        "Keep moving and stay vigilant.",
+                        "Understood. Stay ready.",
+                        "Stand firm.",
+                    },
+                    ["TL"] = {
+                        "Manatiling alerto.",
+                        "Huwag ibaba ang bantay.",
+                        "Tumingin sa unahan.",
+                        "Magpahinga.",
+                        "Mag-ingat ka sa labas.",
+                        "Bantayan mo ang likod mo.",
+                        "Ganti ang pagsaludo.",
+                        "Patuloy na lumakad at maging mapagmatyag.",
+                        "Naintindihan. Maging laging handa.",
+                        "Magpakatatag.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Always. Stay safe out there.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.salute.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Always. Stay safe out there.",
+                        "Salute to you too, friend.",
+                        "Right back at you. Let's make it back in one piece.",
+                        "Honored to stand with you.",
+                        "Keep your head down and stay alive for me.",
+                        "Good to have you beside me out here.",
+                        "Salute returned with respect, partner.",
+                        "We watch each other's backs. Always.",
+                        "Take care of yourself today. I mean it.",
+                        "Stay strong out there. We'll get through this.",
+                    },
+                    ["TL"] = {
+                        "Palagi. Mag-ingat ka sa labas.",
+                        "Saludo rin sa 'yo, kaibigan.",
+                        "Pabalik din sa 'yo. Tiyakin nating makababalik tayo nang buo.",
+                        "Ikinararangal kong makatabi ka sa laban.",
+                        "Yumuko ka sa panganib at manatiling buhay para sa akin.",
+                        "Mabuting kasama kita rito.",
+                        "May kasamang respeto ang ganting saludo ko, kasama.",
+                        "Binabantayan natin ang likod ng isa't isa. Palagi.",
+                        "Ingatan mo ang sarili mo ngayong araw. Seryoso ako.",
+                        "Magpakatatag ka sa labas. Malalampasan natin ito.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.thankyou.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.reply.thankyou",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You're welcome.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.reply.thankyou.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're welcome.",
+                                        "No problem.",
+                                        "Don't mention it.",
+                                        "Glad to help.",
+                                        "Anytime.",
+                                        "Just doing my part.",
+                                        "Happy to assist.",
+                                        "No trouble at all.",
+                                        "All part of surviving together.",
+                                        "You'd do the same for me.",
+                                    },
+                                    ["TL"] = {
+                                        "Walang anuman.",
+                                        "Walang problema.",
+                                        "Huwag mo nang alalahanin.",
+                                        "Masayang tumulong.",
+                                        "Kahit kailan.",
+                                        "Ginagawa ko lang ang bahagi ko.",
+                                        "Mabuti at nakatulong ako.",
+                                        "Walang anuman talaga.",
+                                        "Bahagi lang 'yan ng sabay na pamumuhay.",
+                                        "Gagawin mo rin 'yan para sa akin.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Anytime. We look after our own.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.emote.reply.thankyou.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Anytime. We look after our own.",
+                                        "You're very welcome, friend.",
+                                        "Always happy to lend a hand to you.",
+                                        "Don't worry about it for a second. Glad to be here.",
+                                        "We've got each other's backs. That's what counts.",
+                                        "You deserve the help. Don't mention it.",
+                                        "Anytime! Seriously, just ask whenever.",
+                                        "I'm glad I could be there for you.",
+                                        "No need to thank me. That's what partners do.",
+                                        "Happy to help. Always.",
+                                    },
+                                    ["TL"] = {
+                                        "Kahit kailan. Inaalagaan natin ang mga kasama natin.",
+                                        "Walang anuman talaga, kaibigan.",
+                                        "Lagi akong handang tumulong sa 'yo.",
+                                        "Huwag mo nang isipin kahit sandali. Mabuti at narito ako.",
+                                        "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga.",
+                                        "Karapat-dapat ka sa tulong. Huwag mo nang banggitin.",
+                                        "Kahit kailan! magsabi ka lang kapag may kailangan ka.",
+                                        "Mabuti at nakatulong ako sa 'yo.",
+                                        "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama.",
+                                        "Masayang tumulong. Palagi.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "You're welcome.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.thankyou.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're welcome.",
+                            "No problem.",
+                            "Don't mention it.",
+                            "Glad to help.",
+                            "Anytime.",
+                            "Just doing my part.",
+                            "Happy to assist.",
+                            "No trouble at all.",
+                            "All part of surviving together.",
+                            "You'd do the same for me.",
+                        },
+                        ["TL"] = {
+                            "Walang anuman.",
+                            "Walang problema.",
+                            "Huwag mo nang alalahanin.",
+                            "Masayang tumulong.",
+                            "Kahit kailan.",
+                            "Ginagawa ko lang ang bahagi ko.",
+                            "Mabuti at nakatulong ako.",
+                            "Walang anuman talaga.",
+                            "Bahagi lang 'yan ng sabay na pamumuhay.",
+                            "Gagawin mo rin 'yan para sa akin.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Anytime. We look after our own.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.thankyou.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Anytime. We look after our own.",
+                            "You're very welcome, friend.",
+                            "Always happy to lend a hand to you.",
+                            "Don't worry about it for a second. Glad to be here.",
+                            "We've got each other's backs. That's what counts.",
+                            "You deserve the help. Don't mention it.",
+                            "Anytime! Seriously, just ask whenever.",
+                            "I'm glad I could be there for you.",
+                            "No need to thank me. That's what partners do.",
+                            "Happy to help. Always.",
+                        },
+                        ["TL"] = {
+                            "Kahit kailan. Inaalagaan natin ang mga kasama natin.",
+                            "Walang anuman talaga, kaibigan.",
+                            "Lagi akong handang tumulong sa 'yo.",
+                            "Huwag mo nang isipin kahit sandali. Mabuti at narito ako.",
+                            "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga.",
+                            "Karapat-dapat ka sa tulong. Huwag mo nang banggitin.",
+                            "Kahit kailan! magsabi ka lang kapag may kailangan ka.",
+                            "Mabuti at nakatulong ako sa 'yo.",
+                            "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama.",
+                            "Masayang tumulong. Palagi.",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "emote.reply.thankyou",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.thankyou.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json#records[0]",
+            ["localId"] = "thankyou",
+            ["sourceId"] = "emote.reply.thankyou",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.thankyou",
+        ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2392,127 +3467,107 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.thankyou",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're welcome.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're welcome.",
+                                        "No problem.",
+                                        "Don't mention it.",
+                                        "Glad to help.",
+                                        "Anytime.",
+                                        "Just doing my part.",
+                                        "Happy to assist.",
+                                        "No trouble at all.",
+                                        "All part of surviving together.",
+                                        "You'd do the same for me.",
+                                    },
+                                    ["TL"] = {
+                                        "Walang anuman.",
+                                        "Walang problema.",
+                                        "Huwag mo nang alalahanin.",
+                                        "Masayang tumulong.",
+                                        "Kahit kailan.",
+                                        "Ginagawa ko lang ang bahagi ko.",
+                                        "Mabuti at nakatulong ako.",
+                                        "Walang anuman talaga.",
+                                        "Bahagi lang 'yan ng sabay na pamumuhay.",
+                                        "Gagawin mo rin 'yan para sa akin.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Walang anuman.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No problem.",
-                            },
-                            ["TL"] = {
-                                "Walang problema.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't mention it.",
-                            },
-                            ["TL"] = {
-                                "Huwag mo nang alalahanin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad to help.",
-                            },
-                            ["TL"] = {
-                                "Masayang tumulong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Anytime.",
-                            },
-                            ["TL"] = {
-                                "Kahit kailan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just doing my part.",
-                            },
-                            ["TL"] = {
-                                "Ginagawa ko lang ang bahagi ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Happy to assist.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nakatulong ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No trouble at all.",
-                            },
-                            ["TL"] = {
-                                "Walang anuman talaga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All part of surviving together.",
-                            },
-                            ["TL"] = {
-                                "Bahagi lang 'yan ng sabay na pamumuhay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You'd do the same for me.",
-                            },
-                            ["TL"] = {
-                                "Gagawin mo rin 'yan para sa akin.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Anytime. We look after our own.",
+                                        "You're very welcome, friend.",
+                                        "Always happy to lend a hand to you.",
+                                        "Don't worry about it for a second. Glad to be here.",
+                                        "We've got each other's backs. That's what counts.",
+                                        "You deserve the help. Don't mention it.",
+                                        "Anytime! Seriously, just ask whenever.",
+                                        "I'm glad I could be there for you.",
+                                        "No need to thank me. That's what partners do.",
+                                        "Happy to help. Always.",
+                                    },
+                                    ["TL"] = {
+                                        "Kahit kailan. Inaalagaan natin ang mga kasama natin.",
+                                        "Walang anuman talaga, kaibigan.",
+                                        "Lagi akong handang tumulong sa 'yo.",
+                                        "Huwag mo nang isipin kahit sandali. Mabuti at narito ako.",
+                                        "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga.",
+                                        "Karapat-dapat ka sa tulong. Huwag mo nang banggitin.",
+                                        "Kahit kailan! magsabi ka lang kapag may kailangan ka.",
+                                        "Mabuti at nakatulong ako sa 'yo.",
+                                        "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama.",
+                                        "Masayang tumulong. Palagi.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.reply.thankyou",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "You're welcome.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.reply.thankyou.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2522,177 +3577,174 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "You're welcome.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.thankyou.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're welcome.",
+                        "No problem.",
+                        "Don't mention it.",
+                        "Glad to help.",
+                        "Anytime.",
+                        "Just doing my part.",
+                        "Happy to assist.",
+                        "No trouble at all.",
+                        "All part of surviving together.",
+                        "You'd do the same for me.",
+                    },
+                    ["TL"] = {
+                        "Walang anuman.",
+                        "Walang problema.",
+                        "Huwag mo nang alalahanin.",
+                        "Masayang tumulong.",
+                        "Kahit kailan.",
+                        "Ginagawa ko lang ang bahagi ko.",
+                        "Mabuti at nakatulong ako.",
+                        "Walang anuman talaga.",
+                        "Bahagi lang 'yan ng sabay na pamumuhay.",
+                        "Gagawin mo rin 'yan para sa akin.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Anytime. We look after our own.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.thankyou.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Anytime. We look after our own.",
+                        "You're very welcome, friend.",
+                        "Always happy to lend a hand to you.",
+                        "Don't worry about it for a second. Glad to be here.",
+                        "We've got each other's backs. That's what counts.",
+                        "You deserve the help. Don't mention it.",
+                        "Anytime! Seriously, just ask whenever.",
+                        "I'm glad I could be there for you.",
+                        "No need to thank me. That's what partners do.",
+                        "Happy to help. Always.",
+                    },
+                    ["TL"] = {
+                        "Kahit kailan. Inaalagaan natin ang mga kasama natin.",
+                        "Walang anuman talaga, kaibigan.",
+                        "Lagi akong handang tumulong sa 'yo.",
+                        "Huwag mo nang isipin kahit sandali. Mabuti at narito ako.",
+                        "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga.",
+                        "Karapat-dapat ka sa tulong. Huwag mo nang banggitin.",
+                        "Kahit kailan! magsabi ka lang kapag may kailangan ka.",
+                        "Mabuti at nakatulong ako sa 'yo.",
+                        "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama.",
+                        "Masayang tumulong. Palagi.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.thankyou.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.emote.reply.thankyou.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.thankyou",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.thankyou",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Anytime. We look after our own.",
-                            },
-                            ["TL"] = {
-                                "Kahit kailan. Inaalagaan natin ang mga kasama natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're very welcome, friend.",
-                            },
-                            ["TL"] = {
-                                "Walang anuman talaga, kaibigan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Always happy to lend a hand to you.",
-                            },
-                            ["TL"] = {
-                                "Lagi akong handang tumulong sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't worry about it for a second. Glad to be here.",
-                            },
-                            ["TL"] = {
-                                "Huwag mo nang isipin kahit sandali. Mabuti at narito ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We've got each other's backs. That's what counts.",
-                            },
-                            ["TL"] = {
-                                "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You deserve the help. Don't mention it.",
-                            },
-                            ["TL"] = {
-                                "Karapat-dapat ka sa tulong. Huwag mo nang banggitin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Anytime! Seriously, just ask whenever.",
-                            },
-                            ["TL"] = {
-                                "Kahit kailan! magsabi ka lang kapag may kailangan ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm glad I could be there for you.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nakatulong ako sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No need to thank me. That's what partners do.",
-                            },
-                            ["TL"] = {
-                                "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Happy to help. Always.",
-                            },
-                            ["TL"] = {
-                                "Masayang tumulong. Palagi.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "emote.reply.thumbsdown",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I got the message. Tell me what's wrong.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.reply.thumbsdown.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I got the message. Tell me what's wrong.",
+                                        "Not happy with that? What's your take?",
+                                        "Understood. You disagree.",
+                                        "Message received. We can rethink it.",
+                                        "Got it. You don't like the look of this.",
+                                        "Fair enough. What's the alternative?",
+                                        "I hear the disapproval. Let's adjust.",
+                                        "Noted. We won't go that route then.",
+                                        "Understood. Point taken.",
+                                        "All right, let's look for a better option.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                                        "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                                        "Naiintindihan ko. Hindi ka sang-ayon.",
+                                        "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                                        "Naintindihan. Hindi maganda ang kutob mo rito.",
+                                        "Makatwiran. Ano ang alternatibo?",
+                                        "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                                        "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                                        "Naintindihan. Nakuha ko ang punto mo.",
+                                        "Sige, maghanap tayo ng mas magandang paraan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I got the message. Tell me what's wrong.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.thumbsdown.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I got the message. Tell me what's wrong.",
+                            "Not happy with that? What's your take?",
+                            "Understood. You disagree.",
+                            "Message received. We can rethink it.",
+                            "Got it. You don't like the look of this.",
+                            "Fair enough. What's the alternative?",
+                            "I hear the disapproval. Let's adjust.",
+                            "Noted. We won't go that route then.",
+                            "Understood. Point taken.",
+                            "All right, let's look for a better option.",
+                        },
+                        ["TL"] = {
+                            "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                            "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                            "Naiintindihan ko. Hindi ka sang-ayon.",
+                            "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                            "Naintindihan. Hindi maganda ang kutob mo rito.",
+                            "Makatwiran. Ano ang alternatibo?",
+                            "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                            "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                            "Naintindihan. Nakuha ko ang punto mo.",
+                            "Sige, maghanap tayo ng mas magandang paraan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.thumbsdown.neutral",
+        ["id"] = "emote.reply.thumbsdown",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.thumbsdown.neutral",
+            ["localId"] = "thumbsdown",
+            ["sourceId"] = "emote.reply.thumbsdown",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsdown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.thumbsdown",
+        ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2706,127 +3758,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.thumbsdown",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I got the message. Tell me what's wrong.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not happy with that? What's your take?",
-                            },
-                            ["TL"] = {
-                                "Hindi ka sang-ayon? Ano ang opinyon mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. You disagree.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Hindi ka sang-ayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Message received. We can rethink it.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. You don't like the look of this.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Hindi maganda ang kutob mo rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fair enough. What's the alternative?",
-                            },
-                            ["TL"] = {
-                                "Makatwiran. Ano ang alternatibo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear the disapproval. Let's adjust.",
-                            },
-                            ["TL"] = {
-                                "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted. We won't go that route then.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Point taken.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Nakuha ko ang punto mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right, let's look for a better option.",
-                            },
-                            ["TL"] = {
-                                "Sige, maghanap tayo ng mas magandang paraan.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I got the message. Tell me what's wrong.",
+                                        "Not happy with that? What's your take?",
+                                        "Understood. You disagree.",
+                                        "Message received. We can rethink it.",
+                                        "Got it. You don't like the look of this.",
+                                        "Fair enough. What's the alternative?",
+                                        "I hear the disapproval. Let's adjust.",
+                                        "Noted. We won't go that route then.",
+                                        "Understood. Point taken.",
+                                        "All right, let's look for a better option.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                                        "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                                        "Naiintindihan ko. Hindi ka sang-ayon.",
+                                        "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                                        "Naintindihan. Hindi maganda ang kutob mo rito.",
+                                        "Makatwiran. Ano ang alternatibo?",
+                                        "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                                        "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                                        "Naintindihan. Nakuha ko ang punto mo.",
+                                        "Sige, maghanap tayo ng mas magandang paraan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.reply.thumbsdown",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I got the message. Tell me what's wrong.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.emote.reply.thumbsdown.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2836,1261 +3839,40 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.thumbsup.active.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.thumbsup.active.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup_active.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.thumbsup.active",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.thumbsup.active",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good. Let's keep moving on this.",
-                            },
-                            ["TL"] = {
-                                "Mabuti. Ipagpatuloy natin ang pagkilos dito.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I got the message. Tell me what's wrong.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.thumbsdown.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I got the message. Tell me what's wrong.",
+                        "Not happy with that? What's your take?",
+                        "Understood. You disagree.",
+                        "Message received. We can rethink it.",
+                        "Got it. You don't like the look of this.",
+                        "Fair enough. What's the alternative?",
+                        "I hear the disapproval. Let's adjust.",
+                        "Noted. We won't go that route then.",
+                        "Understood. Point taken.",
+                        "All right, let's look for a better option.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. Back to work.",
-                            },
-                            ["TL"] = {
-                                "Sige. Balik sa trabaho.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Stay on task.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Manatili sa gawain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good. Let's get this finished up.",
-                            },
-                            ["TL"] = {
-                                "Mabuti. Tapusin na natin ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Agreed. Pushing forward now.",
-                            },
-                            ["TL"] = {
-                                "Sang-ayon. Umuusad na ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving along. Keep your eyes peeled.",
-                            },
-                            ["TL"] = {
-                                "Tuloy ang lakad. Maging mapagmatyag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right. Making progress.",
-                            },
-                            ["TL"] = {
-                                "Tama. May nararating na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to know. Sticking to the objective.",
-                            },
-                            ["TL"] = {
-                                "Mabuting malaman. Manatili sa layunin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. No slowing down now.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Walang magbabagal ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "On it. Keeping our momentum.",
-                            },
-                            ["TL"] = {
-                                "Inaasikaso na. Tuloy ang bilis.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                        "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                        "Naiintindihan ko. Hindi ka sang-ayon.",
+                        "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                        "Naintindihan. Hindi maganda ang kutob mo rito.",
+                        "Makatwiran. Ano ang alternatibo?",
+                        "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                        "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                        "Naintindihan. Nakuha ko ang punto mo.",
+                        "Sige, maghanap tayo ng mas magandang paraan.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup_active.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.thumbsup.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.thumbsup.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.thumbsup",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.thumbsup",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good.",
-                            },
-                            ["TL"] = {
-                                "Mabuti.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds like a plan.",
-                            },
-                            ["TL"] = {
-                                "Magandang plano 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad we agree.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nagkasundo tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right on.",
-                            },
-                            ["TL"] = {
-                                "Tama 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Let's make it happen.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Isakatuparan na natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to go.",
-                            },
-                            ["TL"] = {
-                                "Handa na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Works for me.",
-                            },
-                            ["TL"] = {
-                                "Ayos 'yan sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Agreed.",
-                            },
-                            ["TL"] = {
-                                "Sang-ayon ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "All set then.",
-                            },
-                            ["TL"] = {
-                                "Handa na ang lahat kung ganoon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Solid.",
-                            },
-                            ["TL"] = {
-                                "Matibay.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.thumbsup.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.emote.reply.thumbsup.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.thumbsup",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.thumbsup",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's the spirit.",
-                            },
-                            ["TL"] = {
-                                "Iyan ang magandang sigla.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Awesome. Let's knock it out.",
-                            },
-                            ["TL"] = {
-                                "Napakaganda. Tapusin na natin ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Love the energy! Let's do this.",
-                            },
-                            ["TL"] = {
-                                "Gusto ko ang sigla mo! Tara na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Great minds think alike, friend.",
-                            },
-                            ["TL"] = {
-                                "Pareho tayo ng magandang takbo ng isip, kaibigan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hell yeah. We've got this.",
-                            },
-                            ["TL"] = {
-                                "Oo naman. Kayang-kaya natin ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's what I like to see. Full speed ahead.",
-                            },
-                            ["TL"] = {
-                                "Iyan ang gusto kong makita. Tuloy-tuloy lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good deal. Glad you're on board.",
-                            },
-                            ["TL"] = {
-                                "Magandang usapan. Mabuti at kasama ka rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right there with you! Let's get it done.",
-                            },
-                            ["TL"] = {
-                                "Kasama mo ako riyan! Tapusin na natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That puts wind in my sails. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Nagbigay 'yan ng lakas sa akin. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Perfect. We're in sync.",
-                            },
-                            ["TL"] = {
-                                "Perpekto. Tugma ang takbo natin.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.wavebye.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.wavebye.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.wavebye",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.wavebye",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take care.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "See you around.",
-                            },
-                            ["TL"] = {
-                                "Magkita na lang tayo mamaya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Watch your back out there.",
-                            },
-                            ["TL"] = {
-                                "Bantayan mo ang likod mo sa labas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Until next time.",
-                            },
-                            ["TL"] = {
-                                "Hanggang sa muli.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay safe.",
-                            },
-                            ["TL"] = {
-                                "Manatiling ligtas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep your guard up on the way.",
-                            },
-                            ["TL"] = {
-                                "Huwag ibaba ang bantay habang naglalakad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Catch you later.",
-                            },
-                            ["TL"] = {
-                                "Usap na lang tayo mamaya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Farewell for now.",
-                            },
-                            ["TL"] = {
-                                "Paalam muna sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep your head down.",
-                            },
-                            ["TL"] = {
-                                "Yumuko ka sa panganib.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "See you when you get back.",
-                            },
-                            ["TL"] = {
-                                "Kita tayo pagbalik mo.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.wavebye.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.emote.reply.wavebye.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.wavebye",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.wavebye",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Goodbye. Come back in one piece.",
-                            },
-                            ["TL"] = {
-                                "Paalam. Bumalik ka nang buo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take good care of yourself, friend.",
-                            },
-                            ["TL"] = {
-                                "Ingatan mo nang maayos ang sarili mo, kaibigan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "See you soon. Don't do anything reckless.",
-                            },
-                            ["TL"] = {
-                                "Magkita tayo agad. Huwag kang gagawa ng padalos-dalos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll be waiting right here. Stay safe.",
-                            },
-                            ["TL"] = {
-                                "Maghihintay ako rito. Mag-ingat ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Farewell for now. Looking forward to our next talk.",
-                            },
-                            ["TL"] = {
-                                "Paalam muna. Inaasahan ko ang susunod nating usapan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Safe travels out there. Keep your wits about you.",
-                            },
-                            ["TL"] = {
-                                "Ligtas na paglalakbay sa labas. Gamitin lagi ang isip.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Goodbye! Make sure you make it back.",
-                            },
-                            ["TL"] = {
-                                "Paalam! Tiyakin mong makababalik ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Catch you later, partner. Be careful.",
-                            },
-                            ["TL"] = {
-                                "Kita tayo mamaya, kasama. Mag-iingat ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take care. I'll keep the fire going.",
-                            },
-                            ["TL"] = {
-                                "Mag-ingat ka. Pananatilihin kong may apoy rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "See you later. Stay alive out there.",
-                            },
-                            ["TL"] = {
-                                "Kita tayo mamaya. Manatiling buhay sa labas.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.wavehi.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.emote.reply.wavehi.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.wavehi",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.wavehi",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey.",
-                            },
-                            ["TL"] = {
-                                "Uy.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hello there.",
-                            },
-                            ["TL"] = {
-                                "Kumusta ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to see you.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at nakita kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Greetings.",
-                            },
-                            ["TL"] = {
-                                "Pagbati sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey. What's the word?",
-                            },
-                            ["TL"] = {
-                                "Uy. Anong balita?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hello. Everything quiet?",
-                            },
-                            ["TL"] = {
-                                "Kumusta. Tahimik ba ang lahat?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Morning or afternoon, good to see another survivor.",
-                            },
-                            ["TL"] = {
-                                "Umaga man o hapon, mabuting makakita ng buhay na tao.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey. How are things looking?",
-                            },
-                            ["TL"] = {
-                                "Uy. Kamusta ang kalagayan diyan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hello. Need something?",
-                            },
-                            ["TL"] = {
-                                "Kumusta. May kailangan ka ba?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey there. Staying in one piece?",
-                            },
-                            ["TL"] = {
-                                "Kumusta. Buo pa ba ang katawan mo?",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.wavehi.terse",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "terse",
-            ["sourceId"] = "semantic.emote.reply.wavehi.terse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.wavehi",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.wavehi",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "terse",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "terse.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "There you are.",
-                            },
-                            ["TL"] = {
-                                "Nandiyan ka pala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey.",
-                            },
-                            ["TL"] = {
-                                "Uy.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What's up.",
-                            },
-                            ["TL"] = {
-                                "Anong meron.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're back.",
-                            },
-                            ["TL"] = {
-                                "Bumalik ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Morning.",
-                            },
-                            ["TL"] = {
-                                "Magandang araw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Evening.",
-                            },
-                            ["TL"] = {
-                                "Magandang gabi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "State your business.",
-                            },
-                            ["TL"] = {
-                                "Sabihin ang pakay mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Saw you.",
-                            },
-                            ["TL"] = {
-                                "Nakita kita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Alive still.",
-                            },
-                            ["TL"] = {
-                                "Buhay pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Speak up.",
-                            },
-                            ["TL"] = {
-                                "Magsalita ka.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_emotes",
-        ["id"] = "semantic.emote.reply.wavehi.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.emote.reply.wavehi.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json#records[2]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        ["namespace"] = "semantic.emote.reply.wavehi",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.emote.reply.wavehi",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey again. Good to see a friendly face.",
-                            },
-                            ["TL"] = {
-                                "Uy muli. Mabuti at may nakitang kaibigang mukha.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hello, friend! How's your day treating you?",
-                            },
-                            ["TL"] = {
-                                "Kumusta, kaibigan! Kamusta ang araw mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey there! Always brightens things up when you come around.",
-                            },
-                            ["TL"] = {
-                                "Kumusta! Laging sumasaya kapag dumadaan ka rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Great to see you again! Everything okay with you?",
-                            },
-                            ["TL"] = {
-                                "Napakagandang makita ka muli! Maayos ba ang lagay mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey! I was just hoping you'd swing by.",
-                            },
-                            ["TL"] = {
-                                "Uy! Umasa nga akong dadaan ka rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Welcome back! Good to have you around.",
-                            },
-                            ["TL"] = {
-                                "Maligayang pagbabalik! Mabuting narito ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hello! Glad to see you made it through safely.",
-                            },
-                            ["TL"] = {
-                                "Kumusta! Mabuti at nakaligtas ka nang ligtas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey there! Come on over, take a seat.",
-                            },
-                            ["TL"] = {
-                                "Kumusta! Halika rito, umupo ka muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Always a relief to see you walking up. Hey!",
-                            },
-                            ["TL"] = {
-                                "Laging nakapagpapagaan ng loob na makita kang naglalakad papalapit. Uy!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hey, good to see you! How are you holding up?",
-                            },
-                            ["TL"] = {
-                                "Uy, mabuting makita ka! Kumusta ang lagay mo?",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
         },
         ["when"] = nil,
     },

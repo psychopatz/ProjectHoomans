@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.aggressive",
+  "id": "blade_head",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Took its head clean off.",
+            "Split the skull wide open.",
+            "Severed the spine. Done.",
+            "Nothing stands up without a head.",
+            "Carved right through rotten bone.",
+            "Off with its neck. Stay down.",
+            "Sliced it down to the dirt.",
+            "Blade went straight through.",
+            "Head's gone. That one's not getting up.",
+            "Clean decapitation. Keep moving."
+          ],
+          "TL": [
+            "Tanggal ang ulo.",
+            "Biyak ang bungo.",
+            "Naputol ang gulugod. Tapos.",
+            "Walang tatayo kapag walang ulo.",
+            "Bumaon diretso sa bulok na buto.",
+            "Putol ang leeg. Diyan ka lang.",
+            "Hiniwa hanggang bumagsak sa lupa.",
+            "Dire-diretso ang talim.",
+            "Wala nang ulo. Hindi na tatayo 'yan.",
+            "Malinis na pugot. Tuloy lang."
+          ]
+        }
+      }
+    ]
+  }
+}

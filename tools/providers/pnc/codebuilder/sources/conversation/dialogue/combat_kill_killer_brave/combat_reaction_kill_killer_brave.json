@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_killer_brave",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/brave.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Down. Keep moving.",
+              "Threat eliminated. Push forward.",
+              "Target down. Don't break stride.",
+              "Dead. Move through the sector.",
+              "Handled. Keep the momentum.",
+              "Downed. Advance.",
+              "One kill confirmed. Step up.",
+              "Clear here. Continue the push.",
+              "It's down. Walk through.",
+              "Finished. Keep pace."
+            ],
+            "TL": [
+              "Patay. Tuloy tayo.",
+              "Banta naalis na. Sulong.",
+              "Target bagsak na. Huwag huminto.",
+              "Patay na. Lusot sa bahaging 'to.",
+              "Naasikaso. Panatilihin ang bilis.",
+              "Bagsak. Abante.",
+              "Isang kumpirmadong patay. Sulong.",
+              "Malinis dito. Tuloy ang pagsulong.",
+              "Bagsak na. Lakad lang.",
+              "Tapos na. Panatilihin ang hakbang."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Got it. Watch my side.",
+              "Threat down. Cover my flank.",
+              "Took that one out. Check my blind spot.",
+              "Target eliminated. Guard the flank.",
+              "Downed. Keep eyes on my right.",
+              "Handled that one. Watch my shoulder.",
+              "It's dead. Don't let anything sneak up on us.",
+              "Dead. Keep the flank tight.",
+              "Got it. Keep looking left and right.",
+              "Finished. Watch our perimeter."
+            ],
+            "TL": [
+              "Nakuha ko. Bantayan mo ang gilid ko.",
+              "Banta bagsak na. Salagin mo ang gilid ko.",
+              "Tinapos ko 'yon. Tignan ang bulag na parte ko.",
+              "Target naalis. Bantayan ang tabi.",
+              "Bagsak. Tumingin ka sa kanan ko.",
+              "Inasikaso ko ang isang 'yon. Bantayan ang balikat ko.",
+              "Patay na. Huwag hayaang may makapanambang sa atin.",
+              "Patay na. Hawakan nang mahigpit ang gilid.",
+              "Nakuha ko na. Tumingin ka sa kaliwa't kanan.",
+              "Tapos na. Bantayan ang buong paligid natin."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One less. Stay sharp.",
+              "Threat neutralized. Keep your senses up.",
+              "One down. Stay alert.",
+              "Dead. Don't get complacent.",
+              "Count one off. Eyes everywhere.",
+              "Downed. Keep your edge.",
+              "One less danger. Stay focused.",
+              "Target gone. Keep watching corners.",
+              "Handled. Vigilance stays up.",
+              "One less threat. Keep your weapon ready."
+            ],
+            "TL": [
+              "Isa na lang ang nabawas. Magmatyag.",
+              "Banta naalis. Maging alerto.",
+              "Isang bagsak. Manatiling gising.",
+              "Patay na. Huwag maging kampante.",
+              "Bawas ang isa. Tumingin sa lahat ng direksyon.",
+              "Bagsak na. Panatilihin ang talas ng pakiramdam.",
+              "Bawas ang isang panganib. Manatiling nakapokus.",
+              "Wala na ang target. Patuloy na bantayan ang mga sulok.",
+              "Naasikaso na. Huwag ibaba ang pag-iingat.",
+              "Bawas ang isang banta. Ihanda ang sandata."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

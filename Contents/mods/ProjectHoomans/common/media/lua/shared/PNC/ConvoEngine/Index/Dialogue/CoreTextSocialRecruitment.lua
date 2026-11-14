@@ -1,263 +1,83 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["text.recruitment.admire.1"] = {
+    ["recruitment.admire"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.admire.1",
+        ["id"] = "recruitment.admire",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_admire.json",
     },
-    ["text.recruitment.admire.2"] = {
+    ["recruitment.fear"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.admire.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_admire.json",
-    },
-    ["text.recruitment.admire.3"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.admire.3",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_admire.json",
-    },
-    ["text.recruitment.fear.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.fear.1",
+        ["id"] = "recruitment.fear",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_fear.json",
     },
-    ["text.recruitment.fear.2"] = {
+    ["recruitment.reject.cooldown"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.fear.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_fear.json",
-    },
-    ["text.recruitment.fear.3"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.fear.3",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_fear.json",
-    },
-    ["text.recruitment.reject.cooldown.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.cooldown.1",
+        ["id"] = "recruitment.reject.cooldown",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_cooldown.json",
     },
-    ["text.recruitment.reject.cooldown.2"] = {
+    ["recruitment.reject.general"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.reject.cooldown.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_cooldown.json",
-    },
-    ["text.recruitment.reject.general.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.general.1",
+        ["id"] = "recruitment.reject.general",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_general.json",
     },
-    ["text.recruitment.reject.general.2"] = {
+    ["recruitment.reject.hostile"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.reject.general.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_general.json",
-    },
-    ["text.recruitment.reject.general.3"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.general.3",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_general.json",
-    },
-    ["text.recruitment.reject.hostile.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.hostile.1",
+        ["id"] = "recruitment.reject.hostile",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_hostile.json",
     },
-    ["text.recruitment.reject.hostile.2"] = {
+    ["recruitment.reject.leader"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.reject.hostile.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_hostile.json",
-    },
-    ["text.recruitment.reject.leader.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.leader.1",
+        ["id"] = "recruitment.reject.leader",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_leader.json",
     },
-    ["text.recruitment.reject.leader.2"] = {
+    ["recruitment.reject.member"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.reject.leader.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_leader.json",
-    },
-    ["text.recruitment.reject.member.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.member.1",
+        ["id"] = "recruitment.reject.member",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_member.json",
     },
-    ["text.recruitment.reject.member.2"] = {
+    ["recruitment.reject.relationship"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.reject.member.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_member.json",
-    },
-    ["text.recruitment.reject.relationship.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.1",
+        ["id"] = "recruitment.reject.relationship",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
     },
-    ["text.recruitment.reject.relationship.10"] = {
+    ["recruitment.reject.unavailable"] = {
         ["domain"] = "core_text_social_recruitment",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
         },
-        ["id"] = "text.recruitment.reject.relationship.10",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.2"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.2",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.3"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.3",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.4"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.4",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.5"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.5",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.6"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.6",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.7"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.7",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.8"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.8",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.relationship.9"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.relationship.9",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
-    },
-    ["text.recruitment.reject.unavailable.1"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.unavailable.1",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_unavailable.json",
-    },
-    ["text.recruitment.reject.unavailable.2"] = {
-        ["domain"] = "core_text_social_recruitment",
-        ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
-        },
-        ["id"] = "text.recruitment.reject.unavailable.2",
+        ["id"] = "recruitment.reject.unavailable",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_recruitment/recruitment_reject_unavailable.json",
     },

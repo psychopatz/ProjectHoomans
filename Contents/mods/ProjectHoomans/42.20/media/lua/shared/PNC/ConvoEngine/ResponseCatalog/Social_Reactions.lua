@@ -120,13 +120,23 @@ local function plan(
     }
 end
 
+local function canonicalTemplateID(rawID)
+    local value = tostring(rawID or "")
+    if string.sub(value, 1, 9) == "semantic." then
+        return string.sub(value, 10)
+    end
+    return value
+end
+
 local function response(
     poolID, id, when, priority, act, topic, offers,
-    templatePrefix, presentationClass
+    templatePrefix, presentationClass, templateOverride
 )
-    local templateID = (templatePrefix or poolID) .. "." .. id
+    local variantID = (templatePrefix or poolID) .. "." .. id
+    local templateID = templateOverride
+        or (canonicalTemplateID(templatePrefix or poolID) .. "." .. id)
     return {
-        id = templateID,
+        id = variantID,
         templateID = templateID,
         contentOwner = CONTENT_OWNER,
         when = when,
@@ -367,6 +377,17 @@ local KILLER_WEAPON_VARIANTS = {
         } },
     },
 }
+local function killerWeaponTemplateID(style, variantID)
+    if variantID == "firearm_high_named_01" then
+        return "combat.kill.killer." .. style .. ".firearm_high_named.say.1"
+    end
+    if variantID == "firearm_high_named_02" then
+        return "combat.kill.killer." .. style .. ".firearm_high_named.say.2"
+    end
+    local stripped = string.gsub(tostring(variantID or ""), "_01$", "")
+    return "combat.kill.killer." .. style .. "." .. stripped
+end
+
 for _, role in ipairs({ "witness", "killer" }) do
     for _, style in ipairs(KILL_REACTION_STYLES) do
         local poolID = "semantic.combat.kill." .. role .. "." .. style
@@ -382,7 +403,8 @@ for _, role in ipairs({ "witness", "killer" }) do
                     "combat",
                     FOLLOW_UP_OFFERS.kill,
                     poolID,
-                    "BARK"
+                    "BARK",
+                    killerWeaponTemplateID(style, variant.id)
                 )
             end
         end
@@ -398,7 +420,11 @@ for _, role in ipairs({ "witness", "killer" }) do
                 "combat",
                 FOLLOW_UP_OFFERS.kill,
                 "semantic.combat.reaction",
-                "BARK"
+                "BARK",
+                string.format(
+                    "combat.reaction.kill_%s_%s.say.%d",
+                    role, style, variantIndex
+                )
             )
         end
         Catalog.Register(poolID, { variants = variants })
@@ -418,7 +444,10 @@ for _, style in ipairs(KILL_REACTION_STYLES) do
             "combat",
             FOLLOW_UP_OFFERS.humanKill,
             poolID,
-            "BARK"
+            "BARK",
+            string.format(
+                "combat.human_kill.%s.say.%d", style, variantIndex
+            )
         )
     end
     Catalog.Register(poolID, { variants = variants })

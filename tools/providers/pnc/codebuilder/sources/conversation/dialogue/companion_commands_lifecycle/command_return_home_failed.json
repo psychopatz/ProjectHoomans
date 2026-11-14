@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.return_home",
   "id": "failed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/return_home.json",
-    "responseTemplateID": "semantic.command.return_home.failed"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I couldn't head home.",
-          "TL": "Hindi ako nakauwi."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "The path back home is completely blocked.",
-          "TL": "Ganap na may harang ang daan pabalik sa tahanan."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Failed to return. Too many hostiles along the route.",
-          "TL": "Bigo sa pag-uwi. Masyadong maraming kalaban sa ruta."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "I couldn't find a safe way back to base.",
-          "TL": "Wala akong makitang ligtas na daan pabalik sa base."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Return trip failed. Had to double back.",
-          "TL": "Pumalpak ang pag-uwi. Kinailangang bumalik."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Unable to reach home safely right now.",
-          "TL": "Di makarating sa tahanan nang ligtas sa ngayon."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Tried heading back, but the streets were overrun.",
-          "TL": "Sinubukang umuwi, pero pinamumugaran ang mga kalsada."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Lost the route home in the chaos.",
-          "TL": "Nawala ang daan pauwi sa gitna ng gulo."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Can't reach base from this position.",
-          "TL": "Di maabot ang base mula sa pwestong ito."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Return to base aborted. Route compromised.",
-          "TL": "Itinigil ang pag-uwi sa base. May aberya sa ruta."
+          "EN": [
+            "I couldn't head home.",
+            "The path back home is completely blocked.",
+            "Failed to return. Too many hostiles along the route.",
+            "I couldn't find a safe way back to base.",
+            "Return trip failed. Had to double back.",
+            "Unable to reach home safely right now.",
+            "Tried heading back, but the streets were overrun.",
+            "Lost the route home in the chaos.",
+            "Can't reach base from this position.",
+            "Return to base aborted. Route compromised."
+          ],
+          "TL": [
+            "Hindi ako nakauwi.",
+            "Ganap na may harang ang daan pabalik sa tahanan.",
+            "Bigo sa pag-uwi. Masyadong maraming kalaban sa ruta.",
+            "Wala akong makitang ligtas na daan pabalik sa base.",
+            "Pumalpak ang pag-uwi. Kinailangang bumalik.",
+            "Di makarating sa tahanan nang ligtas sa ngayon.",
+            "Sinubukang umuwi, pero pinamumugaran ang mga kalsada.",
+            "Nawala ang daan pauwi sa gitna ng gulo.",
+            "Di maabot ang base mula sa pwestong ito.",
+            "Itinigil ang pag-uwi sa base. May aberya sa ruta."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.return_home",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

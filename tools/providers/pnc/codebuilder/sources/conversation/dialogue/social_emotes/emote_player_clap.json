@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.player",
+  "id": "clap",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,35 +16,25 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-    "responseTemplateID": "semantic.emote.player.clap",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Well done, {addressee.name}.",
-          "TL": "Magaling, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "That's worth celebrating, {addressee.name}.",
-          "TL": "Karapat-dapat ipagdiwang iyan, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Nice work, {addressee.name}.",
-          "TL": "Mahusay na trabaho, {addressee.name}."
+          "EN": [
+            "Well done, {addressee.name}.",
+            "That's worth celebrating, {addressee.name}.",
+            "Nice work, {addressee.name}."
+          ],
+          "TL": [
+            "Magaling, {addressee.name}.",
+            "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
+            "Mahusay na trabaho, {addressee.name}."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.player.clap",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

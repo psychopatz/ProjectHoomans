@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.teammate",
   "id": "missing",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/teammate.json",
-    "responseTemplateID": "semantic.medical.distress.teammate.missing",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I am out of bandages! Can someone spare one for them?",
-          "TL": "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?"
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.02"
-        },
-        "text": {
-          "EN": "No more medical cloth! Does anyone have a bandage?!",
-          "TL": "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.03"
-        },
-        "text": {
-          "EN": "My pack is empty of dressings! Help them, quick!",
-          "TL": "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.04"
-        },
-        "text": {
-          "EN": "I can't treat this wound without supplies! Check your packs!",
-          "TL": "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!"
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.05"
-        },
-        "text": {
-          "EN": "We're out of first aid! Who has a clean rag?!",
-          "TL": "Wala na tayong first aid! Sino may malinis na basahan?!"
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.06"
-        },
-        "text": {
-          "EN": "I don't have what I need to stop their bleeding! Find supplies!",
-          "TL": "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.07"
-        },
-        "text": {
-          "EN": "Zero bandages left! Someone hand me medical gear!",
-          "TL": "Ubos na ang benda! May mag-abot sa akin ng panggamot!"
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.08"
-        },
-        "text": {
-          "EN": "I'm empty-handed! We need bandages for our friend now!",
-          "TL": "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!"
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.09"
-        },
-        "text": {
-          "EN": "No antiseptic, no bandages. Search the drawers, fast!",
-          "TL": "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.teammate.missing.neutral.10"
-        },
-        "text": {
-          "EN": "I can't patch them up alone! Who has medical tools?!",
-          "TL": "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!"
+          "EN": [
+            "I am out of bandages! Can someone spare one for them?",
+            "No more medical cloth! Does anyone have a bandage?!",
+            "My pack is empty of dressings! Help them, quick!",
+            "I can't treat this wound without supplies! Check your packs!",
+            "We're out of first aid! Who has a clean rag?!",
+            "I don't have what I need to stop their bleeding! Find supplies!",
+            "Zero bandages left! Someone hand me medical gear!",
+            "I'm empty-handed! We need bandages for our friend now!",
+            "No antiseptic, no bandages. Search the drawers, fast!",
+            "I can't patch them up alone! Who has medical tools?!"
+          ],
+          "TL": [
+            "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?",
+            "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!",
+            "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!",
+            "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!",
+            "Wala na tayong first aid! Sino may malinis na basahan?!",
+            "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!",
+            "Ubos na ang benda! May mag-abot sa akin ng panggamot!",
+            "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!",
+            "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!",
+            "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.teammate",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_reserved",
-        ["id"] = "semantic.combat.kill.killer.reserved.blade_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.kill.killer.reserved.blade",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Cut down.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.reserved.blade.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Cut down.",
+                                        "Head severed.",
+                                        "Down.",
+                                        "Done.",
+                                        "Clear.",
+                                        "Finished.",
+                                        "Eliminated.",
+                                        "Fell.",
+                                        "Clean strike.",
+                                        "Moving.",
+                                    },
+                                    ["TL"] = {
+                                        "Nahati.",
+                                        "Pugot.",
+                                        "Bagsak.",
+                                        "Tapos.",
+                                        "Malinis.",
+                                        "Yari.",
+                                        "Tanggal.",
+                                        "Bumagsak.",
+                                        "Malinis na tama.",
+                                        "Lalakad na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.kill.killer.reserved",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Cut down.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.reserved.blade.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Cut down.",
+                            "Head severed.",
+                            "Down.",
+                            "Done.",
+                            "Clear.",
+                            "Finished.",
+                            "Eliminated.",
+                            "Fell.",
+                            "Clean strike.",
+                            "Moving.",
+                        },
+                        ["TL"] = {
+                            "Nahati.",
+                            "Pugot.",
+                            "Bagsak.",
+                            "Tapos.",
+                            "Malinis.",
+                            "Yari.",
+                            "Tanggal.",
+                            "Bumagsak.",
+                            "Malinis na tama.",
+                            "Lalakad na.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.kill.killer.reserved.blade",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "blade_01",
-            ["sourceId"] = "semantic.combat.kill.killer.reserved.blade_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade_01.json",
+            ["localId"] = "blade",
+            ["sourceId"] = "combat.kill.killer.reserved.blade",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
-        ["namespace"] = "semantic.combat.kill.killer.reserved",
+        ["namespace"] = "combat.kill.killer.reserved",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,150 +111,222 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.reserved.blade_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/reserved.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Cut down.",
-                            },
-                            ["TL"] = {
-                                "Nahati.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Head severed.",
-                            },
-                            ["TL"] = {
-                                "Pugot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down.",
-                            },
-                            ["TL"] = {
-                                "Bagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done.",
-                            },
-                            ["TL"] = {
-                                "Tapos.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Cut down.",
+                                        "Head severed.",
+                                        "Down.",
+                                        "Done.",
+                                        "Clear.",
+                                        "Finished.",
+                                        "Eliminated.",
+                                        "Fell.",
+                                        "Clean strike.",
+                                        "Moving.",
+                                    },
+                                    ["TL"] = {
+                                        "Nahati.",
+                                        "Pugot.",
+                                        "Bagsak.",
+                                        "Tapos.",
+                                        "Malinis.",
+                                        "Yari.",
+                                        "Tanggal.",
+                                        "Bumagsak.",
+                                        "Malinis na tama.",
+                                        "Lalakad na.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear.",
-                            },
-                            ["TL"] = {
-                                "Malinis.",
-                            },
-                        },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.kill.killer.reserved.blade",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Finished.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Yari.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eliminated.",
-                            },
-                            ["TL"] = {
-                                "Tanggal.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fell.",
-                            },
-                            ["TL"] = {
-                                "Bumagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clean strike.",
-                            },
-                            ["TL"] = {
-                                "Malinis na tama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Moving.",
-                            },
-                            ["TL"] = {
-                                "Lalakad na.",
-                            },
+                            ["fallback"] = "Cut down.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.kill.killer.reserved.blade.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Cut down.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.reserved.blade.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Cut down.",
+                        "Head severed.",
+                        "Down.",
+                        "Done.",
+                        "Clear.",
+                        "Finished.",
+                        "Eliminated.",
+                        "Fell.",
+                        "Clean strike.",
+                        "Moving.",
+                    },
+                    ["TL"] = {
+                        "Nahati.",
+                        "Pugot.",
+                        "Bagsak.",
+                        "Tapos.",
+                        "Malinis.",
+                        "Yari.",
+                        "Tanggal.",
+                        "Bumagsak.",
+                        "Malinis na tama.",
+                        "Lalakad na.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_reserved",
-        ["id"] = "semantic.combat.kill.killer.reserved.firearm_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.kill.killer.reserved.firearm",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hit.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.reserved.firearm.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hit.",
+                                        "Down.",
+                                        "Target neutral.",
+                                        "One round.",
+                                        "Clear.",
+                                        "Eliminated.",
+                                        "Dropped.",
+                                        "Shot connected.",
+                                        "Neutralized.",
+                                        "Done.",
+                                    },
+                                    ["TL"] = {
+                                        "Tinamaan.",
+                                        "Bagsak.",
+                                        "Target bagsak.",
+                                        "Isang bala.",
+                                        "Malinis.",
+                                        "Tanggal.",
+                                        "Naitumba.",
+                                        "Tumama ang putok.",
+                                        "Naalis.",
+                                        "Tapos.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.kill.killer.reserved",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Hit.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.reserved.firearm.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hit.",
+                            "Down.",
+                            "Target neutral.",
+                            "One round.",
+                            "Clear.",
+                            "Eliminated.",
+                            "Dropped.",
+                            "Shot connected.",
+                            "Neutralized.",
+                            "Done.",
+                        },
+                        ["TL"] = {
+                            "Tinamaan.",
+                            "Bagsak.",
+                            "Target bagsak.",
+                            "Isang bala.",
+                            "Malinis.",
+                            "Tanggal.",
+                            "Naitumba.",
+                            "Tumama ang putok.",
+                            "Naalis.",
+                            "Tapos.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.kill.killer.reserved.firearm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "firearm_01",
-            ["sourceId"] = "semantic.combat.kill.killer.reserved.firearm_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm_01.json",
+            ["localId"] = "firearm",
+            ["sourceId"] = "combat.kill.killer.reserved.firearm",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
-        ["namespace"] = "semantic.combat.kill.killer.reserved",
+        ["namespace"] = "combat.kill.killer.reserved",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,135 +340,121 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.reserved.firearm_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/reserved.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hit.",
-                            },
-                            ["TL"] = {
-                                "Tinamaan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down.",
-                            },
-                            ["TL"] = {
-                                "Bagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target neutral.",
-                            },
-                            ["TL"] = {
-                                "Target bagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One round.",
-                            },
-                            ["TL"] = {
-                                "Isang bala.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hit.",
+                                        "Down.",
+                                        "Target neutral.",
+                                        "One round.",
+                                        "Clear.",
+                                        "Eliminated.",
+                                        "Dropped.",
+                                        "Shot connected.",
+                                        "Neutralized.",
+                                        "Done.",
+                                    },
+                                    ["TL"] = {
+                                        "Tinamaan.",
+                                        "Bagsak.",
+                                        "Target bagsak.",
+                                        "Isang bala.",
+                                        "Malinis.",
+                                        "Tanggal.",
+                                        "Naitumba.",
+                                        "Tumama ang putok.",
+                                        "Naalis.",
+                                        "Tapos.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear.",
-                            },
-                            ["TL"] = {
-                                "Malinis.",
-                            },
-                        },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.kill.killer.reserved.firearm",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eliminated.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Tanggal.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped.",
-                            },
-                            ["TL"] = {
-                                "Naitumba.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Shot connected.",
-                            },
-                            ["TL"] = {
-                                "Tumama ang putok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Neutralized.",
-                            },
-                            ["TL"] = {
-                                "Naalis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done.",
-                            },
-                            ["TL"] = {
-                                "Tapos.",
-                            },
+                            ["fallback"] = "Hit.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.kill.killer.reserved.firearm.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Hit.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.reserved.firearm.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hit.",
+                        "Down.",
+                        "Target neutral.",
+                        "One round.",
+                        "Clear.",
+                        "Eliminated.",
+                        "Dropped.",
+                        "Shot connected.",
+                        "Neutralized.",
+                        "Done.",
+                    },
+                    ["TL"] = {
+                        "Tinamaan.",
+                        "Bagsak.",
+                        "Target bagsak.",
+                        "Isang bala.",
+                        "Malinis.",
+                        "Tanggal.",
+                        "Naitumba.",
+                        "Tumama ang putok.",
+                        "Naalis.",
+                        "Tapos.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

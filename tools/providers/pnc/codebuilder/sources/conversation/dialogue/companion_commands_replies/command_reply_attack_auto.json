@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.reply",
   "id": "attack_auto",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.command.reply.attack_auto"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'll handle it.",
-          "TL": "Ako na ang bahala."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Engaging as needed.",
-          "TL": "Lalabanan kapag kinakailangan."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I'll choose my targets.",
-          "TL": "Pipiliin ko ang mga puntirya ko."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Free to engage. Understood.",
-          "TL": "Malaya nang lumaban. Naintindihan."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I'll fight whatever comes close.",
-          "TL": "Lalabanan ko ang anumang lumapit."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "On it. I'll take them down as they come.",
-          "TL": "Inaasikaso na. Patutumbahin ko sila habang dumarating."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Standard combat stance. Understood.",
-          "TL": "Pangkaraniwang tindig sa laban. Naintindihan."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I'll defend myself and support you.",
-          "TL": "Ipagtatanggol ko ang sarili at tutulungan kita."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Attacking at discretion.",
-          "TL": "Aatake ayon sa sitwasyon."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Understood. Engaging threats automatically.",
-          "TL": "Naiintindihan ko. Kusang aatake sa mga banta."
+          "EN": [
+            "I'll handle it.",
+            "Engaging as needed.",
+            "I'll choose my targets.",
+            "Free to engage. Understood.",
+            "I'll fight whatever comes close.",
+            "On it. I'll take them down as they come.",
+            "Standard combat stance. Understood.",
+            "I'll defend myself and support you.",
+            "Attacking at discretion.",
+            "Understood. Engaging threats automatically."
+          ],
+          "TL": [
+            "Ako na ang bahala.",
+            "Lalabanan kapag kinakailangan.",
+            "Pipiliin ko ang mga puntirya ko.",
+            "Malaya nang lumaban. Naintindihan.",
+            "Lalabanan ko ang anumang lumapit.",
+            "Inaasikaso na. Patutumbahin ko sila habang dumarating.",
+            "Pangkaraniwang tindig sa laban. Naintindihan.",
+            "Ipagtatanggol ko ang sarili at tutulungan kita.",
+            "Aatake ayon sa sitwasyon.",
+            "Naiintindihan ko. Kusang aatake sa mga banta."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.reply",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

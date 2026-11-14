@@ -3,102 +3,48 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
-local ConversationRegistry = require
-    "PNC/ConvoEngine/Registry"
-
-local function activeLanguage()
-    if Translator and type(Translator.getLanguage) == "function" then
-        local language = Translator.getLanguage()
-        if language and type(language.toString) == "function" then
-            return tostring(language:toString())
-        end
-    end
-    return "EN"
-end
-
-local function installPSDLFamily(templateID)
-    local existing = ConversationRegistry.PHRASE_FAMILIES[templateID]
-    if type(existing) == "table" and existing._psdl == true then
-        return existing
-    end
-
-    local plan = ConversationRegistry.ConvoPlan(templateID)
-    local payload = type(plan) == "table" and plan.payload or nil
-    local response = type(payload) == "table" and payload.response or nil
-    local authored = type(response) == "table" and response.variants or nil
-    if type(authored) ~= "table" then return nil end
-
-    local language = activeLanguage()
-    local phrases = {}
-    for index, variant in ipairs(authored) do
-        local text = type(variant) == "table" and variant.text or nil
-        local localized = type(text) == "table"
-            and (text[language] or text.EN) or nil
-        local fallback = type(localized) == "table"
-            and localized[1] or localized
-        if type(fallback) == "string" and fallback ~= "" then
-            phrases[#phrases + 1] = {
-                id = "phrase." .. templateID .. ".neutral."
-                    .. string.format("%02d", index),
-                key = "",
-                fallback = fallback,
-                phraseID = tostring(
-                    variant.id or ("neutral." .. index)
-                ),
-            }
-        end
-    end
-    if #phrases == 0 then return nil end
-
-    local family = {
-        id = "phrase." .. templateID,
-        semanticTemplateID = templateID,
-        owner = "projecthoomans.dialogue_content.events",
-        contentOwner = "projecthoomans.dialogue_content.events",
-        _psdl = true,
-        styles = { neutral = phrases },
-    }
-    ConversationRegistry.PHRASE_FAMILIES[templateID] = family
-    return family
-end
+local ConvoPlanFamily = require
+    "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
 
 local MEDICAL_TEMPLATES = {
-    "semantic.medical.distress.call.bandage",
-    "semantic.medical.distress.call.bleedout",
-    "semantic.medical.distress.call.default",
-    "semantic.medical.distress.call.dehydration",
-    "semantic.medical.distress.call.exhaustion",
-    "semantic.medical.distress.call.mercy",
-    "semantic.medical.distress.call.rescue",
-    "semantic.medical.distress.call.starvation",
-    "semantic.medical.distress.default",
-    "semantic.medical.distress.mercy",
-    "semantic.medical.distress.urgent",
-    "semantic.medical.distress.repeat.bandage",
-    "semantic.medical.distress.repeat.bleedout",
-    "semantic.medical.distress.repeat.default",
-    "semantic.medical.distress.repeat.dehydration",
-    "semantic.medical.distress.repeat.exhaustion",
-    "semantic.medical.distress.repeat.mercy",
-    "semantic.medical.distress.repeat.rescue",
-    "semantic.medical.distress.repeat.starvation",
-    "semantic.medical.distress.teammate.default",
-    "semantic.medical.distress.teammate.found",
-    "semantic.medical.distress.teammate.missing",
-    "semantic.medical.distress.treatment.bandage",
-    "semantic.medical.distress.treatment.default",
-    "semantic.medical.distress.update.bandage",
-    "semantic.medical.distress.update.bleedout",
-    "semantic.medical.distress.update.default",
-    "semantic.medical.distress.update.dehydration",
-    "semantic.medical.distress.update.exhaustion",
-    "semantic.medical.distress.update.mercy",
-    "semantic.medical.distress.update.rescue",
-    "semantic.medical.distress.update.starvation",
+    "medical.distress.call.bandage",
+    "medical.distress.call.bleedout",
+    "medical.distress.call.default",
+    "medical.distress.call.dehydration",
+    "medical.distress.call.exhaustion",
+    "medical.distress.call.mercy",
+    "medical.distress.call.rescue",
+    "medical.distress.call.starvation",
+    "medical.distress.default",
+    "medical.distress.mercy",
+    "medical.distress.urgent",
+    "medical.distress.repeat.bandage",
+    "medical.distress.repeat.bleedout",
+    "medical.distress.repeat.default",
+    "medical.distress.repeat.dehydration",
+    "medical.distress.repeat.exhaustion",
+    "medical.distress.repeat.mercy",
+    "medical.distress.repeat.rescue",
+    "medical.distress.repeat.starvation",
+    "medical.distress.teammate.default",
+    "medical.distress.teammate.found",
+    "medical.distress.teammate.missing",
+    "medical.distress.treatment.bandage",
+    "medical.distress.treatment.default",
+    "medical.distress.update.bandage",
+    "medical.distress.update.bleedout",
+    "medical.distress.update.default",
+    "medical.distress.update.dehydration",
+    "medical.distress.update.exhaustion",
+    "medical.distress.update.mercy",
+    "medical.distress.update.rescue",
+    "medical.distress.update.starvation",
 }
 
 for _, templateID in ipairs(MEDICAL_TEMPLATES) do
-    installPSDLFamily(templateID)
+    ConvoPlanFamily.install(templateID, {
+        defaultContentOwner = "projecthoomans.dialogue_content.events",
+    })
 end
 
 return true

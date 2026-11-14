@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.supportive",
+  "id": "firearm",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/supportive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Got it. You good?",
+            "Threat's down. Check yourself.",
+            "Downed that one. I've got your back.",
+            "Clear! You hurt anywhere?",
+            "Got him off us. Stay close.",
+            "Dropped that one. Keep your eyes open.",
+            "Took care of it. Are you alright?",
+            "Shot landed. You safe?",
+            "Target down. Covering you.",
+            "That one's finished. Watch the flanks."
+          ],
+          "TL": [
+            "Nakuha ko. Ayos ka?",
+            "Bagsak ang banta. Tignan mo sarili mo.",
+            "Ibinagsak ko ang isa. Hawak ko ang likod mo.",
+            "Malinis! May tama ka ba kahit saan?",
+            "Nailayo ko sa atin. Dumikit ka.",
+            "Bagsak na 'yon. Manatiling gising ang mata.",
+            "Inasikaso ko na. Ayos ka lang?",
+            "Tumama ang putok. Ligtas ka?",
+            "Bagsak ang target. Sinasalag kita.",
+            "Tapos na ang isang 'yon. Bantayan ang gilid."
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_witness_brave",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/brave.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Clean kill. Check the flanks.",
+              "Good strike. Scan our blind spots.",
+              "Solid takedown. Watch the perimeter.",
+              "Downed cleanly. Keep your eyes on the sides.",
+              "Decisive blow. Scan the lane.",
+              "Threat cleared. Watch for secondary contacts.",
+              "Clean hit. Don't get tunnel vision.",
+              "Down. Maintain field awareness.",
+              "Well executed. Check behind cover.",
+              "Target neutralized. Scan all directions."
+            ],
+            "TL": [
+              "Malinis. Bantayan ang gilid.",
+              "Magandang tama. Tignan ang mga bulag na sulok.",
+              "Solidong pagpabagsak. Bantayan ang paligid.",
+              "Bagsak nang malinis. Tumingin sa magkabilang gilid.",
+              "Tiyak na hampas. Suriin ang daanan.",
+              "Banta naalis. Bantayan kung may susunod pa.",
+              "Malinis na tama. Huwag matutok sa iisang lugar.",
+              "Bagsak. Maging alerto sa buong paligid.",
+              "Magaling ang pagkagawa. Tignan sa likod ng kublihan.",
+              "Target naalis. Magmasid sa lahat ng direksyon."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One down. Keep your head up.",
+              "Good kill. Stay vigilant.",
+              "Threat eliminated. Maintain discipline.",
+              "That's one less. Eyes open.",
+              "Downed. Don't relax your posture.",
+              "Handled. Keep looking forward.",
+              "One in the dirt. Stay sharp.",
+              "Solid work. Keep ready for the next.",
+              "Target down. Don't lose focus.",
+              "Good takedown. Hold your stance."
+            ],
+            "TL": [
+              "Isa na. Huwag magpakampante.",
+              "Magandang patay. Manatiling gising.",
+              "Banta naalis. Panatilihin ang disiplina.",
+              "Bawas ang isa. Buksan ang mga mata.",
+              "Bagsak na. Huwag magpakarelax sa tindig.",
+              "Naasikaso. Patuloy na tumingin sa unahan.",
+              "Isa sa lupa. Maging matalas ang pakiramdam.",
+              "Solido. Maging handa sa susunod.",
+              "Target bagsak na. Huwag mawalan ng pokus.",
+              "Magandang pagtumba. Hawakan ang pwesto mo."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Good. Keep moving before they bunch up.",
+              "Clean hit. Don't let them gather.",
+              "Downed. Advance before they form a crowd.",
+              "Handled. Push through before more arrive.",
+              "Threat dead. Keep moving through the area.",
+              "Solid kill. Advance while the lane is open.",
+              "Target down. Move before the swarm groups.",
+              "Down. Keep momentum before reinforcements come.",
+              "Clean work. Don't stay stationary.",
+              "Handled. Keep pushing forward."
+            ],
+            "TL": [
+              "Ayos. Gumalaw tayo bago sila dumami.",
+              "Malinis na tama. Huwag silang hayaang magtipon.",
+              "Bagsak na. Sulong bago maging kuyog.",
+              "Naasikaso. Lusot bago may dumating pa.",
+              "Patay ang banta. Tuloy sa paggalaw sa lugar.",
+              "Solidong patay. Abante habang bukas ang daan.",
+              "Target bagsak na. Kilos bago magsama-sama ang iba.",
+              "Bagsak. Panatilihin ang bwelo bago may sumaklolo.",
+              "Malinis na trabaho. Huwag maging nakatigil.",
+              "Naasikaso na. Tuloy ang pagsulong."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

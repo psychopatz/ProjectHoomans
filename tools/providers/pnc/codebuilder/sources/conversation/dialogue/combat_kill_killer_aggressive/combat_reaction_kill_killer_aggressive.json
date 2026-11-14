@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_killer_aggressive",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/aggressive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Got one. Who's next?",
+              "Dropped that one cold. Line 'em up.",
+              "That one's dead. Send another.",
+              "Downed it. Who else wants some?",
+              "First down. Bring on the rest.",
+              "Crushed that skull. Next target.",
+              "Stay in the dirt. Next!",
+              "That one's history. Moving to the next.",
+              "One less rotting bastard. Who's next?",
+              "Put it down hard. Step up if you dare."
+            ],
+            "TL": [
+              "Isa na. Sino'ng susunod?",
+              "Bagsak ang isa. Ihanay ang susunod.",
+              "Patay ang isang 'yon. Magpadala pa ng isa.",
+              "Ibinagsak ko na. Sino pa may gusto?",
+              "Unang bagsak. Dalhin ang iba.",
+              "Durog ang bungo. Susunod na target.",
+              "Manatili ka sa lupa. Sunod!",
+              "Burado na 'yon. Lilipat sa susunod.",
+              "Bawas ang isang bulok. Sino susunod?",
+              "Ibinagsak nang malupit. Lumapit ang may tapang."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Down. Give me another.",
+              "Dropped. Bring them on.",
+              "Dead. Who's stepping up?",
+              "Finished that one. Send the next.",
+              "Downed. Keep feeding them to me.",
+              "Cracked open. Next in line.",
+              "That one's done. Give me another target.",
+              "Dead on the ground. Next one step forward.",
+              "Flattened. Who's next to die?",
+              "One down. Not even winded."
+            ],
+            "TL": [
+              "Patay. May kasunod pa ba?",
+              "Bagsak. Dalhin niyo rito.",
+              "Patay na. Sino'ng lalapit?",
+              "Tinapos ko 'yon. Ipadala ang kasunod.",
+              "Bagsak. Iharap niyo lang sa akin.",
+              "Basag na. Susunod sa pila.",
+              "Tapos na ang isang 'yon. Bigyan pa ako ng target.",
+              "Patay sa lupa. Susunod lumapit.",
+              "Pinitpit. Sino susunod na mamamatay?",
+              "Isang bagsak. Hindi man lang ako hinihingal."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "That's one. Keep them coming.",
+              "One less rotten. Keep 'em coming.",
+              "First blood. Line them up.",
+              "That's one down. I can do this all day.",
+              "Score one for us. Keep pushing.",
+              "Count one dead. Come get some.",
+              "That's one less mouth to feed. Next.",
+              "One crushed. Keep 'em coming my way.",
+              "Downed one. Who wants the same?",
+              "One in the grave. Keep them coming."
+            ],
+            "TL": [
+              "Isa na. Sige, lapit pa.",
+              "Bawas ang isang bulok. Lapit lang.",
+              "Unang tama. Ihanay niyo sila.",
+              "Isang bagsak na 'yan. Kaya ko 'to buong araw.",
+              "Puntos sa atin. Tuloy ang sugod.",
+              "Bilangin ang isang patay. Halika rito.",
+              "Bawas ang isang kakain. Sunod.",
+              "Durog ang isa. Papuntahin niyo rito.",
+              "Nagpabagsak ng isa. Sino may gusto ng gano'n din?",
+              "Isa sa hukay. Sige, tuloy lang."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

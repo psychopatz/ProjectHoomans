@@ -7,11 +7,6 @@ return {
         },
         ["id"] = "social.companion_check_in",
         ["kind"] = "dialogue",
-        ["related"] = {
-            "question.gossip",
-            "question.health",
-            "question.needs",
-        },
         ["source"] = "adopters/hoomans/dialogue/companion_check_in/social_companion_check_in.json",
     },
 }

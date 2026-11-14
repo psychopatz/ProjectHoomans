@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.member",
   "id": "twilight",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/member/twilight",
-    "textDomain": "pnc.psdl.social.greetings.member.twilight"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.member.twilight",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "You're supposed to be resting. What's wrong?",
           "TL": "Dapat nagpapahinga ka. Ano ang problema?"
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "Quiet night so far. Let's keep it that way.",
           "TL": "Tahimik na gabi hanggang ngayon. Panatilihin natin itong paraan."
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "I'm on watch. Did you need something?",
           "TL": "Nakabantay ako. may kailangan ka ba?"
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "Good, it's you. I heard footsteps.",
           "TL": "Buti, ikaw pala. Nakarinig ako ng mga yabag."
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "Can't sleep? Pull up a chair, but keep your voice low.",
           "TL": "Hindi makatulog? Hilahin ang isang upuan, ngunit panatilihing mahina ang iyong boses."
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.member",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "You're supposed to be resting. What's wrong?",
+            "Quiet night so far. Let's keep it that way.",
+            "I'm on watch. Did you need something?",
+            "Good, it's you. I heard footsteps.",
+            "Can't sleep? Pull up a chair, but keep your voice low."
+          ],
+          "TL": [
+            "Dapat nagpapahinga ka. Ano ang problema?",
+            "Tahimik na gabi hanggang ngayon. Panatilihin natin itong paraan.",
+            "Nakabantay ako. may kailangan ka ba?",
+            "Buti, ikaw pala. Nakarinig ako ng mga yabag.",
+            "Hindi makatulog? Hilahin ang isang upuan, ngunit panatilihing mahina ang iyong boses."
+          ]
+        }
+      }
+    ]
+  }
 }

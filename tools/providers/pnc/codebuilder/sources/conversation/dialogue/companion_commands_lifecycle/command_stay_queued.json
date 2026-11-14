@@ -1,196 +1,83 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command.stay",
+  "id": "queued",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "queued",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
+    "responseAct": "REPLY"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Okay, I'll stay here.",
+            "Holding position right here.",
+            "Understood. Staying put.",
+            "I'll hold this ground.",
+            "Standing guard right here. Understood.",
+            "Right. I won't move from this spot.",
+            "Holding this perimeter. Go ahead.",
+            "Understood. Maintaining this position.",
+            "Got it. Staying right where I am.",
+            "Holding ground as ordered."
+          ],
+          "TL": [
+            "Sige, mananatili ako rito.",
+            "Hawak ko ang pwestong ito.",
+            "Naintindihan. Dito lang ako.",
+            "Hahawakan ko ang pwestong ito.",
+            "Nakatayong bantay dito. Naintindihan.",
+            "Sige. Di ako aalis sa lugar na 'to.",
+            "Binabantayan ang paligid na ito. Sige na.",
+            "Naiintindihan ko. Pananatilihin ang posisyong ito.",
+            "Nakuha ko. Mananatili kung nasaan ako.",
+            "Hawak ang pwesto ayon sa utos."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:companion_commands",
-        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
-        "responseTemplateID": "semantic.command.stay.queued"
-      },
-      "response": {
-        "act": "REPLY",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Okay, I'll stay here.",
-              "TL": "Sige, mananatili ako rito."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Holding position right here.",
-              "TL": "Hawak ko ang pwestong ito."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Understood. Staying put.",
-              "TL": "Naintindihan. Dito lang ako."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I'll hold this ground.",
-              "TL": "Hahawakan ko ang pwestong ito."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Standing guard right here. Understood.",
-              "TL": "Nakatayong bantay dito. Naintindihan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Right. I won't move from this spot.",
-              "TL": "Sige. Di ako aalis sa lugar na 'to."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Holding this perimeter. Go ahead.",
-              "TL": "Binabantayan ang paligid na ito. Sige na."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Understood. Maintaining this position.",
-              "TL": "Naiintindihan ko. Pananatilihin ang posisyong ito."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Got it. Staying right where I am.",
-              "TL": "Nakuha ko. Mananatili kung nasaan ako."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Holding ground as ordered.",
-              "TL": "Hawak ang pwesto ayon sa utos."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.command.stay"
-    },
-    {
-      "kind": "dialogue",
-      "id": "friendly",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:companion_commands",
-        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
-        "responseTemplateID": "semantic.command.stay.queued.friendly"
-      },
-      "response": {
-        "act": "REPLY",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Sure, I'll stay here. Take your time, friend!",
-              "TL": "Sige, mananatili ako rito. Huwag kang magmadali, kaibigan!"
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I'll keep watch right here, partner. Be careful!",
-              "TL": "Magbabantay ako rito, kasama. Mag-ingat ka!"
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "No problem! I'll guard our spot until you get back.",
-              "TL": "Walang problema! Babantayan ko ang pwesto natin hanggang makabalik ka."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Happy to hold the fort here for you, friend.",
-              "TL": "Masayang babantayan ang kuta rito para sa 'yo, kaibigan."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Sure thing! I'll be waiting right here for you.",
-              "TL": "Walang anuman! Maghihintay ako rito mismo para sa 'yo."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I won't wander off. Stay safe out there, partner!",
-              "TL": "Di ako lalayo. Mag-ingat ka sa labas, kasama!"
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Holding the line right here with a smile. Go do what you need to do.",
-              "TL": "Hawak ang linya rito nang may ngiti. Gawin mo ang kailangan mo."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I'll make sure nobody sneaks past this spot, friend.",
-              "TL": "Titiyakin kong walang makalulusot dito, kaibigan."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Resting my feet and keeping watch. See you soon!",
-              "TL": "Ipapahinga ang paa at magbabantay. Kita tayo agad!"
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "All good! I'll be right here when you return.",
-              "TL": "Ayos ang lahat! Narito lang ako pagbalik mo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.command.stay.queued"
-    }
-  ]
+      {
+        "id": "friendly",
+        "text": {
+          "EN": [
+            "Sure, I'll stay here. Take your time, friend!",
+            "I'll keep watch right here, partner. Be careful!",
+            "No problem! I'll guard our spot until you get back.",
+            "Happy to hold the fort here for you, friend.",
+            "Sure thing! I'll be waiting right here for you.",
+            "I won't wander off. Stay safe out there, partner!",
+            "Holding the line right here with a smile. Go do what you need to do.",
+            "I'll make sure nobody sneaks past this spot, friend.",
+            "Resting my feet and keeping watch. See you soon!",
+            "All good! I'll be right here when you return."
+          ],
+          "TL": [
+            "Sige, mananatili ako rito. Huwag kang magmadali, kaibigan!",
+            "Magbabantay ako rito, kasama. Mag-ingat ka!",
+            "Walang problema! Babantayan ko ang pwesto natin hanggang makabalik ka.",
+            "Masayang babantayan ang kuta rito para sa 'yo, kaibigan.",
+            "Walang anuman! Maghihintay ako rito mismo para sa 'yo.",
+            "Di ako lalayo. Mag-ingat ka sa labas, kasama!",
+            "Hawak ang linya rito nang may ngiti. Gawin mo ang kailangan mo.",
+            "Titiyakin kong walang makalulusot dito, kaibigan.",
+            "Ipapahinga ang paa at magbabantay. Kita tayo agad!",
+            "Ayos ang lahat! Narito lang ako pagbalik mo."
+          ]
+        }
+      }
+    ]
+  }
 }

@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.necroa.player_mask_removed",
+  "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.necroa.player_mask_removed.default",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Put your mask back on. The air is not safe.",
-          "TL": "Put your mask back on. The air is not safe."
+          "EN": [
+            "Put your mask back on. The air is not safe."
+          ],
+          "TL": [
+            "Put your mask back on. The air is not safe."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.necroa.player_mask_removed.default",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

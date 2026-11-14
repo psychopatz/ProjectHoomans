@@ -1,54 +1,51 @@
 {
-  "id": "wellbeing",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.wellbeing",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "question",
+  "id": "wellbeing",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "WELLBEING",
+  "metadata": {
+    "responsePoolID": "question.wellbeing",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "WELLBEING"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.wellbeing.dataset.hanging_in",
-        "metadata": {
-          "fallback": "I'm hanging in there. Thanks for asking.",
-          "templateID": "semantic.question.wellbeing.dataset.hanging_in"
-        },
+        "id": "question.wellbeing.dataset.hanging_in",
         "text": {
           "EN": "I'm hanging in there. Thanks for asking.",
           "TL": "I'm hanging in there. Thanks for asking."
+        },
+        "metadata": {
+          "fallback": "I'm hanging in there. Thanks for asking.",
+          "templateID": "question.wellbeing.dataset.hanging_in"
         }
       },
       {
-        "id": "semantic.question.wellbeing.dataset.all_things_considered",
-        "metadata": {
-          "fallback": "Doing okay, all things considered.",
-          "templateID": "semantic.question.wellbeing.dataset.all_things_considered"
-        },
+        "id": "question.wellbeing.dataset.all_things_considered",
         "text": {
           "EN": "Doing okay, all things considered.",
           "TL": "Doing okay, all things considered."
+        },
+        "metadata": {
+          "fallback": "Doing okay, all things considered.",
+          "templateID": "question.wellbeing.dataset.all_things_considered"
         }
       },
       {
-        "id": "semantic.question.wellbeing.dataset.getting_by",
-        "metadata": {
-          "fallback": "I'm getting by, one day at a time. How about you?",
-          "templateID": "semantic.question.wellbeing.dataset.getting_by"
-        },
+        "id": "question.wellbeing.dataset.getting_by",
         "text": {
           "EN": "I'm getting by, one day at a time. How about you?",
           "TL": "I'm getting by, one day at a time. How about you?"
+        },
+        "metadata": {
+          "fallback": "I'm getting by, one day at a time. How about you?",
+          "templateID": "question.wellbeing.dataset.getting_by"
         }
       },
       {
-        "id": "semantic.question.wellbeing.dataset.hungry",
-        "metadata": {
-          "fallback": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-          "priority": 2,
-          "templateID": "semantic.question.wellbeing.dataset.hungry"
-        },
+        "id": "question.wellbeing.dataset.hungry",
         "text": {
           "EN": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
           "TL": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it."
@@ -71,15 +68,15 @@
               ]
             }
           ]
+        },
+        "metadata": {
+          "fallback": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
+          "priority": 2,
+          "templateID": "question.wellbeing.dataset.hungry"
         }
       },
       {
-        "id": "semantic.question.wellbeing.dataset.thirsty",
-        "metadata": {
-          "fallback": "I'm pretty thirsty. If you have water, could you spare some?",
-          "priority": 3,
-          "templateID": "semantic.question.wellbeing.dataset.thirsty"
-        },
+        "id": "question.wellbeing.dataset.thirsty",
         "text": {
           "EN": "I'm pretty thirsty. If you have water, could you spare some?",
           "TL": "I'm pretty thirsty. If you have water, could you spare some?"
@@ -102,15 +99,15 @@
               ]
             }
           ]
+        },
+        "metadata": {
+          "fallback": "I'm pretty thirsty. If you have water, could you spare some?",
+          "priority": 3,
+          "templateID": "question.wellbeing.dataset.thirsty"
         }
       },
       {
-        "id": "semantic.question.wellbeing.dataset.tired",
-        "metadata": {
-          "fallback": "I'm tired, though I can manage for now.",
-          "priority": 2,
-          "templateID": "semantic.question.wellbeing.dataset.tired"
-        },
+        "id": "question.wellbeing.dataset.tired",
         "text": {
           "EN": "I'm tired, though I can manage for now.",
           "TL": "I'm tired, though I can manage for now."
@@ -133,10 +130,13 @@
               ]
             }
           ]
+        },
+        "metadata": {
+          "fallback": "I'm tired, though I can manage for now.",
+          "priority": 2,
+          "templateID": "question.wellbeing.dataset.tired"
         }
       }
     ]
-  },
-  "namespace": "semantic.question",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

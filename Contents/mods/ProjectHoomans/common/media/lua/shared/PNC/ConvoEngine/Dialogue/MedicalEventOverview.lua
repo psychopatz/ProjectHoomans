@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "medical_event_overview",
-        ["id"] = "semantic.medical.distress.default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "medical.distress.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I need help with this wound.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.medical.distress.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I need help with this wound.",
+                                        "Hurting pretty badly here. Need aid.",
+                                        "Got injured. Can someone look at this?",
+                                        "Need medical attention before this gets worse.",
+                                        "Wound is throbbing. I need a hand.",
+                                        "Took some damage. Could use first aid.",
+                                        "This cut is nasty. Help me clean it.",
+                                        "I'm in pain here. Need medical supplies.",
+                                        "Injured and slowing down. Need treatment.",
+                                        "Got banged up pretty good. Help me patch up.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko ng tulong sa sugat na 'to.",
+                                        "Medyo malala ang tama ko rito. Kailangan ng gamot.",
+                                        "Nasugatan ako. May makakatingin ba nito?",
+                                        "Kailangan ng panggagamot bago lumala 'to.",
+                                        "Pumipintig ang sugat. Kailangan ko ng saklolo.",
+                                        "Nasaktan ako. Kailangan ko ng first aid.",
+                                        "Marumi ang hiwa na 'to. Tulungan mo akong linisin.",
+                                        "Nasasaktan ako rito. Kailangan ko ng gamot.",
+                                        "Sugatan at bumabagal na. Kailangan ng lunas.",
+                                        "Nabugbog ako nang husto. Tulungan mo akong magbenda.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "medical.distress",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I need help with this wound.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.distress.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I need help with this wound.",
+                            "Hurting pretty badly here. Need aid.",
+                            "Got injured. Can someone look at this?",
+                            "Need medical attention before this gets worse.",
+                            "Wound is throbbing. I need a hand.",
+                            "Took some damage. Could use first aid.",
+                            "This cut is nasty. Help me clean it.",
+                            "I'm in pain here. Need medical supplies.",
+                            "Injured and slowing down. Need treatment.",
+                            "Got banged up pretty good. Help me patch up.",
+                        },
+                        ["TL"] = {
+                            "Kailangan ko ng tulong sa sugat na 'to.",
+                            "Medyo malala ang tama ko rito. Kailangan ng gamot.",
+                            "Nasugatan ako. May makakatingin ba nito?",
+                            "Kailangan ng panggagamot bago lumala 'to.",
+                            "Pumipintig ang sugat. Kailangan ko ng saklolo.",
+                            "Nasaktan ako. Kailangan ko ng first aid.",
+                            "Marumi ang hiwa na 'to. Tulungan mo akong linisin.",
+                            "Nasasaktan ako rito. Kailangan ko ng gamot.",
+                            "Sugatan at bumabagal na. Kailangan ng lunas.",
+                            "Nabugbog ako nang husto. Tulungan mo akong magbenda.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "medical.distress.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "default",
-            ["sourceId"] = "semantic.medical.distress.default",
+            ["sourceId"] = "medical.distress.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
-        ["namespace"] = "semantic.medical.distress",
+        ["namespace"] = "medical.distress",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -24,167 +110,78 @@ return {
         ["payload"] = {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
-                ["responseTemplateID"] = "semantic.medical.distress.default",
+                ["responseAct"] = "MEDICAL_RESPONSE",
                 ["sourceSurface"] = "content/event/medical/overview.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "MEDICAL_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.01",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need help with this wound.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng tulong sa sugat na 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.02",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hurting pretty badly here. Need aid.",
-                            },
-                            ["TL"] = {
-                                "Medyo malala ang tama ko rito. Kailangan ng gamot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.03",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got injured. Can someone look at this?",
-                            },
-                            ["TL"] = {
-                                "Nasugatan ako. May makakatingin ba nito?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.04",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Need medical attention before this gets worse.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ng panggagamot bago lumala 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.05",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Wound is throbbing. I need a hand.",
-                            },
-                            ["TL"] = {
-                                "Pumipintig ang sugat. Kailangan ko ng saklolo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.06",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Took some damage. Could use first aid.",
-                            },
-                            ["TL"] = {
-                                "Nasaktan ako. Kailangan ko ng first aid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.07",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "This cut is nasty. Help me clean it.",
-                            },
-                            ["TL"] = {
-                                "Marumi ang hiwa na 'to. Tulungan mo akong linisin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.08",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm in pain here. Need medical supplies.",
-                            },
-                            ["TL"] = {
-                                "Nasasaktan ako rito. Kailangan ko ng gamot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.09",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Injured and slowing down. Need treatment.",
-                            },
-                            ["TL"] = {
-                                "Sugatan at bumabagal na. Kailangan ng lunas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.default.neutral.10",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got banged up pretty good. Help me patch up.",
-                            },
-                            ["TL"] = {
-                                "Nabugbog ako nang husto. Tulungan mo akong magbenda.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I need help with this wound.",
+                                        "Hurting pretty badly here. Need aid.",
+                                        "Got injured. Can someone look at this?",
+                                        "Need medical attention before this gets worse.",
+                                        "Wound is throbbing. I need a hand.",
+                                        "Took some damage. Could use first aid.",
+                                        "This cut is nasty. Help me clean it.",
+                                        "I'm in pain here. Need medical supplies.",
+                                        "Injured and slowing down. Need treatment.",
+                                        "Got banged up pretty good. Help me patch up.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko ng tulong sa sugat na 'to.",
+                                        "Medyo malala ang tama ko rito. Kailangan ng gamot.",
+                                        "Nasugatan ako. May makakatingin ba nito?",
+                                        "Kailangan ng panggagamot bago lumala 'to.",
+                                        "Pumipintig ang sugat. Kailangan ko ng saklolo.",
+                                        "Nasaktan ako. Kailangan ko ng first aid.",
+                                        "Marumi ang hiwa na 'to. Tulungan mo akong linisin.",
+                                        "Nasasaktan ako rito. Kailangan ko ng gamot.",
+                                        "Sugatan at bumabagal na. Kailangan ng lunas.",
+                                        "Nabugbog ako nang husto. Tulungan mo akong magbenda.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "MEDICAL_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "medical.distress.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I need help with this wound.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.medical.distress.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -194,20 +191,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I need help with this wound.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.distress.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I need help with this wound.",
+                        "Hurting pretty badly here. Need aid.",
+                        "Got injured. Can someone look at this?",
+                        "Need medical attention before this gets worse.",
+                        "Wound is throbbing. I need a hand.",
+                        "Took some damage. Could use first aid.",
+                        "This cut is nasty. Help me clean it.",
+                        "I'm in pain here. Need medical supplies.",
+                        "Injured and slowing down. Need treatment.",
+                        "Got banged up pretty good. Help me patch up.",
+                    },
+                    ["TL"] = {
+                        "Kailangan ko ng tulong sa sugat na 'to.",
+                        "Medyo malala ang tama ko rito. Kailangan ng gamot.",
+                        "Nasugatan ako. May makakatingin ba nito?",
+                        "Kailangan ng panggagamot bago lumala 'to.",
+                        "Pumipintig ang sugat. Kailangan ko ng saklolo.",
+                        "Nasaktan ako. Kailangan ko ng first aid.",
+                        "Marumi ang hiwa na 'to. Tulungan mo akong linisin.",
+                        "Nasasaktan ako rito. Kailangan ko ng gamot.",
+                        "Sugatan at bumabagal na. Kailangan ng lunas.",
+                        "Nabugbog ako nang husto. Tulungan mo akong magbenda.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "medical_event_overview",
-        ["id"] = "semantic.medical.distress.mercy",
+        ["exchangeFamily"] = {
+            ["familyID"] = "medical.distress.mercy",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Please. I need help with this wound, don't let me die.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.medical.distress.mercy.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Please. I need help with this wound, don't let me die.",
+                                        "Have mercy on me... patch me up, please.",
+                                        "I won't survive this cut without your mercy.",
+                                        "Please help... I'm begging for aid.",
+                                        "Don't leave me to bleed out like an animal.",
+                                        "Show some kindness. This wound is killing me.",
+                                        "Please, just dress the wound. That's all I ask.",
+                                        "I'm at your mercy. Help stop this pain.",
+                                        "Spare my life and treat this injury, please.",
+                                        "I have so much to live for... please help me.",
+                                    },
+                                    ["TL"] = {
+                                        "Pakiusap. Tulungan mo ako sa sugat na 'to, huwag mo akong hayaang mamatay.",
+                                        "Maawa ka sa akin... bendahan mo ako, pakiusap.",
+                                        "Hindi ako mabubuhay sa hiwang 'to kung wala ang awa mo.",
+                                        "Pakiusap tulungan mo ako... nagmamakaawa ako sa lunas.",
+                                        "Huwag mo akong iwang maubusan ng dugo na parang hayop.",
+                                        "Magpakita ka ng kabutihan. Pinapatay ako ng sugat na 'to.",
+                                        "Pakiusap, gamutin lang ang sugat. 'Yon lang ang hinihiling ko.",
+                                        "Nasa awa mo ako. Tulungan mong matigil ang sakit.",
+                                        "Iligtas mo ang buhay ko at gamutin 'tong pinsala, pakiusap.",
+                                        "Marami pa akong dahilan para mabuhay... tulungan mo ako.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "medical.distress",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Please. I need help with this wound, don't let me die.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.distress.mercy.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Please. I need help with this wound, don't let me die.",
+                            "Have mercy on me... patch me up, please.",
+                            "I won't survive this cut without your mercy.",
+                            "Please help... I'm begging for aid.",
+                            "Don't leave me to bleed out like an animal.",
+                            "Show some kindness. This wound is killing me.",
+                            "Please, just dress the wound. That's all I ask.",
+                            "I'm at your mercy. Help stop this pain.",
+                            "Spare my life and treat this injury, please.",
+                            "I have so much to live for... please help me.",
+                        },
+                        ["TL"] = {
+                            "Pakiusap. Tulungan mo ako sa sugat na 'to, huwag mo akong hayaang mamatay.",
+                            "Maawa ka sa akin... bendahan mo ako, pakiusap.",
+                            "Hindi ako mabubuhay sa hiwang 'to kung wala ang awa mo.",
+                            "Pakiusap tulungan mo ako... nagmamakaawa ako sa lunas.",
+                            "Huwag mo akong iwang maubusan ng dugo na parang hayop.",
+                            "Magpakita ka ng kabutihan. Pinapatay ako ng sugat na 'to.",
+                            "Pakiusap, gamutin lang ang sugat. 'Yon lang ang hinihiling ko.",
+                            "Nasa awa mo ako. Tulungan mong matigil ang sakit.",
+                            "Iligtas mo ang buhay ko at gamutin 'tong pinsala, pakiusap.",
+                            "Marami pa akong dahilan para mabuhay... tulungan mo ako.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "medical.distress.mercy",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "mercy",
-            ["sourceId"] = "semantic.medical.distress.mercy",
+            ["sourceId"] = "medical.distress.mercy",
             ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_mercy.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
-        ["namespace"] = "semantic.medical.distress",
+        ["namespace"] = "medical.distress",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -220,167 +338,78 @@ return {
         ["payload"] = {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
-                ["responseTemplateID"] = "semantic.medical.distress.mercy",
+                ["responseAct"] = "MEDICAL_RESPONSE",
                 ["sourceSurface"] = "content/event/medical/overview.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "MEDICAL_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.01",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Please. I need help with this wound, don't let me die.",
-                            },
-                            ["TL"] = {
-                                "Pakiusap. Tulungan mo ako sa sugat na 'to, huwag mo akong hayaang mamatay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.02",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Have mercy on me... patch me up, please.",
-                            },
-                            ["TL"] = {
-                                "Maawa ka sa akin... bendahan mo ako, pakiusap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.03",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I won't survive this cut without your mercy.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako mabubuhay sa hiwang 'to kung wala ang awa mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.04",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Please help... I'm begging for aid.",
-                            },
-                            ["TL"] = {
-                                "Pakiusap tulungan mo ako... nagmamakaawa ako sa lunas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.05",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't leave me to bleed out like an animal.",
-                            },
-                            ["TL"] = {
-                                "Huwag mo akong iwang maubusan ng dugo na parang hayop.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.06",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Show some kindness. This wound is killing me.",
-                            },
-                            ["TL"] = {
-                                "Magpakita ka ng kabutihan. Pinapatay ako ng sugat na 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.07",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Please, just dress the wound. That's all I ask.",
-                            },
-                            ["TL"] = {
-                                "Pakiusap, gamutin lang ang sugat. 'Yon lang ang hinihiling ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.08",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm at your mercy. Help stop this pain.",
-                            },
-                            ["TL"] = {
-                                "Nasa awa mo ako. Tulungan mong matigil ang sakit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.09",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Spare my life and treat this injury, please.",
-                            },
-                            ["TL"] = {
-                                "Iligtas mo ang buhay ko at gamutin 'tong pinsala, pakiusap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.mercy.neutral.10",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I have so much to live for... please help me.",
-                            },
-                            ["TL"] = {
-                                "Marami pa akong dahilan para mabuhay... tulungan mo ako.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Please. I need help with this wound, don't let me die.",
+                                        "Have mercy on me... patch me up, please.",
+                                        "I won't survive this cut without your mercy.",
+                                        "Please help... I'm begging for aid.",
+                                        "Don't leave me to bleed out like an animal.",
+                                        "Show some kindness. This wound is killing me.",
+                                        "Please, just dress the wound. That's all I ask.",
+                                        "I'm at your mercy. Help stop this pain.",
+                                        "Spare my life and treat this injury, please.",
+                                        "I have so much to live for... please help me.",
+                                    },
+                                    ["TL"] = {
+                                        "Pakiusap. Tulungan mo ako sa sugat na 'to, huwag mo akong hayaang mamatay.",
+                                        "Maawa ka sa akin... bendahan mo ako, pakiusap.",
+                                        "Hindi ako mabubuhay sa hiwang 'to kung wala ang awa mo.",
+                                        "Pakiusap tulungan mo ako... nagmamakaawa ako sa lunas.",
+                                        "Huwag mo akong iwang maubusan ng dugo na parang hayop.",
+                                        "Magpakita ka ng kabutihan. Pinapatay ako ng sugat na 'to.",
+                                        "Pakiusap, gamutin lang ang sugat. 'Yon lang ang hinihiling ko.",
+                                        "Nasa awa mo ako. Tulungan mong matigil ang sakit.",
+                                        "Iligtas mo ang buhay ko at gamutin 'tong pinsala, pakiusap.",
+                                        "Marami pa akong dahilan para mabuhay... tulungan mo ako.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "MEDICAL_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "medical.distress.mercy",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Please. I need help with this wound, don't let me die.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.medical.distress.mercy.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -390,20 +419,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Please. I need help with this wound, don't let me die.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.distress.mercy.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Please. I need help with this wound, don't let me die.",
+                        "Have mercy on me... patch me up, please.",
+                        "I won't survive this cut without your mercy.",
+                        "Please help... I'm begging for aid.",
+                        "Don't leave me to bleed out like an animal.",
+                        "Show some kindness. This wound is killing me.",
+                        "Please, just dress the wound. That's all I ask.",
+                        "I'm at your mercy. Help stop this pain.",
+                        "Spare my life and treat this injury, please.",
+                        "I have so much to live for... please help me.",
+                    },
+                    ["TL"] = {
+                        "Pakiusap. Tulungan mo ako sa sugat na 'to, huwag mo akong hayaang mamatay.",
+                        "Maawa ka sa akin... bendahan mo ako, pakiusap.",
+                        "Hindi ako mabubuhay sa hiwang 'to kung wala ang awa mo.",
+                        "Pakiusap tulungan mo ako... nagmamakaawa ako sa lunas.",
+                        "Huwag mo akong iwang maubusan ng dugo na parang hayop.",
+                        "Magpakita ka ng kabutihan. Pinapatay ako ng sugat na 'to.",
+                        "Pakiusap, gamutin lang ang sugat. 'Yon lang ang hinihiling ko.",
+                        "Nasa awa mo ako. Tulungan mong matigil ang sakit.",
+                        "Iligtas mo ang buhay ko at gamutin 'tong pinsala, pakiusap.",
+                        "Marami pa akong dahilan para mabuhay... tulungan mo ako.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "medical_event_overview",
-        ["id"] = "semantic.medical.distress.urgent",
+        ["exchangeFamily"] = {
+            ["familyID"] = "medical.distress.urgent",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I am hurt! I need help now!",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.medical.distress.urgent.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I am hurt! I need help now!",
+                                        "Emergency! I need immediate medical attention!",
+                                        "Hit bad! Come over here right now!",
+                                        "Urgent! I'm bleeding and falling down!",
+                                        "I need aid this second! Hurry!",
+                                        "Severe injury! Drop what you're doing and help me!",
+                                        "I won't last long without treatment! Now!",
+                                        "Critical wound! Bandage me now!",
+                                        "I'm going down hard! Medic, help me!",
+                                        "Urgent distress! Someone patch me up right now!",
+                                    },
+                                    ["TL"] = {
+                                        "Sugatan ako! Kailangan ko ng tulong ngayon na!",
+                                        "Kagipitan! Kailangan ko ng agarang gamot ngayon din!",
+                                        "Grabe ang tama ko! Halika rito ngayon din!",
+                                        "Apurahan! Dumurugo ako at bumabagsak!",
+                                        "Kailangan ko ng gamot sa segundong ito! Bilis!",
+                                        "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!",
+                                        "Hindi ako magtatagal nang walang gamot! Ngayon na!",
+                                        "Kritikal na sugat! Bendahan mo ako ngayon din!",
+                                        "Bumabagsak na ako! Saklolo, tulungan mo ako!",
+                                        "Apurahang saklolo! May magbenda sa akin ngayon din!",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "medical.distress",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I am hurt! I need help now!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.distress.urgent.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I am hurt! I need help now!",
+                            "Emergency! I need immediate medical attention!",
+                            "Hit bad! Come over here right now!",
+                            "Urgent! I'm bleeding and falling down!",
+                            "I need aid this second! Hurry!",
+                            "Severe injury! Drop what you're doing and help me!",
+                            "I won't last long without treatment! Now!",
+                            "Critical wound! Bandage me now!",
+                            "I'm going down hard! Medic, help me!",
+                            "Urgent distress! Someone patch me up right now!",
+                        },
+                        ["TL"] = {
+                            "Sugatan ako! Kailangan ko ng tulong ngayon na!",
+                            "Kagipitan! Kailangan ko ng agarang gamot ngayon din!",
+                            "Grabe ang tama ko! Halika rito ngayon din!",
+                            "Apurahan! Dumurugo ako at bumabagsak!",
+                            "Kailangan ko ng gamot sa segundong ito! Bilis!",
+                            "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!",
+                            "Hindi ako magtatagal nang walang gamot! Ngayon na!",
+                            "Kritikal na sugat! Bendahan mo ako ngayon din!",
+                            "Bumabagsak na ako! Saklolo, tulungan mo ako!",
+                            "Apurahang saklolo! May magbenda sa akin ngayon din!",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "medical.distress.urgent",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "urgent",
-            ["sourceId"] = "semantic.medical.distress.urgent",
+            ["sourceId"] = "medical.distress.urgent",
             ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_urgent.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
-        ["namespace"] = "semantic.medical.distress",
+        ["namespace"] = "medical.distress",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -416,167 +566,78 @@ return {
         ["payload"] = {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
-                ["responseTemplateID"] = "semantic.medical.distress.urgent",
+                ["responseAct"] = "MEDICAL_RESPONSE",
                 ["sourceSurface"] = "content/event/medical/overview.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "MEDICAL_RESPONSE",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.01",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I am hurt! I need help now!",
-                            },
-                            ["TL"] = {
-                                "Sugatan ako! Kailangan ko ng tulong ngayon na!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.02",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Emergency! I need immediate medical attention!",
-                            },
-                            ["TL"] = {
-                                "Kagipitan! Kailangan ko ng agarang gamot ngayon din!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.03",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hit bad! Come over here right now!",
-                            },
-                            ["TL"] = {
-                                "Grabe ang tama ko! Halika rito ngayon din!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.04",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Urgent! I'm bleeding and falling down!",
-                            },
-                            ["TL"] = {
-                                "Apurahan! Dumurugo ako at bumabagsak!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.05",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need aid this second! Hurry!",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng gamot sa segundong ito! Bilis!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.06",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Severe injury! Drop what you're doing and help me!",
-                            },
-                            ["TL"] = {
-                                "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.07",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I won't last long without treatment! Now!",
-                            },
-                            ["TL"] = {
-                                "Hindi ako magtatagal nang walang gamot! Ngayon na!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.08",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Critical wound! Bandage me now!",
-                            },
-                            ["TL"] = {
-                                "Kritikal na sugat! Bendahan mo ako ngayon din!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.09",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm going down hard! Medic, help me!",
-                            },
-                            ["TL"] = {
-                                "Bumabagsak na ako! Saklolo, tulungan mo ako!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["metadata"] = {
-                            ["style"] = "neutral",
-                            ["textKey"] = "semantic.medical.distress.urgent.neutral.10",
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Urgent distress! Someone patch me up right now!",
-                            },
-                            ["TL"] = {
-                                "Apurahang saklolo! May magbenda sa akin ngayon din!",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I am hurt! I need help now!",
+                                        "Emergency! I need immediate medical attention!",
+                                        "Hit bad! Come over here right now!",
+                                        "Urgent! I'm bleeding and falling down!",
+                                        "I need aid this second! Hurry!",
+                                        "Severe injury! Drop what you're doing and help me!",
+                                        "I won't last long without treatment! Now!",
+                                        "Critical wound! Bandage me now!",
+                                        "I'm going down hard! Medic, help me!",
+                                        "Urgent distress! Someone patch me up right now!",
+                                    },
+                                    ["TL"] = {
+                                        "Sugatan ako! Kailangan ko ng tulong ngayon na!",
+                                        "Kagipitan! Kailangan ko ng agarang gamot ngayon din!",
+                                        "Grabe ang tama ko! Halika rito ngayon din!",
+                                        "Apurahan! Dumurugo ako at bumabagsak!",
+                                        "Kailangan ko ng gamot sa segundong ito! Bilis!",
+                                        "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!",
+                                        "Hindi ako magtatagal nang walang gamot! Ngayon na!",
+                                        "Kritikal na sugat! Bendahan mo ako ngayon din!",
+                                        "Bumabagsak na ako! Saklolo, tulungan mo ako!",
+                                        "Apurahang saklolo! May magbenda sa akin ngayon din!",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "MEDICAL_RESPONSE",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "medical.distress.urgent",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I am hurt! I need help now!",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.medical.distress.urgent.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -585,6 +646,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I am hurt! I need help now!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.distress.urgent.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I am hurt! I need help now!",
+                        "Emergency! I need immediate medical attention!",
+                        "Hit bad! Come over here right now!",
+                        "Urgent! I'm bleeding and falling down!",
+                        "I need aid this second! Hurry!",
+                        "Severe injury! Drop what you're doing and help me!",
+                        "I won't last long without treatment! Now!",
+                        "Critical wound! Bandage me now!",
+                        "I'm going down hard! Medic, help me!",
+                        "Urgent distress! Someone patch me up right now!",
+                    },
+                    ["TL"] = {
+                        "Sugatan ako! Kailangan ko ng tulong ngayon na!",
+                        "Kagipitan! Kailangan ko ng agarang gamot ngayon din!",
+                        "Grabe ang tama ko! Halika rito ngayon din!",
+                        "Apurahan! Dumurugo ako at bumabagsak!",
+                        "Kailangan ko ng gamot sa segundong ito! Bilis!",
+                        "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!",
+                        "Hindi ako magtatagal nang walang gamot! Ngayon na!",
+                        "Kritikal na sugat! Bendahan mo ako ngayon din!",
+                        "Bumabagsak na ako! Saklolo, tulungan mo ako!",
+                        "Apurahang saklolo! May magbenda sa akin ngayon din!",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

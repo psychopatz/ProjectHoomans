@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.companion_dogs.greeting",
+  "id": "male",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.companion_dogs.greeting.male",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Who is a good boy?",
-          "TL": "Who is a good boy?"
+          "EN": [
+            "Who is a good boy?"
+          ],
+          "TL": [
+            "Who is a good boy?"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.companion_dogs.greeting.male",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.member",
   "id": "sunset",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/member/sunset",
-    "textDomain": "pnc.psdl.social.greetings.member.sunset"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.member.sunset",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "We made it through the day. That's something.",
           "TL": "Nalampasan natin ang araw. May halaga iyon."
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "Hey. Need a hand before we wrap up?",
           "TL": "Hey. Kailangan ng kamay bago tayo magtapos?"
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "Long day, but I'm still ready if you need me.",
           "TL": "Mahabang araw, pero handa pa rin ako kung kailangan mo ako."
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "Everyone accounted for?",
           "TL": "Lahat ng tao accounted para sa?"
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "The light's fading. We should finish up soon.",
           "TL": "Kumukupas na ang liwanag. Dapat na tayong magtapos."
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.member",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "We made it through the day. That's something.",
+            "Hey. Need a hand before we wrap up?",
+            "Long day, but I'm still ready if you need me.",
+            "Everyone accounted for?",
+            "The light's fading. We should finish up soon."
+          ],
+          "TL": [
+            "Nalampasan natin ang araw. May halaga iyon.",
+            "Hey. Kailangan ng kamay bago tayo magtapos?",
+            "Mahabang araw, pero handa pa rin ako kung kailangan mo ako.",
+            "Lahat ng tao accounted para sa?",
+            "Kumukupas na ang liwanag. Dapat na tayong magtapos."
+          ]
+        }
+      }
+    ]
+  }
 }

@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "social",
+  "id": "hostile_withdrawn",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Please leave me alone.",
+            "I need to be on my own right now.",
+            "I'm asking for privacy. Please respect it.",
+            "Go on. I'll be fine by myself.",
+            "Let's not interact for the rest of today.",
+            "I'd prefer not to speak to anyone right now.",
+            "Please walk away.",
+            "Give me time to myself.",
+            "I need some quiet. Leave me be.",
+            "We're done talking for now."
+          ],
+          "TL": [
+            "Pakiusap iwan mo akong mag-isa.",
+            "Kailangan kong mapag-isa ngayon.",
+            "Hinihiling ko ang katahimikan. Pakiusap igalang mo.",
+            "Sige na. Ayos lang ako nang mag-isa.",
+            "Huwag muna tayong mag-usap sa buong araw na ito.",
+            "Mas gusto kong walang makausap ngayon.",
+            "Pakiusap lumayo ka na.",
+            "Bigyan mo ako ng oras para sa sarili ko.",
+            "Kailangan ko ng katahimikan. Hayaan mo ako.",
+            "Tapos na tayong mag-usap sa ngayon."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
-        "responseTemplateID": "semantic.social.hostile_withdrawn",
-        "style": "guarded"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Leave me alone. Now.",
+            "Get out of my sight.",
+            "Don't come near me.",
+            "I have nothing to say to you. Go.",
+            "Walk away while you still can.",
+            "Leave me be.",
+            "I'm done with you. Get lost.",
+            "Stay away from my corner.",
+            "Leave. Immediately.",
+            "Don't speak to me."
+          ],
+          "TL": [
+            "Iwan mo ako. Ngayon.",
+            "Umalis ka sa paningin ko.",
+            "Huwag kang lalapit sa akin.",
+            "Wala akong sasabihin sa 'yo. Umalis ka na.",
+            "Lumakad ka palayo habang kaya mo pa.",
+            "Hayaan mo akong mag-isa.",
+            "Tapos na ako sa 'yo. Lumayas ka na.",
+            "Huwag kang pupunta sa pwesto ko.",
+            "Umalis ka. Ngayon din.",
+            "Huwag mo akong kausapin."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "Leave me alone. Now.",
-              "TL": "Iwan mo ako. Ngayon."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "Get out of my sight.",
-              "TL": "Umalis ka sa paningin ko."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "Don't come near me.",
-              "TL": "Huwag kang lalapit sa akin."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "I have nothing to say to you. Go.",
-              "TL": "Wala akong sasabihin sa 'yo. Umalis ka na."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "Walk away while you still can.",
-              "TL": "Lumakad ka palayo habang kaya mo pa."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Leave me be.",
-              "TL": "Hayaan mo akong mag-isa."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "I'm done with you. Get lost.",
-              "TL": "Tapos na ako sa 'yo. Lumayas ka na."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "Stay away from my corner.",
-              "TL": "Huwag kang pupunta sa pwesto ko."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "Leave. Immediately.",
-              "TL": "Umalis ka. Ngayon din."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "Don't speak to me.",
-              "TL": "Huwag mo akong kausapin."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Leave.",
+            "Go.",
+            "Away.",
+            "Alone.",
+            "Out.",
+            "Walk.",
+            "Done.",
+            "Quiet.",
+            "Not now.",
+            "Get lost."
+          ],
+          "TL": [
+            "Umalis ka.",
+            "Alis.",
+            "Malayo.",
+            "Mag-isa.",
+            "Labas.",
+            "Lakad na.",
+            "Tapos na.",
+            "Tahimik.",
+            "Hindi ngayon.",
+            "Lumayas ka."
+          ]
+        }
       },
-      "namespace": "semantic.social.hostile_withdrawn"
-    },
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
-        "responseTemplateID": "semantic.social.hostile_withdrawn",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Please leave me alone.",
-              "TL": "Pakiusap iwan mo akong mag-isa."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I need to be on my own right now.",
-              "TL": "Kailangan kong mapag-isa ngayon."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "I'm asking for privacy. Please respect it.",
-              "TL": "Hinihiling ko ang katahimikan. Pakiusap igalang mo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Go on. I'll be fine by myself.",
-              "TL": "Sige na. Ayos lang ako nang mag-isa."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Let's not interact for the rest of today.",
-              "TL": "Huwag muna tayong mag-usap sa buong araw na ito."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I'd prefer not to speak to anyone right now.",
-              "TL": "Mas gusto kong walang makausap ngayon."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Please walk away.",
-              "TL": "Pakiusap lumayo ka na."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Give me time to myself.",
-              "TL": "Bigyan mo ako ng oras para sa sarili ko."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I need some quiet. Leave me be.",
-              "TL": "Kailangan ko ng katahimikan. Hayaan mo ako."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "We're done talking for now.",
-              "TL": "Tapos na tayong mag-usap sa ngayon."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.social.hostile_withdrawn"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
-        "responseTemplateID": "semantic.social.hostile_withdrawn",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Leave.",
-              "TL": "Umalis ka."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Go.",
-              "TL": "Alis."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Away.",
-              "TL": "Malayo."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Alone.",
-              "TL": "Mag-isa."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Out.",
-              "TL": "Labas."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Walk.",
-              "TL": "Lakad na."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Done.",
-              "TL": "Tapos na."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Quiet.",
-              "TL": "Tahimik."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Not now.",
-              "TL": "Hindi ngayon."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Get lost.",
-              "TL": "Lumayas ka."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.social.hostile_withdrawn"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
-        "responseTemplateID": "semantic.social.hostile_withdrawn",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "I just need some time alone, friend. Please.",
-              "TL": "Kailangan ko lang ng oras mag-isa, kaibigan. Pakiusap."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "It's not you, I promise. I just need to be by myself.",
-              "TL": "Hindi ikaw ang may sala, pangako. Kailangan ko lang mapag-isa."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Please give me some quiet time. We'll talk later.",
-              "TL": "Pakiusap bigyan mo ako ng katahimikan. Mag-usap tayo mamaya."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "I'm in a dark headspace. I don't want to bring you down with me.",
-              "TL": "Mabigat ang iniisip ko. Ayokong mahawa ka sa akin."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "I need to withdraw for a little while. Take care of yourself.",
-              "TL": "Kailangan ko munang lumayo sandali. Ingatan mo sarili mo."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "Let me sit in the quiet. I'll find you when I'm ready.",
-              "TL": "Hayaan mo muna akong maupo sa tahimik. Hahanapin kita kapag handa na."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "Thank you for understanding. I just need space today.",
-              "TL": "Salamat sa pag-unawa. Kailangan ko lang ng espasyo ngayon."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "Don't worry about me, but please let me be for now.",
-              "TL": "Huwag kang mag-alala sa 'kin, pero hayaan mo muna ako ngayon."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "I promise I'll be okay. Just give me this time.",
-              "TL": "Pangako magiging maayos ako. Ibigay mo lang ang oras na ito."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "See you later, friend. I need the silence right now.",
-              "TL": "Kita tayo mamaya, kaibigan. Kailangan ko ng katahimikan ngayon."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.social.hostile_withdrawn"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "I just need some time alone, friend. Please.",
+            "It's not you, I promise. I just need to be by myself.",
+            "Please give me some quiet time. We'll talk later.",
+            "I'm in a dark headspace. I don't want to bring you down with me.",
+            "I need to withdraw for a little while. Take care of yourself.",
+            "Let me sit in the quiet. I'll find you when I'm ready.",
+            "Thank you for understanding. I just need space today.",
+            "Don't worry about me, but please let me be for now.",
+            "I promise I'll be okay. Just give me this time.",
+            "See you later, friend. I need the silence right now."
+          ],
+          "TL": [
+            "Kailangan ko lang ng oras mag-isa, kaibigan. Pakiusap.",
+            "Hindi ikaw ang may sala, pangako. Kailangan ko lang mapag-isa.",
+            "Pakiusap bigyan mo ako ng katahimikan. Mag-usap tayo mamaya.",
+            "Mabigat ang iniisip ko. Ayokong mahawa ka sa akin.",
+            "Kailangan ko munang lumayo sandali. Ingatan mo sarili mo.",
+            "Hayaan mo muna akong maupo sa tahimik. Hahanapin kita kapag handa na.",
+            "Salamat sa pag-unawa. Kailangan ko lang ng espasyo ngayon.",
+            "Huwag kang mag-alala sa 'kin, pero hayaan mo muna ako ngayon.",
+            "Pangako magiging maayos ako. Ibigay mo lang ang oras na ito.",
+            "Kita tayo mamaya, kaibigan. Kailangan ko ng katahimikan ngayon."
+          ]
+        }
+      }
+    ]
+  }
 }

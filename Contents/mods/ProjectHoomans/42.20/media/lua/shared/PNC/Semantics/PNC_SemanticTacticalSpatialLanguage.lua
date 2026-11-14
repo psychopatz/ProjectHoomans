@@ -84,6 +84,22 @@ end
 
 local function localizedPhrase(templateID)
     local family, phrases = Registry.FamilyFor(templateID, "neutral")
+    if type(family) ~= "table" or type(phrases) ~= "table" then
+        local ConvoPlanFamily = PNC.ConvoEngine and PNC.ConvoEngine.ConvoPlanFamily or nil
+        if type(ConvoPlanFamily) ~= "table" then
+            local ok, loaded = pcall(
+                require,
+                "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
+            )
+            if ok and type(loaded) == "table" then ConvoPlanFamily = loaded end
+        end
+        if type(ConvoPlanFamily) == "table"
+            and type(ConvoPlanFamily.install) == "function"
+        then
+            ConvoPlanFamily.install(templateID)
+            family, phrases = Registry.FamilyFor(templateID, "neutral")
+        end
+    end
     local phrase = type(family) == "table"
         and type(phrases) == "table" and phrases[1] or nil
     if type(phrase) ~= "table" then
@@ -112,7 +128,7 @@ local function familyFor(threatKind, mode)
         or threatKind == "human_hostile"
         or threatKind == "human_npc"
     local subject = hostile and "hostile" or "zombie"
-    return "semantic.combat.tactical_spatial." .. subject .. "." .. mode
+    return "combat.tactical_spatial." .. subject .. "." .. mode
 end
 
 function Language.ComposePrefix(threatKind, spatial, mode)
@@ -133,6 +149,7 @@ function Language.ComposePrefix(threatKind, spatial, mode)
         if not spatial.clockToken then return nil, "clock_unavailable" end
         local label = Relation.GetClockLabel(spatial.clockToken)
         if not label or label == "" then return nil, "clock_label_unavailable" end
+        text = replaceToken(text, "{scene.clock}", label)
         text = replaceToken(text, "{clock}", label)
     else
         if not spatial.relativeSector8 then
@@ -142,6 +159,7 @@ function Language.ComposePrefix(threatKind, spatial, mode)
         if not label or label == "" then
             return nil, "relative_label_unavailable"
         end
+        text = replaceToken(text, "{scene.relative}", label)
         text = replaceToken(text, "{relative}", label)
     end
 

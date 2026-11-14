@@ -1,146 +1,42 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.social.apology.default.guarded"] = {
+    ["social.apology.default"] = {
         ["domain"] = "social_apology",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialApology",
         },
-        ["id"] = "semantic.social.apology.default.guarded",
+        ["id"] = "social.apology.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
     },
-    ["semantic.social.apology.default.neutral"] = {
+    ["social.apology.friendly"] = {
+        ["dependents"] = {
+            "behavior.acknowledge_repair",
+            "behavior.reconcile",
+        },
         ["domain"] = "social_apology",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialApology",
         },
-        ["id"] = "semantic.social.apology.default.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
-    },
-    ["semantic.social.apology.default.terse"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.default.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
-    },
-    ["semantic.social.apology.default.warm"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.default.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
-    },
-    ["semantic.social.apology.friendly.guarded"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.friendly.guarded",
+        ["id"] = "social.apology.friendly",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
     },
-    ["semantic.social.apology.friendly.neutral"] = {
+    ["social.apology.stressed"] = {
         ["domain"] = "social_apology",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialApology",
         },
-        ["id"] = "semantic.social.apology.friendly.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
-    },
-    ["semantic.social.apology.friendly.terse"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.friendly.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
-    },
-    ["semantic.social.apology.friendly.warm"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.friendly.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
-    },
-    ["semantic.social.apology.stressed.guarded"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.stressed.guarded",
+        ["id"] = "social.apology.stressed",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
     },
-    ["semantic.social.apology.stressed.neutral"] = {
+    ["social.apology.withdrawn"] = {
         ["domain"] = "social_apology",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialApology",
         },
-        ["id"] = "semantic.social.apology.stressed.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
-    },
-    ["semantic.social.apology.stressed.terse"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.stressed.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
-    },
-    ["semantic.social.apology.stressed.warm"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.stressed.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
-    },
-    ["semantic.social.apology.withdrawn.guarded"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.withdrawn.guarded",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
-    },
-    ["semantic.social.apology.withdrawn.neutral"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.withdrawn.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
-    },
-    ["semantic.social.apology.withdrawn.terse"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.withdrawn.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
-    },
-    ["semantic.social.apology.withdrawn.warm"] = {
-        ["domain"] = "social_apology",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialApology",
-        },
-        ["id"] = "semantic.social.apology.withdrawn.warm",
+        ["id"] = "social.apology.withdrawn",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
     },

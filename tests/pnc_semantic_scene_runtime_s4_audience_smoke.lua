@@ -87,7 +87,7 @@ register({
     outputs = {
         speech = {
             dialogueAct = "INFORM",
-            contentTemplateID = "semantic.social.acknowledged",
+            contentTemplateID = "social.acknowledged",
         },
     },
     continuation = {
@@ -114,7 +114,7 @@ register({
     outputs = {
         speech = {
             dialogueAct = "ACKNOWLEDGE",
-            contentTemplateID = "semantic.social.acknowledged",
+            contentTemplateID = "social.acknowledged",
         },
     },
     continuation = {

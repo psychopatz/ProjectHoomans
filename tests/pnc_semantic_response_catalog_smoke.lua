@@ -79,7 +79,7 @@ local navigation = Catalog.Select(
     { npcID = "mara", subject = "CONVERSATION_TOPIC" },
     "navigation"
 )
-T.equal(navigation.templateID, "semantic.navigation.subject_change",
+T.equal(navigation.templateID, "navigation.subject_change",
     "semantic navigation uses its dedicated subject-change response")
 T.equal(navigation.fallback,
     "All right. What did you want to talk about?",
@@ -121,7 +121,7 @@ local assaulted = Catalog.Select(
     { npcID = "mara", combatReactionStyle = "aggressive" },
     "player_assaulted"
 )
-T.equal(assaulted.templateID, "semantic.combat.player_assaulted.aggressive",
+T.equal(assaulted.templateID, "combat.player_assaulted.aggressive",
     "player assault reaction selects the aggression-aware semantic family")
 T.equal(assaulted.fallback, "You just made a big mistake.",
     "player assault reaction has an appropriate hostile-transition fallback")

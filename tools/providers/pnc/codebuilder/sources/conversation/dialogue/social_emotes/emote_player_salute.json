@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.player",
+  "id": "salute",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,35 +16,25 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-    "responseTemplateID": "semantic.emote.player.salute",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Respect, {addressee.name}.",
-          "TL": "Paggalang, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I see you, {addressee.name}.",
-          "TL": "Nakikita kita, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Stay sharp, {addressee.name}.",
-          "TL": "Manatiling alerto, {addressee.name}."
+          "EN": [
+            "Respect, {addressee.name}.",
+            "I see you, {addressee.name}.",
+            "Stay sharp, {addressee.name}."
+          ],
+          "TL": [
+            "Paggalang, {addressee.name}.",
+            "Nakikita kita, {addressee.name}.",
+            "Manatiling alerto, {addressee.name}."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.player.salute",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

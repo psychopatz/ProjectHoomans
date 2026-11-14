@@ -1,9 +1,13 @@
 {
-  "id": "utterance",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.stay",
+  "id": "utterance",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.stay.utterance",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.stay.utterance",
@@ -12,14 +16,17 @@
           "TL": "Dito ka maghintay."
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "Wait here.",
-    "TL": "Dito ka maghintay."
-  },
-  "namespace": "ui.suggestion.stay",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Wait here.",
+          "TL": "Dito ka maghintay."
+        }
+      }
+    ]
+  }
 }

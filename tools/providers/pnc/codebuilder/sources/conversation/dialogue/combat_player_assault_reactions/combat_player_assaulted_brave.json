@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.player_assaulted",
   "id": "brave",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:combat_kill",
     "contentOwner": "projecthoomans.dialogue_content.combat",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat/player_assault_reactions.json",
-    "responseTemplateID": "semantic.combat.player_assaulted.brave",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "That's it. You're done.",
-          "TL": "Tama na. Tapos ka na."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Bad choice. Defend yourself.",
-          "TL": "Maling desisyon. Ipagtanggol mo ang sarili mo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "You shouldn't have done that.",
-          "TL": "Hindi mo dapat ginawa 'yon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "I gave you space. Now defend yourself.",
-          "TL": "Binigyan kita ng puwang. Ipagtanggol mo sarili mo ngayon."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "That's where this ends.",
-          "TL": "Diyan na nagtatapos 'to."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "You made your choice.",
-          "TL": "Pumili ka na ng kahihinatnan mo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I won't let you hurt me. Stand down or fight.",
-          "TL": "Hindi kita hahayaang saktan ako. Sumuko ka o lumaban."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Unacceptable. Drop your weapon.",
-          "TL": "Hindi katanggap-tanggap. Ibaba mo ang sandata mo."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "You crossed the line.",
-          "TL": "Lumagpas ka sa linya."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Stand down right now, or I finish this.",
-          "TL": "Tumigil ka ngayon din, o tatapusin ko 'to."
+          "EN": [
+            "That's it. You're done.",
+            "Bad choice. Defend yourself.",
+            "You shouldn't have done that.",
+            "I gave you space. Now defend yourself.",
+            "That's where this ends.",
+            "You made your choice.",
+            "I won't let you hurt me. Stand down or fight.",
+            "Unacceptable. Drop your weapon.",
+            "You crossed the line.",
+            "Stand down right now, or I finish this."
+          ],
+          "TL": [
+            "Tama na. Tapos ka na.",
+            "Maling desisyon. Ipagtanggol mo ang sarili mo.",
+            "Hindi mo dapat ginawa 'yon.",
+            "Binigyan kita ng puwang. Ipagtanggol mo sarili mo ngayon.",
+            "Diyan na nagtatapos 'to.",
+            "Pumili ka na ng kahihinatnan mo.",
+            "Hindi kita hahayaang saktan ako. Sumuko ka o lumaban.",
+            "Hindi katanggap-tanggap. Ibaba mo ang sandata mo.",
+            "Lumagpas ka sa linya.",
+            "Tumigil ka ngayon din, o tatapusin ko 'to."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.player_assaulted",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.cold",
+  "id": "firearm_high",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/cold.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Clean shot.",
+            "Target expired. Moving.",
+            "Zero waste. Proceed.",
+            "Bullet found the brain. Next.",
+            "Dropped efficiently.",
+            "Threat terminated.",
+            "Simple precision.",
+            "One less obstacle.",
+            "Expired instantly.",
+            "Path opened."
+          ],
+          "TL": [
+            "Malinis na tira.",
+            "Patay ang target. Kilos.",
+            "Walang aksaya. Tuloy.",
+            "Bumaon ang bala sa utak. Sunod.",
+            "Bumagsak nang walang aberya.",
+            "Banta tinapos na.",
+            "Simpleng asinta.",
+            "Nabawasan ng isang sagabal.",
+            "Patay agad.",
+            "Bukas na ang daan."
+          ]
+        }
+      }
+    ]
+  }
+}

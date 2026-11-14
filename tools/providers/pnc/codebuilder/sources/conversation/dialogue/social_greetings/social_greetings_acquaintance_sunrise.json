@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.acquaintance",
   "id": "sunrise",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/neutral/acquaintance/sunrise",
-    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.sunrise"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.sunrise",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "Morning. Good to see a familiar face.",
           "TL": "Umaga. Ang sarap makakita ng pamilyar na mukha."
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "Hey. How's the day treating you?",
           "TL": "Hey. Kumusta ang pagtrato sa iyo ng araw?"
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "There you are. Need a minute?",
           "TL": "Narito ka pala. Kailangan mo ba ng sandali?"
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "Morning. You look like you have something on your mind.",
           "TL": "Umaga. Parang may iniisip ka."
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "Nice to see you made it through another night.",
           "TL": "Natutuwa akong makita kang nagtagumpay sa isa pang gabi."
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.acquaintance",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Morning. Good to see a familiar face.",
+            "Hey. How's the day treating you?",
+            "There you are. Need a minute?",
+            "Morning. You look like you have something on your mind.",
+            "Nice to see you made it through another night."
+          ],
+          "TL": [
+            "Umaga. Ang sarap makakita ng pamilyar na mukha.",
+            "Hey. Kumusta ang pagtrato sa iyo ng araw?",
+            "Narito ka pala. Kailangan mo ba ng sandali?",
+            "Umaga. Parang may iniisip ka.",
+            "Natutuwa akong makita kang nagtagumpay sa isa pang gabi."
+          ]
+        }
+      }
+    ]
+  }
 }

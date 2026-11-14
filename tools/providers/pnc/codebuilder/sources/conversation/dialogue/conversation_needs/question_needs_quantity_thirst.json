@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "question.needs.quantity",
+  "id": "thirst",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:conversation_content",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-    "responseTemplateID": "semantic.question.needs.quantity.thirst",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I know water is what I need, but I can't give you an exact amount yet.",
-          "TL": "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Even half a bottle of water would make a difference.",
-          "TL": "Kahit kalahating botelya ng tubig ay malaking tulong na."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Just enough clean water to wet my throat, please.",
-          "TL": "Sapat lang na malinis na tubig pambasa ng lalamunan ko."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "A single flask or a few gulps would be fantastic.",
-          "TL": "Kahit isang lagayan o ilang lagok ay napakaganda na."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I'm parched. Any amount of safe water would help.",
-          "TL": "Uhaw ako. Anumang dami ng ligtas na tubig ay makakatulong."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Don't need a whole gallon, just enough to stay hydrated.",
-          "TL": "Hindi kailangan ng galon, sapat lang para mawala ang uhaw."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Whatever water you can afford to part with right now.",
-          "TL": "Anumang tubig na kaya mong ibigay sa ngayon."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "A cup or a bottle, I won't turn it down.",
-          "TL": "Kahit tasa o botelya, hindi ko tatanggihan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Enough water to get through the afternoon would be great.",
-          "TL": "Sapat na tubig para maitawid ang hapon ay ayos na."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Just a small sip or two to keep my strength up.",
-          "TL": "Kahit isa o dalawang lagok lang para manatili ang lakas."
+          "EN": [
+            "I know water is what I need, but I can't give you an exact amount yet.",
+            "Even half a bottle of water would make a difference.",
+            "Just enough clean water to wet my throat, please.",
+            "A single flask or a few gulps would be fantastic.",
+            "I'm parched. Any amount of safe water would help.",
+            "Don't need a whole gallon, just enough to stay hydrated.",
+            "Whatever water you can afford to part with right now.",
+            "A cup or a bottle, I won't turn it down.",
+            "Enough water to get through the afternoon would be great.",
+            "Just a small sip or two to keep my strength up."
+          ],
+          "TL": [
+            "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+            "Kahit kalahating botelya ng tubig ay malaking tulong na.",
+            "Sapat lang na malinis na tubig pambasa ng lalamunan ko.",
+            "Kahit isang lagayan o ilang lagok ay napakaganda na.",
+            "Uhaw ako. Anumang dami ng ligtas na tubig ay makakatulong.",
+            "Hindi kailangan ng galon, sapat lang para mawala ang uhaw.",
+            "Anumang tubig na kaya mong ibigay sa ngayon.",
+            "Kahit tasa o botelya, hindi ko tatanggihan.",
+            "Sapat na tubig para maitawid ang hapon ay ayos na.",
+            "Kahit isa o dalawang lagok lang para manatili ang lakas."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.question.needs.quantity.thirst",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

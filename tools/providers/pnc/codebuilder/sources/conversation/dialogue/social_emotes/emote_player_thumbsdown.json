@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.player",
+  "id": "thumbsdown",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,35 +16,25 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-    "responseTemplateID": "semantic.emote.player.thumbsdown",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "No. That's not good enough, {addressee.name}.",
-          "TL": "Hindi. Hindi sapat iyan, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I don't like that, {addressee.name}.",
-          "TL": "Hindi ko gusto iyan, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Try again, {addressee.name}.",
-          "TL": "Subukan muli, {addressee.name}."
+          "EN": [
+            "No. That's not good enough, {addressee.name}.",
+            "I don't like that, {addressee.name}.",
+            "Try again, {addressee.name}."
+          ],
+          "TL": [
+            "Hindi. Hindi sapat iyan, {addressee.name}.",
+            "Hindi ko gusto iyan, {addressee.name}.",
+            "Subukan muli, {addressee.name}."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.player.thumbsdown",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

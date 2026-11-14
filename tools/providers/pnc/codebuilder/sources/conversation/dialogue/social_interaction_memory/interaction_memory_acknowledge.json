@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "interaction.memory",
+  "id": "acknowledge",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "I hear you.",
+            "I remember that.",
+            "Sounds familiar.",
+            "Makes sense given what happened.",
+            "I recall that well.",
+            "Yes, that was quite an event.",
+            "I understand why you bring that up.",
+            "Right. That was a significant moment.",
+            "I hear what you're saying about that.",
+            "Fair enough. That memory tracks."
+          ],
+          "TL": [
+            "Naririnig kita.",
+            "Naaalala ko iyan.",
+            "Pamilyar ang dating.",
+            "May katuturan base sa nangyari.",
+            "Maliwanag kong naaalala 'yon.",
+            "Oo, matinding pangyayari 'yon.",
+            "Nauunawaan ko kung bakit mo binuksan 'yan.",
+            "Tama. Mahalagang sandali 'yon.",
+            "Naiintindihan ko ang sinasabi mo tungkol doon.",
+            "Makatwiran. Tugma ang alaalang 'yan."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "All right. I heard you.",
+            "I remember, but let's not dwell on the past.",
+            "Past is past. Keep your focus here.",
+            "I know what happened. No need to rehash it.",
+            "Noted. But don't expect me to get sentimental.",
+            "Yeah, I remember. Why bring it up now?",
+            "I haven't forgotten. I never forget.",
+            "Heard. Let's move on.",
+            "I remember the lesson it taught us.",
+            "All right. Keep that to yourself moving forward."
+          ],
+          "TL": [
+            "Sige. Narinig kita.",
+            "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan.",
+            "Nakalipas na. Magpokus ka sa kasalukuyan.",
+            "Alam ko ang nangyari. Di na kailangang ulitin pa.",
+            "Tala ko na. Pero huwag kang umasang magiging madrama ako.",
+            "Oo, tanda ko. Bakit mo binubuksan ngayon?",
+            "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot.",
+            "Narinig ko. Lumipat na tayo ng usapan.",
+            "Naaalala ko ang aral na itinuro niyan sa atin.",
+            "Sige. Itago mo na lang sa sarili mo sa susunod."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I hear you.",
-              "TL": "Naririnig kita."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I remember that.",
-              "TL": "Naaalala ko iyan."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Sounds familiar.",
-              "TL": "Pamilyar ang dating."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Makes sense given what happened.",
-              "TL": "May katuturan base sa nangyari."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "I recall that well.",
-              "TL": "Maliwanag kong naaalala 'yon."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Yes, that was quite an event.",
-              "TL": "Oo, matinding pangyayari 'yon."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I understand why you bring that up.",
-              "TL": "Nauunawaan ko kung bakit mo binuksan 'yan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Right. That was a significant moment.",
-              "TL": "Tama. Mahalagang sandali 'yon."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I hear what you're saying about that.",
-              "TL": "Naiintindihan ko ang sinasabi mo tungkol doon."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Fair enough. That memory tracks.",
-              "TL": "Makatwiran. Tugma ang alaalang 'yan."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Mm.",
+            "Remember.",
+            "Recall it.",
+            "Yeah.",
+            "Heard.",
+            "Right.",
+            "Got it.",
+            "True.",
+            "Yep.",
+            "Understood."
+          ],
+          "TL": [
+            "Mm.",
+            "Tanda ko.",
+            "Naalala ko.",
+            "Oo.",
+            "Narinig.",
+            "Tama.",
+            "Nakuha ko.",
+            "Totoo.",
+            "Oo nga.",
+            "Naintindihan."
+          ]
+        }
       },
-      "namespace": "semantic.interaction.memory.acknowledge"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "Yeah. I can see why that stayed with you.",
-              "TL": "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "I remember that too. It meant a lot to me.",
-              "TL": "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "That was a special moment between us. Glad you remember.",
-              "TL": "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "It stayed in my heart as well, friend.",
-              "TL": "Nanatili rin 'yon sa puso ko, kaibigan."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Thanks for reminding me of that. Good times.",
-              "TL": "Salamat sa pagpapaalala niyan. Magandang alaala."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "Those memories keep us human out here.",
-              "TL": "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "I smile every time I think back on that day.",
-              "TL": "Napapangiti ako tuwing naaalala ko ang araw na 'yon."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "We made it through that together. I won't forget it.",
-              "TL": "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "I'm glad we share that memory.",
-              "TL": "Masaya ako at pinagsaluhan natin ang alaalang 'yon."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "That really stuck with both of us, didn't it?",
-              "TL": "Talagang tumatak sa ating dalawa 'yon, 'di ba?"
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.memory.acknowledge"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Mm.",
-              "TL": "Mm."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Remember.",
-              "TL": "Tanda ko."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Recall it.",
-              "TL": "Naalala ko."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Yeah.",
-              "TL": "Oo."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Heard.",
-              "TL": "Narinig."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Right.",
-              "TL": "Tama."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Got it.",
-              "TL": "Nakuha ko."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "True.",
-              "TL": "Totoo."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Yep.",
-              "TL": "Oo nga."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Understood.",
-              "TL": "Naintindihan."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.memory.acknowledge"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "All right. I heard you.",
-              "TL": "Sige. Narinig kita."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "I remember, but let's not dwell on the past.",
-              "TL": "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "Past is past. Keep your focus here.",
-              "TL": "Nakalipas na. Magpokus ka sa kasalukuyan."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "I know what happened. No need to rehash it.",
-              "TL": "Alam ko ang nangyari. Di na kailangang ulitin pa."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "Noted. But don't expect me to get sentimental.",
-              "TL": "Tala ko na. Pero huwag kang umasang magiging madrama ako."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Yeah, I remember. Why bring it up now?",
-              "TL": "Oo, tanda ko. Bakit mo binubuksan ngayon?"
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "I haven't forgotten. I never forget.",
-              "TL": "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "Heard. Let's move on.",
-              "TL": "Narinig ko. Lumipat na tayo ng usapan."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "I remember the lesson it taught us.",
-              "TL": "Naaalala ko ang aral na itinuro niyan sa atin."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "All right. Keep that to yourself moving forward.",
-              "TL": "Sige. Itago mo na lang sa sarili mo sa susunod."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.memory.acknowledge"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "Yeah. I can see why that stayed with you.",
+            "I remember that too. It meant a lot to me.",
+            "That was a special moment between us. Glad you remember.",
+            "It stayed in my heart as well, friend.",
+            "Thanks for reminding me of that. Good times.",
+            "Those memories keep us human out here.",
+            "I smile every time I think back on that day.",
+            "We made it through that together. I won't forget it.",
+            "I'm glad we share that memory.",
+            "That really stuck with both of us, didn't it?"
+          ],
+          "TL": [
+            "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan.",
+            "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin.",
+            "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo.",
+            "Nanatili rin 'yon sa puso ko, kaibigan.",
+            "Salamat sa pagpapaalala niyan. Magandang alaala.",
+            "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito.",
+            "Napapangiti ako tuwing naaalala ko ang araw na 'yon.",
+            "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan.",
+            "Masaya ako at pinagsaluhan natin ang alaalang 'yon.",
+            "Talagang tumatak sa ating dalawa 'yon, 'di ba?"
+          ]
+        }
+      }
+    ]
+  }
 }

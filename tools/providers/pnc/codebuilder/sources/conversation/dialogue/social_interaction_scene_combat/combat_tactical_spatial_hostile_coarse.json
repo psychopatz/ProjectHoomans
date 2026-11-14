@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "combat.tactical_spatial.hostile",
+  "id": "coarse",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/combat/tactical_spatial.json",
-    "responseTemplateID": "semantic.combat.tactical_spatial.hostile.coarse",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Hostiles {scene.relative}!",
-          "TL": "Mga kalaban {scene.relative}!"
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Armed fighters {scene.relative}!",
-          "TL": "May armadong mga tao {scene.relative}!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Enemy movement {scene.relative}!",
-          "TL": "Galaw ng kalaban {scene.relative}!"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Take cover, hostiles {scene.relative}!",
-          "TL": "Magtago, may mga kalaban {scene.relative}!"
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Gunfire expected {scene.relative}! Hostiles!",
-          "TL": "Maghanda sa putukan {scene.relative}! Mga kalaban!"
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Watch out {scene.relative}, armed hostiles!",
-          "TL": "Mag-ingat {scene.relative}, may mga armadong kalaban!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Enemy survivors spotted {scene.relative}!",
-          "TL": "May kalabang nakaligtas {scene.relative}!"
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Contact {scene.relative}! Keep low!",
-          "TL": "May kalaban {scene.relative}! Yumuko!"
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Check {scene.relative}! Hostiles advancing!",
-          "TL": "Tingnan {scene.relative}! Sumusulong ang kalaban!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Incoming attack {scene.relative}!",
-          "TL": "Paparating na atake {scene.relative}!"
+          "EN": [
+            "Hostiles {scene.relative}!",
+            "Armed fighters {scene.relative}!",
+            "Enemy movement {scene.relative}!",
+            "Take cover, hostiles {scene.relative}!",
+            "Gunfire expected {scene.relative}! Hostiles!",
+            "Watch out {scene.relative}, armed hostiles!",
+            "Enemy survivors spotted {scene.relative}!",
+            "Contact {scene.relative}! Keep low!",
+            "Check {scene.relative}! Hostiles advancing!",
+            "Incoming attack {scene.relative}!"
+          ],
+          "TL": [
+            "Mga kalaban {scene.relative}!",
+            "May armadong mga tao {scene.relative}!",
+            "Galaw ng kalaban {scene.relative}!",
+            "Magtago, may mga kalaban {scene.relative}!",
+            "Maghanda sa putukan {scene.relative}! Mga kalaban!",
+            "Mag-ingat {scene.relative}, may mga armadong kalaban!",
+            "May kalabang nakaligtas {scene.relative}!",
+            "May kalaban {scene.relative}! Yumuko!",
+            "Tingnan {scene.relative}! Sumusulong ang kalaban!",
+            "Paparating na atake {scene.relative}!"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.tactical_spatial.hostile.coarse",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

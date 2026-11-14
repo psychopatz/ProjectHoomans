@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.cold",
+  "id": "heavy_melee",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/cold.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Crushed it.",
+            "Structural skull collapse. Done.",
+            "Pulverized. Moving on.",
+            "Impact sufficient. Next.",
+            "Ceased all motor function.",
+            "Crushed flat.",
+            "Bones splintered. Clear.",
+            "Force delivered. Finished.",
+            "Obliterated. Advance.",
+            "Skull collapsed inward."
+          ],
+          "TL": [
+            "Dinurog.",
+            "Basag ang istruktura ng bungo. Tapos.",
+            "Durog na. Tuloy.",
+            "Sapat ang lakas ng tama. Sunod.",
+            "Tumigil ang lahat ng galaw.",
+            "Pinitpit.",
+            "Nabasag ang mga buto. Malinis.",
+            "Naitama ang bigat. Tapos.",
+            "Winasak. Abante.",
+            "Lumalubog ang bungo sa lakas."
+          ]
+        }
+      }
+    ]
+  }
+}

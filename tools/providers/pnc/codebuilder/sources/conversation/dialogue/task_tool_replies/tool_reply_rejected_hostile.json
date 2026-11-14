@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "rejected_hostile",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.rejected_hostile.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_hostile.json",
-        "responseTemplateID": "semantic.tool_reply.rejected_hostile.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Back off.",
-              "TL": "Umatras ka."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Step back right now.",
-              "TL": "Lumayo ka ngayon din."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Get out of my face.",
-              "TL": "Umalis ka sa harap ko."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Give me space before I lose my temper.",
-              "TL": "Bigyan mo ako ng puwang bago ako magalit."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Back away from me immediately.",
-              "TL": "Lumayo ka sa akin agad-agad."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I said back off.",
-              "TL": "Sabi ko umatras ka."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Keep your distance.",
-              "TL": "Panatilihin ang distansya."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Step back and cool down.",
-              "TL": "Umatras ka at palamigin ang ulo."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Back off while you still have the chance.",
-              "TL": "Umatras ka habang may pagkakataon ka pa."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Last warning: back off.",
-              "TL": "Huling babala: umatras ka."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_hostile.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Back off.",
+              "Step back right now.",
+              "Get out of my face.",
+              "Give me space before I lose my temper.",
+              "Back away from me immediately.",
+              "I said back off.",
+              "Keep your distance.",
+              "Step back and cool down.",
+              "Back off while you still have the chance.",
+              "Last warning: back off."
+            ],
+            "TL": [
+              "Umatras ka.",
+              "Lumayo ka ngayon din.",
+              "Umalis ka sa harap ko.",
+              "Bigyan mo ako ng puwang bago ako magalit.",
+              "Lumayo ka sa akin agad-agad.",
+              "Sabi ko umatras ka.",
+              "Panatilihin ang distansya.",
+              "Umatras ka at palamigin ang ulo.",
+              "Umatras ka habang may pagkakataon ka pa.",
+              "Huling babala: umatras ka."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.rejected_hostile.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_hostile.json",
-        "responseTemplateID": "semantic.tool_reply.rejected_hostile.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "You do not get to speak to me that way.",
-              "TL": "Wala kang karapatang kausapin ako nang ganyan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Mind your mouth before someone breaks it for you.",
-              "TL": "Bantayan ang bibig mo bago may bumasag niyan para sa 'yo."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "You don't talk to me with that disrespect.",
-              "TL": "Huwag mo akong kausapin nang may pambabastos."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Check your tone right now.",
-              "TL": "Ayusin mo ang tono mo ngayon din."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "I won't tolerate that disrespect from anyone.",
-              "TL": "Di ko palalampasin ang pambabastos na 'yan kahit kanino."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Who do you think you're talking to?",
-              "TL": "Sino sa tingin mo ang kinakausap mo?"
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "You have crossed a serious line with that mouth.",
-              "TL": "Tumawid ka sa seryosong linya sa bibig mong 'yan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Watch how you address me.",
-              "TL": "Bantayan mo kung paano mo ako kausapin."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Lower your tone and show some basic respect.",
-              "TL": "Hinaan ang tono at magpakita ng simpleng galang."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "You don't get to address me like that.",
-              "TL": "Hindi mo ako pwedeng kausapin nang ganyan."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "You do not get to speak to me that way.",
+              "Mind your mouth before someone breaks it for you.",
+              "You don't talk to me with that disrespect.",
+              "Check your tone right now.",
+              "I won't tolerate that disrespect from anyone.",
+              "Who do you think you're talking to?",
+              "You have crossed a serious line with that mouth.",
+              "Watch how you address me.",
+              "Lower your tone and show some basic respect.",
+              "You don't get to address me like that."
+            ],
+            "TL": [
+              "Wala kang karapatang kausapin ako nang ganyan.",
+              "Bantayan ang bibig mo bago may bumasag niyan para sa 'yo.",
+              "Huwag mo akong kausapin nang may pambabastos.",
+              "Ayusin mo ang tono mo ngayon din.",
+              "Di ko palalampasin ang pambabastos na 'yan kahit kanino.",
+              "Sino sa tingin mo ang kinakausap mo?",
+              "Tumawid ka sa seryosong linya sa bibig mong 'yan.",
+              "Bantayan mo kung paano mo ako kausapin.",
+              "Hinaan ang tono at magpakita ng simpleng galang.",
+              "Hindi mo ako pwedeng kausapin nang ganyan."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

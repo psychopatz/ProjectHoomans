@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.reaction",
   "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:event_reactions",
     "contentOwner": "projecthoomans.dialogue_content.events",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/social.json",
-    "responseTemplateID": "semantic.social.reaction.default",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I hear you.",
-          "TL": "Narinig kita."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Understood.",
-          "TL": "Naiintindihan ko."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Got it.",
-          "TL": "Nakuha ko."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "I'm listening.",
-          "TL": "Nakikinig ako."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Fair enough.",
-          "TL": "Makatarungan 'yan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Sounds good.",
-          "TL": "Mabuti 'yan."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Copy that.",
-          "TL": "Kopya."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Noted.",
-          "TL": "Tandaan ko 'yan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Makes sense.",
-          "TL": "May punto ka."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "I agree.",
-          "TL": "Sumasang-ayon ako."
+          "EN": [
+            "I hear you.",
+            "Understood.",
+            "Got it.",
+            "I'm listening.",
+            "Fair enough.",
+            "Sounds good.",
+            "Copy that.",
+            "Noted.",
+            "Makes sense.",
+            "I agree."
+          ],
+          "TL": [
+            "Narinig kita.",
+            "Naiintindihan ko.",
+            "Nakuha ko.",
+            "Nakikinig ako.",
+            "Makatarungan 'yan.",
+            "Mabuti 'yan.",
+            "Kopya.",
+            "Tandaan ko 'yan.",
+            "May punto ka.",
+            "Sumasang-ayon ako."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.social.reaction",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

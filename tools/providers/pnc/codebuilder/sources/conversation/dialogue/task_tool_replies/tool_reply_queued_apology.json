@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "queued_apology",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.queued_apology.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_apology.json",
-        "responseTemplateID": "semantic.tool_reply.queued_apology.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I hear you.",
-              "TL": "Narinig kita."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I hear your apology.",
-              "TL": "Naririnig ko ang paumanhin mo."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Message heard.",
-              "TL": "Narinig ang mensahe."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I heard what you had to say.",
-              "TL": "Narinig ko ang kailangan mong sabihin."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Got it. I hear you.",
-              "TL": "Nakuha ko. Narinig kita."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I hear you owning up.",
-              "TL": "Naririnig kong inaamin mo."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Understood. Heard.",
-              "TL": "Naintindihan. Narinig."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I heard your words on that.",
-              "TL": "Narinig ko ang mga salita mo riyan."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Noted. I'm listening.",
-              "TL": "Tala ko na. Nakikinig ako."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Heard your statement.",
-              "TL": "Narinig ang pahayag mo."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_apology.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I hear you.",
+              "I hear your apology.",
+              "Message heard.",
+              "I heard what you had to say.",
+              "Got it. I hear you.",
+              "I hear you owning up.",
+              "Understood. Heard.",
+              "I heard your words on that.",
+              "Noted. I'm listening.",
+              "Heard your statement."
+            ],
+            "TL": [
+              "Narinig kita.",
+              "Naririnig ko ang paumanhin mo.",
+              "Narinig ang mensahe.",
+              "Narinig ko ang kailangan mong sabihin.",
+              "Nakuha ko. Narinig kita.",
+              "Naririnig kong inaamin mo.",
+              "Naintindihan. Narinig.",
+              "Narinig ko ang mga salita mo riyan.",
+              "Tala ko na. Nakikinig ako.",
+              "Narinig ang pahayag mo."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.queued_apology.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_apology.json",
-        "responseTemplateID": "semantic.tool_reply.queued_apology.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "We will talk about it.",
-              "TL": "Pag-uusapan natin iyan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "We'll discuss it once things calm down.",
-              "TL": "Pag-uusapan natin kapag kumalma na ang lahat."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "We will hash this out later.",
-              "TL": "Aayusin natin ito mamaya."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "We'll revisit that when we have a quiet moment.",
-              "TL": "Babalikan natin 'yan kapag may tahimik na oras."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "We will talk through that soon.",
-              "TL": "Pag-uusapan natin 'yan sa lalong madaling panahon."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I'll talk to you about it later.",
-              "TL": "Kakausapin kita tungkol diyan mamaya."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "We'll sort that out when we're safe.",
-              "TL": "Aayusin natin 'yan kapag ligtas na tayo."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "We will clear the air later.",
-              "TL": "Lilinawin natin ang lahat mamaya."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "We'll have a proper conversation about it.",
-              "TL": "Mag-uusap tayo nang masinsinan tungkol diyan."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Talk about it when we reach camp.",
-              "TL": "Pag-usapan natin kapag nakarating sa kampo."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "We will talk about it.",
+              "We'll discuss it once things calm down.",
+              "We will hash this out later.",
+              "We'll revisit that when we have a quiet moment.",
+              "We will talk through that soon.",
+              "I'll talk to you about it later.",
+              "We'll sort that out when we're safe.",
+              "We will clear the air later.",
+              "We'll have a proper conversation about it.",
+              "Talk about it when we reach camp."
+            ],
+            "TL": [
+              "Pag-uusapan natin iyan.",
+              "Pag-uusapan natin kapag kumalma na ang lahat.",
+              "Aayusin natin ito mamaya.",
+              "Babalikan natin 'yan kapag may tahimik na oras.",
+              "Pag-uusapan natin 'yan sa lalong madaling panahon.",
+              "Kakausapin kita tungkol diyan mamaya.",
+              "Aayusin natin 'yan kapag ligtas na tayo.",
+              "Lilinawin natin ang lahat mamaya.",
+              "Mag-uusap tayo nang masinsinan tungkol diyan.",
+              "Pag-usapan natin kapag nakarating sa kampo."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

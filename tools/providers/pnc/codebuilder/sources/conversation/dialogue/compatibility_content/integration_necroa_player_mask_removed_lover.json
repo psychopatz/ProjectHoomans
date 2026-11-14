@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.necroa.player_mask_removed",
+  "id": "lover",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.necroa.player_mask_removed.lover",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Please put your mask back on, love. This air is not safe.",
-          "TL": "Please put your mask back on, love. This air is not safe."
+          "EN": [
+            "Please put your mask back on, love. This air is not safe."
+          ],
+          "TL": [
+            "Please put your mask back on, love. This air is not safe."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.necroa.player_mask_removed.lover",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -9,120 +9,66 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/conversation_landing_whats_up.json",
     },
-    ["semantic.flow.greeting.followup.default.neutral"] = {
+    ["flow.greeting.followup.default"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "semantic.flow.greeting.followup.default.neutral",
+        ["id"] = "flow.greeting.followup.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup_default.json",
     },
-    ["semantic.flow.greeting.followup.friendly.neutral"] = {
+    ["flow.greeting.followup.friendly"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "semantic.flow.greeting.followup.friendly.neutral",
+        ["id"] = "flow.greeting.followup.friendly",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup.json",
     },
-    ["semantic.flow.greeting.opening.default.guarded"] = {
+    ["flow.greeting.opening.default"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "semantic.flow.greeting.opening.default.guarded",
+        ["id"] = "flow.greeting.opening.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
     },
-    ["semantic.flow.greeting.opening.default.neutral"] = {
+    ["flow.greeting.opening.friendly"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "semantic.flow.greeting.opening.default.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
-    },
-    ["semantic.flow.greeting.opening.default.terse"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "semantic.flow.greeting.opening.default.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
-    },
-    ["semantic.flow.greeting.opening.default.warm"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "semantic.flow.greeting.opening.default.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
-    },
-    ["semantic.flow.greeting.opening.friendly.guarded"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "semantic.flow.greeting.opening.friendly.guarded",
+        ["id"] = "flow.greeting.opening.friendly",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
     },
-    ["semantic.flow.greeting.opening.friendly.neutral"] = {
+    ["flow.greeting.opening.question.default"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "semantic.flow.greeting.opening.friendly.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
-    },
-    ["semantic.flow.greeting.opening.friendly.terse"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "semantic.flow.greeting.opening.friendly.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
-    },
-    ["semantic.flow.greeting.opening.friendly.warm"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "semantic.flow.greeting.opening.friendly.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
-    },
-    ["semantic.flow.greeting.opening.question.default.neutral"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "semantic.flow.greeting.opening.question.default.neutral",
+        ["id"] = "flow.greeting.opening.question.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
     },
-    ["semantic.flow.greeting.opening.question.friendly.neutral"] = {
+    ["flow.greeting.opening.question.friendly"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "semantic.flow.greeting.opening.question.friendly.neutral",
+        ["id"] = "flow.greeting.opening.question.friendly",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question.json",
     },
-    ["semantic.flow.greeting.opening.rain.neutral"] = {
+    ["flow.greeting.opening.rain"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "semantic.flow.greeting.opening.rain.neutral",
+        ["id"] = "flow.greeting.opening.rain",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_rain.json",
     },

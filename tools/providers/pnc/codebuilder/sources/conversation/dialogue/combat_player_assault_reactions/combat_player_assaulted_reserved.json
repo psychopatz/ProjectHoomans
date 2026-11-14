@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.player_assaulted",
   "id": "reserved",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:combat_kill",
     "contentOwner": "projecthoomans.dialogue_content.combat",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat/player_assault_reactions.json",
-    "responseTemplateID": "semantic.combat.player_assaulted.reserved",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Back off. Now.",
-          "TL": "Lumayo ka. Ngayon na."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Enough. Stay away from me.",
-          "TL": "Tama na. Lumayo ka sa akin."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Step back.",
-          "TL": "Umatras ka."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Do not do that again.",
-          "TL": "Huwag mong uulitin 'yon."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Don't touch me.",
-          "TL": "Huwag mo akong hahawakan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Last warning.",
-          "TL": "Huling babala."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Stay back.",
-          "TL": "Diyan ka lang sa malayo."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Drop it.",
-          "TL": "Ibaba mo 'yan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Keep your distance.",
-          "TL": "Dumistansya ka."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "One step back. Right now.",
-          "TL": "Isang hakbang pabalik. Ngayon na."
+          "EN": [
+            "Back off. Now.",
+            "Enough. Stay away from me.",
+            "Step back.",
+            "Do not do that again.",
+            "Don't touch me.",
+            "Last warning.",
+            "Stay back.",
+            "Drop it.",
+            "Keep your distance.",
+            "One step back. Right now."
+          ],
+          "TL": [
+            "Lumayo ka. Ngayon na.",
+            "Tama na. Lumayo ka sa akin.",
+            "Umatras ka.",
+            "Huwag mong uulitin 'yon.",
+            "Huwag mo akong hahawakan.",
+            "Huling babala.",
+            "Diyan ka lang sa malayo.",
+            "Ibaba mo 'yan.",
+            "Dumistansya ka.",
+            "Isang hakbang pabalik. Ngayon na."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.player_assaulted",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

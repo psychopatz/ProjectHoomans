@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_human_banter_human_kill_brave",
-        ["id"] = "semantic.combat.human_kill.brave.line_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.human_kill.brave",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Threat's down. Stay sharp.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.human_kill.brave.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Threat's down. Stay sharp.",
+                                        "Shooter neutralized. Hold position.",
+                                        "Target down. Scan the perimeter.",
+                                        "He's eliminated. Maintain alertness.",
+                                        "Gunman is down. Stay behind cover.",
+                                        "Hostile neutralized. Check your angles.",
+                                        "Confirmed kill. Keep your discipline.",
+                                        "He took his shot and lost. Stay ready.",
+                                        "Threat extinguished. Eyes on the high ground.",
+                                        "Done. Stay in formation.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak ang banta. Magmatyag.",
+                                        "Bumaril naalis na. Hawakan ang pwesto.",
+                                        "Bagsak ang target. Suriin ang paligid.",
+                                        "Naalis na siya. Manatiling alerto.",
+                                        "Bagsak ang armadong tao. Manatili sa kublihan.",
+                                        "Kalaban naalis na. Tignan ang mga anggulo mo.",
+                                        "Kumpirmadong patay. Panatilihin ang disiplina.",
+                                        "Sumubok siya at natalo. Manatiling handa.",
+                                        "Banta nawala na. Bantayan ang mataas na lugar.",
+                                        "Tapos. Manatili sa pormasyon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "He's done. Watch the rest.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.human_kill.brave.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "He's done. Watch the rest.",
+                                        "That one's down. Focus on any survivors.",
+                                        "One less rifle against us. Watch the flanks.",
+                                        "Hostile down. Don't let your guard down.",
+                                        "He won't be firing again. Check the bushes.",
+                                        "Downed. Scan for secondary shooters.",
+                                        "He's finished. Keep watching the tree line.",
+                                        "Target ceased. Search the area.",
+                                        "One enemy down. Expect more.",
+                                        "Confirmed casualty. Keep the pressure on.",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos na siya. Bantayan ang iba.",
+                                        "Bagsak na ang isang 'yon. Tutukan kung may iba pa.",
+                                        "Bawas ang isang baril laban sa atin. Bantayan ang gilid.",
+                                        "Bagsak ang kalaban. Huwag ibaba ang depensa.",
+                                        "Hindi na siya puputok ulit. Tignan ang damuhan.",
+                                        "Bagsak. Maghanap ng pangalawang bumaril.",
+                                        "Tapos na siya. Bantayan pa rin ang kakahuyan.",
+                                        "Tumigil na ang target. Halughugin ang lugar.",
+                                        "Isang kalaban ang naitumba. Asahang may iba pa.",
+                                        "Kumpirmadong patay. Ipagpatuloy ang pag-iingat.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Down. Don't freeze up now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.human_kill.brave.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Down. Don't freeze up now.",
+                                        "He's dead. Keep moving, don't stall.",
+                                        "Kill confirmed. Stay in the fight.",
+                                        "He's on the ground. Keep your head clear.",
+                                        "Target down. Don't let adrenaline take over.",
+                                        "Dead. Breathe and scan your sector.",
+                                        "Threat removed. Stay proactive.",
+                                        "He's finished. Keep momentum going.",
+                                        "Eliminated. Don't look at the body, look ahead.",
+                                        "Threat neutralized. Move when ready.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak. Huwag kang titigil ngayon.",
+                                        "Patay na siya. Kilos lang, huwag matulala.",
+                                        "Kumpirmadong patay. Manatili sa laban.",
+                                        "Nasa lupa na siya. Panatilihing malinaw ang isip.",
+                                        "Bagsak ang target. Huwag magpadala sa kaba.",
+                                        "Patay. Huminga at suriin ang parte mo.",
+                                        "Banta naalis na. Manatiling mabilis umaksyon.",
+                                        "Tapos na siya. Huwag mawalan ng bwelo.",
+                                        "Naalis na. Huwag tingnan ang bangkay, tumingin sa unahan.",
+                                        "Banta naalis. Kilos kapag handa na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.human_kill",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Threat's down. Stay sharp.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.human_kill.brave.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Threat's down. Stay sharp.",
+                            "Shooter neutralized. Hold position.",
+                            "Target down. Scan the perimeter.",
+                            "He's eliminated. Maintain alertness.",
+                            "Gunman is down. Stay behind cover.",
+                            "Hostile neutralized. Check your angles.",
+                            "Confirmed kill. Keep your discipline.",
+                            "He took his shot and lost. Stay ready.",
+                            "Threat extinguished. Eyes on the high ground.",
+                            "Done. Stay in formation.",
+                        },
+                        ["TL"] = {
+                            "Bagsak ang banta. Magmatyag.",
+                            "Bumaril naalis na. Hawakan ang pwesto.",
+                            "Bagsak ang target. Suriin ang paligid.",
+                            "Naalis na siya. Manatiling alerto.",
+                            "Bagsak ang armadong tao. Manatili sa kublihan.",
+                            "Kalaban naalis na. Tignan ang mga anggulo mo.",
+                            "Kumpirmadong patay. Panatilihin ang disiplina.",
+                            "Sumubok siya at natalo. Manatiling handa.",
+                            "Banta nawala na. Bantayan ang mataas na lugar.",
+                            "Tapos. Manatili sa pormasyon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "He's done. Watch the rest.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.human_kill.brave.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "He's done. Watch the rest.",
+                            "That one's down. Focus on any survivors.",
+                            "One less rifle against us. Watch the flanks.",
+                            "Hostile down. Don't let your guard down.",
+                            "He won't be firing again. Check the bushes.",
+                            "Downed. Scan for secondary shooters.",
+                            "He's finished. Keep watching the tree line.",
+                            "Target ceased. Search the area.",
+                            "One enemy down. Expect more.",
+                            "Confirmed casualty. Keep the pressure on.",
+                        },
+                        ["TL"] = {
+                            "Tapos na siya. Bantayan ang iba.",
+                            "Bagsak na ang isang 'yon. Tutukan kung may iba pa.",
+                            "Bawas ang isang baril laban sa atin. Bantayan ang gilid.",
+                            "Bagsak ang kalaban. Huwag ibaba ang depensa.",
+                            "Hindi na siya puputok ulit. Tignan ang damuhan.",
+                            "Bagsak. Maghanap ng pangalawang bumaril.",
+                            "Tapos na siya. Bantayan pa rin ang kakahuyan.",
+                            "Tumigil na ang target. Halughugin ang lugar.",
+                            "Isang kalaban ang naitumba. Asahang may iba pa.",
+                            "Kumpirmadong patay. Ipagpatuloy ang pag-iingat.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Down. Don't freeze up now.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.human_kill.brave.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Down. Don't freeze up now.",
+                            "He's dead. Keep moving, don't stall.",
+                            "Kill confirmed. Stay in the fight.",
+                            "He's on the ground. Keep your head clear.",
+                            "Target down. Don't let adrenaline take over.",
+                            "Dead. Breathe and scan your sector.",
+                            "Threat removed. Stay proactive.",
+                            "He's finished. Keep momentum going.",
+                            "Eliminated. Don't look at the body, look ahead.",
+                            "Threat neutralized. Move when ready.",
+                        },
+                        ["TL"] = {
+                            "Bagsak. Huwag kang titigil ngayon.",
+                            "Patay na siya. Kilos lang, huwag matulala.",
+                            "Kumpirmadong patay. Manatili sa laban.",
+                            "Nasa lupa na siya. Panatilihing malinaw ang isip.",
+                            "Bagsak ang target. Huwag magpadala sa kaba.",
+                            "Patay. Huminga at suriin ang parte mo.",
+                            "Banta naalis na. Manatiling mabilis umaksyon.",
+                            "Tapos na siya. Huwag mawalan ng bwelo.",
+                            "Naalis na. Huwag tingnan ang bangkay, tumingin sa unahan.",
+                            "Banta naalis. Kilos kapag handa na.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.human_kill.brave",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "line_01",
-            ["sourceId"] = "semantic.combat.human_kill.brave.line_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave_line_01.json",
+            ["localId"] = "brave",
+            ["sourceId"] = "combat.human_kill.brave",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillBrave",
-        ["namespace"] = "semantic.combat.human_kill.brave",
+        ["namespace"] = "combat.human_kill",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
-                ["responseTemplateID"] = "semantic.combat.human_kill.brave.line_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/brave.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat's down. Stay sharp.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang banta. Magmatyag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Shooter neutralized. Hold position.",
-                            },
-                            ["TL"] = {
-                                "Bumaril naalis na. Hawakan ang pwesto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down. Scan the perimeter.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang target. Suriin ang paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's eliminated. Maintain alertness.",
-                            },
-                            ["TL"] = {
-                                "Naalis na siya. Manatiling alerto.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Threat's down. Stay sharp.",
+                                        "Shooter neutralized. Hold position.",
+                                        "Target down. Scan the perimeter.",
+                                        "He's eliminated. Maintain alertness.",
+                                        "Gunman is down. Stay behind cover.",
+                                        "Hostile neutralized. Check your angles.",
+                                        "Confirmed kill. Keep your discipline.",
+                                        "He took his shot and lost. Stay ready.",
+                                        "Threat extinguished. Eyes on the high ground.",
+                                        "Done. Stay in formation.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak ang banta. Magmatyag.",
+                                        "Bumaril naalis na. Hawakan ang pwesto.",
+                                        "Bagsak ang target. Suriin ang paligid.",
+                                        "Naalis na siya. Manatiling alerto.",
+                                        "Bagsak ang armadong tao. Manatili sa kublihan.",
+                                        "Kalaban naalis na. Tignan ang mga anggulo mo.",
+                                        "Kumpirmadong patay. Panatilihin ang disiplina.",
+                                        "Sumubok siya at natalo. Manatiling handa.",
+                                        "Banta nawala na. Bantayan ang mataas na lugar.",
+                                        "Tapos. Manatili sa pormasyon.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Gunman is down. Stay behind cover.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang armadong tao. Manatili sa kublihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hostile neutralized. Check your angles.",
-                            },
-                            ["TL"] = {
-                                "Kalaban naalis na. Tignan ang mga anggulo mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Confirmed kill. Keep your discipline.",
-                            },
-                            ["TL"] = {
-                                "Kumpirmadong patay. Panatilihin ang disiplina.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He took his shot and lost. Stay ready.",
-                            },
-                            ["TL"] = {
-                                "Sumubok siya at natalo. Manatiling handa.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "He's done. Watch the rest.",
+                                        "That one's down. Focus on any survivors.",
+                                        "One less rifle against us. Watch the flanks.",
+                                        "Hostile down. Don't let your guard down.",
+                                        "He won't be firing again. Check the bushes.",
+                                        "Downed. Scan for secondary shooters.",
+                                        "He's finished. Keep watching the tree line.",
+                                        "Target ceased. Search the area.",
+                                        "One enemy down. Expect more.",
+                                        "Confirmed casualty. Keep the pressure on.",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos na siya. Bantayan ang iba.",
+                                        "Bagsak na ang isang 'yon. Tutukan kung may iba pa.",
+                                        "Bawas ang isang baril laban sa atin. Bantayan ang gilid.",
+                                        "Bagsak ang kalaban. Huwag ibaba ang depensa.",
+                                        "Hindi na siya puputok ulit. Tignan ang damuhan.",
+                                        "Bagsak. Maghanap ng pangalawang bumaril.",
+                                        "Tapos na siya. Bantayan pa rin ang kakahuyan.",
+                                        "Tumigil na ang target. Halughugin ang lugar.",
+                                        "Isang kalaban ang naitumba. Asahang may iba pa.",
+                                        "Kumpirmadong patay. Ipagpatuloy ang pag-iingat.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat extinguished. Eyes on the high ground.",
-                            },
-                            ["TL"] = {
-                                "Banta nawala na. Bantayan ang mataas na lugar.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Down. Don't freeze up now.",
+                                        "He's dead. Keep moving, don't stall.",
+                                        "Kill confirmed. Stay in the fight.",
+                                        "He's on the ground. Keep your head clear.",
+                                        "Target down. Don't let adrenaline take over.",
+                                        "Dead. Breathe and scan your sector.",
+                                        "Threat removed. Stay proactive.",
+                                        "He's finished. Keep momentum going.",
+                                        "Eliminated. Don't look at the body, look ahead.",
+                                        "Threat neutralized. Move when ready.",
+                                    },
+                                    ["TL"] = {
+                                        "Bagsak. Huwag kang titigil ngayon.",
+                                        "Patay na siya. Kilos lang, huwag matulala.",
+                                        "Kumpirmadong patay. Manatili sa laban.",
+                                        "Nasa lupa na siya. Panatilihing malinaw ang isip.",
+                                        "Bagsak ang target. Huwag magpadala sa kaba.",
+                                        "Patay. Huminga at suriin ang parte mo.",
+                                        "Banta naalis na. Manatiling mabilis umaksyon.",
+                                        "Tapos na siya. Huwag mawalan ng bwelo.",
+                                        "Naalis na. Huwag tingnan ang bangkay, tumingin sa unahan.",
+                                        "Banta naalis. Kilos kapag handa na.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Done. Stay in formation.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.human_kill.brave",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Tapos. Manatili sa pormasyon.",
-                            },
+                            ["fallback"] = "Threat's down. Stay sharp.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.human_kill.brave.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave_line_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_human_banter_human_kill_brave",
-        ["id"] = "semantic.combat.human_kill.brave.line_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "line_02",
-            ["sourceId"] = "semantic.combat.human_kill.brave.line_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave_line_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillBrave",
-        ["namespace"] = "semantic.combat.human_kill.brave",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
-                ["responseTemplateID"] = "semantic.combat.human_kill.brave.line_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/brave.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's done. Watch the rest.",
-                            },
-                            ["TL"] = {
-                                "Tapos na siya. Bantayan ang iba.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Threat's down. Stay sharp.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.human_kill.brave.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Threat's down. Stay sharp.",
+                        "Shooter neutralized. Hold position.",
+                        "Target down. Scan the perimeter.",
+                        "He's eliminated. Maintain alertness.",
+                        "Gunman is down. Stay behind cover.",
+                        "Hostile neutralized. Check your angles.",
+                        "Confirmed kill. Keep your discipline.",
+                        "He took his shot and lost. Stay ready.",
+                        "Threat extinguished. Eyes on the high ground.",
+                        "Done. Stay in formation.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That one's down. Focus on any survivors.",
-                            },
-                            ["TL"] = {
-                                "Bagsak na ang isang 'yon. Tutukan kung may iba pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less rifle against us. Watch the flanks.",
-                            },
-                            ["TL"] = {
-                                "Bawas ang isang baril laban sa atin. Bantayan ang gilid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hostile down. Don't let your guard down.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang kalaban. Huwag ibaba ang depensa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He won't be firing again. Check the bushes.",
-                            },
-                            ["TL"] = {
-                                "Hindi na siya puputok ulit. Tignan ang damuhan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Downed. Scan for secondary shooters.",
-                            },
-                            ["TL"] = {
-                                "Bagsak. Maghanap ng pangalawang bumaril.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's finished. Keep watching the tree line.",
-                            },
-                            ["TL"] = {
-                                "Tapos na siya. Bantayan pa rin ang kakahuyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target ceased. Search the area.",
-                            },
-                            ["TL"] = {
-                                "Tumigil na ang target. Halughugin ang lugar.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One enemy down. Expect more.",
-                            },
-                            ["TL"] = {
-                                "Isang kalaban ang naitumba. Asahang may iba pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Confirmed casualty. Keep the pressure on.",
-                            },
-                            ["TL"] = {
-                                "Kumpirmadong patay. Ipagpatuloy ang pag-iingat.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Bagsak ang banta. Magmatyag.",
+                        "Bumaril naalis na. Hawakan ang pwesto.",
+                        "Bagsak ang target. Suriin ang paligid.",
+                        "Naalis na siya. Manatiling alerto.",
+                        "Bagsak ang armadong tao. Manatili sa kublihan.",
+                        "Kalaban naalis na. Tignan ang mga anggulo mo.",
+                        "Kumpirmadong patay. Panatilihin ang disiplina.",
+                        "Sumubok siya at natalo. Manatiling handa.",
+                        "Banta nawala na. Bantayan ang mataas na lugar.",
+                        "Tapos. Manatili sa pormasyon.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave_line_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_human_banter_human_kill_brave",
-        ["id"] = "semantic.combat.human_kill.brave.line_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "line_03",
-            ["sourceId"] = "semantic.combat.human_kill.brave.line_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave_line_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillBrave",
-        ["namespace"] = "semantic.combat.human_kill.brave",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
-                ["responseTemplateID"] = "semantic.combat.human_kill.brave.line_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/brave.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Down. Don't freeze up now.",
-                            },
-                            ["TL"] = {
-                                "Bagsak. Huwag kang titigil ngayon.",
-                            },
-                        },
+            {
+                ["fallback"] = "He's done. Watch the rest.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.human_kill.brave.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "He's done. Watch the rest.",
+                        "That one's down. Focus on any survivors.",
+                        "One less rifle against us. Watch the flanks.",
+                        "Hostile down. Don't let your guard down.",
+                        "He won't be firing again. Check the bushes.",
+                        "Downed. Scan for secondary shooters.",
+                        "He's finished. Keep watching the tree line.",
+                        "Target ceased. Search the area.",
+                        "One enemy down. Expect more.",
+                        "Confirmed casualty. Keep the pressure on.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's dead. Keep moving, don't stall.",
-                            },
-                            ["TL"] = {
-                                "Patay na siya. Kilos lang, huwag matulala.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Kill confirmed. Stay in the fight.",
-                            },
-                            ["TL"] = {
-                                "Kumpirmadong patay. Manatili sa laban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's on the ground. Keep your head clear.",
-                            },
-                            ["TL"] = {
-                                "Nasa lupa na siya. Panatilihing malinaw ang isip.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down. Don't let adrenaline take over.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang target. Huwag magpadala sa kaba.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead. Breathe and scan your sector.",
-                            },
-                            ["TL"] = {
-                                "Patay. Huminga at suriin ang parte mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat removed. Stay proactive.",
-                            },
-                            ["TL"] = {
-                                "Banta naalis na. Manatiling mabilis umaksyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "He's finished. Keep momentum going.",
-                            },
-                            ["TL"] = {
-                                "Tapos na siya. Huwag mawalan ng bwelo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Eliminated. Don't look at the body, look ahead.",
-                            },
-                            ["TL"] = {
-                                "Naalis na. Huwag tingnan ang bangkay, tumingin sa unahan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat neutralized. Move when ready.",
-                            },
-                            ["TL"] = {
-                                "Banta naalis. Kilos kapag handa na.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Tapos na siya. Bantayan ang iba.",
+                        "Bagsak na ang isang 'yon. Tutukan kung may iba pa.",
+                        "Bawas ang isang baril laban sa atin. Bantayan ang gilid.",
+                        "Bagsak ang kalaban. Huwag ibaba ang depensa.",
+                        "Hindi na siya puputok ulit. Tignan ang damuhan.",
+                        "Bagsak. Maghanap ng pangalawang bumaril.",
+                        "Tapos na siya. Bantayan pa rin ang kakahuyan.",
+                        "Tumigil na ang target. Halughugin ang lugar.",
+                        "Isang kalaban ang naitumba. Asahang may iba pa.",
+                        "Kumpirmadong patay. Ipagpatuloy ang pag-iingat.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave_line_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "Down. Don't freeze up now.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.human_kill.brave.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Down. Don't freeze up now.",
+                        "He's dead. Keep moving, don't stall.",
+                        "Kill confirmed. Stay in the fight.",
+                        "He's on the ground. Keep your head clear.",
+                        "Target down. Don't let adrenaline take over.",
+                        "Dead. Breathe and scan your sector.",
+                        "Threat removed. Stay proactive.",
+                        "He's finished. Keep momentum going.",
+                        "Eliminated. Don't look at the body, look ahead.",
+                        "Threat neutralized. Move when ready.",
+                    },
+                    ["TL"] = {
+                        "Bagsak. Huwag kang titigil ngayon.",
+                        "Patay na siya. Kilos lang, huwag matulala.",
+                        "Kumpirmadong patay. Manatili sa laban.",
+                        "Nasa lupa na siya. Panatilihing malinaw ang isip.",
+                        "Bagsak ang target. Huwag magpadala sa kaba.",
+                        "Patay. Huminga at suriin ang parte mo.",
+                        "Banta naalis na. Manatiling mabilis umaksyon.",
+                        "Tapos na siya. Huwag mawalan ng bwelo.",
+                        "Naalis na. Huwag tingnan ang bangkay, tumingin sa unahan.",
+                        "Banta naalis. Kilos kapag handa na.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

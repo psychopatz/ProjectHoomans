@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "event_reactions_companion",
-        ["id"] = "semantic.companion.reaction.abandonment",
+        ["exchangeFamily"] = {
+            ["familyID"] = "companion.reaction.abandonment",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Stay with me next time. We watch each other's backs.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.companion.reaction.abandonment.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Stay with me next time. We watch each other's backs.",
+                                        "Don't leave me behind like that. We survive together.",
+                                        "I almost got swarmed when you ran off. Stick close.",
+                                        "We're a team. Don't take off on your own.",
+                                        "Where did you go?! You can't just vanish.",
+                                        "Next time, warn me before you leave.",
+                                        "Thought I was on my own out there. Stay together.",
+                                        "Leaving your partner gets people killed. Keep near.",
+                                        "Glad you're back, but don't ditch me again.",
+                                        "Stick with me. We're stronger as a pair.",
+                                    },
+                                    ["TL"] = {
+                                        "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod.",
+                                        "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay.",
+                                        "Halos makuyog ako no'ng umalis ka. Dumikit ka lang.",
+                                        "Magkasama tayo. Huwag kang aalis nang mag-isa.",
+                                        "Saan ka pumunta?! Hindi ka pwedeng mawala na lang.",
+                                        "Sa susunod, sabihan mo ako bago ka umalis.",
+                                        "Akala ko naiwan na akong mag-isa. Magsama tayo.",
+                                        "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka.",
+                                        "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit.",
+                                        "Sumabay ka sa akin. Mas malakas tayo kapag magkasama.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "companion.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Stay with me next time. We watch each other's backs.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.companion.reaction.abandonment.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Stay with me next time. We watch each other's backs.",
+                            "Don't leave me behind like that. We survive together.",
+                            "I almost got swarmed when you ran off. Stick close.",
+                            "We're a team. Don't take off on your own.",
+                            "Where did you go?! You can't just vanish.",
+                            "Next time, warn me before you leave.",
+                            "Thought I was on my own out there. Stay together.",
+                            "Leaving your partner gets people killed. Keep near.",
+                            "Glad you're back, but don't ditch me again.",
+                            "Stick with me. We're stronger as a pair.",
+                        },
+                        ["TL"] = {
+                            "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod.",
+                            "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay.",
+                            "Halos makuyog ako no'ng umalis ka. Dumikit ka lang.",
+                            "Magkasama tayo. Huwag kang aalis nang mag-isa.",
+                            "Saan ka pumunta?! Hindi ka pwedeng mawala na lang.",
+                            "Sa susunod, sabihan mo ako bago ka umalis.",
+                            "Akala ko naiwan na akong mag-isa. Magsama tayo.",
+                            "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka.",
+                            "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit.",
+                            "Sumabay ka sa akin. Mas malakas tayo kapag magkasama.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "companion.reaction.abandonment",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "abandonment",
-            ["sourceId"] = "semantic.companion.reaction.abandonment",
+            ["sourceId"] = "companion.reaction.abandonment",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_abandonment.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
-        ["namespace"] = "semantic.companion.reaction",
+        ["namespace"] = "companion.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.companion.reaction.abandonment",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/companion.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay with me next time. We watch each other's backs.",
-                            },
-                            ["TL"] = {
-                                "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't leave me behind like that. We survive together.",
-                            },
-                            ["TL"] = {
-                                "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I almost got swarmed when you ran off. Stick close.",
-                            },
-                            ["TL"] = {
-                                "Halos makuyog ako no'ng umalis ka. Dumikit ka lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We're a team. Don't take off on your own.",
-                            },
-                            ["TL"] = {
-                                "Magkasama tayo. Huwag kang aalis nang mag-isa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Where did you go?! You can't just vanish.",
-                            },
-                            ["TL"] = {
-                                "Saan ka pumunta?! Hindi ka pwedeng mawala na lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Next time, warn me before you leave.",
-                            },
-                            ["TL"] = {
-                                "Sa susunod, sabihan mo ako bago ka umalis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thought I was on my own out there. Stay together.",
-                            },
-                            ["TL"] = {
-                                "Akala ko naiwan na akong mag-isa. Magsama tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Leaving your partner gets people killed. Keep near.",
-                            },
-                            ["TL"] = {
-                                "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad you're back, but don't ditch me again.",
-                            },
-                            ["TL"] = {
-                                "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stick with me. We're stronger as a pair.",
-                            },
-                            ["TL"] = {
-                                "Sumabay ka sa akin. Mas malakas tayo kapag magkasama.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Stay with me next time. We watch each other's backs.",
+                                        "Don't leave me behind like that. We survive together.",
+                                        "I almost got swarmed when you ran off. Stick close.",
+                                        "We're a team. Don't take off on your own.",
+                                        "Where did you go?! You can't just vanish.",
+                                        "Next time, warn me before you leave.",
+                                        "Thought I was on my own out there. Stay together.",
+                                        "Leaving your partner gets people killed. Keep near.",
+                                        "Glad you're back, but don't ditch me again.",
+                                        "Stick with me. We're stronger as a pair.",
+                                    },
+                                    ["TL"] = {
+                                        "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod.",
+                                        "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay.",
+                                        "Halos makuyog ako no'ng umalis ka. Dumikit ka lang.",
+                                        "Magkasama tayo. Huwag kang aalis nang mag-isa.",
+                                        "Saan ka pumunta?! Hindi ka pwedeng mawala na lang.",
+                                        "Sa susunod, sabihan mo ako bago ka umalis.",
+                                        "Akala ko naiwan na akong mag-isa. Magsama tayo.",
+                                        "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka.",
+                                        "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit.",
+                                        "Sumabay ka sa akin. Mas malakas tayo kapag magkasama.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "companion.reaction.abandonment",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Stay with me next time. We watch each other's backs.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.companion.reaction.abandonment.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,20 +192,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Stay with me next time. We watch each other's backs.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.companion.reaction.abandonment.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Stay with me next time. We watch each other's backs.",
+                        "Don't leave me behind like that. We survive together.",
+                        "I almost got swarmed when you ran off. Stick close.",
+                        "We're a team. Don't take off on your own.",
+                        "Where did you go?! You can't just vanish.",
+                        "Next time, warn me before you leave.",
+                        "Thought I was on my own out there. Stay together.",
+                        "Leaving your partner gets people killed. Keep near.",
+                        "Glad you're back, but don't ditch me again.",
+                        "Stick with me. We're stronger as a pair.",
+                    },
+                    ["TL"] = {
+                        "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod.",
+                        "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay.",
+                        "Halos makuyog ako no'ng umalis ka. Dumikit ka lang.",
+                        "Magkasama tayo. Huwag kang aalis nang mag-isa.",
+                        "Saan ka pumunta?! Hindi ka pwedeng mawala na lang.",
+                        "Sa susunod, sabihan mo ako bago ka umalis.",
+                        "Akala ko naiwan na akong mag-isa. Magsama tayo.",
+                        "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka.",
+                        "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit.",
+                        "Sumabay ka sa akin. Mas malakas tayo kapag magkasama.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "event_reactions_companion",
-        ["id"] = "semantic.companion.reaction.camp_rejected",
+        ["exchangeFamily"] = {
+            ["familyID"] = "companion.reaction.camp_rejected",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can't find a safe room or campfire nearby.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.companion.reaction.camp_rejected.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can't find a safe room or campfire nearby.",
+                                        "Nowhere safe to rest around here. We need better cover.",
+                                        "Can't camp in the open like this. Too dangerous.",
+                                        "We need walls or a fire before we settle down.",
+                                        "This spot isn't secure enough for camp. Keep walking.",
+                                        "No shelter here. Let's find four walls first.",
+                                        "Can't sleep here. Infected could walk right in.",
+                                        "We need a barricaded room or a campfire before resting.",
+                                        "Not pitching camp here. Let's find a secure building.",
+                                        "Too exposed. Find us a real camp spot.",
+                                    },
+                                    ["TL"] = {
+                                        "Wala akong makitang ligtas na kwarto o campfire sa malapit.",
+                                        "Walang ligtas na pahingahan dito. Kailangan natin ng mas maayos na silungan.",
+                                        "Hindi pwedeng magkampo sa lantad nang ganito. Masyadong delikado.",
+                                        "Kailangan natin ng pader o apoy bago huminto.",
+                                        "Hindi sapat ang kaligtasan ng pwestong 'to para sa kampo. Lakad pa.",
+                                        "Walang masisilungan dito. Maghanap muna tayo ng apat na pader.",
+                                        "Hindi pwedeng matulog dito. Madaling makakapasok ang mga infected.",
+                                        "Kailangan natin ng may barikadang kwarto o campfire bago magpahinga.",
+                                        "Hindi ako magkakampo rito. Maghanap tayo ng ligtas na gusali.",
+                                        "Masyadong lantad. Hanapan mo tayo ng tunay na matutuluyan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "companion.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can't find a safe room or campfire nearby.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.companion.reaction.camp_rejected.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can't find a safe room or campfire nearby.",
+                            "Nowhere safe to rest around here. We need better cover.",
+                            "Can't camp in the open like this. Too dangerous.",
+                            "We need walls or a fire before we settle down.",
+                            "This spot isn't secure enough for camp. Keep walking.",
+                            "No shelter here. Let's find four walls first.",
+                            "Can't sleep here. Infected could walk right in.",
+                            "We need a barricaded room or a campfire before resting.",
+                            "Not pitching camp here. Let's find a secure building.",
+                            "Too exposed. Find us a real camp spot.",
+                        },
+                        ["TL"] = {
+                            "Wala akong makitang ligtas na kwarto o campfire sa malapit.",
+                            "Walang ligtas na pahingahan dito. Kailangan natin ng mas maayos na silungan.",
+                            "Hindi pwedeng magkampo sa lantad nang ganito. Masyadong delikado.",
+                            "Kailangan natin ng pader o apoy bago huminto.",
+                            "Hindi sapat ang kaligtasan ng pwestong 'to para sa kampo. Lakad pa.",
+                            "Walang masisilungan dito. Maghanap muna tayo ng apat na pader.",
+                            "Hindi pwedeng matulog dito. Madaling makakapasok ang mga infected.",
+                            "Kailangan natin ng may barikadang kwarto o campfire bago magpahinga.",
+                            "Hindi ako magkakampo rito. Maghanap tayo ng ligtas na gusali.",
+                            "Masyadong lantad. Hanapan mo tayo ng tunay na matutuluyan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "companion.reaction.camp_rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "camp_rejected",
-            ["sourceId"] = "semantic.companion.reaction.camp_rejected",
+            ["sourceId"] = "companion.reaction.camp_rejected",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_camp_rejected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
-        ["namespace"] = "semantic.companion.reaction",
+        ["namespace"] = "companion.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,127 +340,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.companion.reaction.camp_rejected",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/companion.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't find a safe room or campfire nearby.",
-                            },
-                            ["TL"] = {
-                                "Wala akong makitang ligtas na kwarto o campfire sa malapit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nowhere safe to rest around here. We need better cover.",
-                            },
-                            ["TL"] = {
-                                "Walang ligtas na pahingahan dito. Kailangan natin ng mas maayos na silungan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't camp in the open like this. Too dangerous.",
-                            },
-                            ["TL"] = {
-                                "Hindi pwedeng magkampo sa lantad nang ganito. Masyadong delikado.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We need walls or a fire before we settle down.",
-                            },
-                            ["TL"] = {
-                                "Kailangan natin ng pader o apoy bago huminto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "This spot isn't secure enough for camp. Keep walking.",
-                            },
-                            ["TL"] = {
-                                "Hindi sapat ang kaligtasan ng pwestong 'to para sa kampo. Lakad pa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No shelter here. Let's find four walls first.",
-                            },
-                            ["TL"] = {
-                                "Walang masisilungan dito. Maghanap muna tayo ng apat na pader.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't sleep here. Infected could walk right in.",
-                            },
-                            ["TL"] = {
-                                "Hindi pwedeng matulog dito. Madaling makakapasok ang mga infected.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We need a barricaded room or a campfire before resting.",
-                            },
-                            ["TL"] = {
-                                "Kailangan natin ng may barikadang kwarto o campfire bago magpahinga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not pitching camp here. Let's find a secure building.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako magkakampo rito. Maghanap tayo ng ligtas na gusali.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too exposed. Find us a real camp spot.",
-                            },
-                            ["TL"] = {
-                                "Masyadong lantad. Hanapan mo tayo ng tunay na matutuluyan.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can't find a safe room or campfire nearby.",
+                                        "Nowhere safe to rest around here. We need better cover.",
+                                        "Can't camp in the open like this. Too dangerous.",
+                                        "We need walls or a fire before we settle down.",
+                                        "This spot isn't secure enough for camp. Keep walking.",
+                                        "No shelter here. Let's find four walls first.",
+                                        "Can't sleep here. Infected could walk right in.",
+                                        "We need a barricaded room or a campfire before resting.",
+                                        "Not pitching camp here. Let's find a secure building.",
+                                        "Too exposed. Find us a real camp spot.",
+                                    },
+                                    ["TL"] = {
+                                        "Wala akong makitang ligtas na kwarto o campfire sa malapit.",
+                                        "Walang ligtas na pahingahan dito. Kailangan natin ng mas maayos na silungan.",
+                                        "Hindi pwedeng magkampo sa lantad nang ganito. Masyadong delikado.",
+                                        "Kailangan natin ng pader o apoy bago huminto.",
+                                        "Hindi sapat ang kaligtasan ng pwestong 'to para sa kampo. Lakad pa.",
+                                        "Walang masisilungan dito. Maghanap muna tayo ng apat na pader.",
+                                        "Hindi pwedeng matulog dito. Madaling makakapasok ang mga infected.",
+                                        "Kailangan natin ng may barikadang kwarto o campfire bago magpahinga.",
+                                        "Hindi ako magkakampo rito. Maghanap tayo ng ligtas na gusali.",
+                                        "Masyadong lantad. Hanapan mo tayo ng tunay na matutuluyan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "companion.reaction.camp_rejected",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can't find a safe room or campfire nearby.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.companion.reaction.camp_rejected.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -312,20 +421,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can't find a safe room or campfire nearby.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.companion.reaction.camp_rejected.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can't find a safe room or campfire nearby.",
+                        "Nowhere safe to rest around here. We need better cover.",
+                        "Can't camp in the open like this. Too dangerous.",
+                        "We need walls or a fire before we settle down.",
+                        "This spot isn't secure enough for camp. Keep walking.",
+                        "No shelter here. Let's find four walls first.",
+                        "Can't sleep here. Infected could walk right in.",
+                        "We need a barricaded room or a campfire before resting.",
+                        "Not pitching camp here. Let's find a secure building.",
+                        "Too exposed. Find us a real camp spot.",
+                    },
+                    ["TL"] = {
+                        "Wala akong makitang ligtas na kwarto o campfire sa malapit.",
+                        "Walang ligtas na pahingahan dito. Kailangan natin ng mas maayos na silungan.",
+                        "Hindi pwedeng magkampo sa lantad nang ganito. Masyadong delikado.",
+                        "Kailangan natin ng pader o apoy bago huminto.",
+                        "Hindi sapat ang kaligtasan ng pwestong 'to para sa kampo. Lakad pa.",
+                        "Walang masisilungan dito. Maghanap muna tayo ng apat na pader.",
+                        "Hindi pwedeng matulog dito. Madaling makakapasok ang mga infected.",
+                        "Kailangan natin ng may barikadang kwarto o campfire bago magpahinga.",
+                        "Hindi ako magkakampo rito. Maghanap tayo ng ligtas na gusali.",
+                        "Masyadong lantad. Hanapan mo tayo ng tunay na matutuluyan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "event_reactions_companion",
-        ["id"] = "semantic.companion.reaction.default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "companion.reaction.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I heard you. We will handle it together.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.companion.reaction.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I heard you. We will handle it together.",
+                                        "Understood. I'm right here with you.",
+                                        "Got your message. Let's get it done.",
+                                        "I'm with you. Lead the way.",
+                                        "Heard. Whatever comes, we take it on.",
+                                        "Copy that. Staying right by your side.",
+                                        "I hear you loud and clear. Let's move.",
+                                        "Count on me. We're in this together.",
+                                        "Understood. Let's keep our heads clear.",
+                                        "Right behind you. Let's handle this.",
+                                    },
+                                    ["TL"] = {
+                                        "Narinig kita. Sabay natin 'yang haharapin.",
+                                        "Naintindihan ko. Nandito lang ako kasama mo.",
+                                        "Nakuha ko ang sabi mo. Tapusin na natin.",
+                                        "Kasama mo ako. Ikaw ang manguna.",
+                                        "Narinig ko. Kahit ano'ng dumating, lalabanan natin.",
+                                        "Kopya. Dito lang ako sa tabi mo.",
+                                        "Malinaw kong narinig. Kilos na tayo.",
+                                        "Maaasahan mo ako. Magkasama tayo rito.",
+                                        "Naiintindihan ko. Panatilihing malinaw ang isip natin.",
+                                        "Nasa likod mo lang ako. Asikasuhin natin 'to.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "companion.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I heard you. We will handle it together.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.companion.reaction.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I heard you. We will handle it together.",
+                            "Understood. I'm right here with you.",
+                            "Got your message. Let's get it done.",
+                            "I'm with you. Lead the way.",
+                            "Heard. Whatever comes, we take it on.",
+                            "Copy that. Staying right by your side.",
+                            "I hear you loud and clear. Let's move.",
+                            "Count on me. We're in this together.",
+                            "Understood. Let's keep our heads clear.",
+                            "Right behind you. Let's handle this.",
+                        },
+                        ["TL"] = {
+                            "Narinig kita. Sabay natin 'yang haharapin.",
+                            "Naintindihan ko. Nandito lang ako kasama mo.",
+                            "Nakuha ko ang sabi mo. Tapusin na natin.",
+                            "Kasama mo ako. Ikaw ang manguna.",
+                            "Narinig ko. Kahit ano'ng dumating, lalabanan natin.",
+                            "Kopya. Dito lang ako sa tabi mo.",
+                            "Malinaw kong narinig. Kilos na tayo.",
+                            "Maaasahan mo ako. Magkasama tayo rito.",
+                            "Naiintindihan ko. Panatilihing malinaw ang isip natin.",
+                            "Nasa likod mo lang ako. Asikasuhin natin 'to.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "companion.reaction.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "default",
-            ["sourceId"] = "semantic.companion.reaction.default",
+            ["sourceId"] = "companion.reaction.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
-        ["namespace"] = "semantic.companion.reaction",
+        ["namespace"] = "companion.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -339,127 +569,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.companion.reaction.default",
+                ["responseAct"] = "ACK",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/companion.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "ACK",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I heard you. We will handle it together.",
-                            },
-                            ["TL"] = {
-                                "Narinig kita. Sabay natin 'yang haharapin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. I'm right here with you.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan ko. Nandito lang ako kasama mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got your message. Let's get it done.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko ang sabi mo. Tapusin na natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm with you. Lead the way.",
-                            },
-                            ["TL"] = {
-                                "Kasama mo ako. Ikaw ang manguna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heard. Whatever comes, we take it on.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko. Kahit ano'ng dumating, lalabanan natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Copy that. Staying right by your side.",
-                            },
-                            ["TL"] = {
-                                "Kopya. Dito lang ako sa tabi mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear you loud and clear. Let's move.",
-                            },
-                            ["TL"] = {
-                                "Malinaw kong narinig. Kilos na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Count on me. We're in this together.",
-                            },
-                            ["TL"] = {
-                                "Maaasahan mo ako. Magkasama tayo rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. Let's keep our heads clear.",
-                            },
-                            ["TL"] = {
-                                "Naiintindihan ko. Panatilihing malinaw ang isip natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right behind you. Let's handle this.",
-                            },
-                            ["TL"] = {
-                                "Nasa likod mo lang ako. Asikasuhin natin 'to.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I heard you. We will handle it together.",
+                                        "Understood. I'm right here with you.",
+                                        "Got your message. Let's get it done.",
+                                        "I'm with you. Lead the way.",
+                                        "Heard. Whatever comes, we take it on.",
+                                        "Copy that. Staying right by your side.",
+                                        "I hear you loud and clear. Let's move.",
+                                        "Count on me. We're in this together.",
+                                        "Understood. Let's keep our heads clear.",
+                                        "Right behind you. Let's handle this.",
+                                    },
+                                    ["TL"] = {
+                                        "Narinig kita. Sabay natin 'yang haharapin.",
+                                        "Naintindihan ko. Nandito lang ako kasama mo.",
+                                        "Nakuha ko ang sabi mo. Tapusin na natin.",
+                                        "Kasama mo ako. Ikaw ang manguna.",
+                                        "Narinig ko. Kahit ano'ng dumating, lalabanan natin.",
+                                        "Kopya. Dito lang ako sa tabi mo.",
+                                        "Malinaw kong narinig. Kilos na tayo.",
+                                        "Maaasahan mo ako. Magkasama tayo rito.",
+                                        "Naiintindihan ko. Panatilihing malinaw ang isip natin.",
+                                        "Nasa likod mo lang ako. Asikasuhin natin 'to.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "ACK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "companion.reaction.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I heard you. We will handle it together.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.companion.reaction.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -468,6 +649,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I heard you. We will handle it together.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.companion.reaction.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I heard you. We will handle it together.",
+                        "Understood. I'm right here with you.",
+                        "Got your message. Let's get it done.",
+                        "I'm with you. Lead the way.",
+                        "Heard. Whatever comes, we take it on.",
+                        "Copy that. Staying right by your side.",
+                        "I hear you loud and clear. Let's move.",
+                        "Count on me. We're in this together.",
+                        "Understood. Let's keep our heads clear.",
+                        "Right behind you. Let's handle this.",
+                    },
+                    ["TL"] = {
+                        "Narinig kita. Sabay natin 'yang haharapin.",
+                        "Naintindihan ko. Nandito lang ako kasama mo.",
+                        "Nakuha ko ang sabi mo. Tapusin na natin.",
+                        "Kasama mo ako. Ikaw ang manguna.",
+                        "Narinig ko. Kahit ano'ng dumating, lalabanan natin.",
+                        "Kopya. Dito lang ako sa tabi mo.",
+                        "Malinaw kong narinig. Kilos na tayo.",
+                        "Maaasahan mo ako. Magkasama tayo rito.",
+                        "Naiintindihan ko. Panatilihing malinaw ang isip natin.",
+                        "Nasa likod mo lang ako. Asikasuhin natin 'to.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.drink",
   "id": "rejected",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
-    "responseTemplateID": "semantic.task.drink.rejected",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'm not thirsty right now.",
-          "TL": "Hindi ako nauuhaw ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I don't need to drink at the moment.",
-          "TL": "Di ko kailangang uminom sa sandaling ito."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I'm fully hydrated. Saving the water.",
-          "TL": "Busog pa ako sa tubig. Itatabi ang inumin."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Can't drink right now. Too dangerous to pause.",
-          "TL": "Di pwedeng uminom ngayon. Masyadong mapanganib huminto."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Refusing to drink that water. It looks tainted.",
-          "TL": "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "I have plenty of fluids. Don't need to drink.",
-          "TL": "Marami pa akong tubig sa katawan. Di kailangang uminom."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "No need for a drink yet.",
-          "TL": "Wala pang pangangailangan sa inumin."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I'll save our clean water for later.",
-          "TL": "Itatabi ko ang malinis na tubig mamaya."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Drink order rejected. Not parched.",
-          "TL": "Tinatanggihan ang pag-inom. Di ako uhaw."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Can't drink that right now.",
-          "TL": "Di ko maiinom 'yan ngayon."
+          "EN": [
+            "I'm not thirsty right now.",
+            "I don't need to drink at the moment.",
+            "I'm fully hydrated. Saving the water.",
+            "Can't drink right now. Too dangerous to pause.",
+            "Refusing to drink that water. It looks tainted.",
+            "I have plenty of fluids. Don't need to drink.",
+            "No need for a drink yet.",
+            "I'll save our clean water for later.",
+            "Drink order rejected. Not parched.",
+            "Can't drink that right now."
+          ],
+          "TL": [
+            "Hindi ako nauuhaw ngayon.",
+            "Di ko kailangang uminom sa sandaling ito.",
+            "Busog pa ako sa tubig. Itatabi ang inumin.",
+            "Di pwedeng uminom ngayon. Masyadong mapanganib huminto.",
+            "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado.",
+            "Marami pa akong tubig sa katawan. Di kailangang uminom.",
+            "Wala pang pangangailangan sa inumin.",
+            "Itatabi ko ang malinis na tubig mamaya.",
+            "Tinatanggihan ang pag-inom. Di ako uhaw.",
+            "Di ko maiinom 'yan ngayon."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.drink",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

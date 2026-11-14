@@ -1,9 +1,13 @@
 {
-  "id": "label",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.identity.real",
+  "id": "label",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.identity.real.label",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.identity.real.label",
@@ -12,14 +16,17 @@
           "TL": "Sabihin ang tunay mong pangalan"
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "Say your real name",
-    "TL": "Sabihin ang tunay mong pangalan"
-  },
-  "namespace": "ui.suggestion.identity.real",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Say your real name",
+          "TL": "Sabihin ang tunay mong pangalan"
+        }
+      }
+    ]
+  }
 }

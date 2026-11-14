@@ -2,16 +2,246 @@
 return {
     {
         ["domain"] = "combat_kill_killer_supportive",
-        ["id"] = "semantic.combat.reaction.kill_killer_supportive_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.reaction.kill_killer_supportive",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Got it. Stay close.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Got it. Stay close.",
+                                        "Threat down. Stay right by me.",
+                                        "I took care of it. Keep tight.",
+                                        "Got that one. Don't drift away.",
+                                        "It's dead. I've got this side covered.",
+                                        "Downed it. Stick with me.",
+                                        "That one's finished. Keep close to my shoulder.",
+                                        "Handled. Watch the rear while I lead.",
+                                        "Target down. Stay near.",
+                                        "Took it out. We're safe on this side.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na. Dito ka lang.",
+                                        "Bagsak ang banta. Dito ka lang sa tabi ko.",
+                                        "Inasikaso ko na. Dumikit ka lang.",
+                                        "Nakuha ko na 'yon. Huwag kang lumayo.",
+                                        "Patay na. Hawak ko ang parteng 'to.",
+                                        "Ibinagsak ko na. Sumama ka sa akin.",
+                                        "Tapos na ang isang 'yon. Dumikit sa balikat ko.",
+                                        "Naasikaso na. Bantayan ang likod habang nangunguna ako.",
+                                        "Bagsak ang target. Diyan ka lang sa malapit.",
+                                        "Tinapos ko na. Ligtas tayo sa parteng 'to.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "It's down. You alright?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "It's down. You alright?",
+                                        "Got it off us. Are you hurt?",
+                                        "Threat eliminated. You doing okay?",
+                                        "It's dead. Check yourself over.",
+                                        "Downed that one. Everything alright with you?",
+                                        "Took it down. You safe there?",
+                                        "That one's done for. Are you okay?",
+                                        "Dropped it before it reached you. You good?",
+                                        "Handled that threat. How are you holding up?",
+                                        "It won't touch you now. You alright?",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos na. Okay ka lang?",
+                                        "Nailayo ko sa atin. Nasaktan ka ba?",
+                                        "Naalis ang banta. Ayos ka lang ba?",
+                                        "Patay na. Tignan mo sarili mo.",
+                                        "Ibinagsak ko 'yon. Ayos lang ang lahat sa'yo?",
+                                        "Ibinagsak ko na. Ligtas ka riyan?",
+                                        "Tapos na 'yon. Ayos ka lang?",
+                                        "Ibinagsak bago pa makalapit sa'yo. Ayos ka?",
+                                        "Naasikaso ang banta. Kamusta ka riyan?",
+                                        "Hindi ka na mahahawakan no'n. Okay ka lang?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "One less. I've got you.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "One less. I've got you.",
+                                        "Threat's gone. I'm right here.",
+                                        "Downed it. You're protected.",
+                                        "One less to worry about. I'm with you.",
+                                        "Handled. I won't let them touch you.",
+                                        "It's dead. I've got your back.",
+                                        "One less in our way. Lean on me if you need to.",
+                                        "Took care of that one. We'll get through this.",
+                                        "Threat down. You're safe with me.",
+                                        "That one's gone. I've got you covered.",
+                                    },
+                                    ["TL"] = {
+                                        "Isa na lang ang nabawas. Kasama mo ako.",
+                                        "Wala na ang banta. Nandito lang ako.",
+                                        "Ibinagsak ko na. Protektado ka.",
+                                        "Bawas ang aalahanin. Kasama mo ako.",
+                                        "Naasikaso na. Hindi ko hahayaang mahawakan ka nila.",
+                                        "Patay na. Hawak ko ang likod mo.",
+                                        "Bawas sa dinaraanan. Sumandal ka sa akin kung kailangan.",
+                                        "Inasikaso ko ang isang 'yon. Malalampasan natin 'to.",
+                                        "Banta bagsak na. Ligtas ka kasama ko.",
+                                        "Wala na ang isang 'yon. Nakabantay ako sa'yo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.reaction",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Got it. Stay close.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Got it. Stay close.",
+                            "Threat down. Stay right by me.",
+                            "I took care of it. Keep tight.",
+                            "Got that one. Don't drift away.",
+                            "It's dead. I've got this side covered.",
+                            "Downed it. Stick with me.",
+                            "That one's finished. Keep close to my shoulder.",
+                            "Handled. Watch the rear while I lead.",
+                            "Target down. Stay near.",
+                            "Took it out. We're safe on this side.",
+                        },
+                        ["TL"] = {
+                            "Patay na. Dito ka lang.",
+                            "Bagsak ang banta. Dito ka lang sa tabi ko.",
+                            "Inasikaso ko na. Dumikit ka lang.",
+                            "Nakuha ko na 'yon. Huwag kang lumayo.",
+                            "Patay na. Hawak ko ang parteng 'to.",
+                            "Ibinagsak ko na. Sumama ka sa akin.",
+                            "Tapos na ang isang 'yon. Dumikit sa balikat ko.",
+                            "Naasikaso na. Bantayan ang likod habang nangunguna ako.",
+                            "Bagsak ang target. Diyan ka lang sa malapit.",
+                            "Tinapos ko na. Ligtas tayo sa parteng 'to.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "It's down. You alright?",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "It's down. You alright?",
+                            "Got it off us. Are you hurt?",
+                            "Threat eliminated. You doing okay?",
+                            "It's dead. Check yourself over.",
+                            "Downed that one. Everything alright with you?",
+                            "Took it down. You safe there?",
+                            "That one's done for. Are you okay?",
+                            "Dropped it before it reached you. You good?",
+                            "Handled that threat. How are you holding up?",
+                            "It won't touch you now. You alright?",
+                        },
+                        ["TL"] = {
+                            "Tapos na. Okay ka lang?",
+                            "Nailayo ko sa atin. Nasaktan ka ba?",
+                            "Naalis ang banta. Ayos ka lang ba?",
+                            "Patay na. Tignan mo sarili mo.",
+                            "Ibinagsak ko 'yon. Ayos lang ang lahat sa'yo?",
+                            "Ibinagsak ko na. Ligtas ka riyan?",
+                            "Tapos na 'yon. Ayos ka lang?",
+                            "Ibinagsak bago pa makalapit sa'yo. Ayos ka?",
+                            "Naasikaso ang banta. Kamusta ka riyan?",
+                            "Hindi ka na mahahawakan no'n. Okay ka lang?",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "One less. I've got you.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "One less. I've got you.",
+                            "Threat's gone. I'm right here.",
+                            "Downed it. You're protected.",
+                            "One less to worry about. I'm with you.",
+                            "Handled. I won't let them touch you.",
+                            "It's dead. I've got your back.",
+                            "One less in our way. Lean on me if you need to.",
+                            "Took care of that one. We'll get through this.",
+                            "Threat down. You're safe with me.",
+                            "That one's gone. I've got you covered.",
+                        },
+                        ["TL"] = {
+                            "Isa na lang ang nabawas. Kasama mo ako.",
+                            "Wala na ang banta. Nandito lang ako.",
+                            "Ibinagsak ko na. Protektado ka.",
+                            "Bawas ang aalahanin. Kasama mo ako.",
+                            "Naasikaso na. Hindi ko hahayaang mahawakan ka nila.",
+                            "Patay na. Hawak ko ang likod mo.",
+                            "Bawas sa dinaraanan. Sumandal ka sa akin kung kailangan.",
+                            "Inasikaso ko ang isang 'yon. Malalampasan natin 'to.",
+                            "Banta bagsak na. Ligtas ka kasama ko.",
+                            "Wala na ang isang 'yon. Nakabantay ako sa'yo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.reaction.kill_killer_supportive",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "kill_killer_supportive_01",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_supportive_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_01.json",
+            ["localId"] = "kill_killer_supportive",
+            ["sourceId"] = "combat.reaction.kill_killer_supportive",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerSupportive",
-        ["namespace"] = "semantic.combat.reaction",
+        ["namespace"] = "combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,449 +255,259 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_supportive_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/supportive.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it. Stay close.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Dito ka lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat down. Stay right by me.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang banta. Dito ka lang sa tabi ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I took care of it. Keep tight.",
-                            },
-                            ["TL"] = {
-                                "Inasikaso ko na. Dumikit ka lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got that one. Don't drift away.",
-                            },
-                            ["TL"] = {
-                                "Nakuha ko na 'yon. Huwag kang lumayo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Got it. Stay close.",
+                                        "Threat down. Stay right by me.",
+                                        "I took care of it. Keep tight.",
+                                        "Got that one. Don't drift away.",
+                                        "It's dead. I've got this side covered.",
+                                        "Downed it. Stick with me.",
+                                        "That one's finished. Keep close to my shoulder.",
+                                        "Handled. Watch the rear while I lead.",
+                                        "Target down. Stay near.",
+                                        "Took it out. We're safe on this side.",
+                                    },
+                                    ["TL"] = {
+                                        "Patay na. Dito ka lang.",
+                                        "Bagsak ang banta. Dito ka lang sa tabi ko.",
+                                        "Inasikaso ko na. Dumikit ka lang.",
+                                        "Nakuha ko na 'yon. Huwag kang lumayo.",
+                                        "Patay na. Hawak ko ang parteng 'to.",
+                                        "Ibinagsak ko na. Sumama ka sa akin.",
+                                        "Tapos na ang isang 'yon. Dumikit sa balikat ko.",
+                                        "Naasikaso na. Bantayan ang likod habang nangunguna ako.",
+                                        "Bagsak ang target. Diyan ka lang sa malapit.",
+                                        "Tinapos ko na. Ligtas tayo sa parteng 'to.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead. I've got this side covered.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Hawak ko ang parteng 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Downed it. Stick with me.",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak ko na. Sumama ka sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That one's finished. Keep close to my shoulder.",
-                            },
-                            ["TL"] = {
-                                "Tapos na ang isang 'yon. Dumikit sa balikat ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled. Watch the rear while I lead.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso na. Bantayan ang likod habang nangunguna ako.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "It's down. You alright?",
+                                        "Got it off us. Are you hurt?",
+                                        "Threat eliminated. You doing okay?",
+                                        "It's dead. Check yourself over.",
+                                        "Downed that one. Everything alright with you?",
+                                        "Took it down. You safe there?",
+                                        "That one's done for. Are you okay?",
+                                        "Dropped it before it reached you. You good?",
+                                        "Handled that threat. How are you holding up?",
+                                        "It won't touch you now. You alright?",
+                                    },
+                                    ["TL"] = {
+                                        "Tapos na. Okay ka lang?",
+                                        "Nailayo ko sa atin. Nasaktan ka ba?",
+                                        "Naalis ang banta. Ayos ka lang ba?",
+                                        "Patay na. Tignan mo sarili mo.",
+                                        "Ibinagsak ko 'yon. Ayos lang ang lahat sa'yo?",
+                                        "Ibinagsak ko na. Ligtas ka riyan?",
+                                        "Tapos na 'yon. Ayos ka lang?",
+                                        "Ibinagsak bago pa makalapit sa'yo. Ayos ka?",
+                                        "Naasikaso ang banta. Kamusta ka riyan?",
+                                        "Hindi ka na mahahawakan no'n. Okay ka lang?",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down. Stay near.",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang target. Diyan ka lang sa malapit.",
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "One less. I've got you.",
+                                        "Threat's gone. I'm right here.",
+                                        "Downed it. You're protected.",
+                                        "One less to worry about. I'm with you.",
+                                        "Handled. I won't let them touch you.",
+                                        "It's dead. I've got your back.",
+                                        "One less in our way. Lean on me if you need to.",
+                                        "Took care of that one. We'll get through this.",
+                                        "Threat down. You're safe with me.",
+                                        "That one's gone. I've got you covered.",
+                                    },
+                                    ["TL"] = {
+                                        "Isa na lang ang nabawas. Kasama mo ako.",
+                                        "Wala na ang banta. Nandito lang ako.",
+                                        "Ibinagsak ko na. Protektado ka.",
+                                        "Bawas ang aalahanin. Kasama mo ako.",
+                                        "Naasikaso na. Hindi ko hahayaang mahawakan ka nila.",
+                                        "Patay na. Hawak ko ang likod mo.",
+                                        "Bawas sa dinaraanan. Sumandal ka sa akin kung kailangan.",
+                                        "Inasikaso ko ang isang 'yon. Malalampasan natin 'to.",
+                                        "Banta bagsak na. Ligtas ka kasama ko.",
+                                        "Wala na ang isang 'yon. Nakabantay ako sa'yo.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Took it out. We're safe on this side.",
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.reaction.kill_killer_supportive",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Tinapos ko na. Ligtas tayo sa parteng 'to.",
-                            },
+                            ["fallback"] = "Got it. Stay close.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.reaction.kill_killer_supportive.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_killer_supportive",
-        ["id"] = "semantic.combat.reaction.kill_killer_supportive_02",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_killer_supportive_02",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_supportive_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_02.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerSupportive",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_supportive_02",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/supportive.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's down. You alright?",
-                            },
-                            ["TL"] = {
-                                "Tapos na. Okay ka lang?",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Got it. Stay close.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Got it. Stay close.",
+                        "Threat down. Stay right by me.",
+                        "I took care of it. Keep tight.",
+                        "Got that one. Don't drift away.",
+                        "It's dead. I've got this side covered.",
+                        "Downed it. Stick with me.",
+                        "That one's finished. Keep close to my shoulder.",
+                        "Handled. Watch the rear while I lead.",
+                        "Target down. Stay near.",
+                        "Took it out. We're safe on this side.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it off us. Are you hurt?",
-                            },
-                            ["TL"] = {
-                                "Nailayo ko sa atin. Nasaktan ka ba?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat eliminated. You doing okay?",
-                            },
-                            ["TL"] = {
-                                "Naalis ang banta. Ayos ka lang ba?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead. Check yourself over.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Tignan mo sarili mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Downed that one. Everything alright with you?",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak ko 'yon. Ayos lang ang lahat sa'yo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Took it down. You safe there?",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak ko na. Ligtas ka riyan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That one's done for. Are you okay?",
-                            },
-                            ["TL"] = {
-                                "Tapos na 'yon. Ayos ka lang?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped it before it reached you. You good?",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak bago pa makalapit sa'yo. Ayos ka?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled that threat. How are you holding up?",
-                            },
-                            ["TL"] = {
-                                "Naasikaso ang banta. Kamusta ka riyan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It won't touch you now. You alright?",
-                            },
-                            ["TL"] = {
-                                "Hindi ka na mahahawakan no'n. Okay ka lang?",
-                            },
-                        },
+                    ["TL"] = {
+                        "Patay na. Dito ka lang.",
+                        "Bagsak ang banta. Dito ka lang sa tabi ko.",
+                        "Inasikaso ko na. Dumikit ka lang.",
+                        "Nakuha ko na 'yon. Huwag kang lumayo.",
+                        "Patay na. Hawak ko ang parteng 'to.",
+                        "Ibinagsak ko na. Sumama ka sa akin.",
+                        "Tapos na ang isang 'yon. Dumikit sa balikat ko.",
+                        "Naasikaso na. Bantayan ang likod habang nangunguna ako.",
+                        "Bagsak ang target. Diyan ka lang sa malapit.",
+                        "Tinapos ko na. Ligtas tayo sa parteng 'to.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_02.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_kill_killer_supportive",
-        ["id"] = "semantic.combat.reaction.kill_killer_supportive_03",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "kill_killer_supportive_03",
-            ["sourceId"] = "semantic.combat.reaction.kill_killer_supportive_03",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_03.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerSupportive",
-        ["namespace"] = "semantic.combat.reaction",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_supportive_03",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/supportive.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less. I've got you.",
-                            },
-                            ["TL"] = {
-                                "Isa na lang ang nabawas. Kasama mo ako.",
-                            },
-                        },
+            {
+                ["fallback"] = "It's down. You alright?",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "It's down. You alright?",
+                        "Got it off us. Are you hurt?",
+                        "Threat eliminated. You doing okay?",
+                        "It's dead. Check yourself over.",
+                        "Downed that one. Everything alright with you?",
+                        "Took it down. You safe there?",
+                        "That one's done for. Are you okay?",
+                        "Dropped it before it reached you. You good?",
+                        "Handled that threat. How are you holding up?",
+                        "It won't touch you now. You alright?",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat's gone. I'm right here.",
-                            },
-                            ["TL"] = {
-                                "Wala na ang banta. Nandito lang ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Downed it. You're protected.",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak ko na. Protektado ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less to worry about. I'm with you.",
-                            },
-                            ["TL"] = {
-                                "Bawas ang aalahanin. Kasama mo ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Handled. I won't let them touch you.",
-                            },
-                            ["TL"] = {
-                                "Naasikaso na. Hindi ko hahayaang mahawakan ka nila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "It's dead. I've got your back.",
-                            },
-                            ["TL"] = {
-                                "Patay na. Hawak ko ang likod mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One less in our way. Lean on me if you need to.",
-                            },
-                            ["TL"] = {
-                                "Bawas sa dinaraanan. Sumandal ka sa akin kung kailangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Took care of that one. We'll get through this.",
-                            },
-                            ["TL"] = {
-                                "Inasikaso ko ang isang 'yon. Malalampasan natin 'to.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Threat down. You're safe with me.",
-                            },
-                            ["TL"] = {
-                                "Banta bagsak na. Ligtas ka kasama ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That one's gone. I've got you covered.",
-                            },
-                            ["TL"] = {
-                                "Wala na ang isang 'yon. Nakabantay ako sa'yo.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Tapos na. Okay ka lang?",
+                        "Nailayo ko sa atin. Nasaktan ka ba?",
+                        "Naalis ang banta. Ayos ka lang ba?",
+                        "Patay na. Tignan mo sarili mo.",
+                        "Ibinagsak ko 'yon. Ayos lang ang lahat sa'yo?",
+                        "Ibinagsak ko na. Ligtas ka riyan?",
+                        "Tapos na 'yon. Ayos ka lang?",
+                        "Ibinagsak bago pa makalapit sa'yo. Ayos ka?",
+                        "Naasikaso ang banta. Kamusta ka riyan?",
+                        "Hindi ka na mahahawakan no'n. Okay ka lang?",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_03.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "One less. I've got you.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "One less. I've got you.",
+                        "Threat's gone. I'm right here.",
+                        "Downed it. You're protected.",
+                        "One less to worry about. I'm with you.",
+                        "Handled. I won't let them touch you.",
+                        "It's dead. I've got your back.",
+                        "One less in our way. Lean on me if you need to.",
+                        "Took care of that one. We'll get through this.",
+                        "Threat down. You're safe with me.",
+                        "That one's gone. I've got you covered.",
+                    },
+                    ["TL"] = {
+                        "Isa na lang ang nabawas. Kasama mo ako.",
+                        "Wala na ang banta. Nandito lang ako.",
+                        "Ibinagsak ko na. Protektado ka.",
+                        "Bawas ang aalahanin. Kasama mo ako.",
+                        "Naasikaso na. Hindi ko hahayaang mahawakan ka nila.",
+                        "Patay na. Hawak ko ang likod mo.",
+                        "Bawas sa dinaraanan. Sumandal ka sa akin kung kailangan.",
+                        "Inasikaso ko ang isang 'yon. Malalampasan natin 'to.",
+                        "Banta bagsak na. Ligtas ka kasama ko.",
+                        "Wala na ang isang 'yon. Nakabantay ako sa'yo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

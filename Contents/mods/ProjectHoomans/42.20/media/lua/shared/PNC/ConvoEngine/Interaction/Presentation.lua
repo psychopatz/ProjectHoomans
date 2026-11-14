@@ -64,6 +64,24 @@ local function initialFallback(templateID)
     local family, phrases = ConversationRegistry.FamilyFor(
         templateID, "neutral"
     )
+    if type(family) ~= "table" or type(phrases) ~= "table" then
+        local ConvoPlanFamily = PNC.ConvoEngine and PNC.ConvoEngine.ConvoPlanFamily or nil
+        if type(ConvoPlanFamily) ~= "table" then
+            local ok, loaded = pcall(
+                require,
+                "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
+            )
+            if ok and type(loaded) == "table" then ConvoPlanFamily = loaded end
+        end
+        if type(ConvoPlanFamily) == "table"
+            and type(ConvoPlanFamily.install) == "function"
+        then
+            ConvoPlanFamily.install(templateID)
+            family, phrases = ConversationRegistry.FamilyFor(
+                templateID, "neutral"
+            )
+        end
+    end
     if type(family) ~= "table"
         or type(phrases) ~= "table"
         or type(phrases[1]) ~= "table"

@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.necroa.mask_warning",
+  "id": "family",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.necroa.mask_warning.family",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Put your mask on, family. I am not losing you to the air.",
-          "TL": "Put your mask on, family. I am not losing you to the air."
+          "EN": [
+            "Put your mask on, family. I am not losing you to the air."
+          ],
+          "TL": [
+            "Put your mask on, family. I am not losing you to the air."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.necroa.mask_warning.family",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

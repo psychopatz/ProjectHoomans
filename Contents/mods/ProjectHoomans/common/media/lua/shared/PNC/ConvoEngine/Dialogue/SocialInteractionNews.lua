@@ -2,16 +2,297 @@
 return {
     {
         ["domain"] = "social_interaction_news",
-        ["id"] = "semantic.interaction.news.acknowledge.guarded",
+        ["exchangeFamily"] = {
+            ["familyID"] = "interaction.news.acknowledge",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That's good to know.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.interaction.news.acknowledge.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That's good to know.",
+                                        "Appreciate the update.",
+                                        "I'll keep that intelligence in mind.",
+                                        "Good to have fresh news from the area.",
+                                        "Thanks for passing that along.",
+                                        "Understood. That changes how we look at the sector.",
+                                        "Good information. We'll plan around it.",
+                                        "Noted. Reliable news is hard to come by.",
+                                        "Thanks for keeping me informed.",
+                                        "That helps clear up a few rumors. Thanks.",
+                                    },
+                                    ["TL"] = {
+                                        "Mabuting malaman iyan.",
+                                        "Salamat sa balita.",
+                                        "Isasaisip ko ang impormasyong iyan.",
+                                        "Mabuting makatanggap ng bagong balita mula sa lugar.",
+                                        "Salamat sa pagpasa niyan.",
+                                        "Naintindihan. Binabago niyan ang pananaw natin sa lugar.",
+                                        "Magandang impormasyon. Magpaplano tayo batay diyan.",
+                                        "Tala ko na. Mahirap makahanap ng maaasahang balita.",
+                                        "Salamat sa pagpapanatili sa aking may alam.",
+                                        "Nakatulong 'yan para maalis ang ilang sabi-sabi. Salamat.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "I'll keep it in mind.",
+                                ["id"] = "guarded",
+                                ["templateID"] = "convo.interaction.news.acknowledge.say.1.guarded",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'll keep it in mind.",
+                                        "Where did you hear that from?",
+                                        "I'll believe it when I see it with my own eyes.",
+                                        "Rumors can get people killed out here. Be sure of your facts.",
+                                        "Noted, but I'll verify that myself.",
+                                        "Could be a setup. Don't act on rumors too quickly.",
+                                        "Who gave you that information?",
+                                        "I'll take it under advisement, but keep my distance.",
+                                        "Don't spread that around until we know it's solid.",
+                                        "Heard. I'll watch for confirming signs.",
+                                    },
+                                    ["TL"] = {
+                                        "Tatandaan ko iyan.",
+                                        "Saan mo narinig ang balitang 'yan?",
+                                        "Maniwala lang ako kapag nakita ko na ng sarili kong mata.",
+                                        "Ang tsismis ay nakamamatay dito. Tiyakin mo ang katotohanan.",
+                                        "Tala ko na, pero kumpirmahin ko muna sa sarili ko.",
+                                        "Baka bitag 'yan. Huwag kumilos sa sabi-sabi nang padalos-dalos.",
+                                        "Sinong nagbigay sa 'yo ng impormasyong 'yan?",
+                                        "Isasaalang-alang ko, pero magmamasid pa rin ako mula sa malayo.",
+                                        "Huwag mong ikalat 'yan hangga't di tiyak na totoo.",
+                                        "Narinig ko. Magmamasid ako ng mga patunay.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Got it.",
+                                ["id"] = "terse",
+                                ["templateID"] = "convo.interaction.news.acknowledge.say.1.terse",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Got it.",
+                                        "Noted.",
+                                        "Heard.",
+                                        "Good info.",
+                                        "Understood.",
+                                        "Clear.",
+                                        "Thanks.",
+                                        "Right.",
+                                        "Acknowledged.",
+                                        "Useful.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige.",
+                                        "Tala ko na.",
+                                        "Narinig ko.",
+                                        "Magandang balita.",
+                                        "Naintindihan.",
+                                        "Malinaw.",
+                                        "Salamat.",
+                                        "Tama.",
+                                        "Kinikilala ko.",
+                                        "May silbi.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Thanks for telling me. I'll keep that in mind.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.interaction.news.acknowledge.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Thanks for telling me. I'll keep that in mind.",
+                                        "That's huge news, friend! Thank you for sharing.",
+                                        "Always glad to know you're looking out for me with news like this.",
+                                        "You have great sources! Thanks a ton.",
+                                        "I really appreciate you giving me the heads up first.",
+                                        "Good news is worth its weight in gold out here. Thanks!",
+                                        "Thanks for sharing that with me. It gives me hope.",
+                                        "I'm relieved to hear that. Thank you so much, partner.",
+                                        "That's fantastic information. Appreciate you keeping us safe.",
+                                        "Thanks! Let's make sure the others hear this too.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat sa pagsabi. Tatandaan ko iyan.",
+                                        "Napakalaking balita niyan, kaibigan! Salamat sa pagbabahagi.",
+                                        "Lagi akong masaya na binabantayan mo ako sa mga ganitong balita.",
+                                        "Napakagaling ng mga pinagkukunan mo! Maraming salamat.",
+                                        "Talagang pinahahalagahan ko na ako ang unang pinaalalahanan mo.",
+                                        "Ang magandang balita ay ginto ang halaga rito. Salamat!",
+                                        "Salamat sa pagbabahagi niyan sa akin. Nagbibigay ito ng pag-asa.",
+                                        "Nakahinga ako nang maluwag nang marinig 'yan. Salamat nang marami, kasama.",
+                                        "Napakagandang impormasyon. Salamat sa pag-iingat sa atin.",
+                                        "Salamat! Tiyakin nating marinig din ito ng iba.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "interaction.news",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That's good to know.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.news.acknowledge.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That's good to know.",
+                            "Appreciate the update.",
+                            "I'll keep that intelligence in mind.",
+                            "Good to have fresh news from the area.",
+                            "Thanks for passing that along.",
+                            "Understood. That changes how we look at the sector.",
+                            "Good information. We'll plan around it.",
+                            "Noted. Reliable news is hard to come by.",
+                            "Thanks for keeping me informed.",
+                            "That helps clear up a few rumors. Thanks.",
+                        },
+                        ["TL"] = {
+                            "Mabuting malaman iyan.",
+                            "Salamat sa balita.",
+                            "Isasaisip ko ang impormasyong iyan.",
+                            "Mabuting makatanggap ng bagong balita mula sa lugar.",
+                            "Salamat sa pagpasa niyan.",
+                            "Naintindihan. Binabago niyan ang pananaw natin sa lugar.",
+                            "Magandang impormasyon. Magpaplano tayo batay diyan.",
+                            "Tala ko na. Mahirap makahanap ng maaasahang balita.",
+                            "Salamat sa pagpapanatili sa aking may alam.",
+                            "Nakatulong 'yan para maalis ang ilang sabi-sabi. Salamat.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "I'll keep it in mind.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.news.acknowledge.say.1.guarded",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll keep it in mind.",
+                            "Where did you hear that from?",
+                            "I'll believe it when I see it with my own eyes.",
+                            "Rumors can get people killed out here. Be sure of your facts.",
+                            "Noted, but I'll verify that myself.",
+                            "Could be a setup. Don't act on rumors too quickly.",
+                            "Who gave you that information?",
+                            "I'll take it under advisement, but keep my distance.",
+                            "Don't spread that around until we know it's solid.",
+                            "Heard. I'll watch for confirming signs.",
+                        },
+                        ["TL"] = {
+                            "Tatandaan ko iyan.",
+                            "Saan mo narinig ang balitang 'yan?",
+                            "Maniwala lang ako kapag nakita ko na ng sarili kong mata.",
+                            "Ang tsismis ay nakamamatay dito. Tiyakin mo ang katotohanan.",
+                            "Tala ko na, pero kumpirmahin ko muna sa sarili ko.",
+                            "Baka bitag 'yan. Huwag kumilos sa sabi-sabi nang padalos-dalos.",
+                            "Sinong nagbigay sa 'yo ng impormasyong 'yan?",
+                            "Isasaalang-alang ko, pero magmamasid pa rin ako mula sa malayo.",
+                            "Huwag mong ikalat 'yan hangga't di tiyak na totoo.",
+                            "Narinig ko. Magmamasid ako ng mga patunay.",
+                        },
+                    },
+                    ["variantID"] = "guarded",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.news.acknowledge.say.1.terse",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Got it.",
+                            "Noted.",
+                            "Heard.",
+                            "Good info.",
+                            "Understood.",
+                            "Clear.",
+                            "Thanks.",
+                            "Right.",
+                            "Acknowledged.",
+                            "Useful.",
+                        },
+                        ["TL"] = {
+                            "Sige.",
+                            "Tala ko na.",
+                            "Narinig ko.",
+                            "Magandang balita.",
+                            "Naintindihan.",
+                            "Malinaw.",
+                            "Salamat.",
+                            "Tama.",
+                            "Kinikilala ko.",
+                            "May silbi.",
+                        },
+                    },
+                    ["variantID"] = "terse",
+                },
+                {
+                    ["fallback"] = "Thanks for telling me. I'll keep that in mind.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.interaction.news.acknowledge.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thanks for telling me. I'll keep that in mind.",
+                            "That's huge news, friend! Thank you for sharing.",
+                            "Always glad to know you're looking out for me with news like this.",
+                            "You have great sources! Thanks a ton.",
+                            "I really appreciate you giving me the heads up first.",
+                            "Good news is worth its weight in gold out here. Thanks!",
+                            "Thanks for sharing that with me. It gives me hope.",
+                            "I'm relieved to hear that. Thank you so much, partner.",
+                            "That's fantastic information. Appreciate you keeping us safe.",
+                            "Thanks! Let's make sure the others hear this too.",
+                        },
+                        ["TL"] = {
+                            "Salamat sa pagsabi. Tatandaan ko iyan.",
+                            "Napakalaking balita niyan, kaibigan! Salamat sa pagbabahagi.",
+                            "Lagi akong masaya na binabantayan mo ako sa mga ganitong balita.",
+                            "Napakagaling ng mga pinagkukunan mo! Maraming salamat.",
+                            "Talagang pinahahalagahan ko na ako ang unang pinaalalahanan mo.",
+                            "Ang magandang balita ay ginto ang halaga rito. Salamat!",
+                            "Salamat sa pagbabahagi niyan sa akin. Nagbibigay ito ng pag-asa.",
+                            "Nakahinga ako nang maluwag nang marinig 'yan. Salamat nang marami, kasama.",
+                            "Napakagandang impormasyon. Salamat sa pag-iingat sa atin.",
+                            "Salamat! Tiyakin nating marinig din ito ng iba.",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "interaction.news.acknowledge",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "guarded",
-            ["sourceId"] = "semantic.interaction.news.acknowledge.guarded",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json#records[3]",
+            ["localId"] = "acknowledge",
+            ["sourceId"] = "interaction.news.acknowledge",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
-        ["namespace"] = "semantic.interaction.news.acknowledge",
+        ["namespace"] = "interaction.news",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +306,165 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.news.acknowledge",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/news/acknowledge.json",
-                ["style"] = "guarded",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "guarded.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll keep it in mind.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That's good to know.",
+                                        "Appreciate the update.",
+                                        "I'll keep that intelligence in mind.",
+                                        "Good to have fresh news from the area.",
+                                        "Thanks for passing that along.",
+                                        "Understood. That changes how we look at the sector.",
+                                        "Good information. We'll plan around it.",
+                                        "Noted. Reliable news is hard to come by.",
+                                        "Thanks for keeping me informed.",
+                                        "That helps clear up a few rumors. Thanks.",
+                                    },
+                                    ["TL"] = {
+                                        "Mabuting malaman iyan.",
+                                        "Salamat sa balita.",
+                                        "Isasaisip ko ang impormasyong iyan.",
+                                        "Mabuting makatanggap ng bagong balita mula sa lugar.",
+                                        "Salamat sa pagpasa niyan.",
+                                        "Naintindihan. Binabago niyan ang pananaw natin sa lugar.",
+                                        "Magandang impormasyon. Magpaplano tayo batay diyan.",
+                                        "Tala ko na. Mahirap makahanap ng maaasahang balita.",
+                                        "Salamat sa pagpapanatili sa aking may alam.",
+                                        "Nakatulong 'yan para maalis ang ilang sabi-sabi. Salamat.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Tatandaan ko iyan.",
+                            {
+                                ["id"] = "guarded",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'll keep it in mind.",
+                                        "Where did you hear that from?",
+                                        "I'll believe it when I see it with my own eyes.",
+                                        "Rumors can get people killed out here. Be sure of your facts.",
+                                        "Noted, but I'll verify that myself.",
+                                        "Could be a setup. Don't act on rumors too quickly.",
+                                        "Who gave you that information?",
+                                        "I'll take it under advisement, but keep my distance.",
+                                        "Don't spread that around until we know it's solid.",
+                                        "Heard. I'll watch for confirming signs.",
+                                    },
+                                    ["TL"] = {
+                                        "Tatandaan ko iyan.",
+                                        "Saan mo narinig ang balitang 'yan?",
+                                        "Maniwala lang ako kapag nakita ko na ng sarili kong mata.",
+                                        "Ang tsismis ay nakamamatay dito. Tiyakin mo ang katotohanan.",
+                                        "Tala ko na, pero kumpirmahin ko muna sa sarili ko.",
+                                        "Baka bitag 'yan. Huwag kumilos sa sabi-sabi nang padalos-dalos.",
+                                        "Sinong nagbigay sa 'yo ng impormasyong 'yan?",
+                                        "Isasaalang-alang ko, pero magmamasid pa rin ako mula sa malayo.",
+                                        "Huwag mong ikalat 'yan hangga't di tiyak na totoo.",
+                                        "Narinig ko. Magmamasid ako ng mga patunay.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Where did you hear that from?",
+                            {
+                                ["id"] = "terse",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Got it.",
+                                        "Noted.",
+                                        "Heard.",
+                                        "Good info.",
+                                        "Understood.",
+                                        "Clear.",
+                                        "Thanks.",
+                                        "Right.",
+                                        "Acknowledged.",
+                                        "Useful.",
+                                    },
+                                    ["TL"] = {
+                                        "Sige.",
+                                        "Tala ko na.",
+                                        "Narinig ko.",
+                                        "Magandang balita.",
+                                        "Naintindihan.",
+                                        "Malinaw.",
+                                        "Salamat.",
+                                        "Tama.",
+                                        "Kinikilala ko.",
+                                        "May silbi.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Saan mo narinig ang balitang 'yan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll believe it when I see it with my own eyes.",
-                            },
-                            ["TL"] = {
-                                "Maniwala lang ako kapag nakita ko na ng sarili kong mata.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Rumors can get people killed out here. Be sure of your facts.",
-                            },
-                            ["TL"] = {
-                                "Ang tsismis ay nakamamatay dito. Tiyakin mo ang katotohanan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted, but I'll verify that myself.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na, pero kumpirmahin ko muna sa sarili ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Could be a setup. Don't act on rumors too quickly.",
-                            },
-                            ["TL"] = {
-                                "Baka bitag 'yan. Huwag kumilos sa sabi-sabi nang padalos-dalos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Who gave you that information?",
-                            },
-                            ["TL"] = {
-                                "Sinong nagbigay sa 'yo ng impormasyong 'yan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll take it under advisement, but keep my distance.",
-                            },
-                            ["TL"] = {
-                                "Isasaalang-alang ko, pero magmamasid pa rin ako mula sa malayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't spread that around until we know it's solid.",
-                            },
-                            ["TL"] = {
-                                "Huwag mong ikalat 'yan hangga't di tiyak na totoo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heard. I'll watch for confirming signs.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko. Magmamasid ako ng mga patunay.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Thanks for telling me. I'll keep that in mind.",
+                                        "That's huge news, friend! Thank you for sharing.",
+                                        "Always glad to know you're looking out for me with news like this.",
+                                        "You have great sources! Thanks a ton.",
+                                        "I really appreciate you giving me the heads up first.",
+                                        "Good news is worth its weight in gold out here. Thanks!",
+                                        "Thanks for sharing that with me. It gives me hope.",
+                                        "I'm relieved to hear that. Thank you so much, partner.",
+                                        "That's fantastic information. Appreciate you keeping us safe.",
+                                        "Thanks! Let's make sure the others hear this too.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat sa pagsabi. Tatandaan ko iyan.",
+                                        "Napakalaking balita niyan, kaibigan! Salamat sa pagbabahagi.",
+                                        "Lagi akong masaya na binabantayan mo ako sa mga ganitong balita.",
+                                        "Napakagaling ng mga pinagkukunan mo! Maraming salamat.",
+                                        "Talagang pinahahalagahan ko na ako ang unang pinaalalahanan mo.",
+                                        "Ang magandang balita ay ginto ang halaga rito. Salamat!",
+                                        "Salamat sa pagbabahagi niyan sa akin. Nagbibigay ito ng pag-asa.",
+                                        "Nakahinga ako nang maluwag nang marinig 'yan. Salamat nang marami, kasama.",
+                                        "Napakagandang impormasyon. Salamat sa pag-iingat sa atin.",
+                                        "Salamat! Tiyakin nating marinig din ito ng iba.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "interaction.news.acknowledge",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That's good to know.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.interaction.news.acknowledge.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,476 +474,139 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_news",
-        ["id"] = "semantic.interaction.news.acknowledge.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.interaction.news.acknowledge.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
-        ["namespace"] = "semantic.interaction.news.acknowledge",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.news.acknowledge",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/news/acknowledge.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's good to know.",
-                            },
-                            ["TL"] = {
-                                "Mabuting malaman iyan.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That's good to know.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.news.acknowledge.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That's good to know.",
+                        "Appreciate the update.",
+                        "I'll keep that intelligence in mind.",
+                        "Good to have fresh news from the area.",
+                        "Thanks for passing that along.",
+                        "Understood. That changes how we look at the sector.",
+                        "Good information. We'll plan around it.",
+                        "Noted. Reliable news is hard to come by.",
+                        "Thanks for keeping me informed.",
+                        "That helps clear up a few rumors. Thanks.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Appreciate the update.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa balita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll keep that intelligence in mind.",
-                            },
-                            ["TL"] = {
-                                "Isasaisip ko ang impormasyong iyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good to have fresh news from the area.",
-                            },
-                            ["TL"] = {
-                                "Mabuting makatanggap ng bagong balita mula sa lugar.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for passing that along.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagpasa niyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood. That changes how we look at the sector.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan. Binabago niyan ang pananaw natin sa lugar.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good information. We'll plan around it.",
-                            },
-                            ["TL"] = {
-                                "Magandang impormasyon. Magpaplano tayo batay diyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted. Reliable news is hard to come by.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na. Mahirap makahanap ng maaasahang balita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for keeping me informed.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagpapanatili sa aking may alam.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That helps clear up a few rumors. Thanks.",
-                            },
-                            ["TL"] = {
-                                "Nakatulong 'yan para maalis ang ilang sabi-sabi. Salamat.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Mabuting malaman iyan.",
+                        "Salamat sa balita.",
+                        "Isasaisip ko ang impormasyong iyan.",
+                        "Mabuting makatanggap ng bagong balita mula sa lugar.",
+                        "Salamat sa pagpasa niyan.",
+                        "Naintindihan. Binabago niyan ang pananaw natin sa lugar.",
+                        "Magandang impormasyon. Magpaplano tayo batay diyan.",
+                        "Tala ko na. Mahirap makahanap ng maaasahang balita.",
+                        "Salamat sa pagpapanatili sa aking may alam.",
+                        "Nakatulong 'yan para maalis ang ilang sabi-sabi. Salamat.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_news",
-        ["id"] = "semantic.interaction.news.acknowledge.terse",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "terse",
-            ["sourceId"] = "semantic.interaction.news.acknowledge.terse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json#records[2]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
-        ["namespace"] = "semantic.interaction.news.acknowledge",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.news.acknowledge",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/news/acknowledge.json",
-                ["style"] = "terse",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "terse.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got it.",
-                            },
-                            ["TL"] = {
-                                "Sige.",
-                            },
-                        },
+            {
+                ["fallback"] = "I'll keep it in mind.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.news.acknowledge.say.1.guarded",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll keep it in mind.",
+                        "Where did you hear that from?",
+                        "I'll believe it when I see it with my own eyes.",
+                        "Rumors can get people killed out here. Be sure of your facts.",
+                        "Noted, but I'll verify that myself.",
+                        "Could be a setup. Don't act on rumors too quickly.",
+                        "Who gave you that information?",
+                        "I'll take it under advisement, but keep my distance.",
+                        "Don't spread that around until we know it's solid.",
+                        "Heard. I'll watch for confirming signs.",
                     },
-                    {
-                        ["id"] = "terse.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Noted.",
-                            },
-                            ["TL"] = {
-                                "Tala ko na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heard.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good info.",
-                            },
-                            ["TL"] = {
-                                "Magandang balita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Understood.",
-                            },
-                            ["TL"] = {
-                                "Naintindihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clear.",
-                            },
-                            ["TL"] = {
-                                "Malinaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks.",
-                            },
-                            ["TL"] = {
-                                "Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right.",
-                            },
-                            ["TL"] = {
-                                "Tama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Acknowledged.",
-                            },
-                            ["TL"] = {
-                                "Kinikilala ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Useful.",
-                            },
-                            ["TL"] = {
-                                "May silbi.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Tatandaan ko iyan.",
+                        "Saan mo narinig ang balitang 'yan?",
+                        "Maniwala lang ako kapag nakita ko na ng sarili kong mata.",
+                        "Ang tsismis ay nakamamatay dito. Tiyakin mo ang katotohanan.",
+                        "Tala ko na, pero kumpirmahin ko muna sa sarili ko.",
+                        "Baka bitag 'yan. Huwag kumilos sa sabi-sabi nang padalos-dalos.",
+                        "Sinong nagbigay sa 'yo ng impormasyong 'yan?",
+                        "Isasaalang-alang ko, pero magmamasid pa rin ako mula sa malayo.",
+                        "Huwag mong ikalat 'yan hangga't di tiyak na totoo.",
+                        "Narinig ko. Magmamasid ako ng mga patunay.",
                     },
                 },
+                ["variantID"] = "guarded",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "social_interaction_news",
-        ["id"] = "semantic.interaction.news.acknowledge.warm",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.interaction.news.acknowledge.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
-        ["namespace"] = "semantic.interaction.news.acknowledge",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:core_social_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.social",
-                ["responseTemplateID"] = "semantic.interaction.news.acknowledge",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/news/acknowledge.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for telling me. I'll keep that in mind.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagsabi. Tatandaan ko iyan.",
-                            },
-                        },
+            {
+                ["fallback"] = "Got it.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.news.acknowledge.say.1.terse",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Got it.",
+                        "Noted.",
+                        "Heard.",
+                        "Good info.",
+                        "Understood.",
+                        "Clear.",
+                        "Thanks.",
+                        "Right.",
+                        "Acknowledged.",
+                        "Useful.",
                     },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's huge news, friend! Thank you for sharing.",
-                            },
-                            ["TL"] = {
-                                "Napakalaking balita niyan, kaibigan! Salamat sa pagbabahagi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Always glad to know you're looking out for me with news like this.",
-                            },
-                            ["TL"] = {
-                                "Lagi akong masaya na binabantayan mo ako sa mga ganitong balita.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You have great sources! Thanks a ton.",
-                            },
-                            ["TL"] = {
-                                "Napakagaling ng mga pinagkukunan mo! Maraming salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I really appreciate you giving me the heads up first.",
-                            },
-                            ["TL"] = {
-                                "Talagang pinahahalagahan ko na ako ang unang pinaalalahanan mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good news is worth its weight in gold out here. Thanks!",
-                            },
-                            ["TL"] = {
-                                "Ang magandang balita ay ginto ang halaga rito. Salamat!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks for sharing that with me. It gives me hope.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagbabahagi niyan sa akin. Nagbibigay ito ng pag-asa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm relieved to hear that. Thank you so much, partner.",
-                            },
-                            ["TL"] = {
-                                "Nakahinga ako nang maluwag nang marinig 'yan. Salamat nang marami, kasama.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's fantastic information. Appreciate you keeping us safe.",
-                            },
-                            ["TL"] = {
-                                "Napakagandang impormasyon. Salamat sa pag-iingat sa atin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thanks! Let's make sure the others hear this too.",
-                            },
-                            ["TL"] = {
-                                "Salamat! Tiyakin nating marinig din ito ng iba.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Sige.",
+                        "Tala ko na.",
+                        "Narinig ko.",
+                        "Magandang balita.",
+                        "Naintindihan.",
+                        "Malinaw.",
+                        "Salamat.",
+                        "Tama.",
+                        "Kinikilala ko.",
+                        "May silbi.",
                     },
                 },
+                ["variantID"] = "terse",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
+            {
+                ["fallback"] = "Thanks for telling me. I'll keep that in mind.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.interaction.news.acknowledge.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thanks for telling me. I'll keep that in mind.",
+                        "That's huge news, friend! Thank you for sharing.",
+                        "Always glad to know you're looking out for me with news like this.",
+                        "You have great sources! Thanks a ton.",
+                        "I really appreciate you giving me the heads up first.",
+                        "Good news is worth its weight in gold out here. Thanks!",
+                        "Thanks for sharing that with me. It gives me hope.",
+                        "I'm relieved to hear that. Thank you so much, partner.",
+                        "That's fantastic information. Appreciate you keeping us safe.",
+                        "Thanks! Let's make sure the others hear this too.",
+                    },
+                    ["TL"] = {
+                        "Salamat sa pagsabi. Tatandaan ko iyan.",
+                        "Napakalaking balita niyan, kaibigan! Salamat sa pagbabahagi.",
+                        "Lagi akong masaya na binabantayan mo ako sa mga ganitong balita.",
+                        "Napakagaling ng mga pinagkukunan mo! Maraming salamat.",
+                        "Talagang pinahahalagahan ko na ako ang unang pinaalalahanan mo.",
+                        "Ang magandang balita ay ginto ang halaga rito. Salamat!",
+                        "Salamat sa pagbabahagi niyan sa akin. Nagbibigay ito ng pag-asa.",
+                        "Nakahinga ako nang maluwag nang marinig 'yan. Salamat nang marami, kasama.",
+                        "Napakagandang impormasyon. Salamat sa pag-iingat sa atin.",
+                        "Salamat! Tiyakin nating marinig din ito ng iba.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
         },
         ["when"] = nil,
     },

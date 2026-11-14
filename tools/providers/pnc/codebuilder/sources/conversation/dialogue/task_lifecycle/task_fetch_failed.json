@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.fetch",
   "id": "failed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
-    "responseTemplateID": "semantic.task.fetch.failed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I couldn't fetch that.",
-          "TL": "Hindi ko nakuha iyon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Failed to retrieve the item.",
-          "TL": "Bigo sa pagkuha ng gamit."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "The item wasn't there or was destroyed.",
-          "TL": "Wala roon ang gamit o kaya'y nasira na."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Way was blocked. Couldn't reach it.",
-          "TL": "May harang sa daan. Di ko naabot."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Hostiles prevented me from grabbing it.",
-          "TL": "Pumigil ang mga kalaban sa pagkuha ko."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Unable to fetch that from that container.",
-          "TL": "Di makuha 'yon mula sa lalagyan."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Lost access to the item. Fetch failed.",
-          "TL": "Nawalan ng daan sa gamit. Bigo ang pagkuha."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I couldn't find what you were pointing to.",
-          "TL": "Di ko nahanap ang itinuturo mo."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Inventory full or path obstructed. Failed.",
-          "TL": "Puno ang bag o may harang sa daan. Bigo."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Couldn't get to the target item.",
-          "TL": "Di makarating sa puntiryang gamit."
+          "EN": [
+            "I couldn't fetch that.",
+            "Failed to retrieve the item.",
+            "The item wasn't there or was destroyed.",
+            "Way was blocked. Couldn't reach it.",
+            "Hostiles prevented me from grabbing it.",
+            "Unable to fetch that from that container.",
+            "Lost access to the item. Fetch failed.",
+            "I couldn't find what you were pointing to.",
+            "Inventory full or path obstructed. Failed.",
+            "Couldn't get to the target item."
+          ],
+          "TL": [
+            "Hindi ko nakuha iyon.",
+            "Bigo sa pagkuha ng gamit.",
+            "Wala roon ang gamit o kaya'y nasira na.",
+            "May harang sa daan. Di ko naabot.",
+            "Pumigil ang mga kalaban sa pagkuha ko.",
+            "Di makuha 'yon mula sa lalagyan.",
+            "Nawalan ng daan sa gamit. Bigo ang pagkuha.",
+            "Di ko nahanap ang itinuturo mo.",
+            "Puno ang bag o may harang sa daan. Bigo.",
+            "Di makarating sa puntiryang gamit."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.fetch",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

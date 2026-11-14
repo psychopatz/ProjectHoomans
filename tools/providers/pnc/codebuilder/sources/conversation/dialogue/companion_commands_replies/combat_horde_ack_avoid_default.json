@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.horde.ack",
   "id": "avoid_default",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.combat.horde.ack.avoid_default"
+    "responseAct": "ACK"
   },
-  "response": {
-    "act": "ACK",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Copy. We go around.",
-          "TL": "Sige. Iikot tayo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Understood. Avoiding the swarm.",
-          "TL": "Naintindihan. Iiwasan ang kawan."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Bypassing the horde.",
-          "TL": "Lalampasan ang kawan sa malayo."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Taking the side path. Quietly.",
-          "TL": "Dadaan sa gilid. Nang tahimik."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Copy that. Staying out of their sight line.",
-          "TL": "Kopyado. Lalayo sa paningin nila."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "We'll detour around them.",
-          "TL": "Iikot tayo sa paligid nila."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Understood. No engagement.",
-          "TL": "Naiintindihan ko. Walang labanang magaganap."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Steering clear of the horde.",
-          "TL": "Lalayo sa kawan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Copy. Slipping past the dead.",
-          "TL": "Sige. Papalusot sa mga patay."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Avoiding contact. Lead the way.",
-          "TL": "Iiwas sa engkwentro. Ituro ang daan."
+          "EN": [
+            "Copy. We go around.",
+            "Understood. Avoiding the swarm.",
+            "Bypassing the horde.",
+            "Taking the side path. Quietly.",
+            "Copy that. Staying out of their sight line.",
+            "We'll detour around them.",
+            "Understood. No engagement.",
+            "Steering clear of the horde.",
+            "Copy. Slipping past the dead.",
+            "Avoiding contact. Lead the way."
+          ],
+          "TL": [
+            "Sige. Iikot tayo.",
+            "Naintindihan. Iiwasan ang kawan.",
+            "Lalampasan ang kawan sa malayo.",
+            "Dadaan sa gilid. Nang tahimik.",
+            "Kopyado. Lalayo sa paningin nila.",
+            "Iikot tayo sa paligid nila.",
+            "Naiintindihan ko. Walang labanang magaganap.",
+            "Lalayo sa kawan.",
+            "Sige. Papalusot sa mga patay.",
+            "Iiwas sa engkwentro. Ituro ang daan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.horde.ack",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

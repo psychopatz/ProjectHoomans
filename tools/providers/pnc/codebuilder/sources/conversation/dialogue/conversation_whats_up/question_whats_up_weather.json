@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question.whats_up",
+  "id": "weather",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:conversation_content",
+    "contentOwner": "projecthoomans.dialogue_content.conversation",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "The weather is the main thing on my mind right now.",
+            "Looks like the skies might turn on us soon.",
+            "Watching the clouds roll in. Hope we stay dry.",
+            "Cold wind's picking up today. Harder to stay warm.",
+            "Can't afford to get soaked out here without a fire.",
+            "Hoping the rain holds off until we finish our runs.",
+            "Weather's unpredictable lately. Keeping an eye on the sky.",
+            "Temperature is dropping fast. Gonna be a cold night.",
+            "Just thinking about finding a roof before the weather hits.",
+            "Clear skies for now, but you never know when it'll shift."
+          ],
+          "TL": [
+            "Ang panahon ang pangunahing iniisip ko ngayon.",
+            "Mukhang sasama ang lagay ng panahon maya-maya.",
+            "Tinitingnan ang pagdating ng mga ulap. Sana manatiling tuyo.",
+            "Lumalakas ang malamig na hangin ngayon. Mahirap magpainit.",
+            "Hindi puwedeng mabasa rito kung walang apoy.",
+            "Sana huwag munang umulan hanggang sa matapos ang mga lakad natin.",
+            "Pabago-bago ang panahon kamakailan. Laging nakatingin sa langit.",
+            "Bumababa nang mabilis ang temperatura. Magiging malamig ang gabi.",
+            "Iniisip ko lang makahanap ng bubong bago dumating ang ulan.",
+            "Maliwanag pa naman ngayon, pero hindi mo masasabi kung kailan magbabago."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:conversation_content",
-        "contentOwner": "projecthoomans.dialogue_content.conversation",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
-        "responseTemplateID": "semantic.question.whats_up.weather",
-        "style": "guarded"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Watching the weather. Stay focused.",
+            "Storms bring trouble. Don't linger out in the open.",
+            "Sky looks nasty. Get your head in the game.",
+            "Bad weather makes it easy for them to sneak up. Stay alert.",
+            "Wind is masking noises. Keep your ears open and back off.",
+            "Clouds are gathering. I don't plan on getting caught out here.",
+            "Weather is turning. Stop wasting time chatting.",
+            "Fog or rain will blind us. Keep your weapon ready.",
+            "Eyeing the clouds. You'd better find cover too.",
+            "A storm is brewing. I'm focusing on shelter."
+          ],
+          "TL": [
+            "Binabantayan ko ang panahon. Manatiling nakatutok.",
+            "Bagyo ang nagdadala ng gulo. Huwag kang tumambay sa bukas na lugar.",
+            "Madilim ang langit. Maghanda ka sa anumang darating.",
+            "Mas madali silang makalapit kapag masama ang panahon. Maging alerto.",
+            "Tinatabunan ng hangin ang mga ingay. Maging mapagmatyag at umatras ka.",
+            "Makulimlim na. Wala akong balak abutan ng ulan dito sa labas.",
+            "Papasama ang panahon. Huwag magsayang ng oras sa pakikipag-usap.",
+            "Mabubulag tayo sa hamog o ulan. Ihanda ang armas mo.",
+            "Tinitingnan ko ang mga ulap. Mabuti pang maghanap ka na rin ng masisilungan.",
+            "May paparating na bagyo. Naghahanap ako ng masisilungan."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "Watching the weather. Stay focused.",
-              "TL": "Binabantayan ko ang panahon. Manatiling nakatutok."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "Storms bring trouble. Don't linger out in the open.",
-              "TL": "Bagyo ang nagdadala ng gulo. Huwag kang tumambay sa bukas na lugar."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "Sky looks nasty. Get your head in the game.",
-              "TL": "Madilim ang langit. Maghanda ka sa anumang darating."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "Bad weather makes it easy for them to sneak up. Stay alert.",
-              "TL": "Mas madali silang makalapit kapag masama ang panahon. Maging alerto."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "Wind is masking noises. Keep your ears open and back off.",
-              "TL": "Tinatabunan ng hangin ang mga ingay. Maging mapagmatyag at umatras ka."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Clouds are gathering. I don't plan on getting caught out here.",
-              "TL": "Makulimlim na. Wala akong balak abutan ng ulan dito sa labas."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "Weather is turning. Stop wasting time chatting.",
-              "TL": "Papasama ang panahon. Huwag magsayang ng oras sa pakikipag-usap."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "Fog or rain will blind us. Keep your weapon ready.",
-              "TL": "Mabubulag tayo sa hamog o ulan. Ihanda ang armas mo."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "Eyeing the clouds. You'd better find cover too.",
-              "TL": "Tinitingnan ko ang mga ulap. Mabuti pang maghanap ka na rin ng masisilungan."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "A storm is brewing. I'm focusing on shelter.",
-              "TL": "May paparating na bagyo. Naghahanap ako ng masisilungan."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Watching the weather.",
+            "Rain coming.",
+            "Cold wind.",
+            "Dark clouds.",
+            "Weather's turning.",
+            "Storm brewing.",
+            "Need shelter.",
+            "Stay dry.",
+            "Freezing out.",
+            "Windy."
+          ],
+          "TL": [
+            "Binabantayan ang panahon.",
+            "Uulan na.",
+            "Malamig ang hangin.",
+            "Makulimlim.",
+            "Papasama ang panahon.",
+            "May bagyo.",
+            "Kailangan ng masisilungan.",
+            "Manatiling tuyo.",
+            "Napakalamig.",
+            "Mahangin."
+          ]
+        }
       },
-      "namespace": "semantic.question.whats_up.weather"
-    },
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:conversation_content",
-        "contentOwner": "projecthoomans.dialogue_content.conversation",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
-        "responseTemplateID": "semantic.question.whats_up.weather",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "The weather is the main thing on my mind right now.",
-              "TL": "Ang panahon ang pangunahing iniisip ko ngayon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Looks like the skies might turn on us soon.",
-              "TL": "Mukhang sasama ang lagay ng panahon maya-maya."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Watching the clouds roll in. Hope we stay dry.",
-              "TL": "Tinitingnan ang pagdating ng mga ulap. Sana manatiling tuyo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Cold wind's picking up today. Harder to stay warm.",
-              "TL": "Lumalakas ang malamig na hangin ngayon. Mahirap magpainit."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Can't afford to get soaked out here without a fire.",
-              "TL": "Hindi puwedeng mabasa rito kung walang apoy."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Hoping the rain holds off until we finish our runs.",
-              "TL": "Sana huwag munang umulan hanggang sa matapos ang mga lakad natin."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Weather's unpredictable lately. Keeping an eye on the sky.",
-              "TL": "Pabago-bago ang panahon kamakailan. Laging nakatingin sa langit."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Temperature is dropping fast. Gonna be a cold night.",
-              "TL": "Bumababa nang mabilis ang temperatura. Magiging malamig ang gabi."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Just thinking about finding a roof before the weather hits.",
-              "TL": "Iniisip ko lang makahanap ng bubong bago dumating ang ulan."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Clear skies for now, but you never know when it'll shift.",
-              "TL": "Maliwanag pa naman ngayon, pero hindi mo masasabi kung kailan magbabago."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.question.whats_up.weather"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:conversation_content",
-        "contentOwner": "projecthoomans.dialogue_content.conversation",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
-        "responseTemplateID": "semantic.question.whats_up.weather",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Watching the weather.",
-              "TL": "Binabantayan ang panahon."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Rain coming.",
-              "TL": "Uulan na."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Cold wind.",
-              "TL": "Malamig ang hangin."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Dark clouds.",
-              "TL": "Makulimlim."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Weather's turning.",
-              "TL": "Papasama ang panahon."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Storm brewing.",
-              "TL": "May bagyo."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Need shelter.",
-              "TL": "Kailangan ng masisilungan."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Stay dry.",
-              "TL": "Manatiling tuyo."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Freezing out.",
-              "TL": "Napakalamig."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Windy.",
-              "TL": "Mahangin."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.question.whats_up.weather"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:conversation_content",
-        "contentOwner": "projecthoomans.dialogue_content.conversation",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
-        "responseTemplateID": "semantic.question.whats_up.weather",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "The weather is the main thing on my mind right now. How are you holding up?",
-              "TL": "Ang panahon ang pangunahing iniisip ko ngayon. Kumusta ka naman?"
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "Chilly out here today. Make sure you bundle up and stay warm, alright?",
-              "TL": "Malamig dito ngayon. Magsuot ka ng makapal at magpainit, ha?"
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Looks like rain might fall. Let's make sure our dry clothes stay safe.",
-              "TL": "Mukhang uulan. Siguraduhin nating ligtas ang mga tuyo nating damit."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "I was just watching the clouds. Hope you've got a warm fire waiting for you.",
-              "TL": "Pinagmamasdan ko ang mga ulap. Sana may mainit kang masisilungan."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Cold wind today, but seeing your face makes it feel a bit warmer.",
-              "TL": "Malamig ang hangin, pero nakakabawas ng ginaw na makita ka."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "Hoping the bad weather passes over us without trouble. Stay dry out there.",
-              "TL": "Sana lumampas ang masamang panahon nang walang gulo. Manatiling tuyo sa labas."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "Weather's rough, but we'll weather any storm together, my friend.",
-              "TL": "Mabigat ang panahon, pero kakayanin natin anumang bagyo, kaibigan."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "If it starts pouring, come share some shelter with us.",
-              "TL": "Kapag nagsimulang bumuhos ang ulan, sumilong ka kasama namin."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "Just keeping an eye on the sky so none of our people get caught in the wet.",
-              "TL": "Binabantayan ang langit para walang mabasa sa mga kasamahan natin."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "Gloomy day outside, but good company makes all the difference.",
-              "TL": "Madilim ang araw sa labas, pero iba talaga kapag may magandang kasama."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.question.whats_up.weather"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "The weather is the main thing on my mind right now. How are you holding up?",
+            "Chilly out here today. Make sure you bundle up and stay warm, alright?",
+            "Looks like rain might fall. Let's make sure our dry clothes stay safe.",
+            "I was just watching the clouds. Hope you've got a warm fire waiting for you.",
+            "Cold wind today, but seeing your face makes it feel a bit warmer.",
+            "Hoping the bad weather passes over us without trouble. Stay dry out there.",
+            "Weather's rough, but we'll weather any storm together, my friend.",
+            "If it starts pouring, come share some shelter with us.",
+            "Just keeping an eye on the sky so none of our people get caught in the wet.",
+            "Gloomy day outside, but good company makes all the difference."
+          ],
+          "TL": [
+            "Ang panahon ang pangunahing iniisip ko ngayon. Kumusta ka naman?",
+            "Malamig dito ngayon. Magsuot ka ng makapal at magpainit, ha?",
+            "Mukhang uulan. Siguraduhin nating ligtas ang mga tuyo nating damit.",
+            "Pinagmamasdan ko ang mga ulap. Sana may mainit kang masisilungan.",
+            "Malamig ang hangin, pero nakakabawas ng ginaw na makita ka.",
+            "Sana lumampas ang masamang panahon nang walang gulo. Manatiling tuyo sa labas.",
+            "Mabigat ang panahon, pero kakayanin natin anumang bagyo, kaibigan.",
+            "Kapag nagsimulang bumuhos ang ulan, sumilong ka kasama namin.",
+            "Binabantayan ang langit para walang mabasa sa mga kasamahan natin.",
+            "Madilim ang araw sa labas, pero iba talaga kapag may magandang kasama."
+          ]
+        }
+      }
+    ]
+  }
 }

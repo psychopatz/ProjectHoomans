@@ -1,196 +1,83 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command.camp",
+  "id": "queued",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "queued",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
+    "responseAct": "REPLY"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Okay, I'll set up camp there.",
+            "Understood. Setting up our camp now.",
+            "I'll go get the camp established.",
+            "On my way to set up camp.",
+            "Making camp in that spot. Understood.",
+            "Right. Setting up shelter over there.",
+            "I'll secure the camp site now.",
+            "Moving to establish camp as ordered.",
+            "Got it. Pitching camp.",
+            "Understood. Heading over to make camp."
+          ],
+          "TL": [
+            "Sige, magse-set up ako ng kampo roon.",
+            "Naintindihan. Itatayo na ang kampo natin ngayon.",
+            "Pupunta ako para itayo ang kampo.",
+            "Papunta na para magtayo ng kampo.",
+            "Magtatayo ng kampo sa pwestong 'yon. Naintindihan.",
+            "Sige. Magtatayo ng silungan doon.",
+            "Seselyuhan ko ang kampo ngayon.",
+            "Kikilos para magtayo ng kampo ayon sa utos.",
+            "Nakuha ko. Maglalatag ng kampo.",
+            "Naiintindihan ko. Pupunta roon para magkampo."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:companion_commands",
-        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
-        "responseTemplateID": "semantic.command.camp.queued"
-      },
-      "response": {
-        "act": "REPLY",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Okay, I'll set up camp there.",
-              "TL": "Sige, magse-set up ako ng kampo roon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Understood. Setting up our camp now.",
-              "TL": "Naintindihan. Itatayo na ang kampo natin ngayon."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "I'll go get the camp established.",
-              "TL": "Pupunta ako para itayo ang kampo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "On my way to set up camp.",
-              "TL": "Papunta na para magtayo ng kampo."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Making camp in that spot. Understood.",
-              "TL": "Magtatayo ng kampo sa pwestong 'yon. Naintindihan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Right. Setting up shelter over there.",
-              "TL": "Sige. Magtatayo ng silungan doon."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I'll secure the camp site now.",
-              "TL": "Seselyuhan ko ang kampo ngayon."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Moving to establish camp as ordered.",
-              "TL": "Kikilos para magtayo ng kampo ayon sa utos."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Got it. Pitching camp.",
-              "TL": "Nakuha ko. Maglalatag ng kampo."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Understood. Heading over to make camp.",
-              "TL": "Naiintindihan ko. Pupunta roon para magkampo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.command.camp"
-    },
-    {
-      "kind": "dialogue",
-      "id": "friendly",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:companion_commands",
-        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
-        "responseTemplateID": "semantic.command.camp.queued.friendly"
-      },
-      "response": {
-        "act": "REPLY",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Sure, I'll set up camp there. Sounds cozy.",
-              "TL": "Sige, magse-set up ako ng kampo roon. Mukhang maaliwalas."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Happy to! Let's get a good fire going.",
-              "TL": "Masayang gagawin! Magpaningas tayo ng maayos na apoy."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Good call, friend. I'll get our camp ready.",
-              "TL": "Magandang pasya, kaibigan. Ihahanda ko ang kampo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Leave it to me! I'll make sure it's safe and comfortable.",
-              "TL": "Ipaubaya mo sa akin! Titiyakin kong ligtas at komportable."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Great idea. I'll go set up camp for us.",
-              "TL": "Magandang ideya. Pupunta ako para itayo ang kampo natin."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Right on! Time to get off our feet. Setting up now.",
-              "TL": "Aba oo! Oras na para magpahinga. Magtatayo na ngayon."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Gladly. I'll have the beds laid out shortly.",
-              "TL": "Malugod kong gagawin. Ilalatag ko ang higaan maya-maya."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Sounds wonderful. I'll get our shelter squared away.",
-              "TL": "Napakaganda. Aayusin ko ang silungan natin."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Sure thing, partner! Camp will be ready in no time.",
-              "TL": "Walang anuman, kasama! Handa na ang kampo agad."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "On it, friend! Rest easy, I'll handle camp.",
-              "TL": "Inaasikaso na, kaibigan! Magpahinga ka, ako na sa kampo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.command.camp.queued"
-    }
-  ]
+      {
+        "id": "friendly",
+        "text": {
+          "EN": [
+            "Sure, I'll set up camp there. Sounds cozy.",
+            "Happy to! Let's get a good fire going.",
+            "Good call, friend. I'll get our camp ready.",
+            "Leave it to me! I'll make sure it's safe and comfortable.",
+            "Great idea. I'll go set up camp for us.",
+            "Right on! Time to get off our feet. Setting up now.",
+            "Gladly. I'll have the beds laid out shortly.",
+            "Sounds wonderful. I'll get our shelter squared away.",
+            "Sure thing, partner! Camp will be ready in no time.",
+            "On it, friend! Rest easy, I'll handle camp."
+          ],
+          "TL": [
+            "Sige, magse-set up ako ng kampo roon. Mukhang maaliwalas.",
+            "Masayang gagawin! Magpaningas tayo ng maayos na apoy.",
+            "Magandang pasya, kaibigan. Ihahanda ko ang kampo.",
+            "Ipaubaya mo sa akin! Titiyakin kong ligtas at komportable.",
+            "Magandang ideya. Pupunta ako para itayo ang kampo natin.",
+            "Aba oo! Oras na para magpahinga. Magtatayo na ngayon.",
+            "Malugod kong gagawin. Ilalatag ko ang higaan maya-maya.",
+            "Napakaganda. Aayusin ko ang silungan natin.",
+            "Walang anuman, kasama! Handa na ang kampo agad.",
+            "Inaasikaso na, kaibigan! Magpahinga ka, ako na sa kampo."
+          ]
+        }
+      }
+    ]
+  }
 }

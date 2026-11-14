@@ -1,21 +1,17 @@
 {
-  "id": "refuse",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.refuse",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "id": "refuse",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "REFUSE",
+  "metadata": {
+    "responsePoolID": "refuse",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "REFUSE"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.refuse.dataset.pending_unavailable",
-        "metadata": {
-          "fallback": "I can't take that on right now.",
-          "priority": 1,
-          "templateID": "semantic.refuse.dataset.pending_unavailable"
-        },
+        "id": "refuse.dataset.pending_unavailable",
         "text": {
           "EN": "I can't take that on right now.",
           "TL": "I can't take that on right now."
@@ -24,15 +20,15 @@
           "op": "eq",
           "path": "conversation.hasPendingRequest",
           "value": true
+        },
+        "metadata": {
+          "fallback": "I can't take that on right now.",
+          "priority": 1,
+          "templateID": "refuse.dataset.pending_unavailable"
         }
       },
       {
-        "id": "semantic.refuse.dataset.pending_enough",
-        "metadata": {
-          "fallback": "Not this time. I have enough to manage.",
-          "priority": 1,
-          "templateID": "semantic.refuse.dataset.pending_enough"
-        },
+        "id": "refuse.dataset.pending_enough",
         "text": {
           "EN": "Not this time. I have enough to manage.",
           "TL": "Not this time. I have enough to manage."
@@ -41,10 +37,13 @@
           "op": "eq",
           "path": "conversation.hasPendingRequest",
           "value": true
+        },
+        "metadata": {
+          "fallback": "Not this time. I have enough to manage.",
+          "priority": 1,
+          "templateID": "refuse.dataset.pending_enough"
         }
       }
     ]
-  },
-  "namespace": "semantic",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

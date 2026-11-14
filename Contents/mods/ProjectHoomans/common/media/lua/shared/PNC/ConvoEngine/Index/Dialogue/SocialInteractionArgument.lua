@@ -1,74 +1,26 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.interaction.argument.deescalate.guarded"] = {
+    ["interaction.argument.deescalate"] = {
+        ["dependents"] = {
+            "behavior.deescalate",
+        },
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
         },
-        ["id"] = "semantic.interaction.argument.deescalate.guarded",
+        ["id"] = "interaction.argument.deescalate",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
     },
-    ["semantic.interaction.argument.deescalate.neutral"] = {
+    ["interaction.argument.retaliate"] = {
+        ["dependents"] = {
+            "behavior.retaliate_verbally",
+        },
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
         },
-        ["id"] = "semantic.interaction.argument.deescalate.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
-    },
-    ["semantic.interaction.argument.deescalate.terse"] = {
-        ["domain"] = "social_interaction_argument",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
-        },
-        ["id"] = "semantic.interaction.argument.deescalate.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
-    },
-    ["semantic.interaction.argument.deescalate.warm"] = {
-        ["domain"] = "social_interaction_argument",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
-        },
-        ["id"] = "semantic.interaction.argument.deescalate.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
-    },
-    ["semantic.interaction.argument.retaliate.guarded"] = {
-        ["domain"] = "social_interaction_argument",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
-        },
-        ["id"] = "semantic.interaction.argument.retaliate.guarded",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
-    },
-    ["semantic.interaction.argument.retaliate.neutral"] = {
-        ["domain"] = "social_interaction_argument",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
-        },
-        ["id"] = "semantic.interaction.argument.retaliate.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
-    },
-    ["semantic.interaction.argument.retaliate.terse"] = {
-        ["domain"] = "social_interaction_argument",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
-        },
-        ["id"] = "semantic.interaction.argument.retaliate.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
-    },
-    ["semantic.interaction.argument.retaliate.warm"] = {
-        ["domain"] = "social_interaction_argument",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
-        },
-        ["id"] = "semantic.interaction.argument.retaliate.warm",
+        ["id"] = "interaction.argument.retaliate",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
     },

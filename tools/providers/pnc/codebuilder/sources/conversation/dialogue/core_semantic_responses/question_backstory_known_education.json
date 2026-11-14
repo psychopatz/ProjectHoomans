@@ -1,30 +1,30 @@
 {
-  "id": "education",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.backstory.known.education",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "question.backstory.known",
+  "id": "education",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "EDUCATION",
+  "metadata": {
+    "responsePoolID": "question.backstory.known.education",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "EDUCATION"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.backstory.known.education.authored",
+        "id": "question.backstory.known.education.authored",
+        "text": {
+          "EN": "I studied %1.",
+          "TL": "Nag-aral ako ng %1."
+        },
         "metadata": {
           "fallback": "I studied %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
           "translationArgs": {
             "content": "fact_content"
           }
-        },
-        "text": {
-          "EN": "I studied %1.",
-          "TL": "Nag-aral ako ng %1."
         }
       }
     ]
-  },
-  "namespace": "semantic.question.backstory.known",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

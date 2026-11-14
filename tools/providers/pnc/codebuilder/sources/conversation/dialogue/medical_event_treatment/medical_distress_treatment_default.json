@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.treatment",
   "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/treatment.json",
-    "responseTemplateID": "semantic.medical.distress.treatment.default",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "Thank you. That treatment helped.",
-          "TL": "Salamat. Malaking tulong ang panggagamot na 'yon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.02"
-        },
-        "text": {
-          "EN": "Feeling much better. I appreciate the aid.",
-          "TL": "Medyo maayos na pakiramdam ko. Salamat sa tulong."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.03"
-        },
-        "text": {
-          "EN": "Much better now. Thank you for patching me up.",
-          "TL": "Mas maayos na ngayon. Salamat sa paggamot sa akin."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.04"
-        },
-        "text": {
-          "EN": "Pain is subsiding. Thanks for taking care of it.",
-          "TL": "Humuhupa na ang sakit. Salamat sa pag-asikaso no'n."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.05"
-        },
-        "text": {
-          "EN": "Good work on that treatment. I'm indebted to you.",
-          "TL": "Magaling ang panggagamot mo. May utang na loob ako sa'yo."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.06"
-        },
-        "text": {
-          "EN": "That took the edge off. Thank you.",
-          "TL": "Nabawasan ang kirot. Salamat sa'yo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.07"
-        },
-        "text": {
-          "EN": "I can function again. Thanks for the quick aid.",
-          "TL": "Makakagalaw na ulit ako. Salamat sa mabilis na lunas."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.08"
-        },
-        "text": {
-          "EN": "Appreciate the medical help. I owe you one.",
-          "TL": "Salamat sa tulong medikal. May utang ako sa'yo."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.09"
-        },
-        "text": {
-          "EN": "Thanks, that helped a lot. Ready to move.",
-          "TL": "Salamat, malaking tulong 'yon. Handa nang kumilos."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.treatment.default.neutral.10"
-        },
-        "text": {
-          "EN": "You saved my skin with that aid. Thank you.",
-          "TL": "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat."
+          "EN": [
+            "Thank you. That treatment helped.",
+            "Feeling much better. I appreciate the aid.",
+            "Much better now. Thank you for patching me up.",
+            "Pain is subsiding. Thanks for taking care of it.",
+            "Good work on that treatment. I'm indebted to you.",
+            "That took the edge off. Thank you.",
+            "I can function again. Thanks for the quick aid.",
+            "Appreciate the medical help. I owe you one.",
+            "Thanks, that helped a lot. Ready to move.",
+            "You saved my skin with that aid. Thank you."
+          ],
+          "TL": [
+            "Salamat. Malaking tulong ang panggagamot na 'yon.",
+            "Medyo maayos na pakiramdam ko. Salamat sa tulong.",
+            "Mas maayos na ngayon. Salamat sa paggamot sa akin.",
+            "Humuhupa na ang sakit. Salamat sa pag-asikaso no'n.",
+            "Magaling ang panggagamot mo. May utang na loob ako sa'yo.",
+            "Nabawasan ang kirot. Salamat sa'yo.",
+            "Makakagalaw na ulit ako. Salamat sa mabilis na lunas.",
+            "Salamat sa tulong medikal. May utang ako sa'yo.",
+            "Salamat, malaking tulong 'yon. Handa nang kumilos.",
+            "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.treatment",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

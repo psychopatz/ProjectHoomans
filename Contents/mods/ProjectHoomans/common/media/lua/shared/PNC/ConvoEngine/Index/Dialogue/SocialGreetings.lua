@@ -156,7 +156,7 @@ return {
     ["social.greetings.member.dusk"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialGreetings",
+            "PNC/ConvoEngine/Dialogue/SocialGreetings__b02b846f",
         },
         ["id"] = "social.greetings.member.dusk",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["social.greetings.member.sunrise"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialGreetings",
+            "PNC/ConvoEngine/Dialogue/SocialGreetings__b02b846f",
         },
         ["id"] = "social.greetings.member.sunrise",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["social.greetings.member.sunset"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialGreetings",
+            "PNC/ConvoEngine/Dialogue/SocialGreetings__b02b846f",
         },
         ["id"] = "social.greetings.member.sunset",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["social.greetings.member.twilight"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialGreetings",
+            "PNC/ConvoEngine/Dialogue/SocialGreetings__b02b846f",
         },
         ["id"] = "social.greetings.member.twilight",
         ["kind"] = "dialogue",

@@ -1,9 +1,13 @@
 {
-  "id": "tooltip",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "ui.suggestion.needs_destination",
+  "id": "tooltip",
+  "owner": "ProjectHoomans",
   "metadata": {
     "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
     "textKey": "suggestion.needs_destination.tooltip",
+    "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
         "key": "suggestion.needs_destination.tooltip",
@@ -12,14 +16,17 @@
           "TL": "Pumili muna ng pupuntahan."
         }
       }
-    ],
-    "textTarget": "UI_PNC_Conversation"
+    ]
   },
-  "owner": "ProjectHoomans",
-  "text": {
-    "EN": "Choose a destination first.",
-    "TL": "Pumili muna ng pupuntahan."
-  },
-  "namespace": "ui.suggestion.needs_destination",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Choose a destination first.",
+          "TL": "Pumili muna ng pupuntahan."
+        }
+      }
+    ]
+  }
 }

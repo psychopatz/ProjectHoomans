@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.player_assaulted",
   "id": "aggressive",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:combat_kill",
     "contentOwner": "projecthoomans.dialogue_content.combat",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat/player_assault_reactions.json",
-    "responseTemplateID": "semantic.combat.player_assaulted.aggressive",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "You just made a big mistake.",
-          "TL": "Malaking pagkakamali ang ginawa mo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "All right. You want a fight, you've got one.",
-          "TL": "Sige. Gusto mo ng laban, makukuha mo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "You hit me? You're going to regret that.",
-          "TL": "Sinaktan mo ako? Pagsisisihan mo 'yan."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Try that again and see what happens.",
-          "TL": "Ulitin mo pa at tignan natin ang mangyayari."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Wrong person to mess with.",
-          "TL": "Maling tao ang binangga mo."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "You want some of this?! Come on then!",
-          "TL": "Gusto mo pala ng gulo?! Halika rito!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "That was your last free shot.",
-          "TL": "Huling libreng tira mo na 'yon."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I'll put you in the ground for that.",
-          "TL": "Ililibing kita sa ginawa mo."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "You swung at me? Big mistake.",
-          "TL": "Hinataw mo ako? Malaking mali."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "You really want to do this? Let's go.",
-          "TL": "Gusto mo talagang gawin 'to? Tara."
+          "EN": [
+            "You just made a big mistake.",
+            "All right. You want a fight, you've got one.",
+            "You hit me? You're going to regret that.",
+            "Try that again and see what happens.",
+            "Wrong person to mess with.",
+            "You want some of this?! Come on then!",
+            "That was your last free shot.",
+            "I'll put you in the ground for that.",
+            "You swung at me? Big mistake.",
+            "You really want to do this? Let's go."
+          ],
+          "TL": [
+            "Malaking pagkakamali ang ginawa mo.",
+            "Sige. Gusto mo ng laban, makukuha mo.",
+            "Sinaktan mo ako? Pagsisisihan mo 'yan.",
+            "Ulitin mo pa at tignan natin ang mangyayari.",
+            "Maling tao ang binangga mo.",
+            "Gusto mo pala ng gulo?! Halika rito!",
+            "Huling libreng tira mo na 'yon.",
+            "Ililibing kita sa ginawa mo.",
+            "Hinataw mo ako? Malaking mali.",
+            "Gusto mo talagang gawin 'to? Tara."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.player_assaulted",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

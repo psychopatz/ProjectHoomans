@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.brave",
+  "id": "firearm_high",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/brave.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Dead center. Keep moving.",
+            "Clean hit. Advance.",
+            "Downed. Scanning the next sector.",
+            "One shot, one down. Keep pace.",
+            "Target eliminated. Form up.",
+            "Precise shot. Push through.",
+            "Threat neutralized. Eyes ahead.",
+            "Confirmed kill. Move forward.",
+            "Handled. Watch your spacing.",
+            "Center mass then head. Done."
+          ],
+          "TL": [
+            "Gitnang-gitna. Tuloy lang.",
+            "Malinis na tama. Sulong.",
+            "Bagsak. Sinusuri ang susunod na parte.",
+            "Isang putok, isang bagsak. Panatilihin ang bilis.",
+            "Target naalis. Ayusin ang pwesto.",
+            "Eksaktong putok. Lusot tayo.",
+            "Banta nawala na. Tumingin sa unahan.",
+            "Kumpirmadong patay. Abante.",
+            "Naasikaso na. Bantayan ang agwat.",
+            "Gitna muna bago ulo. Tapos."
+          ]
+        }
+      }
+    ]
+  }
+}

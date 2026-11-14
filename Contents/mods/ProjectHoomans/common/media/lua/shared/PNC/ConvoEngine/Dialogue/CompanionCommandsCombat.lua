@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.choice.avoid",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.choice.avoid",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Go around.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.choice.avoid.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Go around.",
+                                        "Bypass them. Stay quiet.",
+                                        "Find another route. Don't draw them.",
+                                        "Circle wide. Keep in the shadows.",
+                                        "Not worth the ammo. Move around.",
+                                        "Detour through the alley. Quietly.",
+                                        "We sneak past. Crouch and move.",
+                                        "Leave them be. Take the back way.",
+                                        "Avoid contact. Step carefully.",
+                                        "Back out and take the alternate street.",
+                                    },
+                                    ["TL"] = {
+                                        "Umikot tayo.",
+                                        "Lalagpasan natin sila. Huwag mag-ingay.",
+                                        "Maghanap ng ibang ruta. Huwag silang akitin.",
+                                        "Umikot nang malayo. Manatili sa dilim.",
+                                        "Sayang ang bala. Umiwas na lang.",
+                                        "Daan tayo sa eskinita. Nang tahimik.",
+                                        "Lulusot tayo nang lihim. Yumuko at lumakad.",
+                                        "Hayaan sila roon. Daan tayo sa likod.",
+                                        "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang.",
+                                        "Atras muna at dumaan sa kabilang kalsada.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.choice",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Go around.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.choice.avoid.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Go around.",
+                            "Bypass them. Stay quiet.",
+                            "Find another route. Don't draw them.",
+                            "Circle wide. Keep in the shadows.",
+                            "Not worth the ammo. Move around.",
+                            "Detour through the alley. Quietly.",
+                            "We sneak past. Crouch and move.",
+                            "Leave them be. Take the back way.",
+                            "Avoid contact. Step carefully.",
+                            "Back out and take the alternate street.",
+                        },
+                        ["TL"] = {
+                            "Umikot tayo.",
+                            "Lalagpasan natin sila. Huwag mag-ingay.",
+                            "Maghanap ng ibang ruta. Huwag silang akitin.",
+                            "Umikot nang malayo. Manatili sa dilim.",
+                            "Sayang ang bala. Umiwas na lang.",
+                            "Daan tayo sa eskinita. Nang tahimik.",
+                            "Lulusot tayo nang lihim. Yumuko at lumakad.",
+                            "Hayaan sila roon. Daan tayo sa likod.",
+                            "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang.",
+                            "Atras muna at dumaan sa kabilang kalsada.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.choice.avoid",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "avoid",
-            ["sourceId"] = "semantic.combat.horde.choice.avoid",
+            ["sourceId"] = "combat.horde.choice.avoid",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde.choice",
+        ["namespace"] = "combat.horde.choice",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,126 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.choice.avoid",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Go around.",
-                            },
-                            ["TL"] = {
-                                "Umikot tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Bypass them. Stay quiet.",
-                            },
-                            ["TL"] = {
-                                "Lalagpasan natin sila. Huwag mag-ingay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Find another route. Don't draw them.",
-                            },
-                            ["TL"] = {
-                                "Maghanap ng ibang ruta. Huwag silang akitin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Circle wide. Keep in the shadows.",
-                            },
-                            ["TL"] = {
-                                "Umikot nang malayo. Manatili sa dilim.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not worth the ammo. Move around.",
-                            },
-                            ["TL"] = {
-                                "Sayang ang bala. Umiwas na lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Detour through the alley. Quietly.",
-                            },
-                            ["TL"] = {
-                                "Daan tayo sa eskinita. Nang tahimik.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We sneak past. Crouch and move.",
-                            },
-                            ["TL"] = {
-                                "Lulusot tayo nang lihim. Yumuko at lumakad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Leave them be. Take the back way.",
-                            },
-                            ["TL"] = {
-                                "Hayaan sila roon. Daan tayo sa likod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Avoid contact. Step carefully.",
-                            },
-                            ["TL"] = {
-                                "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Back out and take the alternate street.",
-                            },
-                            ["TL"] = {
-                                "Atras muna at dumaan sa kabilang kalsada.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Go around.",
+                                        "Bypass them. Stay quiet.",
+                                        "Find another route. Don't draw them.",
+                                        "Circle wide. Keep in the shadows.",
+                                        "Not worth the ammo. Move around.",
+                                        "Detour through the alley. Quietly.",
+                                        "We sneak past. Crouch and move.",
+                                        "Leave them be. Take the back way.",
+                                        "Avoid contact. Step carefully.",
+                                        "Back out and take the alternate street.",
+                                    },
+                                    ["TL"] = {
+                                        "Umikot tayo.",
+                                        "Lalagpasan natin sila. Huwag mag-ingay.",
+                                        "Maghanap ng ibang ruta. Huwag silang akitin.",
+                                        "Umikot nang malayo. Manatili sa dilim.",
+                                        "Sayang ang bala. Umiwas na lang.",
+                                        "Daan tayo sa eskinita. Nang tahimik.",
+                                        "Lulusot tayo nang lihim. Yumuko at lumakad.",
+                                        "Hayaan sila roon. Daan tayo sa likod.",
+                                        "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang.",
+                                        "Atras muna at dumaan sa kabilang kalsada.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.choice.avoid",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Go around.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.choice.avoid.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -154,20 +192,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Go around.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.choice.avoid.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Go around.",
+                        "Bypass them. Stay quiet.",
+                        "Find another route. Don't draw them.",
+                        "Circle wide. Keep in the shadows.",
+                        "Not worth the ammo. Move around.",
+                        "Detour through the alley. Quietly.",
+                        "We sneak past. Crouch and move.",
+                        "Leave them be. Take the back way.",
+                        "Avoid contact. Step carefully.",
+                        "Back out and take the alternate street.",
+                    },
+                    ["TL"] = {
+                        "Umikot tayo.",
+                        "Lalagpasan natin sila. Huwag mag-ingay.",
+                        "Maghanap ng ibang ruta. Huwag silang akitin.",
+                        "Umikot nang malayo. Manatili sa dilim.",
+                        "Sayang ang bala. Umiwas na lang.",
+                        "Daan tayo sa eskinita. Nang tahimik.",
+                        "Lulusot tayo nang lihim. Yumuko at lumakad.",
+                        "Hayaan sila roon. Daan tayo sa likod.",
+                        "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang.",
+                        "Atras muna at dumaan sa kabilang kalsada.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.choice.engage",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.choice.engage",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Take them.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.choice.engage.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Take them.",
+                                        "We fight. Weapons up.",
+                                        "Engage. Clear them all.",
+                                        "Stand and fight. Don't break line.",
+                                        "Let's take them down right here.",
+                                        "Strike now. Watch each other's sides.",
+                                        "We're clearing this herd. Let's go.",
+                                        "Cut them down one by one.",
+                                        "Fight through them. Forward.",
+                                        "Take the fight to them.",
+                                    },
+                                    ["TL"] = {
+                                        "Sugurin natin.",
+                                        "Lalaban tayo. Itaas ang sandata.",
+                                        "Sugod. Ubusin silang lahat.",
+                                        "Tumayo at lumaban. Huwag sirain ang linya.",
+                                        "Itumba na natin sila rito mismo.",
+                                        "Tira na ngayon. Bantayan ang gilid ng isa't isa.",
+                                        "Lilinisin natin ang kuyog na 'to. Tara.",
+                                        "Hiwain sila isa-isa.",
+                                        "Lusubin natin sila. Pasulong.",
+                                        "Harapin natin ang laban.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.choice",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Take them.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.choice.engage.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Take them.",
+                            "We fight. Weapons up.",
+                            "Engage. Clear them all.",
+                            "Stand and fight. Don't break line.",
+                            "Let's take them down right here.",
+                            "Strike now. Watch each other's sides.",
+                            "We're clearing this herd. Let's go.",
+                            "Cut them down one by one.",
+                            "Fight through them. Forward.",
+                            "Take the fight to them.",
+                        },
+                        ["TL"] = {
+                            "Sugurin natin.",
+                            "Lalaban tayo. Itaas ang sandata.",
+                            "Sugod. Ubusin silang lahat.",
+                            "Tumayo at lumaban. Huwag sirain ang linya.",
+                            "Itumba na natin sila rito mismo.",
+                            "Tira na ngayon. Bantayan ang gilid ng isa't isa.",
+                            "Lilinisin natin ang kuyog na 'to. Tara.",
+                            "Hiwain sila isa-isa.",
+                            "Lusubin natin sila. Pasulong.",
+                            "Harapin natin ang laban.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.choice.engage",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "engage",
-            ["sourceId"] = "semantic.combat.horde.choice.engage",
+            ["sourceId"] = "combat.horde.choice.engage",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_engage.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde.choice",
+        ["namespace"] = "combat.horde.choice",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -181,126 +340,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.choice.engage",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take them.",
-                            },
-                            ["TL"] = {
-                                "Sugurin natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We fight. Weapons up.",
-                            },
-                            ["TL"] = {
-                                "Lalaban tayo. Itaas ang sandata.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Engage. Clear them all.",
-                            },
-                            ["TL"] = {
-                                "Sugod. Ubusin silang lahat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stand and fight. Don't break line.",
-                            },
-                            ["TL"] = {
-                                "Tumayo at lumaban. Huwag sirain ang linya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's take them down right here.",
-                            },
-                            ["TL"] = {
-                                "Itumba na natin sila rito mismo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Strike now. Watch each other's sides.",
-                            },
-                            ["TL"] = {
-                                "Tira na ngayon. Bantayan ang gilid ng isa't isa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We're clearing this herd. Let's go.",
-                            },
-                            ["TL"] = {
-                                "Lilinisin natin ang kuyog na 'to. Tara.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Cut them down one by one.",
-                            },
-                            ["TL"] = {
-                                "Hiwain sila isa-isa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fight through them. Forward.",
-                            },
-                            ["TL"] = {
-                                "Lusubin natin sila. Pasulong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Take the fight to them.",
-                            },
-                            ["TL"] = {
-                                "Harapin natin ang laban.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Take them.",
+                                        "We fight. Weapons up.",
+                                        "Engage. Clear them all.",
+                                        "Stand and fight. Don't break line.",
+                                        "Let's take them down right here.",
+                                        "Strike now. Watch each other's sides.",
+                                        "We're clearing this herd. Let's go.",
+                                        "Cut them down one by one.",
+                                        "Fight through them. Forward.",
+                                        "Take the fight to them.",
+                                    },
+                                    ["TL"] = {
+                                        "Sugurin natin.",
+                                        "Lalaban tayo. Itaas ang sandata.",
+                                        "Sugod. Ubusin silang lahat.",
+                                        "Tumayo at lumaban. Huwag sirain ang linya.",
+                                        "Itumba na natin sila rito mismo.",
+                                        "Tira na ngayon. Bantayan ang gilid ng isa't isa.",
+                                        "Lilinisin natin ang kuyog na 'to. Tara.",
+                                        "Hiwain sila isa-isa.",
+                                        "Lusubin natin sila. Pasulong.",
+                                        "Harapin natin ang laban.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.choice.engage",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Take them.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.choice.engage.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -310,20 +421,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Take them.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.choice.engage.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Take them.",
+                        "We fight. Weapons up.",
+                        "Engage. Clear them all.",
+                        "Stand and fight. Don't break line.",
+                        "Let's take them down right here.",
+                        "Strike now. Watch each other's sides.",
+                        "We're clearing this herd. Let's go.",
+                        "Cut them down one by one.",
+                        "Fight through them. Forward.",
+                        "Take the fight to them.",
+                    },
+                    ["TL"] = {
+                        "Sugurin natin.",
+                        "Lalaban tayo. Itaas ang sandata.",
+                        "Sugod. Ubusin silang lahat.",
+                        "Tumayo at lumaban. Huwag sirain ang linya.",
+                        "Itumba na natin sila rito mismo.",
+                        "Tira na ngayon. Bantayan ang gilid ng isa't isa.",
+                        "Lilinisin natin ang kuyog na 'to. Tara.",
+                        "Hiwain sila isa-isa.",
+                        "Lusubin natin sila. Pasulong.",
+                        "Harapin natin ang laban.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.choice.hold",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.choice.hold",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hold for now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.choice.hold.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hold for now.",
+                                        "Stay put. Watch their movement.",
+                                        "Hold position and let them pass.",
+                                        "Wait here. Don't make a sound.",
+                                        "Hold up. See which way they drift.",
+                                        "Freeze. Don't reveal our position.",
+                                        "Keep low and hold here.",
+                                        "Stay behind cover for a moment.",
+                                        "Hold the line. Wait for the signal.",
+                                        "Wait and observe before moving.",
+                                    },
+                                    ["TL"] = {
+                                        "Hinto muna.",
+                                        "Diyan lang. Bantayan ang galaw nila.",
+                                        "Hawakan ang pwesto at hayaang lumampas sila.",
+                                        "Maghintay rito. Huwag gagawa ng tunog.",
+                                        "Tigil muna. Tignan kung saan sila papunta.",
+                                        "Huwag gagalaw. Huwag ilantad ang pwesto natin.",
+                                        "Yumuko at manatili rito.",
+                                        "Manatili sa kublihan sandali.",
+                                        "Hawakan ang linya. Hintayin ang senyas.",
+                                        "Maghintay at magmasid bago kumilos.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.choice",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Hold for now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.choice.hold.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hold for now.",
+                            "Stay put. Watch their movement.",
+                            "Hold position and let them pass.",
+                            "Wait here. Don't make a sound.",
+                            "Hold up. See which way they drift.",
+                            "Freeze. Don't reveal our position.",
+                            "Keep low and hold here.",
+                            "Stay behind cover for a moment.",
+                            "Hold the line. Wait for the signal.",
+                            "Wait and observe before moving.",
+                        },
+                        ["TL"] = {
+                            "Hinto muna.",
+                            "Diyan lang. Bantayan ang galaw nila.",
+                            "Hawakan ang pwesto at hayaang lumampas sila.",
+                            "Maghintay rito. Huwag gagawa ng tunog.",
+                            "Tigil muna. Tignan kung saan sila papunta.",
+                            "Huwag gagalaw. Huwag ilantad ang pwesto natin.",
+                            "Yumuko at manatili rito.",
+                            "Manatili sa kublihan sandali.",
+                            "Hawakan ang linya. Hintayin ang senyas.",
+                            "Maghintay at magmasid bago kumilos.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.choice.hold",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "hold",
-            ["sourceId"] = "semantic.combat.horde.choice.hold",
+            ["sourceId"] = "combat.horde.choice.hold",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_hold.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde.choice",
+        ["namespace"] = "combat.horde.choice",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -337,126 +569,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.choice.hold",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hold for now.",
-                            },
-                            ["TL"] = {
-                                "Hinto muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay put. Watch their movement.",
-                            },
-                            ["TL"] = {
-                                "Diyan lang. Bantayan ang galaw nila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hold position and let them pass.",
-                            },
-                            ["TL"] = {
-                                "Hawakan ang pwesto at hayaang lumampas sila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Wait here. Don't make a sound.",
-                            },
-                            ["TL"] = {
-                                "Maghintay rito. Huwag gagawa ng tunog.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hold up. See which way they drift.",
-                            },
-                            ["TL"] = {
-                                "Tigil muna. Tignan kung saan sila papunta.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Freeze. Don't reveal our position.",
-                            },
-                            ["TL"] = {
-                                "Huwag gagalaw. Huwag ilantad ang pwesto natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Keep low and hold here.",
-                            },
-                            ["TL"] = {
-                                "Yumuko at manatili rito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stay behind cover for a moment.",
-                            },
-                            ["TL"] = {
-                                "Manatili sa kublihan sandali.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hold the line. Wait for the signal.",
-                            },
-                            ["TL"] = {
-                                "Hawakan ang linya. Hintayin ang senyas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Wait and observe before moving.",
-                            },
-                            ["TL"] = {
-                                "Maghintay at magmasid bago kumilos.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hold for now.",
+                                        "Stay put. Watch their movement.",
+                                        "Hold position and let them pass.",
+                                        "Wait here. Don't make a sound.",
+                                        "Hold up. See which way they drift.",
+                                        "Freeze. Don't reveal our position.",
+                                        "Keep low and hold here.",
+                                        "Stay behind cover for a moment.",
+                                        "Hold the line. Wait for the signal.",
+                                        "Wait and observe before moving.",
+                                    },
+                                    ["TL"] = {
+                                        "Hinto muna.",
+                                        "Diyan lang. Bantayan ang galaw nila.",
+                                        "Hawakan ang pwesto at hayaang lumampas sila.",
+                                        "Maghintay rito. Huwag gagawa ng tunog.",
+                                        "Tigil muna. Tignan kung saan sila papunta.",
+                                        "Huwag gagalaw. Huwag ilantad ang pwesto natin.",
+                                        "Yumuko at manatili rito.",
+                                        "Manatili sa kublihan sandali.",
+                                        "Hawakan ang linya. Hintayin ang senyas.",
+                                        "Maghintay at magmasid bago kumilos.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.choice.hold",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Hold for now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.choice.hold.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -466,20 +650,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Hold for now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.choice.hold.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hold for now.",
+                        "Stay put. Watch their movement.",
+                        "Hold position and let them pass.",
+                        "Wait here. Don't make a sound.",
+                        "Hold up. See which way they drift.",
+                        "Freeze. Don't reveal our position.",
+                        "Keep low and hold here.",
+                        "Stay behind cover for a moment.",
+                        "Hold the line. Wait for the signal.",
+                        "Wait and observe before moving.",
+                    },
+                    ["TL"] = {
+                        "Hinto muna.",
+                        "Diyan lang. Bantayan ang galaw nila.",
+                        "Hawakan ang pwesto at hayaang lumampas sila.",
+                        "Maghintay rito. Huwag gagawa ng tunog.",
+                        "Tigil muna. Tignan kung saan sila papunta.",
+                        "Huwag gagalaw. Huwag ilantad ang pwesto natin.",
+                        "Yumuko at manatili rito.",
+                        "Manatili sa kublihan sandali.",
+                        "Hawakan ang linya. Hintayin ang senyas.",
+                        "Maghintay at magmasid bago kumilos.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.deescalated",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.deescalated",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "They're thinning out. Don't relax yet.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.deescalated.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "They're thinning out. Don't relax yet.",
+                                        "Most of the swarm is down. Check stragglers.",
+                                        "The main wave is broken. Keep scanning.",
+                                        "Fewer coming through now. Catch your breath.",
+                                        "Herd's scattered. Clear the remaining few.",
+                                        "We weathered the bulk of them. Stay focused.",
+                                        "Numbers are dropping. Keep the pressure on.",
+                                        "They're losing momentum. Finish them off.",
+                                        "Only a handful left. Watch your spacing.",
+                                        "The rush is slowing down. Good work.",
+                                    },
+                                    ["TL"] = {
+                                        "Kumokonti sila. Huwag munang kampante.",
+                                        "Bagsak na karamihan sa kuyog. Tignan ang mga naiwan.",
+                                        "Nawasak na ang bulto. Tuloy sa pagmamasid.",
+                                        "Kakaunti na lang ang dumarating. Huminga muna.",
+                                        "Kalat na ang kuyog. Ubusin ang natitira.",
+                                        "Nalagpasan natin ang pinakamarami. Manatiling nakatutok.",
+                                        "Bumaba na ang bilang nila. Tuloy ang laban.",
+                                        "Nawawalan na sila ng pwersa. Tapusin na natin sila.",
+                                        "Ilan-ilan na lang ang natitira. Bantayan ang distansya.",
+                                        "Bumagal na ang pagdagsa. Maganda ang ginawa natin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "They're thinning out. Don't relax yet.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.deescalated.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "They're thinning out. Don't relax yet.",
+                            "Most of the swarm is down. Check stragglers.",
+                            "The main wave is broken. Keep scanning.",
+                            "Fewer coming through now. Catch your breath.",
+                            "Herd's scattered. Clear the remaining few.",
+                            "We weathered the bulk of them. Stay focused.",
+                            "Numbers are dropping. Keep the pressure on.",
+                            "They're losing momentum. Finish them off.",
+                            "Only a handful left. Watch your spacing.",
+                            "The rush is slowing down. Good work.",
+                        },
+                        ["TL"] = {
+                            "Kumokonti sila. Huwag munang kampante.",
+                            "Bagsak na karamihan sa kuyog. Tignan ang mga naiwan.",
+                            "Nawasak na ang bulto. Tuloy sa pagmamasid.",
+                            "Kakaunti na lang ang dumarating. Huminga muna.",
+                            "Kalat na ang kuyog. Ubusin ang natitira.",
+                            "Nalagpasan natin ang pinakamarami. Manatiling nakatutok.",
+                            "Bumaba na ang bilang nila. Tuloy ang laban.",
+                            "Nawawalan na sila ng pwersa. Tapusin na natin sila.",
+                            "Ilan-ilan na lang ang natitira. Bantayan ang distansya.",
+                            "Bumagal na ang pagdagsa. Maganda ang ginawa natin.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.deescalated",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "deescalated",
-            ["sourceId"] = "semantic.combat.horde.deescalated",
+            ["sourceId"] = "combat.horde.deescalated",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_deescalated.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde",
+        ["namespace"] = "combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -493,126 +798,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.deescalated",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're thinning out. Don't relax yet.",
-                            },
-                            ["TL"] = {
-                                "Kumokonti sila. Huwag munang kampante.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Most of the swarm is down. Check stragglers.",
-                            },
-                            ["TL"] = {
-                                "Bagsak na karamihan sa kuyog. Tignan ang mga naiwan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The main wave is broken. Keep scanning.",
-                            },
-                            ["TL"] = {
-                                "Nawasak na ang bulto. Tuloy sa pagmamasid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fewer coming through now. Catch your breath.",
-                            },
-                            ["TL"] = {
-                                "Kakaunti na lang ang dumarating. Huminga muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Herd's scattered. Clear the remaining few.",
-                            },
-                            ["TL"] = {
-                                "Kalat na ang kuyog. Ubusin ang natitira.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We weathered the bulk of them. Stay focused.",
-                            },
-                            ["TL"] = {
-                                "Nalagpasan natin ang pinakamarami. Manatiling nakatutok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Numbers are dropping. Keep the pressure on.",
-                            },
-                            ["TL"] = {
-                                "Bumaba na ang bilang nila. Tuloy ang laban.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're losing momentum. Finish them off.",
-                            },
-                            ["TL"] = {
-                                "Nawawalan na sila ng pwersa. Tapusin na natin sila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Only a handful left. Watch your spacing.",
-                            },
-                            ["TL"] = {
-                                "Ilan-ilan na lang ang natitira. Bantayan ang distansya.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The rush is slowing down. Good work.",
-                            },
-                            ["TL"] = {
-                                "Bumagal na ang pagdagsa. Maganda ang ginawa natin.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "They're thinning out. Don't relax yet.",
+                                        "Most of the swarm is down. Check stragglers.",
+                                        "The main wave is broken. Keep scanning.",
+                                        "Fewer coming through now. Catch your breath.",
+                                        "Herd's scattered. Clear the remaining few.",
+                                        "We weathered the bulk of them. Stay focused.",
+                                        "Numbers are dropping. Keep the pressure on.",
+                                        "They're losing momentum. Finish them off.",
+                                        "Only a handful left. Watch your spacing.",
+                                        "The rush is slowing down. Good work.",
+                                    },
+                                    ["TL"] = {
+                                        "Kumokonti sila. Huwag munang kampante.",
+                                        "Bagsak na karamihan sa kuyog. Tignan ang mga naiwan.",
+                                        "Nawasak na ang bulto. Tuloy sa pagmamasid.",
+                                        "Kakaunti na lang ang dumarating. Huminga muna.",
+                                        "Kalat na ang kuyog. Ubusin ang natitira.",
+                                        "Nalagpasan natin ang pinakamarami. Manatiling nakatutok.",
+                                        "Bumaba na ang bilang nila. Tuloy ang laban.",
+                                        "Nawawalan na sila ng pwersa. Tapusin na natin sila.",
+                                        "Ilan-ilan na lang ang natitira. Bantayan ang distansya.",
+                                        "Bumagal na ang pagdagsa. Maganda ang ginawa natin.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.deescalated",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "They're thinning out. Don't relax yet.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.deescalated.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -622,20 +879,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "They're thinning out. Don't relax yet.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.deescalated.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "They're thinning out. Don't relax yet.",
+                        "Most of the swarm is down. Check stragglers.",
+                        "The main wave is broken. Keep scanning.",
+                        "Fewer coming through now. Catch your breath.",
+                        "Herd's scattered. Clear the remaining few.",
+                        "We weathered the bulk of them. Stay focused.",
+                        "Numbers are dropping. Keep the pressure on.",
+                        "They're losing momentum. Finish them off.",
+                        "Only a handful left. Watch your spacing.",
+                        "The rush is slowing down. Good work.",
+                    },
+                    ["TL"] = {
+                        "Kumokonti sila. Huwag munang kampante.",
+                        "Bagsak na karamihan sa kuyog. Tignan ang mga naiwan.",
+                        "Nawasak na ang bulto. Tuloy sa pagmamasid.",
+                        "Kakaunti na lang ang dumarating. Huminga muna.",
+                        "Kalat na ang kuyog. Ubusin ang natitira.",
+                        "Nalagpasan natin ang pinakamarami. Manatiling nakatutok.",
+                        "Bumaba na ang bilang nila. Tuloy ang laban.",
+                        "Nawawalan na sila ng pwersa. Tapusin na natin sila.",
+                        "Ilan-ilan na lang ang natitira. Bantayan ang distansya.",
+                        "Bumagal na ang pagdagsa. Maganda ang ginawa natin.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Horde nearby. Keep your eyes up.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Horde nearby. Keep your eyes up.",
+                                        "Large group in the vicinity. Tread quietly.",
+                                        "There's a swarm around here. Stay cautious.",
+                                        "I hear heavy movement outside. Watch yourself.",
+                                        "Pack of infected close by. Stay alert.",
+                                        "We're near a wandering horde. Keep low.",
+                                        "Too much shuffling out there. Keep weapons ready.",
+                                        "Dead are gathering nearby. Stay on your toes.",
+                                        "Horde in the area. Pick your steps carefully.",
+                                        "Infected swarm close. Don't make unnecessary noise.",
+                                    },
+                                    ["TL"] = {
+                                        "May kuyog na malapit. Magmatyag tayo.",
+                                        "Malaking grupo sa paligid. Huwag gumawa ng ingay.",
+                                        "May kuyog sa lugar na 'to. Mag-ingat.",
+                                        "May naririnig akong maraming yabag sa labas. Mag-ingat.",
+                                        "Grupo ng infected malapit dito. Maging alerto.",
+                                        "Malapit tayo sa palakad-lakad na kuyog. Yumuko.",
+                                        "Masyadong maraming kaluskos sa labas. Ihanda ang sandata.",
+                                        "Nagtitipon ang mga patay malapit dito. Maging handa.",
+                                        "May kuyog sa paligid. Piliin nang maigi ang bawat hakbang.",
+                                        "Malapit ang kuyog ng infected. Huwag gumawa ng ingay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Horde nearby. Keep your eyes up.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Horde nearby. Keep your eyes up.",
+                            "Large group in the vicinity. Tread quietly.",
+                            "There's a swarm around here. Stay cautious.",
+                            "I hear heavy movement outside. Watch yourself.",
+                            "Pack of infected close by. Stay alert.",
+                            "We're near a wandering horde. Keep low.",
+                            "Too much shuffling out there. Keep weapons ready.",
+                            "Dead are gathering nearby. Stay on your toes.",
+                            "Horde in the area. Pick your steps carefully.",
+                            "Infected swarm close. Don't make unnecessary noise.",
+                        },
+                        ["TL"] = {
+                            "May kuyog na malapit. Magmatyag tayo.",
+                            "Malaking grupo sa paligid. Huwag gumawa ng ingay.",
+                            "May kuyog sa lugar na 'to. Mag-ingat.",
+                            "May naririnig akong maraming yabag sa labas. Mag-ingat.",
+                            "Grupo ng infected malapit dito. Maging alerto.",
+                            "Malapit tayo sa palakad-lakad na kuyog. Yumuko.",
+                            "Masyadong maraming kaluskos sa labas. Ihanda ang sandata.",
+                            "Nagtitipon ang mga patay malapit dito. Maging handa.",
+                            "May kuyog sa paligid. Piliin nang maigi ang bawat hakbang.",
+                            "Malapit ang kuyog ng infected. Huwag gumawa ng ingay.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "default",
-            ["sourceId"] = "semantic.combat.horde.default",
+            ["sourceId"] = "combat.horde.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde",
+        ["namespace"] = "combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -649,126 +1027,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.default",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Horde nearby. Keep your eyes up.",
-                            },
-                            ["TL"] = {
-                                "May kuyog na malapit. Magmatyag tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Large group in the vicinity. Tread quietly.",
-                            },
-                            ["TL"] = {
-                                "Malaking grupo sa paligid. Huwag gumawa ng ingay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "There's a swarm around here. Stay cautious.",
-                            },
-                            ["TL"] = {
-                                "May kuyog sa lugar na 'to. Mag-ingat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear heavy movement outside. Watch yourself.",
-                            },
-                            ["TL"] = {
-                                "May naririnig akong maraming yabag sa labas. Mag-ingat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Pack of infected close by. Stay alert.",
-                            },
-                            ["TL"] = {
-                                "Grupo ng infected malapit dito. Maging alerto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We're near a wandering horde. Keep low.",
-                            },
-                            ["TL"] = {
-                                "Malapit tayo sa palakad-lakad na kuyog. Yumuko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too much shuffling out there. Keep weapons ready.",
-                            },
-                            ["TL"] = {
-                                "Masyadong maraming kaluskos sa labas. Ihanda ang sandata.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead are gathering nearby. Stay on your toes.",
-                            },
-                            ["TL"] = {
-                                "Nagtitipon ang mga patay malapit dito. Maging handa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Horde in the area. Pick your steps carefully.",
-                            },
-                            ["TL"] = {
-                                "May kuyog sa paligid. Piliin nang maigi ang bawat hakbang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Infected swarm close. Don't make unnecessary noise.",
-                            },
-                            ["TL"] = {
-                                "Malapit ang kuyog ng infected. Huwag gumawa ng ingay.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Horde nearby. Keep your eyes up.",
+                                        "Large group in the vicinity. Tread quietly.",
+                                        "There's a swarm around here. Stay cautious.",
+                                        "I hear heavy movement outside. Watch yourself.",
+                                        "Pack of infected close by. Stay alert.",
+                                        "We're near a wandering horde. Keep low.",
+                                        "Too much shuffling out there. Keep weapons ready.",
+                                        "Dead are gathering nearby. Stay on your toes.",
+                                        "Horde in the area. Pick your steps carefully.",
+                                        "Infected swarm close. Don't make unnecessary noise.",
+                                    },
+                                    ["TL"] = {
+                                        "May kuyog na malapit. Magmatyag tayo.",
+                                        "Malaking grupo sa paligid. Huwag gumawa ng ingay.",
+                                        "May kuyog sa lugar na 'to. Mag-ingat.",
+                                        "May naririnig akong maraming yabag sa labas. Mag-ingat.",
+                                        "Grupo ng infected malapit dito. Maging alerto.",
+                                        "Malapit tayo sa palakad-lakad na kuyog. Yumuko.",
+                                        "Masyadong maraming kaluskos sa labas. Ihanda ang sandata.",
+                                        "Nagtitipon ang mga patay malapit dito. Maging handa.",
+                                        "May kuyog sa paligid. Piliin nang maigi ang bawat hakbang.",
+                                        "Malapit ang kuyog ng infected. Huwag gumawa ng ingay.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Horde nearby. Keep your eyes up.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -778,20 +1108,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Horde nearby. Keep your eyes up.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Horde nearby. Keep your eyes up.",
+                        "Large group in the vicinity. Tread quietly.",
+                        "There's a swarm around here. Stay cautious.",
+                        "I hear heavy movement outside. Watch yourself.",
+                        "Pack of infected close by. Stay alert.",
+                        "We're near a wandering horde. Keep low.",
+                        "Too much shuffling out there. Keep weapons ready.",
+                        "Dead are gathering nearby. Stay on your toes.",
+                        "Horde in the area. Pick your steps carefully.",
+                        "Infected swarm close. Don't make unnecessary noise.",
+                    },
+                    ["TL"] = {
+                        "May kuyog na malapit. Magmatyag tayo.",
+                        "Malaking grupo sa paligid. Huwag gumawa ng ingay.",
+                        "May kuyog sa lugar na 'to. Mag-ingat.",
+                        "May naririnig akong maraming yabag sa labas. Mag-ingat.",
+                        "Grupo ng infected malapit dito. Maging alerto.",
+                        "Malapit tayo sa palakad-lakad na kuyog. Yumuko.",
+                        "Masyadong maraming kaluskos sa labas. Ihanda ang sandata.",
+                        "Nagtitipon ang mga patay malapit dito. Maging handa.",
+                        "May kuyog sa paligid. Piliin nang maigi ang bawat hakbang.",
+                        "Malapit ang kuyog ng infected. Huwag gumawa ng ingay.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.escalated",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.escalated",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "More are piling in. This is getting bad.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.escalated.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "More are piling in. This is getting bad.",
+                                        "They keep coming! We're losing ground.",
+                                        "The herd just doubled. We need a plan.",
+                                        "Too many to push through! Fall back a step.",
+                                        "The swarm's thickening. Watch your flanks!",
+                                        "Every window is shaking. They're surrounding us.",
+                                        "They're pouring through the gaps. Steady!",
+                                        "This isn't thinning out, it's growing!",
+                                        "More rottens behind the first wave!",
+                                        "We're getting boxed in. Don't stop swinging.",
+                                    },
+                                    ["TL"] = {
+                                        "Dumarami sila. Lumalala ito.",
+                                        "Patuloy silang dumarami! Nawawalan tayo ng espasyo.",
+                                        "Doble na ang dami nila. Kailangan natin ng plano.",
+                                        "Masyadong marami para lusubin! Umatras nang kaunti.",
+                                        "Kumakapal ang kuyog. Bantayan ang gilid mo!",
+                                        "Nanginginig ang bawat bintana. Pinalilibutan nila tayo.",
+                                        "Bumubuhos sila sa mga butas. Magpakatatag!",
+                                        "Hindi sila kumokonti, lalo pang dumarami!",
+                                        "May mga bulok pa sa likod ng unang grupo!",
+                                        "Naiipit na tayo. Huwag titigil sa paghataw.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "More are piling in. This is getting bad.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.escalated.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "More are piling in. This is getting bad.",
+                            "They keep coming! We're losing ground.",
+                            "The herd just doubled. We need a plan.",
+                            "Too many to push through! Fall back a step.",
+                            "The swarm's thickening. Watch your flanks!",
+                            "Every window is shaking. They're surrounding us.",
+                            "They're pouring through the gaps. Steady!",
+                            "This isn't thinning out, it's growing!",
+                            "More rottens behind the first wave!",
+                            "We're getting boxed in. Don't stop swinging.",
+                        },
+                        ["TL"] = {
+                            "Dumarami sila. Lumalala ito.",
+                            "Patuloy silang dumarami! Nawawalan tayo ng espasyo.",
+                            "Doble na ang dami nila. Kailangan natin ng plano.",
+                            "Masyadong marami para lusubin! Umatras nang kaunti.",
+                            "Kumakapal ang kuyog. Bantayan ang gilid mo!",
+                            "Nanginginig ang bawat bintana. Pinalilibutan nila tayo.",
+                            "Bumubuhos sila sa mga butas. Magpakatatag!",
+                            "Hindi sila kumokonti, lalo pang dumarami!",
+                            "May mga bulok pa sa likod ng unang grupo!",
+                            "Naiipit na tayo. Huwag titigil sa paghataw.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.escalated",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "escalated",
-            ["sourceId"] = "semantic.combat.horde.escalated",
+            ["sourceId"] = "combat.horde.escalated",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_escalated.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde",
+        ["namespace"] = "combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -805,126 +1256,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.escalated",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "More are piling in. This is getting bad.",
-                            },
-                            ["TL"] = {
-                                "Dumarami sila. Lumalala ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They keep coming! We're losing ground.",
-                            },
-                            ["TL"] = {
-                                "Patuloy silang dumarami! Nawawalan tayo ng espasyo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The herd just doubled. We need a plan.",
-                            },
-                            ["TL"] = {
-                                "Doble na ang dami nila. Kailangan natin ng plano.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too many to push through! Fall back a step.",
-                            },
-                            ["TL"] = {
-                                "Masyadong marami para lusubin! Umatras nang kaunti.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The swarm's thickening. Watch your flanks!",
-                            },
-                            ["TL"] = {
-                                "Kumakapal ang kuyog. Bantayan ang gilid mo!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Every window is shaking. They're surrounding us.",
-                            },
-                            ["TL"] = {
-                                "Nanginginig ang bawat bintana. Pinalilibutan nila tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're pouring through the gaps. Steady!",
-                            },
-                            ["TL"] = {
-                                "Bumubuhos sila sa mga butas. Magpakatatag!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "This isn't thinning out, it's growing!",
-                            },
-                            ["TL"] = {
-                                "Hindi sila kumokonti, lalo pang dumarami!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "More rottens behind the first wave!",
-                            },
-                            ["TL"] = {
-                                "May mga bulok pa sa likod ng unang grupo!",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We're getting boxed in. Don't stop swinging.",
-                            },
-                            ["TL"] = {
-                                "Naiipit na tayo. Huwag titigil sa paghataw.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "More are piling in. This is getting bad.",
+                                        "They keep coming! We're losing ground.",
+                                        "The herd just doubled. We need a plan.",
+                                        "Too many to push through! Fall back a step.",
+                                        "The swarm's thickening. Watch your flanks!",
+                                        "Every window is shaking. They're surrounding us.",
+                                        "They're pouring through the gaps. Steady!",
+                                        "This isn't thinning out, it's growing!",
+                                        "More rottens behind the first wave!",
+                                        "We're getting boxed in. Don't stop swinging.",
+                                    },
+                                    ["TL"] = {
+                                        "Dumarami sila. Lumalala ito.",
+                                        "Patuloy silang dumarami! Nawawalan tayo ng espasyo.",
+                                        "Doble na ang dami nila. Kailangan natin ng plano.",
+                                        "Masyadong marami para lusubin! Umatras nang kaunti.",
+                                        "Kumakapal ang kuyog. Bantayan ang gilid mo!",
+                                        "Nanginginig ang bawat bintana. Pinalilibutan nila tayo.",
+                                        "Bumubuhos sila sa mga butas. Magpakatatag!",
+                                        "Hindi sila kumokonti, lalo pang dumarami!",
+                                        "May mga bulok pa sa likod ng unang grupo!",
+                                        "Naiipit na tayo. Huwag titigil sa paghataw.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.escalated",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "More are piling in. This is getting bad.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.escalated.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -934,20 +1337,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "More are piling in. This is getting bad.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.escalated.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "More are piling in. This is getting bad.",
+                        "They keep coming! We're losing ground.",
+                        "The herd just doubled. We need a plan.",
+                        "Too many to push through! Fall back a step.",
+                        "The swarm's thickening. Watch your flanks!",
+                        "Every window is shaking. They're surrounding us.",
+                        "They're pouring through the gaps. Steady!",
+                        "This isn't thinning out, it's growing!",
+                        "More rottens behind the first wave!",
+                        "We're getting boxed in. Don't stop swinging.",
+                    },
+                    ["TL"] = {
+                        "Dumarami sila. Lumalala ito.",
+                        "Patuloy silang dumarami! Nawawalan tayo ng espasyo.",
+                        "Doble na ang dami nila. Kailangan natin ng plano.",
+                        "Masyadong marami para lusubin! Umatras nang kaunti.",
+                        "Kumakapal ang kuyog. Bantayan ang gilid mo!",
+                        "Nanginginig ang bawat bintana. Pinalilibutan nila tayo.",
+                        "Bumubuhos sila sa mga butas. Magpakatatag!",
+                        "Hindi sila kumokonti, lalo pang dumarami!",
+                        "May mga bulok pa sa likod ng unang grupo!",
+                        "Naiipit na tayo. Huwag titigil sa paghataw.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.prompt.default",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.prompt.default",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That's a lot of them. We fighting or going around?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.prompt.default.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That's a lot of them. We fighting or going around?",
+                                        "Big swarm ahead. What's the plan?",
+                                        "Whole herd in our way. Do we push through or find another path?",
+                                        "Look at the street. Are we engaging or avoiding?",
+                                        "Infected group is large. How do you want to handle this?",
+                                        "Crowd ahead of us. Should we fight or sneak past?",
+                                        "There's quite a crowd. What are we doing?",
+                                        "They're blocking the lane. Do we clear them or detour?",
+                                        "Horde right in front. What do you want to do?",
+                                        "That's more than a few. Engage or back off?",
+                                    },
+                                    ["TL"] = {
+                                        "Ang dami nila. Lalaban ba tayo o iiwas?",
+                                        "Malaking kuyog sa unahan. Ano'ng plano?",
+                                        "Buong kawan ang nakaharang. Susugod ba tayo o maghahanap ng ibang daan?",
+                                        "Tingnan mo ang kalsada. Lalabanan ba natin o iiwasan?",
+                                        "Malaki ang grupo ng infected. Paano mo gustong harapin 'to?",
+                                        "May mga patay sa harap natin. Lalaban ba tayo o lulusot nang tahimik?",
+                                        "Medyo marami sila. Ano'ng gagawin natin?",
+                                        "Harang sila sa daan. Lilinisin ba natin o iikot tayo?",
+                                        "Kuyog mismo sa harap. Ano'ng gusto mong gawin?",
+                                        "Higit pa sa iilan 'yan. Susugod o aatras?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.prompt",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That's a lot of them. We fighting or going around?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.prompt.default.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That's a lot of them. We fighting or going around?",
+                            "Big swarm ahead. What's the plan?",
+                            "Whole herd in our way. Do we push through or find another path?",
+                            "Look at the street. Are we engaging or avoiding?",
+                            "Infected group is large. How do you want to handle this?",
+                            "Crowd ahead of us. Should we fight or sneak past?",
+                            "There's quite a crowd. What are we doing?",
+                            "They're blocking the lane. Do we clear them or detour?",
+                            "Horde right in front. What do you want to do?",
+                            "That's more than a few. Engage or back off?",
+                        },
+                        ["TL"] = {
+                            "Ang dami nila. Lalaban ba tayo o iiwas?",
+                            "Malaking kuyog sa unahan. Ano'ng plano?",
+                            "Buong kawan ang nakaharang. Susugod ba tayo o maghahanap ng ibang daan?",
+                            "Tingnan mo ang kalsada. Lalabanan ba natin o iiwasan?",
+                            "Malaki ang grupo ng infected. Paano mo gustong harapin 'to?",
+                            "May mga patay sa harap natin. Lalaban ba tayo o lulusot nang tahimik?",
+                            "Medyo marami sila. Ano'ng gagawin natin?",
+                            "Harang sila sa daan. Lilinisin ba natin o iikot tayo?",
+                            "Kuyog mismo sa harap. Ano'ng gusto mong gawin?",
+                            "Higit pa sa iilan 'yan. Susugod o aatras?",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.prompt.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "default",
-            ["sourceId"] = "semantic.combat.horde.prompt.default",
+            ["sourceId"] = "combat.horde.prompt.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde.prompt",
+        ["namespace"] = "combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -961,126 +1485,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.prompt.default",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's a lot of them. We fighting or going around?",
-                            },
-                            ["TL"] = {
-                                "Ang dami nila. Lalaban ba tayo o iiwas?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Big swarm ahead. What's the plan?",
-                            },
-                            ["TL"] = {
-                                "Malaking kuyog sa unahan. Ano'ng plano?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Whole herd in our way. Do we push through or find another path?",
-                            },
-                            ["TL"] = {
-                                "Buong kawan ang nakaharang. Susugod ba tayo o maghahanap ng ibang daan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Look at the street. Are we engaging or avoiding?",
-                            },
-                            ["TL"] = {
-                                "Tingnan mo ang kalsada. Lalabanan ba natin o iiwasan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Infected group is large. How do you want to handle this?",
-                            },
-                            ["TL"] = {
-                                "Malaki ang grupo ng infected. Paano mo gustong harapin 'to?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Crowd ahead of us. Should we fight or sneak past?",
-                            },
-                            ["TL"] = {
-                                "May mga patay sa harap natin. Lalaban ba tayo o lulusot nang tahimik?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "There's quite a crowd. What are we doing?",
-                            },
-                            ["TL"] = {
-                                "Medyo marami sila. Ano'ng gagawin natin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're blocking the lane. Do we clear them or detour?",
-                            },
-                            ["TL"] = {
-                                "Harang sila sa daan. Lilinisin ba natin o iikot tayo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Horde right in front. What do you want to do?",
-                            },
-                            ["TL"] = {
-                                "Kuyog mismo sa harap. Ano'ng gusto mong gawin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's more than a few. Engage or back off?",
-                            },
-                            ["TL"] = {
-                                "Higit pa sa iilan 'yan. Susugod o aatras?",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That's a lot of them. We fighting or going around?",
+                                        "Big swarm ahead. What's the plan?",
+                                        "Whole herd in our way. Do we push through or find another path?",
+                                        "Look at the street. Are we engaging or avoiding?",
+                                        "Infected group is large. How do you want to handle this?",
+                                        "Crowd ahead of us. Should we fight or sneak past?",
+                                        "There's quite a crowd. What are we doing?",
+                                        "They're blocking the lane. Do we clear them or detour?",
+                                        "Horde right in front. What do you want to do?",
+                                        "That's more than a few. Engage or back off?",
+                                    },
+                                    ["TL"] = {
+                                        "Ang dami nila. Lalaban ba tayo o iiwas?",
+                                        "Malaking kuyog sa unahan. Ano'ng plano?",
+                                        "Buong kawan ang nakaharang. Susugod ba tayo o maghahanap ng ibang daan?",
+                                        "Tingnan mo ang kalsada. Lalabanan ba natin o iiwasan?",
+                                        "Malaki ang grupo ng infected. Paano mo gustong harapin 'to?",
+                                        "May mga patay sa harap natin. Lalaban ba tayo o lulusot nang tahimik?",
+                                        "Medyo marami sila. Ano'ng gagawin natin?",
+                                        "Harang sila sa daan. Lilinisin ba natin o iikot tayo?",
+                                        "Kuyog mismo sa harap. Ano'ng gusto mong gawin?",
+                                        "Higit pa sa iilan 'yan. Susugod o aatras?",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.prompt.default",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That's a lot of them. We fighting or going around?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.prompt.default.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1090,20 +1566,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That's a lot of them. We fighting or going around?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.prompt.default.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That's a lot of them. We fighting or going around?",
+                        "Big swarm ahead. What's the plan?",
+                        "Whole herd in our way. Do we push through or find another path?",
+                        "Look at the street. Are we engaging or avoiding?",
+                        "Infected group is large. How do you want to handle this?",
+                        "Crowd ahead of us. Should we fight or sneak past?",
+                        "There's quite a crowd. What are we doing?",
+                        "They're blocking the lane. Do we clear them or detour?",
+                        "Horde right in front. What do you want to do?",
+                        "That's more than a few. Engage or back off?",
+                    },
+                    ["TL"] = {
+                        "Ang dami nila. Lalaban ba tayo o iiwas?",
+                        "Malaking kuyog sa unahan. Ano'ng plano?",
+                        "Buong kawan ang nakaharang. Susugod ba tayo o maghahanap ng ibang daan?",
+                        "Tingnan mo ang kalsada. Lalabanan ba natin o iiwasan?",
+                        "Malaki ang grupo ng infected. Paano mo gustong harapin 'to?",
+                        "May mga patay sa harap natin. Lalaban ba tayo o lulusot nang tahimik?",
+                        "Medyo marami sila. Ano'ng gagawin natin?",
+                        "Harang sila sa daan. Lilinisin ba natin o iikot tayo?",
+                        "Kuyog mismo sa harap. Ano'ng gusto mong gawin?",
+                        "Higit pa sa iilan 'yan. Susugod o aatras?",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.prompt.eager",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.prompt.eager",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That's a hell of a crowd. We taking them?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.prompt.eager.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That's a hell of a crowd. We taking them?",
+                                        "Big group ahead. Let's carve right through them.",
+                                        "Look at all those targets. You ready to swing?",
+                                        "We can take this pack. What's the call?",
+                                        "I say we clear them out right here. Ready?",
+                                        "They're packed together nicely. Time to strike.",
+                                        "I've got plenty of energy. Let's drop them.",
+                                        "Crowd of dead ahead. Give the word and I charge.",
+                                        "We've got weapons and room. Let's do this.",
+                                        "Let's crack some skulls. We fighting or what?",
+                                    },
+                                    ["TL"] = {
+                                        "Ang dami nila. Susugod ba tayo?",
+                                        "Malaking grupo sa unahan. Biyakin na natin sila.",
+                                        "Tingnan mo ang dami ng target. Handa ka na bang humataw?",
+                                        "Kaya natin ang grupong 'to. Ano'ng desisyon?",
+                                        "Linisin na natin sila rito mismo. Handa ka na?",
+                                        "Magkakadikit sila nang maayos. Oras na para sumugod.",
+                                        "Marami pa akong lakas. Itumba na natin sila.",
+                                        "Kuyog ng mga patay sa unahan. Sabihin mo lang at susugod ako.",
+                                        "May sandata at espasyo tayo. Labanan na natin.",
+                                        "Magbasag tayo ng bungo. Lalaban ba tayo o ano?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.prompt",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That's a hell of a crowd. We taking them?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.prompt.eager.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That's a hell of a crowd. We taking them?",
+                            "Big group ahead. Let's carve right through them.",
+                            "Look at all those targets. You ready to swing?",
+                            "We can take this pack. What's the call?",
+                            "I say we clear them out right here. Ready?",
+                            "They're packed together nicely. Time to strike.",
+                            "I've got plenty of energy. Let's drop them.",
+                            "Crowd of dead ahead. Give the word and I charge.",
+                            "We've got weapons and room. Let's do this.",
+                            "Let's crack some skulls. We fighting or what?",
+                        },
+                        ["TL"] = {
+                            "Ang dami nila. Susugod ba tayo?",
+                            "Malaking grupo sa unahan. Biyakin na natin sila.",
+                            "Tingnan mo ang dami ng target. Handa ka na bang humataw?",
+                            "Kaya natin ang grupong 'to. Ano'ng desisyon?",
+                            "Linisin na natin sila rito mismo. Handa ka na?",
+                            "Magkakadikit sila nang maayos. Oras na para sumugod.",
+                            "Marami pa akong lakas. Itumba na natin sila.",
+                            "Kuyog ng mga patay sa unahan. Sabihin mo lang at susugod ako.",
+                            "May sandata at espasyo tayo. Labanan na natin.",
+                            "Magbasag tayo ng bungo. Lalaban ba tayo o ano?",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.prompt.eager",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "eager",
-            ["sourceId"] = "semantic.combat.horde.prompt.eager",
+            ["sourceId"] = "combat.horde.prompt.eager",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_eager.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde.prompt",
+        ["namespace"] = "combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1117,126 +1714,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.prompt.eager",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's a hell of a crowd. We taking them?",
-                            },
-                            ["TL"] = {
-                                "Ang dami nila. Susugod ba tayo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Big group ahead. Let's carve right through them.",
-                            },
-                            ["TL"] = {
-                                "Malaking grupo sa unahan. Biyakin na natin sila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Look at all those targets. You ready to swing?",
-                            },
-                            ["TL"] = {
-                                "Tingnan mo ang dami ng target. Handa ka na bang humataw?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We can take this pack. What's the call?",
-                            },
-                            ["TL"] = {
-                                "Kaya natin ang grupong 'to. Ano'ng desisyon?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I say we clear them out right here. Ready?",
-                            },
-                            ["TL"] = {
-                                "Linisin na natin sila rito mismo. Handa ka na?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're packed together nicely. Time to strike.",
-                            },
-                            ["TL"] = {
-                                "Magkakadikit sila nang maayos. Oras na para sumugod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I've got plenty of energy. Let's drop them.",
-                            },
-                            ["TL"] = {
-                                "Marami pa akong lakas. Itumba na natin sila.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Crowd of dead ahead. Give the word and I charge.",
-                            },
-                            ["TL"] = {
-                                "Kuyog ng mga patay sa unahan. Sabihin mo lang at susugod ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We've got weapons and room. Let's do this.",
-                            },
-                            ["TL"] = {
-                                "May sandata at espasyo tayo. Labanan na natin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's crack some skulls. We fighting or what?",
-                            },
-                            ["TL"] = {
-                                "Magbasag tayo ng bungo. Lalaban ba tayo o ano?",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That's a hell of a crowd. We taking them?",
+                                        "Big group ahead. Let's carve right through them.",
+                                        "Look at all those targets. You ready to swing?",
+                                        "We can take this pack. What's the call?",
+                                        "I say we clear them out right here. Ready?",
+                                        "They're packed together nicely. Time to strike.",
+                                        "I've got plenty of energy. Let's drop them.",
+                                        "Crowd of dead ahead. Give the word and I charge.",
+                                        "We've got weapons and room. Let's do this.",
+                                        "Let's crack some skulls. We fighting or what?",
+                                    },
+                                    ["TL"] = {
+                                        "Ang dami nila. Susugod ba tayo?",
+                                        "Malaking grupo sa unahan. Biyakin na natin sila.",
+                                        "Tingnan mo ang dami ng target. Handa ka na bang humataw?",
+                                        "Kaya natin ang grupong 'to. Ano'ng desisyon?",
+                                        "Linisin na natin sila rito mismo. Handa ka na?",
+                                        "Magkakadikit sila nang maayos. Oras na para sumugod.",
+                                        "Marami pa akong lakas. Itumba na natin sila.",
+                                        "Kuyog ng mga patay sa unahan. Sabihin mo lang at susugod ako.",
+                                        "May sandata at espasyo tayo. Labanan na natin.",
+                                        "Magbasag tayo ng bungo. Lalaban ba tayo o ano?",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.prompt.eager",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That's a hell of a crowd. We taking them?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.prompt.eager.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1246,20 +1795,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That's a hell of a crowd. We taking them?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.prompt.eager.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That's a hell of a crowd. We taking them?",
+                        "Big group ahead. Let's carve right through them.",
+                        "Look at all those targets. You ready to swing?",
+                        "We can take this pack. What's the call?",
+                        "I say we clear them out right here. Ready?",
+                        "They're packed together nicely. Time to strike.",
+                        "I've got plenty of energy. Let's drop them.",
+                        "Crowd of dead ahead. Give the word and I charge.",
+                        "We've got weapons and room. Let's do this.",
+                        "Let's crack some skulls. We fighting or what?",
+                    },
+                    ["TL"] = {
+                        "Ang dami nila. Susugod ba tayo?",
+                        "Malaking grupo sa unahan. Biyakin na natin sila.",
+                        "Tingnan mo ang dami ng target. Handa ka na bang humataw?",
+                        "Kaya natin ang grupong 'to. Ano'ng desisyon?",
+                        "Linisin na natin sila rito mismo. Handa ka na?",
+                        "Magkakadikit sila nang maayos. Oras na para sumugod.",
+                        "Marami pa akong lakas. Itumba na natin sila.",
+                        "Kuyog ng mga patay sa unahan. Sabihin mo lang at susugod ako.",
+                        "May sandata at espasyo tayo. Labanan na natin.",
+                        "Magbasag tayo ng bungo. Lalaban ba tayo o ano?",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.prompt.reserved",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.prompt.reserved",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Horde ahead. Engage or go around?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.prompt.reserved.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Horde ahead. Engage or go around?",
+                                        "Crowd spotted. Call it.",
+                                        "Massed dead. Fight or bypass?",
+                                        "Swarm blocking route. Your call.",
+                                        "Large group. Stand and fight or slip past?",
+                                        "Herd ahead. Make a choice.",
+                                        "Horde present. Direct us.",
+                                        "Too many in the open. Do we push or turn?",
+                                        "Mass contacts. Decision?",
+                                        "Herd in path. Fight or avoid?",
+                                    },
+                                    ["TL"] = {
+                                        "May kuyog sa unahan. Lalaban o iiwas?",
+                                        "May nakitang grupo. Desisyunan mo.",
+                                        "Nagtitipong mga patay. Lalabanan o lalagpasan?",
+                                        "Harang ang kuyog sa daan. Ikaw ang masusunod.",
+                                        "Malaking grupo. Tatayo at lalaban o lulusot?",
+                                        "Kawan sa harap. Pumili ka.",
+                                        "May kuyog dito. Pangunahan mo kami.",
+                                        "Masyadong marami sa bukas na lugar. Susulong o liliko?",
+                                        "Maraming kalaban. Ano'ng pasya?",
+                                        "May kuyog sa dinaraanan. Laban o iwas?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.prompt",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Horde ahead. Engage or go around?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.prompt.reserved.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Horde ahead. Engage or go around?",
+                            "Crowd spotted. Call it.",
+                            "Massed dead. Fight or bypass?",
+                            "Swarm blocking route. Your call.",
+                            "Large group. Stand and fight or slip past?",
+                            "Herd ahead. Make a choice.",
+                            "Horde present. Direct us.",
+                            "Too many in the open. Do we push or turn?",
+                            "Mass contacts. Decision?",
+                            "Herd in path. Fight or avoid?",
+                        },
+                        ["TL"] = {
+                            "May kuyog sa unahan. Lalaban o iiwas?",
+                            "May nakitang grupo. Desisyunan mo.",
+                            "Nagtitipong mga patay. Lalabanan o lalagpasan?",
+                            "Harang ang kuyog sa daan. Ikaw ang masusunod.",
+                            "Malaking grupo. Tatayo at lalaban o lulusot?",
+                            "Kawan sa harap. Pumili ka.",
+                            "May kuyog dito. Pangunahan mo kami.",
+                            "Masyadong marami sa bukas na lugar. Susulong o liliko?",
+                            "Maraming kalaban. Ano'ng pasya?",
+                            "May kuyog sa dinaraanan. Laban o iwas?",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.prompt.reserved",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "reserved",
-            ["sourceId"] = "semantic.combat.horde.prompt.reserved",
+            ["sourceId"] = "combat.horde.prompt.reserved",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_reserved.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde.prompt",
+        ["namespace"] = "combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1273,126 +1943,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.prompt.reserved",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Horde ahead. Engage or go around?",
-                            },
-                            ["TL"] = {
-                                "May kuyog sa unahan. Lalaban o iiwas?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Crowd spotted. Call it.",
-                            },
-                            ["TL"] = {
-                                "May nakitang grupo. Desisyunan mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Massed dead. Fight or bypass?",
-                            },
-                            ["TL"] = {
-                                "Nagtitipong mga patay. Lalabanan o lalagpasan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Swarm blocking route. Your call.",
-                            },
-                            ["TL"] = {
-                                "Harang ang kuyog sa daan. Ikaw ang masusunod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Large group. Stand and fight or slip past?",
-                            },
-                            ["TL"] = {
-                                "Malaking grupo. Tatayo at lalaban o lulusot?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Herd ahead. Make a choice.",
-                            },
-                            ["TL"] = {
-                                "Kawan sa harap. Pumili ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Horde present. Direct us.",
-                            },
-                            ["TL"] = {
-                                "May kuyog dito. Pangunahan mo kami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too many in the open. Do we push or turn?",
-                            },
-                            ["TL"] = {
-                                "Masyadong marami sa bukas na lugar. Susulong o liliko?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Mass contacts. Decision?",
-                            },
-                            ["TL"] = {
-                                "Maraming kalaban. Ano'ng pasya?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Herd in path. Fight or avoid?",
-                            },
-                            ["TL"] = {
-                                "May kuyog sa dinaraanan. Laban o iwas?",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Horde ahead. Engage or go around?",
+                                        "Crowd spotted. Call it.",
+                                        "Massed dead. Fight or bypass?",
+                                        "Swarm blocking route. Your call.",
+                                        "Large group. Stand and fight or slip past?",
+                                        "Herd ahead. Make a choice.",
+                                        "Horde present. Direct us.",
+                                        "Too many in the open. Do we push or turn?",
+                                        "Mass contacts. Decision?",
+                                        "Herd in path. Fight or avoid?",
+                                    },
+                                    ["TL"] = {
+                                        "May kuyog sa unahan. Lalaban o iiwas?",
+                                        "May nakitang grupo. Desisyunan mo.",
+                                        "Nagtitipong mga patay. Lalabanan o lalagpasan?",
+                                        "Harang ang kuyog sa daan. Ikaw ang masusunod.",
+                                        "Malaking grupo. Tatayo at lalaban o lulusot?",
+                                        "Kawan sa harap. Pumili ka.",
+                                        "May kuyog dito. Pangunahan mo kami.",
+                                        "Masyadong marami sa bukas na lugar. Susulong o liliko?",
+                                        "Maraming kalaban. Ano'ng pasya?",
+                                        "May kuyog sa dinaraanan. Laban o iwas?",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.prompt.reserved",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Horde ahead. Engage or go around?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.prompt.reserved.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1402,20 +2024,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Horde ahead. Engage or go around?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.prompt.reserved.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Horde ahead. Engage or go around?",
+                        "Crowd spotted. Call it.",
+                        "Massed dead. Fight or bypass?",
+                        "Swarm blocking route. Your call.",
+                        "Large group. Stand and fight or slip past?",
+                        "Herd ahead. Make a choice.",
+                        "Horde present. Direct us.",
+                        "Too many in the open. Do we push or turn?",
+                        "Mass contacts. Decision?",
+                        "Herd in path. Fight or avoid?",
+                    },
+                    ["TL"] = {
+                        "May kuyog sa unahan. Lalaban o iiwas?",
+                        "May nakitang grupo. Desisyunan mo.",
+                        "Nagtitipong mga patay. Lalabanan o lalagpasan?",
+                        "Harang ang kuyog sa daan. Ikaw ang masusunod.",
+                        "Malaking grupo. Tatayo at lalaban o lulusot?",
+                        "Kawan sa harap. Pumili ka.",
+                        "May kuyog dito. Pangunahan mo kami.",
+                        "Masyadong marami sa bukas na lugar. Susulong o liliko?",
+                        "Maraming kalaban. Ano'ng pasya?",
+                        "May kuyog sa dinaraanan. Laban o iwas?",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.prompt.shaken",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.prompt.shaken",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "God... that's a lot. Are we really fighting all of them?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.prompt.shaken.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "God... that's a lot. Are we really fighting all of them?",
+                                        "Look at the size of that crowd... can we go around?",
+                                        "They'll swarm us if we step out there. Please, let's retreat.",
+                                        "There are way too many... my hands are shaking.",
+                                        "We can't handle this many at once. Can we slip away?",
+                                        "Jesus, don't shoot... they'll tear us apart.",
+                                        "Are we seriously thinking of fighting that horde?",
+                                        "I don't think we survive that fight. Let's run.",
+                                        "Too many rottens... what do you want to do?",
+                                        "That swarm is terrifying. Tell me we're bypassing it.",
+                                    },
+                                    ["TL"] = {
+                                        "Diyos ko... ang dami nila. Lalabanan talaga natin lahat 'yan?",
+                                        "Tingnan mo ang laki ng kuyog... pwede ba tayong umikot?",
+                                        "Kukuyugin nila tayo kapag lumabas tayo. Pakiusap, umatras tayo.",
+                                        "Masyado silang marami... nanginginig ang mga kamay ko.",
+                                        "Hindi natin kaya ang ganyan karami nang sabay. Pwede bang tumakas?",
+                                        "Diyos ko, huwag kang puputok... pupunitin nila tayo.",
+                                        "Seryoso ba tayong lalabanan ang kuyog na 'yan?",
+                                        "Sa tingin ko hindi tayo mabubuhay sa laban na 'yan. Tumakbo na tayo.",
+                                        "Masyadong maraming bulok... ano'ng gusto mong gawin?",
+                                        "Nakakatakot ang kuyog na 'yan. Sabihin mong iiwasan natin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde.prompt",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "God... that's a lot. Are we really fighting all of them?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.prompt.shaken.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "God... that's a lot. Are we really fighting all of them?",
+                            "Look at the size of that crowd... can we go around?",
+                            "They'll swarm us if we step out there. Please, let's retreat.",
+                            "There are way too many... my hands are shaking.",
+                            "We can't handle this many at once. Can we slip away?",
+                            "Jesus, don't shoot... they'll tear us apart.",
+                            "Are we seriously thinking of fighting that horde?",
+                            "I don't think we survive that fight. Let's run.",
+                            "Too many rottens... what do you want to do?",
+                            "That swarm is terrifying. Tell me we're bypassing it.",
+                        },
+                        ["TL"] = {
+                            "Diyos ko... ang dami nila. Lalabanan talaga natin lahat 'yan?",
+                            "Tingnan mo ang laki ng kuyog... pwede ba tayong umikot?",
+                            "Kukuyugin nila tayo kapag lumabas tayo. Pakiusap, umatras tayo.",
+                            "Masyado silang marami... nanginginig ang mga kamay ko.",
+                            "Hindi natin kaya ang ganyan karami nang sabay. Pwede bang tumakas?",
+                            "Diyos ko, huwag kang puputok... pupunitin nila tayo.",
+                            "Seryoso ba tayong lalabanan ang kuyog na 'yan?",
+                            "Sa tingin ko hindi tayo mabubuhay sa laban na 'yan. Tumakbo na tayo.",
+                            "Masyadong maraming bulok... ano'ng gusto mong gawin?",
+                            "Nakakatakot ang kuyog na 'yan. Sabihin mong iiwasan natin.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.prompt.shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "shaken",
-            ["sourceId"] = "semantic.combat.horde.prompt.shaken",
+            ["sourceId"] = "combat.horde.prompt.shaken",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_shaken.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde.prompt",
+        ["namespace"] = "combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1429,126 +2172,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.prompt.shaken",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "God... that's a lot. Are we really fighting all of them?",
-                            },
-                            ["TL"] = {
-                                "Diyos ko... ang dami nila. Lalabanan talaga natin lahat 'yan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Look at the size of that crowd... can we go around?",
-                            },
-                            ["TL"] = {
-                                "Tingnan mo ang laki ng kuyog... pwede ba tayong umikot?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They'll swarm us if we step out there. Please, let's retreat.",
-                            },
-                            ["TL"] = {
-                                "Kukuyugin nila tayo kapag lumabas tayo. Pakiusap, umatras tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "There are way too many... my hands are shaking.",
-                            },
-                            ["TL"] = {
-                                "Masyado silang marami... nanginginig ang mga kamay ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We can't handle this many at once. Can we slip away?",
-                            },
-                            ["TL"] = {
-                                "Hindi natin kaya ang ganyan karami nang sabay. Pwede bang tumakas?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Jesus, don't shoot... they'll tear us apart.",
-                            },
-                            ["TL"] = {
-                                "Diyos ko, huwag kang puputok... pupunitin nila tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Are we seriously thinking of fighting that horde?",
-                            },
-                            ["TL"] = {
-                                "Seryoso ba tayong lalabanan ang kuyog na 'yan?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't think we survive that fight. Let's run.",
-                            },
-                            ["TL"] = {
-                                "Sa tingin ko hindi tayo mabubuhay sa laban na 'yan. Tumakbo na tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too many rottens... what do you want to do?",
-                            },
-                            ["TL"] = {
-                                "Masyadong maraming bulok... ano'ng gusto mong gawin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That swarm is terrifying. Tell me we're bypassing it.",
-                            },
-                            ["TL"] = {
-                                "Nakakatakot ang kuyog na 'yan. Sabihin mong iiwasan natin.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "God... that's a lot. Are we really fighting all of them?",
+                                        "Look at the size of that crowd... can we go around?",
+                                        "They'll swarm us if we step out there. Please, let's retreat.",
+                                        "There are way too many... my hands are shaking.",
+                                        "We can't handle this many at once. Can we slip away?",
+                                        "Jesus, don't shoot... they'll tear us apart.",
+                                        "Are we seriously thinking of fighting that horde?",
+                                        "I don't think we survive that fight. Let's run.",
+                                        "Too many rottens... what do you want to do?",
+                                        "That swarm is terrifying. Tell me we're bypassing it.",
+                                    },
+                                    ["TL"] = {
+                                        "Diyos ko... ang dami nila. Lalabanan talaga natin lahat 'yan?",
+                                        "Tingnan mo ang laki ng kuyog... pwede ba tayong umikot?",
+                                        "Kukuyugin nila tayo kapag lumabas tayo. Pakiusap, umatras tayo.",
+                                        "Masyado silang marami... nanginginig ang mga kamay ko.",
+                                        "Hindi natin kaya ang ganyan karami nang sabay. Pwede bang tumakas?",
+                                        "Diyos ko, huwag kang puputok... pupunitin nila tayo.",
+                                        "Seryoso ba tayong lalabanan ang kuyog na 'yan?",
+                                        "Sa tingin ko hindi tayo mabubuhay sa laban na 'yan. Tumakbo na tayo.",
+                                        "Masyadong maraming bulok... ano'ng gusto mong gawin?",
+                                        "Nakakatakot ang kuyog na 'yan. Sabihin mong iiwasan natin.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.prompt.shaken",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "God... that's a lot. Are we really fighting all of them?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.prompt.shaken.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1558,20 +2253,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "God... that's a lot. Are we really fighting all of them?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.prompt.shaken.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "God... that's a lot. Are we really fighting all of them?",
+                        "Look at the size of that crowd... can we go around?",
+                        "They'll swarm us if we step out there. Please, let's retreat.",
+                        "There are way too many... my hands are shaking.",
+                        "We can't handle this many at once. Can we slip away?",
+                        "Jesus, don't shoot... they'll tear us apart.",
+                        "Are we seriously thinking of fighting that horde?",
+                        "I don't think we survive that fight. Let's run.",
+                        "Too many rottens... what do you want to do?",
+                        "That swarm is terrifying. Tell me we're bypassing it.",
+                    },
+                    ["TL"] = {
+                        "Diyos ko... ang dami nila. Lalabanan talaga natin lahat 'yan?",
+                        "Tingnan mo ang laki ng kuyog... pwede ba tayong umikot?",
+                        "Kukuyugin nila tayo kapag lumabas tayo. Pakiusap, umatras tayo.",
+                        "Masyado silang marami... nanginginig ang mga kamay ko.",
+                        "Hindi natin kaya ang ganyan karami nang sabay. Pwede bang tumakas?",
+                        "Diyos ko, huwag kang puputok... pupunitin nila tayo.",
+                        "Seryoso ba tayong lalabanan ang kuyog na 'yan?",
+                        "Sa tingin ko hindi tayo mabubuhay sa laban na 'yan. Tumakbo na tayo.",
+                        "Masyadong maraming bulok... ano'ng gusto mong gawin?",
+                        "Nakakatakot ang kuyog na 'yan. Sabihin mong iiwasan natin.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "companion_commands_combat",
-        ["id"] = "semantic.combat.horde.started",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.horde.started",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That's a lot of them. Stay sharp.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.horde.started.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That's a lot of them. Stay sharp.",
+                                        "We've got a whole crowd moving in. Eyes open.",
+                                        "Horde spotted! Check your exits.",
+                                        "Too many bodies out there. Watch the perimeter.",
+                                        "They're grouping up. Form a line.",
+                                        "Sound drew a swarm. Get ready.",
+                                        "Look at that herd. Stay close.",
+                                        "Mass contacts coming from down the street.",
+                                        "Here they come. Don't let them flank us.",
+                                        "Big group incoming. Watch each other's backs.",
+                                    },
+                                    ["TL"] = {
+                                        "Ang dami nila. Mag-ingat tayo.",
+                                        "May malaking grupo na paparating. Magmatyag.",
+                                        "May kuyog! Tignan ang mga labasan.",
+                                        "Masyado silang marami sa labas. Bantayan ang paligid.",
+                                        "Nagsasama-sama sila. Ayusin ang hanay.",
+                                        "Nakaakit ng kuyog ang ingay. Humanda.",
+                                        "Tingnan mo ang kawan na 'yan. Dumikit ka.",
+                                        "Napakaraming papalapit mula sa kalsada.",
+                                        "Heto na sila. Huwag silang hayaang pumaligid.",
+                                        "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.horde",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That's a lot of them. Stay sharp.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.horde.started.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That's a lot of them. Stay sharp.",
+                            "We've got a whole crowd moving in. Eyes open.",
+                            "Horde spotted! Check your exits.",
+                            "Too many bodies out there. Watch the perimeter.",
+                            "They're grouping up. Form a line.",
+                            "Sound drew a swarm. Get ready.",
+                            "Look at that herd. Stay close.",
+                            "Mass contacts coming from down the street.",
+                            "Here they come. Don't let them flank us.",
+                            "Big group incoming. Watch each other's backs.",
+                        },
+                        ["TL"] = {
+                            "Ang dami nila. Mag-ingat tayo.",
+                            "May malaking grupo na paparating. Magmatyag.",
+                            "May kuyog! Tignan ang mga labasan.",
+                            "Masyado silang marami sa labas. Bantayan ang paligid.",
+                            "Nagsasama-sama sila. Ayusin ang hanay.",
+                            "Nakaakit ng kuyog ang ingay. Humanda.",
+                            "Tingnan mo ang kawan na 'yan. Dumikit ka.",
+                            "Napakaraming papalapit mula sa kalsada.",
+                            "Heto na sila. Huwag silang hayaang pumaligid.",
+                            "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.horde.started",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["localId"] = "started",
-            ["sourceId"] = "semantic.combat.horde.started",
+            ["sourceId"] = "combat.horde.started",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_started.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
-        ["namespace"] = "semantic.combat.horde",
+        ["namespace"] = "combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1585,126 +2401,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.combat.horde.started",
+                ["responseAct"] = "REPLY",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
             },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's a lot of them. Stay sharp.",
-                            },
-                            ["TL"] = {
-                                "Ang dami nila. Mag-ingat tayo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We've got a whole crowd moving in. Eyes open.",
-                            },
-                            ["TL"] = {
-                                "May malaking grupo na paparating. Magmatyag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Horde spotted! Check your exits.",
-                            },
-                            ["TL"] = {
-                                "May kuyog! Tignan ang mga labasan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Too many bodies out there. Watch the perimeter.",
-                            },
-                            ["TL"] = {
-                                "Masyado silang marami sa labas. Bantayan ang paligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "They're grouping up. Form a line.",
-                            },
-                            ["TL"] = {
-                                "Nagsasama-sama sila. Ayusin ang hanay.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sound drew a swarm. Get ready.",
-                            },
-                            ["TL"] = {
-                                "Nakaakit ng kuyog ang ingay. Humanda.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Look at that herd. Stay close.",
-                            },
-                            ["TL"] = {
-                                "Tingnan mo ang kawan na 'yan. Dumikit ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Mass contacts coming from down the street.",
-                            },
-                            ["TL"] = {
-                                "Napakaraming papalapit mula sa kalsada.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Here they come. Don't let them flank us.",
-                            },
-                            ["TL"] = {
-                                "Heto na sila. Huwag silang hayaang pumaligid.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Big group incoming. Watch each other's backs.",
-                            },
-                            ["TL"] = {
-                                "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That's a lot of them. Stay sharp.",
+                                        "We've got a whole crowd moving in. Eyes open.",
+                                        "Horde spotted! Check your exits.",
+                                        "Too many bodies out there. Watch the perimeter.",
+                                        "They're grouping up. Form a line.",
+                                        "Sound drew a swarm. Get ready.",
+                                        "Look at that herd. Stay close.",
+                                        "Mass contacts coming from down the street.",
+                                        "Here they come. Don't let them flank us.",
+                                        "Big group incoming. Watch each other's backs.",
+                                    },
+                                    ["TL"] = {
+                                        "Ang dami nila. Mag-ingat tayo.",
+                                        "May malaking grupo na paparating. Magmatyag.",
+                                        "May kuyog! Tignan ang mga labasan.",
+                                        "Masyado silang marami sa labas. Bantayan ang paligid.",
+                                        "Nagsasama-sama sila. Ayusin ang hanay.",
+                                        "Nakaakit ng kuyog ang ingay. Humanda.",
+                                        "Tingnan mo ang kawan na 'yan. Dumikit ka.",
+                                        "Napakaraming papalapit mula sa kalsada.",
+                                        "Heto na sila. Huwag silang hayaang pumaligid.",
+                                        "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.horde.started",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That's a lot of them. Stay sharp.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.horde.started.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1713,6 +2481,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That's a lot of them. Stay sharp.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.horde.started.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That's a lot of them. Stay sharp.",
+                        "We've got a whole crowd moving in. Eyes open.",
+                        "Horde spotted! Check your exits.",
+                        "Too many bodies out there. Watch the perimeter.",
+                        "They're grouping up. Form a line.",
+                        "Sound drew a swarm. Get ready.",
+                        "Look at that herd. Stay close.",
+                        "Mass contacts coming from down the street.",
+                        "Here they come. Don't let them flank us.",
+                        "Big group incoming. Watch each other's backs.",
+                    },
+                    ["TL"] = {
+                        "Ang dami nila. Mag-ingat tayo.",
+                        "May malaking grupo na paparating. Magmatyag.",
+                        "May kuyog! Tignan ang mga labasan.",
+                        "Masyado silang marami sa labas. Bantayan ang paligid.",
+                        "Nagsasama-sama sila. Ayusin ang hanay.",
+                        "Nakaakit ng kuyog ang ingay. Humanda.",
+                        "Tingnan mo ang kawan na 'yan. Dumikit ka.",
+                        "Napakaraming papalapit mula sa kalsada.",
+                        "Heto na sila. Huwag silang hayaang pumaligid.",
+                        "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

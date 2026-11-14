@@ -1,272 +1,179 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.conversation.acknowledged.default.guarded"] = {
+    ["conversation.acknowledged.default"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.conversation.acknowledged.default.guarded",
+        ["id"] = "conversation.acknowledged.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
     },
-    ["semantic.conversation.acknowledged.default.neutral"] = {
+    ["emote.player.clap"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.conversation.acknowledged.default.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
-    },
-    ["semantic.conversation.acknowledged.default.terse"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.conversation.acknowledged.default.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
-    },
-    ["semantic.conversation.acknowledged.default.warm"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.conversation.acknowledged.default.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
-    },
-    ["semantic.emote.player.clap.neutral"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.player.clap.neutral",
+        ["id"] = "emote.player.clap",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_clap.json",
     },
-    ["semantic.emote.player.insult.neutral"] = {
+    ["emote.player.insult"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.player.insult.neutral",
+        ["id"] = "emote.player.insult",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_insult.json",
     },
-    ["semantic.emote.player.salute.neutral"] = {
+    ["emote.player.salute"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.player.salute.neutral",
+        ["id"] = "emote.player.salute",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_salute.json",
     },
-    ["semantic.emote.player.thankyou.neutral"] = {
+    ["emote.player.thankyou"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.player.thankyou.neutral",
+        ["id"] = "emote.player.thankyou",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thankyou.json",
     },
-    ["semantic.emote.player.thumbsdown.neutral"] = {
+    ["emote.player.thumbsdown"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.player.thumbsdown.neutral",
+        ["id"] = "emote.player.thumbsdown",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsdown.json",
     },
-    ["semantic.emote.player.thumbsup.neutral"] = {
+    ["emote.player.thumbsup"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.player.thumbsup.neutral",
+        ["id"] = "emote.player.thumbsup",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsup.json",
     },
-    ["semantic.emote.player.wavebye.neutral"] = {
+    ["emote.player.wavebye"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.player.wavebye.neutral",
+        ["id"] = "emote.player.wavebye",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavebye.json",
     },
-    ["semantic.emote.player.wavehi.neutral"] = {
+    ["emote.player.wavehi"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.player.wavehi.neutral",
+        ["id"] = "emote.player.wavehi",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavehi.json",
     },
-    ["semantic.emote.reply.clap.neutral"] = {
+    ["emote.reply.clap"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.reply.clap.neutral",
+        ["id"] = "emote.reply.clap",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json",
     },
-    ["semantic.emote.reply.clap.warm"] = {
+    ["emote.reply.default"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.reply.clap.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json",
-    },
-    ["semantic.emote.reply.default.neutral"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.default.neutral",
+        ["id"] = "emote.reply.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_default.json",
     },
-    ["semantic.emote.reply.insult.neutral"] = {
+    ["emote.reply.insult"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.reply.insult.neutral",
+        ["id"] = "emote.reply.insult",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json",
     },
-    ["semantic.emote.reply.insult.warm"] = {
+    ["emote.reply.salute"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.reply.insult.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json",
-    },
-    ["semantic.emote.reply.salute.neutral"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.salute.neutral",
+        ["id"] = "emote.reply.salute",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json",
     },
-    ["semantic.emote.reply.salute.warm"] = {
+    ["emote.reply.thankyou"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.reply.salute.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json",
-    },
-    ["semantic.emote.reply.thankyou.neutral"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.thankyou.neutral",
+        ["id"] = "emote.reply.thankyou",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json",
     },
-    ["semantic.emote.reply.thankyou.warm"] = {
+    ["emote.reply.thumbsdown"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
-        ["id"] = "semantic.emote.reply.thankyou.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json",
-    },
-    ["semantic.emote.reply.thumbsdown.neutral"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.thumbsdown.neutral",
+        ["id"] = "emote.reply.thumbsdown",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsdown.json",
     },
-    ["semantic.emote.reply.thumbsup.active.neutral"] = {
+    ["emote.reply.thumbsup"] = {
+        ["dependents"] = {
+            "emote.reply.thumbsup.active",
+        },
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes__cb245da6",
         },
-        ["id"] = "semantic.emote.reply.thumbsup.active.neutral",
+        ["id"] = "emote.reply.thumbsup",
         ["kind"] = "dialogue",
+        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
+    },
+    ["emote.reply.thumbsup.active"] = {
+        ["domain"] = "social_emotes",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/SocialEmotes__cb245da6",
+        },
+        ["id"] = "emote.reply.thumbsup.active",
+        ["kind"] = "dialogue",
+        ["related"] = {
+            "emote.reply.thumbsup",
+        },
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup_active.json",
     },
-    ["semantic.emote.reply.thumbsup.neutral"] = {
+    ["emote.reply.wavebye"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes__cb245da6",
         },
-        ["id"] = "semantic.emote.reply.thumbsup.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
-    },
-    ["semantic.emote.reply.thumbsup.warm"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.thumbsup.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
-    },
-    ["semantic.emote.reply.wavebye.neutral"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.wavebye.neutral",
+        ["id"] = "emote.reply.wavebye",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json",
     },
-    ["semantic.emote.reply.wavebye.warm"] = {
+    ["emote.reply.wavehi"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes__cb245da6",
         },
-        ["id"] = "semantic.emote.reply.wavebye.warm",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json",
-    },
-    ["semantic.emote.reply.wavehi.neutral"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.wavehi.neutral",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
-    },
-    ["semantic.emote.reply.wavehi.terse"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.wavehi.terse",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
-    },
-    ["semantic.emote.reply.wavehi.warm"] = {
-        ["domain"] = "social_emotes",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes",
-        },
-        ["id"] = "semantic.emote.reply.wavehi.warm",
+        ["id"] = "emote.reply.wavehi",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
     },

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.reply",
   "id": "attack_none",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.command.reply.attack_none"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'll avoid trouble.",
-          "TL": "Iiwas ako sa gulo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Holding fire. Keeping passive.",
-          "TL": "Tigil-putok. Mananatiling tahimik."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Staying out of fights.",
-          "TL": "Lalayo ako sa anumang labanan."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Understood. Ceasing all attacks.",
-          "TL": "Naiintindihan ko. Ititigil ang lahat ng atake."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I won't provoke anything.",
-          "TL": "Wala akong gagalawin o pupukawin."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Keeping my weapon stowed.",
-          "TL": "Nakatago ang armas ko."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Pacifist stance. Understood.",
-          "TL": "Tahimik na paninindigan. Naintindihan."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I'll steer clear of hostiles.",
-          "TL": "Iiwas ako sa mga kalaban."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Standing down from combat.",
-          "TL": "Uuurong sa laban."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "No attacking. Got it.",
-          "TL": "Walang aatake. Nakuha ko."
+          "EN": [
+            "I'll avoid trouble.",
+            "Holding fire. Keeping passive.",
+            "Staying out of fights.",
+            "Understood. Ceasing all attacks.",
+            "I won't provoke anything.",
+            "Keeping my weapon stowed.",
+            "Pacifist stance. Understood.",
+            "I'll steer clear of hostiles.",
+            "Standing down from combat.",
+            "No attacking. Got it."
+          ],
+          "TL": [
+            "Iiwas ako sa gulo.",
+            "Tigil-putok. Mananatiling tahimik.",
+            "Lalayo ako sa anumang labanan.",
+            "Naiintindihan ko. Ititigil ang lahat ng atake.",
+            "Wala akong gagalawin o pupukawin.",
+            "Nakatago ang armas ko.",
+            "Tahimik na paninindigan. Naintindihan.",
+            "Iiwas ako sa mga kalaban.",
+            "Uuurong sa laban.",
+            "Walang aatake. Nakuha ko."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.reply",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

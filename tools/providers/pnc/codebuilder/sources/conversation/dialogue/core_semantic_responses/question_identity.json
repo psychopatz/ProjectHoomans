@@ -1,43 +1,40 @@
 {
-  "id": "identity",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.identity",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "response_pool.question",
+  "id": "identity",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "IDENTITY",
+  "metadata": {
+    "responsePoolID": "question.identity",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "IDENTITY"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.identity.dataset.stranger_alt_1",
-        "metadata": {
-          "fallback": "I keep my name to myself until I know someone better. What should I call you?",
-          "templateID": "semantic.question.identity.stranger_alt_1"
-        },
+        "id": "question.identity.dataset.stranger_alt_1",
         "text": {
           "EN": "I keep my name to myself until I know someone better. What should I call you?",
           "TL": "I keep my name to myself until I know someone better. What should I call you?"
+        },
+        "metadata": {
+          "fallback": "I keep my name to myself until I know someone better. What should I call you?",
+          "templateID": "question.identity.stranger_alt_1"
         }
       },
       {
-        "id": "semantic.question.identity.dataset.stranger_alt_2",
-        "metadata": {
-          "fallback": "Let's get to know each other first. What do people call you?",
-          "templateID": "semantic.question.identity.stranger_alt_2"
-        },
+        "id": "question.identity.dataset.stranger_alt_2",
         "text": {
           "EN": "Let's get to know each other first. What do people call you?",
           "TL": "Let's get to know each other first. What do people call you?"
+        },
+        "metadata": {
+          "fallback": "Let's get to know each other first. What do people call you?",
+          "templateID": "question.identity.stranger_alt_2"
         }
       },
       {
-        "id": "semantic.question.identity.dataset.wary_alt_1",
-        "metadata": {
-          "fallback": "I don't trust you enough to share my name. Who are you, really?",
-          "priority": 2,
-          "templateID": "semantic.question.identity.wary_alt_1"
-        },
+        "id": "question.identity.dataset.wary_alt_1",
         "text": {
           "EN": "I don't trust you enough to share my name. Who are you, really?",
           "TL": "I don't trust you enough to share my name. Who are you, really?"
@@ -46,15 +43,15 @@
           "op": "eq",
           "path": "conversation.identityTrust",
           "value": "untrustworthy"
+        },
+        "metadata": {
+          "fallback": "I don't trust you enough to share my name. Who are you, really?",
+          "priority": 2,
+          "templateID": "question.identity.wary_alt_1"
         }
       },
       {
-        "id": "semantic.question.identity.dataset.wary_alt_2",
-        "metadata": {
-          "fallback": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-          "priority": 2,
-          "templateID": "semantic.question.identity.wary_alt_2"
-        },
+        "id": "question.identity.dataset.wary_alt_2",
         "text": {
           "EN": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
           "TL": "After that lie, I'm not telling you my name. Tell me the truth about yours."
@@ -63,10 +60,13 @@
           "op": "eq",
           "path": "conversation.identityTrust",
           "value": "untrustworthy"
+        },
+        "metadata": {
+          "fallback": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
+          "priority": 2,
+          "templateID": "question.identity.wary_alt_2"
         }
       }
     ]
-  },
-  "namespace": "semantic.question",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

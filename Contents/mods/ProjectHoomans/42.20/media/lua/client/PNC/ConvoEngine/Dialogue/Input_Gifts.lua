@@ -88,19 +88,19 @@ local GiftCapability = {
     },
     responsePools = {
         selection_required = {
-            templateID = "semantic.gift.selection_required",
+            templateID = "gift.selection_required",
         },
         pending = {
-            templateID = "semantic.gift.pending",
+            templateID = "gift.pending",
         },
         completed = {
-            templateID = "semantic.gift.completed",
+            templateID = "gift.completed",
         },
         rejected = {
-            templateID = "semantic.gift.rejected",
+            templateID = "gift.rejected",
         },
         failed = {
-            templateID = "semantic.gift.failed",
+            templateID = "gift.failed",
         },
     },
 }

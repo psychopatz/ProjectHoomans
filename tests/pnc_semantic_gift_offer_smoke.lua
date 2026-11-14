@@ -428,7 +428,7 @@ local unavailableSelectorResult = Input.Internal.DispatchAction(actionView, {
 T.equal(unavailableSelectorResult.status, "gift_selector_unavailable",
     "missing inventory UI returns the established selector failure")
 T.equal(unavailableSelectorResult.response.key,
-    "semantic.gift.selection_required",
+    "gift.selection_required",
     "missing inventory UI preserves the selection response contract")
 PNC.InventoryWindow = inventoryWindow
 

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.repeat",
   "id": "dehydration",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/repeat.json",
-    "responseTemplateID": "semantic.medical.distress.repeat.dehydration",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I still need water to recover. My throat is on fire.",
-          "TL": "Kailangan ko pa rin ng tubig para makabawi. Parang may apoy sa lalamunan ko."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.02"
-        },
-        "text": {
-          "EN": "Still dying of thirst... did you find any bottle?",
-          "TL": "Mamamatay pa rin sa uhaw... may nahanap ka bang bote?"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.03"
-        },
-        "text": {
-          "EN": "Water, please! I can't take this parched feeling.",
-          "TL": "Tubig, pakiusap! Hindi ko na makayanan ang matinding uhaw."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.04"
-        },
-        "text": {
-          "EN": "I asked for water... please tell me you have some.",
-          "TL": "Humihingi ako ng tubig... sabihin mong may dala ka."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.05"
-        },
-        "text": {
-          "EN": "Tongue feels like sandpaper. Bring water quickly.",
-          "TL": "Parang liha ang dila ko. Magdala ka ng tubig agad."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.06"
-        },
-        "text": {
-          "EN": "Still completely dehydrated. I can't stand up like this.",
-          "TL": "Dehydrated pa rin ako. Hindi ako makakatayo nang ganito."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.07"
-        },
-        "text": {
-          "EN": "Water... I'm begging you, just one cup.",
-          "TL": "Tubig... nagmamakaawa ako, kahit isang baso lang."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.08"
-        },
-        "text": {
-          "EN": "Still dry as bone. Please bring hydration.",
-          "TL": "Tuyot pa rin ako. Pakiusap dalhan mo ako ng tubig."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.09"
-        },
-        "text": {
-          "EN": "I can't recover without liquids. Help me.",
-          "TL": "Hindi ako makakabawi nang walang inumin. Tulong."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.repeat.dehydration.neutral.10"
-        },
-        "text": {
-          "EN": "Still waiting for a drink... head is pounding.",
-          "TL": "Naghihintay pa rin ng maiinom... sumasakit ang ulo ko."
+          "EN": [
+            "I still need water to recover. My throat is on fire.",
+            "Still dying of thirst... did you find any bottle?",
+            "Water, please! I can't take this parched feeling.",
+            "I asked for water... please tell me you have some.",
+            "Tongue feels like sandpaper. Bring water quickly.",
+            "Still completely dehydrated. I can't stand up like this.",
+            "Water... I'm begging you, just one cup.",
+            "Still dry as bone. Please bring hydration.",
+            "I can't recover without liquids. Help me.",
+            "Still waiting for a drink... head is pounding."
+          ],
+          "TL": [
+            "Kailangan ko pa rin ng tubig para makabawi. Parang may apoy sa lalamunan ko.",
+            "Mamamatay pa rin sa uhaw... may nahanap ka bang bote?",
+            "Tubig, pakiusap! Hindi ko na makayanan ang matinding uhaw.",
+            "Humihingi ako ng tubig... sabihin mong may dala ka.",
+            "Parang liha ang dila ko. Magdala ka ng tubig agad.",
+            "Dehydrated pa rin ako. Hindi ako makakatayo nang ganito.",
+            "Tubig... nagmamakaawa ako, kahit isang baso lang.",
+            "Tuyot pa rin ako. Pakiusap dalhan mo ako ng tubig.",
+            "Hindi ako makakabawi nang walang inumin. Tulong.",
+            "Naghihintay pa rin ng maiinom... sumasakit ang ulo ko."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.repeat",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

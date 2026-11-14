@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "integration.bandits.hooman_hurt",
+  "id": "colonist",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,21 +16,21 @@
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
-    "responseTemplateID": "semantic.compat.bandits.hooman_hurt.colonist",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Bandit fire! Pull back and cover the wounded colonist.",
-          "TL": "Bandit fire! Pull back and cover the wounded colonist."
+          "EN": [
+            "Bandit fire! Pull back and cover the wounded colonist."
+          ],
+          "TL": [
+            "Bandit fire! Pull back and cover the wounded colonist."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.integration.bandits.hooman_hurt.colonist",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

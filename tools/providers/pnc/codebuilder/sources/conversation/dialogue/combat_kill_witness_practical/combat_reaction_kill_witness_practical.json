@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_witness_practical",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/practical.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Good. Check the area.",
+              "Nice kill. Scan before moving in.",
+              "Target down. Clear your corners.",
+              "Good takedown. Check for flankers.",
+              "Downed. Watch the shadows.",
+              "Solid strike. Secure the room first.",
+              "Well handled. Don't step out without scanning.",
+              "Threat cleared. Look all around.",
+              "Clean hit. Ensure the perimeter is safe.",
+              "Dropped it. Scan before continuing."
+            ],
+            "TL": [
+              "Ayos. Suriin natin ang paligid.",
+              "Magandang patay. Magmasid bago lumapit.",
+              "Bagsak ang target. Linisin ang mga sulok.",
+              "Magandang pagpabagsak. Tignan kung may pumapaligid.",
+              "Bagsak na. Bantayan ang mga anino.",
+              "Solidong tama. Siguraduhin muna ang kwarto.",
+              "Maayos na napigilan. Huwag lalabas nang hindi nagmamasid.",
+              "Banta naalis. Tumingin sa buong paligid.",
+              "Malinis na tama. Tiyaking ligtas ang paligid.",
+              "Naibagsak mo. Magmasid bago magpatuloy."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One down. Watch for more.",
+              "Good hit. Expect stragglers.",
+              "That's one. Don't assume the area is clear.",
+              "Downed. Listen for more footsteps.",
+              "One eliminated. Watch the windows.",
+              "Threat dead. Stay alert for secondary threats.",
+              "Handled that one. Watch the hallway.",
+              "One in the dirt. Keep your guard raised.",
+              "Good takedown. More could be nearby.",
+              "Down. Keep your ears open."
+            ],
+            "TL": [
+              "Isa na. Bantayan ang iba.",
+              "Magandang tama. Asahan ang mga naiwan.",
+              "Isa 'yan. Huwag ipalagay na malinis na ang lugar.",
+              "Bagsak. Makinig kung may mga yabag pa.",
+              "Isa ang tinanggal. Bantayan ang mga bintana.",
+              "Patay ang banta. Maging alerto sa mga susunod.",
+              "Naasikaso 'yon. Bantayan ang pasilyo.",
+              "Isa sa lupa. Panatilihing nakataas ang depensa.",
+              "Magandang pagtumba. Baka may iba pang malapit.",
+              "Bagsak. Buksan ang pandinig."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Nice. Let's make sure it's clear.",
+              "Clean drop. Verify the whole sector.",
+              "Good hit. Check behind all doors.",
+              "Target down. Confirm no further movement.",
+              "Well done. Let's sweep the rest of the room.",
+              "Threat neutralized. Methodical check next.",
+              "Solid kill. Sweep the perimeter together.",
+              "Downed cleanly. Verify our exit is open.",
+              "Handled. Make sure nothing is creeping up.",
+              "Good work. Let's make certain the coast is clear."
+            ],
+            "TL": [
+              "Maganda. Siguraduhin nating malinaw ang paligid.",
+              "Malinis na pagbagsak. Kumpirmahin ang buong bahagi.",
+              "Magandang tama. Tignan sa likod ng lahat ng pinto.",
+              "Bagsak ang target. Kumpirmahing wala nang galaw.",
+              "Magaling. Linisin natin ang natitira sa kwarto.",
+              "Banta naalis. Maingat na pagsusuri ang susunod.",
+              "Solidong patay. Sabay nating linisin ang paligid.",
+              "Malinis na naibagsak. Tiyaking bukas ang labasan natin.",
+              "Naasikaso na. Siguruhing walang gumagapang palapit.",
+              "Magandang trabaho. Tiyakin nating malinis ang daan."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

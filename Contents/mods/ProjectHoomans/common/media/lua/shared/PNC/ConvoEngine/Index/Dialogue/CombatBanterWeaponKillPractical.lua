@@ -1,57 +1,57 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.combat.kill.killer.practical.axe_spear_01"] = {
+    ["combat.kill.killer.practical.axe_spear"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
         },
-        ["id"] = "semantic.combat.kill.killer.practical.axe_spear_01",
+        ["id"] = "combat.kill.killer.practical.axe_spear",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear_01.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
     },
-    ["semantic.combat.kill.killer.practical.blade_01"] = {
+    ["combat.kill.killer.practical.blade"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
         },
-        ["id"] = "semantic.combat.kill.killer.practical.blade_01",
+        ["id"] = "combat.kill.killer.practical.blade",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade_01.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade.json",
     },
-    ["semantic.combat.kill.killer.practical.blunt_01"] = {
+    ["combat.kill.killer.practical.blunt"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
         },
-        ["id"] = "semantic.combat.kill.killer.practical.blunt_01",
+        ["id"] = "combat.kill.killer.practical.blunt",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt_01.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt.json",
     },
-    ["semantic.combat.kill.killer.practical.firearm_high_01"] = {
+    ["combat.kill.killer.practical.firearm_high"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
         },
-        ["id"] = "semantic.combat.kill.killer.practical.firearm_high_01",
+        ["id"] = "combat.kill.killer.practical.firearm_high",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high_01.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high.json",
     },
-    ["semantic.combat.kill.killer.practical.firearm_low_01"] = {
+    ["combat.kill.killer.practical.firearm_low"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
         },
-        ["id"] = "semantic.combat.kill.killer.practical.firearm_low_01",
+        ["id"] = "combat.kill.killer.practical.firearm_low",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low_01.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low.json",
     },
-    ["semantic.combat.kill.killer.practical.unarmed_01"] = {
+    ["combat.kill.killer.practical.unarmed"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
         },
-        ["id"] = "semantic.combat.kill.killer.practical.unarmed_01",
+        ["id"] = "combat.kill.killer.practical.unarmed",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed_01.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed.json",
     },
 }

@@ -1,6 +1,14 @@
 {
-  "id": "follow",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "pnc.dialogue",
+  "id": "follow",
+  "owner": "ProjectHoomans",
+  "on": {
+    "action": "FOLLOW",
+    "intent": "REQUEST",
+    "speechAct": "REQUEST"
+  },
   "metadata": {
     "capability": "pnc:companion.follow",
     "confidence": 0.99,
@@ -23,7 +31,7 @@
     },
     "originalOwner": "ProjectHoomans",
     "priority": 165,
-    "responsePoolID": "semantic.authored.follow",
+    "responsePoolID": "authored.follow",
     "sourceProfile": "conversation.source.projecthoomans.8378f35867",
     "triggers": [
       {
@@ -49,29 +57,21 @@
         "keep close behind me",
         "please keep close behind me"
       ]
-    }
+    },
+    "responseAct": "FLOW_RESPONSE"
   },
-  "on": {
-    "action": "FOLLOW",
-    "intent": "REQUEST",
-    "speechAct": "REQUEST"
-  },
-  "owner": "ProjectHoomans",
-  "response": {
-    "act": "FLOW_RESPONSE",
+  "say": {
     "variants": [
       {
         "id": "accepted",
-        "metadata": {
-          "templateID": "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted"
-        },
         "text": {
           "EN": "Okay, I'll come with you.",
           "TL": "Sige, sasama ako sa iyo."
+        },
+        "metadata": {
+          "templateID": "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted"
         }
       }
     ]
-  },
-  "namespace": "pnc.dialogue",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

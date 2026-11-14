@@ -45,7 +45,7 @@ local decision = Policy.Decide(navigation, nil, {
 T.equal(decision.branch, "SEMANTIC_NAVIGATION_RECEIVED",
     "navigation frames use the semantic navigation branch")
 T.equal(decision.response.templateID,
-    "semantic.navigation.subject_change",
+    "navigation.subject_change",
     "subject-change navigation selects a semantic response")
 T.equal(decision.response.fallback,
     "All right. What did you want to talk about?",

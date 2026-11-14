@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_killer_cold",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/cold.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Done. Keep up.",
+              "Target neutralized. Walk.",
+              "Dead. Step across.",
+              "Finished. Maintain speed.",
+              "Threat ceased. Move.",
+              "Casualty verified. March.",
+              "Handled without delay. Keep up.",
+              "Neutralized. Continue the route.",
+              "Down. Walk past it.",
+              "Dead. Move forward."
+            ],
+            "TL": [
+              "Tapos. Sumabay ka.",
+              "Naalis ang target. Lakad.",
+              "Patay na. Hakbangan mo.",
+              "Tapos na. Panatilihin ang bilis.",
+              "Tumigil ang banta. Kilos.",
+              "Biktima kumpirmado. Magmartsa.",
+              "Naasikaso nang walang antala. Sumabay ka.",
+              "Naitumba. Ipagpatuloy ang ruta.",
+              "Bagsak na. Lagpasan mo.",
+              "Patay. Pasulong."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "It's dead. Move.",
+              "Body is neutralized. March on.",
+              "Ceased function. Step over.",
+              "Dead tissue. Proceed.",
+              "Target down. Do not stop.",
+              "Eliminated. Keep walking.",
+              "Threat dead. Advance.",
+              "Corpse is irrelevant. Move.",
+              "Finished. Next position.",
+              "No heartbeat. Move on."
+            ],
+            "TL": [
+              "Patay na. Galaw.",
+              "Naitumba na ang katawan. Magpatuloy.",
+              "Wala nang galaw. Hakbangan.",
+              "Patay na laman. Tuloy.",
+              "Bagsak ang target. Huwag titigil.",
+              "Naalis na. Magpatuloy sa paglalakad.",
+              "Patay ang banta. Abante.",
+              "Walang kwenta ang bangkay. Galaw.",
+              "Tapos na. Susunod na pwesto.",
+              "Walang tibok ng puso. Tuloy."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One less problem.",
+              "Target subtracted.",
+              "Simple elimination.",
+              "One obstacle removed.",
+              "Threat terminated. Efficient.",
+              "Reduced by one.",
+              "Clean removal.",
+              "One less mouth in the world.",
+              "Ammunition or blade justified.",
+              "Zero consequence. Next."
+            ],
+            "TL": [
+              "Isang problema na lang ang nawala.",
+              "Nabawasan ng target.",
+              "Simpleng pag-alis.",
+              "Isang sagabal ang tinanggal.",
+              "Tinapos ang banta. Maayos.",
+              "Nabawasan ng isa.",
+              "Malinis na pagpuksa.",
+              "Bawas ang isang bibig sa mundo.",
+              "Makatarungan ang nagamit na gamit.",
+              "Walang naging aberya. Sunod."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

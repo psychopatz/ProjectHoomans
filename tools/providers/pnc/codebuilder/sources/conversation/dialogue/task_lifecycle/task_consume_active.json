@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.consume",
   "id": "active",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-    "responseTemplateID": "semantic.task.consume.active",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I'm using that now.",
-          "TL": "Ginagamit ko na iyon ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Currently using the item.",
-          "TL": "Kasalukuyang ginagamit ang gamit."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Applying it right now.",
-          "TL": "Inilalapat na ngayon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "In the middle of consuming that.",
-          "TL": "Kasalukuyang ginagamit iyan."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Working through this item.",
-          "TL": "Ginagamit ang bagay na ito."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Taking this now. Give me a second.",
-          "TL": "Ginagamit ko na ito. Bigyan mo ako ng sandali."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Using the supplies as requested.",
-          "TL": "Ginagamit ang mga kagamitan ayon sa hiling."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Consuming it right now.",
-          "TL": "Ginagamit ko na ngayon."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Holding still to use this.",
-          "TL": "Nakahinto para gamitin ito."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Using it. Almost done.",
-          "TL": "Ginagamit na. Halos tapos na."
+          "EN": [
+            "I'm using that now.",
+            "Currently using the item.",
+            "Applying it right now.",
+            "In the middle of consuming that.",
+            "Working through this item.",
+            "Taking this now. Give me a second.",
+            "Using the supplies as requested.",
+            "Consuming it right now.",
+            "Holding still to use this.",
+            "Using it. Almost done."
+          ],
+          "TL": [
+            "Ginagamit ko na iyon ngayon.",
+            "Kasalukuyang ginagamit ang gamit.",
+            "Inilalapat na ngayon.",
+            "Kasalukuyang ginagamit iyan.",
+            "Ginagamit ang bagay na ito.",
+            "Ginagamit ko na ito. Bigyan mo ako ng sandali.",
+            "Ginagamit ang mga kagamitan ayon sa hiling.",
+            "Ginagamit ko na ngayon.",
+            "Nakahinto para gamitin ito.",
+            "Ginagamit na. Halos tapos na."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.consume",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

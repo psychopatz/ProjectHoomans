@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.lover",
   "id": "sunset",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/special/lover/sunset",
-    "textDomain": "pnc.psdl.social.greetings.special.lover.sunset"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.special.lover.sunset",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "There you are. I worried when you were gone so long.",
           "TL": "Narito ka pala. Nag-alala ako nang matagal kang wala."
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "Come sit with me before the light goes.",
           "TL": "Halika maupo ka sa akin bago mamatay ang ilaw."
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "Long day. I'm glad you're here at the end of it.",
           "TL": "Mahabang araw. Natutuwa akong narito ka sa dulo nito."
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "You made it back. That's all I needed to see.",
           "TL": "Nakabalik ka. Iyon lang ang kailangan kong makita."
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "The sunset almost makes this place look peaceful.",
           "TL": "Halos nagmumukhang payapa ang lugar na ito sa dapit-hapon."
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.lover",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "There you are. I worried when you were gone so long.",
+            "Come sit with me before the light goes.",
+            "Long day. I'm glad you're here at the end of it.",
+            "You made it back. That's all I needed to see.",
+            "The sunset almost makes this place look peaceful."
+          ],
+          "TL": [
+            "Narito ka pala. Nag-alala ako nang matagal kang wala.",
+            "Halika maupo ka sa akin bago mamatay ang ilaw.",
+            "Mahabang araw. Natutuwa akong narito ka sa dulo nito.",
+            "Nakabalik ka. Iyon lang ang kailangan kong makita.",
+            "Halos nagmumukhang payapa ang lugar na ito sa dapit-hapon."
+          ]
+        }
+      }
+    ]
+  }
 }

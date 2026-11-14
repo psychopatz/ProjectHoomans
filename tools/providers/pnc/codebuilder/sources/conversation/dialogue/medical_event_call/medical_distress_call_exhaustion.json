@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.call",
   "id": "exhaustion",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/call.json",
-    "responseTemplateID": "semantic.medical.distress.call.exhaustion",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "Pushed too far. I can't lift my arms.",
-          "TL": "Nasobrahan ako. Hindi ko na maitaas ang mga braso ko."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.02"
-        },
-        "text": {
-          "EN": "Completely spent... give me a moment to recover.",
-          "TL": "Ubos na ubos na ang lakas ko... bigyan mo ako ng saglit para makabawi."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.03"
-        },
-        "text": {
-          "EN": "Legs gave out beneath me. Need to sit.",
-          "TL": "Bumigay ang mga binti ko. Kailangan kong umupo."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.04"
-        },
-        "text": {
-          "EN": "Can't move another step. Total exhaustion.",
-          "TL": "Hindi na makakahakbang pa. Sagad na pagod na."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.05"
-        },
-        "text": {
-          "EN": "Breathing hurts. I need rest right now.",
-          "TL": "Masakit huminga. Kailangan ko ng pahinga ngayon din."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.06"
-        },
-        "text": {
-          "EN": "Collapsed from fatigue... give me five minutes.",
-          "TL": "Bumagsak sa matinding pagod... bigyan mo ako ng limang minuto."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.07"
-        },
-        "text": {
-          "EN": "Muscles are locking up. Can't stand.",
-          "TL": "Naninigas na ang kalamnan ko. Hindi makatayo."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.08"
-        },
-        "text": {
-          "EN": "I have nothing left in the tank. Need a break.",
-          "TL": "Wala nang natitirang lakas. Kailangan ng pahinga."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.09"
-        },
-        "text": {
-          "EN": "Vision is swimming from exhaustion. Give me time.",
-          "TL": "Umiikot ang paningin ko sa pagod. Bigyan mo ako ng oras."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.exhaustion.neutral.10"
-        },
-        "text": {
-          "EN": "Body won't respond... let me rest a second.",
-          "TL": "Ayaw nang gumalaw ng katawan ko... pahingahin mo muna ako."
+          "EN": [
+            "Pushed too far. I can't lift my arms.",
+            "Completely spent... give me a moment to recover.",
+            "Legs gave out beneath me. Need to sit.",
+            "Can't move another step. Total exhaustion.",
+            "Breathing hurts. I need rest right now.",
+            "Collapsed from fatigue... give me five minutes.",
+            "Muscles are locking up. Can't stand.",
+            "I have nothing left in the tank. Need a break.",
+            "Vision is swimming from exhaustion. Give me time.",
+            "Body won't respond... let me rest a second."
+          ],
+          "TL": [
+            "Nasobrahan ako. Hindi ko na maitaas ang mga braso ko.",
+            "Ubos na ubos na ang lakas ko... bigyan mo ako ng saglit para makabawi.",
+            "Bumigay ang mga binti ko. Kailangan kong umupo.",
+            "Hindi na makakahakbang pa. Sagad na pagod na.",
+            "Masakit huminga. Kailangan ko ng pahinga ngayon din.",
+            "Bumagsak sa matinding pagod... bigyan mo ako ng limang minuto.",
+            "Naninigas na ang kalamnan ko. Hindi makatayo.",
+            "Wala nang natitirang lakas. Kailangan ng pahinga.",
+            "Umiikot ang paningin ko sa pagod. Bigyan mo ako ng oras.",
+            "Ayaw nang gumalaw ng katawan ko... pahingahin mo muna ako."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.call",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

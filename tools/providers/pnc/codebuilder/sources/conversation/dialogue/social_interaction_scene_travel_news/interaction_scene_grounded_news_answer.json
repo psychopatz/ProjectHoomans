@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "interaction.scene",
+  "id": "grounded_news_answer",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "That is what I can confirm right now.",
+            "That's all the verified information I have.",
+            "That covers the extent of what I know.",
+            "Beyond that, it's just guesswork.",
+            "That's as much as I was able to find out.",
+            "I'll let you know if I hear anything more.",
+            "That's the factual picture for now.",
+            "That's what's solid. The rest is rumor.",
+            "I've told you everything I can verify.",
+            "That's the report as it stands."
+          ],
+          "TL": [
+            "Iyan ang makukumpirma ko sa ngayon.",
+            "Iyan lang ang napatunayang impormasyong hawak ko.",
+            "Iyan ang kabuuan ng nalalaman ko.",
+            "Higit pa riyan, hula-hula na lang.",
+            "Iyan lang ang nagawa kong alamin.",
+            "Sasabihan kita kapag may narinig pa akong bago.",
+            "Iyan ang totoong larawan sa ngayon.",
+            "Iyan ang totoo. Tsismis na ang iba.",
+            "Nasabi ko na ang lahat ng kaya kong kumpirmahin.",
+            "Iyan ang ulat sa kasalukuyan."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
-        "responseTemplateID": "semantic.interaction.scene.grounded_news_answer",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Nothing else I can verify yet.",
+            "I don't deal in rumors. That's the only confirmed piece.",
+            "Don't press for details I can't back up.",
+            "That's the extent of it. Keep it between us.",
+            "I won't guess about the rest. Stick to the facts.",
+            "That is all you need to know for now.",
+            "Anything beyond that is dangerous speculation.",
+            "I've verified that much. Nothing more to say.",
+            "Take that information and plan accordingly.",
+            "That's all that's confirmed. Watch your step."
+          ],
+          "TL": [
+            "Wala pa akong ibang mapapatunayan.",
+            "Di ako nakikipagtsismisan. Iyan lang ang kumpirmado.",
+            "Huwag kang maghanap ng detalyeng di ko mapatutunayan.",
+            "Hanggang diyan lang. Sa ating dalawa lang 'yan.",
+            "Hindi ako manghuhula. Manatili sa katotohanan.",
+            "Iyan lang ang kailangan mong malaman sa ngayon.",
+            "Anuman higit diyan ay mapanganib na haka-haka.",
+            "Iyan lang ang nakumpirma ko. Wala nang dapat sabihin pa.",
+            "Kunin ang balitang 'yan at magplano nang maayos.",
+            "Iyan lang ang tiyak. Mag-ingat ka sa hakbang mo."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "That is what I can confirm right now.",
-              "TL": "Iyan ang makukumpirma ko sa ngayon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "That's all the verified information I have.",
-              "TL": "Iyan lang ang napatunayang impormasyong hawak ko."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "That covers the extent of what I know.",
-              "TL": "Iyan ang kabuuan ng nalalaman ko."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Beyond that, it's just guesswork.",
-              "TL": "Higit pa riyan, hula-hula na lang."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "That's as much as I was able to find out.",
-              "TL": "Iyan lang ang nagawa kong alamin."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I'll let you know if I hear anything more.",
-              "TL": "Sasabihan kita kapag may narinig pa akong bago."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "That's the factual picture for now.",
-              "TL": "Iyan ang totoong larawan sa ngayon."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "That's what's solid. The rest is rumor.",
-              "TL": "Iyan ang totoo. Tsismis na ang iba."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I've told you everything I can verify.",
-              "TL": "Nasabi ko na ang lahat ng kaya kong kumpirmahin."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "That's the report as it stands.",
-              "TL": "Iyan ang ulat sa kasalukuyan."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "That is all I can confirm.",
+            "That's it.",
+            "All I know.",
+            "Confirmed only.",
+            "Nothing more.",
+            "That's all.",
+            "Full report.",
+            "End of it.",
+            "Done.",
+            "All there is."
+          ],
+          "TL": [
+            "Iyan lang ang makukumpirma ko.",
+            "Iyon lang.",
+            "Lahat ng alam ko.",
+            "Kumpirmado lang.",
+            "Wala nang iba.",
+            "Iyon na ang lahat.",
+            "Buong ulat.",
+            "Diyan nagtatapos.",
+            "Tapos.",
+            "Iyan lang."
+          ]
+        }
       },
-      "namespace": "semantic.interaction.scene.grounded_news_answer"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
-        "responseTemplateID": "semantic.interaction.scene.grounded_news_answer",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "I wish I knew more, but that is what I can confirm.",
-              "TL": "Sana mas marami akong alam, pero iyan ang makukumpirma ko."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "That's all I have for you right now, friend, but I'll keep asking.",
-              "TL": "Iyan lang muna, kaibigan, pero patuloy akong magtatanong."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "I wanted to share everything I knew to keep you safe.",
-              "TL": "Gusto kong ibahagi ang lahat para manatili kang ligtas."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "If any more news comes my way, you'll be the first I tell.",
-              "TL": "Kapag may bagong balita, ikaw ang una kong sasabihan."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Hope that helps you out today, partner.",
-              "TL": "Sana makatulong 'yan sa 'yo ngayong araw, kasama."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "That's the whole story as far as I've been told.",
-              "TL": "Iyan ang buong kuwento ayon sa sinabi sa akin."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "I'm glad I could pass that along to you.",
-              "TL": "Mabuti at naipasa ko sa 'yo 'yan."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "That's what we have to work with for now, friend.",
-              "TL": "Iyan ang hawak natin sa ngayon, kaibigan."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "I'll keep my ears open for you.",
-              "TL": "Bukas ang tainga ko para sa 'yo."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "That's everything for now. Take good care of yourself.",
-              "TL": "Iyan ang lahat sa ngayon. Ingatan mo ang sarili mo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.grounded_news_answer"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
-        "responseTemplateID": "semantic.interaction.scene.grounded_news_answer",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "That is all I can confirm.",
-              "TL": "Iyan lang ang makukumpirma ko."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "That's it.",
-              "TL": "Iyon lang."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "All I know.",
-              "TL": "Lahat ng alam ko."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Confirmed only.",
-              "TL": "Kumpirmado lang."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Nothing more.",
-              "TL": "Wala nang iba."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "That's all.",
-              "TL": "Iyon na ang lahat."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Full report.",
-              "TL": "Buong ulat."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "End of it.",
-              "TL": "Diyan nagtatapos."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Done.",
-              "TL": "Tapos."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "All there is.",
-              "TL": "Iyan lang."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.grounded_news_answer"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
-        "responseTemplateID": "semantic.interaction.scene.grounded_news_answer",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "Nothing else I can verify yet.",
-              "TL": "Wala pa akong ibang mapapatunayan."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "I don't deal in rumors. That's the only confirmed piece.",
-              "TL": "Di ako nakikipagtsismisan. Iyan lang ang kumpirmado."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "Don't press for details I can't back up.",
-              "TL": "Huwag kang maghanap ng detalyeng di ko mapatutunayan."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "That's the extent of it. Keep it between us.",
-              "TL": "Hanggang diyan lang. Sa ating dalawa lang 'yan."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "I won't guess about the rest. Stick to the facts.",
-              "TL": "Hindi ako manghuhula. Manatili sa katotohanan."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "That is all you need to know for now.",
-              "TL": "Iyan lang ang kailangan mong malaman sa ngayon."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "Anything beyond that is dangerous speculation.",
-              "TL": "Anuman higit diyan ay mapanganib na haka-haka."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "I've verified that much. Nothing more to say.",
-              "TL": "Iyan lang ang nakumpirma ko. Wala nang dapat sabihin pa."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "Take that information and plan accordingly.",
-              "TL": "Kunin ang balitang 'yan at magplano nang maayos."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "That's all that's confirmed. Watch your step.",
-              "TL": "Iyan lang ang tiyak. Mag-ingat ka sa hakbang mo."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.grounded_news_answer"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "I wish I knew more, but that is what I can confirm.",
+            "That's all I have for you right now, friend, but I'll keep asking.",
+            "I wanted to share everything I knew to keep you safe.",
+            "If any more news comes my way, you'll be the first I tell.",
+            "Hope that helps you out today, partner.",
+            "That's the whole story as far as I've been told.",
+            "I'm glad I could pass that along to you.",
+            "That's what we have to work with for now, friend.",
+            "I'll keep my ears open for you.",
+            "That's everything for now. Take good care of yourself."
+          ],
+          "TL": [
+            "Sana mas marami akong alam, pero iyan ang makukumpirma ko.",
+            "Iyan lang muna, kaibigan, pero patuloy akong magtatanong.",
+            "Gusto kong ibahagi ang lahat para manatili kang ligtas.",
+            "Kapag may bagong balita, ikaw ang una kong sasabihan.",
+            "Sana makatulong 'yan sa 'yo ngayong araw, kasama.",
+            "Iyan ang buong kuwento ayon sa sinabi sa akin.",
+            "Mabuti at naipasa ko sa 'yo 'yan.",
+            "Iyan ang hawak natin sa ngayon, kaibigan.",
+            "Bukas ang tainga ko para sa 'yo.",
+            "Iyan ang lahat sa ngayon. Ingatan mo ang sarili mo."
+          ]
+        }
+      }
+    ]
+  }
 }

@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "combat.tactical_spatial.zombie",
+  "id": "clock",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/combat/tactical_spatial.json",
-    "responseTemplateID": "semantic.combat.tactical_spatial.zombie.clock",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Zombies, {scene.clock}!",
-          "TL": "Mga zombie, {scene.clock}!"
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Dead coming in from {scene.clock}!",
-          "TL": "May mga patay na parating mula sa {scene.clock}!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Watch {scene.clock}, walkers spotted!",
-          "TL": "Bantayan ang {scene.clock}, may mga walker!"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Zombies at {scene.clock}! Get ready!",
-          "TL": "Mga zombie sa {scene.clock}! Humanda!"
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Movement at {scene.clock}, it's dead heads!",
-          "TL": "May galaw sa {scene.clock}, mga zombie 'yan!"
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Incoming zombies from {scene.clock}!",
-          "TL": "Paparating na mga zombie galing sa {scene.clock}!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Eyes on {scene.clock}! Walkers approaching!",
-          "TL": "Tumingin sa {scene.clock}! May lumalapit na mga walker!"
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Check {scene.clock}, we've got zombies!",
-          "TL": "Tingnan ang {scene.clock}, may mga zombie tayo!"
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Zombies moving in fast at {scene.clock}!",
-          "TL": "Mabilis na lumalapit ang mga zombie sa {scene.clock}!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Target at {scene.clock}! Zombies!",
-          "TL": "Puntirya sa {scene.clock}! Mga zombie!"
+          "EN": [
+            "Zombies, {scene.clock}!",
+            "Dead coming in from {scene.clock}!",
+            "Watch {scene.clock}, walkers spotted!",
+            "Zombies at {scene.clock}! Get ready!",
+            "Movement at {scene.clock}, it's dead heads!",
+            "Incoming zombies from {scene.clock}!",
+            "Eyes on {scene.clock}! Walkers approaching!",
+            "Check {scene.clock}, we've got zombies!",
+            "Zombies moving in fast at {scene.clock}!",
+            "Target at {scene.clock}! Zombies!"
+          ],
+          "TL": [
+            "Mga zombie, {scene.clock}!",
+            "May mga patay na parating mula sa {scene.clock}!",
+            "Bantayan ang {scene.clock}, may mga walker!",
+            "Mga zombie sa {scene.clock}! Humanda!",
+            "May galaw sa {scene.clock}, mga zombie 'yan!",
+            "Paparating na mga zombie galing sa {scene.clock}!",
+            "Tumingin sa {scene.clock}! May lumalapit na mga walker!",
+            "Tingnan ang {scene.clock}, may mga zombie tayo!",
+            "Mabilis na lumalapit ang mga zombie sa {scene.clock}!",
+            "Puntirya sa {scene.clock}! Mga zombie!"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.tactical_spatial.zombie.clock",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

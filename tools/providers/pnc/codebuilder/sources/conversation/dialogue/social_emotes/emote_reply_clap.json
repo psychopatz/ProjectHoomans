@@ -1,198 +1,83 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "emote.reply",
+  "id": "clap",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Thanks.",
+            "Appreciate the applause.",
+            "Just doing what had to be done.",
+            "Glad you liked it.",
+            "Much appreciated.",
+            "All in a day's work.",
+            "Thanks. Good to know it landed well.",
+            "Appreciate it.",
+            "Thanks. Let's keep the momentum going.",
+            "Thank you for the encouragement."
+          ],
+          "TL": [
+            "Salamat.",
+            "Salamat sa palakpak.",
+            "Ginawa lang ang kailangang gawin.",
+            "Mabuti at nagustuhan mo.",
+            "Maraming salamat.",
+            "Bahagi lang 'yan ng araw-araw na trabaho.",
+            "Salamat. Mabuting malaman na maayos ang dating.",
+            "Salamat.",
+            "Salamat. Tuloy lang natin ang sigla.",
+            "Salamat sa pampalakas ng loob."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-        "responseTemplateID": "semantic.emote.reply.clap",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "Thanks.",
-              "TL": "Salamat."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Appreciate the applause.",
-              "TL": "Salamat sa palakpak."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Just doing what had to be done.",
-              "TL": "Ginawa lang ang kailangang gawin."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Glad you liked it.",
-              "TL": "Mabuti at nagustuhan mo."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Much appreciated.",
-              "TL": "Maraming salamat."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "All in a day's work.",
-              "TL": "Bahagi lang 'yan ng araw-araw na trabaho."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Thanks. Good to know it landed well.",
-              "TL": "Salamat. Mabuting malaman na maayos ang dating."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Appreciate it.",
-              "TL": "Salamat."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Thanks. Let's keep the momentum going.",
-              "TL": "Salamat. Tuloy lang natin ang sigla."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Thank you for the encouragement.",
-              "TL": "Salamat sa pampalakas ng loob."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.emote.reply.clap"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
-        "responseTemplateID": "semantic.emote.reply.clap",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "You're too kind.",
-              "TL": "Napakabait mo naman."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "Thanks! That really puts a smile on my face.",
-              "TL": "Salamat! Napangiti talaga ako roon."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Appreciate the cheer! We make a solid team.",
-              "TL": "Salamat sa suporta! Matibay tayong grupo."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "Thank you! Couldn't have done it without good company.",
-              "TL": "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Haha, thanks! Glad to bring some light into the day.",
-              "TL": "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "That makes me feel good. Thank you!",
-              "TL": "Napakasarap sa pakiramdam niyan. Salamat!"
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "You're awesome. Thanks for the cheer.",
-              "TL": "Ang galing mo. Salamat sa pagpalakpak."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "Appreciate the love! Let's keep winning.",
-              "TL": "Salamat sa suporta! Tuloy lang tayo sa tagumpay."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "Thanks a bunch! That means a lot to me.",
-              "TL": "Maraming salamat! Malaking bagay 'yan sa akin."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "Haha, bowing now! Thanks, friend.",
-              "TL": "Haha, yumuyukod na ako! Salamat, kaibigan."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.emote.reply.clap"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "You're too kind.",
+            "Thanks! That really puts a smile on my face.",
+            "Appreciate the cheer! We make a solid team.",
+            "Thank you! Couldn't have done it without good company.",
+            "Haha, thanks! Glad to bring some light into the day.",
+            "That makes me feel good. Thank you!",
+            "You're awesome. Thanks for the cheer.",
+            "Appreciate the love! Let's keep winning.",
+            "Thanks a bunch! That means a lot to me.",
+            "Haha, bowing now! Thanks, friend."
+          ],
+          "TL": [
+            "Napakabait mo naman.",
+            "Salamat! Napangiti talaga ako roon.",
+            "Salamat sa suporta! Matibay tayong grupo.",
+            "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
+            "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
+            "Napakasarap sa pakiramdam niyan. Salamat!",
+            "Ang galing mo. Salamat sa pagpalakpak.",
+            "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
+            "Maraming salamat! Malaking bagay 'yan sa akin.",
+            "Haha, yumuyukod na ako! Salamat, kaibigan."
+          ]
+        }
+      }
+    ]
+  }
 }

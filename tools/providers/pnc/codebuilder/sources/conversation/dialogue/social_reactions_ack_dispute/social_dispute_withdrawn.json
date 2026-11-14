@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "social",
+  "id": "dispute_withdrawn",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "All right. Let's step back from this.",
+            "We're not getting anywhere. Let's move on.",
+            "I think we've said enough on the matter.",
+            "Let's take a break from this topic.",
+            "Fair enough. Let's focus on other priorities.",
+            "No point spinning our wheels. Let's work.",
+            "Understood. We'll leave it at that.",
+            "Agreed. Moving past it now.",
+            "We can revisit this when things settle down.",
+            "All right. Let's put our energy elsewhere."
+          ],
+          "TL": [
+            "Sige. Umatras muna tayo sa usapang ito.",
+            "Wala tayong mararating. Magpatuloy na tayo.",
+            "Sa tingin ko sapat na ang nasabi natin sa usapin.",
+            "Magpahinga muna tayo sa paksang ito.",
+            "Makatwiran. Magpokus na lang tayo sa ibang gawain.",
+            "Walang silbing magpaulit-ulit. Magtrabaho na tayo.",
+            "Naintindihan. Diyan na muna natin iiwan.",
+            "Sang-ayon. Lumilipas na tayo roon.",
+            "Mababalikan natin ito kapag maayos na ang lahat.",
+            "Sige. Dalhin na lang natin ang lakas sa iba."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
-        "responseTemplateID": "semantic.social.dispute_withdrawn",
-        "style": "guarded"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "Let's leave it there.",
+            "I'm not arguing with you anymore.",
+            "Done talking about this.",
+            "Subject is closed. Back off.",
+            "I've said my piece. Leave it alone.",
+            "Drop it before I get angry.",
+            "Nothing more to say.",
+            "We're done here.",
+            "Walk away.",
+            "I'm finished with this conversation."
+          ],
+          "TL": [
+            "Tama na iyon.",
+            "Hindi na ako makikipagtalo sa 'yo.",
+            "Tapos na akong pag-usapan ito.",
+            "Sarado na ang paksa. Umatras ka.",
+            "Nasabi ko na ang parte ko. Hayaan mo na.",
+            "Itigil mo 'yan bago pa ako magalit.",
+            "Wala nang dapat sabihin pa.",
+            "Tapos na tayo rito.",
+            "Umalis ka na.",
+            "Tapos na ako sa usapang ito."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "Let's leave it there.",
-              "TL": "Tama na iyon."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "I'm not arguing with you anymore.",
-              "TL": "Hindi na ako makikipagtalo sa 'yo."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "Done talking about this.",
-              "TL": "Tapos na akong pag-usapan ito."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "Subject is closed. Back off.",
-              "TL": "Sarado na ang paksa. Umatras ka."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "I've said my piece. Leave it alone.",
-              "TL": "Nasabi ko na ang parte ko. Hayaan mo na."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Drop it before I get angry.",
-              "TL": "Itigil mo 'yan bago pa ako magalit."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "Nothing more to say.",
-              "TL": "Wala nang dapat sabihin pa."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "We're done here.",
-              "TL": "Tapos na tayo rito."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "Walk away.",
-              "TL": "Umalis ka na."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "I'm finished with this conversation.",
-              "TL": "Tapos na ako sa usapang ito."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Drop it.",
+            "Done.",
+            "Enough.",
+            "No more.",
+            "Moving on.",
+            "Leave it.",
+            "Finished.",
+            "Closed.",
+            "End of it.",
+            "Drop the topic."
+          ],
+          "TL": [
+            "Hayaan mo na.",
+            "Tapos na.",
+            "Sapat na.",
+            "Wala na.",
+            "Tuloy na.",
+            "Tama na.",
+            "Tapos.",
+            "Sarado.",
+            "Diyan nagtatapos.",
+            "Iwan ang paksa."
+          ]
+        }
       },
-      "namespace": "semantic.social.dispute_withdrawn"
-    },
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
-        "responseTemplateID": "semantic.social.dispute_withdrawn",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "All right. Let's step back from this.",
-              "TL": "Sige. Umatras muna tayo sa usapang ito."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "We're not getting anywhere. Let's move on.",
-              "TL": "Wala tayong mararating. Magpatuloy na tayo."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "I think we've said enough on the matter.",
-              "TL": "Sa tingin ko sapat na ang nasabi natin sa usapin."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Let's take a break from this topic.",
-              "TL": "Magpahinga muna tayo sa paksang ito."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Fair enough. Let's focus on other priorities.",
-              "TL": "Makatwiran. Magpokus na lang tayo sa ibang gawain."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "No point spinning our wheels. Let's work.",
-              "TL": "Walang silbing magpaulit-ulit. Magtrabaho na tayo."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Understood. We'll leave it at that.",
-              "TL": "Naintindihan. Diyan na muna natin iiwan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Agreed. Moving past it now.",
-              "TL": "Sang-ayon. Lumilipas na tayo roon."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "We can revisit this when things settle down.",
-              "TL": "Mababalikan natin ito kapag maayos na ang lahat."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "All right. Let's put our energy elsewhere.",
-              "TL": "Sige. Dalhin na lang natin ang lakas sa iba."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.social.dispute_withdrawn"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
-        "responseTemplateID": "semantic.social.dispute_withdrawn",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Drop it.",
-              "TL": "Hayaan mo na."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Done.",
-              "TL": "Tapos na."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Enough.",
-              "TL": "Sapat na."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "No more.",
-              "TL": "Wala na."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Moving on.",
-              "TL": "Tuloy na."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Leave it.",
-              "TL": "Tama na."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Finished.",
-              "TL": "Tapos."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Closed.",
-              "TL": "Sarado."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "End of it.",
-              "TL": "Diyan nagtatapos."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Drop the topic.",
-              "TL": "Iwan ang paksa."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.social.dispute_withdrawn"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
-        "responseTemplateID": "semantic.social.dispute_withdrawn",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "Let's leave it there for now, friend. We're still good.",
-              "TL": "Tama na muna iyon, kaibigan. Maayos pa rin tayo."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "I don't want this to come between us. Let's rest on it.",
-              "TL": "Ayokong masira tayo dahil dito. Ipahinga na muna natin."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "We've said what we needed to say. All love here.",
-              "TL": "Nasabi na natin ang kailangan. Maayos ang kalooban dito."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "Let's pause this. You're more important to me than this argument.",
-              "TL": "Tigil muna. Mas mahalaga ka sa akin kaysa sa pagtatalong ito."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "All good. Let's go grab a drink and clear our heads.",
-              "TL": "Ayos lang. Uminom muna tayo para mahimasmasan."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "I hear you, and I respect you. Let's let the dust settle.",
-              "TL": "Narinig kita, at iginagalang kita. Hayaang lumipas ang alikabok."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "We don't need to fight. We're on the same team.",
-              "TL": "Di natin kailangang mag-away. Nasa iisang koponan tayo."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "It's all right. We can let this one slide.",
-              "TL": "Ayos lang. Pwede nating palampasin ang isang 'to."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "I value our partnership too much to push this.",
-              "TL": "Masyadong mahalaga ang samahan natin para ipagpilitan ito."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "We'll be okay. Let's take a breather.",
-              "TL": "Magiging maayos tayo. Huminga muna tayo nang malalim."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.social.dispute_withdrawn"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "Let's leave it there for now, friend. We're still good.",
+            "I don't want this to come between us. Let's rest on it.",
+            "We've said what we needed to say. All love here.",
+            "Let's pause this. You're more important to me than this argument.",
+            "All good. Let's go grab a drink and clear our heads.",
+            "I hear you, and I respect you. Let's let the dust settle.",
+            "We don't need to fight. We're on the same team.",
+            "It's all right. We can let this one slide.",
+            "I value our partnership too much to push this.",
+            "We'll be okay. Let's take a breather."
+          ],
+          "TL": [
+            "Tama na muna iyon, kaibigan. Maayos pa rin tayo.",
+            "Ayokong masira tayo dahil dito. Ipahinga na muna natin.",
+            "Nasabi na natin ang kailangan. Maayos ang kalooban dito.",
+            "Tigil muna. Mas mahalaga ka sa akin kaysa sa pagtatalong ito.",
+            "Ayos lang. Uminom muna tayo para mahimasmasan.",
+            "Narinig kita, at iginagalang kita. Hayaang lumipas ang alikabok.",
+            "Di natin kailangang mag-away. Nasa iisang koponan tayo.",
+            "Ayos lang. Pwede nating palampasin ang isang 'to.",
+            "Masyadong mahalaga ang samahan natin para ipagpilitan ito.",
+            "Magiging maayos tayo. Huminga muna tayo nang malalim."
+          ]
+        }
+      }
+    ]
+  }
 }

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.consume",
   "id": "rejected",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-    "responseTemplateID": "semantic.task.consume.rejected",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I can't use that right now.",
-          "TL": "Hindi ko magamit iyon ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I don't need to use that at the moment.",
-          "TL": "Di ko kailangang gamitin iyan sa sandaling ito."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "That's not suitable for me right now.",
-          "TL": "Di angkop sa akin 'yan ngayon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Unable to consume that. Not needed.",
-          "TL": "Di magagamit 'yan. Di kailangan."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I can't use that under these conditions.",
-          "TL": "Di ko magagamit 'yan sa ganitong kalagayan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Save it for later. I don't need it now.",
-          "TL": "Itabi mo muna. Di ko kailangan ngayon."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Refusing to consume that. Not appropriate.",
-          "TL": "Tumatangging gamitin 'yan. Di nararapat."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I don't have a use for that right now.",
-          "TL": "Wala akong paggagamitan niyan ngayon."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Can't use that. Not the right time.",
-          "TL": "Di magagamit 'yan. Maling oras."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Consume order rejected.",
-          "TL": "Tinatanggihan ang utos na gamitin."
+          "EN": [
+            "I can't use that right now.",
+            "I don't need to use that at the moment.",
+            "That's not suitable for me right now.",
+            "Unable to consume that. Not needed.",
+            "I can't use that under these conditions.",
+            "Save it for later. I don't need it now.",
+            "Refusing to consume that. Not appropriate.",
+            "I don't have a use for that right now.",
+            "Can't use that. Not the right time.",
+            "Consume order rejected."
+          ],
+          "TL": [
+            "Hindi ko magamit iyon ngayon.",
+            "Di ko kailangang gamitin iyan sa sandaling ito.",
+            "Di angkop sa akin 'yan ngayon.",
+            "Di magagamit 'yan. Di kailangan.",
+            "Di ko magagamit 'yan sa ganitong kalagayan.",
+            "Itabi mo muna. Di ko kailangan ngayon.",
+            "Tumatangging gamitin 'yan. Di nararapat.",
+            "Wala akong paggagamitan niyan ngayon.",
+            "Di magagamit 'yan. Maling oras.",
+            "Tinatanggihan ang utos na gamitin."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.consume",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

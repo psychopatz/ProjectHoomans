@@ -104,7 +104,7 @@ Catalog.Register("semantic.offer", {
         },
         {
             id = "semantic.offer.friendly",
-            templateID = "semantic.social.offer_friendly",
+            templateID = "social.offer_friendly",
             fallback = "That's kind of you. I'll keep it in mind.",
             when = { socialStyle = { "friendly", "protective" } },
             priority = 1,

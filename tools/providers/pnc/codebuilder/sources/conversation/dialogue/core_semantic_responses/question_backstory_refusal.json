@@ -1,27 +1,27 @@
 {
-  "id": "refusal",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.backstory.refusal",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "question.backstory",
+  "id": "refusal",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "REFUSAL",
+  "metadata": {
+    "responsePoolID": "question.backstory.refusal",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "REFUSAL"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.backstory.refusal.authored",
-        "metadata": {
-          "fallback": "I'm not ready to talk about that yet.",
-          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"
-        },
+        "id": "question.backstory.refusal.authored",
         "text": {
           "EN": "I'm not ready to talk about that yet.",
           "TL": "Hindi pa ako handang pag-usapan iyan."
+        },
+        "metadata": {
+          "fallback": "I'm not ready to talk about that yet.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"
         }
       }
     ]
-  },
-  "namespace": "semantic.question.backstory",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

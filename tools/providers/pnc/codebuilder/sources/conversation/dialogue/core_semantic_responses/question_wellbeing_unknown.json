@@ -1,16 +1,36 @@
 {
-  "id": "unknown",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.question.wellbeing.unknown",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "namespace": "question.wellbeing",
+  "id": "unknown",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "UNKNOWN",
+  "metadata": {
+    "responsePoolID": "question.wellbeing.unknown",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "UNKNOWN"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.question.wellbeing.unknown.dataset.causal_followup",
+        "id": "question.wellbeing.unknown.dataset.causal_followup",
+        "text": {
+          "EN": "I can tell something is off, but I do not know what caused it yet.",
+          "TL": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito."
+        },
+        "when": {
+          "all": [
+            {
+              "op": "eq",
+              "path": "conversation.healthState",
+              "value": "unknown"
+            },
+            {
+              "op": "eq",
+              "path": "conversation.pattern",
+              "value": "pnc.dataset.question.wellbeing.what_is_going_on_with_you"
+            }
+          ]
+        },
         "metadata": {
           "fallback": "I can tell something is off, but I do not know what caused it yet.",
           "plan": {
@@ -46,28 +66,8 @@
             "SGD"
           ],
           "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown"
-        },
-        "text": {
-          "EN": "I can tell something is off, but I do not know what caused it yet.",
-          "TL": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito."
-        },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.healthState",
-              "value": "unknown"
-            },
-            {
-              "op": "eq",
-              "path": "conversation.pattern",
-              "value": "pnc.dataset.question.wellbeing.what_is_going_on_with_you"
-            }
-          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.question.wellbeing",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

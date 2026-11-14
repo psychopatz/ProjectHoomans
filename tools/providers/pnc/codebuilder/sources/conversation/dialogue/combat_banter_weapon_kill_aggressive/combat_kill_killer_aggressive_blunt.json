@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.aggressive",
+  "id": "blunt",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Felt that one crack.",
+            "Crushed its skull to pieces.",
+            "Smashed that head like a melon.",
+            "Nothing gets up after a hit like that.",
+            "Broke every bone in its face.",
+            "Felt the impact straight up my arms.",
+            "Caved that rotten skull right in.",
+            "Heavy hit. Stay down.",
+            "Pounded that one into the floor.",
+            "Cracked wide open. Moving on."
+          ],
+          "TL": [
+            "Ramdam ko ang pag-crack no'n.",
+            "Durog ang bungo sa pira-piraso.",
+            "Pinitpit ang ulo na parang pakwan.",
+            "Walang tatayo pagkatapos ng gano'ng hampas.",
+            "Basag ang bawat buto sa mukha.",
+            "Ramdam hanggang braso ang impact.",
+            "Lubog ang bulok na bungo papasok.",
+            "Mabigat na tama. Huwag ka nang babangon.",
+            "Ibinagsak sa sahig sa lakas ng palo.",
+            "Basag nang todo. Tuloy."
+          ]
+        }
+      }
+    ]
+  }
+}

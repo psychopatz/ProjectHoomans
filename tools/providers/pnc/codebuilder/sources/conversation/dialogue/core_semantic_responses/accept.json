@@ -1,21 +1,17 @@
 {
-  "id": "accept",
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "metadata": {
-    "responsePoolID": "semantic.accept",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
-  },
+  "id": "accept",
   "owner": "ProjectHoomans",
-  "response": {
-    "act": "ACCEPT",
+  "metadata": {
+    "responsePoolID": "accept",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
+    "responseAct": "ACCEPT"
+  },
+  "say": {
     "variants": [
       {
-        "id": "semantic.accept.dataset.pending_started",
-        "metadata": {
-          "fallback": "Okay, I'll get started.",
-          "priority": 1,
-          "templateID": "semantic.accept.dataset.pending_started"
-        },
+        "id": "accept.dataset.pending_started",
         "text": {
           "EN": "Okay, I'll get started.",
           "TL": "Okay, I'll get started."
@@ -24,15 +20,15 @@
           "op": "eq",
           "path": "conversation.hasPendingRequest",
           "value": true
+        },
+        "metadata": {
+          "fallback": "Okay, I'll get started.",
+          "priority": 1,
+          "templateID": "accept.dataset.pending_started"
         }
       },
       {
-        "id": "semantic.accept.dataset.pending_care",
-        "metadata": {
-          "fallback": "All right. I can take care of that.",
-          "priority": 1,
-          "templateID": "semantic.accept.dataset.pending_care"
-        },
+        "id": "accept.dataset.pending_care",
         "text": {
           "EN": "All right. I can take care of that.",
           "TL": "All right. I can take care of that."
@@ -41,10 +37,13 @@
           "op": "eq",
           "path": "conversation.hasPendingRequest",
           "value": true
+        },
+        "metadata": {
+          "fallback": "All right. I can take care of that.",
+          "priority": 1,
+          "templateID": "accept.dataset.pending_care"
         }
       }
     ]
-  },
-  "namespace": "semantic",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

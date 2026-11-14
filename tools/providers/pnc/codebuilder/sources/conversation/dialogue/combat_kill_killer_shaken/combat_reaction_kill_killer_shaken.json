@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_killer_shaken",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/shaken.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "It's down... give me a second.",
+              "I got it... but my breath won't catch.",
+              "Dead... give me a moment to steady my hands.",
+              "It's down... that was way too close.",
+              "Just... wait a second. My chest hurts.",
+              "It's dead... hands are shaking like crazy.",
+              "Got him down... need half a minute.",
+              "God... it's over. Give me a second.",
+              "Down... heart is pounding in my ears.",
+              "It's finished... just give me a moment."
+            ],
+            "TL": [
+              "Patay na... sandali lang.",
+              "Nakuha ko... pero kinakapos ako sa hininga.",
+              "Patay na... bigyan mo ako ng saglit para kumalma ang kamay ko.",
+              "Bagsak na... masyadong malapit 'yon.",
+              "Saglit lang... kumikirot ang dibdib ko.",
+              "Patay na... nanginginig nang husto ang mga kamay ko.",
+              "Naibagsak ko... kailangan ko ng kalahating minuto.",
+              "Diyos ko... tapos na. Sandali lang.",
+              "Bagsak... dumadagundong ang puso sa tenga ko.",
+              "Tapos na... bigyan mo lang ako ng saglit."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Got it. I need a breath.",
+              "It's dead. Let me catch my breath.",
+              "Down. I can barely breathe right now.",
+              "Took it out... need air.",
+              "Dead. Just let me inhale for a second.",
+              "I got it down. Deep breath... deep breath.",
+              "Finished. My lungs are burning.",
+              "It's on the ground. Catching my breath.",
+              "Got it. Just need ten seconds to breathe.",
+              "Killed it. Breathing hard... one second."
+            ],
+            "TL": [
+              "Nakuha ko. Kailangan ko munang huminga.",
+              "Patay na. Pahingahin mo muna ako.",
+              "Bagsak. Halos hindi ako makahinga ngayon.",
+              "Tinapos ko na... kailangan ko ng hangin.",
+              "Patay na. Hayaan mo muna akong huminga nang malalim.",
+              "Naibagsak ko na. Malalim na hininga... malalim na hininga.",
+              "Tapos na. Parang nasusunog ang baga ko.",
+              "Nasa lupa na. Humihinga muna ako nang maayos.",
+              "Nakuha ko. Kailangan ko lang ng sampung segundo para huminga.",
+              "Napatay ko na. Hinihingal ako... isang saglit."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "It's dead. I really hate this.",
+              "Down. God, the smell makes me sick.",
+              "It's finished. I despise having to do that.",
+              "Dead. Look at all that blood... horrible.",
+              "Got it down. Hate everything about this.",
+              "It's dead. Why does it always have to be like this?",
+              "Down. I hate the crunch it made.",
+              "It's over. Sick of the violence.",
+              "Dead. I really, really hate this world.",
+              "Killed it. Hate the feeling in my hands."
+            ],
+            "TL": [
+              "Patay na. Ayoko talaga nito.",
+              "Bagsak. Diyos ko, nasusuka ako sa amoy.",
+              "Tapos na. Ayaw na ayaw kong kailangang gawin 'yon.",
+              "Patay na. Tingnan mo ang dugo... kakila-kilabot.",
+              "Naibagsak ko na. Kinamumuhian ko ang lahat ng ito.",
+              "Patay na. Bakit kailangang laging ganito?",
+              "Bagsak. Ayaw ko 'yung naging lagutok no'n.",
+              "Tapos na. Sawa na ako sa karahasan.",
+              "Patay. Ayoko talaga, ayoko sa mundong 'to.",
+              "Napatay ko na. Ayoko 'yung pakiramdam sa mga kamay ko."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

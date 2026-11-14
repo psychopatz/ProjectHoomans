@@ -1,74 +1,74 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["semantic.medical.distress.repeat.bandage"] = {
+    ["medical.distress.repeat.bandage"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.bandage",
+        ["id"] = "medical.distress.repeat.bandage",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
     },
-    ["semantic.medical.distress.repeat.bleedout"] = {
+    ["medical.distress.repeat.bleedout"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.bleedout",
+        ["id"] = "medical.distress.repeat.bleedout",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bleedout.json",
     },
-    ["semantic.medical.distress.repeat.default"] = {
+    ["medical.distress.repeat.default"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.default",
+        ["id"] = "medical.distress.repeat.default",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_default.json",
     },
-    ["semantic.medical.distress.repeat.dehydration"] = {
+    ["medical.distress.repeat.dehydration"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.dehydration",
+        ["id"] = "medical.distress.repeat.dehydration",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_dehydration.json",
     },
-    ["semantic.medical.distress.repeat.exhaustion"] = {
+    ["medical.distress.repeat.exhaustion"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.exhaustion",
+        ["id"] = "medical.distress.repeat.exhaustion",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_exhaustion.json",
     },
-    ["semantic.medical.distress.repeat.mercy"] = {
+    ["medical.distress.repeat.mercy"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.mercy",
+        ["id"] = "medical.distress.repeat.mercy",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_mercy.json",
     },
-    ["semantic.medical.distress.repeat.rescue"] = {
+    ["medical.distress.repeat.rescue"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.rescue",
+        ["id"] = "medical.distress.repeat.rescue",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_rescue.json",
     },
-    ["semantic.medical.distress.repeat.starvation"] = {
+    ["medical.distress.repeat.starvation"] = {
         ["domain"] = "medical_event_repeat",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
         },
-        ["id"] = "semantic.medical.distress.repeat.starvation",
+        ["id"] = "medical.distress.repeat.starvation",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_starvation.json",
     },

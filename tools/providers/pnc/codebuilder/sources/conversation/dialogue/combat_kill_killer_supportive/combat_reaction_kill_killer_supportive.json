@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.reaction",
+  "id": "kill_killer_supportive",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/supportive.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Got it. Stay close.",
+              "Threat down. Stay right by me.",
+              "I took care of it. Keep tight.",
+              "Got that one. Don't drift away.",
+              "It's dead. I've got this side covered.",
+              "Downed it. Stick with me.",
+              "That one's finished. Keep close to my shoulder.",
+              "Handled. Watch the rear while I lead.",
+              "Target down. Stay near.",
+              "Took it out. We're safe on this side."
+            ],
+            "TL": [
+              "Patay na. Dito ka lang.",
+              "Bagsak ang banta. Dito ka lang sa tabi ko.",
+              "Inasikaso ko na. Dumikit ka lang.",
+              "Nakuha ko na 'yon. Huwag kang lumayo.",
+              "Patay na. Hawak ko ang parteng 'to.",
+              "Ibinagsak ko na. Sumama ka sa akin.",
+              "Tapos na ang isang 'yon. Dumikit sa balikat ko.",
+              "Naasikaso na. Bantayan ang likod habang nangunguna ako.",
+              "Bagsak ang target. Diyan ka lang sa malapit.",
+              "Tinapos ko na. Ligtas tayo sa parteng 'to."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "It's down. You alright?",
+              "Got it off us. Are you hurt?",
+              "Threat eliminated. You doing okay?",
+              "It's dead. Check yourself over.",
+              "Downed that one. Everything alright with you?",
+              "Took it down. You safe there?",
+              "That one's done for. Are you okay?",
+              "Dropped it before it reached you. You good?",
+              "Handled that threat. How are you holding up?",
+              "It won't touch you now. You alright?"
+            ],
+            "TL": [
+              "Tapos na. Okay ka lang?",
+              "Nailayo ko sa atin. Nasaktan ka ba?",
+              "Naalis ang banta. Ayos ka lang ba?",
+              "Patay na. Tignan mo sarili mo.",
+              "Ibinagsak ko 'yon. Ayos lang ang lahat sa'yo?",
+              "Ibinagsak ko na. Ligtas ka riyan?",
+              "Tapos na 'yon. Ayos ka lang?",
+              "Ibinagsak bago pa makalapit sa'yo. Ayos ka?",
+              "Naasikaso ang banta. Kamusta ka riyan?",
+              "Hindi ka na mahahawakan no'n. Okay ka lang?"
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "One less. I've got you.",
+              "Threat's gone. I'm right here.",
+              "Downed it. You're protected.",
+              "One less to worry about. I'm with you.",
+              "Handled. I won't let them touch you.",
+              "It's dead. I've got your back.",
+              "One less in our way. Lean on me if you need to.",
+              "Took care of that one. We'll get through this.",
+              "Threat down. You're safe with me.",
+              "That one's gone. I've got you covered."
+            ],
+            "TL": [
+              "Isa na lang ang nabawas. Kasama mo ako.",
+              "Wala na ang banta. Nandito lang ako.",
+              "Ibinagsak ko na. Protektado ka.",
+              "Bawas ang aalahanin. Kasama mo ako.",
+              "Naasikaso na. Hindi ko hahayaang mahawakan ka nila.",
+              "Patay na. Hawak ko ang likod mo.",
+              "Bawas sa dinaraanan. Sumandal ka sa akin kung kailangan.",
+              "Inasikaso ko ang isang 'yon. Malalampasan natin 'to.",
+              "Banta bagsak na. Ligtas ka kasama ko.",
+              "Wala na ang isang 'yon. Nakabantay ako sa'yo."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

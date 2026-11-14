@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "quest.clinic_supplies.accept",
+  "id": "rejected",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:quest_content",
     "contentOwner": "projecthoomans.dialogue_content.quest",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
-    "responseTemplateID": "semantic.quest.clinic_supplies.accept.rejected",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I can't accept that request right now.",
-          "TL": "Hindi ko matatanggap ang kahilingang iyon ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I'm not in a position to take that on.",
-          "TL": "Wala ako sa posisyong balikatin 'yan."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Too much on my plate. Can't accept the clinic run.",
-          "TL": "Masyado akong maraming ginagawa. Hindi ko matatanggap ang klinika."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Not right now. I have to pass on that request.",
-          "TL": "Hindi muna ngayon. Tatanggihan ko muna ang kahilingang 'yan."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I can't commit to gathering clinic supplies today.",
-          "TL": "Hindi ako makakapangakong mag-ipon ng suplay sa klinika ngayon."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "I have to turn that down for now.",
-          "TL": "Kailangan ko munang tanggihan 'yan sa ngayon."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Can't help with the clinic run at the moment.",
-          "TL": "Hindi makakatulong sa klinika sa ngayon."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "I won't be taking that request.",
-          "TL": "Hindi ko tatanggapin ang kahilingang 'yan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Sorry, I can't agree to that right now.",
-          "TL": "Pasensya na, hindi ako makakapayag diyan ngayon."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "I must decline that medical supply task.",
-          "TL": "Kailangan kong tanggihan ang gawaing medikal na 'yan."
+          "EN": [
+            "I can't accept that request right now.",
+            "I'm not in a position to take that on.",
+            "Too much on my plate. Can't accept the clinic run.",
+            "Not right now. I have to pass on that request.",
+            "I can't commit to gathering clinic supplies today.",
+            "I have to turn that down for now.",
+            "Can't help with the clinic run at the moment.",
+            "I won't be taking that request.",
+            "Sorry, I can't agree to that right now.",
+            "I must decline that medical supply task."
+          ],
+          "TL": [
+            "Hindi ko matatanggap ang kahilingang iyon ngayon.",
+            "Wala ako sa posisyong balikatin 'yan.",
+            "Masyado akong maraming ginagawa. Hindi ko matatanggap ang klinika.",
+            "Hindi muna ngayon. Tatanggihan ko muna ang kahilingang 'yan.",
+            "Hindi ako makakapangakong mag-ipon ng suplay sa klinika ngayon.",
+            "Kailangan ko munang tanggihan 'yan sa ngayon.",
+            "Hindi makakatulong sa klinika sa ngayon.",
+            "Hindi ko tatanggapin ang kahilingang 'yan.",
+            "Pasensya na, hindi ako makakapayag diyan ngayon.",
+            "Kailangan kong tanggihan ang gawaing medikal na 'yan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.quest.clinic_supplies.accept.rejected",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

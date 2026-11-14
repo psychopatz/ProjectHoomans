@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "social.greetings.acquaintance",
   "id": "dusk",
   "owner": "ProjectHoomans",
   "participants": {
@@ -41,56 +43,39 @@
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
     "textTarget": "psdl/social/greetings/neutral/acquaintance/dusk",
-    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.dusk"
-  },
-  "response": {
-    "act": "GREETING",
-    "variants": [
+    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.dusk",
+    "responseAct": "GREETING",
+    "textRows": [
       {
-        "id": "greeting.001",
-        "metadata": {
-          "textKey": "greeting.001"
-        },
+        "key": "greeting.001",
         "text": {
           "EN": "Evening. Need something before we turn in?",
           "TL": "Gabi. Kailangan mo ng isang bagay bago tayo lumiko?"
         }
       },
       {
-        "id": "greeting.002",
-        "metadata": {
-          "textKey": "greeting.002"
-        },
+        "key": "greeting.002",
         "text": {
           "EN": "Good, it's only you. You startled me.",
           "TL": "Buti, ikaw lang. Ginulat mo ako."
         }
       },
       {
-        "id": "greeting.003",
-        "metadata": {
-          "textKey": "greeting.003"
-        },
+        "key": "greeting.003",
         "text": {
           "EN": "Not much daylight left. Talk to me.",
           "TL": "Wala na masyadong liwanag ng araw. kausapin mo ako."
         }
       },
       {
-        "id": "greeting.004",
-        "metadata": {
-          "textKey": "greeting.004"
-        },
+        "key": "greeting.004",
         "text": {
           "EN": "Hey. Keeping watch, or just passing by?",
           "TL": "Hey. Nagmamasid, o dumadaan lang?"
         }
       },
       {
-        "id": "greeting.005",
-        "metadata": {
-          "textKey": "greeting.005"
-        },
+        "key": "greeting.005",
         "text": {
           "EN": "We should keep this quiet, but I'm listening.",
           "TL": "Dapat tahimik lang tayo rito, pero nakikinig ako."
@@ -98,6 +83,27 @@
       }
     ]
   },
-  "namespace": "social.greetings.acquaintance",
-  "schema": "psychopatz.convo-engine.v1"
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Evening. Need something before we turn in?",
+            "Good, it's only you. You startled me.",
+            "Not much daylight left. Talk to me.",
+            "Hey. Keeping watch, or just passing by?",
+            "We should keep this quiet, but I'm listening."
+          ],
+          "TL": [
+            "Gabi. Kailangan mo ng isang bagay bago tayo lumiko?",
+            "Buti, ikaw lang. Ginulat mo ako.",
+            "Wala na masyadong liwanag ng araw. kausapin mo ako.",
+            "Hey. Nagmamasid, o dumadaan lang?",
+            "Dapat tahimik lang tayo rito, pero nakikinig ako."
+          ]
+        }
+      }
+    ]
+  }
 }

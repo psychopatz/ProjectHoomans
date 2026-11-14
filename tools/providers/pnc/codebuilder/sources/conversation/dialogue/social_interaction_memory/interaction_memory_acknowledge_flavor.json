@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "interaction.memory",
+  "id": "acknowledge_flavor",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "The listener gives a small acknowledging nod.",
+            "The listener listens thoughtfully and nods.",
+            "A steady nod shows the listener remembers.",
+            "The listener absorbs the words and dips their head.",
+            "The listener acknowledges the shared recollection quietly.",
+            "A quiet look of recognition passes over the listener's face.",
+            "The listener blinks slowly, recalling the moment.",
+            "The listener gives a calm, measured gesture of understanding.",
+            "A brief pause precedes an acknowledging nod.",
+            "The listener tilts their head in silent agreement."
+          ],
+          "TL": [
+            "Bahagyang tumango ang nakikinig bilang pagkilala.",
+            "Matiyagang nakikinig ang kausap at tumatango.",
+            "Isang matatag na tango ang nagpapakitang naaalala niya.",
+            "Inintindi ng nakikinig ang mga salita at bahagyang yumukod.",
+            "Tahimik na kinilala ng nakikinig ang pinagsaluhang alaala.",
+            "Isang tahimik na anyo ng pagkilala ang dumaan sa mukha ng nakikinig.",
+            "Mabagal na kumurap ang nakikinig, inaalala ang sandali.",
+            "Nagbigay ang nakikinig ng kalmado at maingat na senyas ng pagkaunawa.",
+            "Isang maikling paghinto ang nauna bago tumango bilang pagkilala.",
+            "Itinagilid ng nakikinig ang ulo bilang tahimik na pagsang-ayon."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge_flavor",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "The listener gives a guarded nod.",
+            "The listener watches closely without revealing their thoughts.",
+            "A cautious look crosses the listener's eyes.",
+            "The listener stiffens slightly as the past is mentioned.",
+            "A slow, guarded nod shows the words were registered.",
+            "The listener's hand rests near their belt during the pause.",
+            "The listener narrows their eyes, weighing the intent behind the words.",
+            "A tight, reserved expression settles on the listener's face.",
+            "The listener gives nothing away, nodding once carefully.",
+            "The listener keeps their guard up while acknowledging the memory."
+          ],
+          "TL": [
+            "Maingat na tumango ang nakikinig.",
+            "Masusing nagmasid ang nakikinig nang walang inilalantad na iniisip.",
+            "Isang maingat na tingin ang dumaan sa mga mata ng nakikinig.",
+            "Bahagyang nanigas ang nakikinig nang mabanggit ang nakaraan.",
+            "Isang mabagal at maingat na tango ang nagpahiwatig na narinig ang sinabi.",
+            "Nakalapag ang kamay ng nakikinig malapit sa sinturon sa sandaling iyon.",
+            "Nanliit ang mga mata ng nakikinig, tinitimbang ang layunin sa likod ng salita.",
+            "Isang mahigpit at maramdamang ekspresyon ang namutawi sa mukha ng nakikinig.",
+            "Walang ipinakitang emosyon ang nakikinig, isang maingat na tango lang.",
+            "Nanatiling alerto ang nakikinig habang kinikilala ang alaala."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "The listener gives a small acknowledging nod.",
-              "TL": "Bahagyang tumango ang nakikinig bilang pagkilala."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "The listener listens thoughtfully and nods.",
-              "TL": "Matiyagang nakikinig ang kausap at tumatango."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "A steady nod shows the listener remembers.",
-              "TL": "Isang matatag na tango ang nagpapakitang naaalala niya."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "The listener absorbs the words and dips their head.",
-              "TL": "Inintindi ng nakikinig ang mga salita at bahagyang yumukod."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "The listener acknowledges the shared recollection quietly.",
-              "TL": "Tahimik na kinilala ng nakikinig ang pinagsaluhang alaala."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "A quiet look of recognition passes over the listener's face.",
-              "TL": "Isang tahimik na anyo ng pagkilala ang dumaan sa mukha ng nakikinig."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "The listener blinks slowly, recalling the moment.",
-              "TL": "Mabagal na kumurap ang nakikinig, inaalala ang sandali."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "The listener gives a calm, measured gesture of understanding.",
-              "TL": "Nagbigay ang nakikinig ng kalmado at maingat na senyas ng pagkaunawa."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "A brief pause precedes an acknowledging nod.",
-              "TL": "Isang maikling paghinto ang nauna bago tumango bilang pagkilala."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "The listener tilts their head in silent agreement.",
-              "TL": "Itinagilid ng nakikinig ang ulo bilang tahimik na pagsang-ayon."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "A brief nod follows.",
+            "A curt dip of the chin confirms it.",
+            "The listener grunts in assent.",
+            "A sharp single nod.",
+            "The listener barely shifts.",
+            "Eyes narrow briefly in recognition.",
+            "A quick jerk of the head acknowledges it.",
+            "The listener's jaw sets firmly.",
+            "A momentary pause, nothing more.",
+            "A flat nod ends the topic."
+          ],
+          "TL": [
+            "Isang maikling tango ang sumunod.",
+            "Maikling pagyuko ng baba ang kumumpirma.",
+            "Umungol ang nakikinig bilang pagsang-ayon.",
+            "Isang mabilis at iisang tango.",
+            "Halos hindi gumalaw ang nakikinig.",
+            "Sandaling nanliit ang mga mata sa pagkilala.",
+            "Mabilis na paggalaw ng ulo ang kumilala roon.",
+            "Nadiin ang panga ng nakikinig.",
+            "Isang saglit na paghinto, wala nang iba.",
+            "Isang malamig na tango ang nagtapos sa paksa."
+          ]
+        }
       },
-      "namespace": "semantic.interaction.memory.acknowledge_flavor"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge_flavor",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "The listener softens and nods with quiet understanding.",
-              "TL": "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "A faint, gentle smile touches the listener's lips.",
-              "TL": "Isang banayad na ngiti ang lumitaw sa labi ng nakikinig."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "The listener's eyes warm as the memory settles in.",
-              "TL": "Uminit ang mga mata ng nakikinig habang lumalalim ang alaala."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "The listener gives a warm, reassuring nod.",
-              "TL": "Nagbigay ang nakikinig ng mainit at nakapagpapanatag na tango."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "A fond look washes over the listener's tired features.",
-              "TL": "Isang masuyong tingin ang dumaloy sa pagod na mukha ng nakikinig."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "The listener reaches out slightly, comforted by the recollection.",
-              "TL": "Bahagyang iniabot ng nakikinig ang kamay, gumaan ang loob sa alaala."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "A soft breath escapes the listener as they remember.",
-              "TL": "Isang marahang buntong-hininga ang pinakawalan ng nakikinig habang nagugunita."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "The listener's shoulders relax with affectionate recognition.",
-              "TL": "Lumuwag ang balikat ng nakikinig kalakip ang magiliw na pagkilala."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "The listener nods warmly, visibly moved by the memory.",
-              "TL": "Mainit na tumango ang nakikinig, halatang naantig sa alaala."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "A quiet sense of camaraderie passes between them.",
-              "TL": "Isang tahimik na damdamin ng pagkakaibigan ang namagitan sa kanila."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.memory.acknowledge_flavor"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge_flavor",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "A brief nod follows.",
-              "TL": "Isang maikling tango ang sumunod."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "A curt dip of the chin confirms it.",
-              "TL": "Maikling pagyuko ng baba ang kumumpirma."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "The listener grunts in assent.",
-              "TL": "Umungol ang nakikinig bilang pagsang-ayon."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "A sharp single nod.",
-              "TL": "Isang mabilis at iisang tango."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "The listener barely shifts.",
-              "TL": "Halos hindi gumalaw ang nakikinig."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "Eyes narrow briefly in recognition.",
-              "TL": "Sandaling nanliit ang mga mata sa pagkilala."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "A quick jerk of the head acknowledges it.",
-              "TL": "Mabilis na paggalaw ng ulo ang kumilala roon."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "The listener's jaw sets firmly.",
-              "TL": "Nadiin ang panga ng nakikinig."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "A momentary pause, nothing more.",
-              "TL": "Isang saglit na paghinto, wala nang iba."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "A flat nod ends the topic.",
-              "TL": "Isang malamig na tango ang nagtapos sa paksa."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.memory.acknowledge_flavor"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/memory/acknowledge_flavor.json",
-        "responseTemplateID": "semantic.interaction.memory.acknowledge_flavor",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "The listener gives a guarded nod.",
-              "TL": "Maingat na tumango ang nakikinig."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "The listener watches closely without revealing their thoughts.",
-              "TL": "Masusing nagmasid ang nakikinig nang walang inilalantad na iniisip."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "A cautious look crosses the listener's eyes.",
-              "TL": "Isang maingat na tingin ang dumaan sa mga mata ng nakikinig."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "The listener stiffens slightly as the past is mentioned.",
-              "TL": "Bahagyang nanigas ang nakikinig nang mabanggit ang nakaraan."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "A slow, guarded nod shows the words were registered.",
-              "TL": "Isang mabagal at maingat na tango ang nagpahiwatig na narinig ang sinabi."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "The listener's hand rests near their belt during the pause.",
-              "TL": "Nakalapag ang kamay ng nakikinig malapit sa sinturon sa sandaling iyon."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "The listener narrows their eyes, weighing the intent behind the words.",
-              "TL": "Nanliit ang mga mata ng nakikinig, tinitimbang ang layunin sa likod ng salita."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "A tight, reserved expression settles on the listener's face.",
-              "TL": "Isang mahigpit at maramdamang ekspresyon ang namutawi sa mukha ng nakikinig."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "The listener gives nothing away, nodding once carefully.",
-              "TL": "Walang ipinakitang emosyon ang nakikinig, isang maingat na tango lang."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "The listener keeps their guard up while acknowledging the memory.",
-              "TL": "Nanatiling alerto ang nakikinig habang kinikilala ang alaala."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.memory.acknowledge_flavor"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "The listener softens and nods with quiet understanding.",
+            "A faint, gentle smile touches the listener's lips.",
+            "The listener's eyes warm as the memory settles in.",
+            "The listener gives a warm, reassuring nod.",
+            "A fond look washes over the listener's tired features.",
+            "The listener reaches out slightly, comforted by the recollection.",
+            "A soft breath escapes the listener as they remember.",
+            "The listener's shoulders relax with affectionate recognition.",
+            "The listener nods warmly, visibly moved by the memory.",
+            "A quiet sense of camaraderie passes between them."
+          ],
+          "TL": [
+            "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango.",
+            "Isang banayad na ngiti ang lumitaw sa labi ng nakikinig.",
+            "Uminit ang mga mata ng nakikinig habang lumalalim ang alaala.",
+            "Nagbigay ang nakikinig ng mainit at nakapagpapanatag na tango.",
+            "Isang masuyong tingin ang dumaloy sa pagod na mukha ng nakikinig.",
+            "Bahagyang iniabot ng nakikinig ang kamay, gumaan ang loob sa alaala.",
+            "Isang marahang buntong-hininga ang pinakawalan ng nakikinig habang nagugunita.",
+            "Lumuwag ang balikat ng nakikinig kalakip ang magiliw na pagkilala.",
+            "Mainit na tumango ang nakikinig, halatang naantig sa alaala.",
+            "Isang tahimik na damdamin ng pagkakaibigan ang namagitan sa kanila."
+          ]
+        }
+      }
+    ]
+  }
 }

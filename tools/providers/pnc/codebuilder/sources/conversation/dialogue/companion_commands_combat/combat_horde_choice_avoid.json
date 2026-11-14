@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.horde.choice",
   "id": "avoid",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
-    "responseTemplateID": "semantic.combat.horde.choice.avoid"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Go around.",
-          "TL": "Umikot tayo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Bypass them. Stay quiet.",
-          "TL": "Lalagpasan natin sila. Huwag mag-ingay."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Find another route. Don't draw them.",
-          "TL": "Maghanap ng ibang ruta. Huwag silang akitin."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Circle wide. Keep in the shadows.",
-          "TL": "Umikot nang malayo. Manatili sa dilim."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Not worth the ammo. Move around.",
-          "TL": "Sayang ang bala. Umiwas na lang."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Detour through the alley. Quietly.",
-          "TL": "Daan tayo sa eskinita. Nang tahimik."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "We sneak past. Crouch and move.",
-          "TL": "Lulusot tayo nang lihim. Yumuko at lumakad."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Leave them be. Take the back way.",
-          "TL": "Hayaan sila roon. Daan tayo sa likod."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Avoid contact. Step carefully.",
-          "TL": "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Back out and take the alternate street.",
-          "TL": "Atras muna at dumaan sa kabilang kalsada."
+          "EN": [
+            "Go around.",
+            "Bypass them. Stay quiet.",
+            "Find another route. Don't draw them.",
+            "Circle wide. Keep in the shadows.",
+            "Not worth the ammo. Move around.",
+            "Detour through the alley. Quietly.",
+            "We sneak past. Crouch and move.",
+            "Leave them be. Take the back way.",
+            "Avoid contact. Step carefully.",
+            "Back out and take the alternate street."
+          ],
+          "TL": [
+            "Umikot tayo.",
+            "Lalagpasan natin sila. Huwag mag-ingay.",
+            "Maghanap ng ibang ruta. Huwag silang akitin.",
+            "Umikot nang malayo. Manatili sa dilim.",
+            "Sayang ang bala. Umiwas na lang.",
+            "Daan tayo sa eskinita. Nang tahimik.",
+            "Lulusot tayo nang lihim. Yumuko at lumakad.",
+            "Hayaan sila roon. Daan tayo sa likod.",
+            "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang.",
+            "Atras muna at dumaan sa kabilang kalsada."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.horde.choice",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

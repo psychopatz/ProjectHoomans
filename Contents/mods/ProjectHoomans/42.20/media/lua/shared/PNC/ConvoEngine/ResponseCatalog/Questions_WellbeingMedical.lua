@@ -8,7 +8,7 @@ Catalog.Register("semantic.question.wellbeing", {
     variants = {
         {
             id = "semantic.question.wellbeing.panic",
-            templateID = "semantic.question.wellbeing.panic",
+            templateID = "question.wellbeing.panic",
             fallback = "I'm pretty shaken up right now.",
             when = {
                 emotionType = "panic",
@@ -18,7 +18,7 @@ Catalog.Register("semantic.question.wellbeing", {
         },
         {
             id = "semantic.question.wellbeing.stress",
-            templateID = "semantic.question.wellbeing.stress",
+            templateID = "question.wellbeing.stress",
             fallback = "I'm tense, but I can keep going.",
             when = {
                 emotionType = "stress",
@@ -28,56 +28,56 @@ Catalog.Register("semantic.question.wellbeing", {
         },
         {
             id = "semantic.question.wellbeing.thirst",
-            templateID = "semantic.question.wellbeing.thirst",
+            templateID = "question.wellbeing.thirst",
             fallback = "I'm pretty thirsty. Could you spare some water?",
             when = { needType = "thirst", needUrgency = { "moderate", "severe", "emergency", "critical" } },
             priority = 3,
         },
         {
             id = "semantic.question.wellbeing.thirst_alt",
-            templateID = "semantic.question.wellbeing.thirst_alt",
+            templateID = "question.wellbeing.thirst_alt",
             fallback = "I could really use a drink. Do you have any water?",
             when = { needType = "thirst", needUrgency = { "moderate", "severe", "emergency", "critical" } },
             priority = 3,
         },
         {
             id = "semantic.question.wellbeing.hunger",
-            templateID = "semantic.question.wellbeing.hunger",
+            templateID = "question.wellbeing.hunger",
             fallback = "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
             when = { needType = "hunger", needUrgency = { "moderate", "severe", "emergency", "critical" } },
             priority = 2,
         },
         {
             id = "semantic.question.wellbeing.hunger_alt",
-            templateID = "semantic.question.wellbeing.hunger_alt",
+            templateID = "question.wellbeing.hunger_alt",
             fallback = "I'm getting hungry. Could you spare something to eat?",
             when = { needType = "hunger", needUrgency = { "moderate", "severe", "emergency", "critical" } },
             priority = 2,
         },
         {
             id = "semantic.question.wellbeing.fatigue",
-            templateID = "semantic.question.wellbeing.fatigue",
+            templateID = "question.wellbeing.fatigue",
             fallback = "I'm worn out, but I can still manage.",
             when = { needType = "fatigue", needUrgency = { "moderate", "severe", "emergency", "critical" } },
             priority = 2,
         },
         {
             id = "semantic.question.wellbeing.fatigue_alt",
-            templateID = "semantic.question.wellbeing.fatigue_alt",
+            templateID = "question.wellbeing.fatigue_alt",
             fallback = "I'm tired. A little rest would help.",
             when = { needType = "fatigue", needUrgency = { "moderate", "severe", "emergency", "critical" } },
             priority = 2,
         },
         {
             id = "semantic.question.wellbeing.injured",
-            templateID = "semantic.question.wellbeing.injured",
+            templateID = "question.wellbeing.injured",
             fallback = "A little banged up, but I'll manage.",
             when = { healthState = { "injured", "wounded", "critical" } },
             priority = 2,
         },
         {
             id = "semantic.question.wellbeing.default",
-            templateID = "semantic.question.wellbeing.default",
+            templateID = "question.wellbeing.default",
             fallback = "I'm okay. How about you?",
         },
     },
@@ -87,7 +87,7 @@ Catalog.Register("semantic.question.medical_bite.positive", {
     variants = {
         {
             id = "semantic.question.medical_bite.positive.default",
-            templateID = "semantic.question.medical_bite.positive",
+            templateID = "question.medical_bite.positive",
             fallback = "Yes, I've been bitten.",
             dialogueAct = "MEDICAL_STATUS",
             topic = "MEDICAL",
@@ -102,7 +102,7 @@ Catalog.Register("semantic.question.medical_bite.negative", {
     variants = {
         {
             id = "semantic.question.medical_bite.negative.default",
-            templateID = "semantic.question.medical_bite.negative",
+            templateID = "question.medical_bite.negative",
             fallback = "No, I don't have a recorded bite.",
             dialogueAct = "MEDICAL_STATUS",
             topic = "MEDICAL",
@@ -117,7 +117,7 @@ Catalog.Register("semantic.question.medical_bite.unknown", {
     variants = {
         {
             id = "semantic.question.medical_bite.unknown.default",
-            templateID = "semantic.question.medical_bite.unknown",
+            templateID = "question.medical_bite.unknown",
             fallback = "I can't confirm whether I've been bitten.",
             dialogueAct = "MEDICAL_STATUS",
             topic = "MEDICAL",

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.consume",
   "id": "failed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
-    "responseTemplateID": "semantic.task.consume.failed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I couldn't use that.",
-          "TL": "Hindi ko nagamit iyon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Failed to consume that item.",
-          "TL": "Bigo sa paggamit ng bagay na iyon."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Something interrupted me while trying to use that.",
-          "TL": "May umabala sa akin habang sinusubukang gamitin iyon."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Couldn't finish using it.",
-          "TL": "Di natapos gamitin."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Unable to apply that right now.",
-          "TL": "Di mailapat iyan sa ngayon."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Using that failed. Something went wrong.",
-          "TL": "Pumalpak ang paggamit. May nangyaring mali."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I lost hold of it or couldn't use it.",
-          "TL": "Nabitawan ko o di nagamit."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Couldn't consume it. Area wasn't secure.",
-          "TL": "Di nagamit. Di ligtas ang paligid."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Action interrupted. Item not consumed.",
-          "TL": "Naabala ang kilos. Di nagamit ang bagay."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Failed to take that.",
-          "TL": "Bigo sa paggamit niyan."
+          "EN": [
+            "I couldn't use that.",
+            "Failed to consume that item.",
+            "Something interrupted me while trying to use that.",
+            "Couldn't finish using it.",
+            "Unable to apply that right now.",
+            "Using that failed. Something went wrong.",
+            "I lost hold of it or couldn't use it.",
+            "Couldn't consume it. Area wasn't secure.",
+            "Action interrupted. Item not consumed.",
+            "Failed to take that."
+          ],
+          "TL": [
+            "Hindi ko nagamit iyon.",
+            "Bigo sa paggamit ng bagay na iyon.",
+            "May umabala sa akin habang sinusubukang gamitin iyon.",
+            "Di natapos gamitin.",
+            "Di mailapat iyan sa ngayon.",
+            "Pumalpak ang paggamit. May nangyaring mali.",
+            "Nabitawan ko o di nagamit.",
+            "Di nagamit. Di ligtas ang paligid.",
+            "Naabala ang kilos. Di nagamit ang bagay.",
+            "Bigo sa paggamit niyan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.consume",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

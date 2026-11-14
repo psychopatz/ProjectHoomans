@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.practical",
+  "id": "firearm_high",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/practical.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Good shot placement. Check the lane.",
+            "One round spent. Check your corners.",
+            "Target down. Scan before advancing.",
+            "Clean shot. Keep ammunition in mind.",
+            "Dropped it cleanly. Watch for flankers.",
+            "Down. Keep your weapon raised.",
+            "Threat eliminated. Count your rounds.",
+            "Solid hit. Keep moving methodically.",
+            "Target neutralized. Check the perimeter.",
+            "Shot connected well. Don't rush ahead."
+          ],
+          "TL": [
+            "Maganda ang tama. Suriin ang linya.",
+            "Isang bala ang nagamit. Tignan ang mga sulok.",
+            "Bagsak ang target. Magmasid bago sumulong.",
+            "Malinis na putok. Tandaan ang natitirang bala.",
+            "Bumagsak nang maayos. Mag-ingat sa mga nasa gilid.",
+            "Bagsak. Panatilihing nakataas ang sandata.",
+            "Banta naalis. Bilangin ang bala.",
+            "Solido ang tama. Tuloy sa maingat na pagkilos.",
+            "Bagsak ang target. Suriin ang paligid.",
+            "Tumama nang maayos ang putok. Huwag magmadali."
+          ]
+        }
+      }
+    ]
+  }
+}

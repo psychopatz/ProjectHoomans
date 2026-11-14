@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.stop_following",
   "id": "rejected",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stop_following.json",
-    "responseTemplateID": "semantic.command.stop_following.rejected"
+    "responseAct": "REPLY"
   },
-  "response": {
-    "act": "REPLY",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I can't stop following right now.",
-          "TL": "Hindi ako makapaghinto sa pagsunod ngayon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "It's too dangerous to split up. I'm staying with you.",
-          "TL": "Masyadong mapanganib maghiwalay. Sasama ako sa 'yo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I won't leave you alone against that swarm.",
-          "TL": "Di kita iiwan mag-isa laban sa kawang 'yan."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "We need to stay together to survive this. Refusing to halt.",
-          "TL": "Kailangan nating magsama para mabuhay. Tumatangging huminto."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "If I stop following here, I'll be completely cut off.",
-          "TL": "Kapag huminto ako rito, ganap akong mahihiwalay."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Cannot halt here. Too many dead around us.",
-          "TL": "Di makahinto rito. Napakaraming patay sa paligid."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I'm sticking with you until we reach actual cover.",
-          "TL": "Didikit ako sa 'yo hanggang makarating sa tunay na silong."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Splitting up now will get us killed. I'm following.",
-          "TL": "Ikinamamatay ang paghihiwalay ngayon. Susunod ako."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Unable to break follow in active combat.",
-          "TL": "Di makatigil sa pagsunod habang may bakbakan."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Order rejected. We survive together or not at all.",
-          "TL": "Tinatanggihan ang utos. Sabay tayong mabubuhay o mamamatay."
+          "EN": [
+            "I can't stop following right now.",
+            "It's too dangerous to split up. I'm staying with you.",
+            "I won't leave you alone against that swarm.",
+            "We need to stay together to survive this. Refusing to halt.",
+            "If I stop following here, I'll be completely cut off.",
+            "Cannot halt here. Too many dead around us.",
+            "I'm sticking with you until we reach actual cover.",
+            "Splitting up now will get us killed. I'm following.",
+            "Unable to break follow in active combat.",
+            "Order rejected. We survive together or not at all."
+          ],
+          "TL": [
+            "Hindi ako makapaghinto sa pagsunod ngayon.",
+            "Masyadong mapanganib maghiwalay. Sasama ako sa 'yo.",
+            "Di kita iiwan mag-isa laban sa kawang 'yan.",
+            "Kailangan nating magsama para mabuhay. Tumatangging huminto.",
+            "Kapag huminto ako rito, ganap akong mahihiwalay.",
+            "Di makahinto rito. Napakaraming patay sa paligid.",
+            "Didikit ako sa 'yo hanggang makarating sa tunay na silong.",
+            "Ikinamamatay ang paghihiwalay ngayon. Susunod ako.",
+            "Di makatigil sa pagsunod habang may bakbakan.",
+            "Tinatanggihan ang utos. Sabay tayong mabubuhay o mamamatay."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.stop_following",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

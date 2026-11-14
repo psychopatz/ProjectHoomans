@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "emote.player",
+  "id": "thankyou",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,35 +16,25 @@
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
-    "responseTemplateID": "semantic.emote.player.thankyou",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "Thanks, {addressee.name}.",
-          "TL": "Salamat, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "I appreciate that, {addressee.name}.",
-          "TL": "Pinahahalagahan ko iyan, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "You have my thanks, {addressee.name}.",
-          "TL": "Salamat sa iyo, {addressee.name}."
+          "EN": [
+            "Thanks, {addressee.name}.",
+            "I appreciate that, {addressee.name}.",
+            "You have my thanks, {addressee.name}."
+          ],
+          "TL": [
+            "Salamat, {addressee.name}.",
+            "Pinahahalagahan ko iyan, {addressee.name}.",
+            "Salamat sa iyo, {addressee.name}."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.emote.player.thankyou",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

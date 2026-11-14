@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "task.give",
   "id": "failed",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,84 +16,39 @@
     "category": "projecthoomans:task_lifecycle",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
-    "responseTemplateID": "semantic.task.give.failed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I couldn't give that to you.",
-          "TL": "Hindi ko naibigay iyon sa iyo."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Handoff failed. You were out of reach.",
-          "TL": "Pumalpak ang pag-aabot. Masyado kang malayo."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Your hands or pack were full. Couldn't give it.",
-          "TL": "Puno ang kamay o bag mo. Di maibigay."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Action interrupted. Item not given.",
-          "TL": "Naabala ang kilos. Di naibigay ang gamit."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "Unable to transfer the item to you.",
-          "TL": "Di mailipat ang gamit sa 'yo."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Failed to hand it over. Something got in the way.",
-          "TL": "Bigo sa pag-aabot. May humarang sa pagitan."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "I couldn't complete the give action.",
-          "TL": "Di ko natapos ang pagbibigay."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Dropped it during the exchange.",
-          "TL": "Nahulog habang nagpapalitan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Give task failed.",
-          "TL": "Bigo ang gawaing magbigay."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Could not give that item.",
-          "TL": "Hindi naibigay ang bagay na 'yan."
+          "EN": [
+            "I couldn't give that to you.",
+            "Handoff failed. You were out of reach.",
+            "Your hands or pack were full. Couldn't give it.",
+            "Action interrupted. Item not given.",
+            "Unable to transfer the item to you.",
+            "Failed to hand it over. Something got in the way.",
+            "I couldn't complete the give action.",
+            "Dropped it during the exchange.",
+            "Give task failed.",
+            "Could not give that item."
+          ],
+          "TL": [
+            "Hindi ko naibigay iyon sa iyo.",
+            "Pumalpak ang pag-aabot. Masyado kang malayo.",
+            "Puno ang kamay o bag mo. Di maibigay.",
+            "Naabala ang kilos. Di naibigay ang gamit.",
+            "Di mailipat ang gamit sa 'yo.",
+            "Bigo sa pag-aabot. May humarang sa pagitan.",
+            "Di ko natapos ang pagbibigay.",
+            "Nahulog habang nagpapalitan.",
+            "Bigo ang gawaing magbigay.",
+            "Hindi naibigay ang bagay na 'yan."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.task.give",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

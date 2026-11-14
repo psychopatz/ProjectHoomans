@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.brave",
+  "id": "axe",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/brave.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "One chop. Done.",
+            "Heavy cleave. Push forward.",
+            "Broke the spine in one stroke. Move.",
+            "Split the skull. Threat eliminated.",
+            "Solid strike. Next target.",
+            "Downed instantly. Keep moving.",
+            "Axe did its work. Advance.",
+            "Clean breach through bone. Proceed.",
+            "That one's finished. Step forward.",
+            "Decisive hit. Don't stop now."
+          ],
+          "TL": [
+            "Isang taga. Tapos.",
+            "Mabigat na taga. Sulong sa unahan.",
+            "Nabasag ang gulugod sa isang palo. Kilos.",
+            "Biyak ang bungo. Banta nawala na.",
+            "Solido ang tama. Susunod na target.",
+            "Bagsak agad. Tuloy ang lakad.",
+            "Nagawa ng palakol ang trabaho. Abante.",
+            "Malinis na bumaon sa buto. Tuloy.",
+            "Tapos na ang isang 'yon. Hakbang pasulong.",
+            "Tiyak na tama. Huwag hihinto ngayon."
+          ]
+        }
+      }
+    ]
+  }
+}

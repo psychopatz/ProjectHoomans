@@ -38,7 +38,7 @@ function Internal.OpenGiftSelector(view, offer, context, reason)
             accepted = false,
             reason = "inventory_ui_unavailable",
             response = Internal.GiftResponse(
-                "semantic.gift.selection_required",
+                "gift.selection_required",
                 "I need to see what you brought me first."
             ),
         }

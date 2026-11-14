@@ -71,7 +71,7 @@ addBehavior({
     outputs = {
         speech = {
             dialogueAct = "INFORM",
-            contentTemplateID = "semantic.social.acknowledged",
+            contentTemplateID = "social.acknowledged",
         },
     },
     continuation = {
@@ -98,7 +98,7 @@ addBehavior({
     outputs = {
         speech = {
             dialogueAct = "INFORM",
-            contentTemplateID = "semantic.social.acknowledged",
+            contentTemplateID = "social.acknowledged",
         },
     },
     continuation = { mode = "terminate" },

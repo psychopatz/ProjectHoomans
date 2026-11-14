@@ -1,6 +1,8 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
-  "id": "neutral",
+  "namespace": "quest.clinic_supplies.status",
+  "id": "failed",
   "owner": "ProjectHoomans",
   "participants": {
     "speaker": [
@@ -14,84 +16,39 @@
     "category": "projecthoomans:quest_content",
     "contentOwner": "projecthoomans.dialogue_content.quest",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
-    "responseTemplateID": "semantic.quest.clinic_supplies.status.failed",
-    "style": "neutral"
+    "responseAct": "REACT"
   },
-  "response": {
-    "act": "REACT",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "I couldn't check that request.",
-          "TL": "Hindi ko masuri ang kahilingang iyon."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Unable to verify the status of the clinic supplies.",
-          "TL": "Hindi ko makumpirma ang katayuan ng mga suplay sa klinika."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "Status check on the medical supplies failed.",
-          "TL": "Bigo ang pagsusuri sa katayuan ng mga suplay."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Couldn't retrieve the clinic quest details.",
-          "TL": "Hindi makuha ang mga detalye ng misyon sa klinika."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I wasn't able to inspect the request status.",
-          "TL": "Hindi ko nasuri ang katayuan ng kahilingan."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Failed to look up where we stand on clinic supplies.",
-          "TL": "Bigo sa pagtingin sa katayuan ng suplay sa klinika."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Couldn't confirm progress on that task.",
-          "TL": "Hindi makumpirma ang progreso sa gawaing 'yan."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Unable to check our clinic supplies progress.",
-          "TL": "Hindi masuri ang progreso natin sa suplay sa klinika."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Checking that request didn't go through.",
-          "TL": "Hindi natuloy ang pagsusuri sa kahilingang 'yan."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Couldn't get a status read on the medical run.",
-          "TL": "Hindi makakuha ng ulat sa medikal na lakad."
+          "EN": [
+            "I couldn't check that request.",
+            "Unable to verify the status of the clinic supplies.",
+            "Status check on the medical supplies failed.",
+            "Couldn't retrieve the clinic quest details.",
+            "I wasn't able to inspect the request status.",
+            "Failed to look up where we stand on clinic supplies.",
+            "Couldn't confirm progress on that task.",
+            "Unable to check our clinic supplies progress.",
+            "Checking that request didn't go through.",
+            "Couldn't get a status read on the medical run."
+          ],
+          "TL": [
+            "Hindi ko masuri ang kahilingang iyon.",
+            "Hindi ko makumpirma ang katayuan ng mga suplay sa klinika.",
+            "Bigo ang pagsusuri sa katayuan ng mga suplay.",
+            "Hindi makuha ang mga detalye ng misyon sa klinika.",
+            "Hindi ko nasuri ang katayuan ng kahilingan.",
+            "Bigo sa pagtingin sa katayuan ng suplay sa klinika.",
+            "Hindi makumpirma ang progreso sa gawaing 'yan.",
+            "Hindi masuri ang progreso natin sa suplay sa klinika.",
+            "Hindi natuloy ang pagsusuri sa kahilingang 'yan.",
+            "Hindi makakuha ng ulat sa medikal na lakad."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.quest.clinic_supplies.status.failed",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

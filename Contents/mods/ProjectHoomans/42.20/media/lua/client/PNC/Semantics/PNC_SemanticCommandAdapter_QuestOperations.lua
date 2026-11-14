@@ -14,46 +14,46 @@ local Adapter = PNC.Semantics.CommandAdapter
 local QUEST_RESPONSE_POOLS = {
     offer = {
         queued = {
-            templateID = "semantic.quest.clinic_supplies.offer.queued",
+            templateID = "quest.clinic_supplies.offer.queued",
         },
         rejected = {
-            templateID = "semantic.quest.clinic_supplies.offer.rejected",
+            templateID = "quest.clinic_supplies.offer.rejected",
         },
         failed = {
-            templateID = "semantic.quest.clinic_supplies.offer.failed",
+            templateID = "quest.clinic_supplies.offer.failed",
         },
     },
     accept = {
         queued = {
-            templateID = "semantic.quest.clinic_supplies.accept.queued",
+            templateID = "quest.clinic_supplies.accept.queued",
         },
         rejected = {
-            templateID = "semantic.quest.clinic_supplies.accept.rejected",
+            templateID = "quest.clinic_supplies.accept.rejected",
         },
         failed = {
-            templateID = "semantic.quest.clinic_supplies.accept.failed",
+            templateID = "quest.clinic_supplies.accept.failed",
         },
     },
     status = {
         queued = {
-            templateID = "semantic.quest.clinic_supplies.status.queued",
+            templateID = "quest.clinic_supplies.status.queued",
         },
         rejected = {
-            templateID = "semantic.quest.clinic_supplies.status.rejected",
+            templateID = "quest.clinic_supplies.status.rejected",
         },
         failed = {
-            templateID = "semantic.quest.clinic_supplies.status.failed",
+            templateID = "quest.clinic_supplies.status.failed",
         },
     },
     turn_in = {
         queued = {
-            templateID = "semantic.quest.clinic_supplies.turn_in.queued",
+            templateID = "quest.clinic_supplies.turn_in.queued",
         },
         rejected = {
-            templateID = "semantic.quest.clinic_supplies.turn_in.rejected",
+            templateID = "quest.clinic_supplies.turn_in.rejected",
         },
         failed = {
-            templateID = "semantic.quest.clinic_supplies.turn_in.failed",
+            templateID = "quest.clinic_supplies.turn_in.failed",
         },
     },
 }

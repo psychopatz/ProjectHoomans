@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "order_rejected",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_rejected.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_rejected.json",
-        "responseTemplateID": "semantic.tool_reply.order_rejected.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I cannot do that right now.",
-              "TL": "Hindi ko magagawa iyon ngayon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "That's not something I can pull off here.",
-              "TL": "Hindi ko magagawa 'yan dito."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Unable to execute that request at this time.",
-              "TL": "Di maisakatuparan ang hiling na 'yan sa ngayon."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I have to decline that order.",
-              "TL": "Kailangan kong tanggihan ang utos na 'yan."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "Not possible under current circumstances.",
-              "TL": "Hindi posible sa kasalukuyang kalagayan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I can't carry that out right now.",
-              "TL": "Di ko kayang isakatuparan 'yan ngayon."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Unable to comply with that command.",
-              "TL": "Di makasusunod sa utos na 'yan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I can't do that. Find another solution.",
-              "TL": "Di ko magagawa 'yan. Humanap ng ibang solusyon."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Order declined. Conditions won't allow it.",
-              "TL": "Tinatanggihan ang utos. Di pinapayagan ng sitwasyon."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I cannot perform that action right now.",
-              "TL": "Hindi ko maisasagawa ang kilos na 'yan sa ngayon."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_rejected.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I cannot do that right now.",
+              "That's not something I can pull off here.",
+              "Unable to execute that request at this time.",
+              "I have to decline that order.",
+              "Not possible under current circumstances.",
+              "I can't carry that out right now.",
+              "Unable to comply with that command.",
+              "I can't do that. Find another solution.",
+              "Order declined. Conditions won't allow it.",
+              "I cannot perform that action right now."
+            ],
+            "TL": [
+              "Hindi ko magagawa iyon ngayon.",
+              "Hindi ko magagawa 'yan dito.",
+              "Di maisakatuparan ang hiling na 'yan sa ngayon.",
+              "Kailangan kong tanggihan ang utos na 'yan.",
+              "Hindi posible sa kasalukuyang kalagayan.",
+              "Di ko kayang isakatuparan 'yan ngayon.",
+              "Di makasusunod sa utos na 'yan.",
+              "Di ko magagawa 'yan. Humanap ng ibang solusyon.",
+              "Tinatanggihan ang utos. Di pinapayagan ng sitwasyon.",
+              "Hindi ko maisasagawa ang kilos na 'yan sa ngayon."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.order_rejected.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_rejected.json",
-        "responseTemplateID": "semantic.tool_reply.order_rejected.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "That order is not going to work.",
-              "TL": "Hindi uubra ang utos na iyan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "That's a bad plan and it won't succeed.",
-              "TL": "Masamang plano 'yan at hindi magtatagumpay."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "That order makes no sense in this situation.",
-              "TL": "Walang saysay ang utos na 'yan sa sitwasyong ito."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "That won't work. We need a different approach.",
-              "TL": "Hindi uubra 'yan. Kailangan natin ng ibang diskarte."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "I'm not following an order that leads to failure.",
-              "TL": "Di ako susunod sa utos na papunta sa kapahamakan."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "That command will only get us killed.",
-              "TL": "Ipapahamak lang tayo ng utos na 'yan."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Not going to work out. Try another idea.",
-              "TL": "Hindi magiging maayos 'yan. Sumubok ng ibang ideya."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Flawed order. I won't execute it.",
-              "TL": "May depekto ang utos. Di ko isasakatuparan."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "That plan is dead in the water.",
-              "TL": "Patay ang planong 'yan sa simula pa lang."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "That won't work out here. Give a better order.",
-              "TL": "Di uubra 'yan dito. Magbigay ka ng mas maayos na utos."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "That order is not going to work.",
+              "That's a bad plan and it won't succeed.",
+              "That order makes no sense in this situation.",
+              "That won't work. We need a different approach.",
+              "I'm not following an order that leads to failure.",
+              "That command will only get us killed.",
+              "Not going to work out. Try another idea.",
+              "Flawed order. I won't execute it.",
+              "That plan is dead in the water.",
+              "That won't work out here. Give a better order."
+            ],
+            "TL": [
+              "Hindi uubra ang utos na iyan.",
+              "Masamang plano 'yan at hindi magtatagumpay.",
+              "Walang saysay ang utos na 'yan sa sitwasyong ito.",
+              "Hindi uubra 'yan. Kailangan natin ng ibang diskarte.",
+              "Di ako susunod sa utos na papunta sa kapahamakan.",
+              "Ipapahamak lang tayo ng utos na 'yan.",
+              "Hindi magiging maayos 'yan. Sumubok ng ibang ideya.",
+              "May depekto ang utos. Di ko isasakatuparan.",
+              "Patay ang planong 'yan sa simula pa lang.",
+              "Di uubra 'yan dito. Magbigay ka ng mas maayos na utos."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

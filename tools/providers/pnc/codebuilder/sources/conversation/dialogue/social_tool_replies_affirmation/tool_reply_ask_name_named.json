@@ -1,291 +1,122 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply.ask_name",
+  "id": "named",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.ask_name.named.1.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-        "responseTemplateID": "semantic.tool_reply.ask_name.named.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I am %s.",
-              "TL": "Ako si %s."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "My name is %s.",
-              "TL": "%s ang pangalan ko."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Call me %s.",
-              "TL": "Tawagin mo akong %s."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I go by %s.",
-              "TL": "%s ang tawag sa akin."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "%s is what people call me.",
-              "TL": "%s ang itawag mo sa akin."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "I'm %s, good to meet you.",
-              "TL": "Ako si %s, ikinagagalak kitang makilala."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Folks around here know me as %s.",
-              "TL": "Kilala ako ng mga tao rito bilang %s."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "The name's %s. Pleased to make your acquaintance.",
-              "TL": "%s ang pangalan ko. Ikinagagalak kitang makilala."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "You can know me as %s.",
-              "TL": "Maaari mo akong makilala bilang %s."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I'm %s, standing before you.",
-              "TL": "Ako si %s, na kaharap mo ngayon."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I am %s.",
+              "My name is %s.",
+              "Call me %s.",
+              "I go by %s.",
+              "%s is what people call me.",
+              "I'm %s, good to meet you.",
+              "Folks around here know me as %s.",
+              "The name's %s. Pleased to make your acquaintance.",
+              "You can know me as %s.",
+              "I'm %s, standing before you."
+            ],
+            "TL": [
+              "Ako si %s.",
+              "%s ang pangalan ko.",
+              "Tawagin mo akong %s.",
+              "%s ang tawag sa akin.",
+              "%s ang itawag mo sa akin.",
+              "Ako si %s, ikinagagalak kitang makilala.",
+              "Kilala ako ng mga tao rito bilang %s.",
+              "%s ang pangalan ko. Ikinagagalak kitang makilala.",
+              "Maaari mo akong makilala bilang %s.",
+              "Ako si %s, na kaharap mo ngayon."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.ask_name.named.2.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-        "responseTemplateID": "semantic.tool_reply.ask_name.named.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "The name is %s.",
-              "TL": "%s ang pangalan ko."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I'm %s. Nice to meet you properly.",
-              "TL": "Ako si %s. Mabuti at pormal tayong nagkakilala."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "You're speaking with %s.",
-              "TL": "Kausap mo si %s."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "%s is my name. Don't wear it out.",
-              "TL": "%s ang pangalan ko. Tandaan mo 'yan."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "I answer to %s.",
-              "TL": "Sumasagot ako sa pangalang %s."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "They call me %s around these parts.",
-              "TL": "Tinatawag nila akong %s dito sa lugar na ito."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Name's %s. Glad we got that sorted.",
-              "TL": "%s ang pangalan. Mabuti at nalaman mo na."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Just call me %s.",
-              "TL": "Tawagin mo na lang akong %s."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "I'm known as %s to the survivors here.",
-              "TL": "Kilala ako bilang %s ng mga nakaligtas dito."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "It's %s. Good to put a name to the face.",
-              "TL": "%s ako. Mabuti at may pangalan na ang mukhang ito."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "The name is %s.",
+              "I'm %s. Nice to meet you properly.",
+              "You're speaking with %s.",
+              "%s is my name. Don't wear it out.",
+              "I answer to %s.",
+              "They call me %s around these parts.",
+              "Name's %s. Glad we got that sorted.",
+              "Just call me %s.",
+              "I'm known as %s to the survivors here.",
+              "It's %s. Good to put a name to the face."
+            ],
+            "TL": [
+              "%s ang pangalan ko.",
+              "Ako si %s. Mabuti at pormal tayong nagkakilala.",
+              "Kausap mo si %s.",
+              "%s ang pangalan ko. Tandaan mo 'yan.",
+              "Sumasagot ako sa pangalang %s.",
+              "Tinatawag nila akong %s dito sa lugar na ito.",
+              "%s ang pangalan. Mabuti at nalaman mo na.",
+              "Tawagin mo na lang akong %s.",
+              "Kilala ako bilang %s ng mga nakaligtas dito.",
+              "%s ako. Mabuti at may pangalan na ang mukhang ito."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.ask_name.named.3.neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
-        "responseTemplateID": "semantic.tool_reply.ask_name.named.3",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "You can call me %s.",
-              "TL": "Maaari mo akong tawaging %s."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Go ahead and call me %s.",
-              "TL": "Sige lang, tawagin mo akong %s."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "%s works fine for me.",
-              "TL": "Ayos na ang %s para sa akin."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "I'm %s. That's the handle I go by.",
-              "TL": "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "You may call me %s if you'd like.",
-              "TL": "Maaari mo akong tawaging %s kung nais mo."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "%s is what my companions call me.",
-              "TL": "%s ang tawag sa akin ng mga kasamahan ko."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I prefer %s, if you're asking.",
-              "TL": "Mas gusto ko ang %s, kung nagtatanong ka."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Call me %s. Simple enough to remember.",
-              "TL": "Tawagin mo akong %s. Madaling matandaan."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "%s is the name. Keep it in mind.",
-              "TL": "%s ang pangalan. Itatak mo sa isip mo."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I'm %s. Let's make sure we both survive today.",
-              "TL": "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon."
-            }
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "You can call me %s.",
+              "Go ahead and call me %s.",
+              "%s works fine for me.",
+              "I'm %s. That's the handle I go by.",
+              "You may call me %s if you'd like.",
+              "%s is what my companions call me.",
+              "I prefer %s, if you're asking.",
+              "Call me %s. Simple enough to remember.",
+              "%s is the name. Keep it in mind.",
+              "I'm %s. Let's make sure we both survive today."
+            ],
+            "TL": [
+              "Maaari mo akong tawaging %s.",
+              "Sige lang, tawagin mo akong %s.",
+              "Ayos na ang %s para sa akin.",
+              "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan.",
+              "Maaari mo akong tawaging %s kung nais mo.",
+              "%s ang tawag sa akin ng mga kasamahan ko.",
+              "Mas gusto ko ang %s, kung nagtatanong ka.",
+              "Tawagin mo akong %s. Madaling matandaan.",
+              "%s ang pangalan. Itatak mo sa isip mo.",
+              "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

@@ -1,390 +1,141 @@
 {
   "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "interaction.scene",
+  "id": "excursion_departing",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "neutral",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "We're moving out. Keep close.",
+            "Heading out now. Stay sharp.",
+            "Departure time. Keep your eyes peeled.",
+            "Stepping outside the wire. Watch your surroundings.",
+            "We're on the move. Maintain distance and formation.",
+            "Moving out. Quiet footsteps.",
+            "Time to go. Stick to the planned route.",
+            "Excursion begins now. Stay focused.",
+            "Here we go. Eyes front and watch your flanks.",
+            "Moving outbound. Keep noise to a minimum."
+          ],
+          "TL": [
+            "Aalis na tayo. Dumikit ka.",
+            "Lalabas na tayo ngayon. Maging alerto.",
+            "Oras na ng pag-alis. Buksan ang mga mata.",
+            "Lalabas na sa bakod. Bantayan ang paligid.",
+            "Kumikilos na tayo. Panatilihin ang pormasyon.",
+            "Lumalabas na. Tahimik na mga hakbang.",
+            "Oras na para umalis. Manatili sa pinlanong ruta.",
+            "Nagsisimula na ang lakad. Magpokus.",
+            "Ito na tayo. Tumingin sa unahan at tagiliran.",
+            "Papalabas na. Huwag gagawa ng ingay."
+          ]
+        }
       },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
-        "responseTemplateID": "semantic.interaction.scene.excursion_departing",
-        "style": "neutral"
+      {
+        "id": "guarded",
+        "text": {
+          "EN": [
+            "We're outbound. Keep the group tight.",
+            "Crossing outside. Weapons ready, safety off.",
+            "No talking from here on out. Hand signals only.",
+            "Keep low and match my speed. Don't wander off.",
+            "Scan your sectors continuously as we move.",
+            "Outbound. If we take fire, dive for immediate cover.",
+            "Watch the tree line and rooftops. Moving out.",
+            "Stay alert. The outside world is completely hostile.",
+            "We're moving. Anyone who strays gets left behind.",
+            "Formation tight. Moving into enemy territory."
+          ],
+          "TL": [
+            "Papunta na tayo. Panatilihing dikit ang grupo.",
+            "Lalabas na. Handa ang armas, alisin ang safety.",
+            "Walang magsasalita simula rito. Senyas-kamay lang.",
+            "Yumuko at sumabay sa bilis ko. Huwag lalayo.",
+            "Bantayan ang pwesto niyo habang lumalakad.",
+            "Palabas na. Kapag may nagpaputok, dapa agad sa kublihan.",
+            "Bantayan ang mga puno at bubong. Lakad na.",
+            "Maging alisto. Mapanganib ang buong mundo sa labas.",
+            "Kumikilos na. Ang lumihis maiiwan.",
+            "Mahigpit na pormasyon. Papatungo sa teritoryo ng kalaban."
+          ]
+        }
       },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "We're moving out. Keep close.",
-              "TL": "Aalis na tayo. Dumikit ka."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "Heading out now. Stay sharp.",
-              "TL": "Lalabas na tayo ngayon. Maging alerto."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "Departure time. Keep your eyes peeled.",
-              "TL": "Oras na ng pag-alis. Buksan ang mga mata."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "Stepping outside the wire. Watch your surroundings.",
-              "TL": "Lalabas na sa bakod. Bantayan ang paligid."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "We're on the move. Maintain distance and formation.",
-              "TL": "Kumikilos na tayo. Panatilihin ang pormasyon."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Moving out. Quiet footsteps.",
-              "TL": "Lumalabas na. Tahimik na mga hakbang."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Time to go. Stick to the planned route.",
-              "TL": "Oras na para umalis. Manatili sa pinlanong ruta."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "Excursion begins now. Stay focused.",
-              "TL": "Nagsisimula na ang lakad. Magpokus."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Here we go. Eyes front and watch your flanks.",
-              "TL": "Ito na tayo. Tumingin sa unahan at tagiliran."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "Moving outbound. Keep noise to a minimum.",
-              "TL": "Papalabas na. Huwag gagawa ng ingay."
-            }
-          }
-        ]
+      {
+        "id": "terse",
+        "text": {
+          "EN": [
+            "Moving out. Stay close.",
+            "Moving out.",
+            "Let's move.",
+            "Heading out.",
+            "Outbound.",
+            "On the move.",
+            "Stay tight.",
+            "Quiet steps.",
+            "Marching.",
+            "Go."
+          ],
+          "TL": [
+            "Aalis na. Dumikit.",
+            "Lalakad na.",
+            "Kilos na.",
+            "Lalabas na.",
+            "Palabas.",
+            "Kumikilos na.",
+            "Dumikit.",
+            "Tahimik na hakbang.",
+            "Lumalakad na.",
+            "Tara."
+          ]
+        }
       },
-      "namespace": "semantic.interaction.scene.excursion_departing"
-    },
-    {
-      "kind": "dialogue",
-      "id": "warm",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
-        "responseTemplateID": "semantic.interaction.scene.excursion_departing",
-        "style": "warm"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "warm.01",
-            "text": {
-              "EN": "We're heading out. Stay close and we'll get through it.",
-              "TL": "Aalis na tayo. Dumikit ka at malalampasan natin ito."
-            }
-          },
-          {
-            "id": "warm.02",
-            "text": {
-              "EN": "Off we go, friend! Right beside you all the way.",
-              "TL": "Lalakad na tayo, kaibigan! Katabi mo ako sa buong daan."
-            }
-          },
-          {
-            "id": "warm.03",
-            "text": {
-              "EN": "Stay close to me, partner. We watch out for each other.",
-              "TL": "Dumikit ka sa akin, kasama. Bantayan natin ang isa't isa."
-            }
-          },
-          {
-            "id": "warm.04",
-            "text": {
-              "EN": "Moving out together. Let's make it a safe trip.",
-              "TL": "Sabay tayong aalis. Gawin nating ligtas ang biyahe."
-            }
-          },
-          {
-            "id": "warm.05",
-            "text": {
-              "EN": "Here we go! Keep your chin up and stay close.",
-              "TL": "Ito na! Itaas ang noo at dumikit."
-            }
-          },
-          {
-            "id": "warm.06",
-            "text": {
-              "EN": "Heading out. Don't worry, we've got this covered.",
-              "TL": "Lalabas na. Huwag mag-alala, hawak natin ito."
-            }
-          },
-          {
-            "id": "warm.07",
-            "text": {
-              "EN": "Step together, friend. We'll be back before you know it.",
-              "TL": "Sabay-sabay sa hakbang, kaibigan. Makababalik tayo agad."
-            }
-          },
-          {
-            "id": "warm.08",
-            "text": {
-              "EN": "On our way! Stay safe and keep smiling.",
-              "TL": "Papunta na tayo! Manatiling ligtas at masigla."
-            }
-          },
-          {
-            "id": "warm.09",
-            "text": {
-              "EN": "Moving out. I'm right behind you if you need a hand.",
-              "TL": "Lumalabas na. Nasa likod mo lang ako kung kailangan mo ng tulong."
-            }
-          },
-          {
-            "id": "warm.10",
-            "text": {
-              "EN": "Let's bring back good loot and all our limbs! Moving out.",
-              "TL": "Mag-uwi tayo ng magagandang gamit nang buo ang katawan! Lakad na."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.excursion_departing"
-    },
-    {
-      "kind": "dialogue",
-      "id": "terse",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
-        "responseTemplateID": "semantic.interaction.scene.excursion_departing",
-        "style": "terse"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "terse.01",
-            "text": {
-              "EN": "Moving out. Stay close.",
-              "TL": "Aalis na. Dumikit."
-            }
-          },
-          {
-            "id": "terse.02",
-            "text": {
-              "EN": "Moving out.",
-              "TL": "Lalakad na."
-            }
-          },
-          {
-            "id": "terse.03",
-            "text": {
-              "EN": "Let's move.",
-              "TL": "Kilos na."
-            }
-          },
-          {
-            "id": "terse.04",
-            "text": {
-              "EN": "Heading out.",
-              "TL": "Lalabas na."
-            }
-          },
-          {
-            "id": "terse.05",
-            "text": {
-              "EN": "Outbound.",
-              "TL": "Palabas."
-            }
-          },
-          {
-            "id": "terse.06",
-            "text": {
-              "EN": "On the move.",
-              "TL": "Kumikilos na."
-            }
-          },
-          {
-            "id": "terse.07",
-            "text": {
-              "EN": "Stay tight.",
-              "TL": "Dumikit."
-            }
-          },
-          {
-            "id": "terse.08",
-            "text": {
-              "EN": "Quiet steps.",
-              "TL": "Tahimik na hakbang."
-            }
-          },
-          {
-            "id": "terse.09",
-            "text": {
-              "EN": "Marching.",
-              "TL": "Lumalakad na."
-            }
-          },
-          {
-            "id": "terse.10",
-            "text": {
-              "EN": "Go.",
-              "TL": "Tara."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.excursion_departing"
-    },
-    {
-      "kind": "dialogue",
-      "id": "guarded",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:core_social_content",
-        "contentOwner": "projecthoomans.dialogue_content.social",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
-        "responseTemplateID": "semantic.interaction.scene.excursion_departing",
-        "style": "guarded"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "guarded.01",
-            "text": {
-              "EN": "We're outbound. Keep the group tight.",
-              "TL": "Papunta na tayo. Panatilihing dikit ang grupo."
-            }
-          },
-          {
-            "id": "guarded.02",
-            "text": {
-              "EN": "Crossing outside. Weapons ready, safety off.",
-              "TL": "Lalabas na. Handa ang armas, alisin ang safety."
-            }
-          },
-          {
-            "id": "guarded.03",
-            "text": {
-              "EN": "No talking from here on out. Hand signals only.",
-              "TL": "Walang magsasalita simula rito. Senyas-kamay lang."
-            }
-          },
-          {
-            "id": "guarded.04",
-            "text": {
-              "EN": "Keep low and match my speed. Don't wander off.",
-              "TL": "Yumuko at sumabay sa bilis ko. Huwag lalayo."
-            }
-          },
-          {
-            "id": "guarded.05",
-            "text": {
-              "EN": "Scan your sectors continuously as we move.",
-              "TL": "Bantayan ang pwesto niyo habang lumalakad."
-            }
-          },
-          {
-            "id": "guarded.06",
-            "text": {
-              "EN": "Outbound. If we take fire, dive for immediate cover.",
-              "TL": "Palabas na. Kapag may nagpaputok, dapa agad sa kublihan."
-            }
-          },
-          {
-            "id": "guarded.07",
-            "text": {
-              "EN": "Watch the tree line and rooftops. Moving out.",
-              "TL": "Bantayan ang mga puno at bubong. Lakad na."
-            }
-          },
-          {
-            "id": "guarded.08",
-            "text": {
-              "EN": "Stay alert. The outside world is completely hostile.",
-              "TL": "Maging alisto. Mapanganib ang buong mundo sa labas."
-            }
-          },
-          {
-            "id": "guarded.09",
-            "text": {
-              "EN": "We're moving. Anyone who strays gets left behind.",
-              "TL": "Kumikilos na. Ang lumihis maiiwan."
-            }
-          },
-          {
-            "id": "guarded.10",
-            "text": {
-              "EN": "Formation tight. Moving into enemy territory.",
-              "TL": "Mahigpit na pormasyon. Papatungo sa teritoryo ng kalaban."
-            }
-          }
-        ]
-      },
-      "namespace": "semantic.interaction.scene.excursion_departing"
-    }
-  ]
+      {
+        "id": "warm",
+        "text": {
+          "EN": [
+            "We're heading out. Stay close and we'll get through it.",
+            "Off we go, friend! Right beside you all the way.",
+            "Stay close to me, partner. We watch out for each other.",
+            "Moving out together. Let's make it a safe trip.",
+            "Here we go! Keep your chin up and stay close.",
+            "Heading out. Don't worry, we've got this covered.",
+            "Step together, friend. We'll be back before you know it.",
+            "On our way! Stay safe and keep smiling.",
+            "Moving out. I'm right behind you if you need a hand.",
+            "Let's bring back good loot and all our limbs! Moving out."
+          ],
+          "TL": [
+            "Aalis na tayo. Dumikit ka at malalampasan natin ito.",
+            "Lalakad na tayo, kaibigan! Katabi mo ako sa buong daan.",
+            "Dumikit ka sa akin, kasama. Bantayan natin ang isa't isa.",
+            "Sabay tayong aalis. Gawin nating ligtas ang biyahe.",
+            "Ito na! Itaas ang noo at dumikit.",
+            "Lalabas na. Huwag mag-alala, hawak natin ito.",
+            "Sabay-sabay sa hakbang, kaibigan. Makababalik tayo agad.",
+            "Papunta na tayo! Manatiling ligtas at masigla.",
+            "Lumalabas na. Nasa likod mo lang ako kung kailangan mo ng tulong.",
+            "Mag-uwi tayo ng magagandang gamit nang buo ang katawan! Lakad na."
+          ]
+        }
+      }
+    ]
+  }
 }

@@ -1,196 +1,89 @@
 {
-  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "tool_reply",
+  "id": "rejected_generic",
   "owner": "ProjectHoomans",
-  "records": [
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.rejected_generic.1",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_generic.json",
-        "responseTemplateID": "semantic.tool_reply.rejected_generic.1",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "That did not land well.",
-              "TL": "Hindi naging maganda ang dating niyan."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "That went over poorly.",
-              "TL": "Pangit ang naging dating niyan."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "That didn't work out.",
-              "TL": "Hindi naging maayos 'yan."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "That was not well received.",
-              "TL": "Hindi maganda ang pagtanggap diyan."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "You miscalculated that one.",
-              "TL": "Nagkamali ka sa kalkulasyon doon."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "That completely backfired.",
-              "TL": "Bumalik sa 'yo ang epekto niyan."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "Not a good approach.",
-              "TL": "Hindi magandang paraan 'yan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "That fell flat on its face.",
-              "TL": "Bumagsak lang 'yan nang kusa."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "That missed completely.",
-              "TL": "Sumablay nang buo."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "That was a mistake.",
-              "TL": "Isang pagkakamali 'yon."
-            }
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_generic.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "That did not land well.",
+              "That went over poorly.",
+              "That didn't work out.",
+              "That was not well received.",
+              "You miscalculated that one.",
+              "That completely backfired.",
+              "Not a good approach.",
+              "That fell flat on its face.",
+              "That missed completely.",
+              "That was a mistake."
+            ],
+            "TL": [
+              "Hindi naging maganda ang dating niyan.",
+              "Pangit ang naging dating niyan.",
+              "Hindi naging maayos 'yan.",
+              "Hindi maganda ang pagtanggap diyan.",
+              "Nagkamali ka sa kalkulasyon doon.",
+              "Bumalik sa 'yo ang epekto niyan.",
+              "Hindi magandang paraan 'yan.",
+              "Bumagsak lang 'yan nang kusa.",
+              "Sumablay nang buo.",
+              "Isang pagkakamali 'yon."
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
-    {
-      "kind": "dialogue",
-      "id": "semantic.tool_reply.rejected_generic.2",
-      "owner": "ProjectHoomans",
-      "participants": {
-        "speaker": [
-          "participant"
-        ],
-        "addressee": [
-          "participant"
-        ]
-      },
-      "metadata": {
-        "category": "projecthoomans:tool_replies",
-        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
-        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_generic.json",
-        "responseTemplateID": "semantic.tool_reply.rejected_generic.2",
-        "style": "neutral"
-      },
-      "response": {
-        "act": "REACT",
-        "variants": [
-          {
-            "id": "neutral.01",
-            "text": {
-              "EN": "I am not taking that from you right now.",
-              "TL": "Hindi ko tatanggapin iyan mula sa iyo ngayon."
-            }
-          },
-          {
-            "id": "neutral.02",
-            "text": {
-              "EN": "I'm not in the mood for that kind of talk.",
-              "TL": "Wala ako sa mood para sa ganyang usapan."
-            }
-          },
-          {
-            "id": "neutral.03",
-            "text": {
-              "EN": "I'm rejecting that completely.",
-              "TL": "Tinatanggihan ko 'yan nang buo."
-            }
-          },
-          {
-            "id": "neutral.04",
-            "text": {
-              "EN": "You can keep that nonsense to yourself.",
-              "TL": "Itago mo sa sarili mo ang kalokohang 'yan."
-            }
-          },
-          {
-            "id": "neutral.05",
-            "text": {
-              "EN": "I'm not putting up with that today.",
-              "TL": "Di ko pagtitiisan 'yan ngayong araw."
-            }
-          },
-          {
-            "id": "neutral.06",
-            "text": {
-              "EN": "Not taking that. Walk it back.",
-              "TL": "Di tatanggapin 'yan. Bawiin mo."
-            }
-          },
-          {
-            "id": "neutral.07",
-            "text": {
-              "EN": "I refuse to engage with that.",
-              "TL": "Tumatanggi akong makipag-usap tungkol diyan."
-            }
-          },
-          {
-            "id": "neutral.08",
-            "text": {
-              "EN": "I'm shutting that down immediately.",
-              "TL": "Papatayin ko agad ang usapang 'yan."
-            }
-          },
-          {
-            "id": "neutral.09",
-            "text": {
-              "EN": "Not tolerating that right now.",
-              "TL": "Di ko palalampasin 'yan ngayon."
-            }
-          },
-          {
-            "id": "neutral.10",
-            "text": {
-              "EN": "I'm not accepting that from you.",
-              "TL": "Hindi ko tatanggapin 'yan galing sa 'yo."
-            }
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "I am not taking that from you right now.",
+              "I'm not in the mood for that kind of talk.",
+              "I'm rejecting that completely.",
+              "You can keep that nonsense to yourself.",
+              "I'm not putting up with that today.",
+              "Not taking that. Walk it back.",
+              "I refuse to engage with that.",
+              "I'm shutting that down immediately.",
+              "Not tolerating that right now.",
+              "I'm not accepting that from you."
+            ],
+            "TL": [
+              "Hindi ko tatanggapin iyan mula sa iyo ngayon.",
+              "Wala ako sa mood para sa ganyang usapan.",
+              "Tinatanggihan ko 'yan nang buo.",
+              "Itago mo sa sarili mo ang kalokohang 'yan.",
+              "Di ko pagtitiisan 'yan ngayong araw.",
+              "Di tatanggapin 'yan. Bawiin mo.",
+              "Tumatanggi akong makipag-usap tungkol diyan.",
+              "Papatayin ko agad ang usapang 'yan.",
+              "Di ko palalampasin 'yan ngayon.",
+              "Hindi ko tatanggapin 'yan galing sa 'yo."
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
-  ]
+  }
 }

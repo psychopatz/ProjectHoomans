@@ -89,10 +89,10 @@ local function resolveHealthStateQuestion(ir, state, context)
     local templateID
     if fact and fact.status == "known" then
         if value == "injured" or value == "wounded" or value == "critical" then
-            templateID = "semantic.question.health_state.injured"
+            templateID = "question.health_state.injured"
             fallback = "I'm hurt, but I'm managing."
         elseif value == "healthy" or value == "normal" then
-            templateID = "semantic.question.health_state.healthy"
+            templateID = "question.health_state.healthy"
             fallback = "I'm doing okay."
         end
         if templateID then
@@ -123,7 +123,7 @@ local function resolveKnowledgeQuestion(ir, state, context)
         local fallback = "I know about " .. topic .. "."
         if answer ~= "" then fallback = fallback .. " " .. answer end
         local response = factResponse(
-            "semantic.question.knowledge.known",
+            "question.knowledge.known",
             fallback,
             "semantic.question.knowledge",
             fact,
@@ -142,7 +142,7 @@ local function resolveKnowledgeQuestion(ir, state, context)
         return response
     end
     local response = factResponse(
-        "semantic.question.knowledge.unknown",
+        "question.knowledge.unknown",
         "I don't have reliable information about " .. topic .. ".",
         "semantic.question.knowledge",
         fact,

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "command.player",
   "id": "attack_none",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,34 +16,25 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
-    "responseTemplateID": "semantic.command.player.attack_none"
+    "responseAct": "DIRECTIVE"
   },
-  "response": {
-    "act": "DIRECTIVE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "{addressee.name}, stay out of the fight.",
-          "TL": "{addressee.name}, huwag sumali sa laban."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "Avoid trouble, {addressee.name}.",
-          "TL": "Iwasan ang gulo, {addressee.name}."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "{addressee.name}, don't engage unless I change the order.",
-          "TL": "{addressee.name}, huwag lumaban hangga't hindi ko binabago ang utos."
+          "EN": [
+            "{addressee.name}, stay out of the fight.",
+            "Avoid trouble, {addressee.name}.",
+            "{addressee.name}, don't engage unless I change the order."
+          ],
+          "TL": [
+            "{addressee.name}, huwag sumali sa laban.",
+            "Iwasan ang gulo, {addressee.name}.",
+            "{addressee.name}, huwag lumaban hangga't hindi ko binabago ang utos."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.command.player",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

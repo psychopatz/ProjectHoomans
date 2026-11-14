@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "combat.horde.ack",
   "id": "engage_hesitant",
   "owner": "ProjectHoomans",
   "participants": {
@@ -14,83 +16,39 @@
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
     "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
-    "responseTemplateID": "semantic.combat.horde.ack.engage_hesitant"
+    "responseAct": "ACK"
   },
-  "response": {
-    "act": "ACK",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
+        "id": "neutral",
         "text": {
-          "EN": "If you say so... alright. I'm with you.",
-          "TL": "Kung sinasabi mo... sige. Kasama mo ako."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "text": {
-          "EN": "This is reckless, but I won't abandon you.",
-          "TL": "Kapusukan ito, pero hindi kita iiwan."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "text": {
-          "EN": "I have a bad feeling about this, but I'm in.",
-          "TL": "Masama ang kutob ko rito, pero sasama ako."
-        }
-      },
-      {
-        "id": "neutral.04",
-        "text": {
-          "EN": "Watch my back... here we go.",
-          "TL": "Bantayan mo ang likod ko... heto na tayo."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "text": {
-          "EN": "I hope you know what you're doing. Moving in.",
-          "TL": "Sana alam mo ang ginagawa mo. Susulong na."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "text": {
-          "EN": "Not loving these odds, but I'll fight beside you.",
-          "TL": "Di maganda ang tsansa, pero lalaban ako sa tabi mo."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "text": {
-          "EN": "Hesitant, but committed. Stay close.",
-          "TL": "Nag-aalangan, pero sasabak. Dumikit ka."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "text": {
-          "EN": "Alright... just don't let them flank us.",
-          "TL": "Sige... huwag mo lang silang hayaang pumaligid."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "text": {
-          "EN": "Stepping into the meat grinder. Let's make it out alive.",
-          "TL": "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "text": {
-          "EN": "Okay... I trust your blade. Let's go.",
-          "TL": "Sige... tiwala ako sa talim mo. Tara."
+          "EN": [
+            "If you say so... alright. I'm with you.",
+            "This is reckless, but I won't abandon you.",
+            "I have a bad feeling about this, but I'm in.",
+            "Watch my back... here we go.",
+            "I hope you know what you're doing. Moving in.",
+            "Not loving these odds, but I'll fight beside you.",
+            "Hesitant, but committed. Stay close.",
+            "Alright... just don't let them flank us.",
+            "Stepping into the meat grinder. Let's make it out alive.",
+            "Okay... I trust your blade. Let's go."
+          ],
+          "TL": [
+            "Kung sinasabi mo... sige. Kasama mo ako.",
+            "Kapusukan ito, pero hindi kita iiwan.",
+            "Masama ang kutob ko rito, pero sasama ako.",
+            "Bantayan mo ang likod ko... heto na tayo.",
+            "Sana alam mo ang ginagawa mo. Susulong na.",
+            "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
+            "Nag-aalangan, pero sasabak. Dumikit ka.",
+            "Sige... huwag mo lang silang hayaang pumaligid.",
+            "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
+            "Sige... tiwala ako sa talim mo. Tara."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.combat.horde.ack",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

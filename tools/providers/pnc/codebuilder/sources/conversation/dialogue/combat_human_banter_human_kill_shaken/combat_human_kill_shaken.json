@@ -1,0 +1,122 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.human_kill",
+  "id": "shaken",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.combat_human",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/shaken.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "1": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "Jesus... he's dead.",
+              "I... I really killed him.",
+              "God... look at him lying there.",
+              "He stopped moving... he's really gone.",
+              "I had to do it... he was shooting at us.",
+              "Lord help us... what have we done?",
+              "He's dead. I can't look at it.",
+              "His eyes are still open... Jesus.",
+              "I didn't want this... but he wouldn't stop.",
+              "God forgive me. He's dead."
+            ],
+            "TL": [
+              "Diyos ko... patay na siya.",
+              "Ako... napatay ko talaga siya.",
+              "Diyos ko... tingnan mo siyang nakahandusay.",
+              "Tumigil na siya sa paggalaw... wala na talaga.",
+              "Kinailangan kong gawin... binaril niya tayo eh.",
+              "Panginoon tulungan mo kami... ano'ng nagawa natin?",
+              "Patay na siya. Hindi ko kayang tingnan.",
+              "Bukas pa ang mga mata niya... Diyos ko.",
+              "Ayoko nito... pero ayaw niyang tumigil.",
+              "Patawarin ako ng Diyos. Patay na siya."
+            ]
+          }
+        }
+      ]
+    },
+    "2": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "God. That was a person.",
+              "A real person... not a zombie.",
+              "He had a name... someone knew him.",
+              "We're killing each other now... God.",
+              "He was just trying to survive too...",
+              "That was an actual human being lying there.",
+              "I can't shake this feeling... we took a life.",
+              "He had boots, a jacket, a life... now he's gone.",
+              "Killing people... what are we becoming?",
+              "That was somebody's family once."
+            ],
+            "TL": [
+              "Diyos ko. Tao 'yon.",
+              "Tunay na tao... hindi zombie.",
+              "May pangalan 'yon... may nakakakilala sa kanya.",
+              "Pumapatay na tayo ng kapwa... Diyos ko.",
+              "Gusto lang din niyang mabuhay...",
+              "Tunay na tao ang nakahandusay diyan.",
+              "Hindi maalis sa isip ko... pumatay tayo ng tao.",
+              "May gamit siya, may buhay... ngayon wala na.",
+              "Pumapatay ng kapwa... ano na nagiging tayo?",
+              "Pamilya rin siya ng iba noon."
+            ]
+          }
+        }
+      ]
+    },
+    "3": {
+      "variants": [
+        {
+          "id": "neutral",
+          "text": {
+            "EN": [
+              "He's down... let's just get out of here.",
+              "Please... can we just leave this place?",
+              "Don't search him. Let's just go.",
+              "I don't want to be here anymore.",
+              "He's dead. We need to leave before others show up.",
+              "Let's grab what we need and run.",
+              "I can't stay near his body. Come on.",
+              "He's dead... let's just move away.",
+              "Get me out of here. Please.",
+              "It's done. Don't look back. Walk."
+            ],
+            "TL": [
+              "Bagsak na siya... umalis na tayo rito.",
+              "Pakiusap... pwede bang lumayo na tayo rito?",
+              "Huwag mo na siyang kapkapan. Umalis na lang tayo.",
+              "Ayoko nang manatili rito.",
+              "Patay na siya. Kailangan nating umalis bago may dumating pang iba.",
+              "Kuhanin ang kailangan at tumakbo na tayo.",
+              "Hindi ko kayang tumayo malapit sa bangkay niya. Halika na.",
+              "Patay na siya... lumayo na tayo.",
+              "Ilayo mo ako rito. Pakiusap.",
+              "Tapos na. Huwag kang lilingon. Lakad."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -103,6 +103,8 @@ PNC = {
                 }
             end,
         },
+    },
+    ConvoEngine = {
         SocialReactions = {
             Resolve = function(spec)
                 local c = spec.context
@@ -128,10 +130,10 @@ PNC = {
                         "semantic.followup.event.health",
                         "semantic.followup.event.next",
                     },
-                }
-            end,
+                    }
+                end,
+            },
         },
-    },
 }
 
 local Service = T.load(

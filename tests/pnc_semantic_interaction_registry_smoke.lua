@@ -32,7 +32,7 @@ T.equal(warn.mode, "beat",
 T.equal(warn.outputs.speech.dialogueAct, "BOUNDARY_WARNING",
     "warn speech output preserves its dialogue act")
 T.equal(warn.outputs.speech.contentTemplateID,
-    "semantic.social.hostile_boundary",
+    "social.hostile_boundary",
     "warn behavior references ordinary Dialogue Content")
 T.falsy(warn.labelKey,
     "structural behavior definitions do not own localized labels")
@@ -55,7 +55,7 @@ local badBehavior, behaviorReason = Behaviors.Validate({
     outputs = {
         speech = {
             dialogueAct = "BAD",
-            contentTemplateID = "semantic.social.hostile_boundary",
+            contentTemplateID = "social.hostile_boundary",
         },
     },
     baseRelevance = 2,

@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.call",
   "id": "starvation",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/call.json",
-    "responseTemplateID": "semantic.medical.distress.call.starvation",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "Haven't eaten in days... I'm starving to death.",
-          "TL": "Ilang araw nang hindi kumakain... namamatay na ako sa gutom."
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.02"
-        },
-        "text": {
-          "EN": "Too weak from hunger to stand up. Food, please.",
-          "TL": "Masyadong nanghihina sa gutom para makatayo. Pagkain, pakiusap."
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.03"
-        },
-        "text": {
-          "EN": "Stomach is eating itself... any crumbs left?",
-          "TL": "Kumakalam na ang sikmura ko... may natira pa bang mumo?"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.04"
-        },
-        "text": {
-          "EN": "Starving... can't even hold my weapon.",
-          "TL": "Gutom na gutom... hindi ko man lang mahawakan ang sandata ko."
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.05"
-        },
-        "text": {
-          "EN": "Please, just a bite of anything edible.",
-          "TL": "Pakiusap, kahit isang kagat lang ng anumang makakain."
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.06"
-        },
-        "text": {
-          "EN": "Fainting from lack of calories. I need food.",
-          "TL": "Nahihiya sa kawalan ng pagkain. Kailangan ko ng makakain."
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.07"
-        },
-        "text": {
-          "EN": "Hunger cramps are tearing me apart. Help me.",
-          "TL": "Pinupulikat ang tiyan ko sa gutom. Tulungan mo ako."
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.08"
-        },
-        "text": {
-          "EN": "I can't go on like this without food in my belly.",
-          "TL": "Hindi ko na kayang magpatuloy nang walang laman ang tiyan."
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.09"
-        },
-        "text": {
-          "EN": "Empty for days... please bring me something to eat.",
-          "TL": "Ilang araw nang walang laman... dalhan mo ako ng makakain."
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.starvation.neutral.10"
-        },
-        "text": {
-          "EN": "Starving on the floor... spare a ration, please.",
-          "TL": "Nagugutom sa sahig... magbahagi naman ng rasyon, pakiusap."
+          "EN": [
+            "Haven't eaten in days... I'm starving to death.",
+            "Too weak from hunger to stand up. Food, please.",
+            "Stomach is eating itself... any crumbs left?",
+            "Starving... can't even hold my weapon.",
+            "Please, just a bite of anything edible.",
+            "Fainting from lack of calories. I need food.",
+            "Hunger cramps are tearing me apart. Help me.",
+            "I can't go on like this without food in my belly.",
+            "Empty for days... please bring me something to eat.",
+            "Starving on the floor... spare a ration, please."
+          ],
+          "TL": [
+            "Ilang araw nang hindi kumakain... namamatay na ako sa gutom.",
+            "Masyadong nanghihina sa gutom para makatayo. Pagkain, pakiusap.",
+            "Kumakalam na ang sikmura ko... may natira pa bang mumo?",
+            "Gutom na gutom... hindi ko man lang mahawakan ang sandata ko.",
+            "Pakiusap, kahit isang kagat lang ng anumang makakain.",
+            "Nahihiya sa kawalan ng pagkain. Kailangan ko ng makakain.",
+            "Pinupulikat ang tiyan ko sa gutom. Tulungan mo ako.",
+            "Hindi ko na kayang magpatuloy nang walang laman ang tiyan.",
+            "Ilang araw nang walang laman... dalhan mo ako ng makakain.",
+            "Nagugutom sa sahig... magbahagi naman ng rasyon, pakiusap."
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.call",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

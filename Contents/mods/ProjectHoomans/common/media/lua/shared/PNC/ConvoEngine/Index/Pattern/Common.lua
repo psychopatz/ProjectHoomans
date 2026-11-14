@@ -209,7 +209,7 @@ return {
     },
     ["pnc.dataset.question.weather.can_we_talk_about_the_weather"] = {
         ["dependents"] = {
-            "semantic.flow.weather.raining",
+            "flow.weather.raining",
         },
         ["domain"] = "common",
         ["generated"] = {
@@ -292,9 +292,6 @@ return {
         ["source"] = "patterns/common/wellbeing_activity.json",
     },
     ["pnc.dataset.question.wellbeing.what_is_going_on_with_you"] = {
-        ["dependents"] = {
-            "semantic.question.wellbeing.unknown",
-        },
         ["domain"] = "common",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Patterns/Common/WellbeingActivity",

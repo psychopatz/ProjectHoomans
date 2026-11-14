@@ -1,5 +1,7 @@
 {
+  "schema": "psychopatz.convo-engine.v1",
   "kind": "dialogue",
+  "namespace": "medical.distress.call",
   "id": "default",
   "owner": "ProjectHoomans",
   "participants": {
@@ -13,124 +15,39 @@
   "metadata": {
     "category": "projecthoomans:medical_event",
     "sourceSurface": "content/event/medical/call.json",
-    "responseTemplateID": "semantic.medical.distress.call.default",
-    "style": "neutral"
+    "responseAct": "MEDICAL_RESPONSE"
   },
-  "response": {
-    "act": "MEDICAL_RESPONSE",
+  "say": {
     "variants": [
       {
-        "id": "neutral.01",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.01"
-        },
+        "id": "neutral",
         "text": {
-          "EN": "I'm down! I need help over here!",
-          "TL": "Bagsak ako! Kailangan ko ng tulong dito!"
-        }
-      },
-      {
-        "id": "neutral.02",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.02"
-        },
-        "text": {
-          "EN": "Can't stand! Someone help me up!",
-          "TL": "Hindi ako makatayo! Tulungan niyo akong makatayo!"
-        }
-      },
-      {
-        "id": "neutral.03",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.03"
-        },
-        "text": {
-          "EN": "I'm hit! Get over here!",
-          "TL": "Tinamaan ako! Halika rito!"
-        }
-      },
-      {
-        "id": "neutral.04",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.04"
-        },
-        "text": {
-          "EN": "Need medical attention immediately!",
-          "TL": "Kailangan ko ng agarang panggagamot!"
-        }
-      },
-      {
-        "id": "neutral.05",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.05"
-        },
-        "text": {
-          "EN": "Down and helpless! Don't leave me!",
-          "TL": "Bagsak at walang laban! Huwag niyo akong iwan!"
-        }
-      },
-      {
-        "id": "neutral.06",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.06"
-        },
-        "text": {
-          "EN": "I took a bad fall! Help me!",
-          "TL": "Napasama ang bagsak ko! Tulungan mo ako!"
-        }
-      },
-      {
-        "id": "neutral.07",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.07"
-        },
-        "text": {
-          "EN": "Can't get back on my feet! Help!",
-          "TL": "Hindi ako makabangon! Tulong!"
-        }
-      },
-      {
-        "id": "neutral.08",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.08"
-        },
-        "text": {
-          "EN": "Hurt bad! Over here, please!",
-          "TL": "Malubha ang tama ko! Dito, pakiusap!"
-        }
-      },
-      {
-        "id": "neutral.09",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.09"
-        },
-        "text": {
-          "EN": "I'm down on the ground! Need a hand!",
-          "TL": "Nasa sahig ako! Pasaklolo naman!"
-        }
-      },
-      {
-        "id": "neutral.10",
-        "metadata": {
-          "style": "neutral",
-          "textKey": "semantic.medical.distress.call.default.neutral.10"
-        },
-        "text": {
-          "EN": "Injured and stranded! Come help!",
-          "TL": "Sugatan at nastranded! Tulungan niyo ako!"
+          "EN": [
+            "I'm down! I need help over here!",
+            "Can't stand! Someone help me up!",
+            "I'm hit! Get over here!",
+            "Need medical attention immediately!",
+            "Down and helpless! Don't leave me!",
+            "I took a bad fall! Help me!",
+            "Can't get back on my feet! Help!",
+            "Hurt bad! Over here, please!",
+            "I'm down on the ground! Need a hand!",
+            "Injured and stranded! Come help!"
+          ],
+          "TL": [
+            "Bagsak ako! Kailangan ko ng tulong dito!",
+            "Hindi ako makatayo! Tulungan niyo akong makatayo!",
+            "Tinamaan ako! Halika rito!",
+            "Kailangan ko ng agarang panggagamot!",
+            "Bagsak at walang laban! Huwag niyo akong iwan!",
+            "Napasama ang bagsak ko! Tulungan mo ako!",
+            "Hindi ako makabangon! Tulong!",
+            "Malubha ang tama ko! Dito, pakiusap!",
+            "Nasa sahig ako! Pasaklolo naman!",
+            "Sugatan at nastranded! Tulungan niyo ako!"
+          ]
         }
       }
     ]
-  },
-  "namespace": "semantic.medical.distress.call",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

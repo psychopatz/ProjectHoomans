@@ -1,0 +1,54 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.kill.killer.practical",
+  "id": "blade",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/practical.json",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Blade did its job. Keep moving.",
+            "Clean cut. Check blade edge.",
+            "Down without wasting noise.",
+            "Quiet kill. Keep your eyes sharp.",
+            "Severed cleanly. Don't let your guard down.",
+            "One silent drop. Keep the pace.",
+            "Edge held up fine. Move ahead.",
+            "Target down quietly. Scan the hall.",
+            "No ammo burned. Good.",
+            "Dropped it silently. Watch the rear."
+          ],
+          "TL": [
+            "Ginawa ng talim ang trabaho nito. Tuloy.",
+            "Malinis na hiwa. Tignan ang talim.",
+            "Bagsak nang hindi gumagawa ng ingay.",
+            "Tahimik na patay. Panatilihing matalas ang mata.",
+            "Hiwa nang malinis. Huwag ibaba ang depensa.",
+            "Isang tahimik na pagbagsak. Tuloy ang hakbang.",
+            "Maayos pa ang talim. Pasulong.",
+            "Tahimik na naitumba ang target. Suriin ang pasilyo.",
+            "Walang balang nasayang. Maganda.",
+            "Tahimik na ibinagsak. Bantayan ang likuran."
+          ]
+        }
+      }
+    ]
+  }
+}

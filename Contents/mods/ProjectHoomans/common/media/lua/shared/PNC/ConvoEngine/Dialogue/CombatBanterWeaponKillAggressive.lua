@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
-        ["id"] = "semantic.combat.kill.killer.aggressive.axe_head_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.kill.killer.aggressive.axe_head",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Split that rotten head wide open.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.aggressive.axe_head.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Split that rotten head wide open.",
+                                        "Axe bit deep right into the skull.",
+                                        "Cleft in two. Stay in the dirt.",
+                                        "Buried the axe right between its ears.",
+                                        "Heavy swing. Done for good.",
+                                        "Crushed the crown with one chop.",
+                                        "That skull never stood a chance.",
+                                        "Broke right through bone.",
+                                        "Split it down to the neck.",
+                                        "One hard chop and it's over.",
+                                    },
+                                    ["TL"] = {
+                                        "Biyak na biyak ang bulok na ulo.",
+                                        "Bumaon nang malalim ang palakol sa bungo.",
+                                        "Biyak sa dalawa. Manatili ka sa lupa.",
+                                        "Ibaon ang palakol sa gitna ng tenga nito.",
+                                        "Mabigat na hataw. Tapos magpakailanman.",
+                                        "Durog ang tuktok sa isang taga.",
+                                        "Walang laban ang bungong 'yon.",
+                                        "Bumasag diretso sa buto.",
+                                        "Biyak hanggang leeg.",
+                                        "Isang malakas na taga at tapos na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.kill.killer.aggressive",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Split that rotten head wide open.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.aggressive.axe_head.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Split that rotten head wide open.",
+                            "Axe bit deep right into the skull.",
+                            "Cleft in two. Stay in the dirt.",
+                            "Buried the axe right between its ears.",
+                            "Heavy swing. Done for good.",
+                            "Crushed the crown with one chop.",
+                            "That skull never stood a chance.",
+                            "Broke right through bone.",
+                            "Split it down to the neck.",
+                            "One hard chop and it's over.",
+                        },
+                        ["TL"] = {
+                            "Biyak na biyak ang bulok na ulo.",
+                            "Bumaon nang malalim ang palakol sa bungo.",
+                            "Biyak sa dalawa. Manatili ka sa lupa.",
+                            "Ibaon ang palakol sa gitna ng tenga nito.",
+                            "Mabigat na hataw. Tapos magpakailanman.",
+                            "Durog ang tuktok sa isang taga.",
+                            "Walang laban ang bungong 'yon.",
+                            "Bumasag diretso sa buto.",
+                            "Biyak hanggang leeg.",
+                            "Isang malakas na taga at tapos na.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.kill.killer.aggressive.axe_head",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "axe_head_01",
-            ["sourceId"] = "semantic.combat.kill.killer.aggressive.axe_head_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head_01.json",
+            ["localId"] = "axe_head",
+            ["sourceId"] = "combat.kill.killer.aggressive.axe_head",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
-        ["namespace"] = "semantic.combat.kill.killer.aggressive",
+        ["namespace"] = "combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,150 +111,222 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.aggressive.axe_head_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Split that rotten head wide open.",
-                            },
-                            ["TL"] = {
-                                "Biyak na biyak ang bulok na ulo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Axe bit deep right into the skull.",
-                            },
-                            ["TL"] = {
-                                "Bumaon nang malalim ang palakol sa bungo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Cleft in two. Stay in the dirt.",
-                            },
-                            ["TL"] = {
-                                "Biyak sa dalawa. Manatili ka sa lupa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Buried the axe right between its ears.",
-                            },
-                            ["TL"] = {
-                                "Ibaon ang palakol sa gitna ng tenga nito.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Split that rotten head wide open.",
+                                        "Axe bit deep right into the skull.",
+                                        "Cleft in two. Stay in the dirt.",
+                                        "Buried the axe right between its ears.",
+                                        "Heavy swing. Done for good.",
+                                        "Crushed the crown with one chop.",
+                                        "That skull never stood a chance.",
+                                        "Broke right through bone.",
+                                        "Split it down to the neck.",
+                                        "One hard chop and it's over.",
+                                    },
+                                    ["TL"] = {
+                                        "Biyak na biyak ang bulok na ulo.",
+                                        "Bumaon nang malalim ang palakol sa bungo.",
+                                        "Biyak sa dalawa. Manatili ka sa lupa.",
+                                        "Ibaon ang palakol sa gitna ng tenga nito.",
+                                        "Mabigat na hataw. Tapos magpakailanman.",
+                                        "Durog ang tuktok sa isang taga.",
+                                        "Walang laban ang bungong 'yon.",
+                                        "Bumasag diretso sa buto.",
+                                        "Biyak hanggang leeg.",
+                                        "Isang malakas na taga at tapos na.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heavy swing. Done for good.",
-                            },
-                            ["TL"] = {
-                                "Mabigat na hataw. Tapos magpakailanman.",
-                            },
-                        },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.kill.killer.aggressive.axe_head",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Crushed the crown with one chop.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Durog ang tuktok sa isang taga.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That skull never stood a chance.",
-                            },
-                            ["TL"] = {
-                                "Walang laban ang bungong 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Broke right through bone.",
-                            },
-                            ["TL"] = {
-                                "Bumasag diretso sa buto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Split it down to the neck.",
-                            },
-                            ["TL"] = {
-                                "Biyak hanggang leeg.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One hard chop and it's over.",
-                            },
-                            ["TL"] = {
-                                "Isang malakas na taga at tapos na.",
-                            },
+                            ["fallback"] = "Split that rotten head wide open.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.kill.killer.aggressive.axe_head.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Split that rotten head wide open.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.aggressive.axe_head.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Split that rotten head wide open.",
+                        "Axe bit deep right into the skull.",
+                        "Cleft in two. Stay in the dirt.",
+                        "Buried the axe right between its ears.",
+                        "Heavy swing. Done for good.",
+                        "Crushed the crown with one chop.",
+                        "That skull never stood a chance.",
+                        "Broke right through bone.",
+                        "Split it down to the neck.",
+                        "One hard chop and it's over.",
+                    },
+                    ["TL"] = {
+                        "Biyak na biyak ang bulok na ulo.",
+                        "Bumaon nang malalim ang palakol sa bungo.",
+                        "Biyak sa dalawa. Manatili ka sa lupa.",
+                        "Ibaon ang palakol sa gitna ng tenga nito.",
+                        "Mabigat na hataw. Tapos magpakailanman.",
+                        "Durog ang tuktok sa isang taga.",
+                        "Walang laban ang bungong 'yon.",
+                        "Bumasag diretso sa buto.",
+                        "Biyak hanggang leeg.",
+                        "Isang malakas na taga at tapos na.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
-        ["id"] = "semantic.combat.kill.killer.aggressive.blade_head_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.kill.killer.aggressive.blade_head",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Took its head clean off.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.aggressive.blade_head.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Took its head clean off.",
+                                        "Split the skull wide open.",
+                                        "Severed the spine. Done.",
+                                        "Nothing stands up without a head.",
+                                        "Carved right through rotten bone.",
+                                        "Off with its neck. Stay down.",
+                                        "Sliced it down to the dirt.",
+                                        "Blade went straight through.",
+                                        "Head's gone. That one's not getting up.",
+                                        "Clean decapitation. Keep moving.",
+                                    },
+                                    ["TL"] = {
+                                        "Tanggal ang ulo.",
+                                        "Biyak ang bungo.",
+                                        "Naputol ang gulugod. Tapos.",
+                                        "Walang tatayo kapag walang ulo.",
+                                        "Bumaon diretso sa bulok na buto.",
+                                        "Putol ang leeg. Diyan ka lang.",
+                                        "Hiniwa hanggang bumagsak sa lupa.",
+                                        "Dire-diretso ang talim.",
+                                        "Wala nang ulo. Hindi na tatayo 'yan.",
+                                        "Malinis na pugot. Tuloy lang.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.kill.killer.aggressive",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Took its head clean off.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.aggressive.blade_head.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Took its head clean off.",
+                            "Split the skull wide open.",
+                            "Severed the spine. Done.",
+                            "Nothing stands up without a head.",
+                            "Carved right through rotten bone.",
+                            "Off with its neck. Stay down.",
+                            "Sliced it down to the dirt.",
+                            "Blade went straight through.",
+                            "Head's gone. That one's not getting up.",
+                            "Clean decapitation. Keep moving.",
+                        },
+                        ["TL"] = {
+                            "Tanggal ang ulo.",
+                            "Biyak ang bungo.",
+                            "Naputol ang gulugod. Tapos.",
+                            "Walang tatayo kapag walang ulo.",
+                            "Bumaon diretso sa bulok na buto.",
+                            "Putol ang leeg. Diyan ka lang.",
+                            "Hiniwa hanggang bumagsak sa lupa.",
+                            "Dire-diretso ang talim.",
+                            "Wala nang ulo. Hindi na tatayo 'yan.",
+                            "Malinis na pugot. Tuloy lang.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.kill.killer.aggressive.blade_head",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "blade_head_01",
-            ["sourceId"] = "semantic.combat.kill.killer.aggressive.blade_head_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head_01.json",
+            ["localId"] = "blade_head",
+            ["sourceId"] = "combat.kill.killer.aggressive.blade_head",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
-        ["namespace"] = "semantic.combat.kill.killer.aggressive",
+        ["namespace"] = "combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,150 +340,222 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.aggressive.blade_head_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Took its head clean off.",
-                            },
-                            ["TL"] = {
-                                "Tanggal ang ulo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Split the skull wide open.",
-                            },
-                            ["TL"] = {
-                                "Biyak ang bungo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Severed the spine. Done.",
-                            },
-                            ["TL"] = {
-                                "Naputol ang gulugod. Tapos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nothing stands up without a head.",
-                            },
-                            ["TL"] = {
-                                "Walang tatayo kapag walang ulo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Took its head clean off.",
+                                        "Split the skull wide open.",
+                                        "Severed the spine. Done.",
+                                        "Nothing stands up without a head.",
+                                        "Carved right through rotten bone.",
+                                        "Off with its neck. Stay down.",
+                                        "Sliced it down to the dirt.",
+                                        "Blade went straight through.",
+                                        "Head's gone. That one's not getting up.",
+                                        "Clean decapitation. Keep moving.",
+                                    },
+                                    ["TL"] = {
+                                        "Tanggal ang ulo.",
+                                        "Biyak ang bungo.",
+                                        "Naputol ang gulugod. Tapos.",
+                                        "Walang tatayo kapag walang ulo.",
+                                        "Bumaon diretso sa bulok na buto.",
+                                        "Putol ang leeg. Diyan ka lang.",
+                                        "Hiniwa hanggang bumagsak sa lupa.",
+                                        "Dire-diretso ang talim.",
+                                        "Wala nang ulo. Hindi na tatayo 'yan.",
+                                        "Malinis na pugot. Tuloy lang.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Carved right through rotten bone.",
-                            },
-                            ["TL"] = {
-                                "Bumaon diretso sa bulok na buto.",
-                            },
-                        },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.kill.killer.aggressive.blade_head",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Off with its neck. Stay down.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Putol ang leeg. Diyan ka lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sliced it down to the dirt.",
-                            },
-                            ["TL"] = {
-                                "Hiniwa hanggang bumagsak sa lupa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Blade went straight through.",
-                            },
-                            ["TL"] = {
-                                "Dire-diretso ang talim.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Head's gone. That one's not getting up.",
-                            },
-                            ["TL"] = {
-                                "Wala nang ulo. Hindi na tatayo 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clean decapitation. Keep moving.",
-                            },
-                            ["TL"] = {
-                                "Malinis na pugot. Tuloy lang.",
-                            },
+                            ["fallback"] = "Took its head clean off.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.kill.killer.aggressive.blade_head.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Took its head clean off.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.aggressive.blade_head.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Took its head clean off.",
+                        "Split the skull wide open.",
+                        "Severed the spine. Done.",
+                        "Nothing stands up without a head.",
+                        "Carved right through rotten bone.",
+                        "Off with its neck. Stay down.",
+                        "Sliced it down to the dirt.",
+                        "Blade went straight through.",
+                        "Head's gone. That one's not getting up.",
+                        "Clean decapitation. Keep moving.",
+                    },
+                    ["TL"] = {
+                        "Tanggal ang ulo.",
+                        "Biyak ang bungo.",
+                        "Naputol ang gulugod. Tapos.",
+                        "Walang tatayo kapag walang ulo.",
+                        "Bumaon diretso sa bulok na buto.",
+                        "Putol ang leeg. Diyan ka lang.",
+                        "Hiniwa hanggang bumagsak sa lupa.",
+                        "Dire-diretso ang talim.",
+                        "Wala nang ulo. Hindi na tatayo 'yan.",
+                        "Malinis na pugot. Tuloy lang.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
-        ["id"] = "semantic.combat.kill.killer.aggressive.blunt_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.kill.killer.aggressive.blunt",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Felt that one crack.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.aggressive.blunt.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Felt that one crack.",
+                                        "Crushed its skull to pieces.",
+                                        "Smashed that head like a melon.",
+                                        "Nothing gets up after a hit like that.",
+                                        "Broke every bone in its face.",
+                                        "Felt the impact straight up my arms.",
+                                        "Caved that rotten skull right in.",
+                                        "Heavy hit. Stay down.",
+                                        "Pounded that one into the floor.",
+                                        "Cracked wide open. Moving on.",
+                                    },
+                                    ["TL"] = {
+                                        "Ramdam ko ang pag-crack no'n.",
+                                        "Durog ang bungo sa pira-piraso.",
+                                        "Pinitpit ang ulo na parang pakwan.",
+                                        "Walang tatayo pagkatapos ng gano'ng hampas.",
+                                        "Basag ang bawat buto sa mukha.",
+                                        "Ramdam hanggang braso ang impact.",
+                                        "Lubog ang bulok na bungo papasok.",
+                                        "Mabigat na tama. Huwag ka nang babangon.",
+                                        "Ibinagsak sa sahig sa lakas ng palo.",
+                                        "Basag nang todo. Tuloy.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.kill.killer.aggressive",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Felt that one crack.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.aggressive.blunt.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Felt that one crack.",
+                            "Crushed its skull to pieces.",
+                            "Smashed that head like a melon.",
+                            "Nothing gets up after a hit like that.",
+                            "Broke every bone in its face.",
+                            "Felt the impact straight up my arms.",
+                            "Caved that rotten skull right in.",
+                            "Heavy hit. Stay down.",
+                            "Pounded that one into the floor.",
+                            "Cracked wide open. Moving on.",
+                        },
+                        ["TL"] = {
+                            "Ramdam ko ang pag-crack no'n.",
+                            "Durog ang bungo sa pira-piraso.",
+                            "Pinitpit ang ulo na parang pakwan.",
+                            "Walang tatayo pagkatapos ng gano'ng hampas.",
+                            "Basag ang bawat buto sa mukha.",
+                            "Ramdam hanggang braso ang impact.",
+                            "Lubog ang bulok na bungo papasok.",
+                            "Mabigat na tama. Huwag ka nang babangon.",
+                            "Ibinagsak sa sahig sa lakas ng palo.",
+                            "Basag nang todo. Tuloy.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.kill.killer.aggressive.blunt",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "blunt_01",
-            ["sourceId"] = "semantic.combat.kill.killer.aggressive.blunt_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt_01.json",
+            ["localId"] = "blunt",
+            ["sourceId"] = "combat.kill.killer.aggressive.blunt",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
-        ["namespace"] = "semantic.combat.kill.killer.aggressive",
+        ["namespace"] = "combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -339,150 +569,294 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.aggressive.blunt_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Felt that one crack.",
-                            },
-                            ["TL"] = {
-                                "Ramdam ko ang pag-crack no'n.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Crushed its skull to pieces.",
-                            },
-                            ["TL"] = {
-                                "Durog ang bungo sa pira-piraso.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Smashed that head like a melon.",
-                            },
-                            ["TL"] = {
-                                "Pinitpit ang ulo na parang pakwan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nothing gets up after a hit like that.",
-                            },
-                            ["TL"] = {
-                                "Walang tatayo pagkatapos ng gano'ng hampas.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Felt that one crack.",
+                                        "Crushed its skull to pieces.",
+                                        "Smashed that head like a melon.",
+                                        "Nothing gets up after a hit like that.",
+                                        "Broke every bone in its face.",
+                                        "Felt the impact straight up my arms.",
+                                        "Caved that rotten skull right in.",
+                                        "Heavy hit. Stay down.",
+                                        "Pounded that one into the floor.",
+                                        "Cracked wide open. Moving on.",
+                                    },
+                                    ["TL"] = {
+                                        "Ramdam ko ang pag-crack no'n.",
+                                        "Durog ang bungo sa pira-piraso.",
+                                        "Pinitpit ang ulo na parang pakwan.",
+                                        "Walang tatayo pagkatapos ng gano'ng hampas.",
+                                        "Basag ang bawat buto sa mukha.",
+                                        "Ramdam hanggang braso ang impact.",
+                                        "Lubog ang bulok na bungo papasok.",
+                                        "Mabigat na tama. Huwag ka nang babangon.",
+                                        "Ibinagsak sa sahig sa lakas ng palo.",
+                                        "Basag nang todo. Tuloy.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Broke every bone in its face.",
-                            },
-                            ["TL"] = {
-                                "Basag ang bawat buto sa mukha.",
-                            },
-                        },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.kill.killer.aggressive.blunt",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Felt the impact straight up my arms.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Ramdam hanggang braso ang impact.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Caved that rotten skull right in.",
-                            },
-                            ["TL"] = {
-                                "Lubog ang bulok na bungo papasok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Heavy hit. Stay down.",
-                            },
-                            ["TL"] = {
-                                "Mabigat na tama. Huwag ka nang babangon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Pounded that one into the floor.",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak sa sahig sa lakas ng palo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Cracked wide open. Moving on.",
-                            },
-                            ["TL"] = {
-                                "Basag nang todo. Tuloy.",
-                            },
+                            ["fallback"] = "Felt that one crack.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.kill.killer.aggressive.blunt.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Felt that one crack.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.aggressive.blunt.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Felt that one crack.",
+                        "Crushed its skull to pieces.",
+                        "Smashed that head like a melon.",
+                        "Nothing gets up after a hit like that.",
+                        "Broke every bone in its face.",
+                        "Felt the impact straight up my arms.",
+                        "Caved that rotten skull right in.",
+                        "Heavy hit. Stay down.",
+                        "Pounded that one into the floor.",
+                        "Cracked wide open. Moving on.",
+                    },
+                    ["TL"] = {
+                        "Ramdam ko ang pag-crack no'n.",
+                        "Durog ang bungo sa pira-piraso.",
+                        "Pinitpit ang ulo na parang pakwan.",
+                        "Walang tatayo pagkatapos ng gano'ng hampas.",
+                        "Basag ang bawat buto sa mukha.",
+                        "Ramdam hanggang braso ang impact.",
+                        "Lubog ang bulok na bungo papasok.",
+                        "Mabigat na tama. Huwag ka nang babangon.",
+                        "Ibinagsak sa sahig sa lakas ng palo.",
+                        "Basag nang todo. Tuloy.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
-        ["id"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_01",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.kill.killer.aggressive.firearm_high_named",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "This {slot.weapon.name} still shoots straight.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.aggressive.firearm_high_named.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "This {slot.weapon.name} still shoots straight.",
+                                        "Nothing beats this {slot.weapon.name} when it counts.",
+                                        "Good old {slot.weapon.name}. Never lets me down.",
+                                        "Told you this {slot.weapon.name} has stopping power.",
+                                        "That {slot.weapon.name} put it right in the dirt.",
+                                        "Clean work with the {slot.weapon.name}.",
+                                        "This {slot.weapon.name} punched right through.",
+                                        "Glad I had this {slot.weapon.name} ready.",
+                                        "One round from this {slot.weapon.name} is all it takes.",
+                                        "The {slot.weapon.name} tore right through its skull.",
+                                    },
+                                    ["TL"] = {
+                                        "Tuwid pa ring bumaril itong {slot.weapon.name}.",
+                                        "Walang tatalo sa {slot.weapon.name} na 'to kapag kailangan.",
+                                        "Maaasahang {slot.weapon.name}. Hindi ako binibigo.",
+                                        "Sabi ko sa'yo may lakas pumigil itong {slot.weapon.name}.",
+                                        "Ibinagsak agad ng {slot.weapon.name} sa lupa.",
+                                        "Malinis na trabaho gamit ang {slot.weapon.name}.",
+                                        "Tumagos agad itong {slot.weapon.name}.",
+                                        "Mabuti na lang at handa itong {slot.weapon.name}.",
+                                        "Isang bala lang mula sa {slot.weapon.name} na 'to, sapat na.",
+                                        "Winasak ng {slot.weapon.name} ang bungo nito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Right where I wanted it. Down.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.aggressive.firearm_high_named.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Right where I wanted it. Down.",
+                                        "Dropped it in one shot. Beautiful.",
+                                        "Right between the eyes. Got him.",
+                                        "That's how you put one down.",
+                                        "Dead on arrival. Love it.",
+                                        "Drilled that one clean.",
+                                        "Saw the opening and took it.",
+                                        "Dropped like a stone.",
+                                        "Target down. Who's next?",
+                                        "Put that lead right where it hurts.",
+                                    },
+                                    ["TL"] = {
+                                        "Eksakto sa gusto ko. Bagsak.",
+                                        "Bumagsak sa isang putok. Ayos.",
+                                        "Sa pagitan mismo ng mga mata. Sapul.",
+                                        "Ganyan magpabagsak ng isa.",
+                                        "Tigok agad. Ayos.",
+                                        "Sapul na sapul ang isang 'yon.",
+                                        "Nakakita ng butas at tinamaan agad.",
+                                        "Bumagsak na parang bato.",
+                                        "Bagsak ang target. Sino susunod?",
+                                        "Ipinasok ang tingga sa dapat kalagyan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.kill.killer.aggressive",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "This {slot.weapon.name} still shoots straight.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.aggressive.firearm_high_named.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "This {slot.weapon.name} still shoots straight.",
+                            "Nothing beats this {slot.weapon.name} when it counts.",
+                            "Good old {slot.weapon.name}. Never lets me down.",
+                            "Told you this {slot.weapon.name} has stopping power.",
+                            "That {slot.weapon.name} put it right in the dirt.",
+                            "Clean work with the {slot.weapon.name}.",
+                            "This {slot.weapon.name} punched right through.",
+                            "Glad I had this {slot.weapon.name} ready.",
+                            "One round from this {slot.weapon.name} is all it takes.",
+                            "The {slot.weapon.name} tore right through its skull.",
+                        },
+                        ["TL"] = {
+                            "Tuwid pa ring bumaril itong {slot.weapon.name}.",
+                            "Walang tatalo sa {slot.weapon.name} na 'to kapag kailangan.",
+                            "Maaasahang {slot.weapon.name}. Hindi ako binibigo.",
+                            "Sabi ko sa'yo may lakas pumigil itong {slot.weapon.name}.",
+                            "Ibinagsak agad ng {slot.weapon.name} sa lupa.",
+                            "Malinis na trabaho gamit ang {slot.weapon.name}.",
+                            "Tumagos agad itong {slot.weapon.name}.",
+                            "Mabuti na lang at handa itong {slot.weapon.name}.",
+                            "Isang bala lang mula sa {slot.weapon.name} na 'to, sapat na.",
+                            "Winasak ng {slot.weapon.name} ang bungo nito.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Right where I wanted it. Down.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.aggressive.firearm_high_named.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Right where I wanted it. Down.",
+                            "Dropped it in one shot. Beautiful.",
+                            "Right between the eyes. Got him.",
+                            "That's how you put one down.",
+                            "Dead on arrival. Love it.",
+                            "Drilled that one clean.",
+                            "Saw the opening and took it.",
+                            "Dropped like a stone.",
+                            "Target down. Who's next?",
+                            "Put that lead right where it hurts.",
+                        },
+                        ["TL"] = {
+                            "Eksakto sa gusto ko. Bagsak.",
+                            "Bumagsak sa isang putok. Ayos.",
+                            "Sa pagitan mismo ng mga mata. Sapul.",
+                            "Ganyan magpabagsak ng isa.",
+                            "Tigok agad. Ayos.",
+                            "Sapul na sapul ang isang 'yon.",
+                            "Nakakita ng butas at tinamaan agad.",
+                            "Bumagsak na parang bato.",
+                            "Bagsak ang target. Sino susunod?",
+                            "Ipinasok ang tingga sa dapat kalagyan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.kill.killer.aggressive.firearm_high_named",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "firearm_high_named_01",
-            ["sourceId"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_01.json",
+            ["localId"] = "firearm_high_named",
+            ["sourceId"] = "combat.kill.killer.aggressive.firearm_high_named",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
-        ["namespace"] = "semantic.combat.kill.killer.aggressive",
+        ["namespace"] = "combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -496,127 +870,114 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_01",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "This {slot.weapon.name} still shoots straight.",
-                            },
-                            ["TL"] = {
-                                "Tuwid pa ring bumaril itong {slot.weapon.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nothing beats this {slot.weapon.name} when it counts.",
-                            },
-                            ["TL"] = {
-                                "Walang tatalo sa {slot.weapon.name} na 'to kapag kailangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good old {slot.weapon.name}. Never lets me down.",
-                            },
-                            ["TL"] = {
-                                "Maaasahang {slot.weapon.name}. Hindi ako binibigo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Told you this {slot.weapon.name} has stopping power.",
-                            },
-                            ["TL"] = {
-                                "Sabi ko sa'yo may lakas pumigil itong {slot.weapon.name}.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "This {slot.weapon.name} still shoots straight.",
+                                        "Nothing beats this {slot.weapon.name} when it counts.",
+                                        "Good old {slot.weapon.name}. Never lets me down.",
+                                        "Told you this {slot.weapon.name} has stopping power.",
+                                        "That {slot.weapon.name} put it right in the dirt.",
+                                        "Clean work with the {slot.weapon.name}.",
+                                        "This {slot.weapon.name} punched right through.",
+                                        "Glad I had this {slot.weapon.name} ready.",
+                                        "One round from this {slot.weapon.name} is all it takes.",
+                                        "The {slot.weapon.name} tore right through its skull.",
+                                    },
+                                    ["TL"] = {
+                                        "Tuwid pa ring bumaril itong {slot.weapon.name}.",
+                                        "Walang tatalo sa {slot.weapon.name} na 'to kapag kailangan.",
+                                        "Maaasahang {slot.weapon.name}. Hindi ako binibigo.",
+                                        "Sabi ko sa'yo may lakas pumigil itong {slot.weapon.name}.",
+                                        "Ibinagsak agad ng {slot.weapon.name} sa lupa.",
+                                        "Malinis na trabaho gamit ang {slot.weapon.name}.",
+                                        "Tumagos agad itong {slot.weapon.name}.",
+                                        "Mabuti na lang at handa itong {slot.weapon.name}.",
+                                        "Isang bala lang mula sa {slot.weapon.name} na 'to, sapat na.",
+                                        "Winasak ng {slot.weapon.name} ang bungo nito.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That {slot.weapon.name} put it right in the dirt.",
-                            },
-                            ["TL"] = {
-                                "Ibinagsak agad ng {slot.weapon.name} sa lupa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Clean work with the {slot.weapon.name}.",
-                            },
-                            ["TL"] = {
-                                "Malinis na trabaho gamit ang {slot.weapon.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "This {slot.weapon.name} punched right through.",
-                            },
-                            ["TL"] = {
-                                "Tumagos agad itong {slot.weapon.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Glad I had this {slot.weapon.name} ready.",
-                            },
-                            ["TL"] = {
-                                "Mabuti na lang at handa itong {slot.weapon.name}.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "One round from this {slot.weapon.name} is all it takes.",
-                            },
-                            ["TL"] = {
-                                "Isang bala lang mula sa {slot.weapon.name} na 'to, sapat na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "The {slot.weapon.name} tore right through its skull.",
-                            },
-                            ["TL"] = {
-                                "Winasak ng {slot.weapon.name} ang bungo nito.",
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Right where I wanted it. Down.",
+                                        "Dropped it in one shot. Beautiful.",
+                                        "Right between the eyes. Got him.",
+                                        "That's how you put one down.",
+                                        "Dead on arrival. Love it.",
+                                        "Drilled that one clean.",
+                                        "Saw the opening and took it.",
+                                        "Dropped like a stone.",
+                                        "Target down. Who's next?",
+                                        "Put that lead right where it hurts.",
+                                    },
+                                    ["TL"] = {
+                                        "Eksakto sa gusto ko. Bagsak.",
+                                        "Bumagsak sa isang putok. Ayos.",
+                                        "Sa pagitan mismo ng mga mata. Sapul.",
+                                        "Ganyan magpabagsak ng isa.",
+                                        "Tigok agad. Ayos.",
+                                        "Sapul na sapul ang isang 'yon.",
+                                        "Nakakita ng butas at tinamaan agad.",
+                                        "Bumagsak na parang bato.",
+                                        "Bagsak ang target. Sino susunod?",
+                                        "Ipinasok ang tingga sa dapat kalagyan.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.kill.killer.aggressive.firearm_high_named",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "This {slot.weapon.name} still shoots straight.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.kill.killer.aggressive.firearm_high_named.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
             ["weapon"] = {
@@ -626,26 +987,180 @@ return {
                 ["type"] = "entity.item",
             },
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_01.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "This {slot.weapon.name} still shoots straight.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.aggressive.firearm_high_named.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "This {slot.weapon.name} still shoots straight.",
+                        "Nothing beats this {slot.weapon.name} when it counts.",
+                        "Good old {slot.weapon.name}. Never lets me down.",
+                        "Told you this {slot.weapon.name} has stopping power.",
+                        "That {slot.weapon.name} put it right in the dirt.",
+                        "Clean work with the {slot.weapon.name}.",
+                        "This {slot.weapon.name} punched right through.",
+                        "Glad I had this {slot.weapon.name} ready.",
+                        "One round from this {slot.weapon.name} is all it takes.",
+                        "The {slot.weapon.name} tore right through its skull.",
+                    },
+                    ["TL"] = {
+                        "Tuwid pa ring bumaril itong {slot.weapon.name}.",
+                        "Walang tatalo sa {slot.weapon.name} na 'to kapag kailangan.",
+                        "Maaasahang {slot.weapon.name}. Hindi ako binibigo.",
+                        "Sabi ko sa'yo may lakas pumigil itong {slot.weapon.name}.",
+                        "Ibinagsak agad ng {slot.weapon.name} sa lupa.",
+                        "Malinis na trabaho gamit ang {slot.weapon.name}.",
+                        "Tumagos agad itong {slot.weapon.name}.",
+                        "Mabuti na lang at handa itong {slot.weapon.name}.",
+                        "Isang bala lang mula sa {slot.weapon.name} na 'to, sapat na.",
+                        "Winasak ng {slot.weapon.name} ang bungo nito.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Right where I wanted it. Down.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.aggressive.firearm_high_named.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Right where I wanted it. Down.",
+                        "Dropped it in one shot. Beautiful.",
+                        "Right between the eyes. Got him.",
+                        "That's how you put one down.",
+                        "Dead on arrival. Love it.",
+                        "Drilled that one clean.",
+                        "Saw the opening and took it.",
+                        "Dropped like a stone.",
+                        "Target down. Who's next?",
+                        "Put that lead right where it hurts.",
+                    },
+                    ["TL"] = {
+                        "Eksakto sa gusto ko. Bagsak.",
+                        "Bumagsak sa isang putok. Ayos.",
+                        "Sa pagitan mismo ng mga mata. Sapul.",
+                        "Ganyan magpabagsak ng isa.",
+                        "Tigok agad. Ayos.",
+                        "Sapul na sapul ang isang 'yon.",
+                        "Nakakita ng butas at tinamaan agad.",
+                        "Bumagsak na parang bato.",
+                        "Bagsak ang target. Sino susunod?",
+                        "Ipinasok ang tingga sa dapat kalagyan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
-        ["id"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_02",
+        ["exchangeFamily"] = {
+            ["familyID"] = "combat.kill.killer.aggressive.spear",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That's why I like the reach.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.combat.kill.killer.aggressive.spear.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That's why I like the reach.",
+                                        "Punched right through the eye socket.",
+                                        "Kept my distance and pinned it down.",
+                                        "Spear through the brain. Done.",
+                                        "Stuck it before it could touch me.",
+                                        "Straight thrust. Dropped immediately.",
+                                        "Punctured the skull cleanly.",
+                                        "Pinned and dropped. Next target.",
+                                        "Reach wins every time.",
+                                        "Skewer through the forehead. Over.",
+                                    },
+                                    ["TL"] = {
+                                        "Kaya gusto ko ang abot nito.",
+                                        "Tumagos sa butas ng mata.",
+                                        "Dumistansya at itinarak pabagsak.",
+                                        "Sibat sa utak. Tapos.",
+                                        "Itinarak bago pa ako mahawakan.",
+                                        "Diretsong saksak. Bagsak agad.",
+                                        "Bumutas sa bungo nang malinis.",
+                                        "Tinuhog at ibinagsak. Susunod na target.",
+                                        "Laging panalo ang mahabang abot.",
+                                        "Tuhog sa noo. Tapos.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.kill.killer.aggressive",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That's why I like the reach.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.kill.killer.aggressive.spear.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That's why I like the reach.",
+                            "Punched right through the eye socket.",
+                            "Kept my distance and pinned it down.",
+                            "Spear through the brain. Done.",
+                            "Stuck it before it could touch me.",
+                            "Straight thrust. Dropped immediately.",
+                            "Punctured the skull cleanly.",
+                            "Pinned and dropped. Next target.",
+                            "Reach wins every time.",
+                            "Skewer through the forehead. Over.",
+                        },
+                        ["TL"] = {
+                            "Kaya gusto ko ang abot nito.",
+                            "Tumagos sa butas ng mata.",
+                            "Dumistansya at itinarak pabagsak.",
+                            "Sibat sa utak. Tapos.",
+                            "Itinarak bago pa ako mahawakan.",
+                            "Diretsong saksak. Bagsak agad.",
+                            "Bumutas sa bungo nang malinis.",
+                            "Tinuhog at ibinagsak. Susunod na target.",
+                            "Laging panalo ang mahabang abot.",
+                            "Tuhog sa noo. Tapos.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "combat.kill.killer.aggressive.spear",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "firearm_high_named_02",
-            ["sourceId"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_02",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_02.json",
+            ["localId"] = "spear",
+            ["sourceId"] = "combat.kill.killer.aggressive.spear",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
-        ["namespace"] = "semantic.combat.kill.killer.aggressive",
+        ["namespace"] = "combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -659,292 +1174,121 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_02",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right where I wanted it. Down.",
-                            },
-                            ["TL"] = {
-                                "Eksakto sa gusto ko. Bagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped it in one shot. Beautiful.",
-                            },
-                            ["TL"] = {
-                                "Bumagsak sa isang putok. Ayos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Right between the eyes. Got him.",
-                            },
-                            ["TL"] = {
-                                "Sa pagitan mismo ng mga mata. Sapul.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's how you put one down.",
-                            },
-                            ["TL"] = {
-                                "Ganyan magpabagsak ng isa.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That's why I like the reach.",
+                                        "Punched right through the eye socket.",
+                                        "Kept my distance and pinned it down.",
+                                        "Spear through the brain. Done.",
+                                        "Stuck it before it could touch me.",
+                                        "Straight thrust. Dropped immediately.",
+                                        "Punctured the skull cleanly.",
+                                        "Pinned and dropped. Next target.",
+                                        "Reach wins every time.",
+                                        "Skewer through the forehead. Over.",
+                                    },
+                                    ["TL"] = {
+                                        "Kaya gusto ko ang abot nito.",
+                                        "Tumagos sa butas ng mata.",
+                                        "Dumistansya at itinarak pabagsak.",
+                                        "Sibat sa utak. Tapos.",
+                                        "Itinarak bago pa ako mahawakan.",
+                                        "Diretsong saksak. Bagsak agad.",
+                                        "Bumutas sa bungo nang malinis.",
+                                        "Tinuhog at ibinagsak. Susunod na target.",
+                                        "Laging panalo ang mahabang abot.",
+                                        "Tuhog sa noo. Tapos.",
+                                    },
+                                },
                             },
                         },
                     },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dead on arrival. Love it.",
-                            },
-                            ["TL"] = {
-                                "Tigok agad. Ayos.",
-                            },
-                        },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.kill.killer.aggressive.spear",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
                     },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Drilled that one clean.",
+                    ["segments"] = {
+                        {
+                            ["args"] = {
                             },
-                            ["TL"] = {
-                                "Sapul na sapul ang isang 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Saw the opening and took it.",
-                            },
-                            ["TL"] = {
-                                "Nakakita ng butas at tinamaan agad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Dropped like a stone.",
-                            },
-                            ["TL"] = {
-                                "Bumagsak na parang bato.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Target down. Who's next?",
-                            },
-                            ["TL"] = {
-                                "Bagsak ang target. Sino susunod?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Put that lead right where it hurts.",
-                            },
-                            ["TL"] = {
-                                "Ipinasok ang tingga sa dapat kalagyan.",
-                            },
+                            ["fallback"] = "That's why I like the reach.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.combat.kill.killer.aggressive.spear.say_1",
                         },
                     },
                 },
             },
         },
-        ["references"] = {
-        },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_02.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
         },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_banter_weapon_kill_aggressive",
-        ["id"] = "semantic.combat.kill.killer.aggressive.spear_01",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "spear_01",
-            ["sourceId"] = "semantic.combat.kill.killer.aggressive.spear_01",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear_01.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
-        ["namespace"] = "semantic.combat.kill.killer.aggressive",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:combat_kill",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseTemplateID"] = "semantic.combat.kill.killer.aggressive.spear_01",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That's why I like the reach.",
-                            },
-                            ["TL"] = {
-                                "Kaya gusto ko ang abot nito.",
-                            },
-                        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That's why I like the reach.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.kill.killer.aggressive.spear.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That's why I like the reach.",
+                        "Punched right through the eye socket.",
+                        "Kept my distance and pinned it down.",
+                        "Spear through the brain. Done.",
+                        "Stuck it before it could touch me.",
+                        "Straight thrust. Dropped immediately.",
+                        "Punctured the skull cleanly.",
+                        "Pinned and dropped. Next target.",
+                        "Reach wins every time.",
+                        "Skewer through the forehead. Over.",
                     },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Punched right through the eye socket.",
-                            },
-                            ["TL"] = {
-                                "Tumagos sa butas ng mata.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Kept my distance and pinned it down.",
-                            },
-                            ["TL"] = {
-                                "Dumistansya at itinarak pabagsak.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Spear through the brain. Done.",
-                            },
-                            ["TL"] = {
-                                "Sibat sa utak. Tapos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Stuck it before it could touch me.",
-                            },
-                            ["TL"] = {
-                                "Itinarak bago pa ako mahawakan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Straight thrust. Dropped immediately.",
-                            },
-                            ["TL"] = {
-                                "Diretsong saksak. Bagsak agad.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Punctured the skull cleanly.",
-                            },
-                            ["TL"] = {
-                                "Bumutas sa bungo nang malinis.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Pinned and dropped. Next target.",
-                            },
-                            ["TL"] = {
-                                "Tinuhog at ibinagsak. Susunod na target.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Reach wins every time.",
-                            },
-                            ["TL"] = {
-                                "Laging panalo ang mahabang abot.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Skewer through the forehead. Over.",
-                            },
-                            ["TL"] = {
-                                "Tuhog sa noo. Tapos.",
-                            },
-                        },
+                    ["TL"] = {
+                        "Kaya gusto ko ang abot nito.",
+                        "Tumagos sa butas ng mata.",
+                        "Dumistansya at itinarak pabagsak.",
+                        "Sibat sa utak. Tapos.",
+                        "Itinarak bago pa ako mahawakan.",
+                        "Diretsong saksak. Bagsak agad.",
+                        "Bumutas sa bungo nang malinis.",
+                        "Tinuhog at ibinagsak. Susunod na target.",
+                        "Laging panalo ang mahabang abot.",
+                        "Tuhog sa noo. Tapos.",
                     },
                 },
+                ["variantID"] = "neutral",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear_01.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
         },
         ["when"] = nil,
     },

@@ -2,16 +2,102 @@
 return {
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.offer.fatigue.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.offer.fatigue",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "A little rest would help, but this isn't something I can count.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.offer.fatigue.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "A little rest would help, but this isn't something I can count.",
+                                        "What I really need is a safe place to shut my eyes.",
+                                        "Just need some downtime to recover my energy.",
+                                        "Rest is the only cure for this exhaustion right now.",
+                                        "If we can find a secure spot, a nap would do me good.",
+                                        "Fatigue is catching up. I just need a safe corner to rest.",
+                                        "No item can fix this tiredness. I just need to sleep.",
+                                        "Could use a couple hours off my feet, honestly.",
+                                        "Need to recharge my batteries before we do anything risky.",
+                                        "Time to rest would be the greatest gift right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
+                                        "Ang kailangan ko talaga ay ligtas na lugar para makatulog.",
+                                        "Kailangan ko lang ng kaunting pahinga para bumalik ang lakas ko.",
+                                        "Pahinga lang ang makakapagpagaling sa pagod na ito.",
+                                        "Kung makakahanap tayo ng ligtas na sulok, makakatulong ang idlip.",
+                                        "Inaabutan na ako ng antok. Kailangan ko lang ng ligtas na sulok.",
+                                        "Walang gamit ang makakagamot sa pagod na 'to. Tulog lang kailangan ko.",
+                                        "Kailangan ko ng ilang oras na hindi nakatayo, sa totoo lang.",
+                                        "Kailangang makabawi ng lakas bago tayo gumawa ng mapanganib.",
+                                        "Oras para magpahinga ang pinakamagandang maitutulong ngayon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.offer",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "A little rest would help, but this isn't something I can count.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.offer.fatigue.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "A little rest would help, but this isn't something I can count.",
+                            "What I really need is a safe place to shut my eyes.",
+                            "Just need some downtime to recover my energy.",
+                            "Rest is the only cure for this exhaustion right now.",
+                            "If we can find a secure spot, a nap would do me good.",
+                            "Fatigue is catching up. I just need a safe corner to rest.",
+                            "No item can fix this tiredness. I just need to sleep.",
+                            "Could use a couple hours off my feet, honestly.",
+                            "Need to recharge my batteries before we do anything risky.",
+                            "Time to rest would be the greatest gift right now.",
+                        },
+                        ["TL"] = {
+                            "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
+                            "Ang kailangan ko talaga ay ligtas na lugar para makatulog.",
+                            "Kailangan ko lang ng kaunting pahinga para bumalik ang lakas ko.",
+                            "Pahinga lang ang makakapagpagaling sa pagod na ito.",
+                            "Kung makakahanap tayo ng ligtas na sulok, makakatulong ang idlip.",
+                            "Inaabutan na ako ng antok. Kailangan ko lang ng ligtas na sulok.",
+                            "Walang gamit ang makakagamot sa pagod na 'to. Tulog lang kailangan ko.",
+                            "Kailangan ko ng ilang oras na hindi nakatayo, sa totoo lang.",
+                            "Kailangang makabawi ng lakas bago tayo gumawa ng mapanganib.",
+                            "Oras para magpahinga ang pinakamagandang maitutulong ngayon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.offer.fatigue",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.offer.fatigue.neutral",
+            ["localId"] = "fatigue",
+            ["sourceId"] = "question.needs.offer.fatigue",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.offer.fatigue",
+        ["namespace"] = "question.needs.offer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -25,127 +111,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.offer.fatigue",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A little rest would help, but this isn't something I can count.",
-                            },
-                            ["TL"] = {
-                                "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What I really need is a safe place to shut my eyes.",
-                            },
-                            ["TL"] = {
-                                "Ang kailangan ko talaga ay ligtas na lugar para makatulog.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just need some downtime to recover my energy.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko lang ng kaunting pahinga para bumalik ang lakas ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Rest is the only cure for this exhaustion right now.",
-                            },
-                            ["TL"] = {
-                                "Pahinga lang ang makakapagpagaling sa pagod na ito.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "If we can find a secure spot, a nap would do me good.",
-                            },
-                            ["TL"] = {
-                                "Kung makakahanap tayo ng ligtas na sulok, makakatulong ang idlip.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fatigue is catching up. I just need a safe corner to rest.",
-                            },
-                            ["TL"] = {
-                                "Inaabutan na ako ng antok. Kailangan ko lang ng ligtas na sulok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "No item can fix this tiredness. I just need to sleep.",
-                            },
-                            ["TL"] = {
-                                "Walang gamit ang makakagamot sa pagod na 'to. Tulog lang kailangan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Could use a couple hours off my feet, honestly.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng ilang oras na hindi nakatayo, sa totoo lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Need to recharge my batteries before we do anything risky.",
-                            },
-                            ["TL"] = {
-                                "Kailangang makabawi ng lakas bago tayo gumawa ng mapanganib.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Time to rest would be the greatest gift right now.",
-                            },
-                            ["TL"] = {
-                                "Oras para magpahinga ang pinakamagandang maitutulong ngayon.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "A little rest would help, but this isn't something I can count.",
+                                        "What I really need is a safe place to shut my eyes.",
+                                        "Just need some downtime to recover my energy.",
+                                        "Rest is the only cure for this exhaustion right now.",
+                                        "If we can find a secure spot, a nap would do me good.",
+                                        "Fatigue is catching up. I just need a safe corner to rest.",
+                                        "No item can fix this tiredness. I just need to sleep.",
+                                        "Could use a couple hours off my feet, honestly.",
+                                        "Need to recharge my batteries before we do anything risky.",
+                                        "Time to rest would be the greatest gift right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
+                                        "Ang kailangan ko talaga ay ligtas na lugar para makatulog.",
+                                        "Kailangan ko lang ng kaunting pahinga para bumalik ang lakas ko.",
+                                        "Pahinga lang ang makakapagpagaling sa pagod na ito.",
+                                        "Kung makakahanap tayo ng ligtas na sulok, makakatulong ang idlip.",
+                                        "Inaabutan na ako ng antok. Kailangan ko lang ng ligtas na sulok.",
+                                        "Walang gamit ang makakagamot sa pagod na 'to. Tulog lang kailangan ko.",
+                                        "Kailangan ko ng ilang oras na hindi nakatayo, sa totoo lang.",
+                                        "Kailangang makabawi ng lakas bago tayo gumawa ng mapanganib.",
+                                        "Oras para magpahinga ang pinakamagandang maitutulong ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.offer.fatigue",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "A little rest would help, but this isn't something I can count.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.offer.fatigue.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -155,20 +192,336 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "A little rest would help, but this isn't something I can count.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.offer.fatigue.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "A little rest would help, but this isn't something I can count.",
+                        "What I really need is a safe place to shut my eyes.",
+                        "Just need some downtime to recover my energy.",
+                        "Rest is the only cure for this exhaustion right now.",
+                        "If we can find a secure spot, a nap would do me good.",
+                        "Fatigue is catching up. I just need a safe corner to rest.",
+                        "No item can fix this tiredness. I just need to sleep.",
+                        "Could use a couple hours off my feet, honestly.",
+                        "Need to recharge my batteries before we do anything risky.",
+                        "Time to rest would be the greatest gift right now.",
+                    },
+                    ["TL"] = {
+                        "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
+                        "Ang kailangan ko talaga ay ligtas na lugar para makatulog.",
+                        "Kailangan ko lang ng kaunting pahinga para bumalik ang lakas ko.",
+                        "Pahinga lang ang makakapagpagaling sa pagod na ito.",
+                        "Kung makakahanap tayo ng ligtas na sulok, makakatulong ang idlip.",
+                        "Inaabutan na ako ng antok. Kailangan ko lang ng ligtas na sulok.",
+                        "Walang gamit ang makakagamot sa pagod na 'to. Tulog lang kailangan ko.",
+                        "Kailangan ko ng ilang oras na hindi nakatayo, sa totoo lang.",
+                        "Kailangang makabawi ng lakas bago tayo gumawa ng mapanganib.",
+                        "Oras para magpahinga ang pinakamagandang maitutulong ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.offer.hunger.guarded",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.offer.hunger",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Food would help, but I don't have an exact amount yet.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.offer.hunger.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Food would help, but I don't have an exact amount yet.",
+                                        "Any food you could spare would make a difference.",
+                                        "I'm definitely hungry. Whatever rations you have would be welcome.",
+                                        "A meal would be great, even if it's just something small.",
+                                        "I could really use some food right now.",
+                                        "My stomach is empty. Any edible supplies would help.",
+                                        "Food would keep me on my feet. I'll take whatever you offer.",
+                                        "Running low on food out here. Appreciate whatever you can share.",
+                                        "Haven't eaten a decent bite today. Food would go a long way.",
+                                        "Could use rations soon. Let's see what you've got.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
+                                        "Kahit anong pagkaing maibibigay mo ay malaking tulong.",
+                                        "Gutom na talaga ako. Anumang rasyon mayroon ka ay tatanggapin ko.",
+                                        "Maganda sanang makakain, kahit kaunti lang.",
+                                        "Kailangang-kailangan ko talaga ng pagkain ngayon.",
+                                        "Walang laman ang tiyan ko. Makakatulong ang anumang makakain.",
+                                        "Pagkain ang magpapanatili sa akin sa labas. Tatanggapin ko ang iaalok mo.",
+                                        "Nauubusan na ako ng pagkain. Salamat sa anumang maibabahagi mo.",
+                                        "Hindi pa ako kumakain nang maayos ngayon. Malaking tulong ang pagkain.",
+                                        "Kailangan ko ng rasyon agad. Tingnan natin kung anong mayroon ka.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "I need food. Keep your distance.",
+                                ["id"] = "guarded",
+                                ["templateID"] = "convo.question.needs.offer.hunger.say.1.guarded",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I need food. Keep your distance.",
+                                        "If that food has strings attached, forget it.",
+                                        "I'm hungry, but don't try anything funny.",
+                                        "Put the food down on the ground and step back.",
+                                        "I could use rations, but I won't owe you my life.",
+                                        "Is that sealed? I don't take spoiled or poisoned rations.",
+                                        "I need food, but keep your hands where I can see them.",
+                                        "Only take what you're offering freely. No hidden deals.",
+                                        "I'm starving, but I'm still armed. Remember that.",
+                                        "Leave the supplies right there. No sudden moves.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko ng pagkain. Lumayo ka.",
+                                        "Kung may kapalit ang pagkaing 'yan, huwag na lang.",
+                                        "Gutom ako, pero huwag kang magtangkang manloko.",
+                                        "Ilapag mo ang pagkain sa lupa at umatras ka.",
+                                        "Kailangan ko ng rasyon, pero hindi ko ibebenta ang sarili ko.",
+                                        "Selyado ba 'yan? Hindi ako kumakain ng panis o may lason.",
+                                        "Kailangan ko ng pagkain, pero ilagay ang kamay sa kita ko.",
+                                        "Kukunin ko lang kung bukal sa loob. Walang tagong kasunduan.",
+                                        "Gutom ako, pero may armas pa rin ako. Tandaan mo 'yan.",
+                                        "Iwan mo ang gamit diyan. Walang biglaang galaw.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "I need food.",
+                                ["id"] = "terse",
+                                ["templateID"] = "convo.question.needs.offer.hunger.say.1.terse",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I need food.",
+                                        "Hungry.",
+                                        "Got food?",
+                                        "Need rations.",
+                                        "Food helps.",
+                                        "Starving.",
+                                        "Spare a bite.",
+                                        "Any cans?",
+                                        "Food. Please.",
+                                        "Empty stomach.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko ng pagkain.",
+                                        "Gutom.",
+                                        "May pagkain?",
+                                        "Kailangan ng rasyon.",
+                                        "Makatutulong ang pagkain.",
+                                        "Gutom na gutom.",
+                                        "Penge ng pagkain.",
+                                        "May de-lata?",
+                                        "Pagkain. Pakiusap.",
+                                        "Walang laman ang tiyan.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Food would help, if you can spare it.",
+                                ["id"] = "warm",
+                                ["templateID"] = "convo.question.needs.offer.hunger.say.1.warm",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Food would help, if you can spare it.",
+                                        "I'd truly appreciate a bite to eat, friend, if you have extra.",
+                                        "You're very kind to offer. Some food would really lift my spirits.",
+                                        "I could definitely use a meal. Thank you for thinking of me.",
+                                        "Sharing rations is generous out here. I'd be grateful for anything.",
+                                        "A bit of food would mean the world right now, thank you.",
+                                        "If you've got food to share, I won't say no. You're a lifesaver.",
+                                        "I'm hungry, and your generosity means a lot. Thank you.",
+                                        "Happy to accept any food you can spare. Let's eat together.",
+                                        "Thank you for asking. A warm meal or small ration would be wonderful.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang pagkain, kung may maibibigay ka.",
+                                        "Lubos kong pasasalamatan ang makakain, kaibigan, kung may sobra ka.",
+                                        "Napakabait mong mag-alok. Talagang magpapagaan ng loob ko ang pagkain.",
+                                        "Kailangan ko nga ng makakain. Salamat sa pag-alala sa akin.",
+                                        "Napakabuting magbahagi ng rasyon dito. Masaya ako sa kahit ano.",
+                                        "Napakalaking bagay ng kahit kaunting pagkain ngayon, salamat.",
+                                        "Kung may maibabahagi kang pagkain, tatanggapin ko. Ligtas ako sa 'yo.",
+                                        "Gutom ako, at malaking bagay ang kabaitan mo. Salamat.",
+                                        "Masayang tatanggapin ang anumang sobra mo. Sabay tayong kumain.",
+                                        "Salamat sa pagtatanong. Napakaganda sana ng kahit simpleng pagkain.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.offer",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Food would help, but I don't have an exact amount yet.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.offer.hunger.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Food would help, but I don't have an exact amount yet.",
+                            "Any food you could spare would make a difference.",
+                            "I'm definitely hungry. Whatever rations you have would be welcome.",
+                            "A meal would be great, even if it's just something small.",
+                            "I could really use some food right now.",
+                            "My stomach is empty. Any edible supplies would help.",
+                            "Food would keep me on my feet. I'll take whatever you offer.",
+                            "Running low on food out here. Appreciate whatever you can share.",
+                            "Haven't eaten a decent bite today. Food would go a long way.",
+                            "Could use rations soon. Let's see what you've got.",
+                        },
+                        ["TL"] = {
+                            "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
+                            "Kahit anong pagkaing maibibigay mo ay malaking tulong.",
+                            "Gutom na talaga ako. Anumang rasyon mayroon ka ay tatanggapin ko.",
+                            "Maganda sanang makakain, kahit kaunti lang.",
+                            "Kailangang-kailangan ko talaga ng pagkain ngayon.",
+                            "Walang laman ang tiyan ko. Makakatulong ang anumang makakain.",
+                            "Pagkain ang magpapanatili sa akin sa labas. Tatanggapin ko ang iaalok mo.",
+                            "Nauubusan na ako ng pagkain. Salamat sa anumang maibabahagi mo.",
+                            "Hindi pa ako kumakain nang maayos ngayon. Malaking tulong ang pagkain.",
+                            "Kailangan ko ng rasyon agad. Tingnan natin kung anong mayroon ka.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "I need food. Keep your distance.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.offer.hunger.say.1.guarded",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I need food. Keep your distance.",
+                            "If that food has strings attached, forget it.",
+                            "I'm hungry, but don't try anything funny.",
+                            "Put the food down on the ground and step back.",
+                            "I could use rations, but I won't owe you my life.",
+                            "Is that sealed? I don't take spoiled or poisoned rations.",
+                            "I need food, but keep your hands where I can see them.",
+                            "Only take what you're offering freely. No hidden deals.",
+                            "I'm starving, but I'm still armed. Remember that.",
+                            "Leave the supplies right there. No sudden moves.",
+                        },
+                        ["TL"] = {
+                            "Kailangan ko ng pagkain. Lumayo ka.",
+                            "Kung may kapalit ang pagkaing 'yan, huwag na lang.",
+                            "Gutom ako, pero huwag kang magtangkang manloko.",
+                            "Ilapag mo ang pagkain sa lupa at umatras ka.",
+                            "Kailangan ko ng rasyon, pero hindi ko ibebenta ang sarili ko.",
+                            "Selyado ba 'yan? Hindi ako kumakain ng panis o may lason.",
+                            "Kailangan ko ng pagkain, pero ilagay ang kamay sa kita ko.",
+                            "Kukunin ko lang kung bukal sa loob. Walang tagong kasunduan.",
+                            "Gutom ako, pero may armas pa rin ako. Tandaan mo 'yan.",
+                            "Iwan mo ang gamit diyan. Walang biglaang galaw.",
+                        },
+                    },
+                    ["variantID"] = "guarded",
+                },
+                {
+                    ["fallback"] = "I need food.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.offer.hunger.say.1.terse",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I need food.",
+                            "Hungry.",
+                            "Got food?",
+                            "Need rations.",
+                            "Food helps.",
+                            "Starving.",
+                            "Spare a bite.",
+                            "Any cans?",
+                            "Food. Please.",
+                            "Empty stomach.",
+                        },
+                        ["TL"] = {
+                            "Kailangan ko ng pagkain.",
+                            "Gutom.",
+                            "May pagkain?",
+                            "Kailangan ng rasyon.",
+                            "Makatutulong ang pagkain.",
+                            "Gutom na gutom.",
+                            "Penge ng pagkain.",
+                            "May de-lata?",
+                            "Pagkain. Pakiusap.",
+                            "Walang laman ang tiyan.",
+                        },
+                    },
+                    ["variantID"] = "terse",
+                },
+                {
+                    ["fallback"] = "Food would help, if you can spare it.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.offer.hunger.say.1.warm",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Food would help, if you can spare it.",
+                            "I'd truly appreciate a bite to eat, friend, if you have extra.",
+                            "You're very kind to offer. Some food would really lift my spirits.",
+                            "I could definitely use a meal. Thank you for thinking of me.",
+                            "Sharing rations is generous out here. I'd be grateful for anything.",
+                            "A bit of food would mean the world right now, thank you.",
+                            "If you've got food to share, I won't say no. You're a lifesaver.",
+                            "I'm hungry, and your generosity means a lot. Thank you.",
+                            "Happy to accept any food you can spare. Let's eat together.",
+                            "Thank you for asking. A warm meal or small ration would be wonderful.",
+                        },
+                        ["TL"] = {
+                            "Makakatulong ang pagkain, kung may maibibigay ka.",
+                            "Lubos kong pasasalamatan ang makakain, kaibigan, kung may sobra ka.",
+                            "Napakabait mong mag-alok. Talagang magpapagaan ng loob ko ang pagkain.",
+                            "Kailangan ko nga ng makakain. Salamat sa pag-alala sa akin.",
+                            "Napakabuting magbahagi ng rasyon dito. Masaya ako sa kahit ano.",
+                            "Napakalaking bagay ng kahit kaunting pagkain ngayon, salamat.",
+                            "Kung may maibabahagi kang pagkain, tatanggapin ko. Ligtas ako sa 'yo.",
+                            "Gutom ako, at malaking bagay ang kabaitan mo. Salamat.",
+                            "Masayang tatanggapin ang anumang sobra mo. Sabay tayong kumain.",
+                            "Salamat sa pagtatanong. Napakaganda sana ng kahit simpleng pagkain.",
+                        },
+                    },
+                    ["variantID"] = "warm",
+                },
+            },
+        },
+        ["id"] = "question.needs.offer.hunger",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "guarded",
-            ["sourceId"] = "semantic.question.needs.offer.hunger.guarded",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[3]",
+            ["localId"] = "hunger",
+            ["sourceId"] = "question.needs.offer.hunger",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.offer.hunger",
+        ["namespace"] = "question.needs.offer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -182,127 +535,165 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.offer.hunger",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "guarded",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "guarded.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need food. Keep your distance.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Food would help, but I don't have an exact amount yet.",
+                                        "Any food you could spare would make a difference.",
+                                        "I'm definitely hungry. Whatever rations you have would be welcome.",
+                                        "A meal would be great, even if it's just something small.",
+                                        "I could really use some food right now.",
+                                        "My stomach is empty. Any edible supplies would help.",
+                                        "Food would keep me on my feet. I'll take whatever you offer.",
+                                        "Running low on food out here. Appreciate whatever you can share.",
+                                        "Haven't eaten a decent bite today. Food would go a long way.",
+                                        "Could use rations soon. Let's see what you've got.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
+                                        "Kahit anong pagkaing maibibigay mo ay malaking tulong.",
+                                        "Gutom na talaga ako. Anumang rasyon mayroon ka ay tatanggapin ko.",
+                                        "Maganda sanang makakain, kahit kaunti lang.",
+                                        "Kailangang-kailangan ko talaga ng pagkain ngayon.",
+                                        "Walang laman ang tiyan ko. Makakatulong ang anumang makakain.",
+                                        "Pagkain ang magpapanatili sa akin sa labas. Tatanggapin ko ang iaalok mo.",
+                                        "Nauubusan na ako ng pagkain. Salamat sa anumang maibabahagi mo.",
+                                        "Hindi pa ako kumakain nang maayos ngayon. Malaking tulong ang pagkain.",
+                                        "Kailangan ko ng rasyon agad. Tingnan natin kung anong mayroon ka.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Kailangan ko ng pagkain. Lumayo ka.",
+                            {
+                                ["id"] = "guarded",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I need food. Keep your distance.",
+                                        "If that food has strings attached, forget it.",
+                                        "I'm hungry, but don't try anything funny.",
+                                        "Put the food down on the ground and step back.",
+                                        "I could use rations, but I won't owe you my life.",
+                                        "Is that sealed? I don't take spoiled or poisoned rations.",
+                                        "I need food, but keep your hands where I can see them.",
+                                        "Only take what you're offering freely. No hidden deals.",
+                                        "I'm starving, but I'm still armed. Remember that.",
+                                        "Leave the supplies right there. No sudden moves.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko ng pagkain. Lumayo ka.",
+                                        "Kung may kapalit ang pagkaing 'yan, huwag na lang.",
+                                        "Gutom ako, pero huwag kang magtangkang manloko.",
+                                        "Ilapag mo ang pagkain sa lupa at umatras ka.",
+                                        "Kailangan ko ng rasyon, pero hindi ko ibebenta ang sarili ko.",
+                                        "Selyado ba 'yan? Hindi ako kumakain ng panis o may lason.",
+                                        "Kailangan ko ng pagkain, pero ilagay ang kamay sa kita ko.",
+                                        "Kukunin ko lang kung bukal sa loob. Walang tagong kasunduan.",
+                                        "Gutom ako, pero may armas pa rin ako. Tandaan mo 'yan.",
+                                        "Iwan mo ang gamit diyan. Walang biglaang galaw.",
+                                    },
+                                },
                             },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "If that food has strings attached, forget it.",
+                            {
+                                ["id"] = "terse",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I need food.",
+                                        "Hungry.",
+                                        "Got food?",
+                                        "Need rations.",
+                                        "Food helps.",
+                                        "Starving.",
+                                        "Spare a bite.",
+                                        "Any cans?",
+                                        "Food. Please.",
+                                        "Empty stomach.",
+                                    },
+                                    ["TL"] = {
+                                        "Kailangan ko ng pagkain.",
+                                        "Gutom.",
+                                        "May pagkain?",
+                                        "Kailangan ng rasyon.",
+                                        "Makatutulong ang pagkain.",
+                                        "Gutom na gutom.",
+                                        "Penge ng pagkain.",
+                                        "May de-lata?",
+                                        "Pagkain. Pakiusap.",
+                                        "Walang laman ang tiyan.",
+                                    },
+                                },
                             },
-                            ["TL"] = {
-                                "Kung may kapalit ang pagkaing 'yan, huwag na lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm hungry, but don't try anything funny.",
-                            },
-                            ["TL"] = {
-                                "Gutom ako, pero huwag kang magtangkang manloko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Put the food down on the ground and step back.",
-                            },
-                            ["TL"] = {
-                                "Ilapag mo ang pagkain sa lupa at umatras ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I could use rations, but I won't owe you my life.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng rasyon, pero hindi ko ibebenta ang sarili ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Is that sealed? I don't take spoiled or poisoned rations.",
-                            },
-                            ["TL"] = {
-                                "Selyado ba 'yan? Hindi ako kumakain ng panis o may lason.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need food, but keep your hands where I can see them.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng pagkain, pero ilagay ang kamay sa kita ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Only take what you're offering freely. No hidden deals.",
-                            },
-                            ["TL"] = {
-                                "Kukunin ko lang kung bukal sa loob. Walang tagong kasunduan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm starving, but I'm still armed. Remember that.",
-                            },
-                            ["TL"] = {
-                                "Gutom ako, pero may armas pa rin ako. Tandaan mo 'yan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "guarded.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Leave the supplies right there. No sudden moves.",
-                            },
-                            ["TL"] = {
-                                "Iwan mo ang gamit diyan. Walang biglaang galaw.",
+                            {
+                                ["id"] = "warm",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Food would help, if you can spare it.",
+                                        "I'd truly appreciate a bite to eat, friend, if you have extra.",
+                                        "You're very kind to offer. Some food would really lift my spirits.",
+                                        "I could definitely use a meal. Thank you for thinking of me.",
+                                        "Sharing rations is generous out here. I'd be grateful for anything.",
+                                        "A bit of food would mean the world right now, thank you.",
+                                        "If you've got food to share, I won't say no. You're a lifesaver.",
+                                        "I'm hungry, and your generosity means a lot. Thank you.",
+                                        "Happy to accept any food you can spare. Let's eat together.",
+                                        "Thank you for asking. A warm meal or small ration would be wonderful.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang pagkain, kung may maibibigay ka.",
+                                        "Lubos kong pasasalamatan ang makakain, kaibigan, kung may sobra ka.",
+                                        "Napakabait mong mag-alok. Talagang magpapagaan ng loob ko ang pagkain.",
+                                        "Kailangan ko nga ng makakain. Salamat sa pag-alala sa akin.",
+                                        "Napakabuting magbahagi ng rasyon dito. Masaya ako sa kahit ano.",
+                                        "Napakalaking bagay ng kahit kaunting pagkain ngayon, salamat.",
+                                        "Kung may maibabahagi kang pagkain, tatanggapin ko. Ligtas ako sa 'yo.",
+                                        "Gutom ako, at malaking bagay ang kabaitan mo. Salamat.",
+                                        "Masayang tatanggapin ang anumang sobra mo. Sabay tayong kumain.",
+                                        "Salamat sa pagtatanong. Napakaganda sana ng kahit simpleng pagkain.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.offer.hunger",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Food would help, but I don't have an exact amount yet.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.offer.hunger.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -312,491 +703,240 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Food would help, but I don't have an exact amount yet.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.offer.hunger.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Food would help, but I don't have an exact amount yet.",
+                        "Any food you could spare would make a difference.",
+                        "I'm definitely hungry. Whatever rations you have would be welcome.",
+                        "A meal would be great, even if it's just something small.",
+                        "I could really use some food right now.",
+                        "My stomach is empty. Any edible supplies would help.",
+                        "Food would keep me on my feet. I'll take whatever you offer.",
+                        "Running low on food out here. Appreciate whatever you can share.",
+                        "Haven't eaten a decent bite today. Food would go a long way.",
+                        "Could use rations soon. Let's see what you've got.",
+                    },
+                    ["TL"] = {
+                        "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
+                        "Kahit anong pagkaing maibibigay mo ay malaking tulong.",
+                        "Gutom na talaga ako. Anumang rasyon mayroon ka ay tatanggapin ko.",
+                        "Maganda sanang makakain, kahit kaunti lang.",
+                        "Kailangang-kailangan ko talaga ng pagkain ngayon.",
+                        "Walang laman ang tiyan ko. Makakatulong ang anumang makakain.",
+                        "Pagkain ang magpapanatili sa akin sa labas. Tatanggapin ko ang iaalok mo.",
+                        "Nauubusan na ako ng pagkain. Salamat sa anumang maibabahagi mo.",
+                        "Hindi pa ako kumakain nang maayos ngayon. Malaking tulong ang pagkain.",
+                        "Kailangan ko ng rasyon agad. Tingnan natin kung anong mayroon ka.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "I need food. Keep your distance.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.offer.hunger.say.1.guarded",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I need food. Keep your distance.",
+                        "If that food has strings attached, forget it.",
+                        "I'm hungry, but don't try anything funny.",
+                        "Put the food down on the ground and step back.",
+                        "I could use rations, but I won't owe you my life.",
+                        "Is that sealed? I don't take spoiled or poisoned rations.",
+                        "I need food, but keep your hands where I can see them.",
+                        "Only take what you're offering freely. No hidden deals.",
+                        "I'm starving, but I'm still armed. Remember that.",
+                        "Leave the supplies right there. No sudden moves.",
+                    },
+                    ["TL"] = {
+                        "Kailangan ko ng pagkain. Lumayo ka.",
+                        "Kung may kapalit ang pagkaing 'yan, huwag na lang.",
+                        "Gutom ako, pero huwag kang magtangkang manloko.",
+                        "Ilapag mo ang pagkain sa lupa at umatras ka.",
+                        "Kailangan ko ng rasyon, pero hindi ko ibebenta ang sarili ko.",
+                        "Selyado ba 'yan? Hindi ako kumakain ng panis o may lason.",
+                        "Kailangan ko ng pagkain, pero ilagay ang kamay sa kita ko.",
+                        "Kukunin ko lang kung bukal sa loob. Walang tagong kasunduan.",
+                        "Gutom ako, pero may armas pa rin ako. Tandaan mo 'yan.",
+                        "Iwan mo ang gamit diyan. Walang biglaang galaw.",
+                    },
+                },
+                ["variantID"] = "guarded",
+            },
+            {
+                ["fallback"] = "I need food.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.offer.hunger.say.1.terse",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I need food.",
+                        "Hungry.",
+                        "Got food?",
+                        "Need rations.",
+                        "Food helps.",
+                        "Starving.",
+                        "Spare a bite.",
+                        "Any cans?",
+                        "Food. Please.",
+                        "Empty stomach.",
+                    },
+                    ["TL"] = {
+                        "Kailangan ko ng pagkain.",
+                        "Gutom.",
+                        "May pagkain?",
+                        "Kailangan ng rasyon.",
+                        "Makatutulong ang pagkain.",
+                        "Gutom na gutom.",
+                        "Penge ng pagkain.",
+                        "May de-lata?",
+                        "Pagkain. Pakiusap.",
+                        "Walang laman ang tiyan.",
+                    },
+                },
+                ["variantID"] = "terse",
+            },
+            {
+                ["fallback"] = "Food would help, if you can spare it.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.offer.hunger.say.1.warm",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Food would help, if you can spare it.",
+                        "I'd truly appreciate a bite to eat, friend, if you have extra.",
+                        "You're very kind to offer. Some food would really lift my spirits.",
+                        "I could definitely use a meal. Thank you for thinking of me.",
+                        "Sharing rations is generous out here. I'd be grateful for anything.",
+                        "A bit of food would mean the world right now, thank you.",
+                        "If you've got food to share, I won't say no. You're a lifesaver.",
+                        "I'm hungry, and your generosity means a lot. Thank you.",
+                        "Happy to accept any food you can spare. Let's eat together.",
+                        "Thank you for asking. A warm meal or small ration would be wonderful.",
+                    },
+                    ["TL"] = {
+                        "Makakatulong ang pagkain, kung may maibibigay ka.",
+                        "Lubos kong pasasalamatan ang makakain, kaibigan, kung may sobra ka.",
+                        "Napakabait mong mag-alok. Talagang magpapagaan ng loob ko ang pagkain.",
+                        "Kailangan ko nga ng makakain. Salamat sa pag-alala sa akin.",
+                        "Napakabuting magbahagi ng rasyon dito. Masaya ako sa kahit ano.",
+                        "Napakalaking bagay ng kahit kaunting pagkain ngayon, salamat.",
+                        "Kung may maibabahagi kang pagkain, tatanggapin ko. Ligtas ako sa 'yo.",
+                        "Gutom ako, at malaking bagay ang kabaitan mo. Salamat.",
+                        "Masayang tatanggapin ang anumang sobra mo. Sabay tayong kumain.",
+                        "Salamat sa pagtatanong. Napakaganda sana ng kahit simpleng pagkain.",
+                    },
+                },
+                ["variantID"] = "warm",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.offer.hunger.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.offer.hunger.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[0]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.offer.hunger",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:conversation_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.offer.hunger",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Food would help, but I don't have an exact amount yet.",
-                            },
-                            ["TL"] = {
-                                "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Any food you could spare would make a difference.",
-                            },
-                            ["TL"] = {
-                                "Kahit anong pagkaing maibibigay mo ay malaking tulong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm definitely hungry. Whatever rations you have would be welcome.",
-                            },
-                            ["TL"] = {
-                                "Gutom na talaga ako. Anumang rasyon mayroon ka ay tatanggapin ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A meal would be great, even if it's just something small.",
-                            },
-                            ["TL"] = {
-                                "Maganda sanang makakain, kahit kaunti lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I could really use some food right now.",
-                            },
-                            ["TL"] = {
-                                "Kailangang-kailangan ko talaga ng pagkain ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "My stomach is empty. Any edible supplies would help.",
-                            },
-                            ["TL"] = {
-                                "Walang laman ang tiyan ko. Makakatulong ang anumang makakain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Food would keep me on my feet. I'll take whatever you offer.",
-                            },
-                            ["TL"] = {
-                                "Pagkain ang magpapanatili sa akin sa labas. Tatanggapin ko ang iaalok mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Running low on food out here. Appreciate whatever you can share.",
-                            },
-                            ["TL"] = {
-                                "Nauubusan na ako ng pagkain. Salamat sa anumang maibabahagi mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Haven't eaten a decent bite today. Food would go a long way.",
-                            },
-                            ["TL"] = {
-                                "Hindi pa ako kumakain nang maayos ngayon. Malaking tulong ang pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Could use rations soon. Let's see what you've got.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng rasyon agad. Tingnan natin kung anong mayroon ka.",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.offer.thirst",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Water would help, but I don't have an exact amount yet.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.offer.thirst.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Water would help, but I don't have an exact amount yet.",
+                                        "I could really use a clean drink of water.",
+                                        "Any spare water you have would be a big relief.",
+                                        "Thirsty as can be. A bottle or canteen would help.",
+                                        "My throat is completely parched. Water would do wonders.",
+                                        "Need water soon before dehydration sets in.",
+                                        "If you've got extra water on you, I'll take it.",
+                                        "A few sips of clean water would keep me walking.",
+                                        "Desperate for a drink today. Anything you can spare?",
+                                        "Fresh water is life out here. I'd gladly take some.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon.",
+                                        "Kailangang-kailangan ko talaga ng malinis na maiinom na tubig.",
+                                        "Anumang sobrang tubig na mayroon ka ay malaking ginhawa.",
+                                        "Uhaw na uhaw ako. Makakatulong ang botelya o lalagyan.",
+                                        "Tuyong-tuyo na ang lalamunan ko. Malaking tulong ang tubig.",
+                                        "Kailangan ko ng tubig bago ako maubusan ng likido.",
+                                        "Kung may sobra kang tubig sa bag mo, kukunin ko.",
+                                        "Ilang lagok ng malinis na tubig ang magpapatuloy sa akin.",
+                                        "Uhaw na uhaw ako ngayong araw. May maibibigay ka ba?",
+                                        "Buhay ang malinis na tubig dito. Masaya akong tatanggap.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.offer.hunger.terse",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "terse",
-            ["sourceId"] = "semantic.question.needs.offer.hunger.terse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[2]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.offer.hunger",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:conversation_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.offer.hunger",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "terse",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "terse.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I need food.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng pagkain.",
-                            },
+            ["namespace"] = "question.needs.offer",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Water would help, but I don't have an exact amount yet.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.offer.thirst.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Water would help, but I don't have an exact amount yet.",
+                            "I could really use a clean drink of water.",
+                            "Any spare water you have would be a big relief.",
+                            "Thirsty as can be. A bottle or canteen would help.",
+                            "My throat is completely parched. Water would do wonders.",
+                            "Need water soon before dehydration sets in.",
+                            "If you've got extra water on you, I'll take it.",
+                            "A few sips of clean water would keep me walking.",
+                            "Desperate for a drink today. Anything you can spare?",
+                            "Fresh water is life out here. I'd gladly take some.",
+                        },
+                        ["TL"] = {
+                            "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon.",
+                            "Kailangang-kailangan ko talaga ng malinis na maiinom na tubig.",
+                            "Anumang sobrang tubig na mayroon ka ay malaking ginhawa.",
+                            "Uhaw na uhaw ako. Makakatulong ang botelya o lalagyan.",
+                            "Tuyong-tuyo na ang lalamunan ko. Malaking tulong ang tubig.",
+                            "Kailangan ko ng tubig bago ako maubusan ng likido.",
+                            "Kung may sobra kang tubig sa bag mo, kukunin ko.",
+                            "Ilang lagok ng malinis na tubig ang magpapatuloy sa akin.",
+                            "Uhaw na uhaw ako ngayong araw. May maibibigay ka ba?",
+                            "Buhay ang malinis na tubig dito. Masaya akong tatanggap.",
                         },
                     },
-                    {
-                        ["id"] = "terse.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hungry.",
-                            },
-                            ["TL"] = {
-                                "Gutom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Got food?",
-                            },
-                            ["TL"] = {
-                                "May pagkain?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Need rations.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ng rasyon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Food helps.",
-                            },
-                            ["TL"] = {
-                                "Makatutulong ang pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Starving.",
-                            },
-                            ["TL"] = {
-                                "Gutom na gutom.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Spare a bite.",
-                            },
-                            ["TL"] = {
-                                "Penge ng pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Any cans?",
-                            },
-                            ["TL"] = {
-                                "May de-lata?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Food. Please.",
-                            },
-                            ["TL"] = {
-                                "Pagkain. Pakiusap.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "terse.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Empty stomach.",
-                            },
-                            ["TL"] = {
-                                "Walang laman ang tiyan.",
-                            },
-                        },
-                    },
+                    ["variantID"] = "neutral",
                 },
             },
         },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.offer.hunger.warm",
+        ["id"] = "question.needs.offer.thirst",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "warm",
-            ["sourceId"] = "semantic.question.needs.offer.hunger.warm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[1]",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.offer.hunger",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:conversation_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.offer.hunger",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "warm",
-            },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "warm.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Food would help, if you can spare it.",
-                            },
-                            ["TL"] = {
-                                "Makakatulong ang pagkain, kung may maibibigay ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'd truly appreciate a bite to eat, friend, if you have extra.",
-                            },
-                            ["TL"] = {
-                                "Lubos kong pasasalamatan ang makakain, kaibigan, kung may sobra ka.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "You're very kind to offer. Some food would really lift my spirits.",
-                            },
-                            ["TL"] = {
-                                "Napakabait mong mag-alok. Talagang magpapagaan ng loob ko ang pagkain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I could definitely use a meal. Thank you for thinking of me.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko nga ng makakain. Salamat sa pag-alala sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sharing rations is generous out here. I'd be grateful for anything.",
-                            },
-                            ["TL"] = {
-                                "Napakabuting magbahagi ng rasyon dito. Masaya ako sa kahit ano.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A bit of food would mean the world right now, thank you.",
-                            },
-                            ["TL"] = {
-                                "Napakalaking bagay ng kahit kaunting pagkain ngayon, salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "If you've got food to share, I won't say no. You're a lifesaver.",
-                            },
-                            ["TL"] = {
-                                "Kung may maibabahagi kang pagkain, tatanggapin ko. Ligtas ako sa 'yo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm hungry, and your generosity means a lot. Thank you.",
-                            },
-                            ["TL"] = {
-                                "Gutom ako, at malaking bagay ang kabaitan mo. Salamat.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Happy to accept any food you can spare. Let's eat together.",
-                            },
-                            ["TL"] = {
-                                "Masayang tatanggapin ang anumang sobra mo. Sabay tayong kumain.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "warm.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thank you for asking. A warm meal or small ration would be wonderful.",
-                            },
-                            ["TL"] = {
-                                "Salamat sa pagtatanong. Napakaganda sana ng kahit simpleng pagkain.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.offer.thirst.neutral",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.offer.thirst.neutral",
+            ["localId"] = "thirst",
+            ["sourceId"] = "question.needs.offer.thirst",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_thirst.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.offer.thirst",
+        ["namespace"] = "question.needs.offer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -810,127 +950,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.offer.thirst",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Water would help, but I don't have an exact amount yet.",
-                            },
-                            ["TL"] = {
-                                "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I could really use a clean drink of water.",
-                            },
-                            ["TL"] = {
-                                "Kailangang-kailangan ko talaga ng malinis na maiinom na tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Any spare water you have would be a big relief.",
-                            },
-                            ["TL"] = {
-                                "Anumang sobrang tubig na mayroon ka ay malaking ginhawa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Thirsty as can be. A bottle or canteen would help.",
-                            },
-                            ["TL"] = {
-                                "Uhaw na uhaw ako. Makakatulong ang botelya o lalagyan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "My throat is completely parched. Water would do wonders.",
-                            },
-                            ["TL"] = {
-                                "Tuyong-tuyo na ang lalamunan ko. Malaking tulong ang tubig.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Need water soon before dehydration sets in.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng tubig bago ako maubusan ng likido.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "If you've got extra water on you, I'll take it.",
-                            },
-                            ["TL"] = {
-                                "Kung may sobra kang tubig sa bag mo, kukunin ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A few sips of clean water would keep me walking.",
-                            },
-                            ["TL"] = {
-                                "Ilang lagok ng malinis na tubig ang magpapatuloy sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Desperate for a drink today. Anything you can spare?",
-                            },
-                            ["TL"] = {
-                                "Uhaw na uhaw ako ngayong araw. May maibibigay ka ba?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Fresh water is life out here. I'd gladly take some.",
-                            },
-                            ["TL"] = {
-                                "Buhay ang malinis na tubig dito. Masaya akong tatanggap.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Water would help, but I don't have an exact amount yet.",
+                                        "I could really use a clean drink of water.",
+                                        "Any spare water you have would be a big relief.",
+                                        "Thirsty as can be. A bottle or canteen would help.",
+                                        "My throat is completely parched. Water would do wonders.",
+                                        "Need water soon before dehydration sets in.",
+                                        "If you've got extra water on you, I'll take it.",
+                                        "A few sips of clean water would keep me walking.",
+                                        "Desperate for a drink today. Anything you can spare?",
+                                        "Fresh water is life out here. I'd gladly take some.",
+                                    },
+                                    ["TL"] = {
+                                        "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon.",
+                                        "Kailangang-kailangan ko talaga ng malinis na maiinom na tubig.",
+                                        "Anumang sobrang tubig na mayroon ka ay malaking ginhawa.",
+                                        "Uhaw na uhaw ako. Makakatulong ang botelya o lalagyan.",
+                                        "Tuyong-tuyo na ang lalamunan ko. Malaking tulong ang tubig.",
+                                        "Kailangan ko ng tubig bago ako maubusan ng likido.",
+                                        "Kung may sobra kang tubig sa bag mo, kukunin ko.",
+                                        "Ilang lagok ng malinis na tubig ang magpapatuloy sa akin.",
+                                        "Uhaw na uhaw ako ngayong araw. May maibibigay ka ba?",
+                                        "Buhay ang malinis na tubig dito. Masaya akong tatanggap.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.offer.thirst",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Water would help, but I don't have an exact amount yet.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.offer.thirst.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -940,20 +1031,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Water would help, but I don't have an exact amount yet.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.offer.thirst.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Water would help, but I don't have an exact amount yet.",
+                        "I could really use a clean drink of water.",
+                        "Any spare water you have would be a big relief.",
+                        "Thirsty as can be. A bottle or canteen would help.",
+                        "My throat is completely parched. Water would do wonders.",
+                        "Need water soon before dehydration sets in.",
+                        "If you've got extra water on you, I'll take it.",
+                        "A few sips of clean water would keep me walking.",
+                        "Desperate for a drink today. Anything you can spare?",
+                        "Fresh water is life out here. I'd gladly take some.",
+                    },
+                    ["TL"] = {
+                        "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon.",
+                        "Kailangang-kailangan ko talaga ng malinis na maiinom na tubig.",
+                        "Anumang sobrang tubig na mayroon ka ay malaking ginhawa.",
+                        "Uhaw na uhaw ako. Makakatulong ang botelya o lalagyan.",
+                        "Tuyong-tuyo na ang lalamunan ko. Malaking tulong ang tubig.",
+                        "Kailangan ko ng tubig bago ako maubusan ng likido.",
+                        "Kung may sobra kang tubig sa bag mo, kukunin ko.",
+                        "Ilang lagok ng malinis na tubig ang magpapatuloy sa akin.",
+                        "Uhaw na uhaw ako ngayong araw. May maibibigay ka ba?",
+                        "Buhay ang malinis na tubig dito. Masaya akong tatanggap.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.offer.unknown.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.offer.unknown",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I don't know what I need right now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.offer.unknown.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I don't know what I need right now.",
+                                        "Hard to say what would help most at the moment.",
+                                        "Not entirely sure what supplies I'm missing yet.",
+                                        "Need a minute to take inventory of my situation.",
+                                        "Can't pinpoint what I need right now. Let me check my bag.",
+                                        "Nothing specific comes to mind right this second.",
+                                        "Unsure. Let me get my thoughts together first.",
+                                        "I'm okay for now, or at least nothing urgent stands out.",
+                                        "Not sure what to ask for. What do you have available?",
+                                        "Can't tell what would help most right now. Ask me later.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko alam kung ano ang kailangan ko ngayon.",
+                                        "Mahirap sabihin kung ano ang pinakakailangan sa ngayon.",
+                                        "Hindi pa ako sigurado kung anong gamit ang kulang sa akin.",
+                                        "Kailangan ko ng sandali para alamin ang sitwasyon ko.",
+                                        "Hindi ko masabi kung anong kailangan ngayon. Tingnan ko muna gamit ko.",
+                                        "Walang partikular na pumapasok sa isip ko sa ngayon.",
+                                        "Hindi sigurado. Ayusin ko muna ang mga iniisip ko.",
+                                        "Maayos pa naman sa ngayon, o walang agarang kailangan.",
+                                        "Hindi ko alam kung anong hihingin. Anong mayroon ka?",
+                                        "Hindi ko masabi kung anong makakatulong ngayon. Tanungin mo ako mamaya.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.offer",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I don't know what I need right now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.offer.unknown.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I don't know what I need right now.",
+                            "Hard to say what would help most at the moment.",
+                            "Not entirely sure what supplies I'm missing yet.",
+                            "Need a minute to take inventory of my situation.",
+                            "Can't pinpoint what I need right now. Let me check my bag.",
+                            "Nothing specific comes to mind right this second.",
+                            "Unsure. Let me get my thoughts together first.",
+                            "I'm okay for now, or at least nothing urgent stands out.",
+                            "Not sure what to ask for. What do you have available?",
+                            "Can't tell what would help most right now. Ask me later.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko alam kung ano ang kailangan ko ngayon.",
+                            "Mahirap sabihin kung ano ang pinakakailangan sa ngayon.",
+                            "Hindi pa ako sigurado kung anong gamit ang kulang sa akin.",
+                            "Kailangan ko ng sandali para alamin ang sitwasyon ko.",
+                            "Hindi ko masabi kung anong kailangan ngayon. Tingnan ko muna gamit ko.",
+                            "Walang partikular na pumapasok sa isip ko sa ngayon.",
+                            "Hindi sigurado. Ayusin ko muna ang mga iniisip ko.",
+                            "Maayos pa naman sa ngayon, o walang agarang kailangan.",
+                            "Hindi ko alam kung anong hihingin. Anong mayroon ka?",
+                            "Hindi ko masabi kung anong makakatulong ngayon. Tanungin mo ako mamaya.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.offer.unknown",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.offer.unknown.neutral",
+            ["localId"] = "unknown",
+            ["sourceId"] = "question.needs.offer.unknown",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_unknown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.offer.unknown",
+        ["namespace"] = "question.needs.offer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -967,127 +1179,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.offer.unknown",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I don't know what I need right now.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko alam kung ano ang kailangan ko ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hard to say what would help most at the moment.",
-                            },
-                            ["TL"] = {
-                                "Mahirap sabihin kung ano ang pinakakailangan sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not entirely sure what supplies I'm missing yet.",
-                            },
-                            ["TL"] = {
-                                "Hindi pa ako sigurado kung anong gamit ang kulang sa akin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Need a minute to take inventory of my situation.",
-                            },
-                            ["TL"] = {
-                                "Kailangan ko ng sandali para alamin ang sitwasyon ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't pinpoint what I need right now. Let me check my bag.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko masabi kung anong kailangan ngayon. Tingnan ko muna gamit ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Nothing specific comes to mind right this second.",
-                            },
-                            ["TL"] = {
-                                "Walang partikular na pumapasok sa isip ko sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Unsure. Let me get my thoughts together first.",
-                            },
-                            ["TL"] = {
-                                "Hindi sigurado. Ayusin ko muna ang mga iniisip ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm okay for now, or at least nothing urgent stands out.",
-                            },
-                            ["TL"] = {
-                                "Maayos pa naman sa ngayon, o walang agarang kailangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Not sure what to ask for. What do you have available?",
-                            },
-                            ["TL"] = {
-                                "Hindi ko alam kung anong hihingin. Anong mayroon ka?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't tell what would help most right now. Ask me later.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko masabi kung anong makakatulong ngayon. Tanungin mo ako mamaya.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I don't know what I need right now.",
+                                        "Hard to say what would help most at the moment.",
+                                        "Not entirely sure what supplies I'm missing yet.",
+                                        "Need a minute to take inventory of my situation.",
+                                        "Can't pinpoint what I need right now. Let me check my bag.",
+                                        "Nothing specific comes to mind right this second.",
+                                        "Unsure. Let me get my thoughts together first.",
+                                        "I'm okay for now, or at least nothing urgent stands out.",
+                                        "Not sure what to ask for. What do you have available?",
+                                        "Can't tell what would help most right now. Ask me later.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko alam kung ano ang kailangan ko ngayon.",
+                                        "Mahirap sabihin kung ano ang pinakakailangan sa ngayon.",
+                                        "Hindi pa ako sigurado kung anong gamit ang kulang sa akin.",
+                                        "Kailangan ko ng sandali para alamin ang sitwasyon ko.",
+                                        "Hindi ko masabi kung anong kailangan ngayon. Tingnan ko muna gamit ko.",
+                                        "Walang partikular na pumapasok sa isip ko sa ngayon.",
+                                        "Hindi sigurado. Ayusin ko muna ang mga iniisip ko.",
+                                        "Maayos pa naman sa ngayon, o walang agarang kailangan.",
+                                        "Hindi ko alam kung anong hihingin. Anong mayroon ka?",
+                                        "Hindi ko masabi kung anong makakatulong ngayon. Tanungin mo ako mamaya.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.offer.unknown",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I don't know what I need right now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.offer.unknown.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1097,20 +1260,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I don't know what I need right now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.offer.unknown.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I don't know what I need right now.",
+                        "Hard to say what would help most at the moment.",
+                        "Not entirely sure what supplies I'm missing yet.",
+                        "Need a minute to take inventory of my situation.",
+                        "Can't pinpoint what I need right now. Let me check my bag.",
+                        "Nothing specific comes to mind right this second.",
+                        "Unsure. Let me get my thoughts together first.",
+                        "I'm okay for now, or at least nothing urgent stands out.",
+                        "Not sure what to ask for. What do you have available?",
+                        "Can't tell what would help most right now. Ask me later.",
+                    },
+                    ["TL"] = {
+                        "Hindi ko alam kung ano ang kailangan ko ngayon.",
+                        "Mahirap sabihin kung ano ang pinakakailangan sa ngayon.",
+                        "Hindi pa ako sigurado kung anong gamit ang kulang sa akin.",
+                        "Kailangan ko ng sandali para alamin ang sitwasyon ko.",
+                        "Hindi ko masabi kung anong kailangan ngayon. Tingnan ko muna gamit ko.",
+                        "Walang partikular na pumapasok sa isip ko sa ngayon.",
+                        "Hindi sigurado. Ayusin ko muna ang mga iniisip ko.",
+                        "Maayos pa naman sa ngayon, o walang agarang kailangan.",
+                        "Hindi ko alam kung anong hihingin. Anong mayroon ka?",
+                        "Hindi ko masabi kung anong makakatulong ngayon. Tanungin mo ako mamaya.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.proposal.hunger.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.proposal.hunger",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.proposal.hunger.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                        "Sounds like a fair idea for food, but let's confirm what and how much first.",
+                                        "I'm interested in the food offer, but let's settle on the exact details.",
+                                        "We can make a deal for food, just let me know the specifics.",
+                                        "Food trade sounds promising. What rations are we looking at exactly?",
+                                        "I hear your proposal on food. Let's agree on portions before shaking on it.",
+                                        "Could work for food, but we need to pin down the details first.",
+                                        "I'm open to trading for food. Just tell me what items you have in mind.",
+                                        "A food arrangement sounds good. Let's confirm what's on the table.",
+                                        "That food proposal works for me once we iron out the amount.",
+                                    },
+                                    ["TL"] = {
+                                        "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                                        "Mukhang magandang ideya para sa pagkain, pero tiyakin muna natin kung ano at gaano karami.",
+                                        "Interesado ako sa alok na pagkain, pero linawin natin ang mga detalye.",
+                                        "Puwede tayong magkasundo sa pagkain, sabihin mo lang ang mga detalye.",
+                                        "Mukhang maganda ang palitan ng pagkain. Anong rasyon ba eksakto ang tinitingnan natin?",
+                                        "Narinig ko ang alok mo sa pagkain. Magkasundo muna tayo sa dami bago natin pagtibayin.",
+                                        "Puwede sa pagkain, pero kailangan nating tiyakin ang detalye muna.",
+                                        "Bukas ako sa pakikipagpalitan ng pagkain. Sabihin mo lang anong gamit ang nasa isip mo.",
+                                        "Maganda ang kasunduan sa pagkain. Tiyakin natin kung ano ang iaalok.",
+                                        "Ayos sa akin ang alok sa pagkain kapag naitama na natin ang dami.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.proposal",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.proposal.hunger.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                            "Sounds like a fair idea for food, but let's confirm what and how much first.",
+                            "I'm interested in the food offer, but let's settle on the exact details.",
+                            "We can make a deal for food, just let me know the specifics.",
+                            "Food trade sounds promising. What rations are we looking at exactly?",
+                            "I hear your proposal on food. Let's agree on portions before shaking on it.",
+                            "Could work for food, but we need to pin down the details first.",
+                            "I'm open to trading for food. Just tell me what items you have in mind.",
+                            "A food arrangement sounds good. Let's confirm what's on the table.",
+                            "That food proposal works for me once we iron out the amount.",
+                        },
+                        ["TL"] = {
+                            "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                            "Mukhang magandang ideya para sa pagkain, pero tiyakin muna natin kung ano at gaano karami.",
+                            "Interesado ako sa alok na pagkain, pero linawin natin ang mga detalye.",
+                            "Puwede tayong magkasundo sa pagkain, sabihin mo lang ang mga detalye.",
+                            "Mukhang maganda ang palitan ng pagkain. Anong rasyon ba eksakto ang tinitingnan natin?",
+                            "Narinig ko ang alok mo sa pagkain. Magkasundo muna tayo sa dami bago natin pagtibayin.",
+                            "Puwede sa pagkain, pero kailangan nating tiyakin ang detalye muna.",
+                            "Bukas ako sa pakikipagpalitan ng pagkain. Sabihin mo lang anong gamit ang nasa isip mo.",
+                            "Maganda ang kasunduan sa pagkain. Tiyakin natin kung ano ang iaalok.",
+                            "Ayos sa akin ang alok sa pagkain kapag naitama na natin ang dami.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.proposal.hunger",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.proposal.hunger.neutral",
+            ["localId"] = "hunger",
+            ["sourceId"] = "question.needs.proposal.hunger",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_hunger.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.proposal.hunger",
+        ["namespace"] = "question.needs.proposal",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1124,127 +1408,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.proposal.hunger",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
-                            },
-                            ["TL"] = {
-                                "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds like a fair idea for food, but let's confirm what and how much first.",
-                            },
-                            ["TL"] = {
-                                "Mukhang magandang ideya para sa pagkain, pero tiyakin muna natin kung ano at gaano karami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm interested in the food offer, but let's settle on the exact details.",
-                            },
-                            ["TL"] = {
-                                "Interesado ako sa alok na pagkain, pero linawin natin ang mga detalye.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We can make a deal for food, just let me know the specifics.",
-                            },
-                            ["TL"] = {
-                                "Puwede tayong magkasundo sa pagkain, sabihin mo lang ang mga detalye.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Food trade sounds promising. What rations are we looking at exactly?",
-                            },
-                            ["TL"] = {
-                                "Mukhang maganda ang palitan ng pagkain. Anong rasyon ba eksakto ang tinitingnan natin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear your proposal on food. Let's agree on portions before shaking on it.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko ang alok mo sa pagkain. Magkasundo muna tayo sa dami bago natin pagtibayin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Could work for food, but we need to pin down the details first.",
-                            },
-                            ["TL"] = {
-                                "Puwede sa pagkain, pero kailangan nating tiyakin ang detalye muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm open to trading for food. Just tell me what items you have in mind.",
-                            },
-                            ["TL"] = {
-                                "Bukas ako sa pakikipagpalitan ng pagkain. Sabihin mo lang anong gamit ang nasa isip mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A food arrangement sounds good. Let's confirm what's on the table.",
-                            },
-                            ["TL"] = {
-                                "Maganda ang kasunduan sa pagkain. Tiyakin natin kung ano ang iaalok.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "That food proposal works for me once we iron out the amount.",
-                            },
-                            ["TL"] = {
-                                "Ayos sa akin ang alok sa pagkain kapag naitama na natin ang dami.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                        "Sounds like a fair idea for food, but let's confirm what and how much first.",
+                                        "I'm interested in the food offer, but let's settle on the exact details.",
+                                        "We can make a deal for food, just let me know the specifics.",
+                                        "Food trade sounds promising. What rations are we looking at exactly?",
+                                        "I hear your proposal on food. Let's agree on portions before shaking on it.",
+                                        "Could work for food, but we need to pin down the details first.",
+                                        "I'm open to trading for food. Just tell me what items you have in mind.",
+                                        "A food arrangement sounds good. Let's confirm what's on the table.",
+                                        "That food proposal works for me once we iron out the amount.",
+                                    },
+                                    ["TL"] = {
+                                        "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                                        "Mukhang magandang ideya para sa pagkain, pero tiyakin muna natin kung ano at gaano karami.",
+                                        "Interesado ako sa alok na pagkain, pero linawin natin ang mga detalye.",
+                                        "Puwede tayong magkasundo sa pagkain, sabihin mo lang ang mga detalye.",
+                                        "Mukhang maganda ang palitan ng pagkain. Anong rasyon ba eksakto ang tinitingnan natin?",
+                                        "Narinig ko ang alok mo sa pagkain. Magkasundo muna tayo sa dami bago natin pagtibayin.",
+                                        "Puwede sa pagkain, pero kailangan nating tiyakin ang detalye muna.",
+                                        "Bukas ako sa pakikipagpalitan ng pagkain. Sabihin mo lang anong gamit ang nasa isip mo.",
+                                        "Maganda ang kasunduan sa pagkain. Tiyakin natin kung ano ang iaalok.",
+                                        "Ayos sa akin ang alok sa pagkain kapag naitama na natin ang dami.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.proposal.hunger",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.proposal.hunger.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1254,20 +1489,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.proposal.hunger.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                        "Sounds like a fair idea for food, but let's confirm what and how much first.",
+                        "I'm interested in the food offer, but let's settle on the exact details.",
+                        "We can make a deal for food, just let me know the specifics.",
+                        "Food trade sounds promising. What rations are we looking at exactly?",
+                        "I hear your proposal on food. Let's agree on portions before shaking on it.",
+                        "Could work for food, but we need to pin down the details first.",
+                        "I'm open to trading for food. Just tell me what items you have in mind.",
+                        "A food arrangement sounds good. Let's confirm what's on the table.",
+                        "That food proposal works for me once we iron out the amount.",
+                    },
+                    ["TL"] = {
+                        "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                        "Mukhang magandang ideya para sa pagkain, pero tiyakin muna natin kung ano at gaano karami.",
+                        "Interesado ako sa alok na pagkain, pero linawin natin ang mga detalye.",
+                        "Puwede tayong magkasundo sa pagkain, sabihin mo lang ang mga detalye.",
+                        "Mukhang maganda ang palitan ng pagkain. Anong rasyon ba eksakto ang tinitingnan natin?",
+                        "Narinig ko ang alok mo sa pagkain. Magkasundo muna tayo sa dami bago natin pagtibayin.",
+                        "Puwede sa pagkain, pero kailangan nating tiyakin ang detalye muna.",
+                        "Bukas ako sa pakikipagpalitan ng pagkain. Sabihin mo lang anong gamit ang nasa isip mo.",
+                        "Maganda ang kasunduan sa pagkain. Tiyakin natin kung ano ang iaalok.",
+                        "Ayos sa akin ang alok sa pagkain kapag naitama na natin ang dami.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.proposal.thirst.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.proposal.thirst",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.proposal.thirst.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                        "Sounds like a solid idea for water, but let's confirm the bottles and amount first.",
+                                        "I'm open to that water proposal. Just tell me how much you're offering.",
+                                        "We can agree on water, but let's nail down the specifics first.",
+                                        "Water trade sounds good to me. What containers are we discussing?",
+                                        "I hear your water offer. Let's agree on the quantity before finalizing.",
+                                        "Water is always valuable. Tell me the exact amount you want to trade.",
+                                        "I'd take that water deal once we clarify how much you're providing.",
+                                        "Good proposal for water. Let's make sure the details are clear to both of us.",
+                                        "I'm ready to agree on water, just specify how many bottles or sips.",
+                                    },
+                                    ["TL"] = {
+                                        "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                                        "Mukhang maayos na plano para sa tubig, pero tiyakin muna natin ang botelya at dami.",
+                                        "Bukas ako sa alok na tubig. Sabihin mo lang kung gaano karami ang ibibigay mo.",
+                                        "Puwede tayong magkasundo sa tubig, pero ayusin muna natin ang detalye.",
+                                        "Maganda ang palitan ng tubig. Anong lalagyan ba ang pinag-uusapan natin?",
+                                        "Narinig ko ang alok mong tubig. Magkasundo muna tayo sa dami bago tapusin.",
+                                        "Mahalaga palagi ang tubig. Sabihin mo ang eksaktong dami na nais mong ipagpalit.",
+                                        "Tatanggapin ko ang kasunduan sa tubig kapag nalinaw na kung gaano karami ang ibibigay mo.",
+                                        "Magandang alok para sa tubig. Siguraduhin nating malinaw ang detalye sa ating dalawa.",
+                                        "Handa akong sumang-ayon sa tubig, tukuyin mo lang kung ilang botelya o lagok.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.proposal",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.proposal.thirst.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                            "Sounds like a solid idea for water, but let's confirm the bottles and amount first.",
+                            "I'm open to that water proposal. Just tell me how much you're offering.",
+                            "We can agree on water, but let's nail down the specifics first.",
+                            "Water trade sounds good to me. What containers are we discussing?",
+                            "I hear your water offer. Let's agree on the quantity before finalizing.",
+                            "Water is always valuable. Tell me the exact amount you want to trade.",
+                            "I'd take that water deal once we clarify how much you're providing.",
+                            "Good proposal for water. Let's make sure the details are clear to both of us.",
+                            "I'm ready to agree on water, just specify how many bottles or sips.",
+                        },
+                        ["TL"] = {
+                            "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                            "Mukhang maayos na plano para sa tubig, pero tiyakin muna natin ang botelya at dami.",
+                            "Bukas ako sa alok na tubig. Sabihin mo lang kung gaano karami ang ibibigay mo.",
+                            "Puwede tayong magkasundo sa tubig, pero ayusin muna natin ang detalye.",
+                            "Maganda ang palitan ng tubig. Anong lalagyan ba ang pinag-uusapan natin?",
+                            "Narinig ko ang alok mong tubig. Magkasundo muna tayo sa dami bago tapusin.",
+                            "Mahalaga palagi ang tubig. Sabihin mo ang eksaktong dami na nais mong ipagpalit.",
+                            "Tatanggapin ko ang kasunduan sa tubig kapag nalinaw na kung gaano karami ang ibibigay mo.",
+                            "Magandang alok para sa tubig. Siguraduhin nating malinaw ang detalye sa ating dalawa.",
+                            "Handa akong sumang-ayon sa tubig, tukuyin mo lang kung ilang botelya o lagok.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.proposal.thirst",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.proposal.thirst.neutral",
+            ["localId"] = "thirst",
+            ["sourceId"] = "question.needs.proposal.thirst",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_thirst.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.proposal.thirst",
+        ["namespace"] = "question.needs.proposal",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1281,127 +1637,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.proposal.thirst",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
-                            },
-                            ["TL"] = {
-                                "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds like a solid idea for water, but let's confirm the bottles and amount first.",
-                            },
-                            ["TL"] = {
-                                "Mukhang maayos na plano para sa tubig, pero tiyakin muna natin ang botelya at dami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm open to that water proposal. Just tell me how much you're offering.",
-                            },
-                            ["TL"] = {
-                                "Bukas ako sa alok na tubig. Sabihin mo lang kung gaano karami ang ibibigay mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We can agree on water, but let's nail down the specifics first.",
-                            },
-                            ["TL"] = {
-                                "Puwede tayong magkasundo sa tubig, pero ayusin muna natin ang detalye.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Water trade sounds good to me. What containers are we discussing?",
-                            },
-                            ["TL"] = {
-                                "Maganda ang palitan ng tubig. Anong lalagyan ba ang pinag-uusapan natin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear your water offer. Let's agree on the quantity before finalizing.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko ang alok mong tubig. Magkasundo muna tayo sa dami bago tapusin.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Water is always valuable. Tell me the exact amount you want to trade.",
-                            },
-                            ["TL"] = {
-                                "Mahalaga palagi ang tubig. Sabihin mo ang eksaktong dami na nais mong ipagpalit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'd take that water deal once we clarify how much you're providing.",
-                            },
-                            ["TL"] = {
-                                "Tatanggapin ko ang kasunduan sa tubig kapag nalinaw na kung gaano karami ang ibibigay mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Good proposal for water. Let's make sure the details are clear to both of us.",
-                            },
-                            ["TL"] = {
-                                "Magandang alok para sa tubig. Siguraduhin nating malinaw ang detalye sa ating dalawa.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm ready to agree on water, just specify how many bottles or sips.",
-                            },
-                            ["TL"] = {
-                                "Handa akong sumang-ayon sa tubig, tukuyin mo lang kung ilang botelya o lagok.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                        "Sounds like a solid idea for water, but let's confirm the bottles and amount first.",
+                                        "I'm open to that water proposal. Just tell me how much you're offering.",
+                                        "We can agree on water, but let's nail down the specifics first.",
+                                        "Water trade sounds good to me. What containers are we discussing?",
+                                        "I hear your water offer. Let's agree on the quantity before finalizing.",
+                                        "Water is always valuable. Tell me the exact amount you want to trade.",
+                                        "I'd take that water deal once we clarify how much you're providing.",
+                                        "Good proposal for water. Let's make sure the details are clear to both of us.",
+                                        "I'm ready to agree on water, just specify how many bottles or sips.",
+                                    },
+                                    ["TL"] = {
+                                        "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                                        "Mukhang maayos na plano para sa tubig, pero tiyakin muna natin ang botelya at dami.",
+                                        "Bukas ako sa alok na tubig. Sabihin mo lang kung gaano karami ang ibibigay mo.",
+                                        "Puwede tayong magkasundo sa tubig, pero ayusin muna natin ang detalye.",
+                                        "Maganda ang palitan ng tubig. Anong lalagyan ba ang pinag-uusapan natin?",
+                                        "Narinig ko ang alok mong tubig. Magkasundo muna tayo sa dami bago tapusin.",
+                                        "Mahalaga palagi ang tubig. Sabihin mo ang eksaktong dami na nais mong ipagpalit.",
+                                        "Tatanggapin ko ang kasunduan sa tubig kapag nalinaw na kung gaano karami ang ibibigay mo.",
+                                        "Magandang alok para sa tubig. Siguraduhin nating malinaw ang detalye sa ating dalawa.",
+                                        "Handa akong sumang-ayon sa tubig, tukuyin mo lang kung ilang botelya o lagok.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.proposal.thirst",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.proposal.thirst.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1411,20 +1718,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.proposal.thirst.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                        "Sounds like a solid idea for water, but let's confirm the bottles and amount first.",
+                        "I'm open to that water proposal. Just tell me how much you're offering.",
+                        "We can agree on water, but let's nail down the specifics first.",
+                        "Water trade sounds good to me. What containers are we discussing?",
+                        "I hear your water offer. Let's agree on the quantity before finalizing.",
+                        "Water is always valuable. Tell me the exact amount you want to trade.",
+                        "I'd take that water deal once we clarify how much you're providing.",
+                        "Good proposal for water. Let's make sure the details are clear to both of us.",
+                        "I'm ready to agree on water, just specify how many bottles or sips.",
+                    },
+                    ["TL"] = {
+                        "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+                        "Mukhang maayos na plano para sa tubig, pero tiyakin muna natin ang botelya at dami.",
+                        "Bukas ako sa alok na tubig. Sabihin mo lang kung gaano karami ang ibibigay mo.",
+                        "Puwede tayong magkasundo sa tubig, pero ayusin muna natin ang detalye.",
+                        "Maganda ang palitan ng tubig. Anong lalagyan ba ang pinag-uusapan natin?",
+                        "Narinig ko ang alok mong tubig. Magkasundo muna tayo sa dami bago tapusin.",
+                        "Mahalaga palagi ang tubig. Sabihin mo ang eksaktong dami na nais mong ipagpalit.",
+                        "Tatanggapin ko ang kasunduan sa tubig kapag nalinaw na kung gaano karami ang ibibigay mo.",
+                        "Magandang alok para sa tubig. Siguraduhin nating malinaw ang detalye sa ating dalawa.",
+                        "Handa akong sumang-ayon sa tubig, tukuyin mo lang kung ilang botelya o lagok.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.proposal.unknown.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.proposal.unknown",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.proposal.unknown.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                                        "Sounds like an interesting idea, but let's specify the supplies and amount first.",
+                                        "I'm open to discussion, but I need to know what you're actually offering.",
+                                        "We can make an arrangement once the items and quantities are clear.",
+                                        "I hear the proposal, but let's put concrete numbers on the table.",
+                                        "Happy to consider a trade, just spell out what you're putting forward.",
+                                        "Let's iron out what items we're talking about before making any promises.",
+                                        "I'm listening, but I need specific supplies and numbers to agree.",
+                                        "A proposal is fine, but we need clear terms before shaking on it.",
+                                        "Tell me what items and how many, and we'll see if we have a deal.",
+                                    },
+                                    ["TL"] = {
+                                        "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
+                                        "Mukhang kawili-wiling ideya, pero tukuyin muna natin ang gamit at dami.",
+                                        "Bukas ako sa pag-uusap, pero kailangan kong malaman kung ano talaga ang iaalok mo.",
+                                        "Puwede tayong gumawa ng kasunduan kapag malinaw na ang mga gamit at dami.",
+                                        "Narinig ko ang alok, pero maglagay tayo ng tiyak na bilang.",
+                                        "Masayang pag-isipan ang palitan, sabihin mo lang nang malinaw ang ihahain mo.",
+                                        "Linawin muna natin kung anong gamit ang tinutukoy bago mangako.",
+                                        "Nakikinig ako, pero kailangan ko ng partikular na suplay at bilang para pumayag.",
+                                        "Maayos ang panukala, pero kailangan natin ng malinaw na kondisyon bago pagkasunduan.",
+                                        "Sabihin mo kung anong gamit at ilan, at titingnan natin kung magkakasundo tayo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.proposal",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.proposal.unknown.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                            "Sounds like an interesting idea, but let's specify the supplies and amount first.",
+                            "I'm open to discussion, but I need to know what you're actually offering.",
+                            "We can make an arrangement once the items and quantities are clear.",
+                            "I hear the proposal, but let's put concrete numbers on the table.",
+                            "Happy to consider a trade, just spell out what you're putting forward.",
+                            "Let's iron out what items we're talking about before making any promises.",
+                            "I'm listening, but I need specific supplies and numbers to agree.",
+                            "A proposal is fine, but we need clear terms before shaking on it.",
+                            "Tell me what items and how many, and we'll see if we have a deal.",
+                        },
+                        ["TL"] = {
+                            "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
+                            "Mukhang kawili-wiling ideya, pero tukuyin muna natin ang gamit at dami.",
+                            "Bukas ako sa pag-uusap, pero kailangan kong malaman kung ano talaga ang iaalok mo.",
+                            "Puwede tayong gumawa ng kasunduan kapag malinaw na ang mga gamit at dami.",
+                            "Narinig ko ang alok, pero maglagay tayo ng tiyak na bilang.",
+                            "Masayang pag-isipan ang palitan, sabihin mo lang nang malinaw ang ihahain mo.",
+                            "Linawin muna natin kung anong gamit ang tinutukoy bago mangako.",
+                            "Nakikinig ako, pero kailangan ko ng partikular na suplay at bilang para pumayag.",
+                            "Maayos ang panukala, pero kailangan natin ng malinaw na kondisyon bago pagkasunduan.",
+                            "Sabihin mo kung anong gamit at ilan, at titingnan natin kung magkakasundo tayo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.proposal.unknown",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.proposal.unknown.neutral",
+            ["localId"] = "unknown",
+            ["sourceId"] = "question.needs.proposal.unknown",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_unknown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.proposal.unknown",
+        ["namespace"] = "question.needs.proposal",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1438,127 +1866,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.proposal.unknown",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
-                            },
-                            ["TL"] = {
-                                "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Sounds like an interesting idea, but let's specify the supplies and amount first.",
-                            },
-                            ["TL"] = {
-                                "Mukhang kawili-wiling ideya, pero tukuyin muna natin ang gamit at dami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm open to discussion, but I need to know what you're actually offering.",
-                            },
-                            ["TL"] = {
-                                "Bukas ako sa pag-uusap, pero kailangan kong malaman kung ano talaga ang iaalok mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "We can make an arrangement once the items and quantities are clear.",
-                            },
-                            ["TL"] = {
-                                "Puwede tayong gumawa ng kasunduan kapag malinaw na ang mga gamit at dami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I hear the proposal, but let's put concrete numbers on the table.",
-                            },
-                            ["TL"] = {
-                                "Narinig ko ang alok, pero maglagay tayo ng tiyak na bilang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Happy to consider a trade, just spell out what you're putting forward.",
-                            },
-                            ["TL"] = {
-                                "Masayang pag-isipan ang palitan, sabihin mo lang nang malinaw ang ihahain mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let's iron out what items we're talking about before making any promises.",
-                            },
-                            ["TL"] = {
-                                "Linawin muna natin kung anong gamit ang tinutukoy bago mangako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm listening, but I need specific supplies and numbers to agree.",
-                            },
-                            ["TL"] = {
-                                "Nakikinig ako, pero kailangan ko ng partikular na suplay at bilang para pumayag.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A proposal is fine, but we need clear terms before shaking on it.",
-                            },
-                            ["TL"] = {
-                                "Maayos ang panukala, pero kailangan natin ng malinaw na kondisyon bago pagkasunduan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Tell me what items and how many, and we'll see if we have a deal.",
-                            },
-                            ["TL"] = {
-                                "Sabihin mo kung anong gamit at ilan, at titingnan natin kung magkakasundo tayo.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                                        "Sounds like an interesting idea, but let's specify the supplies and amount first.",
+                                        "I'm open to discussion, but I need to know what you're actually offering.",
+                                        "We can make an arrangement once the items and quantities are clear.",
+                                        "I hear the proposal, but let's put concrete numbers on the table.",
+                                        "Happy to consider a trade, just spell out what you're putting forward.",
+                                        "Let's iron out what items we're talking about before making any promises.",
+                                        "I'm listening, but I need specific supplies and numbers to agree.",
+                                        "A proposal is fine, but we need clear terms before shaking on it.",
+                                        "Tell me what items and how many, and we'll see if we have a deal.",
+                                    },
+                                    ["TL"] = {
+                                        "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
+                                        "Mukhang kawili-wiling ideya, pero tukuyin muna natin ang gamit at dami.",
+                                        "Bukas ako sa pag-uusap, pero kailangan kong malaman kung ano talaga ang iaalok mo.",
+                                        "Puwede tayong gumawa ng kasunduan kapag malinaw na ang mga gamit at dami.",
+                                        "Narinig ko ang alok, pero maglagay tayo ng tiyak na bilang.",
+                                        "Masayang pag-isipan ang palitan, sabihin mo lang nang malinaw ang ihahain mo.",
+                                        "Linawin muna natin kung anong gamit ang tinutukoy bago mangako.",
+                                        "Nakikinig ako, pero kailangan ko ng partikular na suplay at bilang para pumayag.",
+                                        "Maayos ang panukala, pero kailangan natin ng malinaw na kondisyon bago pagkasunduan.",
+                                        "Sabihin mo kung anong gamit at ilan, at titingnan natin kung magkakasundo tayo.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.proposal.unknown",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.proposal.unknown.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1568,20 +1947,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.proposal.unknown.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                        "Sounds like an interesting idea, but let's specify the supplies and amount first.",
+                        "I'm open to discussion, but I need to know what you're actually offering.",
+                        "We can make an arrangement once the items and quantities are clear.",
+                        "I hear the proposal, but let's put concrete numbers on the table.",
+                        "Happy to consider a trade, just spell out what you're putting forward.",
+                        "Let's iron out what items we're talking about before making any promises.",
+                        "I'm listening, but I need specific supplies and numbers to agree.",
+                        "A proposal is fine, but we need clear terms before shaking on it.",
+                        "Tell me what items and how many, and we'll see if we have a deal.",
+                    },
+                    ["TL"] = {
+                        "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
+                        "Mukhang kawili-wiling ideya, pero tukuyin muna natin ang gamit at dami.",
+                        "Bukas ako sa pag-uusap, pero kailangan kong malaman kung ano talaga ang iaalok mo.",
+                        "Puwede tayong gumawa ng kasunduan kapag malinaw na ang mga gamit at dami.",
+                        "Narinig ko ang alok, pero maglagay tayo ng tiyak na bilang.",
+                        "Masayang pag-isipan ang palitan, sabihin mo lang nang malinaw ang ihahain mo.",
+                        "Linawin muna natin kung anong gamit ang tinutukoy bago mangako.",
+                        "Nakikinig ako, pero kailangan ko ng partikular na suplay at bilang para pumayag.",
+                        "Maayos ang panukala, pero kailangan natin ng malinaw na kondisyon bago pagkasunduan.",
+                        "Sabihin mo kung anong gamit at ilan, at titingnan natin kung magkakasundo tayo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.quantity.hunger.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.quantity.hunger",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I know food is what I need, but I can't give you an exact amount yet.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.quantity.hunger.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I know food is what I need, but I can't give you an exact amount yet.",
+                                        "Whatever you can spare to eat would be plenty.",
+                                        "Even one can or a couple rations would keep me going.",
+                                        "I'm not picky about the portion size, just need food.",
+                                        "A small portion or a full meal, anything helps.",
+                                        "Just enough food to fill the hollow feeling in my gut.",
+                                        "Don't need a banquet, just whatever food you're willing to share.",
+                                        "A couple bites would buy me a few more hours of strength.",
+                                        "Hard to name a count. Just give me what you don't need.",
+                                        "Any amount of food is better than nothing right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                                        "Kahit anong maibibigay mong makakain ay sapat na.",
+                                        "Kahit isang de-lata o dalawang rasyon ay malaking tulong na.",
+                                        "Hindi ako mapili sa dami, basta may makakain lang.",
+                                        "Maliit man o buong pagkain, lahat 'yon makakatulong.",
+                                        "Sapat lang na pagkain para mapawi ang gutom ko.",
+                                        "Hindi kailangan ng marami, kung ano lang ang kaya mong ibahagi.",
+                                        "Ilang subo lang ay magbibigay sa akin ng ilang oras na lakas.",
+                                        "Mahirap magbilang. Ibigay mo lang kung anong hindi mo kailangan.",
+                                        "Anumang dami ng pagkain ay mas maganda kaysa sa wala ngayon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.quantity",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I know food is what I need, but I can't give you an exact amount yet.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.quantity.hunger.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I know food is what I need, but I can't give you an exact amount yet.",
+                            "Whatever you can spare to eat would be plenty.",
+                            "Even one can or a couple rations would keep me going.",
+                            "I'm not picky about the portion size, just need food.",
+                            "A small portion or a full meal, anything helps.",
+                            "Just enough food to fill the hollow feeling in my gut.",
+                            "Don't need a banquet, just whatever food you're willing to share.",
+                            "A couple bites would buy me a few more hours of strength.",
+                            "Hard to name a count. Just give me what you don't need.",
+                            "Any amount of food is better than nothing right now.",
+                        },
+                        ["TL"] = {
+                            "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                            "Kahit anong maibibigay mong makakain ay sapat na.",
+                            "Kahit isang de-lata o dalawang rasyon ay malaking tulong na.",
+                            "Hindi ako mapili sa dami, basta may makakain lang.",
+                            "Maliit man o buong pagkain, lahat 'yon makakatulong.",
+                            "Sapat lang na pagkain para mapawi ang gutom ko.",
+                            "Hindi kailangan ng marami, kung ano lang ang kaya mong ibahagi.",
+                            "Ilang subo lang ay magbibigay sa akin ng ilang oras na lakas.",
+                            "Mahirap magbilang. Ibigay mo lang kung anong hindi mo kailangan.",
+                            "Anumang dami ng pagkain ay mas maganda kaysa sa wala ngayon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.quantity.hunger",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.quantity.hunger.neutral",
+            ["localId"] = "hunger",
+            ["sourceId"] = "question.needs.quantity.hunger",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_hunger.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.quantity.hunger",
+        ["namespace"] = "question.needs.quantity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1595,127 +2095,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.quantity.hunger",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I know food is what I need, but I can't give you an exact amount yet.",
-                            },
-                            ["TL"] = {
-                                "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Whatever you can spare to eat would be plenty.",
-                            },
-                            ["TL"] = {
-                                "Kahit anong maibibigay mong makakain ay sapat na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Even one can or a couple rations would keep me going.",
-                            },
-                            ["TL"] = {
-                                "Kahit isang de-lata o dalawang rasyon ay malaking tulong na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm not picky about the portion size, just need food.",
-                            },
-                            ["TL"] = {
-                                "Hindi ako mapili sa dami, basta may makakain lang.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A small portion or a full meal, anything helps.",
-                            },
-                            ["TL"] = {
-                                "Maliit man o buong pagkain, lahat 'yon makakatulong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just enough food to fill the hollow feeling in my gut.",
-                            },
-                            ["TL"] = {
-                                "Sapat lang na pagkain para mapawi ang gutom ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't need a banquet, just whatever food you're willing to share.",
-                            },
-                            ["TL"] = {
-                                "Hindi kailangan ng marami, kung ano lang ang kaya mong ibahagi.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A couple bites would buy me a few more hours of strength.",
-                            },
-                            ["TL"] = {
-                                "Ilang subo lang ay magbibigay sa akin ng ilang oras na lakas.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hard to name a count. Just give me what you don't need.",
-                            },
-                            ["TL"] = {
-                                "Mahirap magbilang. Ibigay mo lang kung anong hindi mo kailangan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Any amount of food is better than nothing right now.",
-                            },
-                            ["TL"] = {
-                                "Anumang dami ng pagkain ay mas maganda kaysa sa wala ngayon.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I know food is what I need, but I can't give you an exact amount yet.",
+                                        "Whatever you can spare to eat would be plenty.",
+                                        "Even one can or a couple rations would keep me going.",
+                                        "I'm not picky about the portion size, just need food.",
+                                        "A small portion or a full meal, anything helps.",
+                                        "Just enough food to fill the hollow feeling in my gut.",
+                                        "Don't need a banquet, just whatever food you're willing to share.",
+                                        "A couple bites would buy me a few more hours of strength.",
+                                        "Hard to name a count. Just give me what you don't need.",
+                                        "Any amount of food is better than nothing right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                                        "Kahit anong maibibigay mong makakain ay sapat na.",
+                                        "Kahit isang de-lata o dalawang rasyon ay malaking tulong na.",
+                                        "Hindi ako mapili sa dami, basta may makakain lang.",
+                                        "Maliit man o buong pagkain, lahat 'yon makakatulong.",
+                                        "Sapat lang na pagkain para mapawi ang gutom ko.",
+                                        "Hindi kailangan ng marami, kung ano lang ang kaya mong ibahagi.",
+                                        "Ilang subo lang ay magbibigay sa akin ng ilang oras na lakas.",
+                                        "Mahirap magbilang. Ibigay mo lang kung anong hindi mo kailangan.",
+                                        "Anumang dami ng pagkain ay mas maganda kaysa sa wala ngayon.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.quantity.hunger",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I know food is what I need, but I can't give you an exact amount yet.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.quantity.hunger.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1725,20 +2176,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I know food is what I need, but I can't give you an exact amount yet.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.quantity.hunger.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I know food is what I need, but I can't give you an exact amount yet.",
+                        "Whatever you can spare to eat would be plenty.",
+                        "Even one can or a couple rations would keep me going.",
+                        "I'm not picky about the portion size, just need food.",
+                        "A small portion or a full meal, anything helps.",
+                        "Just enough food to fill the hollow feeling in my gut.",
+                        "Don't need a banquet, just whatever food you're willing to share.",
+                        "A couple bites would buy me a few more hours of strength.",
+                        "Hard to name a count. Just give me what you don't need.",
+                        "Any amount of food is better than nothing right now.",
+                    },
+                    ["TL"] = {
+                        "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                        "Kahit anong maibibigay mong makakain ay sapat na.",
+                        "Kahit isang de-lata o dalawang rasyon ay malaking tulong na.",
+                        "Hindi ako mapili sa dami, basta may makakain lang.",
+                        "Maliit man o buong pagkain, lahat 'yon makakatulong.",
+                        "Sapat lang na pagkain para mapawi ang gutom ko.",
+                        "Hindi kailangan ng marami, kung ano lang ang kaya mong ibahagi.",
+                        "Ilang subo lang ay magbibigay sa akin ng ilang oras na lakas.",
+                        "Mahirap magbilang. Ibigay mo lang kung anong hindi mo kailangan.",
+                        "Anumang dami ng pagkain ay mas maganda kaysa sa wala ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.quantity.thirst.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.quantity.thirst",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I know water is what I need, but I can't give you an exact amount yet.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.quantity.thirst.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I know water is what I need, but I can't give you an exact amount yet.",
+                                        "Even half a bottle of water would make a difference.",
+                                        "Just enough clean water to wet my throat, please.",
+                                        "A single flask or a few gulps would be fantastic.",
+                                        "I'm parched. Any amount of safe water would help.",
+                                        "Don't need a whole gallon, just enough to stay hydrated.",
+                                        "Whatever water you can afford to part with right now.",
+                                        "A cup or a bottle, I won't turn it down.",
+                                        "Enough water to get through the afternoon would be great.",
+                                        "Just a small sip or two to keep my strength up.",
+                                    },
+                                    ["TL"] = {
+                                        "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                                        "Kahit kalahating botelya ng tubig ay malaking tulong na.",
+                                        "Sapat lang na malinis na tubig pambasa ng lalamunan ko.",
+                                        "Kahit isang lagayan o ilang lagok ay napakaganda na.",
+                                        "Uhaw ako. Anumang dami ng ligtas na tubig ay makakatulong.",
+                                        "Hindi kailangan ng galon, sapat lang para mawala ang uhaw.",
+                                        "Anumang tubig na kaya mong ibigay sa ngayon.",
+                                        "Kahit tasa o botelya, hindi ko tatanggihan.",
+                                        "Sapat na tubig para maitawid ang hapon ay ayos na.",
+                                        "Kahit isa o dalawang lagok lang para manatili ang lakas.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.quantity",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I know water is what I need, but I can't give you an exact amount yet.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.quantity.thirst.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I know water is what I need, but I can't give you an exact amount yet.",
+                            "Even half a bottle of water would make a difference.",
+                            "Just enough clean water to wet my throat, please.",
+                            "A single flask or a few gulps would be fantastic.",
+                            "I'm parched. Any amount of safe water would help.",
+                            "Don't need a whole gallon, just enough to stay hydrated.",
+                            "Whatever water you can afford to part with right now.",
+                            "A cup or a bottle, I won't turn it down.",
+                            "Enough water to get through the afternoon would be great.",
+                            "Just a small sip or two to keep my strength up.",
+                        },
+                        ["TL"] = {
+                            "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                            "Kahit kalahating botelya ng tubig ay malaking tulong na.",
+                            "Sapat lang na malinis na tubig pambasa ng lalamunan ko.",
+                            "Kahit isang lagayan o ilang lagok ay napakaganda na.",
+                            "Uhaw ako. Anumang dami ng ligtas na tubig ay makakatulong.",
+                            "Hindi kailangan ng galon, sapat lang para mawala ang uhaw.",
+                            "Anumang tubig na kaya mong ibigay sa ngayon.",
+                            "Kahit tasa o botelya, hindi ko tatanggihan.",
+                            "Sapat na tubig para maitawid ang hapon ay ayos na.",
+                            "Kahit isa o dalawang lagok lang para manatili ang lakas.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.quantity.thirst",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.quantity.thirst.neutral",
+            ["localId"] = "thirst",
+            ["sourceId"] = "question.needs.quantity.thirst",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_thirst.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.quantity.thirst",
+        ["namespace"] = "question.needs.quantity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1752,127 +2324,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.quantity.thirst",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I know water is what I need, but I can't give you an exact amount yet.",
-                            },
-                            ["TL"] = {
-                                "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Even half a bottle of water would make a difference.",
-                            },
-                            ["TL"] = {
-                                "Kahit kalahating botelya ng tubig ay malaking tulong na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just enough clean water to wet my throat, please.",
-                            },
-                            ["TL"] = {
-                                "Sapat lang na malinis na tubig pambasa ng lalamunan ko.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A single flask or a few gulps would be fantastic.",
-                            },
-                            ["TL"] = {
-                                "Kahit isang lagayan o ilang lagok ay napakaganda na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm parched. Any amount of safe water would help.",
-                            },
-                            ["TL"] = {
-                                "Uhaw ako. Anumang dami ng ligtas na tubig ay makakatulong.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Don't need a whole gallon, just enough to stay hydrated.",
-                            },
-                            ["TL"] = {
-                                "Hindi kailangan ng galon, sapat lang para mawala ang uhaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Whatever water you can afford to part with right now.",
-                            },
-                            ["TL"] = {
-                                "Anumang tubig na kaya mong ibigay sa ngayon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "A cup or a bottle, I won't turn it down.",
-                            },
-                            ["TL"] = {
-                                "Kahit tasa o botelya, hindi ko tatanggihan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Enough water to get through the afternoon would be great.",
-                            },
-                            ["TL"] = {
-                                "Sapat na tubig para maitawid ang hapon ay ayos na.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Just a small sip or two to keep my strength up.",
-                            },
-                            ["TL"] = {
-                                "Kahit isa o dalawang lagok lang para manatili ang lakas.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I know water is what I need, but I can't give you an exact amount yet.",
+                                        "Even half a bottle of water would make a difference.",
+                                        "Just enough clean water to wet my throat, please.",
+                                        "A single flask or a few gulps would be fantastic.",
+                                        "I'm parched. Any amount of safe water would help.",
+                                        "Don't need a whole gallon, just enough to stay hydrated.",
+                                        "Whatever water you can afford to part with right now.",
+                                        "A cup or a bottle, I won't turn it down.",
+                                        "Enough water to get through the afternoon would be great.",
+                                        "Just a small sip or two to keep my strength up.",
+                                    },
+                                    ["TL"] = {
+                                        "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                                        "Kahit kalahating botelya ng tubig ay malaking tulong na.",
+                                        "Sapat lang na malinis na tubig pambasa ng lalamunan ko.",
+                                        "Kahit isang lagayan o ilang lagok ay napakaganda na.",
+                                        "Uhaw ako. Anumang dami ng ligtas na tubig ay makakatulong.",
+                                        "Hindi kailangan ng galon, sapat lang para mawala ang uhaw.",
+                                        "Anumang tubig na kaya mong ibigay sa ngayon.",
+                                        "Kahit tasa o botelya, hindi ko tatanggihan.",
+                                        "Sapat na tubig para maitawid ang hapon ay ayos na.",
+                                        "Kahit isa o dalawang lagok lang para manatili ang lakas.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.quantity.thirst",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I know water is what I need, but I can't give you an exact amount yet.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.quantity.thirst.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -1882,20 +2405,141 @@ return {
             ["required"] = false,
             ["type"] = "entity.any",
         },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I know water is what I need, but I can't give you an exact amount yet.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.quantity.thirst.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I know water is what I need, but I can't give you an exact amount yet.",
+                        "Even half a bottle of water would make a difference.",
+                        "Just enough clean water to wet my throat, please.",
+                        "A single flask or a few gulps would be fantastic.",
+                        "I'm parched. Any amount of safe water would help.",
+                        "Don't need a whole gallon, just enough to stay hydrated.",
+                        "Whatever water you can afford to part with right now.",
+                        "A cup or a bottle, I won't turn it down.",
+                        "Enough water to get through the afternoon would be great.",
+                        "Just a small sip or two to keep my strength up.",
+                    },
+                    ["TL"] = {
+                        "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+                        "Kahit kalahating botelya ng tubig ay malaking tulong na.",
+                        "Sapat lang na malinis na tubig pambasa ng lalamunan ko.",
+                        "Kahit isang lagayan o ilang lagok ay napakaganda na.",
+                        "Uhaw ako. Anumang dami ng ligtas na tubig ay makakatulong.",
+                        "Hindi kailangan ng galon, sapat lang para mawala ang uhaw.",
+                        "Anumang tubig na kaya mong ibigay sa ngayon.",
+                        "Kahit tasa o botelya, hindi ko tatanggihan.",
+                        "Sapat na tubig para maitawid ang hapon ay ayos na.",
+                        "Kahit isa o dalawang lagok lang para manatili ang lakas.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
         ["when"] = nil,
     },
     {
         ["domain"] = "conversation_needs",
-        ["id"] = "semantic.question.needs.quantity.unknown.neutral",
+        ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.quantity.unknown",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can't confirm an exact amount yet. Which item do you mean?",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.needs.quantity.unknown.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can't confirm an exact amount yet. Which item do you mean?",
+                                        "Tell me what item you're talking about first, then we can talk quantity.",
+                                        "Depends on what you have. Which supply are we discussing?",
+                                        "Hard to give a number without knowing what item you're offering.",
+                                        "What specific item do you have in mind to trade or share?",
+                                        "Let me know what you're holding before I name an amount.",
+                                        "Which supply are we discussing? I need details first.",
+                                        "Can't tell you how many until I know what it is.",
+                                        "What kind of gear or supplies are we talking about here?",
+                                        "Specify the item first, and then I'll let you know how much I need.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
+                                        "Sabihin mo muna kung anong gamit, bago natin pag-usapan ang dami.",
+                                        "Depende sa mayroon ka. Anong gamit ba ang pinag-uusapan natin?",
+                                        "Mahirap magbigay ng bilang nang hindi alam kung ano ang iaalok mo.",
+                                        "Anong partikular na gamit ang balak mong ibahagi o ipagpalit?",
+                                        "Ipaalam mo muna kung anong hawak mo bago ako magbigay ng dami.",
+                                        "Anong gamit ang tinutukoy natin? Kailangan ko ng detalye muna.",
+                                        "Hindi ko masasabi kung ilan hangga't hindi ko alam kung ano 'yon.",
+                                        "Anong uri ng kagamitan o suplay ang pinag-uusapan natin dito?",
+                                        "Tukuyin mo muna ang gamit, at sasabihin ko kung gaano karami ang kailangan ko.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs.quantity",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can't confirm an exact amount yet. Which item do you mean?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.quantity.unknown.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can't confirm an exact amount yet. Which item do you mean?",
+                            "Tell me what item you're talking about first, then we can talk quantity.",
+                            "Depends on what you have. Which supply are we discussing?",
+                            "Hard to give a number without knowing what item you're offering.",
+                            "What specific item do you have in mind to trade or share?",
+                            "Let me know what you're holding before I name an amount.",
+                            "Which supply are we discussing? I need details first.",
+                            "Can't tell you how many until I know what it is.",
+                            "What kind of gear or supplies are we talking about here?",
+                            "Specify the item first, and then I'll let you know how much I need.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
+                            "Sabihin mo muna kung anong gamit, bago natin pag-usapan ang dami.",
+                            "Depende sa mayroon ka. Anong gamit ba ang pinag-uusapan natin?",
+                            "Mahirap magbigay ng bilang nang hindi alam kung ano ang iaalok mo.",
+                            "Anong partikular na gamit ang balak mong ibahagi o ipagpalit?",
+                            "Ipaalam mo muna kung anong hawak mo bago ako magbigay ng dami.",
+                            "Anong gamit ang tinutukoy natin? Kailangan ko ng detalye muna.",
+                            "Hindi ko masasabi kung ilan hangga't hindi ko alam kung ano 'yon.",
+                            "Anong uri ng kagamitan o suplay ang pinag-uusapan natin dito?",
+                            "Tukuyin mo muna ang gamit, at sasabihin ko kung gaano karami ang kailangan ko.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.needs.quantity.unknown",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "neutral",
-            ["sourceId"] = "semantic.question.needs.quantity.unknown.neutral",
+            ["localId"] = "unknown",
+            ["sourceId"] = "question.needs.quantity.unknown",
             ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_unknown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
-        ["namespace"] = "semantic.question.needs.quantity.unknown",
+        ["namespace"] = "question.needs.quantity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1909,127 +2553,78 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.question.needs.quantity.unknown",
+                ["responseAct"] = "REACT",
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
-                ["style"] = "neutral",
             },
-            ["response"] = {
-                ["act"] = "REACT",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I can't confirm an exact amount yet. Which item do you mean?",
-                            },
-                            ["TL"] = {
-                                "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Tell me what item you're talking about first, then we can talk quantity.",
-                            },
-                            ["TL"] = {
-                                "Sabihin mo muna kung anong gamit, bago natin pag-usapan ang dami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Depends on what you have. Which supply are we discussing?",
-                            },
-                            ["TL"] = {
-                                "Depende sa mayroon ka. Anong gamit ba ang pinag-uusapan natin?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Hard to give a number without knowing what item you're offering.",
-                            },
-                            ["TL"] = {
-                                "Mahirap magbigay ng bilang nang hindi alam kung ano ang iaalok mo.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What specific item do you have in mind to trade or share?",
-                            },
-                            ["TL"] = {
-                                "Anong partikular na gamit ang balak mong ibahagi o ipagpalit?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Let me know what you're holding before I name an amount.",
-                            },
-                            ["TL"] = {
-                                "Ipaalam mo muna kung anong hawak mo bago ako magbigay ng dami.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Which supply are we discussing? I need details first.",
-                            },
-                            ["TL"] = {
-                                "Anong gamit ang tinutukoy natin? Kailangan ko ng detalye muna.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Can't tell you how many until I know what it is.",
-                            },
-                            ["TL"] = {
-                                "Hindi ko masasabi kung ilan hangga't hindi ko alam kung ano 'yon.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "What kind of gear or supplies are we talking about here?",
-                            },
-                            ["TL"] = {
-                                "Anong uri ng kagamitan o suplay ang pinag-uusapan natin dito?",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Specify the item first, and then I'll let you know how much I need.",
-                            },
-                            ["TL"] = {
-                                "Tukuyin mo muna ang gamit, at sasabihin ko kung gaano karami ang kailangan ko.",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can't confirm an exact amount yet. Which item do you mean?",
+                                        "Tell me what item you're talking about first, then we can talk quantity.",
+                                        "Depends on what you have. Which supply are we discussing?",
+                                        "Hard to give a number without knowing what item you're offering.",
+                                        "What specific item do you have in mind to trade or share?",
+                                        "Let me know what you're holding before I name an amount.",
+                                        "Which supply are we discussing? I need details first.",
+                                        "Can't tell you how many until I know what it is.",
+                                        "What kind of gear or supplies are we talking about here?",
+                                        "Specify the item first, and then I'll let you know how much I need.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
+                                        "Sabihin mo muna kung anong gamit, bago natin pag-usapan ang dami.",
+                                        "Depende sa mayroon ka. Anong gamit ba ang pinag-uusapan natin?",
+                                        "Mahirap magbigay ng bilang nang hindi alam kung ano ang iaalok mo.",
+                                        "Anong partikular na gamit ang balak mong ibahagi o ipagpalit?",
+                                        "Ipaalam mo muna kung anong hawak mo bago ako magbigay ng dami.",
+                                        "Anong gamit ang tinutukoy natin? Kailangan ko ng detalye muna.",
+                                        "Hindi ko masasabi kung ilan hangga't hindi ko alam kung ano 'yon.",
+                                        "Anong uri ng kagamitan o suplay ang pinag-uusapan natin dito?",
+                                        "Tukuyin mo muna ang gamit, at sasabihin ko kung gaano karami ang kailangan ko.",
+                                    },
+                                },
                             },
                         },
                     },
                 },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.quantity.unknown",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can't confirm an exact amount yet. Which item do you mean?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.question.needs.quantity.unknown.say_1",
+                        },
+                    },
+                },
+            },
         },
         ["slots"] = {
         },
@@ -2038,6 +2633,41 @@ return {
             ["multiple"] = false,
             ["required"] = false,
             ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can't confirm an exact amount yet. Which item do you mean?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.quantity.unknown.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can't confirm an exact amount yet. Which item do you mean?",
+                        "Tell me what item you're talking about first, then we can talk quantity.",
+                        "Depends on what you have. Which supply are we discussing?",
+                        "Hard to give a number without knowing what item you're offering.",
+                        "What specific item do you have in mind to trade or share?",
+                        "Let me know what you're holding before I name an amount.",
+                        "Which supply are we discussing? I need details first.",
+                        "Can't tell you how many until I know what it is.",
+                        "What kind of gear or supplies are we talking about here?",
+                        "Specify the item first, and then I'll let you know how much I need.",
+                    },
+                    ["TL"] = {
+                        "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
+                        "Sabihin mo muna kung anong gamit, bago natin pag-usapan ang dami.",
+                        "Depende sa mayroon ka. Anong gamit ba ang pinag-uusapan natin?",
+                        "Mahirap magbigay ng bilang nang hindi alam kung ano ang iaalok mo.",
+                        "Anong partikular na gamit ang balak mong ibahagi o ipagpalit?",
+                        "Ipaalam mo muna kung anong hawak mo bago ako magbigay ng dami.",
+                        "Anong gamit ang tinutukoy natin? Kailangan ko ng detalye muna.",
+                        "Hindi ko masasabi kung ilan hangga't hindi ko alam kung ano 'yon.",
+                        "Anong uri ng kagamitan o suplay ang pinag-uusapan natin dito?",
+                        "Tukuyin mo muna ang gamit, at sasabihin ko kung gaano karami ang kailangan ko.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
         },
         ["when"] = nil,
     },

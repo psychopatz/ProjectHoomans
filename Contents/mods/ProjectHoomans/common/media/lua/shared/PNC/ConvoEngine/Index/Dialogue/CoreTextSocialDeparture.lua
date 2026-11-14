@@ -1,29 +1,29 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["text.departure.confirmed"] = {
+    ["departure.confirmed"] = {
         ["domain"] = "core_text_social_departure",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialDeparture",
         },
-        ["id"] = "text.departure.confirmed",
+        ["id"] = "departure.confirmed",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_departure/departure_confirmed.json",
     },
-    ["text.departure.rejected"] = {
+    ["departure.rejected"] = {
         ["domain"] = "core_text_social_departure",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialDeparture",
         },
-        ["id"] = "text.departure.rejected",
+        ["id"] = "departure.rejected",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_departure/departure_rejected.json",
     },
-    ["text.departure.warning"] = {
+    ["departure.warning"] = {
         ["domain"] = "core_text_social_departure",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialDeparture",
         },
-        ["id"] = "text.departure.warning",
+        ["id"] = "departure.warning",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_text_social_departure/departure_warning.json",
     },
