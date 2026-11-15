@@ -52,7 +52,15 @@ function Service.CreateZone(args)
         createdAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
     }
     Internal.EnsureAbstractTiles(zone)
-    if PNC.ZoneService and type(PNC.ZoneService.Register) == "function" then
+    if PNC.WorkZoneService and type(PNC.WorkZoneService.CreateZone) == "function" then
+        PNC.WorkZoneService.CreateZone({
+            id = zone.id, operation = "FARMING", zoneType = "FARMING",
+            ownerType = zone.ownerType, ownerId = zone.ownerId,
+            colonyId = zone.colonyId, factionId = zone.factionId,
+            baseId = zone.baseId, geometry = zone.geometry,
+            bounds = zone.bounds, enabled = zone.enabled,
+        })
+    elseif PNC.ZoneService and type(PNC.ZoneService.Register) == "function" then
         PNC.ZoneService.Register({
             id = zone.id, type = "FARMING",
             ownerType = zone.ownerType, ownerId = zone.ownerId,
@@ -123,6 +131,9 @@ function Service.AssignWorker(zoneId, npcId)
     if npcId == "" then return false, "NPC_REQUIRED" end
     zone.workers = zone.workers or {}
     zone.workers[npcId] = true
+    if PNC.WorkZoneService and type(PNC.WorkZoneService.AssignWorker) == "function" then
+        PNC.WorkZoneService.AssignWorker(zoneId, npcId)
+    end
     if PNC.FarmingWorkAdapter and PNC.FarmingWorkAdapter.EnsureManualOrder then
         return PNC.FarmingWorkAdapter.EnsureManualOrder(zone, npcId)
     end
