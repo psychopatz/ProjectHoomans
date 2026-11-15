@@ -74,6 +74,11 @@ local function processOrder(order, at)
                 tostring(preparationReason or "WAITING_FOR_WORK_ITEM")
             Repository.MarkDirty()
             return
+        elseif order.status == Status.WAITING_RESOURCE
+            and order.blockedReason == "WAITING_FOR_WORK_ITEM"
+        then
+            order.status, order.blockedReason = Status.WAITING_FOR_WORKER, nil
+            Repository.MarkDirty()
         end
     end
     local prepare = Service.PreparationHandlers[order.operation]
@@ -141,7 +146,14 @@ local function processOrder(order, at)
         end
         local ok, reason = claimStation(order, worker)
         if not ok then
-            order.status, order.blockedReason = Status.BLOCKED, reason
+            if reason == "WAITING_FOR_WORK_ITEM"
+                or order.status == Status.WAITING_RESOURCE
+            then
+                order.status = Status.WAITING_RESOURCE
+                order.blockedReason = tostring(reason or "WAITING_FOR_WORK_ITEM")
+            else
+                order.status, order.blockedReason = Status.BLOCKED, reason
+            end
             Repository.MarkDirty(); return
         end
     end

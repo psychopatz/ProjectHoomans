@@ -96,4 +96,27 @@ Registry.Register("FISHING", {
     },
 })
 
+Registry.Register("FARMING", {
+    labelKey = "UI_PNC_Job_Farmer",
+    requirements = {
+        {
+            role = "primary_tool",
+            labelKey = "UI_PNC_JobRequirement_FarmingTool",
+            candidates = {
+                "Base.HandFork",
+                "Base.Trowel",
+                "Base.Shovel",
+                "Base.Shovel2",
+                "Base.SnowShovel",
+                "Base.GardenFork",
+                "Base.GardenHoe",
+            },
+            quantity = 1,
+            durable = true,
+            equipSlot = "primary",
+            validator = "farming_tool",
+        },
+    },
+})
+
 return Registry

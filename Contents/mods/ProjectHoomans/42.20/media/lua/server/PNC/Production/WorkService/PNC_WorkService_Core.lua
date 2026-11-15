@@ -142,7 +142,9 @@ local function workerAvailable(record, order)
     if not belongsToOrder(record, order) then
         return false, "ORDER_OWNERSHIP_MISMATCH"
     end
-    if order.operation == "LUMBER" or order.operation == "CORPSE_HAUL" then
+    if Definitions.UsesFatigueGate
+        and Definitions.UsesFatigueGate(order.operation)
+    then
         local fatigueOK, fatigueReason = FatigueGate.Check(record)
         if not fatigueOK then return false, fatigueReason end
     end
@@ -172,7 +174,13 @@ local function workerAvailable(record, order)
     then
         local report = PNC.WorkItemService.Check(record, order.operation)
         if not report.ok then
-            return false, report.reason or "WAITING_FOR_WORK_ITEM"
+            local canAcquire = not order.requiredWorkerId
+                and type(PNC.WorkItemService.CanAcquireFromStorage) == "function"
+                and PNC.WorkItemService.CanAcquireFromStorage(
+                    record, order.operation) == true
+            if not canAcquire then
+                return false, report.reason or "WAITING_FOR_WORK_ITEM"
+            end
         end
     end
     if Service.ClaimsByWorker[tostring(record.id)] then

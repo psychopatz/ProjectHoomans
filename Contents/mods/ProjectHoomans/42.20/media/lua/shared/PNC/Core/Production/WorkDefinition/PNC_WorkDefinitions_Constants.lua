@@ -9,7 +9,8 @@ Definitions.OPERATION = {
     DECONSTRUCT = "DECONSTRUCT",
     BUILD_OBJECT = "BUILD_OBJECT", READ_BOOK = "READ_BOOK",
     PROVISION_PICKUP = "PROVISION_PICKUP", CORPSE_HAUL = "CORPSE_HAUL",
-    LUMBER = "LUMBER", WORK_ITEM_PICKUP = "WORK_ITEM_PICKUP",
+    LUMBER = "LUMBER", FISHING = "FISHING", FARMING = "FARMING",
+    WORK_ITEM_PICKUP = "WORK_ITEM_PICKUP",
     WORK_ITEM_RETURN = "WORK_ITEM_RETURN",
 }
 
@@ -49,6 +50,8 @@ Definitions.JOB_BY_OPERATION = {
     PROVISION_PICKUP = "Provisioner",
     CORPSE_HAUL = "CorpseHaul",
     LUMBER = "Lumber",
+    FISHING = "Fishing",
+    FARMING = "Farmer",
     WORK_ITEM_PICKUP = "WorkItemLogistics",
     WORK_ITEM_RETURN = "WorkItemLogistics",
 }
@@ -68,6 +71,8 @@ Definitions.CAPABILITY_BY_OPERATION = {
     -- Lumber claims a world object, while the tree ledger remains the
     -- authority for discovery, reservations, damage, and output.
     LUMBER = "work.lumber",
+    FISHING = "work.fishing",
+    FARMING = "work.farming",
 }
 
 -- These operations own their progress clock. The generic scheduler must not
@@ -75,15 +80,27 @@ Definitions.CAPABILITY_BY_OPERATION = {
 Definitions.MANUAL_PROGRESS = {
     CORPSE_HAUL = true,
     LUMBER = true,
+    FISHING = true,
+    FARMING = true,
 }
 
--- Operations in this table genuinely require a live body. Corpse hauling is
--- hybrid: visible workers use the physical path, while abstract workers
--- commit a durable world effect when their simulated progress ends.
+Definitions.USES_FATIGUE_GATE = {
+    CORPSE_HAUL = true,
+    LUMBER = true,
+    FISHING = true,
+    FARMING = true,
+}
+
+-- Operations in this table genuinely require a live body. World-chore
+-- operations are hybrid: visible workers use the physical path, while
+-- abstract workers run bounded simulation or commit durable world effects.
 Definitions.REQUIRES_LIVE = {}
 
 Definitions.EXECUTION_POLICY = {
     CORPSE_HAUL = "HYBRID",
+    LUMBER = "HYBRID",
+    FISHING = "HYBRID",
+    FARMING = "HYBRID",
 }
 
 Definitions.WORLD_EFFECT_BY_OPERATION = {
@@ -117,7 +134,17 @@ Definitions.LOCATION_POLICY_BY_OPERATION = {
         returnHome = "STAY" },
     READ_BOOK = { start = "HOME", execution = "REMOTE",
         returnHome = "STAY" },
+    LUMBER = { start = "ANYWHERE", execution = "REMOTE",
+        returnHome = "STAY" },
+    FISHING = { start = "ANYWHERE", execution = "REMOTE",
+        returnHome = "HOME" },
+    FARMING = { start = "ANYWHERE", execution = "REMOTE",
+        returnHome = "HOME" },
 }
+
+function Definitions.UsesFatigueGate(operation)
+    return Definitions.USES_FATIGUE_GATE[tostring(operation or "")] == true
+end
 
 function Definitions.LocationPolicy(operation)
     return Definitions.LOCATION_POLICY_BY_OPERATION[tostring(operation or "")]

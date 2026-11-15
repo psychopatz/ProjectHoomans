@@ -13,6 +13,24 @@ local now = Internal.now
 local copy = Internal.copy
 
 local function claimStation(order, worker)
+    if order.operation ~= "WORK_ITEM_PICKUP"
+        and order.operation ~= "WORK_ITEM_RETURN"
+        and PNC.WorkItemService
+        and type(PNC.WorkItemService.Check) == "function"
+    then
+        local report = PNC.WorkItemService.Check(worker, order.operation)
+        if not report.ok then
+            if type(PNC.WorkItemService.PrepareForWorker) == "function" then
+                local ready, prepReason = PNC.WorkItemService.PrepareForWorker(
+                    order, worker)
+                if ready ~= true then
+                    return false, prepReason or "WAITING_FOR_WORK_ITEM"
+                end
+            else
+                return false, report.reason or "WAITING_FOR_WORK_ITEM"
+            end
+        end
+    end
     local live = PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(worker.id) or nil
     local acquired = Internal.acquireWorkTarget(order, worker, live)

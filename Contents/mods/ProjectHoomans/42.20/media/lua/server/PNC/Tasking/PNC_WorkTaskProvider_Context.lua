@@ -9,6 +9,9 @@ local Internal = Provider.Internal
 local Status = PNC.WorkDefinitions.STATUS
 
 local function needsFatigueGate(operation)
+    if PNC.WorkDefinitions and PNC.WorkDefinitions.UsesFatigueGate then
+        return PNC.WorkDefinitions.UsesFatigueGate(operation)
+    end
     return operation == "LUMBER" or operation == "CORPSE_HAUL"
 end
 

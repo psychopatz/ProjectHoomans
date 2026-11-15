@@ -76,6 +76,10 @@ local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
             PNC.OrderSystem.SetOrder(record, order.previousOrder)
         end
     end
+    if order.autoAssignedWorker == true then
+        order.requiredWorkerId = nil
+        order.autoAssignedWorker = nil
+    end
     order.workerId, order.stationId, order.facilityId = nil, nil, nil
     order.facilityReservationId, order.previousOrder = nil, nil
     order.stationTarget, order.collectionTarget = nil, nil

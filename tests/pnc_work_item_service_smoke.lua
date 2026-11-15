@@ -22,7 +22,15 @@ T.equal(require "PNC/Core/Jobs/PNC_JobRequirements", PNC.JobRequirements,
     "legacy requirement path must return the canonical registry")
 T.equal(require "PNC/Core/Jobs/PNC_WorkItemService", PNC.WorkItemService,
     "legacy work-item path must return the canonical service")
-T.equal(#PNC.JobRequirements.All(), 2, "alias must not duplicate registered operations")
+T.equal(#PNC.JobRequirements.All(), 3, "alias must not duplicate registered operations")
+T.equal(type(PNC.WorkItemService.CanAcquireFromStorage), "function",
+    "WorkItemService exposes CanAcquireFromStorage")
+local canAcquireNoStorage, noStorageReason =
+    PNC.WorkItemService.CanAcquireFromStorage({ id = "npc-1" }, "FARMING")
+T.falsy(canAcquireNoStorage,
+    "CanAcquireFromStorage returns false when server storage is absent")
+T.equal(noStorageReason, "WORK_ITEM_STORAGE_UNAVAILABLE",
+    "CanAcquireFromStorage reports unavailable storage reason")
 
 PNC.WorkItemService.RegisterValidator("lumber_tool", function(_, item)
     local fullType = tostring(item.type or "")

@@ -30,16 +30,28 @@ local function workerFor(order)
         and PNC.Registry.Get and PNC.Registry.Get(order.workerId) or nil
 end
 
+local function operationKey(operation)
+    return string.upper(tostring(operation or ""))
+end
+
 local function operationHasRequirements(operation)
+    if type(Service.OperationHasRequirements) == "function" then
+        return Service.OperationHasRequirements(operation)
+    end
     local registry = PNC.JobRequirements
     local requirements = registry and registry.GetRequirements
-        and registry.GetRequirements(operation) or nil
+        and registry.GetRequirements(operationKey(operation)) or nil
     return type(requirements) == "table" and #requirements > 0
 end
 
 local function requirementTypes(operation)
+    if type(Service.GetRequirementCandidates) == "function" then
+        return Service.GetRequirementCandidates(operation, "primary")
+    end
     local output = {}
-    local requirements = PNC.JobRequirements.GetRequirements(operation) or {}
+    local requirements = PNC.JobRequirements
+        and PNC.JobRequirements.GetRequirements
+        and PNC.JobRequirements.GetRequirements(operationKey(operation)) or {}
     for index = 1, #requirements do
         local requirement = requirements[index]
         if requirement.equipSlot == "primary" then
@@ -49,6 +61,89 @@ local function requirementTypes(operation)
         end
     end
     return output
+end
+
+local function storageCandidateCount(storage, itemTypes)
+    if not storage then return 0 end
+    if PNC.ColonyStorageService
+        and type(PNC.ColonyStorageService.CountProductionAvailable) == "function"
+    then
+        return tonumber(PNC.ColonyStorageService.CountProductionAvailable(
+            storage.id, itemTypes)) or 0
+    end
+    local inventory = storage.inventory
+    if inventory and type(inventory.count) == "function" then
+        local total = 0
+        for index = 1, #(itemTypes or {}) do
+            total = total + (tonumber(inventory:count({
+                fullType = itemTypes[index],
+            })) or 0)
+        end
+        return total
+    end
+    return 0
+end
+
+local function hasActivePendingPickup(record, operation)
+    local key = operationKey(operation)
+    local runtime = record and record.runtime or nil
+    local pending = runtime and runtime.workItemPickups
+        and runtime.workItemPickups[key] or nil
+    local pendingOrder = pending and Work and Work.Queries
+        and Work.Queries.Get and Work.Queries.Get(pending.orderID) or nil
+    if pendingOrder and pendingOrder.status ~= Status.COMPLETED
+        and pendingOrder.status ~= Status.CANCELLED
+        and pendingOrder.status ~= Status.FAILED
+        and pendingOrder.status ~= Status.BLOCKED
+    then
+        return true, pendingOrder
+    end
+    return false, nil
+end
+
+local function clearPendingPickup(record, operation)
+    local key = operationKey(operation)
+    local runtime = record and record.runtime or nil
+    if runtime and runtime.workItemPickups then
+        runtime.workItemPickups[key] = nil
+    end
+end
+
+local function wakeRequestedOrder(orderID, releaseAutoWorker, workerID)
+    if not orderID or not PNC.WorkRepository
+        or type(PNC.WorkRepository.Get) ~= "function"
+    then return end
+    local requested = PNC.WorkRepository.Get(orderID)
+    if not requested then return end
+    if requested.status == Status.COMPLETED
+        or requested.status == Status.CANCELLED
+        or requested.status == Status.FAILED
+    then return end
+    local changed = false
+    if releaseAutoWorker == true and requested.autoAssignedWorker == true
+        and (not workerID
+            or tostring(requested.requiredWorkerId or "") == tostring(workerID))
+    then
+        requested.requiredWorkerId = nil
+        requested.autoAssignedWorker = nil
+        changed = true
+    end
+    if requested.status == Status.WAITING_RESOURCE
+        and requested.blockedReason == "WAITING_FOR_WORK_ITEM"
+    then
+        requested.status = Status.WAITING_FOR_WORKER or "WAITING_FOR_WORKER"
+        requested.blockedReason = nil
+        requested.revision = (tonumber(requested.revision) or 0) + 1
+        changed = true
+    end
+    if changed then
+        if PNC.WorkRepository.MarkDirty then PNC.WorkRepository.MarkDirty() end
+        if Work and Work.Commands
+            and type(Work.Commands.MarkAssignmentDirty) == "function"
+        then
+            Work.Commands.MarkAssignmentDirty(requested, "WORK_ITEM_READY")
+        end
+    end
 end
 
 local function selectedType(reservation)
@@ -154,6 +249,8 @@ local function finishPickup(order)
         returnPolicy = "ON_JOB_END",
         sourceFullType = payload.selectedType,
     })
+    clearPendingPickup(worker, operation)
+    wakeRequestedOrder(payload.requestedOrderID, false, worker.id)
     return true
 end
 
@@ -177,6 +274,14 @@ end
 local function cancelPickup(order)
     local payload = payloadFor(order)
     local worker = workerFor(order)
+    local operation = tostring(payload.operation or "")
+    local workerID = worker and worker.id or order.workerId or order.requiredWorkerId
+    local targetWorker = worker or (workerID and PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(workerID) or nil)
+    if targetWorker and operation ~= "" then
+        clearPendingPickup(targetWorker, operation)
+    end
+    wakeRequestedOrder(payload.requestedOrderID, true, workerID)
     if payload.collected == true then
         if not worker or not PNC.ColonyStorageService
             or not PNC.ColonyStorageService.ReturnCollectedProductionRecords
@@ -189,19 +294,12 @@ local function cancelPickup(order)
 end
 
 local function requestPickup(record, order)
-    local operation = tostring(order.operation or "")
+    local operation = operationKey(order.operation)
     local report = Service.Check(record, operation)
     if report.ok then return true end
     record.runtime = record.runtime or {}
     record.runtime.workItemPickups = record.runtime.workItemPickups or {}
-    local pending = record.runtime.workItemPickups[operation]
-    local pendingOrder = pending and Work.Queries and Work.Queries.Get
-        and Work.Queries.Get(pending.orderID) or nil
-    if pendingOrder and pendingOrder.status ~= Status.COMPLETED
-        and pendingOrder.status ~= Status.CANCELLED
-        and pendingOrder.status ~= Status.FAILED
-        and pendingOrder.status ~= Status.BLOCKED
-    then
+    if hasActivePendingPickup(record, operation) then
         return false, "WAITING_FOR_WORK_ITEM"
     end
     record.runtime.workItemPickups[operation] = nil
@@ -247,6 +345,79 @@ local function requestPickup(record, order)
     return false, "WAITING_FOR_WORK_ITEM"
 end
 
+function Service.CheckStorageAvailability(record, operation)
+    local key = operationKey(operation)
+    local registry = PNC.JobRequirements
+    local requirements = registry and registry.GetRequirements
+        and registry.GetRequirements(key) or nil
+    if type(requirements) ~= "table" or #requirements == 0 then
+        return true
+    end
+    if not record or record.alive == false then
+        return false, "worker_unavailable"
+    end
+    if hasActivePendingPickup(record, key) then
+        return true, nil, "pending_work_item_pickup"
+    end
+    local access = PNC.StorageAccessPolicy
+    local storage, accessReason
+    if access and type(access.Resolve) == "function" then
+        storage, accessReason = access.Resolve(record)
+    end
+    if not storage then
+        return false, accessReason or "NO_WORK_ITEM_STORAGE"
+    end
+    for index = 1, #requirements do
+        local requirement = requirements[index]
+        local needed = math.max(1, math.floor(tonumber(requirement.quantity) or 1))
+        local available = storageCandidateCount(
+            storage, requirement.candidates or {})
+        if available < needed then
+            return false, "NO_WORK_ITEM_SUPPLY"
+        end
+    end
+    return true, storage
+end
+
+function Service.CanAcquireFromStorage(record, operation)
+    return Service.CheckStorageAvailability(record, operation)
+end
+
+function Service.PrepareForWorker(order, record)
+    if not order or order.operation == PICKUP or order.operation == RETURN
+        or not operationHasRequirements(order.operation)
+    then return true end
+    if not record or record.alive == false then
+        return false, "WORKER_NOT_FOUND"
+    end
+    local report = Service.Check(record, order.operation)
+    if report.ok then return true end
+    local boundAutoWorker = false
+    if not order.requiredWorkerId then
+        order.requiredWorkerId = tostring(record.id)
+        order.autoAssignedWorker = true
+        boundAutoWorker = true
+    elseif tostring(order.requiredWorkerId) ~= tostring(record.id) then
+        return false, "REQUIRED_WORKER_MISMATCH"
+    end
+    local ready, reason = requestPickup(record, order)
+    if ready == true then return true end
+    if reason == "WAITING_FOR_WORK_ITEM" then
+        order.status = Status.WAITING_RESOURCE or "WAITING_RESOURCE"
+        order.blockedReason = "WAITING_FOR_WORK_ITEM"
+        order.revision = (tonumber(order.revision) or 0) + 1
+        if PNC.WorkRepository and PNC.WorkRepository.MarkDirty then
+            PNC.WorkRepository.MarkDirty()
+        end
+        return false, "WAITING_FOR_WORK_ITEM"
+    end
+    if boundAutoWorker then
+        order.requiredWorkerId = nil
+        order.autoAssignedWorker = nil
+    end
+    return false, reason
+end
+
 function Service.PrepareOrder(order)
     if not order or order.operation == PICKUP or order.operation == RETURN
         or not order.requiredWorkerId
@@ -254,10 +425,31 @@ function Service.PrepareOrder(order)
     then return true end
     local record = PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(order.requiredWorkerId) or nil
-    if not record then return false, "WORKER_NOT_FOUND" end
+    if not record or record.alive == false then
+        if order.autoAssignedWorker == true then
+            order.requiredWorkerId = nil
+            order.autoAssignedWorker = nil
+            if PNC.WorkRepository and PNC.WorkRepository.MarkDirty then
+                PNC.WorkRepository.MarkDirty()
+            end
+            return true
+        end
+        return false, "WORKER_NOT_FOUND"
+    end
     local report = Service.Check(record, order.operation)
     if report.ok then return true end
-    return requestPickup(record, order)
+    local ready, reason = requestPickup(record, order)
+    if ready ~= true and reason ~= "WAITING_FOR_WORK_ITEM"
+        and order.autoAssignedWorker == true
+    then
+        order.requiredWorkerId = nil
+        order.autoAssignedWorker = nil
+        if PNC.WorkRepository and PNC.WorkRepository.MarkDirty then
+            PNC.WorkRepository.MarkDirty()
+        end
+        return true
+    end
+    return ready, reason
 end
 
 function Service.ReturnToStorage(record, operation, lease, options)

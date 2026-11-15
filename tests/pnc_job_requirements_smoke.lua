@@ -8,6 +8,24 @@ T.equal(Registry.All()[1], "LUMBER",
     "job requirement listing does not preserve registration order")
 T.equal(Registry.All()[2], "FISHING",
     "job requirement listing omits fishing")
+T.equal(Registry.All()[3], "FARMING",
+    "job requirement listing omits farming")
+
+local farmingDefinition = Registry.Get("farming")
+T.truthy(farmingDefinition, "farming requirement definition registered")
+T.equal(#farmingDefinition.requirements, 1,
+    "farming exposes one primary digging tool requirement")
+local farmingReq = farmingDefinition.requirements[1]
+T.equal(farmingReq.role, "primary_tool", "farming requirement role")
+T.equal(farmingReq.equipSlot, "primary", "farming equips digging tool")
+T.truthy(farmingReq.durable, "farming digging tool is durable")
+T.equal(farmingReq.validator, "farming_tool", "farming tool validator id")
+T.equal(farmingReq.candidates[1], "Base.HandFork",
+    "farming includes hand fork candidate")
+T.equal(farmingReq.candidates[2], "Base.Trowel",
+    "farming includes trowel candidate")
+T.equal(farmingReq.candidates[7], "Base.GardenHoe",
+    "farming includes garden hoe candidate")
 
 local definition = Registry.Get("lumber")
 T.truthy(definition, "lumber requirement definition registered")

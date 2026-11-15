@@ -115,6 +115,41 @@ function Service.RegisterValidator(id, validator)
     return true
 end
 
+function Service.OperationHasRequirements(operation)
+    local key = operationKey(operation)
+    local registry = PNC.JobRequirements
+    local requirements = registry and registry.GetRequirements
+        and registry.GetRequirements(key) or nil
+    return type(requirements) == "table" and #requirements > 0
+end
+
+function Service.GetRequirementCandidates(operation, equipSlot)
+    local key = operationKey(operation)
+    local output = {}
+    local registry = PNC.JobRequirements
+    local requirements = registry and registry.GetRequirements
+        and registry.GetRequirements(key) or {}
+    for index = 1, #requirements do
+        local requirement = requirements[index]
+        if not equipSlot or requirement.equipSlot == equipSlot then
+            for typeIndex = 1, #(requirement.candidates or {}) do
+                output[#output + 1] = requirement.candidates[typeIndex]
+            end
+        end
+    end
+    return output
+end
+
+function Service.CanAcquireFromStorage(record, operation)
+    if type(Service.CheckStorageAvailability) == "function" then
+        return Service.CheckStorageAvailability(record, operation)
+    end
+    if not Service.OperationHasRequirements(operation) then
+        return true
+    end
+    return false, "WORK_ITEM_STORAGE_UNAVAILABLE"
+end
+
 function Service.Check(record, operation, body, preferredID)
     local key = operationKey(operation)
     local registry = PNC.JobRequirements
