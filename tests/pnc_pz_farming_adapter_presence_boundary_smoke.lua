@@ -39,7 +39,13 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.PZFarmingAdapter[name]), "function",
         "entry point preserves PZFarmingAdapter." .. name)
 end
-T.equal(publicCount, 13, "PZ-farming-adapter function declaration count")
+T.equal(publicCount, 16, "PZ-farming-adapter function declaration count")
+T.equal(type(PNC.PZFarmingAdapter.CanPlowSquare), "function",
+    "entry point exposes PZFarmingAdapter.CanPlowSquare")
+T.equal(type(PNC.PZFarmingAdapter.Plow), "function",
+    "entry point exposes PZFarmingAdapter.Plow")
+T.equal(type(PNC.PZFarmingAdapter.InspectZone), "function",
+    "entry point exposes PZFarmingAdapter.InspectZone")
 T.equal(type(PNC.PZFarmingAdapter.IsWaterItem), "function",
     "entry point preserves PZFarmingAdapter.IsWaterItem")
 

@@ -10,7 +10,9 @@ require "PNC/Farming/FarmingService/PNC_FarmingService_Context"
 require "PNC/Farming/FarmingService/PNC_FarmingService_Commands"
 require "PNC/Farming/FarmingService/PNC_FarmingService_Materials"
 require "PNC/Farming/FarmingService/PNC_FarmingService_Snapshots"
+require "PNC/Farming/FarmingService/PNC_FarmingService_Zones"
 require "PNC/Farming/FarmingService/PNC_FarmingService_Ticks"
+require "PNC/Farming/FarmingService/PNC_FarmingService_AbstractTicks"
 require "PNC/Farming/FarmingService/PNC_FarmingService_Provider"
 
 return PNC.FarmingService

@@ -68,11 +68,30 @@ local plant = {
     saveData = function(self) self.saveCount = self.saveCount + 1 end,
 }
 
+local unplowedPlant = nil
+local dirtSquare = {
+    getX = function() return 11 end,
+    getY = function() return 20 end,
+    getZ = function() return 0 end,
+    getFloor = function() return { getSpriteName = function() return "blends_natural_01_64" end } end,
+}
+local concreteSquare = {
+    getX = function() return 12 end,
+    getY = function() return 20 end,
+    getZ = function() return 0 end,
+    getFloor = function() return { getSpriteName = function() return "blends_street_01_16" end } end,
+}
 local system = {
     hoursElapsed = 10,
     getLuaObjectAt = function(_, x, y, z)
         if x == 10 and y == 20 and z == 0 then return plant end
+        if x == 11 and y == 20 and z == 0 then return unplowedPlant end
         return nil
+    end,
+    plow = function(_, sq)
+        if sq == dirtSquare then
+            unplowedPlant = { state = "plow", waterLvl = 0 }
+        end
     end,
     growPlant = function(_, target)
         target.nbOfGrow = target.nbOfGrow + 1
@@ -88,7 +107,13 @@ ZomboidGlobals = { farmingFluidContainerMillilitresPerUse = 250 }
 Perks = { Farming = "Farming" }
 farming_vegetableconf = { props = { Cabbages = { fullGrown = 5 } } }
 getCell = function()
-    return { getGridSquare = function() return {} end }
+    return {
+        getGridSquare = function(_, x, y, z)
+            if x == 11 and y == 20 and z == 0 then return dirtSquare end
+            if x == 12 and y == 20 and z == 0 then return concreteSquare end
+            return {}
+        end,
+    }
 end
 
 PNC = {
@@ -217,5 +242,16 @@ local harvested, harvestReason = Adapter.Harvest(record, body, tile)
 T.equal(harvested, true, "harvesting succeeds")
 T.equal(harvestReason, "HARVESTED", "harvesting reason")
 T.equal(plant.harvestedBy, body, "vanilla receives the live farmer body")
+
+local okDirt = Adapter.CanPlowSquare(dirtSquare)
+local okConcrete, concreteReason = Adapter.CanPlowSquare(concreteSquare)
+T.equal(okDirt, true, "CanPlowSquare accepts natural dirt/grass floor")
+T.equal(okConcrete, false, "CanPlowSquare rejects street concrete floor")
+T.equal(concreteReason, "SQUARE_NOT_ARABLE", "concrete rejection reason")
+
+local plowed, plowReason = Adapter.Plow(record, body, { x = 11, y = 20, z = 0 })
+T.equal(plowed, true, "Adapter.Plow tills arable ground")
+T.equal(plowReason, "PLOWED", "plow return reason")
+T.equal(unplowedPlant and unplowedPlant.state, "plow", "system:plow creates furrow")
 
 T.finish("pnc_farming_mechanics_smoke")

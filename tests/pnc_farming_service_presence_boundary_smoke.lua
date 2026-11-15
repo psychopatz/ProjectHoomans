@@ -12,7 +12,9 @@ local providers = {
     "PNC_FarmingService_Commands",
     "PNC_FarmingService_Materials",
     "PNC_FarmingService_Snapshots",
+    "PNC_FarmingService_Zones",
     "PNC_FarmingService_Ticks",
+    "PNC_FarmingService_AbstractTicks",
     "PNC_FarmingService_Provider",
 }
 
@@ -43,7 +45,11 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.FarmingService[name]), "function",
         "entry point preserves FarmingService." .. name)
 end
-T.equal(publicCount, 8, "farming-service function declaration count")
+T.equal(publicCount, 16, "farming-service function declaration count")
+T.equal(type(PNC.FarmingService.CreateZone), "function",
+    "entry point exposes FarmingService.CreateZone")
+T.equal(type(PNC.FarmingService.HasActionableWork), "function",
+    "entry point exposes FarmingService.HasActionableWork")
 T.equal(type(PNC.FarmingService.Internal.Provider), "table",
     "farming task provider preserved")
 

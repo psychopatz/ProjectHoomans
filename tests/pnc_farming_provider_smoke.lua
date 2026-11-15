@@ -73,8 +73,10 @@ T.falsy(provider.CanContinue({ npcId = record.id, facilityId = facility.id,
     "camped farming lease cannot continue")
 
 camped = false
+record.job = nil
+record.affiliation = { role = "worker" }
 T.equal(#provider.GetCandidates(record.id), 1,
-    "non-camped farmer remains eligible")
+    "non-camped colonist with Farmer policy enabled (without farmer role) is eligible")
 
 record.fatigue = 0.90
 T.equal(#provider.GetCandidates(record.id), 0,

@@ -30,11 +30,22 @@ local function reservationItemFullType(reservation)
 end
 
 local function storageFor(facility)
-    local base = baseFor(facility)
-    if not base or not PNC.ColonyStorageRepository
+    if not PNC.ColonyStorageRepository
         or not PNC.ColonyStorageRepository.GetPrimary
     then return nil end
-    return PNC.ColonyStorageRepository.GetPrimary(base.factionId, base.colonyId)
+    local base = baseFor(facility)
+    local factionId = (base and base.factionId) or (facility and facility.factionId)
+    local colonyId = (base and base.colonyId) or (facility and facility.colonyId)
+    if not colonyId and PNC.BaseService and facility and facility.ownerId
+        and PNC.BaseService.GetForColony
+    then
+        local colBase = PNC.BaseService.GetForColony(facility.ownerId)
+        if colBase then
+            factionId, colonyId = colBase.factionId, colBase.colonyId
+        end
+    end
+    if not colonyId then return nil end
+    return PNC.ColonyStorageRepository.GetPrimary(factionId, colonyId)
 end
 
 local function retrieveMaterial(record, facility, itemTypes, runtime)
@@ -111,6 +122,9 @@ local function operation(record, body, facility, plot, runtime, tile, inspection
     if not entry then return false, "UNKNOWN_CROP" end
     if policy.autoHarvest and tile.status == "HARVESTABLE" then
         return Adapter.Harvest(record, body, tile)
+    end
+    if policy.autoPlow and tile.status == "NEEDS_PLOW" and Adapter.Plow then
+        return Adapter.Plow(record, body, tile)
     end
     local tileKey = tostring(tile.x) .. ":" .. tostring(tile.y) .. ":" .. tostring(tile.z)
     if policy.autoPlant and tile.status == "EMPTY_FURROW"

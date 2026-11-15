@@ -1,4 +1,4 @@
--- Live and abstract farming activity ticks.
+-- Live farming facility activity tick (see AbstractTicks for abstract mode).
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
@@ -82,15 +82,6 @@ function Service.TickLive(record, body, runtime, now)
     end
     runtime.phase = "WAITING_FOR_CROP_STATE"
     runtime.nextFarmingOperationAt = now + 10000
-    return true
-end
-
-function Service.TickAbstract(record, lease)
-    local runtime = record and record.runtime and record.runtime.facilityActivity
-    if runtime then
-        runtime.phase = "WAITING_FOR_WORLD"
-        runtime.lastFarmingReason = "WAITING_FOR_WORLD"
-    end
     return true
 end
 

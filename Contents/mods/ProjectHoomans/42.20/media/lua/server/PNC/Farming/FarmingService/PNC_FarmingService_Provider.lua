@@ -22,32 +22,30 @@ local function recordFor(id)
     return PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
 end
 
-local function isFarmer(record)
-    local affiliation = record and record.affiliation or {}
-    local role = tostring(affiliation.role or affiliation.communityRole or "")
-    return role == "farmer" or record and record.job == "Farmer"
-end
-
 local function isCamped(record)
     return PNC.HomeDutyService
         and PNC.HomeDutyService.IsCamped
         and PNC.HomeDutyService.IsCamped(record) == true
 end
 
+local function managedByWorkService()
+    return PNC.FarmingWorkAdapter ~= nil and PNC.WorkService ~= nil
+end
+
 function Provider.GetCandidates(npcId)
+    if managedByWorkService() then
+        if PNC.FarmingWorkAdapter.Reconcile then PNC.FarmingWorkAdapter.Reconcile() end
+        return {}
+    end
     local record = recordFor(npcId)
     if not record or record.alive == false or isCamped(record)
-        or not isFarmer(record)
         or not WorkPolicy.IsEnabled(record, Farming.FARMER_JOB)
     then return {} end
-    local fatigueOK = FatigueGate.Check(record)
-    if not fatigueOK then return {} end
-    local base = PNC.HomeDutyService and PNC.HomeDutyService.GetBase
-        and PNC.HomeDutyService.GetBase(record) or nil
+    if not FatigueGate.Check(record) then return {} end
+    local base = PNC.HomeDutyService and PNC.HomeDutyService.GetBase and PNC.HomeDutyService.GetBase(record)
     if not base then return {} end
     local output = {}
-    for _, facility in ipairs(PNC.FacilityService.ListByCapability(
-        base.id, "farm.work") or {}) do
+    for _, facility in ipairs(PNC.FacilityService.ListByCapability(base.id, "farm.work") or {}) do
         if Service.HasConfiguredWork(facility)
             and PNC.FacilityReservations.HasCapacity(facility, "farm.work")
         then
@@ -56,8 +54,7 @@ function Provider.GetCandidates(npcId)
                 npcId = tostring(record.id), kind = "FARM_MAINTENANCE",
                 sourceDomain = "farming", sourceRef = facility.id,
                 precedence = "NORMAL_WORK", urgency = 0.35,
-                workPriority = WorkPolicy.GetPriority(record,
-                    Farming.FARMER_JOB),
+                workPriority = WorkPolicy.GetPriority(record, Farming.FARMER_JOB),
                 capability = "farm.work", revision = facility.revision,
             }
         end
@@ -66,6 +63,7 @@ function Provider.GetCandidates(npcId)
 end
 
 function Provider.Validate(intent)
+    if managedByWorkService() then return false end
     local record = recordFor(intent and intent.npcId)
     if not record or isCamped(record) then return false end
     local fatigueOK, fatigueReason = FatigueGate.Check(record)
@@ -103,10 +101,11 @@ function Provider.Start(lease, assignment)
     if not fatigueOK then return false, fatigueReason end
     local ok, reason = PNC.FacilityJobs.Start(record, assignment.facilityId,
         "farm.work", { automatic = true, acquired = assignment,
-            taskLeaseId = lease.leaseId,
-            abstract = lease.executionMode == "ABSTRACT" })
-    if ok then PNC.TaskLeaseService.SetPhase(lease.leaseId,
-        lease.executionMode == "LIVE" and "TRAVEL" or "WAITING") end
+            taskLeaseId = lease.leaseId, abstract = lease.executionMode == "ABSTRACT" })
+    if ok then
+        PNC.TaskLeaseService.SetPhase(lease.leaseId,
+            lease.executionMode == "LIVE" and "TRAVEL" or "WAITING")
+    end
     return ok, reason
 end
 
@@ -114,29 +113,22 @@ function Provider.CanContinue(lease)
     local facility = Repository.GetFacility(lease and lease.facilityId)
     local record = recordFor(lease and lease.npcId)
     if not facility or not record or record.alive == false
-        or isCamped(record)
-        or not Repository.GetComponent(lease.componentId)
+        or isCamped(record) or not Repository.GetComponent(lease.componentId)
     then return false end
     local fatigueOK, fatigueReason = FatigueGate.Check(record)
     if not fatigueOK then return false, fatigueReason end
-    local live = PNC.Registry.GetLiveZombie
-        and PNC.Registry.GetLiveZombie(record.id) or nil
+    local live = PNC.Registry.GetLiveZombie and PNC.Registry.GetLiveZombie(record.id)
     return (lease.executionMode == "LIVE") == (live ~= nil)
 end
 
 function Provider.GetRecoveryState(lease)
     local record = recordFor(lease and lease.npcId)
-    local activity = record and record.runtime
-        and record.runtime.facilityActivity or nil
-    local progressAt = activity and activity.lastProgressAt
-        or lease and lease.lastProgressAt
+    local activity = record and record.runtime and record.runtime.facilityActivity
+    local progressAt = activity and activity.lastProgressAt or lease and lease.lastProgressAt
     if not record or record.alive == false then
-        return { terminal = true, phase = "WAITING",
-            lastProgressAt = progressAt }
+        return { terminal = true, phase = "WAITING", lastProgressAt = progressAt }
     end
-    if not activity or tostring(activity.taskLeaseId or "")
-        ~= tostring(lease and lease.leaseId or "")
-    then
+    if not activity or tostring(activity.taskLeaseId or "") ~= tostring(lease and lease.leaseId or "") then
         return {
             invalid = true, phase = "WAITING", watchable = true,
             timeoutMs = 15000, recoveryReason = "farming_activity_missing",
@@ -145,21 +137,15 @@ function Provider.GetRecoveryState(lease)
     end
     local phase = tostring(activity.phase or lease and lease.phase or "WAITING")
     if phase == "TRAVELLING" then phase = "TRAVEL" end
-    local snapshot = {
-        phase = phase,
-        lastProgressAt = progressAt,
-        watchable = phase == "WORKING" or phase == "FARMING",
-    }
-    if phase == "QUEUED" or phase == "STARTING"
-        or phase == "INTERRUPTED"
-    then
-        snapshot.watchable = true
-        snapshot.timeoutMs = 15000
+    local snapshot = { phase = phase, lastProgressAt = progressAt,
+        watchable = phase == "WORKING" or phase == "FARMING" }
+    if phase == "QUEUED" or phase == "STARTING" or phase == "INTERRUPTED" then
+        snapshot.watchable, snapshot.timeoutMs = true, 15000
         snapshot.recoveryReason = "farming_scene_start_timeout"
     end
-    if phase == "TRAVEL"
-        and Recovery and Recovery.ApplyMovementRecovery
-    then snapshot = Recovery.ApplyMovementRecovery(snapshot, lease, record) end
+    if phase == "TRAVEL" and Recovery and Recovery.ApplyMovementRecovery then
+        snapshot = Recovery.ApplyMovementRecovery(snapshot, lease, record)
+    end
     return snapshot
 end
 
@@ -187,8 +173,7 @@ function Provider.Cancel(lease, reason)
         and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(record, lease.baseId)
     then
-        PNC.HomeDutyService.SendHome(record, lease.baseId,
-            "work_fatigue_gate")
+        PNC.HomeDutyService.SendHome(record, lease.baseId, "work_fatigue_gate")
     end
     return true
 end
@@ -197,7 +182,7 @@ function Provider.Complete(lease)
     return Provider.Cancel(lease)
 end
 
-if PNC.Tasking and PNC.Tasking.Commands then
+if PNC.Tasking and PNC.Tasking.Commands and not managedByWorkService() then
     PNC.Tasking.Commands.RegisterProvider("farming", Provider)
 end
 

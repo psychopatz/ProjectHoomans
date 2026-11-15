@@ -16,6 +16,40 @@ local farmingSkill = Internal.FarmingSkill
 local FatigueGate = PNC.WorkFatigueGate
     or require "PNC/Core/Needs/PNC_WorkFatigueGate"
 
+---Plows an unplanted arable square using the worker's FARMING digging tool.
+function Adapter.Plow(record, body, tile)
+    body = nativeBody(record, body)
+    if not body then return false, "WAITING_FOR_WORLD" end
+    local fatigueOK, fatigueReason = FatigueGate.Check(record)
+    if not fatigueOK then return false, fatigueReason end
+    if Adapter.GetPlantAt(tile.x, tile.y, tile.z) then
+        return false, "ALREADY_FURROW"
+    end
+    local square = Internal.SquareAt
+        and Internal.SquareAt(tile.x, tile.y, tile.z) or nil
+    local canPlow, plowReason = Adapter.CanPlowSquare(square)
+    if not canPlow then return false, plowReason end
+    if PNC.WorkItemService and type(PNC.WorkItemService.Ensure) == "function" then
+        local ensured, ensureReason = PNC.WorkItemService.Ensure(
+            record, "FARMING", body, {
+                owner = "work:FARMING", priority = "WORK",
+                applyHands = body ~= nil,
+            })
+        if not ensured then
+            return false, ensureReason or "DIGGING_TOOL_MISSING"
+        end
+    end
+    local system = farmingSystem()
+    if not system or type(system.plow) ~= "function" then
+        return false, "FARMING_SYSTEM_UNAVAILABLE"
+    end
+    system:plow(square)
+    if PNC.Inventory and PNC.Inventory.CaptureLooseInventory then
+        PNC.Inventory.CaptureLooseInventory(record, body)
+    end
+    return true, "PLOWED"
+end
+
 function Adapter.Plant(record, body, component, tile, desiredCrop)
     body = nativeBody(record, body)
     if not body then return false, "WAITING_FOR_WORLD" end

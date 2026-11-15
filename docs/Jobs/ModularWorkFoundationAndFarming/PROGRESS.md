@@ -1,10 +1,10 @@
 # Modular Work Foundation & Zone-Based Farming Progress
 
 ## Parent Goal Status
-`IN_PROGRESS` (Phase F3 accepted; continuing to Phase F4)
+`IN_PROGRESS` (Phase F4 accepted; continuing to Phase F5)
 
 ## Current Phase
-`Phase F4 — Rebuild Farming as a Zone-Based Chore on Unified Foundation`
+`Phase F5 — UI/Debug Diagnostics, Full Regression & Acceptance`
 
 ## Accepted Items
 - Full repository audit of `server/PNC/Production/`, `server/PNC/Tasking/`, `server/PNC/Farming/`, `server/PNC/Fishing/`, `server/PNC/Lumber/`, and `shared/PNC/Core/Production/`.
@@ -26,17 +26,24 @@
   - Integrated `PNC.WorkToilRunner.ObserveLiveApproach` into `PNC_CorpseHaulService_WorkAdapter_Tick.lua` for `SOURCE_APPROACH` and `DESTINATION_APPROACH`.
   - Added `tests/pnc_fishing_work_adapter_smoke.lua` and verified Kahlua compatibility across all Phase F3 modules.
 
+- **Phase F4 Accepted (`TEST_VERIFIED`):**
+  - Removed the `affiliation.role == "farmer"` gate across `PNC_FarmingService_Provider.lua` and `PNC_FarmingWorkAdapter_OrderBridge.lua`; any colonist with `WorkPolicy.IsEnabled(record, Farming.FARMER_JOB)` can perform `FARMING`.
+  - Extended `shared/PNC/Core/Farming/PNC_Farming.lua` (`autoPlow = true`, `ZoneInfo`, `MAX_ZONE_*` bounds) and `PZFarmingAdapter` (`CanPlowSquare`, `Plow`, `InspectZone`, unplowed arable `ValidatePlotRegion` + `NEEDS_PLOW` classification).
+  - Added zone-based `PNC_FarmingService_Zones.lua` (`CreateZone`, `GetZone`, `ListZones`, `SetZoneDesiredCrop`, `SetZonePolicy`, `AssignWorker`), split `PNC_FarmingService_AbstractTicks.lua` for real abstract growth/input consumption/output deposit via `PNC.WorkOutputService.FlushAbstractDelivery`, and updated `PNC_FarmingService_Materials.lua` + `_Snapshots.lua`.
+  - Created `PNC.FarmingWorkAdapter` (`PNC_FarmingWorkAdapter.lua`, `_Selection.lua`, `_OrderBridge.lua`, `_Actions.lua`, `_Execution.lua`), wired into `PNC_ServerComposition.lua`, registering `"FARMING"` in `PNC.WorkService` (and deferring legacy `"farm.work"` when unified adapter + service are active) so colonists acquire tools (`WorkItemService`), collect seeds/water (`WorkInputService`), walk/animate through `Plow -> Seed -> Water -> Harvest` (`WorkToilRunner`), and deposit harvests (`WorkOutputService`).
+  - Added `tests/pnc_farming_work_adapter_smoke.lua` and updated `pnc_farming_mechanics_smoke`, `pnc_farming_provider_smoke`, `pnc_farming_service_presence_boundary_smoke`, and `pnc_pz_farming_adapter_presence_boundary_smoke`.
+
 ## Current Evidence
-- `TEST_VERIFIED`: `python3 tests/run_tests.py pnc_lumber_*_smoke pnc_fishing_*_smoke pnc_corpse_haul_*_smoke pnc_work_output_service_smoke pnc_work_toil_runner_smoke pnc_work_service_presence_boundary_smoke` (27 tests) -> `PASS 27/27`.
-- `STATIC_VERIFIED`: `pz_verify.py --kahlua` across `PNC/Lumber`, `PNC/Fishing`, and `PNC_CorpseHaulService_WorkAdapter_Tick.lua` -> 0 Kahlua issues.
+- `TEST_VERIFIED`: `python3 tests/run_tests.py` across 14 Phase F4 farming & unified work foundation smoke tests -> `PASS 14/14 in 0.19s`.
+- `STATIC_VERIFIED`: `pz_verify.py --kahlua --tokens` across all 21 files under `server/PNC/Farming/` and `PNC_Farming.lua` -> 0 Kahlua issues, 0 bloated files.
 
 ## Known Gap
-- `Farming` is still tied to `FacilityJobs` (`farm.work`), requires `affiliation.role == "farmer"`, lacks `PZFarmingAdapter.CanPlowSquare`/`Plow` support on unplowed dirt/grass, does not collect seeds/water/tools physically via `WorkInputService`/`WorkItemService` or haul harvests via `WorkOutputService`, and lacks real `TickAbstract` progression.
+- UI / debug inspection and `PNC_SettlementManagement_FacilityActions_Area.lua` arable-soil plot/zone designation compatibility need Phase F5 verification, along with full project regression (`python3 tests/run_tests.py`) and live/runtime harness availability check.
 
 ## Immediate Next Chunk
-**Phase F4:** Remove the `affiliation.role == "farmer"` gate, add `PZFarmingAdapter.CanPlowSquare` & `Plow`, add zone-based farming (`CreateZone` + plot compatibility), register `FARMING` with `PNC.WorkService` (retiring `FacilityJobs` `"farm.work"`), execute `Plow -> Plant -> Water -> Harvest` through `WorkToilRunner` + `WorkInputService` + `WorkOutputService`, and implement real `TickAbstract` progression.
+**Phase F5:** Audit and update UI/debug diagnostics and `PNC_SettlementManagement_FacilityActions_Area.lua`, verify translations/`--i18n`, run full `ProjectHoomans` test suite and static verification, check local PZ runtime harness status (without launching native PZ unless authorized), and reconcile final `PROGRESS.md`/`HANDOFF.md` checkpoint.
 
 ## Immediate Acceptance Criteria
-1. Any colonist with `WorkPolicy.IsEnabled(record, "Farmer")` can claim a `FARMING` order on a zone containing actionable tiles (`NEEDS_PLOW`, `NEEDS_SEED`, `NEEDS_WATER`, `HARVESTABLE`), acquire a digging tool + seeds/water from colony storage, walk to tiles, plow/plant/water/harvest, and deposit harvests into storage.
-2. Zones with only well-watered `GROWING` tiles do not keep colonists pinned to active `FARMING` orders.
-3. Abstract farming advances growth/state and deposits outputs into `ColonyStorageRepository` without stalling in `WAITING_FOR_WORLD`, with `pnc_farming_mechanics_smoke`, `pnc_farming_provider_smoke`, and `pnc_pz_farming_adapter_presence_boundary_smoke` passing.
+1. Colony management / work UI & debug snapshots expose unified `FARMING`, `LUMBER`, `FISHING`, and `CORPSE_HAUL` statuses, active toil phases, and waiting reasons cleanly, and settlement farming designation supports unplowed arable soil without requiring pre-built furrows.
+2. Full `python3 tests/run_tests.py` suite passes with zero regressions and zero Kahlua/token-bloat/i18n findings across Phase F1–F5 changes.
+3. `PROGRESS.md` and `HANDOFF.md` accurately reflect final developer-verified evidence and any remaining user-owned live SP/MP validation gate.

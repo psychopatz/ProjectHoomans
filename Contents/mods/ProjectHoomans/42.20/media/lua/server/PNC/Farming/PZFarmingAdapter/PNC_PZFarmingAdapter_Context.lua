@@ -38,7 +38,14 @@ function Adapter.GetPlantAt(x, y, z)
 end
 
 local function eachTile(component, visitor)
-    local valid, reason, info = Farming.RectangleInfo(component and component.region)
+    local valid, reason, info
+    if type(component) == "table" and not component.region
+        and type(Farming and Farming.ZoneInfo) == "function"
+    then
+        valid, reason, info = Farming.ZoneInfo(component)
+    else
+        valid, reason, info = Farming.RectangleInfo(component and component.region)
+    end
     if not valid then return false, reason end
     for y = info.minY, info.maxY do
         for x = info.minX, info.maxX do
