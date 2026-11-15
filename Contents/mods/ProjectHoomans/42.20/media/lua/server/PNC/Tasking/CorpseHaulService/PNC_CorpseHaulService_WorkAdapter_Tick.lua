@@ -36,6 +36,27 @@ local function releaseAbstractWorker(order)
     return released == true, reason or "WORLD_EFFECT_WORKER_RELEASE_FAILED"
 end
 
+---Observes CorpseHaul live travel through WorkToilRunner when available.
+local function observeCorpseApproach(order, task, record, body, targetKey, targetPos, now)
+    local runner = PNC and PNC.WorkToilRunner
+    if not runner or type(runner.ObserveLiveApproach) ~= "function" then
+        return true
+    end
+    local status = runner.ObserveLiveApproach(record, body, targetKey, targetPos, now, {
+        watchSlot = "corpse_haul",
+        issueMove = false,
+        haltOnArrival = false,
+        isArrived = function() return false end,
+    })
+    if record.runtime and record.runtime.workApproachDiagnostic ~= nil then
+        record.runtime.corpseHaulTravelDiagnostic = record.runtime.workApproachDiagnostic
+    end
+    if status == "stalled" then
+        return operationFailure(order, task, record, "TRAVEL", "TRAVEL_STALLED")
+    end
+    return true
+end
+
 local function tickAbstractWorkOrder(order)
     order = WorkRepository and WorkRepository.Get(order and order.id) or order
     if not order then return false, "WORK_ORDER_UNAVAILABLE" end
@@ -119,8 +140,13 @@ local function tickWorkOrder(order, lease)
                 x = assignment.interactionX, y = assignment.interactionY,
                 z = assignment.interactionZ,
             })
+            return true
         end
-        return true
+        return observeCorpseApproach(order, task, record, body,
+            "corpse_source:" .. tostring(order and order.id or ""), {
+                x = assignment.interactionX, y = assignment.interactionY,
+                z = assignment.interactionZ,
+            }, now)
     end
     if task.phase == "GRAB_PENDING" then
         local sequenceState, sequenceReason = actionStatus(record, order)
@@ -227,8 +253,13 @@ local function tickWorkOrder(order, lease)
                 x = assignment.dropX, y = assignment.dropY,
                 z = assignment.dropZ,
             })
+            return true
         end
-        return true
+        return observeCorpseApproach(order, task, record, body,
+            "corpse_drop:" .. tostring(order and order.id or ""), {
+                x = assignment.dropX, y = assignment.dropY,
+                z = assignment.dropZ,
+            }, now)
     end
     if task.phase == "DROP_PENDING" then
         local sequenceState, sequenceReason = actionStatus(record, order)

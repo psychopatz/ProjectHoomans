@@ -331,6 +331,9 @@ function Service.AssignWorker(zoneId, npcId)
     job.revision = (tonumber(job.revision) or 0) + 1
     if job.state == "CANCELLED" then job.state, job.phase = "READY", "WAITING" end
     Service.Data.jobs[npcId] = job
+    if PNC.FishingWorkAdapter and PNC.FishingWorkAdapter.EnsureOrder then
+        PNC.FishingWorkAdapter.EnsureOrder(job)
+    end
     zone.revision = (tonumber(zone.revision) or 0) + 1
     H.MarkDirty()
     if PNC.Tasking and PNC.Tasking.Events and PNC.Tasking.Events.Emit then

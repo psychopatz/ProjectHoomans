@@ -194,6 +194,24 @@ end
 
 function Adapter.Target(order, worker)
     local job = jobForOrder(order)
+    if not job and order and order.payload and order.payload.zoneId
+        and not order.requiredWorkerId
+    then
+        local zone = Service.GetZone(order.payload.zoneId)
+        if not zone or zone.enabled ~= true then
+            return nil, "LUMBER_JOB_UNAVAILABLE"
+        end
+        local target = zoneCenter(zone)
+        if not target then return nil, "LUMBER_ZONE_TARGET_MISSING" end
+        return {
+            ok = true,
+            componentId = "lumber-zone:" .. tostring(zone.id),
+            claimKey = "lumber-zone:" .. tostring(zone.id),
+            targetKind = "lumber_zone",
+            target = target,
+            phase = "TRAVEL",
+        }
+    end
     local zone = job and Service.GetZone(job.zoneId) or nil
     if not job or not zone or zone.enabled ~= true then
         return nil, "LUMBER_JOB_UNAVAILABLE"
@@ -217,6 +235,16 @@ end
 
 function Adapter.Execute(order, lease)
     local job = jobForOrder(order)
+    if (not job or job.active ~= true) and order and order.workerId
+        and order.payload and order.payload.zoneId
+        and type(Service.AssignWorker) == "function"
+    then
+        local okAssign, assigned = Service.AssignWorker(
+            order.payload.zoneId, order.workerId)
+        if okAssign and type(assigned) == "table" then
+            job = assigned
+        end
+    end
     if not job or job.active ~= true then
         return false, "LUMBER_JOB_UNAVAILABLE"
     end

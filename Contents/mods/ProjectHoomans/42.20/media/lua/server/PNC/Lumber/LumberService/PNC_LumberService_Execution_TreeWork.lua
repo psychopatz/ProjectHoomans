@@ -2,6 +2,8 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
+require "PNC/Production/WorkToilRunner/PNC_WorkToilRunner_Approach"
+
 local Service = PNC.LumberService
 local Internal = Service.Internal
 local now = Internal.Now
@@ -125,119 +127,29 @@ local function npcFatigueIsSufficient(record)
     return FatigueGate.Check(record)
 end
 
-local function travelWatchKey(tree, approach)
-    return table.concat({
-        tostring(tree and tree.key or ""),
-        tostring(approach and approach.x or ""),
-        tostring(approach and approach.y or ""),
-        tostring(approach and approach.z or ""),
-    }, "|")
-end
-
 local function observeLiveTravel(record, body, tree, approach, at)
-    record.runtime = record.runtime or {}
-    local key = travelWatchKey(tree, approach)
-    local watch = record.runtime.lumberTravelWatch
-    local bx = body and type(body.getX) == "function"
-        and body:getX() or record.x
-    local by = body and type(body.getY) == "function"
-        and body:getY() or record.y
-    local pathService = PNC.PathService
-    local recovery
-    local lastPathProgress
-    if type(watch) ~= "table" or watch.key ~= key then
-        watch = {
-            key = key,
-            startedAt = at,
-            lastProgressAt = at,
-            lastX = bx,
-            lastY = by,
-            recoveries = 0,
-            nextRetryAt = 0,
-        }
+    local approachRunner = PNC.WorkToilRunner
+        and PNC.WorkToilRunner.ObserveLiveApproach
+    if type(approachRunner) == "function" then
+        local status, watch, recovery = approachRunner(record, body,
+            tree and tree.key, approach, at, {
+                watchSlot = "lumber",
+                issueMove = false,
+                haltOnArrival = false,
+                stallTimeoutMs = LIVE_TRAVEL_STALL_TIMEOUT_MS,
+                recoveryCooldownMs = LIVE_TRAVEL_RECOVERY_COOLDOWN_MS,
+                maxRecoveries = LIVE_TRAVEL_MAX_RECOVERIES,
+                resetReason = "lumber_travel_stall",
+                isArrived = function() return false end,
+            })
+        record.runtime = record.runtime or {}
         record.runtime.lumberTravelWatch = watch
+        record.runtime.lumberTravelDiagnostic =
+            record.runtime.workApproachDiagnostic
+        if status == "moving" then return nil, watch, recovery end
+        return status, watch, recovery
     end
-
-    if watch.lastX ~= nil and watch.lastY ~= nil then
-        local dx = (tonumber(bx) or 0) - (tonumber(watch.lastX) or 0)
-        local dy = (tonumber(by) or 0) - (tonumber(watch.lastY) or 0)
-        if math.sqrt((dx * dx) + (dy * dy)) >= 0.05 then
-            watch.lastProgressAt = at
-        end
-    end
-    watch.lastX, watch.lastY = bx, by
-
-    if pathService and type(pathService.GetMovementRecoveryState)
-        == "function"
-    then
-        recovery = pathService.GetMovementRecoveryState(record, body, at)
-        lastPathProgress = recovery and tonumber(recovery.lastProgressAt)
-        if lastPathProgress and lastPathProgress > (
-            tonumber(watch.lastProgressAt) or 0)
-        then
-            watch.lastProgressAt = lastPathProgress
-        end
-    end
-
-    -- PathService owns native recovery. Reconcile the stale vanilla state at
-    -- the task boundary as well, because Behavior2 can publish path2 after
-    -- the regular planner fence in the same engine frame.
-    if recovery and recovery.ownerMode == "engine_path"
-        and PNC.EnginePathPlanner
-        and type(PNC.EnginePathPlanner.ReconcileNativeMovementOwner)
-            == "function"
-    then
-        PNC.EnginePathPlanner.ReconcileNativeMovementOwner(body)
-    end
-    record.runtime.lumberTravelDiagnostic = recovery and {
-        phase = recovery.phase,
-        ownerMode = recovery.ownerMode,
-        nativeStallRecoveryCount = recovery.nativeStallRecoveryCount,
-        nativeBackoff = recovery.nativeBackoff,
-        nativeFallback = recovery.nativeFallback,
-        lastProgressAt = recovery.lastProgressAt,
-        lastProgressReason = recovery.lastProgressReason,
-    } or nil
-
-    if at < (tonumber(watch.nextRetryAt) or 0) then
-        return "backoff", watch, recovery
-    end
-    -- A native backoff, fallback handoff, or traversal is already an active
-    -- recovery owner. Do not let lumber cancel/recreate the same route.
-    if recovery and (
-        recovery.nativeBackoff == true
-        or recovery.nativeFallback == true
-        or recovery.watchable == false
-    ) then
-        watch.lastProgressAt = at
-        watch.nextRetryAt = at + LIVE_TRAVEL_RECOVERY_COOLDOWN_MS
-        return "backoff", watch, recovery
-    end
-    if at - (tonumber(watch.lastProgressAt) or at)
-        < LIVE_TRAVEL_STALL_TIMEOUT_MS
-    then
-        return nil, watch, recovery
-    end
-
-    if (tonumber(watch.recoveries) or 0) < LIVE_TRAVEL_MAX_RECOVERIES then
-        local resetAccepted = true
-        if pathService and pathService.Commands
-            and type(pathService.Commands.Reset) == "function"
-        then
-            resetAccepted = pathService.Commands.Reset(
-                record, body, "lumber_travel_stall") ~= false
-        elseif pathService and type(pathService.Reset) == "function" then
-            resetAccepted = pathService.Reset(
-                body, record, "lumber_travel_stall") ~= false
-        end
-        if resetAccepted then
-            watch.recoveries = (tonumber(watch.recoveries) or 0) + 1
-            watch.lastProgressAt = at
-            watch.nextRetryAt = at + LIVE_TRAVEL_RECOVERY_COOLDOWN_MS
-            return "recovered", watch, recovery
-        end
-    end
-    return "stalled", watch, recovery
+    return nil, nil, nil
 end
 
 

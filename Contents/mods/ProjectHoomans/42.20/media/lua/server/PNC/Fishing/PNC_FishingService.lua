@@ -183,6 +183,7 @@ require "PNC/Fishing/PNC_FishingService_Zone"
 require "PNC/Fishing/PNC_FishingService_Diagnostics"
 require "PNC/Fishing/PNC_FishingService_Job"
 require "PNC/Fishing/PNC_FishingService_Lifecycle"
+require "PNC/Fishing/PNC_FishingService_WorkOutput"
 require "PNC/Fishing/PNC_FishingService_Work"
 
 if Events and Events.OnInitGlobalModData and not Service.LoadHookRegistered then

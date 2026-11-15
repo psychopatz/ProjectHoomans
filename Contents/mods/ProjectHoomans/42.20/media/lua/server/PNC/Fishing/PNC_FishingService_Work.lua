@@ -67,6 +67,12 @@ function Service.TickJob(lease)
     if not Service.ValidateZone(zone) then
         return finish(false, false, "fishing_zone_invalid")
     end
+    local at = H.Now()
+    if H.TickPendingOutputDelivery then
+        local handled, okOut, completeOut, reasonOut = H.TickPendingOutputDelivery(
+            live, job, zone, record, body, at, finish, isTired(record), isTired(record))
+        if handled then return okOut, completeOut, reasonOut end
+    end
     if isTired(record) then
         return finish(false, false, "fishing_npc_tired")
     end
@@ -113,7 +119,7 @@ function Service.TickJob(lease)
             handReady = tool.ready, handReason = tool.reason,
         })
     end
-    local at = H.Now()
+    at = H.Now()
     if job.spotRetryAt and at >= (tonumber(job.spotRetryAt) or 0) then
         job.failedSpots = nil
         job.spotRetryAt = nil
@@ -131,6 +137,13 @@ function Service.TickJob(lease)
             return finish(true, false, job.lastReason, { event = "spot_wait" })
         end
     end
+    if H.ObserveLiveTravel and live and not Service.IsNearby(record, zone, nil, job.spot, body) then
+        local travelState, okTravel, completeTravel, reasonTravel =
+            H.ObserveLiveTravel(job, zone, record, body, at, finish, distanceToSpot)
+        if travelState == "handled" then
+            return okTravel, completeTravel, reasonTravel
+        end
+    end
     if live and PNC.PathService
         and type(PNC.PathService.GetMovementRecoveryState) == "function"
     then
@@ -140,7 +153,7 @@ function Service.TickJob(lease)
             at
         )
     end
-    if live and not Service.IsNearby(record, zone, nil, job.spot, body) then
+    if (not H.ObserveLiveTravel) and live and not Service.IsNearby(record, zone, nil, job.spot, body) then
         local distance = distanceToSpot(record, body, job.spot)
         local travel = job.travel or {}
         if tostring(travel.spotId or "") ~= tostring(job.spotId or "") then
@@ -242,14 +255,30 @@ function Service.TickJob(lease)
 
     local preview = Fishing.SelectLoot(record, zone, (job.attemptIndex or 0) + 1)
     if preview and not canAccept(record, preview) then
-        job.state, job.phase = "WAITING", "WAITING_FOR_OUTPUT"
-        job.lastReason = "fishing_inventory_full"
-        job.lastFailureReason = job.lastReason
-        job.lastProgressAt = H.Now()
-        H.UpdateFishingRuntime(record, job, zone, job.phase)
-        H.MarkDirty()
-        return finish(true, false, "fishing_inventory_full", {
-            event = "output_wait" })
+        if not live and H.CanBypassInventoryGate and H.CanBypassInventoryGate(record) then
+            -- Abstract catches deposit straight into ColonyStorageService below.
+        elseif live and H.TickPendingOutputDelivery then
+            local handled, okOut, completeOut, reasonOut = H.TickPendingOutputDelivery(
+                true, job, zone, record, body, at, finish, false, true)
+            if handled then return okOut, completeOut, reasonOut end
+            job.state, job.phase = "WAITING", "WAITING_FOR_OUTPUT"
+            job.lastReason = "fishing_inventory_full"
+            job.lastFailureReason = job.lastReason
+            job.lastProgressAt = H.Now()
+            H.UpdateFishingRuntime(record, job, zone, job.phase)
+            H.MarkDirty()
+            return finish(true, false, "fishing_inventory_full", {
+                event = "output_wait" })
+        else
+            job.state, job.phase = "WAITING", "WAITING_FOR_OUTPUT"
+            job.lastReason = "fishing_inventory_full"
+            job.lastFailureReason = job.lastReason
+            job.lastProgressAt = H.Now()
+            H.UpdateFishingRuntime(record, job, zone, job.phase)
+            H.MarkDirty()
+            return finish(true, false, "fishing_inventory_full", {
+                event = "output_wait" })
+        end
     end
 
     local elapsed = math.max(0, math.min(Service.MAX_ELAPSED_MS,
@@ -320,52 +349,58 @@ function Service.TickJob(lease)
                         itemType = spec.type,
                     })
             end
-            if not canAccept(record, spec) then
-                job.lastFailureReason = "fishing_inventory_full"
-                if Service.FishingDiagnostics
-                    and Service.FishingDiagnostics.RecordAttempt
-                then
-                    Service.FishingDiagnostics.RecordAttempt(record, job, body,
-                        job.lastRoll, {
-                            reason = "output_rejected",
-                            itemType = spec.type,
-                            output = "rejected",
-                            outputReason = "fishing_inventory_full",
-                        })
+            if H.CommitCatchOutput then
+                local committed, okOut, completeOut, reasonOut = H.CommitCatchOutput(
+                    live, job, zone, record, body, spec, required, finish, canAccept, addCatch)
+                if not committed then return okOut, completeOut, reasonOut end
+            else
+                if not canAccept(record, spec) then
+                    job.lastFailureReason = "fishing_inventory_full"
+                    if Service.FishingDiagnostics
+                        and Service.FishingDiagnostics.RecordAttempt
+                    then
+                        Service.FishingDiagnostics.RecordAttempt(record, job, body,
+                            job.lastRoll, {
+                                reason = "output_rejected",
+                                itemType = spec.type,
+                                output = "rejected",
+                                outputReason = "fishing_inventory_full",
+                            })
+                    end
+                    job.workPoints = job.workPoints + required
+                    job.attemptIndex = math.max(0,
+                        (tonumber(job.attemptIndex) or 1) - 1)
+                    job.state, job.phase = "WAITING", "WAITING_FOR_OUTPUT"
+                    job.lastReason = "fishing_inventory_full"
+                    H.UpdateFishingRuntime(record, job, zone, job.phase)
+                    H.MarkDirty()
+                    return finish(true, false, "fishing_inventory_full", {
+                        event = "output_wait" })
                 end
-                job.workPoints = job.workPoints + required
-                job.attemptIndex = math.max(0,
-                    (tonumber(job.attemptIndex) or 1) - 1)
-                job.state, job.phase = "WAITING", "WAITING_FOR_OUTPUT"
-                job.lastReason = "fishing_inventory_full"
-                H.UpdateFishingRuntime(record, job, zone, job.phase)
-                H.MarkDirty()
-                return finish(true, false, "fishing_inventory_full", {
-                    event = "output_wait" })
-            end
-            local added, addReason = addCatch(record, spec)
-            if not added then
-                job.lastFailureReason = addReason or "fishing_inventory_full"
-                if Service.FishingDiagnostics
-                    and Service.FishingDiagnostics.RecordAttempt
-                then
-                    Service.FishingDiagnostics.RecordAttempt(record, job, body,
-                        job.lastRoll, {
-                            reason = "output_rejected",
-                            itemType = spec.type,
-                            output = "rejected",
-                            outputReason = addReason or "fishing_inventory_full",
-                        })
+                local added, addReason = addCatch(record, spec)
+                if not added then
+                    job.lastFailureReason = addReason or "fishing_inventory_full"
+                    if Service.FishingDiagnostics
+                        and Service.FishingDiagnostics.RecordAttempt
+                    then
+                        Service.FishingDiagnostics.RecordAttempt(record, job, body,
+                            job.lastRoll, {
+                                reason = "output_rejected",
+                                itemType = spec.type,
+                                output = "rejected",
+                                outputReason = addReason or "fishing_inventory_full",
+                            })
+                    end
+                    job.workPoints = job.workPoints + required
+                    job.attemptIndex = math.max(0,
+                        (tonumber(job.attemptIndex) or 1) - 1)
+                    job.state, job.phase = "WAITING", "WAITING_FOR_OUTPUT"
+                    job.lastReason = addReason or "fishing_inventory_full"
+                    H.UpdateFishingRuntime(record, job, zone, job.phase)
+                    H.MarkDirty()
+                    return finish(true, false, job.lastReason, {
+                        event = "output_wait" })
                 end
-                job.workPoints = job.workPoints + required
-                job.attemptIndex = math.max(0,
-                    (tonumber(job.attemptIndex) or 1) - 1)
-                job.state, job.phase = "WAITING", "WAITING_FOR_OUTPUT"
-                job.lastReason = addReason or "fishing_inventory_full"
-                H.UpdateFishingRuntime(record, job, zone, job.phase)
-                H.MarkDirty()
-                return finish(true, false, job.lastReason, {
-                    event = "output_wait" })
             end
             if Service.FishingDiagnostics
                 and Service.FishingDiagnostics.RecordAttempt

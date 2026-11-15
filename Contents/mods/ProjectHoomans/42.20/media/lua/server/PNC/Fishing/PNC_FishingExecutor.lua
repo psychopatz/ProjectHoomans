@@ -80,6 +80,12 @@ function Executor.GetCandidates(npcId)
         or zone.enabled ~= true or not Service.ValidateZone(zone)
         or not WorkPolicy.IsEnabled(record, "Fishing")
     then return {} end
+    if PNC.FishingWorkAdapter and PNC.WorkService then
+        if PNC.FishingWorkAdapter.EnsureOrder then
+            PNC.FishingWorkAdapter.EnsureOrder(job)
+        end
+        return {}
+    end
     local ready = ensureFishingWorkItem(record, job, zone)
     if ready ~= true then return {} end
     return {{
@@ -93,6 +99,7 @@ function Executor.GetCandidates(npcId)
 end
 
 function Executor.Validate(intent)
+    if PNC.FishingWorkAdapter and PNC.WorkService then return false end
     local npcId = intent and intent.npcId
     local record = recordFor(npcId)
     if not record or isCamped(record) then return false end
@@ -104,6 +111,9 @@ function Executor.Validate(intent)
 end
 
 function Executor.Assign(intent)
+    if PNC.FishingWorkAdapter and PNC.WorkService then
+        return nil, "FISHING_WORK_AUTHORITY"
+    end
     local record = recordFor(intent and intent.npcId)
     if not record or isCamped(record) then return nil, "NPC_CAMPED" end
     local job = Service and Service.GetJob and Service.GetJob(intent and intent.npcId)
@@ -218,7 +228,8 @@ function Executor.Complete(lease)
     return Executor.Cancel(lease, "fishing_complete")
 end
 
-if PNC.Tasking and PNC.Tasking.Commands
+if not (PNC.FishingWorkAdapter and PNC.WorkService)
+    and PNC.Tasking and PNC.Tasking.Commands
     and PNC.Tasking.Commands.RegisterProvider
 then
     PNC.Tasking.Commands.RegisterProvider("fishing", Executor)

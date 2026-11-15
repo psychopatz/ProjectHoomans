@@ -38,8 +38,10 @@ local function stepApproachAndPickup(context, record, body, effect, at, opts)
         end
     end
     if not square then
-        context.phase = "WAITING_FOR_OUTPUT_CHUNK"
-        return waitFailure(context, record, effect, at, "OUTPUT_CHUNK_LOADING", opts)
+        context.phase = opts and opts.chunkWaitPhase or "WAITING_FOR_OUTPUT_CHUNK"
+        local waitReason = opts and opts.chunkWaitReason or "OUTPUT_CHUNK_LOADING"
+        waitFailure(context, record, effect, at, waitReason, opts)
+        return true, false, opts and opts.chunkWaitReturnReason or "output_chunk_loading"
     end
     if context.phase == "OUTPUT_APPROACH" then
         local bx = body and body.getX and body:getX() or record.x

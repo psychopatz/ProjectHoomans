@@ -1,10 +1,10 @@
 # Modular Work Foundation & Zone-Based Farming Progress
 
 ## Parent Goal Status
-`IN_PROGRESS` (Phase F2 accepted; continuing to Phase F3)
+`IN_PROGRESS` (Phase F3 accepted; continuing to Phase F4)
 
 ## Current Phase
-`Phase F3 — Unify Lumber, Fishing & CorpseHaul Onto Foundation`
+`Phase F4 — Rebuild Farming as a Zone-Based Chore on Unified Foundation`
 
 ## Accepted Items
 - Full repository audit of `server/PNC/Production/`, `server/PNC/Tasking/`, `server/PNC/Farming/`, `server/PNC/Fishing/`, `server/PNC/Lumber/`, and `shared/PNC/Core/Production/`.
@@ -20,17 +20,23 @@
   - Wired both modules in `server/PNC/Production/PNC_Production.lua` without disturbing `pnc_work_service_presence_boundary_smoke`.
   - Verified all new Lua modules pass `pz_verify.py --kahlua --tokens` with 0 errors/warnings and 0 bloated files.
 
+- **Phase F3 Accepted (`TEST_VERIFIED`):**
+  - Refactored `LumberService` output capture/delivery (`OutputCapture`, `OutputDelivery_Pickup`, `OutputDelivery_Deposit`) and live tree approach watchdog (`TreeWork`) onto `PNC.WorkOutputService` and `PNC.WorkToilRunner.ObserveLiveApproach`, adding autonomous `NORMAL_WORK` zone orders alongside manual `FORCED_ORDER` orders (`PNC_LumberWorkAdapter_{OrderBridge,Lifecycle}.lua`).
+  - Added `PNC.FishingWorkAdapter` (`PNC_FishingWorkAdapter.lua` + `_OrderBridge.lua`), deferred standalone `PNC_FishingExecutor` provider registration when `PNC.WorkService` is active, integrated `WorkToilRunner.ObserveLiveApproach` and `WorkOutputService` catch delivery/flush (`PNC_FishingService_WorkOutput.lua` + `PNC_FishingService_Work.lua`), and wired `PNC_FishingWorkAdapter` into `PNC_ServerComposition.lua`.
+  - Integrated `PNC.WorkToilRunner.ObserveLiveApproach` into `PNC_CorpseHaulService_WorkAdapter_Tick.lua` for `SOURCE_APPROACH` and `DESTINATION_APPROACH`.
+  - Added `tests/pnc_fishing_work_adapter_smoke.lua` and verified Kahlua compatibility across all Phase F3 modules.
+
 ## Current Evidence
-- `TEST_VERIFIED`: `python3 tests/run_tests.py pnc_work_output_service_smoke pnc_work_toil_runner_smoke pnc_production_foundation_smoke pnc_production_lifecycle_smoke pnc_work_behavior_progress_smoke pnc_work_service_presence_boundary_smoke` -> `PASS 6/6`.
-- `STATIC_VERIFIED`: `pz_verify.py --kahlua --tokens` across `WorkOutputService/`, `WorkToilRunner/`, `PNC_WorkOutputService.lua`, and `PNC_WorkToilRunner.lua` -> `kahlua:0 files  bloat:0 files`.
+- `TEST_VERIFIED`: `python3 tests/run_tests.py pnc_lumber_*_smoke pnc_fishing_*_smoke pnc_corpse_haul_*_smoke pnc_work_output_service_smoke pnc_work_toil_runner_smoke pnc_work_service_presence_boundary_smoke` (27 tests) -> `PASS 27/27`.
+- `STATIC_VERIFIED`: `pz_verify.py --kahlua` across `PNC/Lumber`, `PNC/Fishing`, and `PNC_CorpseHaulService_WorkAdapter_Tick.lua` -> 0 Kahlua issues.
 
 ## Known Gap
-- `Lumber`, `Fishing`, and `CorpseHaul` still carry duplicated output-delivery/travel-recovery loops and standalone `Tasking` provider registrations (`PNC_LumberExecutor`, `PNC_FishingExecutor`) rather than delegating to `PNC.WorkOutputService` and `PNC.WorkToilRunner` under `PNC.WorkService` (`NORMAL_WORK` vs `FORCED_ORDER`).
+- `Farming` is still tied to `FacilityJobs` (`farm.work`), requires `affiliation.role == "farmer"`, lacks `PZFarmingAdapter.CanPlowSquare`/`Plow` support on unplowed dirt/grass, does not collect seeds/water/tools physically via `WorkInputService`/`WorkItemService` or haul harvests via `WorkOutputService`, and lacks real `TickAbstract` progression.
 
 ## Immediate Next Chunk
-**Phase F3:** Migrate `LumberService` output delivery & travel watchdog onto `PNC.WorkOutputService` & `PNC.WorkToilRunner` (retiring `PNC_LumberExecutor` provider registration, enabling autonomous `NORMAL_WORK` alongside `FORCED_ORDER`), register `FISHING` in `PNC.WorkService` (routing catches via `WorkOutputService` and retiring `PNC_FishingExecutor`), and align `CorpseHaulService_WorkAdapter` with `WorkToilRunner`.
+**Phase F4:** Remove the `affiliation.role == "farmer"` gate, add `PZFarmingAdapter.CanPlowSquare` & `Plow`, add zone-based farming (`CreateZone` + plot compatibility), register `FARMING` with `PNC.WorkService` (retiring `FacilityJobs` `"farm.work"`), execute `Plow -> Plant -> Water -> Harvest` through `WorkToilRunner` + `WorkInputService` + `WorkOutputService`, and implement real `TickAbstract` progression.
 
 ## Immediate Acceptance Criteria
-1. `LumberService` delegates output capture/delivery and live approach recovery to `PNC.WorkOutputService` and `PNC.WorkToilRunner` while supporting both autonomous `NORMAL_WORK` and manual zone assignment (`FORCED_ORDER`).
-2. `FISHING` registers in `PNC.WorkService` and delivers catches via `PNC.WorkOutputService` (`NPC_INVENTORY` live / ColonyStorage abstract), with standalone `PNC_FishingExecutor` / `PNC_LumberExecutor` Tasking provider registrations retired cleanly.
-3. Focused Lumber, Fishing, CorpseHaul, and WorkService smoke tests pass (`TEST_VERIFIED`).
+1. Any colonist with `WorkPolicy.IsEnabled(record, "Farmer")` can claim a `FARMING` order on a zone containing actionable tiles (`NEEDS_PLOW`, `NEEDS_SEED`, `NEEDS_WATER`, `HARVESTABLE`), acquire a digging tool + seeds/water from colony storage, walk to tiles, plow/plant/water/harvest, and deposit harvests into storage.
+2. Zones with only well-watered `GROWING` tiles do not keep colonists pinned to active `FARMING` orders.
+3. Abstract farming advances growth/state and deposits outputs into `ColonyStorageRepository` without stalling in `WAITING_FOR_WORLD`, with `pnc_farming_mechanics_smoke`, `pnc_farming_provider_smoke`, and `pnc_pz_farming_adapter_presence_boundary_smoke` passing.
