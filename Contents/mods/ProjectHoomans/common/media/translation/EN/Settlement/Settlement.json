@@ -204,7 +204,7 @@
     "UI_PNC_Facility_SelectCraftStation": "SELECT CRAFT STATION",
     "UI_PNC_Facility_SelectDiningTable": "SELECT DINING TABLE",
     "UI_PNC_Facility_SelectDisassemblyStation": "SELECT DISASSEMBLY STATION",
-    "UI_PNC_Facility_SelectFarmlandHelp": "Select connected cultivated farmland inside the base.",
+    "UI_PNC_Facility_SelectFarmlandHelp": "Select arable soil or cultivated farmland inside the base.",
     "UI_PNC_Facility_SelectFootprintHelp": "Select the building footprint inside the base territory.",
     "UI_PNC_Facility_SelectHospitalBed": "SELECT HOSPITAL BED",
     "UI_PNC_Facility_SelectLab": "SELECT LAB",

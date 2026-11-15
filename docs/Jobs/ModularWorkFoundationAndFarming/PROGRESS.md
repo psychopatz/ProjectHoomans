@@ -1,10 +1,10 @@
 # Modular Work Foundation & Zone-Based Farming Progress
 
 ## Parent Goal Status
-`IN_PROGRESS` (Phase F4 accepted; continuing to Phase F5)
+`READY_FOR_USER_LIVE_ACCEPTANCE` (Phases F1–F5 developer work verified and committed; only user-owned native SP/MP runtime verification remains because the local PZ JVM/profiler bridge is disconnected)
 
 ## Current Phase
-`Phase F5 — UI/Debug Diagnostics, Full Regression & Acceptance`
+`Phase F5 Complete (Developer-Side) — Ready for User-Owned Live SP/MP Acceptance`
 
 ## Accepted Items
 - Full repository audit of `server/PNC/Production/`, `server/PNC/Tasking/`, `server/PNC/Farming/`, `server/PNC/Fishing/`, `server/PNC/Lumber/`, and `shared/PNC/Core/Production/`.
@@ -33,17 +33,24 @@
   - Created `PNC.FarmingWorkAdapter` (`PNC_FarmingWorkAdapter.lua`, `_Selection.lua`, `_OrderBridge.lua`, `_Actions.lua`, `_Execution.lua`), wired into `PNC_ServerComposition.lua`, registering `"FARMING"` in `PNC.WorkService` (and deferring legacy `"farm.work"` when unified adapter + service are active) so colonists acquire tools (`WorkItemService`), collect seeds/water (`WorkInputService`), walk/animate through `Plow -> Seed -> Water -> Harvest` (`WorkToilRunner`), and deposit harvests (`WorkOutputService`).
   - Added `tests/pnc_farming_work_adapter_smoke.lua` and updated `pnc_farming_mechanics_smoke`, `pnc_farming_provider_smoke`, `pnc_farming_service_presence_boundary_smoke`, and `pnc_pz_farming_adapter_presence_boundary_smoke`.
 
+- **Phase F5 Accepted (`TEST_VERIFIED`, Developer-Side Complete):**
+  - Updated `PNC_WorkService_Snapshots.lua` (`BuildTaskSnapshot`, `BuildActionInformation`) so `FARMING`, `FISHING`, `CORPSE_HAUL`, `LUMBER`, and all `WorkService` operations expose unified `phase`, `toilPhase`, `waitingFor`, `waitingReason`, `blockedReason`, and `activityItemFullType` (`WorkItemService` tool lookup fallback).
+  - Updated `PNC_NameplatePresentation_Actions.lua`, `PNC_ColonistActivityPresentation.lua`, and `PNC_ColonistActivities_Core.lua` to render `FARMING`, `FISHING`, and `CORPSE_HAUL` action labels, active toil phases, and waiting/blocked reasons cleanly.
+  - Updated `PNC_SettlementManagement_FacilityActions_Area.lua` (`growing.plot`) and `EN`/`TL` `Settlement.json` + `Tasks.json` catalogs so UI plot designation accepts unplowed arable soil alongside cultivated furrows (`FARMLAND_REQUIRED` when barren) and all new UI action/job keys exist in both English and Tagalog.
+  - Updated `tests/pnc_mp_server_file_guard_smoke.lua` (`1033 -> 1053` guarded server files) and added `tests/pnc_work_ui_diagnostics_smoke.lua`.
+
 ## Current Evidence
-- `TEST_VERIFIED`: `python3 tests/run_tests.py` across 14 Phase F4 farming & unified work foundation smoke tests -> `PASS 14/14 in 0.19s`.
-- `STATIC_VERIFIED`: `pz_verify.py --kahlua --tokens` across all 21 files under `server/PNC/Farming/` and `PNC_Farming.lua` -> 0 Kahlua issues, 0 bloated files.
+- `TEST_VERIFIED`: `python3 tests/run_tests.py pnc_work_ui_diagnostics_smoke pnc_lumber_progress_snapshot_smoke pnc_activity_status_smoke pnc_production_lifecycle_smoke pnc_farming_work_adapter_smoke pnc_fishing_work_adapter_smoke pnc_corpse_haul_sequence_smoke pnc_mp_server_file_guard_smoke` -> `PASS 8/8 in 0.48s`.
+- `TEST_VERIFIED`: Full suite `python3 tests/run_tests.py` -> `1026/1027` passed (`pnc_mp_server_file_guard_smoke` passed across all 1053 server Lua files). The single failure (`pnc_population_director_smoke.lua:316`) loads zero files from any Phase F1–F5 subsystem and is an unrelated pre-existing failure in world bootstrap tests.
+- `STATIC_VERIFIED`: `pz_verify.py --kahlua` across `shared/PNC/Core/{Production,Farming}`, `server/PNC/{Production,Farming,Fishing,Lumber,Colony/Storage/ColonyStorageService,Colony/ColonyManagement}`, and `client/PNC/UI/{Colonist,Nameplates,SettlementManagement}` -> 0 Kahlua issues across 286 scanned files; `python3 -m json.tool` validated all 4 updated `EN`/`TL` JSON catalogs.
+- `ENVIRONMENT_OFFLINE`: `analyze_profiler.py bridge status` / `process status` reported `{ "configured": false, "connected": false, "state": "disconnected" }` — native Project Zomboid is not running, and live SP/MP runtime testing belongs to the user.
 
 ## Known Gap
-- UI / debug inspection and `PNC_SettlementManagement_FacilityActions_Area.lua` arable-soil plot/zone designation compatibility need Phase F5 verification, along with full project regression (`python3 tests/run_tests.py`) and live/runtime harness availability check.
+- Only user-owned live Project Zomboid SP/MP verification (`Console` clean, UI growing plot designation on unplowed dirt/grass, live NPC tool/seed/water collection, plow/plant/water/harvest, wood chopping, fishing, and corpse hauling in-engine) remains because live JVM execution is offline.
 
 ## Immediate Next Chunk
-**Phase F5:** Audit and update UI/debug diagnostics and `PNC_SettlementManagement_FacilityActions_Area.lua`, verify translations/`--i18n`, run full `ProjectHoomans` test suite and static verification, check local PZ runtime harness status (without launching native PZ unless authorized), and reconcile final `PROGRESS.md`/`HANDOFF.md` checkpoint.
+**User-Owned Acceptance:** Optionally launch Project Zomboid (SP/MP) and verify in-game zone/plot designation, colonist Farming/Lumber/Fishing/CorpseHaul execution, nameplates, and `console.txt`.
 
 ## Immediate Acceptance Criteria
-1. Colony management / work UI & debug snapshots expose unified `FARMING`, `LUMBER`, `FISHING`, and `CORPSE_HAUL` statuses, active toil phases, and waiting reasons cleanly, and settlement farming designation supports unplowed arable soil without requiring pre-built furrows.
-2. Full `python3 tests/run_tests.py` suite passes with zero regressions and zero Kahlua/token-bloat/i18n findings across Phase F1–F5 changes.
-3. `PROGRESS.md` and `HANDOFF.md` accurately reflect final developer-verified evidence and any remaining user-owned live SP/MP validation gate.
+1. All developer-side gates (Phases F1–F5 unit/integration tests, MP server guard across 1053 files, Kahlua static verification, EN/TL JSON validation) are verified and committed on `main`.
+2. User validates live SP/MP engine execution in Project Zomboid when ready.

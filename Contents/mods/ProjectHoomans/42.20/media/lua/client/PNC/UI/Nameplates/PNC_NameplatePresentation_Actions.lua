@@ -225,11 +225,17 @@ function Presentation.WorkActionStatus(snapshot)
         verb = tr("UI_PNC_Action_Grabbing", "Grabbing")
         target = itemName(info.activityItemFullType,
             tr("UI_PNC_Action_ProvisionTarget", "provision"))
+    elseif operation == "FARMING" then
+        verb, target = tr("UI_PNC_Action_Farming", "Farming"), ""
+    elseif operation == "FISHING" then
+        verb, target = tr("UI_PNC_Action_Fishing", "Fishing"), ""
+    elseif operation == "CORPSE_HAUL" then
+        verb, target = tr("UI_PNC_Action_CorpseHaul", "Hauling corpses"), ""
     else
         verb = tr("UI_PNC_Action_Working", "Working")
         target = tostring(operation)
     end
-    local text = verb .. " " .. target
+    local text = target ~= "" and (verb .. " " .. target) or verb
     local lumberText = lumberActionText(info, target)
     if lumberText then
         return lumberText .. " - " .. actionProgress(info, true),
@@ -247,14 +253,22 @@ function Presentation.WorkActionStatus(snapshot)
     elseif status == "TRAVEL_TO_STATION" then
         text = text .. " - " .. tr("UI_PNC_Action_Traveling", "traveling")
     elseif status == "BLOCKED" then
+        local reason = tostring(info.blockedReason or info.waitingReason or "")
         text = text .. " - " .. tr("UI_PNC_Action_Blocked", "blocked")
-    elseif info.waitingFor then
-        local waiting = tostring(info.waitingFor or "")
-        local reason = tostring(info.waitingReason or "")
         if reason ~= "" then
-            waiting = waiting .. ":" .. reason
+            text = text .. ": " .. string.lower(string.gsub(reason, "_", " "))
+        end
+    elseif info.waitingFor or info.waitingReason then
+        local waiting = tostring(info.waitingReason or info.waitingFor or "")
+        if info.waitingFor and info.waitingReason
+            and tostring(info.waitingFor) ~= tostring(info.waitingReason)
+        then
+            waiting = tostring(info.waitingFor) .. ": " .. tostring(info.waitingReason)
         end
         text = text .. " (" .. string.gsub(waiting, "[_:]", " ") .. ")"
+    elseif info.toilPhase and tostring(info.toilPhase) ~= "" then
+        text = text .. " (" .. string.lower(string.gsub(
+            tostring(info.toilPhase), "_", " ")) .. ")"
     end
     return text .. "  " .. actionProgress(info, false),
         ACTION_COLOR, true

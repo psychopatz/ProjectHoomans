@@ -53,7 +53,7 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
                 "Select the building footprint inside the base territory.")
             or role == "growing.plot"
             and Support.Tr("UI_PNC_Facility_SelectFarmlandHelp",
-                "Select connected cultivated farmland inside the base.")
+                "Select arable soil or cultivated farmland inside the base.")
             or role == "work.zone"
             and Support.Tr("UI_PNC_Facility_SelectWorkZoneHelp",
                 "Select one connected tile inside or beside the facility where workers stand.")
@@ -86,7 +86,7 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
                 local valid, plotReason = Farming.RectangleInfo(region)
                 if not valid then ok, reason = false, plotReason end
                 if ok then
-                    local furrow = false
+                    local workable = false
                     local farming = CFarmingSystem and CFarmingSystem.instance or nil
                     local bounds = GridRegion.bounds(region)
                     if not bounds then return false, "EMPTY_REGION" end
@@ -95,12 +95,16 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
                             local square = getCell():getGridSquare(x, y, bounds.minZ)
                             local plant = square and farming and farming.getLuaObjectOnSquare
                                 and farming:getLuaObjectOnSquare(square) or nil
-                            if plant and tostring(plant.state or "") == "plow" then
-                                furrow = true
+                            if plant or (square and ((Farming and Farming.CanPlowSquare
+                                and Farming.CanPlowSquare(square))
+                                or (ISFarmingMenu and ISFarmingMenu.canDigHere
+                                    and ISFarmingMenu.canDigHere({ square }))))
+                            then
+                                workable = true
                             end
                         end
                     end
-                    if not furrow then ok, reason = false, "FARMING_FURROW_REQUIRED" end
+                    if not workable then ok, reason = false, "FARMLAND_REQUIRED" end
                 end
             end
             return ok, ok and nil or Shared.SettlementReason(reason)

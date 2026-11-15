@@ -166,7 +166,9 @@ listing:close()
 -- same early runtime-role guard.
 -- Two guarded public LLM require forwarders retain legacy paths after the
 -- twelve implementations move to Conversation; each new path keeps its guard.
-T.equal(#serverOnlyFiles, 1033,
+-- Twenty unified WorkOutputService, WorkToilRunner, FishingWorkAdapter, and
+-- FarmingWorkAdapter/FarmingService modules share the standard server guard.
+T.equal(#serverOnlyFiles, 1053,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

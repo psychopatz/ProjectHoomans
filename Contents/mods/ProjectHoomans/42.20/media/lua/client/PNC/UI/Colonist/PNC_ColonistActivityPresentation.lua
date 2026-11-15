@@ -31,6 +31,11 @@ local WORK_REASON_LABELS = {
     LUMBER_STORAGE_NOT_FOUND = "stockpile unavailable",
     LUMBER_STOCKPILE_NOT_FOUND = "stockpile unavailable",
     TREE_CHUNK_LOADING = "tree area loading",
+    FARMING_TOOL_MISSING = "missing farming tool",
+    FISHING_TOOL_MISSING = "missing fishing rod",
+    NO_QUALIFIED_WORKER = "no qualified worker",
+    WAITING_FOR_WORK_ITEM = "waiting for tool",
+    no_valid_candidate = "missing required tool",
 }
 
 local function workReason(info)
@@ -96,7 +101,10 @@ function Presentation.Current(person)
         end
         local phase = tostring(info.phase or info.status or "")
         local reason = workReason(info)
-        if reason and (phase == "BLOCKED" or info.waitingFor) then
+        if reason and (phase == "BLOCKED" or info.status == "BLOCKED"
+            or info.waitingFor or info.waitingReason or info.blockedReason
+            or string.find(phase, "^WAITING", 1) == 1)
+        then
             phase = phase .. ": " .. reason
         end
         return phase ~= "" and label .. " (" .. phase .. ")" or label

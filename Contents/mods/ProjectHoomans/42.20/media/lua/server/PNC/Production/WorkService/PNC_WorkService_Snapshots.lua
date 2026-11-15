@@ -151,6 +151,40 @@ local function workItemDiagnostic(record, operation)
     return output
 end
 
+local function operationItemFullType(record, order, diagnostic)
+    local payload = order and order.payload or nil
+    if order.operation == "PROVISION_PICKUP" then
+        return provisionItemFullType(payload)
+    elseif productionOperation(order.operation) then
+        return productionItemFullType(payload, order.operation)
+    elseif constructionOperation(order.operation) then
+        return constructionItemFullType(payload)
+    elseif order.operation == "LUMBER" then
+        return lumberItemFullType(record)
+    end
+    local direct = payload and tostring(payload.activityItemFullType or "")
+        or ""
+    if direct ~= "" then return direct end
+    local selected = diagnostic and tostring(diagnostic.selectedFullType or "")
+        or ""
+    return selected ~= "" and selected or nil
+end
+
+local function resolveWaitingState(order, runtime)
+    local waitingFor = runtime and runtime.waitingFor or order.waitingFor or nil
+    local waitingReason = runtime and runtime.waitingReason
+        or order.waitingReason or order.blockedReason
+        or order.lastDiagnosticReason or nil
+    if not waitingFor then
+        if order.status == Status.WAITING_FOR_WORKER then
+            waitingFor = "worker"
+        elseif order.status == Status.WAITING_RESOURCE then
+            waitingFor = "resource"
+        end
+    end
+    return waitingFor, waitingReason
+end
+
 function Service.Queries.BuildTaskSnapshot(colonyId)
     local output = {}
     for _, order in ipairs(Service.Queries.List(colonyId)) do
@@ -162,17 +196,10 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
             local facilityId = order.facilityId or payload.facilityId
             local facility = facilityId and PNC.SettlementRepository
                 and PNC.SettlementRepository.GetFacility(facilityId) or nil
-            local activityItemFullType
-            if order.operation == "PROVISION_PICKUP" then
-                activityItemFullType = provisionItemFullType(payload)
-            elseif productionOperation(order.operation) then
-                activityItemFullType = productionItemFullType(payload,
-                    order.operation)
-            elseif constructionOperation(order.operation) then
-                activityItemFullType = constructionItemFullType(payload)
-            elseif order.operation == "LUMBER" then
-                activityItemFullType = lumberItemFullType(worker)
-            end
+            local activityItemFullType = operationItemFullType(
+                worker, order, workItemDiagnostic(worker, order.operation))
+            local waitingFor, waitingReason = resolveWaitingState(
+                order, worker and worker.runtime and worker.runtime.lumber)
             local required = math.max(1, tonumber(order.requiredWork) or 1)
             local progress = math.max(0, math.min(required,
                 tonumber(order.progress) or 0))
@@ -249,7 +276,10 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 lastExecutionFailurePhase = order.lastExecutionFailurePhase,
                 lastExecutionFailureAt = order.lastExecutionFailureAt,
                 phase = order.completionStarted == true and "ATOMIC_COMMIT"
-                    or order.status,
+                    or order.phase or order.livePhase or order.status,
+                toilPhase = order.phase or order.livePhase or nil,
+                waitingFor = waitingFor,
+                waitingReason = waitingReason,
                 locationState = worker and workLocationState
                     and workLocationState(worker, order) or nil,
                 locationPolicy = policy and copy(policy) or nil,
@@ -314,26 +344,18 @@ function Service.BuildActionInformation(record)
     local facilityId = payload.facilityId
     local facility = facilityId and PNC.SettlementRepository
         and PNC.SettlementRepository.GetFacility(facilityId) or nil
-    local activityItemFullType
-    if order.operation == "PROVISION_PICKUP" then
-        activityItemFullType = provisionItemFullType(payload)
-    elseif productionOperation(order.operation) then
-        activityItemFullType = productionItemFullType(payload,
-            order.operation)
-    elseif constructionOperation(order.operation) then
-        activityItemFullType = constructionItemFullType(payload)
-    elseif order.operation == "LUMBER" then
-        activityItemFullType = lumberItemFullType(record)
-    end
+    local workDiag = workItemDiagnostic(record, order.operation)
+    local activityItemFullType = operationItemFullType(record, order, workDiag)
     local lumber = order.operation == "LUMBER" and record.runtime
         and record.runtime.lumber or nil
     if order.operation == "LUMBER" then
         progress, required, lumber = lumberProgress(record, order)
     end
     local displayPhase = lumber and lumber.phase
-        or record.orderSpec and record.orderSpec.phase or nil
-    local displayWaitingFor = lumber and lumber.waitingFor or nil
-    local displayWaitingReason = lumber and lumber.waitingReason or nil
+        or order.phase or order.livePhase
+        or record.orderSpec and record.orderSpec.phase or order.status
+    local displayWaitingFor, displayWaitingReason =
+        resolveWaitingState(order, lumber)
     -- claimStation publishes the lease before the first lumber execution
     -- tick replaces the old WAITING_FOR_WORKER runtime record. Once this
     -- order is assigned, expose its phase instead of a stale worker wait.
@@ -360,6 +382,7 @@ function Service.BuildActionInformation(record)
         operation = order.operation,
         status = order.status,
         phase = displayPhase,
+        toilPhase = order.phase or order.livePhase or nil,
         waitingFor = displayWaitingFor,
         waitingReason = displayWaitingReason,
         blockedReason = lumber and lumber.blockedReason or order.blockedReason,
@@ -368,7 +391,7 @@ function Service.BuildActionInformation(record)
         capacity = lumber and PNC.Core.DeepCopy(lumber.capacity) or nil,
         movement = lumber and PNC.Core.DeepCopy(lumber.movement) or nil,
         toolDiagnostic = lumber and PNC.Core.DeepCopy(lumber.tool) or nil,
-        workItemDiagnostic = workItemDiagnostic(record, order.operation),
+        workItemDiagnostic = workDiag,
         progress = progress,
         requiredWork = required,
         percent = math.floor((progress / required) * 100 + 0.5),

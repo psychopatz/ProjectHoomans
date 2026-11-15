@@ -330,11 +330,25 @@ local function currentActivity(person)
             label = Shared.Tr("UI_PNC_Action_Grabbing", "GRABBING")
         elseif operation == "CORPSE_HAUL" then
             label = Shared.Tr("UI_PNC_CommandCorpseHaul", "GRAB CORPSES")
+        elseif operation == "FARMING" then
+            label = Shared.Tr("UI_PNC_Job_Farming", "FARMING")
+        elseif operation == "FISHING" then
+            label = Shared.Tr("UI_PNC_Job_Fishing", "FISHING")
+        elseif operation == "LUMBER" then
+            label = Shared.Tr("UI_PNC_Job_Lumber", "LUMBER")
         else
             label = tostring(info.buildDisplayName or info.recipeId
                 or operation or "WORKING")
         end
-        local phase = tostring(info.phase or "")
+        local phase = tostring(info.phase or info.status or "")
+        local reason = tostring(info.blockedReason or info.waitingReason or "")
+        if reason ~= "" and (phase == "BLOCKED"
+            or tostring(info.status or "") == "BLOCKED"
+            or info.waitingFor ~= nil
+            or string.find(phase, "^WAITING", 1) == 1)
+        then
+            phase = phase .. ": " .. string.lower(string.gsub(reason, "_", " "))
+        end
         return phase ~= "" and label .. " (" .. phase .. ")" or label
     end
     local label

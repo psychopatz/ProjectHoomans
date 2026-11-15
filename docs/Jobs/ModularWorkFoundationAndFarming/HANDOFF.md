@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "F4"
-phase_commit_message: "phase(F4): phase(F4): Rebuild zone-based Farming on unified work foundation"
-updated_at: "2026-11-15T20:07:59.164680Z"
+phase_commit_phase: "F5"
+phase_commit_message: "phase(F5): phase(F5): Unify work UI diagnostics, arable plot selection, and MP file guard"
+updated_at: "2026-11-15T20:18:56.471801Z"
 state: "CLEAN_CHECKPOINT"
-parent_status: "IN_PROGRESS"
+parent_status: "READY_FOR_USER_LIVE_ACCEPTANCE"
 phase: "F5"
-chunk: "Phase F5"
+chunk: "User-Owned Live SP/MP Acceptance"
 retrieval_tier: "verify"
 phase_commit_vector: "project-hoomans=self;psychopatz-core=e2a3deb56382c5895ddf60a9edfea48b2c23ccb1;dynamic-trading=4dcaa177bc59118e82e1681c57b742318de6fd62"
-phase_residual_vector: "project-hoomans=57403d00db22863ff56c135f1f7487e066b59fe15780e4e37d30ae7db8ded392;psychopatz-core=8f81cddfa93f62381634923df5c6227f43359b963041a181e2e995f4f082e799;dynamic-trading=8a0fa0da519971def56422df4843fd38d6b93027dcf3a36926891007b461ebb9"
-residual_worktree_fingerprint: "57403d00db22863ff56c135f1f7487e066b59fe15780e4e37d30ae7db8ded392"
+phase_residual_vector: "project-hoomans=cdbd9f5a44e6c0c1448068746617e6cdaae681910cba390c7f68a36fc69305be;psychopatz-core=d8adcd88225dc0cc253ac36ae34c225e8ea84c3eb7840ea56bc53cb30e0d3e2e;dynamic-trading=8a0fa0da519971def56422df4843fd38d6b93027dcf3a36926891007b461ebb9"
+residual_worktree_fingerprint: "cdbd9f5a44e6c0c1448068746617e6cdaae681910cba390c7f68a36fc69305be"
 codebase_memory_indexed_commit: "539bcb63d49148b5468f0bf611efb8c355f2ceea"
 ---
+
 
 
 
@@ -25,39 +26,40 @@ codebase_memory_indexed_commit: "539bcb63d49148b5468f0bf611efb8c355f2ceea"
 
 ## What became true
 
-- Removed the `affiliation.role == "farmer"` gate in `PNC_FarmingService_Provider.lua` and `PNC_FarmingWorkAdapter_OrderBridge.lua`; enabled `WorkPolicy.IsEnabled(record, "Farmer")` workers for `FARMING`.
-- Extended `PNC_Farming.lua` (`autoPlow = true`, `ZoneInfo`, `MAX_ZONE_*` bounds) and `PZFarmingAdapter` (`CanPlowSquare`, `Plow`, `InspectZone`, unplowed arable `ValidatePlotRegion` + `NEEDS_PLOW`).
-- Added `PNC_FarmingService_Zones.lua` and `PNC_FarmingService_AbstractTicks.lua` (real growth timers, seed/water consumption, plowing/seeding/watering/harvesting, and `WorkOutputService.FlushAbstractDelivery`).
-- Created `PNC.FarmingWorkAdapter` (`_Selection`, `_OrderBridge`, `_Actions`, `_Execution`), registered `"FARMING"` in `PNC.WorkService` (deferring legacy `"farm.work"` when unified adapter + service are loaded), and wired it in `PNC_ServerComposition.lua`.
-- Verified all 14 Phase F4 smoke/integration tests (`PASS 14/14`) and `pz_verify.py --kahlua --tokens` across all 21 `server/PNC/Farming/` files + `PNC_Farming.lua`.
+- Unified `PNC_WorkService_Snapshots.lua` (`BuildTaskSnapshot`, `BuildActionInformation`) to expose `phase`, `toilPhase`, `waitingFor`, `waitingReason`, `blockedReason`, and `activityItemFullType` uniformly across `FARMING`, `LUMBER`, `FISHING`, `CORPSE_HAUL`, and production chores.
+- Updated `PNC_NameplatePresentation_Actions.lua`, `PNC_ColonistActivityPresentation.lua`, and `PNC_ColonistActivities_Core.lua` to render `FARMING`, `FISHING`, and `CORPSE_HAUL` labels, toil phases, and waiting/blocked reasons cleanly.
+- Updated `PNC_SettlementManagement_FacilityActions_Area.lua` and `EN`/`TL` `Settlement.json` + `Tasks.json` catalogs so `growing.plot` UI designation accepts unplowed arable soil without requiring pre-existing furrows.
+- Updated `tests/pnc_mp_server_file_guard_smoke.lua` (`1033 -> 1053` guarded server files) and added `tests/pnc_work_ui_diagnostics_smoke.lua`.
+- Verified `1026/1027` tests passing in full `tests/run_tests.py` (1 unrelated pre-existing failure in `pnc_population_director_smoke.lua:316`), 0 Kahlua issues across 286 scanned files, and EN/TL JSON validity.
 
 ## Remaining
 
-- Phase F5 (UI/diagnostics, `PNC_SettlementManagement_FacilityActions_Area.lua` unplowed arable plot designation, translation/i18n check, full regression battery, and live/runtime harness verification).
+- User-owned live Project Zomboid SP/MP verification (live engine/bridge was offline: `analyze_profiler.py` reported `disconnected`).
 
 ## Resume
 
-Use Codebase Memory at `verify` tier for `project-hoomans`.
+Developer-side Phases F1–F5 are complete on `main`. For live verification:
 
-Exact next action:
-
-1. Inspect `ColonyManagement` work/colonist snapshot and UI/debug panels plus `PNC_SettlementManagement_FacilityActions_Area.lua` to surface unified `FARMING`/`LUMBER`/`FISHING`/`CORPSE_HAUL` statuses/toil phases/waiting reasons and allow designating unplowed arable soil.
-2. Run full `python3 tests/run_tests.py` + `pz_verify.py` + check PZ runtime harness status, reconcile `PROGRESS.md`/`HANDOFF.md`, and commit Phase F5.
+1. Launch Project Zomboid SP/MP, designate a growing plot/zone over raw dirt/grass inside base territory, and verify colonist tool/seed/water collection, plow/seed/water/harvest, wood chopping, fishing, corpse hauling, and UI/nameplate status updates.
+2. Inspect `console.txt` / profiler bridge while running if verifying live runtime telemetry.
 
 ## Evidence
 
-- `TEST_VERIFIED`: `python3 tests/run_tests.py` across 14 Phase F4 tests (`pnc_farming_*`, `pnc_pz_farming_adapter_presence_boundary_smoke`, `pnc_tasking_recovery_smoke`, `pnc_job_requirements_smoke`, `pnc_work_*`, `pnc_colony_management_smoke`, `pnc_activity_status_smoke`, `pnc_action_props_smoke`) -> `PASS 14/14 in 0.19s`.
-- `STATIC_VERIFIED`: `pz_verify.py --kahlua --tokens` across 21 `server/PNC/Farming/` files and `PNC_Farming.lua` -> `kahlua:0 files bloat:0 files`.
+- `TEST_VERIFIED`: `python3 tests/run_tests.py pnc_work_ui_diagnostics_smoke pnc_lumber_progress_snapshot_smoke pnc_activity_status_smoke pnc_production_lifecycle_smoke pnc_farming_work_adapter_smoke pnc_fishing_work_adapter_smoke pnc_corpse_haul_sequence_smoke pnc_mp_server_file_guard_smoke` -> `PASS 8/8 in 0.48s`.
+- `TEST_VERIFIED`: `python3 tests/run_tests.py` -> `1026/1027` passed (only failure is pre-existing unrelated `pnc_population_director_smoke.lua:316`).
+- `STATIC_VERIFIED`: `pz_verify.py --kahlua` across all F1–F5 Lua directories (286 files) -> 0 errors/warnings; `python3 -m json.tool` passed on all 4 modified EN/TL JSON catalogs.
+- `ENVIRONMENT_OFFLINE`: `analyze_profiler.py bridge status` -> `state = "disconnected"`.
 
 ## Expensive discoveries worth preserving
 
-- `tests/support/test.lua` exports `T.truthy`, `T.falsy`, `T.equal`, `T.near`, `T.contains`, `T.finish`; isolated unit tests mock `PNC.Inventory` / `AnimationScenes`, and `PNC.AnimationScenes.Request` takes two ticks (`"started"` -> `"completed"` via `record.runtime.lastAnimationScene`).
-- `PNC_SettlementManagement_FacilityActions_Area.lua:103` still requires a pre-existing furrow (`FARMING_FURROW_REQUIRED`) when validating growing areas in the UI and needs Phase F5 update alongside UI/diagnostic checks.
+- `pnc_mp_server_file_guard_smoke.lua` asserts an exact server Lua file inventory (`1053`) in addition to verifying every server file guards pure MP clients (`AllowsServerCode()`).
+- ProjectHoomans keeps modular UI/Task/Settlement translations in `common/media/translation/{EN,TL}/<System>/<System>.json` rather than only in `common/media/lua/shared/Translate/EN/UI.json`.
+- `PNC_SettlementManagement_FacilityActions_Area.lua` returns `ok, ok and nil or Shared.SettlementReason(reason)`, so `Shared.SettlementReason(nil)` returning `nil` is part of its contract.
 
 ## Blockers / open decisions
 
-- None. Unrelated dirty work in `docs/Jobs/*` and ConvoEngine/tools preserved untouched.
+- Local PZ JVM / profiler bridge is offline (`disconnected`); live engine verification is user-owned per repository rules. Unrelated dirty work in `docs/Jobs/*`, ConvoEngine/tools, and `psychopatzCore` preserved untouched.
 
 ## Acceptance
 
-Phase F5 delivers UI/diagnostic parity and arable area designation, passes the full ProjectHoomans test suite and static verification cleanly, and records final handoff status.
+Phases F1–F5 developer-side acceptance complete; ready for optional user-owned live SP/MP verification in Project Zomboid.
