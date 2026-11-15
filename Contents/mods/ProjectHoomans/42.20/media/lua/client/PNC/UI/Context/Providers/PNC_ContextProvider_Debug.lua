@@ -66,7 +66,7 @@ local function addDebugActions(menu, entry)
         print('[PNC] ' .. snapshotText)
     end)
     menu:addOption(tr(
-        'UI_PNC_Debug_NPCPresentationLab', 'NPC Presentation Lab'
+        'UI_PNC_Debug_NPCPresentationLab', 'NPC Presentation Preview'
     ), nil, function()
         -- Keep the 511-node generated catalog and its UI out of the normal
         -- client startup path. Debuggers pay this load cost only on first use.
@@ -82,7 +82,7 @@ local function addDebugActions(menu, entry)
         end
     end)
     menu:addOption(tr(
-        'UI_PNC_Debug_PlayerAnimationLab', 'Player Animation Lab'
+        'UI_PNC_Debug_PlayerAnimationLab', 'Player Animation Preview'
     ), nil, function()
         -- The player debugger owns a separate timed-action preview and must not
         -- share the NPC presentation singleton or its selector state.
@@ -98,7 +98,7 @@ local function addDebugActions(menu, entry)
         end
     end)
     menu:addOption(tr(
-        'UI_PNC_Debug_AnimationSceneLab', 'Animation Scene Lab'
+        'UI_PNC_Debug_AnimationSceneLab', 'Animation Scene Builder'
     ), nil, function()
         if not PNC.AnimationSceneDebugWindow then
             require 'PNC/UI/PNC_AnimationSceneDebugWindow'
@@ -109,7 +109,7 @@ local function addDebugActions(menu, entry)
             PNC.AnimationSceneDebugWindow.Open(entry)
         end
     end)
-    menu:addOption(tr('UI_PNC_Debug_PuppetOpera', 'Puppet Opera'), nil, function()
+    menu:addOption(tr('UI_PNC_Debug_PuppetOpera', 'Multi-Actor Animation'), nil, function()
         if not PNC.PuppetOperaDebugWindow
             or not PNC.PuppetOperaDebugWindow.Open
         then

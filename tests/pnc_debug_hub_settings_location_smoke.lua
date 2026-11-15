@@ -38,6 +38,7 @@ PNC = {
     NPCTraitDebugUI = { Toggle = function() end },
     FactionDebugUI = { Toggle = function() end },
     FactionDebugOverlay = { Toggle = function() end },
+    SemanticSocialDirectorDebugUI = { Open = function() return {} end },
     Client = { CanUseDebug = function() return true end },
     Translation = {
         GetKey = function(key, fallback)
@@ -69,6 +70,7 @@ local metadata = {
     { id = "pnc.worldKnowledge", name = "WorldKnowledge" },
     { id = "pnc.npcTraits", name = "NPCTraitRegistry" },
     { id = "pnc.factions", name = "FactionInspector" },
+    { id = "pnc.socialDirectorAudit", name = "SocialDirectorAudit" },
 }
 
 for _, entry in ipairs(metadata) do
@@ -90,6 +92,14 @@ T.truthy(tools["pnc.relationships"],
     "relationship inspector debug tool missing")
 T.truthy(tools["pnc.factions"],
     "faction inspector debug tool missing")
+local socialAudit = T.truthy(tools["pnc.socialDirectorAudit"],
+    "Social Director audit debug tool missing")
+T.equal(socialAudit.surface, "global",
+    "Social Director audit leaked onto a scoped Debug Hub surface")
+T.truthy(socialAudit.available(),
+    "Social Director audit was unavailable despite debug access")
+T.truthy(socialAudit.action(),
+    "Social Director audit action did not open its window")
 T.equal(tools["pnc.settings"], nil,
     "Project Hoomans settings remained in debug hub")
 T.equal(tools["pnc.communityOverlay"], nil,

@@ -673,6 +673,8 @@ local registryActionsSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry_Actions.lua")
 local registryCategoriesSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry_Categories.lua")
+local debugIntegrationSource = T.read("ProjectHoomans", "client",
+    "PNC/Integrations/PNC_PsychopatzCoreDebug.lua")
 T.falsy(string.find(buildingTabSource, '"build_stockpile"', 1, true),
     "stockpile bootstrap leaked into the Building child UI")
 T.contains(registryCategoriesSource, 'id = "stockpile"',
@@ -681,6 +683,14 @@ T.contains(registryActionsSource, 'Facility.BeginBuild(owner, "stockpile")',
     "root stockpile bootstrap bypasses the facility build protocol")
 T.contains(registryActionsSource, "stockpileBootstrapVisible",
     "root stockpile bootstrap does not own one-time visibility")
+T.falsy(string.find(registryCategoriesSource, 'id = "ai_debug"', 1, true),
+    "AI Director audit remained in the Command Hub")
+T.falsy(string.find(registryActionsSource, "SocialDirectorDebug", 1, true),
+    "Command Hub still owns Social Director debug routing")
+T.contains(debugIntegrationSource, 'id = "pnc.socialDirectorAudit"',
+    "Social Director audit is missing from the Debug Hub integration")
+T.contains(debugIntegrationSource, 'surface = "global"',
+    "Social Director audit is not explicitly scoped to the global Debug Hub")
 T.contains(workSource, "PsychopatzCore/UI/PsychopatzCommandHubOptions",
     "work window does not consume Core options")
 local settingsSource = T.read("ProjectHoomans", "client",

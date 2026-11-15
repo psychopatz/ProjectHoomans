@@ -23,7 +23,7 @@ end
 
 local function menuTitle()
     local label = text("UI_PNC_DebugDiscoveryRawLabel",
-        "RAW HOOMANS OVERLAYS")
+        "HOOMANS ENTITY OVERLAYS")
     return label .. (DebugMap.IsEnabled() and ": ON" or ": OFF")
 end
 
@@ -66,15 +66,15 @@ if Hub and type(Hub.RegisterTool) == "function" then
     Hub.RegisterTool({
         id = "pnc.map.raw_entities",
         title = text("UI_PNC_DebugDiscoveryShowRaw",
-            "Toggle raw Hoomans overlays"),
+            "Hoomans Entity Overlays"),
         description = text("UI_PNC_DebugDiscoveryRawHelp",
-            "Toggle undiscovered Hoomans entity overlays."),
+            "Show or hide undiscovered Project Hoomans entities on the map."),
         source = "Project Hoomans",
         surface = "map",
         menuTitle = menuTitle,
         menuTooltip = function()
             return text("UI_PNC_DebugDiscoveryRawHelp",
-                "Toggle undiscovered Hoomans entity overlays.")
+                "Show or hide undiscovered Project Hoomans entities on the map.")
         end,
         order = 80,
         available = canDebug,

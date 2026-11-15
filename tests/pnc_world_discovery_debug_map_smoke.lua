@@ -120,11 +120,11 @@ T.equal(rawButton.surface, "map",
     "raw-overlay entry was not scoped to the map debug surface")
 T.equal(PNC.MapRawEntityDebug.ShowRawEntities, false,
     "undiscovered debug overlays start hidden")
-T.equal(rawButton.menuTitle(), "RAW HOOMANS OVERLAYS: OFF",
+T.equal(rawButton.menuTitle(), "HOOMANS ENTITY OVERLAYS: OFF",
     "raw-overlay menu did not expose its OFF state")
 rawButton.action()
 T.equal(PNC.MapRawEntityDebug.ShowRawEntities, true,
     "raw overlays require an explicit shared-menu toggle")
-T.equal(rawButton.menuTitle(), "RAW HOOMANS OVERLAYS: ON",
+T.equal(rawButton.menuTitle(), "HOOMANS ENTITY OVERLAYS: ON",
     "raw-overlay menu did not expose its ON state")
 T.finish("pnc_world_discovery_debug_map_smoke")

@@ -186,7 +186,7 @@ function Monitor.Toggle()
     if not PNC.Client or not PNC.Client.CanUseDebug or not PNC.Client.CanUseDebug() then return nil end
     if not window then
         window = UI.NewWindow(ISPNCNPCMonitor, {
-            title = Support.Tr("UI_PNC_MonitorTitle", "PNC NPC Monitor"),
+            title = Support.Tr("UI_PNC_MonitorTitle", "NPC Runtime Monitor"),
             resizable = true,
             responsiveSpec = {
                 width = 1160,

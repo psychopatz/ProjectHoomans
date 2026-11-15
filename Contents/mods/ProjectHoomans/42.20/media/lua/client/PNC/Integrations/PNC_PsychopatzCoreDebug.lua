@@ -19,16 +19,39 @@ local function translateHubText(key, fallback)
     return resolveText(value, key, fallback)
 end
 
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.socialDirectorAudit",
+    source = "Project Hoomans",
+    surface = "global",
+    order = 204,
+    title = translateHubText("UI_PNC_DebugHub_SocialDirectorAudit_Title",
+        "Social Director Decision Audit"),
+    description = translateHubText(
+        "UI_PNC_DebugHub_SocialDirectorAudit_Description",
+        "Inspect Social Director decisions and capture the reasoning behind them."),
+    available = function()
+        return PNC
+            and PNC.SemanticSocialDirectorDebugUI
+            and type(PNC.SemanticSocialDirectorDebugUI.Open) == "function"
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        return PNC.SemanticSocialDirectorDebugUI.Open() ~= nil
+    end,
+})
+
 if PNC and PNC.ConversationDebugUI and PNC.ConversationDebugUI.Toggle then
     PsychopatzCore.DebugHub.RegisterTool({
         id = "pnc.conversations",
         source = "Project Hoomans",
         order = 205,
         title = translateHubText("UI_PNC_DebugHub_ConversationBlocks_Title",
-            "Conversation Blocks"),
+            "Conversation Graph Inspector"),
         description = translateHubText(
             "UI_PNC_DebugHub_ConversationBlocks_Description",
-            "Browse registered conversation graphs, gates, translations, deterministic rolls, and sandbox effects."),
+            "Inspect registered conversation graphs, gates, translations, deterministic rolls, and sandbox effects."),
         available = function()
             return PNC.ConversationDebugUI.Toggle
                 and PNC.Client and PNC.Client.CanUseDebug
@@ -42,7 +65,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.audio",
     source = "Project Hoomans",
     order = 206,
-    title = translateHubText("UI_PNC_DebugHub_Audio_Title", "Audio Debug"),
+    title = translateHubText("UI_PNC_DebugHub_Audio_Title", "Audio Preview"),
     description = translateHubText("UI_PNC_DebugHub_Audio_Description",
         "Preview player voice aliases and registered game sound effects."),
     available = function()
@@ -63,7 +86,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     source = "Project Hoomans",
     order = 207,
     title = translateHubText("UI_PNC_DebugHub_PlayerAnimation_Title",
-        "Player Animation Lab"),
+        "Player Animation Preview"),
     description = translateHubText(
         "UI_PNC_DebugHub_PlayerAnimation_Description",
         "Preview zombie animation clips on the local ISOPlayer without changing NPC state."),
@@ -88,7 +111,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     source = "Project Hoomans",
     order = 208,
     title = translateHubText("UI_PNC_DebugHub_PuppetOpera_Title",
-        "Puppet Opera Scene Builder"),
+        "Multi-Actor Animation Scene Builder"),
     description = translateHubText(
         "UI_PNC_DebugHub_PuppetOpera_Description",
         "Build multi-actor scenes from the existing player and NPC animation catalogs."),
@@ -113,7 +136,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     source = "Project Hoomans",
     order = 208,
     title = translateHubText("UI_PNC_DebugHub_Perception_Title",
-        "Hoomans Perception Debug"),
+        "Perception Inspector"),
     description = translateHubText(
         "UI_PNC_DebugHub_Perception_Description",
         "Inspect client-visible objects, semantic names, usable surfaces, rooms, campfire zones, and camp-site resolution without sending search requests."),
@@ -134,7 +157,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.npcMonitor",
     source = "Project Hoomans",
     order = 200,
-    title = translateHubText("UI_PNC_DebugHub_NPCMonitor_Title", "NPC Monitor"),
+    title = translateHubText("UI_PNC_DebugHub_NPCMonitor_Title", "NPC Runtime Monitor"),
     description = translateHubText("UI_PNC_DebugHub_NPCMonitor_Description",
         "Inspect NPC lifecycle, authority, presence, combat, and runtime bodies."),
     available = function()
@@ -175,7 +198,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     source = "Project Hoomans",
     order = 202,
     title = translateHubText("UI_PNC_DebugHub_UniqueNPCCreator_Title",
-        "Unique NPC Creator"),
+        "Unique NPC Editor"),
     description = translateHubText(
         "UI_PNC_DebugHub_UniqueNPCCreator_Description",
         "Create, preview, equip, and produce client-local unique NPC definitions."),
@@ -216,9 +239,9 @@ PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.needs",
     source = "Project Hoomans",
     order = 225,
-    title = translateHubText("UI_PNC_DebugHub_ColonistDebug_Title", "Colonist Debug"),
+    title = translateHubText("UI_PNC_DebugHub_ColonistDebug_Title", "Colonist Needs Diagnostics"),
     description = translateHubText("UI_PNC_DebugHub_ColonistDebug_Description",
-        "Inspect provision storage and run targeted colonist debug actions."),
+        "Inspect colonist needs and provision storage, then run targeted diagnostics."),
     available = function()
         return PNC and PNC.ColonistUI and PNC.ColonistUI.OpenDebug
             and PNC.Client and PNC.Client.CanUseDebug
@@ -232,7 +255,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     source = "Project Hoomans",
     order = 226,
     title = translateHubText("UI_PNC_DebugHub_WorldDirector_Title",
-        "World Director"),
+        "Survivor World Director"),
     description = translateHubText("UI_PNC_DebugHub_WorldDirector_Description",
         "Inspect strategic groups, locations, traversal, occupancy, combat-profile caches, encounters, and scheduled jobs."),
     available = function()
@@ -247,7 +270,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.worldEffects",
     source = "Project Hoomans",
     order = 227,
-    title = translateHubText("UI_PNC_DebugHub_WorldEffects_Title", "World Effects"),
+    title = translateHubText("UI_PNC_DebugHub_WorldEffects_Title", "World Effect Queue"),
     description = translateHubText("UI_PNC_DebugHub_WorldEffects_Description",
         "Inspect durable world mutations waiting for loaded squares."),
     available = function()
@@ -264,7 +287,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     source = "Project Hoomans",
     order = 210,
     title = translateHubText("UI_PNC_DebugHub_RelationshipInspector_Title",
-        "Relationship Inspector"),
+        "NPC Relationship Inspector"),
     description = translateHubText(
         "UI_PNC_DebugHub_RelationshipInspector_Description",
         "Inspect directed social data and trigger guarded test events."),
@@ -286,7 +309,7 @@ PsychopatzCore.DebugHub.RegisterTool({
     source = "Project Hoomans",
     order = 211,
     title = translateHubText("UI_PNC_DebugHub_KnowledgeLab_Title",
-        "NPC Knowledge Lab"),
+        "NPC Knowledge Inspector"),
     description = translateHubText("UI_PNC_DebugHub_KnowledgeLab_Description",
         "Compare NPC truth with one character's discovered notes and evidence."),
     available = function()

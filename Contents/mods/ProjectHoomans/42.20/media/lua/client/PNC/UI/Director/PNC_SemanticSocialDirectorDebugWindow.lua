@@ -283,7 +283,7 @@ function ISPNCSemanticSocialDirectorDebugWindow:render()
     PsychopatzWindow.render(self)
     if self.layout then
         UI.DrawSectionTitle(
-            self, "AI SOCIAL DIRECTOR DECISIONS",
+            self, "SOCIAL DIRECTOR DECISIONS",
             self.layout.events.x, self.layout.events.y - 20,
             self.layout.events.width
         )
@@ -319,7 +319,7 @@ function DebugUI.Open()
     local window = DebugUI.instance
     if not window then
         window = UI.NewWindow(ISPNCSemanticSocialDirectorDebugWindow, {
-            title = "PNC AI SOCIAL DIRECTOR AUDIT",
+            title = "SOCIAL DIRECTOR DECISION AUDIT",
             resizable = true,
             persistenceKey = "PNC.SemanticSocialDirectorDebug",
             responsiveSpec = {

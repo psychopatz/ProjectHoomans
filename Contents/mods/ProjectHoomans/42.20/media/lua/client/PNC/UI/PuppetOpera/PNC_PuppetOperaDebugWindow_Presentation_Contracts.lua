@@ -14,7 +14,7 @@ end
 
 Internal.tr = tr
 Internal.TEXT_TITLE = tr(
-    "UI_PNC_PuppetOpera_Title", "Puppet Opera Scene Builder")
+    "UI_PNC_PuppetOpera_Title", "Multi-Actor Animation Scene Builder")
 Internal.TEXT_DESCRIPTION = tr(
     "UI_PNC_PuppetOpera_Description",
     "Build a multi-actor scene from existing player and NPC animation routes"
