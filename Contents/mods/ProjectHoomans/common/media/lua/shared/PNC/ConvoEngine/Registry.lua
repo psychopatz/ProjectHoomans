@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "cbb4cb3ed7fc811f24daf61d5cdc28a1eaadeca80bf3bf479fd46a6ac31ac2ac"
+Registry.WHOLE_MODEL_FINGERPRINT = "378c3e2c710385fdd0d7566e54615724754d13e78313864e68c9e818bc6ebc72"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -199,7 +199,7 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation_
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__f0e430f3")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__25339a92")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle__f0e914b3")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle__f61ddfca")

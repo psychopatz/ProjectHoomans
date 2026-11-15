@@ -8,11 +8,11 @@ require "PNC/Semantics/PNC_SemanticCommandAdapter_Registry"
 local Adapter = PNC.Semantics.CommandAdapter
 
 local TEMPLATE_BASE = {
-    FOLLOW = "semantic.command.follow.queued",
-    STAY = "semantic.command.stay.queued",
-    STOP = "semantic.command.stop_following.queued",
-    GO = "semantic.command.return_home.queued",
-    CAMP = "semantic.command.camp.queued",
+    FOLLOW = "command.follow.queued",
+    STAY = "command.stay.queued",
+    STOP = "command.stop_following.queued",
+    GO = "command.return_home.queued",
+    CAMP = "command.camp.queued",
 }
 
 local function attachContextualQueuedResponses()

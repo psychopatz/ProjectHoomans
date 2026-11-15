@@ -136,7 +136,7 @@ class ContextualSpeechBehaviorTests(unittest.TestCase):
         turn = self._turn(self._scenario("guarded"), "I disagree")
         response, queued = self._response(turn)
         self.assertEqual(response["selectionID"], "semantic.refuse.withdrawn")
-        self.assertEqual(response["templateID"], "semantic.social.dispute_withdrawn")
+        self.assertEqual(response["templateID"], "social.dispute_withdrawn")
         self.assertIn("leave", queued["text"].lower())
 
         default = self._turn(self._scenario("neutral"), "I disagree")
@@ -177,7 +177,7 @@ class ContextualSpeechBehaviorTests(unittest.TestCase):
         phrase_content = catalog["speechRealization"]["phraseContent"]
         names = {row["family"] for row in coverage}
         self.assertTrue({"greeting", "wellbeing", "medical", "companion_action"} <= names)
-        self.assertIn("semantic.question.health_state.healthy", families)
+        self.assertIn("question.health_state.healthy", families)
         self.assertTrue(phrase_content["families"])
         self.assertEqual(len(phrase_content["fingerprint"]), 64)
         self.assertNotIn(
@@ -189,11 +189,11 @@ class ContextualSpeechBehaviorTests(unittest.TestCase):
         payload = follow["messages"][0]["payload"]
         self.assertEqual(
             payload["phraseFamilyID"],
-            "phrase.semantic.command.follow.queued",
+            "phrase.command.follow.queued",
         )
         self.assertEqual(
             payload["phraseSemanticTemplateID"],
-            "semantic.command.follow.queued",
+            "command.follow.queued",
         )
 
 

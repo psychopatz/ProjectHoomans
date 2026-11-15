@@ -163,13 +163,21 @@ local function selectPhrase(templateID, styleVariant, context, salt, localSelect
         phraseHistoryOrder[#phraseHistoryOrder + 1] = key
     end
     phraseHistory[key] = selected.id
+    local ConvoPlanFamily = PNC.ConvoEngine and PNC.ConvoEngine.ConvoPlanFamily or nil
+    local lang = type(ConvoPlanFamily) == "table"
+        and type(ConvoPlanFamily.ActiveLanguage) == "function"
+        and ConvoPlanFamily.ActiveLanguage() or "EN"
+    local localizedFallback = (type(selected.translations) == "table"
+        and (selected.translations[lang] or selected.translations.EN))
+        or selected.fallback or ""
     local result = {
         familyID = familyID,
         semanticTemplateID = tostring(templateID),
         style = style,
         phraseID = tostring(selected.id or ""),
         translationKey = tostring(selected.key or ""),
-        fallback = tostring(selected.fallback or ""),
+        fallback = tostring(localizedFallback),
+        enFallback = tostring(selected.fallback or localizedFallback),
         poolSize = #phrases,
         antiRepeatReason = reason,
     }
@@ -299,6 +307,9 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     output.semanticTemplateID = segment.templateID
     output.templateID = resolvedTemplateID
     output.fallback = phrase.fallback
+    if phrase.enFallback ~= nil and phrase.enFallback ~= "" then
+        output.enFallback = phrase.enFallback
+    end
     output.realizationFamily = segment.templateID
     output.realizationVariant = tostring(
         type(style) == "table" and style.variant or "neutral"

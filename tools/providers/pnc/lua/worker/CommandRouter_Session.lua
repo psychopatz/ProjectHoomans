@@ -62,7 +62,7 @@ function Session.hello(context)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Runtime.moduleManifest,
         headlessRequires = Runtime.headlessRequires,
-        personaCatalog = Persona.catalog(context),
+        personaCatalog = Persona.catalog(context, nil, { compact = true }),
         simulationControlCatalog = Simulation.catalog(context),
         talkCatalog = Talk.catalog(),
         simulationProjection = context.ScenarioSession
@@ -191,7 +191,7 @@ function Session.handle(context, command, payload)
             loadedModules = Runtime.loadedModules,
             moduleManifest = Runtime.moduleManifest,
             headlessRequires = Runtime.headlessRequires,
-            personaCatalog = Persona.catalog(context),
+            personaCatalog = Persona.catalog(context, nil, { compact = true }),
             simulationControlCatalog = Simulation.catalog(context),
             talkCatalog = Talk.catalog(),
             simulationProjection = context.ScenarioSession

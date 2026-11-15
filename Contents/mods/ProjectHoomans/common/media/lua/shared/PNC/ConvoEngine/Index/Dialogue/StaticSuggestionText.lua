@@ -228,7 +228,7 @@ return {
     ["ui.suggestion.personal_check_in"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.personal_check_in",
         ["kind"] = "dialogue",
@@ -237,7 +237,7 @@ return {
     ["ui.suggestion.stay"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.stay",
         ["kind"] = "dialogue",
@@ -246,7 +246,7 @@ return {
     ["ui.suggestion.talk_again_about.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.talk_again_about.label",
         ["kind"] = "dialogue",
@@ -255,7 +255,7 @@ return {
     ["ui.suggestion.talk_something_else.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.talk_something_else.label",
         ["kind"] = "dialogue",
@@ -264,7 +264,7 @@ return {
     ["ui.suggestion.trade"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.trade",
         ["kind"] = "dialogue",
@@ -273,7 +273,7 @@ return {
     ["ui.suggestion.unavailable.tooltip"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.unavailable.tooltip",
         ["kind"] = "dialogue",
@@ -282,7 +282,7 @@ return {
     ["ui.suggestion.wait_at"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.wait_at",
         ["kind"] = "dialogue",
@@ -291,7 +291,7 @@ return {
     ["ui.suggestion.whats_up.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         },
         ["id"] = "ui.suggestion.whats_up.label",
         ["kind"] = "dialogue",

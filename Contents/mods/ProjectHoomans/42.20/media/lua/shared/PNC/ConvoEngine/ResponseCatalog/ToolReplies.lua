@@ -228,4 +228,14 @@ register("semantic.tool_reply.order.rejected", {
     line("tool_reply.order_rejected.2"),
 })
 
+for _, giftOutcome in ipairs({
+    "gift.selection_required",
+    "gift.pending",
+    "gift.completed",
+    "gift.rejected",
+    "gift.failed",
+}) do
+    installConvoLine(giftOutcome)
+end
+
 return true

@@ -19,6 +19,89 @@ return function(Catalog, Core)
         return nil
     end
 
+    function Catalog.Preflight(id, definition, options)
+        id = tostring(id or "")
+        options = type(options) == "table" and options or {}
+        if not Core.validID(id) or type(definition) ~= "table" then
+            return false, {
+                reason = "invalid_response_pool",
+                poolID = id,
+            }
+        end
+        local variants = definition.variants
+        if type(variants) ~= "table" then
+            return false, {
+                reason = "response_pool_requires_variants",
+                poolID = id,
+            }
+        end
+        if options.strictVariants == true and #variants == 0 then
+            return false, {
+                reason = "response_pool_empty",
+                poolID = id,
+            }
+        end
+        if options.strictVariants == true and #variants > Catalog.MAX_VARIANTS then
+            return false, {
+                reason = "response_variant_limit",
+                poolID = id,
+            }
+        end
+        local validCount = 0
+        local firstFailure = nil
+        local limit = options.strictVariants == true
+            and #variants or math.min(#variants, Catalog.MAX_VARIANTS)
+        for index = 1, limit do
+            local normalized, reason, detail = Core.validateVariant(
+                id, index, variants[index]
+            )
+            if normalized then
+                validCount = validCount + 1
+            else
+                if options.strictVariants == true then
+                    return false, {
+                        reason = tostring(reason or "invalid_response_variant"),
+                        poolID = id,
+                        variantIndex = index,
+                        templateID = detail and detail.templateID or nil,
+                        realizationID = detail and detail.realizationID or nil,
+                    }
+                end
+                if not firstFailure then
+                    firstFailure = {
+                        reason = tostring(reason or "invalid_response_variant"),
+                        poolID = id,
+                        variantIndex = index,
+                        templateID = detail and detail.templateID or nil,
+                        realizationID = detail and detail.realizationID or nil,
+                    }
+                end
+            end
+        end
+        if validCount == 0 then
+            local emptyDetail = firstFailure or {}
+            emptyDetail.reason = emptyDetail.reason or "response_pool_empty"
+            emptyDetail.poolID = id
+            return false, emptyDetail
+        end
+        local isNew = Catalog.POOLS[id] == nil
+        if isNew then
+            local count = 0
+            for _ in pairs(Catalog.POOLS) do count = count + 1 end
+            if count >= Catalog.MAX_POOLS then
+                return false, {
+                    reason = "response_pool_limit",
+                    poolID = id,
+                }
+            end
+        end
+        return true, {
+            id = id,
+            variantCount = validCount,
+            isNewPool = isNew,
+        }
+    end
+
     function Catalog.Register(id, definition)
         local pool
         local variants

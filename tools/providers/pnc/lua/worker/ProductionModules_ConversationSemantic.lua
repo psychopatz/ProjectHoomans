@@ -256,16 +256,6 @@ local function loadConversationSemantic(load, registerEntryPointModule)
         "PNC/ConvoEngine/Dialogue/Suggestions_Build.lua",
         "semantic_suggestions_spoke"
     )
-    load(
-        "ProjectHoomans", "shared",
-        "PNC/ConvoEngine/FlowManifest.lua",
-        "semantic_generation_manifest"
-    )
-    load(
-        "ProjectHoomans", "shared",
-        "PNC/ConvoEngine/GeneratedAutomaticFlows.lua",
-        "semantic_generated_flows"
-    )
     load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input_Context.lua", "semantic")
     load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input_Presentation.lua", "semantic")
     for _, spoke in ipairs({
@@ -280,6 +270,18 @@ local function loadConversationSemantic(load, registerEntryPointModule)
         )
     end
     load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input_Actions.lua", "semantic")
+    load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input_GiftPresentation.lua", "semantic")
+    load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input_Gifts.lua", "semantic")
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/ConvoEngine/FlowManifest.lua",
+        "semantic_generation_manifest"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/ConvoEngine/GeneratedAutomaticFlows.lua",
+        "semantic_generated_flows"
+    )
     load("ProjectHoomans", "shared", "PNC/ConvoEngine/IdentityExchange.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticIdentityNetwork.lua", "semantic")
     load(

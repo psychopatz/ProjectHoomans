@@ -13,28 +13,74 @@ local ConvoPlanFamily = PNC.ConvoEngine.ConvoPlanFamily or {}
 PNC.ConvoEngine.ConvoPlanFamily = ConvoPlanFamily
 
 local function activeLanguage()
+    local manager = CustomTranslationManager
+        or (PsychopatzCore and PsychopatzCore.CustomTranslationManager)
+    if type(manager) == "table" and type(manager.getLanguage) == "function" then
+        local ok, language = pcall(manager.getLanguage)
+        if ok and language and tostring(language) ~= "" then
+            return string.upper(tostring(language))
+        end
+    end
     if Translator and type(Translator.getLanguage) == "function" then
         local language = Translator.getLanguage()
         if language and type(language.toString) == "function" then
-            return tostring(language:toString())
+            return string.upper(tostring(language:toString()))
         end
     end
     return "EN"
 end
 
-local function appendLocalizedLines(phrases, installAs, styleKey, localized, basePhraseID)
+ConvoPlanFamily.ActiveLanguage = activeLanguage
+
+local function appendLocalizedLines(phrases, installAs, styleKey, localized, basePhraseID, textMap, variant)
     if type(localized) == "string" then
         localized = { localized }
     end
     if type(localized) ~= "table" then return end
+    local templateKey = type(variant) == "table" and variant.templateID or nil
+    local explicitKey = type(variant) == "table"
+        and (variant.translationKey or variant.key
+            or (type(templateKey) == "string"
+                and string.sub(templateKey, 1, 3) == "UI_"
+                and templateKey or nil))
+        or nil
     for index = 1, #localized do
         local fallback = localized[index]
         if type(fallback) == "string" and fallback ~= "" then
+            local seq = string.format("%02d", #phrases + 1)
+            local translationsByLang = {}
+            local hasTranslations = false
+            if type(textMap) == "table" then
+                for langCode, rawList in pairs(textMap) do
+                    local code = string.upper(tostring(langCode))
+                    if type(rawList) == "table" then
+                        local item = rawList[index]
+                        if type(item) == "string" and item ~= "" then
+                            translationsByLang[code] = item
+                            hasTranslations = true
+                        end
+                    elseif type(rawList) == "string" and rawList ~= "" and index == 1 then
+                        translationsByLang[code] = rawList
+                        hasTranslations = true
+                    end
+                end
+            end
+            local enFallback = translationsByLang.EN or fallback
+            local styleToken = tostring(styleKey or "neutral")
+            if styleToken ~= "neutral"
+                and string.sub(installAs, -(#styleToken + 1)) == ("." .. styleToken)
+            then
+                styleToken = "neutral"
+            end
+            local contentKey = (#localized == 1 and type(explicitKey) == "string" and explicitKey ~= "")
+                and explicitKey
+                or ("conversation.content.semantic." .. installAs .. "." .. styleToken .. "." .. seq)
             phrases[#phrases + 1] = {
-                id = "phrase." .. installAs .. "." .. styleKey .. "."
-                    .. string.format("%02d", #phrases + 1),
-                key = "",
-                fallback = fallback,
+                id = "phrase." .. installAs .. "." .. styleKey .. "." .. seq,
+                key = contentKey,
+                fallback = enFallback,
+                translations = hasTranslations and translationsByLang or nil,
+                convoPlanTemplateID = type(variant) == "table" and variant.templateID or nil,
                 phraseID = tostring(basePhraseID or (styleKey .. "." .. index)),
             }
         end
@@ -93,6 +139,11 @@ local function collectVariants(stylesMap, variants, installAs, language, options
                     or (type(variant.text) == "table" and variant.text or nil)
                 local localized = type(textMap) == "table"
                     and (textMap[language] or textMap.EN) or nil
+                if localized == nil and type(variant.fallback) == "string"
+                    and variant.fallback ~= ""
+                then
+                    localized = variant.fallback
+                end
                 stylesMap[destStyle] = stylesMap[destStyle] or {}
                 local before = #stylesMap[destStyle]
                 appendLocalizedLines(
@@ -100,7 +151,9 @@ local function collectVariants(stylesMap, variants, installAs, language, options
                     installAs,
                     destStyle,
                     localized,
-                    variant.id
+                    variant.id,
+                    textMap,
+                    variant
                 )
                 if #stylesMap[destStyle] > before then
                     added = true

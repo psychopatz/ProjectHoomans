@@ -86,6 +86,24 @@ local function contentFallback(templateID)
     end
     local _, phrases = registry.FamilyFor(templateID, "neutral")
     local phrase = type(phrases) == "table" and phrases[1] or nil
+    if not (phrase and phrase.fallback and phrase.fallback ~= "") then
+        local ConvoPlanFamily = PNC.ConvoEngine
+            and PNC.ConvoEngine.ConvoPlanFamily or nil
+        if type(ConvoPlanFamily) ~= "table" then
+            local ok, loaded = pcall(
+                require,
+                "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
+            )
+            ConvoPlanFamily = ok and loaded or nil
+        end
+        if type(ConvoPlanFamily) == "table"
+            and type(ConvoPlanFamily.install) == "function"
+        then
+            ConvoPlanFamily.install(templateID)
+            _, phrases = registry.FamilyFor(templateID, "neutral")
+            phrase = type(phrases) == "table" and phrases[1] or nil
+        end
+    end
     local fallback = phrase and phrase.fallback or nil
     return Core.boundedText(fallback)
 end
@@ -305,27 +323,44 @@ function Core.matches(variant, context, withTrace)
     return true, specificity, checks
 end
 
-function Core.normalizedVariant(poolID, index, value)
+local function prepareVariant(poolID, index, value)
     if type(value) == "string" then
         value = { fallback = value }
     end
-    if type(value) ~= "table" then return nil end
+    if type(value) ~= "table" then
+        return nil, "invalid_variant_definition", {
+            poolID = tostring(poolID or ""),
+            variantIndex = index,
+        }
+    end
     local templateID = tostring(value.templateID or value.id or "")
+    local id = tostring(value.id or (poolID .. "." .. tostring(index)))
+    local detail = {
+        poolID = tostring(poolID or ""),
+        variantIndex = index,
+        templateID = templateID ~= "" and templateID or id,
+        realizationID = id,
+    }
     local fallback = Core.boundedText(value.fallback or value.text)
     if fallback == "" then fallback = contentFallback(templateID) end
-    if fallback == "" then return nil end
-    local id = tostring(value.id or (poolID .. "." .. tostring(index)))
-    if not Core.validID(id) then return nil end
+    if fallback == "" then
+        return nil, "unresolved_template_fallback", detail
+    end
+    if not Core.validID(id) then
+        return nil, "invalid_variant_id", detail
+    end
     local plan
     if value.plan ~= nil then
-        local valid, normalized = ResponsePlan.Build(value.plan)
-        if not valid then return nil end
+        local valid, normalized, planReason = ResponsePlan.Build(value.plan)
+        if not valid then
+            return nil, tostring(planReason or "invalid_response_plan"), detail
+        end
         plan = normalizePlanContent(normalized, tostring(
             value.templateID or id
         ))
     end
     local contentOwner = value.contentOwner or contentOwnerForPool(poolID)
-    local normalized = {
+    return {
         id = id,
         templateID = templateID ~= "" and templateID or id,
         fallback = fallback,
@@ -342,9 +377,18 @@ function Core.normalizedVariant(poolID, index, value)
         translationArgs = Core.copy(value.translationArgs),
         when = Core.copy(value.when),
         priority = tonumber(value.priority) or 0,
-    }
+    }, nil, detail
+end
+
+function Core.validateVariant(poolID, index, value)
+    return prepareVariant(poolID, index, value)
+end
+
+function Core.normalizedVariant(poolID, index, value)
+    local normalized, reason, detail = prepareVariant(poolID, index, value)
+    if not normalized then return nil, reason, detail end
     Core.registerTextFallback(normalized.templateID, normalized.fallback)
-    return normalized
+    return normalized, nil, detail
 end
 
 function Core.install(Catalog)

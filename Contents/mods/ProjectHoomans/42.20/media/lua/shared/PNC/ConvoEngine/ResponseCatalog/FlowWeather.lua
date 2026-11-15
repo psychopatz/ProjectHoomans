@@ -14,6 +14,7 @@ Catalog.Register("semantic.flow.weather.raining", {
             id = "semantic.flow.weather.raining.default",
             templateID = "semantic.flow.weather.raining.default",
             fallback = "It is raining right now. I would wait for a break.",
+            groundedFactRefs = { "world.weather.raining" },
         },
     },
 })

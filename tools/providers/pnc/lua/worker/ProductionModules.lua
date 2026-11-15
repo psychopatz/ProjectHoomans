@@ -58,12 +58,21 @@ function ProductionModules.load(context)
         },
     }
 
-    Runtime.moduleManifest = {}
-    Runtime.loadedModules = {}
+    Runtime.moduleManifest = Runtime.moduleManifest or {}
+    Runtime.loadedModules = Runtime.loadedModules or {}
+    Runtime.loadedModulePaths = Runtime.loadedModulePaths or {}
+    if Runtime.productionModulesLoaded then
+        return true
+    end
     local function load(mod, layer, relative, role)
+        local key = mod .. ":" .. layer .. ":" .. relative
+        if Runtime.loadedModulePaths[key] then
+            return nil
+        end
         local value = Test.load(mod, layer, relative)
+        Runtime.loadedModulePaths[key] = true
         Runtime.moduleManifest[#Runtime.moduleManifest + 1] = {
-            path = mod .. ":" .. layer .. ":" .. relative,
+            path = key,
             role = role or "production",
             status = "loaded",
         }
@@ -76,8 +85,13 @@ function ProductionModules.load(context)
     -- calls, so record the real ownership in the worker manifest without
     -- executing each file a second time.
     local function registerEntryPointModule(mod, layer, relative, role)
+        local key = mod .. ":" .. layer .. ":" .. relative
+        if Runtime.loadedModulePaths[key] then
+            return nil
+        end
+        Runtime.loadedModulePaths[key] = true
         Runtime.moduleManifest[#Runtime.moduleManifest + 1] = {
-            path = mod .. ":" .. layer .. ":" .. relative,
+            path = key,
             role = role or "entrypoint_dependency",
             status = "loaded_by_entrypoint",
         }
@@ -261,6 +275,7 @@ function ProductionModules.load(context)
         end
     end
     if type(Semantic) ~= "table" then error("semantic core failed to load") end
+    Runtime.productionModulesLoaded = true
 end
 
 function ProductionModules.loadOptional(context)

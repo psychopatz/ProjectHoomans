@@ -326,7 +326,7 @@ Adapter.RegisterAction("CAMP", {
 
 local COMBAT_INTENT_RESPONSES = {
     combat_engage = {
-        default = "semantic.combat.horde.ack.engage_default",
+        default = "combat.horde.ack.engage_default",
         variants = {
             {
                 id = "eager",
@@ -353,7 +353,7 @@ local COMBAT_INTENT_RESPONSES = {
         },
     },
     combat_avoid = {
-        default = "semantic.combat.horde.ack.avoid_default",
+        default = "combat.horde.ack.avoid_default",
         variants = {
             {
                 id = "relief",
@@ -366,7 +366,7 @@ local COMBAT_INTENT_RESPONSES = {
         },
     },
     combat_hold = {
-        default = "semantic.combat.horde.ack.hold_default",
+        default = "combat.horde.ack.hold_default",
         variants = {
             {
                 id = "eager",
@@ -425,7 +425,7 @@ local function registerCombatIntentAction(action, commandID)
         responsePools = {
             queued = {
                 templateID = responses.default
-                    or "semantic.command.reply.generic_rejected",
+                    or "command.reply.generic_rejected",
                 variants = responses.variants,
             },
             rejected = {

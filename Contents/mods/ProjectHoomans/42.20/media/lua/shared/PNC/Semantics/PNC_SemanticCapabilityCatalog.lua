@@ -175,7 +175,9 @@ function Catalog.ListActions()
         end
     end
 
-    local giftCapability = semantics.GiftCapability
+    local convoEngine = PNC and PNC.ConvoEngine or nil
+    local giftCapability = (convoEngine and convoEngine.GiftCapability)
+        or semantics.GiftCapability
     if type(giftCapability) == "table" then
         addAction(rows, byID, "GIFT", "gift_lifecycle", giftCapability)
     end

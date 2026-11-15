@@ -279,9 +279,13 @@ function Suggestions.FrameToIR(frame, view)
                 if sourceExtensions.topic == nil and source.topic ~= nil then
                     sourceExtensions.topic = copyValue(source.topic)
                 end
+                local rawText = Suggestions.ResolveFrameText(source)
+                if rawText == "" then
+                    return nil, "initiating_say_required"
+                end
                 return IR.New({
                     kind = "semantic_suggestion_frame",
-                    rawText = Suggestions.ResolveFrameText(source),
+                    rawText = rawText,
                     normalizedText = normalizedText(
                         source.textFallback or source.utteranceFallback
                     ),

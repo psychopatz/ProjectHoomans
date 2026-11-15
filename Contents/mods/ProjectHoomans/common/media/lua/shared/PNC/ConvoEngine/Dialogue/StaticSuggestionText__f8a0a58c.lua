@@ -3,6 +3,458 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["labelFallback"] = "Ask what's on their mind",
+                ["labelKey"] = "convo.ui.suggestion.personal_check_in.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Ask what's on their mind",
+                    },
+                    ["TL"] = {
+                        "Alamin kung may bumabagabag sa kanya",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.personal_check_in",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Anything bothering you?",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Anything bothering you?",
+                                    },
+                                    ["TL"] = {
+                                        "May bumabagabag ba sa'yo?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Ask what's on their mind",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.personal_check_in.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Ask what's on their mind",
+                        },
+                        ["TL"] = {
+                            "Alamin kung may bumabagabag sa kanya",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "Anything bothering you?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Anything bothering you?",
+                        },
+                        ["TL"] = {
+                            "May bumabagabag ba sa'yo?",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.personal_check_in",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "personal_check_in",
+            ["sourceId"] = "ui.suggestion.personal_check_in",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
+        ["namespace"] = "ui.suggestion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Ask what's on their mind",
+                    },
+                    ["TL"] = {
+                        "Alamin kung may bumabagabag sa kanya",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["metadata"] = {
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.personal_check_in.label",
+                        ["text"] = {
+                            ["EN"] = "Ask what's on their mind",
+                            ["TL"] = "Alamin kung may bumabagabag sa kanya",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.personal_check_in.utterance",
+                        ["text"] = {
+                            ["EN"] = "Anything bothering you?",
+                            ["TL"] = "May bumabagabag ba sa'yo?",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Anything bothering you?",
+                                    },
+                                    ["TL"] = {
+                                        "May bumabagabag ba sa'yo?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.personal_check_in",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Anything bothering you?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.ui.suggestion.personal_check_in.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Ask what's on their mind",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.personal_check_in.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Ask what's on their mind",
+                    },
+                    ["TL"] = {
+                        "Alamin kung may bumabagabag sa kanya",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "Anything bothering you?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Anything bothering you?",
+                    },
+                    ["TL"] = {
+                        "May bumabagabag ba sa'yo?",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["labelFallback"] = "Wait here.",
+                ["labelKey"] = "convo.ui.suggestion.stay.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.stay",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Wait here.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Wait here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka maghintay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Wait here.",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Wait here.",
+                        },
+                        ["TL"] = {
+                            "Dito ka maghintay.",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "Wait here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Wait here.",
+                        },
+                        ["TL"] = {
+                            "Dito ka maghintay.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.stay",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "stay",
+            ["sourceId"] = "ui.suggestion.stay",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
+        ["namespace"] = "ui.suggestion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["metadata"] = {
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.stay.label",
+                        ["text"] = {
+                            ["EN"] = "Wait here.",
+                            ["TL"] = "Dito ka maghintay.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.stay.utterance",
+                        ["text"] = {
+                            ["EN"] = "Wait here.",
+                            ["TL"] = "Dito ka maghintay.",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Wait here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka maghintay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.stay",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Wait here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.ui.suggestion.stay.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Wait here.",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "Wait here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.talk_again_about.label",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -60,7 +512,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_talk_again_about_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         ["namespace"] = "ui.suggestion.talk_again_about",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -224,7 +676,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_talk_something_else_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         ["namespace"] = "ui.suggestion.talk_something_else",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -417,7 +869,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_trade.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -614,7 +1066,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_unavailable_tooltip.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         ["namespace"] = "ui.suggestion.unavailable",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -807,7 +1259,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_wait_at.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1004,7 +1456,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_whats_up_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
         ["namespace"] = "ui.suggestion.whats_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {

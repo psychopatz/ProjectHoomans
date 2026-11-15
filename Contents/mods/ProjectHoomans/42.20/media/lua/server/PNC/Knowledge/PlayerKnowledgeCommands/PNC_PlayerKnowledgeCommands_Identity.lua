@@ -82,11 +82,18 @@ function Commands.HandleSemanticIdentity(player, args)
             claimedName = actualName
             truthful = true
         elseif claimMode == "generated" then
+            local saveSeed = request.context and request.context.saveSeed or nil
+            if saveSeed == nil and getWorld then
+                local world = getWorld()
+                if world and type(world.getSeedString) == "function" then
+                    saveSeed = world:getSeedString()
+                end
+            end
             local expected = IdentityAlias.Generate({
                 player = player,
                 characterUUID = request.context.characterUUID,
                 playerName = actualName,
-                saveSeed = request.context.saveSeed,
+                saveSeed = saveSeed,
             })
             if not Identity.NamesEqual(claimedName, expected) then
                 return IdentityResult.SendRejected(

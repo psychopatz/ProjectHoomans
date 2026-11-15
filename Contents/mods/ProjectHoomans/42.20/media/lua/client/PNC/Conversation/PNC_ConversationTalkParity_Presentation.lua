@@ -101,6 +101,38 @@ function TalkParity.StartProjection(context, value, view)
     }
 end
 
+local function presentationUtterance(choice, choiceSource, frame)
+    if type(frame) == "table" and (
+        frame.navigationExchange == true
+        or tostring(frame.kind or "") == "semantic_group_click_frame"
+        or tostring(frame.kind or "") == "semantic_back_click_frame"
+    ) then
+        return nil
+    end
+    for _, value in ipairs({
+        choice and choice.utterance,
+        choiceSource and choiceSource.utterance,
+        type(frame) == "table" and frame.utterance or nil,
+        type(frame) == "table" and frame.utteranceFallback or nil,
+        type(frame) == "table" and frame.textFallback or nil,
+    }) do
+        local text = value ~= nil and resolvedText(value) or ""
+        if text ~= "" then
+            return text
+        end
+    end
+    if type(frame) == "table" and type(frame.textKey) == "string"
+        and frame.textKey ~= ""
+    then
+        local text = resolvedText({
+            key = frame.textKey,
+            fallback = frame.textFallback,
+        })
+        if text ~= "" then return text end
+    end
+    return nil
+end
+
 local function presentationRows(view)
     local session = view and view.session
     local source = session and session.choices or {}
@@ -110,9 +142,15 @@ local function presentationRows(view)
             local choiceSource = type(choice.source) == "table"
                 and choice.source or {}
             local frame = choiceSource.semanticFrame
+            local labelText = resolvedText(choice.text)
+            local utteranceText = presentationUtterance(
+                choice, choiceSource, frame
+            )
             rows[#rows + 1] = {
                 id = choice.id,
-                text = resolvedText(choice.text),
+                text = labelText,
+                label = labelText,
+                utterance = utteranceText,
                 enabled = choice.enabled ~= false,
                 -- Keep both names during the projection migration. The
                 -- worker's established diagnostic spelling is frame; the

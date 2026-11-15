@@ -16,6 +16,51 @@ Registry.MAX_PROVIDERS = 32
 Registry.MAX_CANDIDATES = 24
 Registry.MAX_COLLECTION_DIAGNOSTICS = 8
 
+local function trimSpeech(value)
+    return string.gsub(tostring(value or ""), "^%s*(.-)%s*$", "%1")
+end
+
+local function isNavigationFrame(frame)
+    if type(frame) ~= "table" then return false end
+    local kind = tostring(frame.kind or "")
+    return frame.navigationExchange == true
+        or kind == "semantic_group_click_frame"
+        or kind == "semantic_back_click_frame"
+end
+
+function Registry.HasValidInitiatingSay(candidate)
+    if type(candidate) ~= "table" then
+        return false, "candidate_must_be_object"
+    end
+    local frame = type(candidate.frame) == "table" and candidate.frame or nil
+    if isNavigationFrame(frame) then
+        return true, "navigation_frame"
+    end
+    local display = type(candidate.display) == "table"
+        and candidate.display or {}
+    for _, value in ipairs({
+        display.utterance,
+        display.utteranceFallback,
+        candidate.utterance,
+        candidate.utteranceFallback,
+        frame and frame.utterance,
+        frame and frame.utteranceFallback,
+        frame and frame.textFallback,
+    }) do
+        if type(value) == "string" and trimSpeech(value) ~= "" then
+            return true, "valid_initiating_say"
+        end
+    end
+    if (type(display.utteranceKey) == "string"
+            and trimSpeech(display.utteranceKey) ~= "")
+        or (frame and type(frame.textKey) == "string"
+            and trimSpeech(frame.textKey) ~= "")
+    then
+        return true, "valid_initiating_say_key"
+    end
+    return false, "initiating_say_required"
+end
+
 -- Generic collection consumes the already-presented candidate contract.
 -- Static/capability providers retain their authoritative eligibility adapters;
 -- raw definitions must not bypass those adapters merely because they are
@@ -24,6 +69,7 @@ local function isCanonicalCandidate(candidate)
     return type(candidate) == "table"
         and type(candidate.frame) == "table"
         and type(candidate.display) == "table"
+        and Registry.HasValidInitiatingSay(candidate)
 end
 
 local providers = Registry._providers or {}
@@ -113,6 +159,12 @@ function Registry.NormalizeCandidate(candidate, providerID, localOrder)
     local provider = Registry.GetProvider(providerID)
     if not provider then return nil, "provider_unknown" end
     if provider.enabled == false then return nil, "provider_disabled" end
+    if type(candidate.frame) == "table" then
+        local validSay, sayReason = Registry.HasValidInitiatingSay(candidate)
+        if not validSay then
+            return nil, sayReason or "initiating_say_required"
+        end
+    end
 
     local output = {}
     local key

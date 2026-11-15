@@ -43,7 +43,10 @@ local function localizedBackstoryContent(result, kind)
     local fact = memory.GetBackstory(record, kind)
     if type(fact) ~= "table" then return nil end
     local language = "EN"
-    if Translator and type(Translator.getLanguage) == "function" then
+    local translations = PsychopatzCore and PsychopatzCore.CustomTranslationManager or nil
+    if type(translations) == "table" and type(translations.getLanguage) == "function" then
+        language = tostring(translations.getLanguage() or "EN")
+    elseif Translator and type(Translator.getLanguage) == "function" then
         local languageValue = Translator.getLanguage()
         if languageValue and type(languageValue.toString) == "function" then
             language = tostring(languageValue:toString())
@@ -165,7 +168,7 @@ function Conversation.ReceiveDisclosureResult(result)
         and view.session and view.session.append
     then
         local responseText = tostring(result.responseText)
-        view.session:append("npc", { fallback = responseText })
+        view.session:append("npc", { text = responseText, fallback = responseText })
         recordBackstoryResponse(responseText)
     elseif result.success == true and reaction
         and view.session and view.session.append

@@ -85,7 +85,8 @@ local function relationshipKindCatalog(context, payload)
     }
 end
 
-local function speechRealizationCatalog(context)
+local function speechRealizationCatalog(context, options)
+    local compact = type(options) == "table" and options.compact == true
     local realization = PNC.ConvoEngine and PNC.ConvoEngine.SpeechRealization or nil
     if not realization then
         local ok, value = pcall(require, "PNC/ConvoEngine/SpeechRealization")
@@ -94,7 +95,7 @@ local function speechRealizationCatalog(context)
     if type(realization) ~= "table" then
         return { schema = "pnc.speech.realization.catalog.v1", coverage = {}, families = {} }
     end
-    local phraseContent = type(realization.PhraseCoverage) == "function"
+    local phraseContent = (not compact and type(realization.PhraseCoverage) == "function")
         and realization.PhraseCoverage() or {}
     local families = {}
     if type(realization.GetFamilyKeys) == "function" then
@@ -105,16 +106,19 @@ local function speechRealizationCatalog(context)
         end
         table.sort(families)
     end
-    return {
+    local result = {
         schema = "pnc.speech.realization.catalog.v1",
         coverage = type(realization.Coverage) == "function"
             and realization.Coverage() or {},
         families = families,
-        phraseContent = phraseContent,
     }
+    if not compact then
+        result.phraseContent = phraseContent
+    end
+    return result
 end
 
-local function personaCatalog(context, payload)
+local function personaCatalog(context, payload, options)
     local definitions = PNC.NPCTraits
         and type(PNC.NPCTraits.GetDefinitions) == "function"
         and PNC.NPCTraits.GetDefinitions() or {}
@@ -181,7 +185,7 @@ local function personaCatalog(context, payload)
     end
     table.sort(archetypes)
     local relationshipKinds = relationshipKindCatalog(context, payload)
-    local speechRealization = speechRealizationCatalog(context)
+    local speechRealization = speechRealizationCatalog(context, options)
     local factionConstants = PNC.FactionConstants or {}
     if type(factionConstants.ROLES) ~= "table" then
         pcall(require, "PNC/Core/Factions/PNC_FactionConstants")

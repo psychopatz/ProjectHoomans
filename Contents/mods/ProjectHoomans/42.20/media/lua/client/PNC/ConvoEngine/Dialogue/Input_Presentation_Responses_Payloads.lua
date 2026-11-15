@@ -24,23 +24,38 @@ local function localizedSegment(templateID, fallback, args)
         args = args,
     }
     fallback = tostring(fallback or "")
-    local key = Internal.SemanticTranslationKey(response)
-    local translation = PNC.Translation
-    if not key or not translation
-        or type(translation.TrFormat) ~= "function"
-    then
-        return fallback, key
-    end
     args = type(args) == "table" and args or {}
     local firstArg = args.familyAddress or args.familyTerm or args.npcName
         or args.target or args.object or args.location or args.topic
         or args.content or args.value
     if type(firstArg) == "table" then firstArg = nil end
-    local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
-    if ok and value ~= nil and tostring(value) ~= "" then
-        return tostring(value), key
+    local function formatFallbackText(text)
+        text = tostring(text or "")
+        if firstArg ~= nil and firstArg ~= "" then
+            text = string.gsub(text, "%%1", function() return tostring(firstArg) end)
+            text = string.gsub(text, "%%s", function() return tostring(firstArg) end)
+        elseif string.find(text, "%%s, ", 1, true) == 1 then
+            text = string.gsub(text, "^%%s, ", "")
+            local first = string.sub(text, 1, 1)
+            if first ~= "" then
+                text = string.upper(first) .. string.sub(text, 2)
+            end
+        end
+        return text
     end
-    return fallback, key
+    local key = Internal.SemanticTranslationKey(response)
+    local translation = PNC.Translation
+    if not key or not translation
+        or type(translation.TrFormat) ~= "function"
+    then
+        return formatFallbackText(fallback), key
+    end
+    local formattedFallback = formatFallbackText(fallback)
+    local ok, value = pcall(translation.TrFormat, key, formattedFallback, firstArg)
+    if ok and value ~= nil and tostring(value) ~= "" then
+        return formatFallbackText(tostring(value)), key
+    end
+    return formattedFallback, key
 end
 
 local function fallbackSegment(templateID, fallback)

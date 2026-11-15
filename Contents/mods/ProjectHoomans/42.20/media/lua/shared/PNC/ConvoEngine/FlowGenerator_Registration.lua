@@ -39,6 +39,113 @@ local function markGenerated(artifact, registry)
     artifact.summary = summaryFor(artifact.coverage)
 end
 
+local function collectPoolContext(artifact)
+    local lookup = {}
+    local metaMap = type(artifact.responsePoolMetadata) == "table"
+        and artifact.responsePoolMetadata or {}
+    for poolID, meta in pairs(metaMap) do
+        if type(meta) == "table" then
+            lookup[tostring(poolID)] = meta
+        end
+    end
+    local capToAction = {}
+    for _, row in ipairs(artifact.coverage or {}) do
+        if type(row) == "table" and row.capabilityID and row.id then
+            capToAction[tostring(row.capabilityID)] = tostring(row.id)
+        end
+    end
+    for _, flow in ipairs(artifact.flows or {}) do
+        if type(flow) == "table" then
+            local capID = flow.capabilityID
+            local actionID = flow.action or (capID and capToAction[tostring(capID)])
+            for _, node in pairs(flow.nodes or {}) do
+                if type(node) == "table" and type(node.responsePool) == "string" then
+                    local key = node.responsePool
+                    lookup[key] = lookup[key] or {}
+                    lookup[key].capabilityID = lookup[key].capabilityID or capID
+                    lookup[key].action = lookup[key].action or actionID
+                end
+            end
+        end
+    end
+    for _, pool in ipairs(artifact.responsePools or {}) do
+        if type(pool) == "table" and type(pool.id) == "string" then
+            local key = pool.id
+            lookup[key] = lookup[key] or {}
+            lookup[key].capabilityID = lookup[key].capabilityID
+                or pool.capabilityID
+            lookup[key].action = lookup[key].action or pool.action
+        end
+    end
+    return lookup
+end
+
+local function formatPoolError(poolID, reason, meta, detail)
+    local capability = (meta and meta.capabilityID) or "unknown"
+    local action = (meta and meta.action) or "unknown"
+    local template = (detail and detail.templateID) or "none"
+    local realization = (detail and detail.realizationID) or "none"
+    return "automatic semantic response registration failed: pool="
+        .. tostring(poolID or "unknown")
+        .. " reason=" .. tostring(reason or "unknown")
+        .. " capability=" .. tostring(capability)
+        .. " action=" .. tostring(action)
+        .. " template=" .. tostring(template)
+        .. " realization=" .. tostring(realization)
+end
+
+local function preflightArtifact(artifact, responses)
+    local poolContext = collectPoolContext(artifact)
+    local preflightedPools = {}
+    local existingCount = 0
+    for _ in pairs(responses.POOLS or {}) do
+        existingCount = existingCount + 1
+    end
+    local newDistinctCount = 0
+    for index = 1, #(artifact.responsePools or {}) do
+        local pool = artifact.responsePools[index]
+        local poolID = type(pool) == "table" and tostring(pool.id or "") or ""
+        local meta = poolContext[poolID] or (type(pool) == "table" and {
+            capabilityID = pool.capabilityID,
+            action = pool.action,
+        }) or nil
+        local ok, info = responses.Preflight(poolID, pool, {
+            strictVariants = true,
+        })
+        if not ok then
+            local detail = type(info) == "table" and info or { reason = info }
+            return false, formatPoolError(poolID, detail.reason, meta, detail)
+        end
+        if not preflightedPools[poolID] and info.isNewPool then
+            newDistinctCount = newDistinctCount + 1
+            if (existingCount + newDistinctCount) > (responses.MAX_POOLS or 256) then
+                return false, formatPoolError(poolID, "response_pool_limit", meta)
+            end
+        end
+        preflightedPools[poolID] = true
+    end
+    for index = 1, #(artifact.flows or {}) do
+        local definition = artifact.flows[index]
+        if type(definition) ~= "table" or tostring(definition.id or "") == ""
+            or type(definition.nodes) ~= "table"
+        then
+            return false, "automatic semantic flow preflight failed: invalid_flow_definition"
+        end
+        for _, node in pairs(definition.nodes) do
+            if type(node) == "table" and node.responsePool ~= nil then
+                local poolID = tostring(node.responsePool)
+                if not preflightedPools[poolID] and not responses.Get(poolID) then
+                    local meta = poolContext[poolID]
+                    return false, formatPoolError(
+                        poolID, "flow_references_unregistered_pool", meta
+                    )
+                end
+            end
+        end
+    end
+    return true
+end
+
 local function register(capabilityCatalog, artifact)
     local registry = PNC.ConvoEngine.DialogueFlowRegistry
         or require "PNC/ConvoEngine/Dialogue/FlowRegistry"
@@ -47,13 +154,18 @@ local function register(capabilityCatalog, artifact)
     artifact = type(artifact) == "table" and artifact or build(
         capabilityCatalog
     )
+    local preflightOk, preflightError = preflightArtifact(artifact, responses)
+    if not preflightOk then
+        error(preflightError)
+    end
+    local poolContext = collectPoolContext(artifact)
     artifact.regeneratedFlowIDs = {}
     for index = 1, #artifact.responsePools do
         local pool = artifact.responsePools[index]
-        local registered = responses.Register(pool.id, pool)
+        local registered, reasonOrPool = responses.Register(pool.id, pool)
         if registered ~= true then
-            error("automatic semantic response registration failed: "
-                .. tostring(pool.id))
+            local meta = poolContext[tostring(pool and pool.id or "")]
+            error(formatPoolError(pool and pool.id, reasonOrPool, meta))
         end
     end
     for index = 1, #artifact.flows do

@@ -400,7 +400,13 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         )
         self.assertEqual(first["result"]["decision"]["branch"], "QUESTION_RECEIVED")
         self.assertTrue(
-            first["result"]["decision"]["response"]["templateID"].startswith(
+            first["result"]["decision"]["response"]["selectionID"].startswith(
+                "semantic.question.identity."
+            )
+        )
+        self.assertTrue(
+            first["result"]["decision"]["response"]["templateID"] == "question.identity"
+            or first["result"]["decision"]["response"]["templateID"].startswith(
                 "semantic.question.identity."
             )
         )
@@ -423,8 +429,13 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
             "QUESTION_RECEIVED",
         )
         self.assertTrue(
-            wellbeing_question["result"]["decision"]["response"]["templateID"].startswith(
+            wellbeing_question["result"]["decision"]["response"]["selectionID"].startswith(
                 "semantic.question.wellbeing."
+            )
+        )
+        self.assertTrue(
+            wellbeing_question["result"]["decision"]["response"]["templateID"].startswith(
+                ("question.wellbeing.", "semantic.question.wellbeing.")
             )
         )
         self.assert_no_identity_effect(wellbeing_question)

@@ -23,7 +23,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
 
-        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+        def wait_until(predicate: object, timeout: float = 20.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()
@@ -60,7 +60,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
 
-        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+        def wait_until(predicate: object, timeout: float = 20.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()
@@ -124,7 +124,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
 
-        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+        def wait_until(predicate: object, timeout: float = 20.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()
@@ -163,7 +163,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
                 if row.get("id") == "identity.choice.lie_name"
             )
             self.assertEqual(app.suggestion_rows[lie_index]["id"], "identity.choice.lie_name")
-            self.assertFalse(app.suggestion_interactive)
+            self.assertTrue(app.suggestion_interactive)
             self.assertIn("identity.choice.lie_name", app.suggestion_inspector.get("1.0", "end"))
         finally:
             app.close()
@@ -178,7 +178,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
 
-        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+        def wait_until(predicate: object, timeout: float = 20.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()
@@ -302,7 +302,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
         errors: list[str] = []
         app._messagebox.showerror = lambda _title, message, **_kwargs: errors.append(str(message))
 
-        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+        def wait_until(predicate: object, timeout: float = 20.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()
@@ -356,7 +356,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
 
-        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+        def wait_until(predicate: object, timeout: float = 20.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()

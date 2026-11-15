@@ -84,6 +84,9 @@ function Provider.Find(id)
     for _, definition in ipairs(Provider.Definitions) do
         if definition.id == id then return definition end
     end
+    for _, definition in ipairs(Provider.CoreDefinitions or {}) do
+        if definition.id == id then return definition end
+    end
     return nil
 end
 

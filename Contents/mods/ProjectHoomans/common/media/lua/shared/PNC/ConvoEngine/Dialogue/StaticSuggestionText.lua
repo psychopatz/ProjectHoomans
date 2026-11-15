@@ -3930,23 +3930,45 @@ return {
                 ["keyOrder"] = {
                     "1",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
-                                ["fallback"] = "I'll go by a different name.",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.default",
+                                ["fallback"] = "I'm {slot.identity_claim.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.neutral",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
-                                        "I'll go by a different name.",
+                                        "I'm {slot.identity_claim.name}.",
+                                        "Name's {slot.identity_claim.name}.",
+                                        "You can call me {slot.identity_claim.name}.",
+                                        "My name's {slot.identity_claim.name}.",
+                                        "It's {slot.identity_claim.name}.",
+                                        "Call me {slot.identity_claim.name}.",
+                                        "I go by {slot.identity_claim.name}.",
+                                        "They call me {slot.identity_claim.name}.",
+                                        "The name's {slot.identity_claim.name}.",
+                                        "Just call me {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}. That's what I go by.",
+                                        "I'll go by {slot.identity_claim.name}.",
                                     },
                                     ["TL"] = {
-                                        "Ibang pangalan ang gagamitin ko.",
+                                        "Ako si {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang pangalan ko.",
+                                        "Tawagin mo akong {slot.identity_claim.name}.",
+                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                                        "Si {slot.identity_claim.name} ito.",
+                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang gamit kong pangalan.",
+                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                                        "Ako nga pala si {slot.identity_claim.name}.",
+                                        "Sabihin na nating {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}. Iyan ang tawag sa akin.",
+                                        "Magpapakilala akong si {slot.identity_claim.name}.",
                                     },
                                 },
                             },
@@ -3956,6 +3978,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "ui.suggestion.identity",
+            ["slots"] = {
+                ["identity_claim"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "fact",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Lie about your name",
@@ -3971,19 +4001,41 @@ return {
                     },
                 },
                 {
-                    ["fallback"] = "I'll go by a different name.",
+                    ["fallback"] = "I'm {slot.identity_claim.name}.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.default",
+                    ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.neutral",
                     ["translations"] = {
                         ["EN"] = {
-                            "I'll go by a different name.",
+                            "I'm {slot.identity_claim.name}.",
+                            "Name's {slot.identity_claim.name}.",
+                            "You can call me {slot.identity_claim.name}.",
+                            "My name's {slot.identity_claim.name}.",
+                            "It's {slot.identity_claim.name}.",
+                            "Call me {slot.identity_claim.name}.",
+                            "I go by {slot.identity_claim.name}.",
+                            "They call me {slot.identity_claim.name}.",
+                            "The name's {slot.identity_claim.name}.",
+                            "Just call me {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name}. That's what I go by.",
+                            "I'll go by {slot.identity_claim.name}.",
                         },
                         ["TL"] = {
-                            "Ibang pangalan ang gagamitin ko.",
+                            "Ako si {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name} ang pangalan ko.",
+                            "Tawagin mo akong {slot.identity_claim.name}.",
+                            "Ang pangalan ko ay {slot.identity_claim.name}.",
+                            "Si {slot.identity_claim.name} ito.",
+                            "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name} ang gamit kong pangalan.",
+                            "{slot.identity_claim.name} ang tawag nila sa akin.",
+                            "Ako nga pala si {slot.identity_claim.name}.",
+                            "Sabihin na nating {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name}. Iyan ang tawag sa akin.",
+                            "Magpapakilala akong si {slot.identity_claim.name}.",
                         },
                     },
-                    ["variantID"] = "default",
+                    ["variantID"] = "neutral",
                 },
             },
         },
@@ -4030,13 +4082,6 @@ return {
                             ["TL"] = "Magsinungaling tungkol sa pangalan",
                         },
                     },
-                    {
-                        ["key"] = "suggestion.identity.lie.utterance",
-                        ["text"] = {
-                            ["EN"] = "I'll go by a different name.",
-                            ["TL"] = "Ibang pangalan ang gagamitin ko.",
-                        },
-                    },
                 },
                 ["textTarget"] = "UI_PNC_Conversation",
             },
@@ -4044,20 +4089,42 @@ return {
                 ["keyOrder"] = {
                     "1",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
-                                ["id"] = "default",
+                                ["id"] = "neutral",
                                 ["text"] = {
                                     ["EN"] = {
-                                        "I'll go by a different name.",
+                                        "I'm {slot.identity_claim.name}.",
+                                        "Name's {slot.identity_claim.name}.",
+                                        "You can call me {slot.identity_claim.name}.",
+                                        "My name's {slot.identity_claim.name}.",
+                                        "It's {slot.identity_claim.name}.",
+                                        "Call me {slot.identity_claim.name}.",
+                                        "I go by {slot.identity_claim.name}.",
+                                        "They call me {slot.identity_claim.name}.",
+                                        "The name's {slot.identity_claim.name}.",
+                                        "Just call me {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}. That's what I go by.",
+                                        "I'll go by {slot.identity_claim.name}.",
                                     },
                                     ["TL"] = {
-                                        "Ibang pangalan ang gagamitin ko.",
+                                        "Ako si {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang pangalan ko.",
+                                        "Tawagin mo akong {slot.identity_claim.name}.",
+                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                                        "Si {slot.identity_claim.name} ito.",
+                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang gamit kong pangalan.",
+                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                                        "Ako nga pala si {slot.identity_claim.name}.",
+                                        "Sabihin na nating {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}. Iyan ang tawag sa akin.",
+                                        "Magpapakilala akong si {slot.identity_claim.name}.",
                                     },
                                 },
                             },
@@ -4084,7 +4151,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "I'll go by a different name.",
+                            ["fallback"] = "I'm {slot.identity_claim.name}.",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.ui.suggestion.identity.lie.say_1",
                         },
@@ -4093,6 +4160,12 @@ return {
             },
         },
         ["slots"] = {
+            ["identity_claim"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "fact",
+            },
         },
         ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie.json",
         ["target"] = {
@@ -4115,19 +4188,41 @@ return {
                 },
             },
             {
-                ["fallback"] = "I'll go by a different name.",
+                ["fallback"] = "I'm {slot.identity_claim.name}.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.default",
+                ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.neutral",
                 ["translations"] = {
                     ["EN"] = {
-                        "I'll go by a different name.",
+                        "I'm {slot.identity_claim.name}.",
+                        "Name's {slot.identity_claim.name}.",
+                        "You can call me {slot.identity_claim.name}.",
+                        "My name's {slot.identity_claim.name}.",
+                        "It's {slot.identity_claim.name}.",
+                        "Call me {slot.identity_claim.name}.",
+                        "I go by {slot.identity_claim.name}.",
+                        "They call me {slot.identity_claim.name}.",
+                        "The name's {slot.identity_claim.name}.",
+                        "Just call me {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name}. That's what I go by.",
+                        "I'll go by {slot.identity_claim.name}.",
                     },
                     ["TL"] = {
-                        "Ibang pangalan ang gagamitin ko.",
+                        "Ako si {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name} ang pangalan ko.",
+                        "Tawagin mo akong {slot.identity_claim.name}.",
+                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                        "Si {slot.identity_claim.name} ito.",
+                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name} ang gamit kong pangalan.",
+                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                        "Ako nga pala si {slot.identity_claim.name}.",
+                        "Sabihin na nating {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name}. Iyan ang tawag sa akin.",
+                        "Magpapakilala akong si {slot.identity_claim.name}.",
                     },
                 },
-                ["variantID"] = "default",
+                ["variantID"] = "neutral",
             },
         },
         ["when"] = nil,
@@ -4156,23 +4251,45 @@ return {
                 ["keyOrder"] = {
                     "1",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
-                                ["fallback"] = "My real name.",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.default",
+                                ["fallback"] = "I'm {slot.identity_claim.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
-                                        "My real name.",
+                                        "I'm {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "My name's {slot.identity_claim.name}.",
+                                        "My name is {slot.identity_claim.name}.",
+                                        "It's {slot.identity_claim.name}.",
+                                        "Name's {slot.identity_claim.name}.",
+                                        "You can call me {slot.identity_claim.name}.",
+                                        "They call me {slot.identity_claim.name}.",
+                                        "I go by {slot.identity_claim.name}.",
+                                        "The name's {slot.identity_claim.name}.",
+                                        "Call me {slot.identity_claim.name}.",
+                                        "Folks call me {slot.identity_claim.name}.",
                                     },
                                     ["TL"] = {
-                                        "Tunay kong pangalan.",
+                                        "Ako si {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                                        "Pangalan ko'y {slot.identity_claim.name}.",
+                                        "Si {slot.identity_claim.name} ito.",
+                                        "{slot.identity_claim.name} ang pangalan ko.",
+                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                                        "Kilala ako bilang {slot.identity_claim.name}.",
+                                        "Ako nga pala si {slot.identity_claim.name}.",
+                                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
                                     },
                                 },
                             },
@@ -4182,6 +4299,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "ui.suggestion.identity",
+            ["slots"] = {
+                ["identity_claim"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "fact",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Say your real name",
@@ -4197,19 +4322,41 @@ return {
                     },
                 },
                 {
-                    ["fallback"] = "My real name.",
+                    ["fallback"] = "I'm {slot.identity_claim.name}.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.real.say.1.default",
+                    ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
                     ["translations"] = {
                         ["EN"] = {
-                            "My real name.",
+                            "I'm {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name}.",
+                            "My name's {slot.identity_claim.name}.",
+                            "My name is {slot.identity_claim.name}.",
+                            "It's {slot.identity_claim.name}.",
+                            "Name's {slot.identity_claim.name}.",
+                            "You can call me {slot.identity_claim.name}.",
+                            "They call me {slot.identity_claim.name}.",
+                            "I go by {slot.identity_claim.name}.",
+                            "The name's {slot.identity_claim.name}.",
+                            "Call me {slot.identity_claim.name}.",
+                            "Folks call me {slot.identity_claim.name}.",
                         },
                         ["TL"] = {
-                            "Tunay kong pangalan.",
+                            "Ako si {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name}.",
+                            "Ang pangalan ko ay {slot.identity_claim.name}.",
+                            "Pangalan ko'y {slot.identity_claim.name}.",
+                            "Si {slot.identity_claim.name} ito.",
+                            "{slot.identity_claim.name} ang pangalan ko.",
+                            "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name} ang tawag nila sa akin.",
+                            "Kilala ako bilang {slot.identity_claim.name}.",
+                            "Ako nga pala si {slot.identity_claim.name}.",
+                            "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                            "Lagi akong tinatawag na {slot.identity_claim.name}.",
                         },
                     },
-                    ["variantID"] = "default",
+                    ["variantID"] = "neutral",
                 },
             },
         },
@@ -4256,13 +4403,6 @@ return {
                             ["TL"] = "Sabihin ang tunay mong pangalan",
                         },
                     },
-                    {
-                        ["key"] = "suggestion.identity.real.utterance",
-                        ["text"] = {
-                            ["EN"] = "My real name.",
-                            ["TL"] = "Tunay kong pangalan.",
-                        },
-                    },
                 },
                 ["textTarget"] = "UI_PNC_Conversation",
             },
@@ -4270,20 +4410,42 @@ return {
                 ["keyOrder"] = {
                     "1",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
-                                ["id"] = "default",
+                                ["id"] = "neutral",
                                 ["text"] = {
                                     ["EN"] = {
-                                        "My real name.",
+                                        "I'm {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "My name's {slot.identity_claim.name}.",
+                                        "My name is {slot.identity_claim.name}.",
+                                        "It's {slot.identity_claim.name}.",
+                                        "Name's {slot.identity_claim.name}.",
+                                        "You can call me {slot.identity_claim.name}.",
+                                        "They call me {slot.identity_claim.name}.",
+                                        "I go by {slot.identity_claim.name}.",
+                                        "The name's {slot.identity_claim.name}.",
+                                        "Call me {slot.identity_claim.name}.",
+                                        "Folks call me {slot.identity_claim.name}.",
                                     },
                                     ["TL"] = {
-                                        "Tunay kong pangalan.",
+                                        "Ako si {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                                        "Pangalan ko'y {slot.identity_claim.name}.",
+                                        "Si {slot.identity_claim.name} ito.",
+                                        "{slot.identity_claim.name} ang pangalan ko.",
+                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                                        "Kilala ako bilang {slot.identity_claim.name}.",
+                                        "Ako nga pala si {slot.identity_claim.name}.",
+                                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
                                     },
                                 },
                             },
@@ -4310,7 +4472,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "My real name.",
+                            ["fallback"] = "I'm {slot.identity_claim.name}.",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.ui.suggestion.identity.real.say_1",
                         },
@@ -4319,6 +4481,12 @@ return {
             },
         },
         ["slots"] = {
+            ["identity_claim"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "fact",
+            },
         },
         ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
         ["target"] = {
@@ -4341,19 +4509,41 @@ return {
                 },
             },
             {
-                ["fallback"] = "My real name.",
+                ["fallback"] = "I'm {slot.identity_claim.name}.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.default",
+                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
                 ["translations"] = {
                     ["EN"] = {
-                        "My real name.",
+                        "I'm {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name}.",
+                        "My name's {slot.identity_claim.name}.",
+                        "My name is {slot.identity_claim.name}.",
+                        "It's {slot.identity_claim.name}.",
+                        "Name's {slot.identity_claim.name}.",
+                        "You can call me {slot.identity_claim.name}.",
+                        "They call me {slot.identity_claim.name}.",
+                        "I go by {slot.identity_claim.name}.",
+                        "The name's {slot.identity_claim.name}.",
+                        "Call me {slot.identity_claim.name}.",
+                        "Folks call me {slot.identity_claim.name}.",
                     },
                     ["TL"] = {
-                        "Tunay kong pangalan.",
+                        "Ako si {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name}.",
+                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                        "Pangalan ko'y {slot.identity_claim.name}.",
+                        "Si {slot.identity_claim.name} ito.",
+                        "{slot.identity_claim.name} ang pangalan ko.",
+                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                        "Kilala ako bilang {slot.identity_claim.name}.",
+                        "Ako nga pala si {slot.identity_claim.name}.",
+                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
                     },
                 },
-                ["variantID"] = "default",
+                ["variantID"] = "neutral",
             },
         },
         ["when"] = nil,
@@ -4382,23 +4572,37 @@ return {
                 ["keyOrder"] = {
                     "1",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
                                 ["fallback"] = "That's none of your business.",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.default",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.neutral",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
                                         "That's none of your business.",
+                                        "You don't need my name.",
+                                        "I'm not giving you my name.",
+                                        "Keep walking. You're not getting my name.",
+                                        "None of your concern.",
+                                        "Forget it. You don't need to know who I am.",
+                                        "My name isn't for you to know.",
+                                        "I don't owe you my name.",
                                     },
                                     ["TL"] = {
                                         "Wala ka nang pakialam.",
+                                        "Hindi mo kailangan ang pangalan ko.",
+                                        "Hindi ko ibibigay ang pangalan ko sa'yo.",
+                                        "Huwag mo nang alamin ang pangalan ko.",
+                                        "Wala kang kinalaman doon.",
+                                        "Kalimutan mo na. Hindi mo kailangang malaman.",
+                                        "Hindi para sa'yo ang pangalan ko.",
+                                        "Hindi ako obligadong magpakilala sa'yo.",
                                     },
                                 },
                             },
@@ -4426,16 +4630,30 @@ return {
                     ["fallback"] = "That's none of your business.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.default",
+                    ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.neutral",
                     ["translations"] = {
                         ["EN"] = {
                             "That's none of your business.",
+                            "You don't need my name.",
+                            "I'm not giving you my name.",
+                            "Keep walking. You're not getting my name.",
+                            "None of your concern.",
+                            "Forget it. You don't need to know who I am.",
+                            "My name isn't for you to know.",
+                            "I don't owe you my name.",
                         },
                         ["TL"] = {
                             "Wala ka nang pakialam.",
+                            "Hindi mo kailangan ang pangalan ko.",
+                            "Hindi ko ibibigay ang pangalan ko sa'yo.",
+                            "Huwag mo nang alamin ang pangalan ko.",
+                            "Wala kang kinalaman doon.",
+                            "Kalimutan mo na. Hindi mo kailangang malaman.",
+                            "Hindi para sa'yo ang pangalan ko.",
+                            "Hindi ako obligadong magpakilala sa'yo.",
                         },
                     },
-                    ["variantID"] = "default",
+                    ["variantID"] = "neutral",
                 },
             },
         },
@@ -4496,20 +4714,34 @@ return {
                 ["keyOrder"] = {
                     "1",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
-                                ["id"] = "default",
+                                ["id"] = "neutral",
                                 ["text"] = {
                                     ["EN"] = {
                                         "That's none of your business.",
+                                        "You don't need my name.",
+                                        "I'm not giving you my name.",
+                                        "Keep walking. You're not getting my name.",
+                                        "None of your concern.",
+                                        "Forget it. You don't need to know who I am.",
+                                        "My name isn't for you to know.",
+                                        "I don't owe you my name.",
                                     },
                                     ["TL"] = {
                                         "Wala ka nang pakialam.",
+                                        "Hindi mo kailangan ang pangalan ko.",
+                                        "Hindi ko ibibigay ang pangalan ko sa'yo.",
+                                        "Huwag mo nang alamin ang pangalan ko.",
+                                        "Wala kang kinalaman doon.",
+                                        "Kalimutan mo na. Hindi mo kailangang malaman.",
+                                        "Hindi para sa'yo ang pangalan ko.",
+                                        "Hindi ako obligadong magpakilala sa'yo.",
                                     },
                                 },
                             },
@@ -4570,16 +4802,30 @@ return {
                 ["fallback"] = "That's none of your business.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.default",
+                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.neutral",
                 ["translations"] = {
                     ["EN"] = {
                         "That's none of your business.",
+                        "You don't need my name.",
+                        "I'm not giving you my name.",
+                        "Keep walking. You're not getting my name.",
+                        "None of your concern.",
+                        "Forget it. You don't need to know who I am.",
+                        "My name isn't for you to know.",
+                        "I don't owe you my name.",
                     },
                     ["TL"] = {
                         "Wala ka nang pakialam.",
+                        "Hindi mo kailangan ang pangalan ko.",
+                        "Hindi ko ibibigay ang pangalan ko sa'yo.",
+                        "Huwag mo nang alamin ang pangalan ko.",
+                        "Wala kang kinalaman doon.",
+                        "Kalimutan mo na. Hindi mo kailangang malaman.",
+                        "Hindi para sa'yo ang pangalan ko.",
+                        "Hindi ako obligadong magpakilala sa'yo.",
                     },
                 },
-                ["variantID"] = "default",
+                ["variantID"] = "neutral",
             },
         },
         ["when"] = nil,
@@ -4744,458 +4990,6 @@ return {
                     },
                 },
                 ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["labelFallback"] = "Ask what's on their mind",
-                ["labelKey"] = "convo.ui.suggestion.personal_check_in.affordance.label",
-                ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask what's on their mind",
-                    },
-                    ["TL"] = {
-                        "Alamin kung may bumabagabag sa kanya",
-                    },
-                },
-            },
-            ["familyID"] = "ui.suggestion.personal_check_in",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Anything bothering you?",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Anything bothering you?",
-                                    },
-                                    ["TL"] = {
-                                        "May bumabagabag ba sa'yo?",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Ask what's on their mind",
-                    ["role"] = "button_label",
-                    ["templateID"] = "convo.ui.suggestion.personal_check_in.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Ask what's on their mind",
-                        },
-                        ["TL"] = {
-                            "Alamin kung may bumabagabag sa kanya",
-                        },
-                    },
-                },
-                {
-                    ["fallback"] = "Anything bothering you?",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Anything bothering you?",
-                        },
-                        ["TL"] = {
-                            "May bumabagabag ba sa'yo?",
-                        },
-                    },
-                    ["variantID"] = "default",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.personal_check_in",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "personal_check_in",
-            ["sourceId"] = "ui.suggestion.personal_check_in",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["label"] = {
-                    ["EN"] = {
-                        "Ask what's on their mind",
-                    },
-                    ["TL"] = {
-                        "Alamin kung may bumabagabag sa kanya",
-                    },
-                },
-                ["textRole"] = "button_label",
-            },
-            ["metadata"] = {
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.personal_check_in.label",
-                        ["text"] = {
-                            ["EN"] = "Ask what's on their mind",
-                            ["TL"] = "Alamin kung may bumabagabag sa kanya",
-                        },
-                    },
-                    {
-                        ["key"] = "suggestion.personal_check_in.utterance",
-                        ["text"] = {
-                            ["EN"] = "Anything bothering you?",
-                            ["TL"] = "May bumabagabag ba sa'yo?",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Anything bothering you?",
-                                    },
-                                    ["TL"] = {
-                                        "May bumabagabag ba sa'yo?",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.personal_check_in",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Anything bothering you?",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.ui.suggestion.personal_check_in.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Ask what's on their mind",
-                ["role"] = "button_label",
-                ["templateID"] = "convo.ui.suggestion.personal_check_in.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask what's on their mind",
-                    },
-                    ["TL"] = {
-                        "Alamin kung may bumabagabag sa kanya",
-                    },
-                },
-            },
-            {
-                ["fallback"] = "Anything bothering you?",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Anything bothering you?",
-                    },
-                    ["TL"] = {
-                        "May bumabagabag ba sa'yo?",
-                    },
-                },
-                ["variantID"] = "default",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["labelFallback"] = "Wait here.",
-                ["labelKey"] = "convo.ui.suggestion.stay.affordance.label",
-                ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
-                    },
-                },
-            },
-            ["familyID"] = "ui.suggestion.stay",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Wait here.",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Wait here.",
-                                    },
-                                    ["TL"] = {
-                                        "Dito ka maghintay.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Wait here.",
-                    ["role"] = "button_label",
-                    ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Wait here.",
-                        },
-                        ["TL"] = {
-                            "Dito ka maghintay.",
-                        },
-                    },
-                },
-                {
-                    ["fallback"] = "Wait here.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Wait here.",
-                        },
-                        ["TL"] = {
-                            "Dito ka maghintay.",
-                        },
-                    },
-                    ["variantID"] = "default",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.stay",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "stay",
-            ["sourceId"] = "ui.suggestion.stay",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["label"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
-                    },
-                },
-                ["textRole"] = "button_label",
-            },
-            ["metadata"] = {
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.stay.label",
-                        ["text"] = {
-                            ["EN"] = "Wait here.",
-                            ["TL"] = "Dito ka maghintay.",
-                        },
-                    },
-                    {
-                        ["key"] = "suggestion.stay.utterance",
-                        ["text"] = {
-                            ["EN"] = "Wait here.",
-                            ["TL"] = "Dito ka maghintay.",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Wait here.",
-                                    },
-                                    ["TL"] = {
-                                        "Dito ka maghintay.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.stay",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Wait here.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.ui.suggestion.stay.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Wait here.",
-                ["role"] = "button_label",
-                ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
-                    },
-                },
-            },
-            {
-                ["fallback"] = "Wait here.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
-                    },
-                },
-                ["variantID"] = "default",
             },
         },
         ["when"] = nil,

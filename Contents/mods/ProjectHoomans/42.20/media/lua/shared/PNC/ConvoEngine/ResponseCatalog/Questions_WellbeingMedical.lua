@@ -215,5 +215,16 @@ if groundedRegistered ~= true then
         .. tostring(groundedReason) .. ")")
 end
 
+local ConvoPlanFamily = require
+    "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
+ConvoPlanFamily.install("question.health_state.healthy", {
+    defaultContentOwner = "projecthoomans.dialogue_content.wellbeing",
+})
+ConvoPlanFamily.install("question.health_state.injured", {
+    defaultContentOwner = "projecthoomans.dialogue_content.wellbeing",
+})
+ConvoPlanFamily.install("question.health_state.unknown", {
+    defaultContentOwner = "projecthoomans.dialogue_content.wellbeing",
+})
 
 return true

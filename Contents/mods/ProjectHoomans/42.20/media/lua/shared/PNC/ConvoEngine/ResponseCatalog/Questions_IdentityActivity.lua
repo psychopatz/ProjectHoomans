@@ -60,8 +60,8 @@ Catalog.Register("semantic.question.activity", {
         },
         {
             id = "semantic.question.activity.default",
-            templateID = "semantic.question.activity.default",
-            fallback = "Not much. Just getting by.",
+            templateID = "question.activity.dataset.keep_moving",
+            fallback = "Just doing what I can to keep things moving.",
         },
     },
 })

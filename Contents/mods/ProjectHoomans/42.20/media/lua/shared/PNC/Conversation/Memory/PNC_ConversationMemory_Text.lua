@@ -136,8 +136,24 @@ function Memory.RenderText(template, arguments)
         return nil
     end
     arguments = type(arguments) == "table" and arguments or {}
-    local rendered = string.gsub(template, "{([%w_]+)}", function(name)
-        local value = arguments[name]
+    local function resolveArgument(name)
+        local direct = arguments[name]
+        if direct ~= nil then return direct end
+        if name == "target.name" then
+            return arguments.subject or arguments.target or arguments.actor or arguments.actorName
+        elseif name == "slot.faction.name" then
+            return arguments.faction or arguments.factionName
+        elseif name == "slot.killer.name" then
+            return arguments.killer or arguments.killerName
+        elseif name == "slot.place.name" or name == "place.name" then
+            return arguments.place or arguments.location or arguments.placeName
+        elseif name == "addressee.name" then
+            return arguments.addressee or arguments.playerName or arguments.familyAddress
+        end
+        return nil
+    end
+    local rendered = string.gsub(template, "{([%w_.]+)}", function(name)
+        local value = resolveArgument(name)
         if value == nil then
             return "{" .. name .. "}"
         end

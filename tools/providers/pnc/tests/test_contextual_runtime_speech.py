@@ -15,9 +15,9 @@ class ContextualRuntimeSpeechTests(unittest.TestCase):
             catalog = worker.persona_catalog()["speechRealization"]
 
         families = set(catalog["families"])
-        self.assertIn("semantic.flow.greeting.opening.default", families)
-        self.assertIn("semantic.question.wellbeing.default", families)
-        self.assertIn("semantic.question.knowledge.known", families)
+        self.assertIn("flow.greeting.opening.default", families)
+        self.assertIn("question.wellbeing.default", families)
+        self.assertIn("question.knowledge.known", families)
         self.assertNotIn(
             "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
             families,
@@ -26,7 +26,7 @@ class ContextualRuntimeSpeechTests(unittest.TestCase):
             follow = worker.input("Follow me")
         self.assertEqual(
             follow["messages"][0]["payload"]["phraseFamilyID"],
-            "phrase.semantic.command.follow.queued",
+            "phrase.command.follow.queued",
         )
         phrase_content = catalog["phraseContent"]
         self.assertTrue(phrase_content["families"])

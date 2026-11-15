@@ -68,10 +68,6 @@ local function loadCorePersistence(load)
     )
     load(
         "ProjectHoomans", "shared",
-        "PNC/Core/Relationships/PNC_EntityRef.lua", "persistence"
-    )
-    load(
-        "ProjectHoomans", "shared",
         "PNC/Core/Relationships/PNC_SocialProfileConstants.lua",
         "persistence"
     )

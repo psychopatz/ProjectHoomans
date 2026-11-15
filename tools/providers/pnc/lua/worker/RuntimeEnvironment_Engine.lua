@@ -155,6 +155,13 @@ function Engine.configure(context)
         getTemperature = function() return 20 end,
     }
 
+    local worldObject = {
+        getSeedString = function()
+            return world.seedString or world.worldSeedString
+        end,
+    }
+
+    getWorld = function() return worldObject end
     getGameTime = function() return gameTime end
     getClimateManager = function() return climate end
     getTimeInMillis = function() return Runtime.now end

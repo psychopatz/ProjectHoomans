@@ -172,6 +172,9 @@ function Internal.CollectSuggestionBuildSources(state)
     if activeHubID ~= nil then
         providerContext.activeHubID = activeHubID
     end
+    if providerContext.revision == nil and revision ~= nil then
+        providerContext.revision = revision
+    end
     local providerCandidates = ChoiceRegistry.Collect(
         providerContext, Suggestions.MAX_CANDIDATES
     )

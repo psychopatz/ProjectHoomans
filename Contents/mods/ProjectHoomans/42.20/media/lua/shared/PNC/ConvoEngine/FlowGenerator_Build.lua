@@ -108,11 +108,19 @@ local function build(capabilityCatalog)
     end
 
     table.sort(candidates, function(left, right) return left.id < right.id end)
+    local responsePoolMetadata = {}
     for index = 1, #candidates do
-        local definition = buildFlow(candidates[index])
+        local candidate = candidates[index]
+        local definition = buildFlow(candidate)
         definitions[#definitions + 1] = definition
         for poolIndex = 1, #definition.responsePools do
-            responsePools[#responsePools + 1] = definition.responsePools[poolIndex]
+            local pool = definition.responsePools[poolIndex]
+            responsePools[#responsePools + 1] = pool
+            responsePoolMetadata[pool.id] = {
+                capabilityID = definition.capabilityID or candidate.bindingID,
+                action = candidate.id,
+                workflowKind = candidate.workflowKind,
+            }
         end
     end
     table.sort(rows, function(left, right) return left.id < right.id end)
@@ -126,6 +134,7 @@ local function build(capabilityCatalog)
         templates = copyValue(TEMPLATES),
         flows = definitions,
         responsePools = responsePools,
+        responsePoolMetadata = responsePoolMetadata,
         coverage = rows,
         summary = summaryFor(rows),
     }
