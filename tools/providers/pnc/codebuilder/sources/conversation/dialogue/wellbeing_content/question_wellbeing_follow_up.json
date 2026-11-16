@@ -1,0 +1,149 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question.wellbeing.follow_up",
+  "id": "responses",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "textTarget": "convo/SemanticResponses",
+    "textRows": [
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetAllThingsConsidered",
+        "text": {
+          "EN": "Doing okay, all things considered.",
+          "TL": "Okay naman ako, sa lahat ng bagay."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetGettingBy",
+        "text": {
+          "EN": "I'm getting by, one day at a time. How about you?",
+          "TL": "Kinakaya ko araw-araw. Ikaw, kumusta?"
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHangingIn",
+        "text": {
+          "EN": "I'm hanging in there. Thanks for asking.",
+          "TL": "Kumakapit pa rin ako. Salamat sa pagtatanong."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHungry",
+        "text": {
+          "EN": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
+          "TL": "Gutom ako, pero kakayanin ko. Kung may sobra kang pagkain, magpapasalamat ako."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetThirsty",
+        "text": {
+          "EN": "I'm pretty thirsty. If you have water, could you spare some?",
+          "TL": "Uhaw na uhaw ako. Kung may tubig ka, maaari ba akong makahingi?"
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetTired",
+        "text": {
+          "EN": "I'm tired, though I can manage for now.",
+          "TL": "Pagod ako, pero kaya ko pa sa ngayon."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpDefault",
+        "text": {
+          "EN": "I don't have enough detail to say what's wrong yet.",
+          "TL": "Wala pa akong sapat na detalye para masabi kung ano ang mali."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpFatigue",
+        "text": {
+          "EN": "I'm still worn out.",
+          "TL": "Pagod na pagod pa rin ako."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpHunger",
+        "text": {
+          "EN": "I'm still hungry.",
+          "TL": "Gutom pa rin ako."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpInjured",
+        "text": {
+          "EN": "I took a bad hit. It's still bothering me.",
+          "TL": "Malakas ang tama sa akin. Masakit pa rin ito."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpPanic",
+        "text": {
+          "EN": "I'm still pretty shaken up.",
+          "TL": "Nanginginig pa rin ako sa nangyari."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpStress",
+        "text": {
+          "EN": "I'm still tense and having trouble settling down.",
+          "TL": "Tensiyonado pa rin ako at nahihirapan akong kumalma."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpThirst",
+        "text": {
+          "EN": "I'm still pretty thirsty.",
+          "TL": "Uhaw na uhaw pa rin ako."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpUnknown",
+        "text": {
+          "EN": "I don't have enough detail to say what's wrong yet.",
+          "TL": "Wala pa akong sapat na detalye para masabi kung ano ang mali."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyFact",
+        "text": {
+          "EN": "I took a bad hit, but I'm steady enough to keep moving.",
+          "TL": "Tinamaan ako nang malakas, pero kaya ko pa ring magpatuloy."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyTone",
+        "text": {
+          "EN": "Thanks for checking in.",
+          "TL": "Salamat sa pag-aalala."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnFact",
+        "text": {
+          "EN": "I'm hurt, but I'm managing.",
+          "TL": "Nasaktan ako, pero kinakaya ko."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnTone",
+        "text": {
+          "EN": "I'd rather not make a big thing of it.",
+          "TL": "Ayoko sanang palakihin pa ito."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Doing okay, all things considered.",
+          "TL": "Okay naman ako, sa lahat ng bagay."
+        }
+      }
+    ]
+  }
+}

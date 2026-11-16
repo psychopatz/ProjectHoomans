@@ -45,6 +45,15 @@ return {
         },
         ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue_alt.json",
     },
+    ["question.wellbeing.follow_up.responses"] = {
+        ["domain"] = "wellbeing_content",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        },
+        ["id"] = "question.wellbeing.follow_up.responses",
+        ["kind"] = "dialogue",
+        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_follow_up.json",
+    },
     ["question.wellbeing.hunger"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
@@ -108,7 +117,7 @@ return {
     ["question.wellbeing.thirst"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent__7c62895f",
         },
         ["id"] = "question.wellbeing.thirst",
         ["kind"] = "dialogue",
@@ -120,7 +129,7 @@ return {
     ["question.wellbeing.thirst_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent__5728baa5",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent__7c62895f",
         },
         ["id"] = "question.wellbeing.thirst_alt",
         ["kind"] = "dialogue",

@@ -167,6 +167,239 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
+            ["familyID"] = "ui.suggestion.availability.tooltips",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Unavailable because this companion cannot receive orders right now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.ui.suggestion.availability.tooltips.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Unavailable because this companion cannot receive orders right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion.availability",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Unavailable because this companion cannot receive orders right now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.availability.tooltips.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Unavailable because this companion cannot receive orders right now.",
+                        },
+                        ["TL"] = {
+                            "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.availability.tooltips",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "tooltips",
+            ["sourceId"] = "ui.suggestion.availability.tooltips",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_availability_tooltips.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.availability",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.already_following.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Already following you.",
+                            ["TL"] = "Sinusundan ka na.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.already_staying.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Already holding position.",
+                            ["TL"] = "Nananatili na sa puwesto.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.camp_site_out_of_range.tooltip",
+                        ["text"] = {
+                            ["EN"] = "This camp location is too far away right now.",
+                            ["TL"] = "Masyadong malayo ang lugar ng kampo sa ngayon.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.camp_site_stale.tooltip",
+                        ["text"] = {
+                            ["EN"] = "This camp location is no longer available; choose a fresh location.",
+                            ["TL"] = "Hindi na available ang lugar; pumili ng bagong lokasyon.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.companion_busy.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Unavailable while the companion is busy or in combat.",
+                            ["TL"] = "Hindi magagamit habang abala o nakikipaglaban ang kasama.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.companion_dead.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Unavailable because the companion is dead.",
+                            ["TL"] = "Hindi magagamit dahil patay na ang kasama.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.companion_incapacitated.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Unavailable because the companion is incapacitated.",
+                            ["TL"] = "Hindi magagamit dahil walang malay o hindi makagalaw ang kasama.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.companion_unavailable.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Unavailable because this companion cannot receive orders right now.",
+                            ["TL"] = "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.go_home.no_base.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Go Home is unavailable because no base has been established.",
+                            ["TL"] = "Hindi magagamit ang pag-uwi dahil wala pang naitayong base.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.no_camp_site.tooltip",
+                        ["text"] = {
+                            ["EN"] = "No valid camp location is currently available.",
+                            ["TL"] = "Walang valid na lugar para magkampo sa ngayon.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.not_following.tooltip",
+                        ["text"] = {
+                            ["EN"] = "Stay is available while the companion is following you.",
+                            ["TL"] = "Magagamit ang paghihintay habang sinusundan ka ng kasama.",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Unavailable because this companion cannot receive orders right now.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.availability.tooltips",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Unavailable because this companion cannot receive orders right now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.ui.suggestion.availability.tooltips.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_availability_tooltips.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Unavailable because this companion cannot receive orders right now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.availability.tooltips.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Unavailable because this companion cannot receive orders right now.",
+                    },
+                    ["TL"] = {
+                        "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.back.label",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -4541,452 +4774,6 @@ return {
                         "Ako nga pala si {slot.identity_claim.name}.",
                         "Pwede mo akong tawaging {slot.identity_claim.name}.",
                         "Lagi akong tinatawag na {slot.identity_claim.name}.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["labelFallback"] = "Don't tell your name",
-                ["labelKey"] = "convo.ui.suggestion.identity.rude.affordance.label",
-                ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Don't tell your name",
-                    },
-                    ["TL"] = {
-                        "Huwag sabihin ang pangalan",
-                    },
-                },
-            },
-            ["familyID"] = "ui.suggestion.identity.rude",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "keyed",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "That's none of your business.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That's none of your business.",
-                                        "You don't need my name.",
-                                        "I'm not giving you my name.",
-                                        "Keep walking. You're not getting my name.",
-                                        "None of your concern.",
-                                        "Forget it. You don't need to know who I am.",
-                                        "My name isn't for you to know.",
-                                        "I don't owe you my name.",
-                                    },
-                                    ["TL"] = {
-                                        "Wala ka nang pakialam.",
-                                        "Hindi mo kailangan ang pangalan ko.",
-                                        "Hindi ko ibibigay ang pangalan ko sa'yo.",
-                                        "Huwag mo nang alamin ang pangalan ko.",
-                                        "Wala kang kinalaman doon.",
-                                        "Kalimutan mo na. Hindi mo kailangang malaman.",
-                                        "Hindi para sa'yo ang pangalan ko.",
-                                        "Hindi ako obligadong magpakilala sa'yo.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.identity",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Don't tell your name",
-                    ["role"] = "button_label",
-                    ["templateID"] = "convo.ui.suggestion.identity.rude.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Don't tell your name",
-                        },
-                        ["TL"] = {
-                            "Huwag sabihin ang pangalan",
-                        },
-                    },
-                },
-                {
-                    ["fallback"] = "That's none of your business.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That's none of your business.",
-                            "You don't need my name.",
-                            "I'm not giving you my name.",
-                            "Keep walking. You're not getting my name.",
-                            "None of your concern.",
-                            "Forget it. You don't need to know who I am.",
-                            "My name isn't for you to know.",
-                            "I don't owe you my name.",
-                        },
-                        ["TL"] = {
-                            "Wala ka nang pakialam.",
-                            "Hindi mo kailangan ang pangalan ko.",
-                            "Hindi ko ibibigay ang pangalan ko sa'yo.",
-                            "Huwag mo nang alamin ang pangalan ko.",
-                            "Wala kang kinalaman doon.",
-                            "Kalimutan mo na. Hindi mo kailangang malaman.",
-                            "Hindi para sa'yo ang pangalan ko.",
-                            "Hindi ako obligadong magpakilala sa'yo.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.identity.rude",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "rude",
-            ["sourceId"] = "ui.suggestion.identity.rude",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.identity",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["label"] = {
-                    ["EN"] = {
-                        "Don't tell your name",
-                    },
-                    ["TL"] = {
-                        "Huwag sabihin ang pangalan",
-                    },
-                },
-                ["textRole"] = "button_label",
-            },
-            ["metadata"] = {
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.identity.rude.label",
-                        ["text"] = {
-                            ["EN"] = "Don't tell your name",
-                            ["TL"] = "Huwag sabihin ang pangalan",
-                        },
-                    },
-                    {
-                        ["key"] = "suggestion.identity.rude.utterance",
-                        ["text"] = {
-                            ["EN"] = "That's none of your business.",
-                            ["TL"] = "Wala ka nang pakialam.",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "keyed",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That's none of your business.",
-                                        "You don't need my name.",
-                                        "I'm not giving you my name.",
-                                        "Keep walking. You're not getting my name.",
-                                        "None of your concern.",
-                                        "Forget it. You don't need to know who I am.",
-                                        "My name isn't for you to know.",
-                                        "I don't owe you my name.",
-                                    },
-                                    ["TL"] = {
-                                        "Wala ka nang pakialam.",
-                                        "Hindi mo kailangan ang pangalan ko.",
-                                        "Hindi ko ibibigay ang pangalan ko sa'yo.",
-                                        "Huwag mo nang alamin ang pangalan ko.",
-                                        "Wala kang kinalaman doon.",
-                                        "Kalimutan mo na. Hindi mo kailangang malaman.",
-                                        "Hindi para sa'yo ang pangalan ko.",
-                                        "Hindi ako obligadong magpakilala sa'yo.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.identity.rude",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "That's none of your business.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.ui.suggestion.identity.rude.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Don't tell your name",
-                ["role"] = "button_label",
-                ["templateID"] = "convo.ui.suggestion.identity.rude.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Don't tell your name",
-                    },
-                    ["TL"] = {
-                        "Huwag sabihin ang pangalan",
-                    },
-                },
-            },
-            {
-                ["fallback"] = "That's none of your business.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That's none of your business.",
-                        "You don't need my name.",
-                        "I'm not giving you my name.",
-                        "Keep walking. You're not getting my name.",
-                        "None of your concern.",
-                        "Forget it. You don't need to know who I am.",
-                        "My name isn't for you to know.",
-                        "I don't owe you my name.",
-                    },
-                    ["TL"] = {
-                        "Wala ka nang pakialam.",
-                        "Hindi mo kailangan ang pangalan ko.",
-                        "Hindi ko ibibigay ang pangalan ko sa'yo.",
-                        "Huwag mo nang alamin ang pangalan ko.",
-                        "Wala kang kinalaman doon.",
-                        "Kalimutan mo na. Hindi mo kailangang malaman.",
-                        "Hindi para sa'yo ang pangalan ko.",
-                        "Hindi ako obligadong magpakilala sa'yo.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.needs_destination.tooltip",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Choose a destination first.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.needs_destination.tooltip.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Choose a destination first.",
-                                    },
-                                    ["TL"] = {
-                                        "Pumili muna ng pupuntahan.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.needs_destination",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Choose a destination first.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.needs_destination.tooltip.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Choose a destination first.",
-                        },
-                        ["TL"] = {
-                            "Pumili muna ng pupuntahan.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.needs_destination.tooltip",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "tooltip",
-            ["sourceId"] = "ui.suggestion.needs_destination.tooltip",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_needs_destination_tooltip.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.needs_destination",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["textKey"] = "suggestion.needs_destination.tooltip",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.needs_destination.tooltip",
-                        ["text"] = {
-                            ["EN"] = "Choose a destination first.",
-                            ["TL"] = "Pumili muna ng pupuntahan.",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Choose a destination first.",
-                                    },
-                                    ["TL"] = {
-                                        "Pumili muna ng pupuntahan.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.needs_destination.tooltip",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Choose a destination first.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.ui.suggestion.needs_destination.tooltip.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_needs_destination_tooltip.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Choose a destination first.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.needs_destination.tooltip.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Choose a destination first.",
-                    },
-                    ["TL"] = {
-                        "Pumili muna ng pupuntahan.",
                     },
                 },
                 ["variantID"] = "neutral",

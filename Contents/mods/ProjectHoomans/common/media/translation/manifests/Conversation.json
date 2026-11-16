@@ -1,32 +1,12 @@
 {
   "languages": {
     "EN": [
-      "EN/Conversation/Flows.json",
-      "EN/Conversation/Identity/Responses.json",
-      "EN/Conversation/Journal/Events.json",
-      "EN/Conversation/PBrainZ/Interface.json",
-      "EN/Conversation/Patterns.json",
-      "EN/Conversation/Semantic/Addressing.json",
-      "EN/Conversation/Semantic/Availability.json",
-      "EN/Conversation/Semantic/Realizations.json",
-      "EN/Conversation/Semantic/Responses.json",
-      "EN/Conversation/Telemetry/Diagnostics.json",
-      "EN/Conversation/UI.json",
-      "EN/Conversation/WorldEvents/Events.json"
+      "EN/Conversation/Text/convo/SemanticResponses.json",
+      "EN/Conversation/UI.json"
     ],
     "TL": [
-      "TL/Conversation/Flows.json",
-      "TL/Conversation/Identity/Responses.json",
-      "TL/Conversation/Journal/Events.json",
-      "TL/Conversation/PBrainZ/Interface.json",
-      "TL/Conversation/Patterns.json",
-      "TL/Conversation/Semantic/Addressing.json",
-      "TL/Conversation/Semantic/Availability.json",
-      "TL/Conversation/Semantic/Realizations.json",
-      "TL/Conversation/Semantic/Responses.json",
-      "TL/Conversation/Telemetry/Diagnostics.json",
-      "TL/Conversation/UI.json",
-      "TL/Conversation/WorldEvents/Events.json"
+      "TL/Conversation/Text/convo/SemanticResponses.json",
+      "TL/Conversation/UI.json"
     ]
   },
   "version": 1

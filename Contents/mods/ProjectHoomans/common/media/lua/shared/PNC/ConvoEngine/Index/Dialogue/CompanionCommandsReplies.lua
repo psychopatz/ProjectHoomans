@@ -156,7 +156,7 @@ return {
     ["command.reply.return_home"] = {
         ["domain"] = "companion_commands_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__a9d02707",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__d3679c75",
         },
         ["id"] = "command.reply.return_home",
         ["kind"] = "dialogue",
@@ -165,10 +165,19 @@ return {
     ["command.reply.stay"] = {
         ["domain"] = "companion_commands_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__a9d02707",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__d3679c75",
         },
         ["id"] = "command.reply.stay",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_stay.json",
+    },
+    ["companion.action.responses"] = {
+        ["domain"] = "companion_commands_replies",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__d3679c75",
+        },
+        ["id"] = "companion.action.responses",
+        ["kind"] = "dialogue",
+        ["source"] = "adopters/hoomans/dialogue/companion_commands_replies/companion_action_responses.json",
     },
 }

@@ -168,7 +168,7 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
     def test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog(self) -> None:
         root = PROJECT / "Contents/mods/ProjectHoomans/common/media/translation"
         for language in ("EN", "TL"):
-            semantic = root / language / "Conversation/Semantic/Responses.json"
+            semantic = root / language / "Conversation/Text/convo/SemanticResponses.json"
             ui_json = root / language / "Conversation/UI.json"
             text_ui = root / language / "Conversation/Text/UI_PNC_Conversation.json"
             for path in (semantic, ui_json, text_ui):

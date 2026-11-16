@@ -146,15 +146,14 @@ class NeedsWordingShardTests(unittest.TestCase):
             with self.subTest(language=language):
                 for key, val in expected.items():
                     self.assertEqual(rendered[language].get(key), val)
-                for catalog_name in ("Responses", "Realizations"):
-                    catalog = json.loads(
-                        (
-                            REPOSITORY
-                            / "Contents/mods/ProjectHoomans/common/media/translation/"
-                            f"{language}/Conversation/Semantic/{catalog_name}.json"
-                        ).read_text(encoding="utf-8")
-                    )
-                    self.assertTrue(LEGACY_KEYS.isdisjoint(catalog))
+                catalog = json.loads(
+                    (
+                        REPOSITORY
+                        / "Contents/mods/ProjectHoomans/common/media/translation/"
+                        f"{language}/Conversation/Text/convo/SemanticResponses.json"
+                    ).read_text(encoding="utf-8")
+                )
+                self.assertTrue(LEGACY_KEYS.isdisjoint(catalog))
 
         status_source = (
             REPOSITORY

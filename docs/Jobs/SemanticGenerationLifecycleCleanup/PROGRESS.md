@@ -1,52 +1,29 @@
 # Progress — Semantic Generation Lifecycle Cleanup
 
-**Status:** COMPLETE — all developer-side phases G0–G6 accepted.
-**Current phase:** COMPLETE (G0–G6 accepted).
+**Status:** COMPLETE (G0–G7 accepted).
+**Current phase:** G7 — Structural ownership refactor and recipe compaction (COMPLETE).
 **Primary repository:** ProjectHoomans.
 **Participant implementation repository:** psychopatzCore.
 **Conditional participant:** DynamicTrading/DTCommon.
 
-## Accepted phases
+## Accepted groundwork & G7 completion
 
-### G0 — Baseline inventory and ownership classification (`ACCEPTED`)
-
-Evidence: `CODE_VERIFIED`, `GENERATED_OUTPUT_VERIFIED` (`docs/Jobs/SemanticGenerationLifecycleCleanup/G0_SURFACE_INVENTORY.json`).
-
-### G1 — Generation recipe and desired-artifact ledger (`ACCEPTED`)
-
-Evidence: `CODE_VERIFIED`, `TEST_VERIFIED` (`tools.semantic_harness.tests.test_generation_recipe`).
-
-### G2 — Check-mode reconciler (`ACCEPTED`)
-
-Evidence: `CODE_VERIFIED`, `TEST_VERIFIED` (`tools.semantic_harness.tests.test_reconcile_check`).
-
-### G3 — Apply-mode safe cleanup and mixed-key ownership (`ACCEPTED`)
-
-Evidence: `CODE_VERIFIED`, `TEST_VERIFIED` (`tools.semantic_harness.tests.test_reconcile_apply`).
-
-### G4 — Programmatic legacy retirement and repository cleanup (`ACCEPTED`)
-
-Evidence: `CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED` (`generation_recipe.json`, `reconcile.py --check`, `test_semantic_authority_boundaries`, `test_semantic_observatory_scale`).
-
-### G5 — Regression and determinism closure (`ACCEPTED`)
-
-Evidence: `CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED` (`tools.semantic_harness.tests.test_semantic_generation_lifecycle_g5`, `test_convo_engine_s6m8_audit`, `test_convo_engine_s9r_closure`, `test_convo_engine_s9_regressions`, `test_generation_ownership`).
-
-### G6 — Agent workflow and documentation acceptance (`ACCEPTED`)
-
-Evidence: `CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED` (`ProjectHoomans/AGENTS.md`, `psychopatzCore/AGENTS.md`, `psychopatzCore/tools/semantic_harness/codebuilder/README.md`, `test_g6_agent_workflow_and_cli_discoverability`).
-
-- Finalized the durable `Semantic CodeBuilder generated artifacts` workflow rule in `ProjectHoomans/AGENTS.md` and `psychopatzCore/AGENTS.md`.
-- Updated `psychopatzCore/tools/semantic_harness/codebuilder/README.md` and `reconcile.py --help` so the canonical source locations and `--check` / `--apply` commands are self-discoverable without manual generated-tree inspection.
-- Verified final canonical reconciliation across all enabled owners (`PsychopatzCore`, `ProjectHoomans`, `DTCommon`):
-  - `desired = 371` (`DTCommon = 12`, `ProjectHoomans = 299`, `PsychopatzCore = 60`)
-  - `missing = 0`
-  - `drifted = 0`
-  - `stale = 0`
-  - `retired_present = 0`
-  - `ambiguous = 0`
-  - `preserved = 38`
-
-## Next Chunk
-
-None — all G0–G6 developer-side phases are complete and accepted.
+- **G0–G6**: Desired-artifact planning, check/apply reconciliation, safe pruning, ownership routing, deterministic generation, active hash-shard preservation, and agent-facing workflow documentation.
+- **G7A — Preserve exception & structural ownership classification audit (`CODE_VERIFIED`)**:
+  - Recorded complete caller/lineage/4-class classification in `docs/Jobs/SemanticGenerationLifecycleCleanup/G7A_PRESERVE_CLASSIFICATION.json` and `AUDIT.md` with zero deletions.
+- **G7B — Semantic wording migration & application translation separation (`CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED`)**:
+  - Moved ordinary application/tooling translations out of `Conversation/` into `Character/Character.json` (`Semantic/Addressing.json`, `34` keys) and `Debug/Debug.json` (`Journal/Events.json`, `PBrainZ/Interface.json`, `Telemetry/Diagnostics.json`, `56` keys), updating `PNC_TranslationBootstrap_Segments.lua` and `PNC_TranslationBootstrap.lua`.
+  - Removed caller-zero `Conversation/WorldEvents/Events.json` (`EN`/`TL`).
+  - Migrated remaining ConvoEngine semantic/dialogue/availability wording into canonical ConvoEngine sources under `tools/providers/pnc/codebuilder/sources/conversation/dialogue/` and emitted generated runtime translations into `Conversation/Text/convo/SemanticResponses.json` (manifest-registered in `manifests/Conversation.json`) and `ProjectHoomans` `Conversation/UI.json` (`100%` CodeBuilder-generated).
+  - Removed all `22` legacy hand-authored translation files from `ProjectHoomans` `Conversation/`.
+- **G7C — Compact `generation_recipe.json` & structural mixed-UI ownership (`CODE_VERIFIED`, `TEST_VERIFIED`)**:
+  - Emptied `conversation_translations.preserved` (`0` preserved translation files).
+  - Removed all `4` one-time historical file/key retirement lists from `generation_recipe.json`, retaining only the `3` compact structural `directory_glob` anti-regression rules.
+  - Added `_structural_generated_ui_keys` in `reconcile.py` so `UI_PNC_Conversation_Suggestion_*` / `UI_DT_Conversation_Suggestion_*` keys are structurally owned and pruned without a receipt or recipe edit while `UI_PsychopatzConversation_*` authored keys in `PsychopatzCore` are preserved untouched.
+- **G7D — Dynamic future-family cleanup & truthful canonical CLI (`CODE_VERIFIED`, `TEST_VERIFIED`)**:
+  - Enabled automatic sibling repository discovery in `build_desired_artifact_ledger` when no explicit repo overrides are passed, making the exact `canonicalCli` command advertised in `generation_recipe.json` succeed across all 3 owners (`PsychopatzCore`, `ProjectHoomans`, `DTCommon`).
+  - Added `tools/semantic_harness/tests/test_semantic_generation_lifecycle_g7.py` verifying recipe compaction, receipt-free dynamic family add/delete cleanup, and end-to-end execution of the exact advertised canonical CLI command.
+- **G7E — Full verification & deterministic closure (`CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED`)**:
+  - `convo_engine_cli.py audit-s6m8 --check-determinism`: `ok=True`, `violationCount=0`, `fileCount=379`, `diffs=[]`.
+  - Two consecutive `reconcile.py --apply` passes: pass 2 wrote `0` files and pruned `0` files.
+  - Final canonical `reconcile.py --check --format summary`: `clean=true`, `desired=382`, `missing=0`, `drifted=0`, `stale=0`, `retired_present=0`, `ambiguous=0`, `preserved=14` (`11` Core engine Lua + `1` Hoomans `DialogueBlocks.lua` + `2` Core `UI.json` mixed-key catalogs).

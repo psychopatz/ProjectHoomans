@@ -1,0 +1,44 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question.residence",
+  "id": "responses",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "textTarget": "convo/SemanticResponses",
+    "textRows": [
+      {
+        "key": "UI_PNC_Conversation_Semantic_ConversationContinuationResidence",
+        "text": {
+          "EN": "That's all I can confirm about where I live right now.",
+          "TL": "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionResidenceKnown",
+        "text": {
+          "EN": "I live at %s.",
+          "TL": "Nakatira ako sa %s."
+        }
+      },
+      {
+        "key": "UI_PNC_Conversation_Semantic_QuestionResidenceUnknown",
+        "text": {
+          "EN": "I don't have a confirmed home to tell you about.",
+          "TL": "Wala akong makumpirmang tirahan na maibabahagi."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "That's all I can confirm about where I live right now.",
+          "TL": "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon."
+        }
+      }
+    ]
+  }
+}

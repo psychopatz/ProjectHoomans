@@ -61,7 +61,7 @@ class TranslationManifestTkTests(unittest.TestCase):
                 text = pane.views["Review"].get("1.0", "end")
                 self.assertIn("ALL_MANIFESTED", text)
                 self.assertIn("Static manifest membership", text)
-                self.assertIn("TL/Conversation/Patterns.json", text)
+                self.assertIn("TL/Conversation/Text/convo/SemanticResponses.json", text)
         finally:
             root.destroy()
 

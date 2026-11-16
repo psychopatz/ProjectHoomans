@@ -1,0 +1,100 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "ui.suggestion.availability",
+  "id": "tooltips",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "textTarget": "UI_PNC_Conversation",
+    "textRows": [
+      {
+        "key": "suggestion.already_following.tooltip",
+        "text": {
+          "EN": "Already following you.",
+          "TL": "Sinusundan ka na."
+        }
+      },
+      {
+        "key": "suggestion.already_staying.tooltip",
+        "text": {
+          "EN": "Already holding position.",
+          "TL": "Nananatili na sa puwesto."
+        }
+      },
+      {
+        "key": "suggestion.camp_site_out_of_range.tooltip",
+        "text": {
+          "EN": "This camp location is too far away right now.",
+          "TL": "Masyadong malayo ang lugar ng kampo sa ngayon."
+        }
+      },
+      {
+        "key": "suggestion.camp_site_stale.tooltip",
+        "text": {
+          "EN": "This camp location is no longer available; choose a fresh location.",
+          "TL": "Hindi na available ang lugar; pumili ng bagong lokasyon."
+        }
+      },
+      {
+        "key": "suggestion.companion_busy.tooltip",
+        "text": {
+          "EN": "Unavailable while the companion is busy or in combat.",
+          "TL": "Hindi magagamit habang abala o nakikipaglaban ang kasama."
+        }
+      },
+      {
+        "key": "suggestion.companion_dead.tooltip",
+        "text": {
+          "EN": "Unavailable because the companion is dead.",
+          "TL": "Hindi magagamit dahil patay na ang kasama."
+        }
+      },
+      {
+        "key": "suggestion.companion_incapacitated.tooltip",
+        "text": {
+          "EN": "Unavailable because the companion is incapacitated.",
+          "TL": "Hindi magagamit dahil walang malay o hindi makagalaw ang kasama."
+        }
+      },
+      {
+        "key": "suggestion.companion_unavailable.tooltip",
+        "text": {
+          "EN": "Unavailable because this companion cannot receive orders right now.",
+          "TL": "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon."
+        }
+      },
+      {
+        "key": "suggestion.go_home.no_base.tooltip",
+        "text": {
+          "EN": "Go Home is unavailable because no base has been established.",
+          "TL": "Hindi magagamit ang pag-uwi dahil wala pang naitayong base."
+        }
+      },
+      {
+        "key": "suggestion.no_camp_site.tooltip",
+        "text": {
+          "EN": "No valid camp location is currently available.",
+          "TL": "Walang valid na lugar para magkampo sa ngayon."
+        }
+      },
+      {
+        "key": "suggestion.not_following.tooltip",
+        "text": {
+          "EN": "Stay is available while the companion is following you.",
+          "TL": "Magagamit ang paghihintay habang sinusundan ka ng kasama."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": "Unavailable because this companion cannot receive orders right now.",
+          "TL": "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon."
+        }
+      }
+    ]
+  }
+}

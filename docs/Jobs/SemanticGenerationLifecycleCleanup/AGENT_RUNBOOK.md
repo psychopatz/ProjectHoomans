@@ -4,7 +4,7 @@
 
 Execute the cleanup/lifecycle roadmap without turning generated-file archaeology into manual agent work.
 
-The parent goal is complete only when all G0–G6 developer-side gates pass.
+G0–G6 are accepted groundwork. The parent goal is complete only when G7 also passes.
 
 ## Startup
 
@@ -30,7 +30,7 @@ Do not create a new branch.
 For semantic generation lifecycle questions prefer:
 
 1. exact current CodeBuilder source/tests;
-2. current canonical source manifests/PSDL/text sources;
+2. current canonical ConvoEngine source families/manifests/text sources;
 3. generated recipe + desired artifact ledger once implemented;
 4. generated registries/manifests;
 5. this job's architecture/roadmap;
@@ -38,15 +38,17 @@ For semantic generation lifecycle questions prefer:
 
 Generated runtime files are evidence/output, not semantic authoring authority.
 
-## Current pre-reconciler rule
+## G7 structural-refactor rule
 
-Until G2/G3 provides the canonical reconciler:
+The reconciler already exists. G7 must simplify ownership rather than add more exception inventory.
 
-- do not manually delete suspected generated leftovers;
-- collect evidence and classify them in G0;
-- do not use filename patterns such as hashes as deletion proof;
+- do not add new per-file preserve entries for ordinary future semantic content;
+- do not add one-off retirement entries merely because a normal generated family was removed;
+- do not use filename/hash patterns as deletion proof;
 - do not patch generated Lua/JSON to fix semantic behavior;
-- edit canonical source only.
+- dialogue/semantic wording belongs in canonical ConvoEngine family source;
+- ordinary application/tooling text belongs outside generated ownership;
+- before changing source naming/sharding, read `psychopatzCore/Docs/semantic_dialogue_language_standard/CONVO_ENGINE.md` and `NAMING_AND_LAYOUT.md`; preserve their accepted contracts.
 
 ## Target steady-state workflow
 
@@ -79,13 +81,7 @@ Unknown or ambiguous artifacts are reported, not deleted.
 
 ## Mixed authored/generated catalogs
 
-UI translation catalogs require key-level ownership.
-
-The agent must prove that:
-- package-authored keys survive;
-- current generated keys are replaced canonically;
-- obsolete formerly generated keys are removed;
-- a missing recipe/receipt cannot cause broad key deletion.
+Treat mixed catalogs as migration/compatibility seams, not the desired architecture. Where one must temporarily remain, key ownership must be automatic and bounded. G7 should preferentially split generated ConvoEngine text into its generated-owned subtree and leave ordinary application translations outside it.
 
 ## Legacy retirement procedure
 
@@ -97,7 +93,7 @@ For each confirmed historical leftover:
 4. prove check mode detects it;
 5. prove apply mode removes it;
 6. prove a second check is clean;
-7. keep a compact anti-regression tombstone where appropriate.
+7. keep a compact **structural** anti-regression tombstone only where reappearance of an old root/class is itself a regression; remove one-time filename tombstones after closure.
 
 Do not perform step 5 before steps 1–4.
 

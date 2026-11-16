@@ -2416,4 +2416,286 @@ return {
         },
         ["when"] = nil,
     },
+    {
+        ["domain"] = "conversation_greeting",
+        ["exchangeFamily"] = {
+            ["familyID"] = "flow.greeting.responses",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You're welcome. Take care.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.flow.greeting.responses.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're welcome. Take care.",
+                                    },
+                                    ["TL"] = {
+                                        "Walang anuman. Mag-ingat ka.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "flow.greeting",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "You're welcome. Take care.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.flow.greeting.responses.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're welcome. Take care.",
+                        },
+                        ["TL"] = {
+                            "Walang anuman. Mag-ingat ka.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "flow.greeting.responses",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "responses",
+            ["sourceId"] = "flow.greeting.responses",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_responses.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "flow.greeting",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["textRows"] = {
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowGreetingFollowup",
+                        ["text"] = {
+                            ["EN"] = "You're welcome. Take care.",
+                            ["TL"] = "Walang anuman. Mag-ingat ka.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly",
+                        ["text"] = {
+                            ["EN"] = "You're welcome. It's good to see you too.",
+                            ["TL"] = "Walang anuman. Mabuti at nakita rin kita.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
+                        ["text"] = {
+                            ["EN"] = "Hey there. Good to see you.",
+                            ["TL"] = "Uy, mabuti at nakita kita.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
+                        ["text"] = {
+                            ["EN"] = "Hey! Good to see you.",
+                            ["TL"] = "Uy! Mabuti at nakita kita.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion",
+                        ["text"] = {
+                            ["EN"] = "How have you been?",
+                            ["TL"] = "Kumusta ka?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly",
+                        ["text"] = {
+                            ["EN"] = "How have you been holding up?",
+                            ["TL"] = "Kumusta ka naman?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain",
+                        ["text"] = {
+                            ["EN"] = "Hey there. Wet one today.",
+                            ["TL"] = "Kumusta. Basa ang araw ngayon.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowWeatherClear",
+                        ["text"] = {
+                            ["EN"] = "The weather looks clear right now.",
+                            ["TL"] = "Mukhang maaliwalas ang panahon ngayon.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowWeatherRaining",
+                        ["text"] = {
+                            ["EN"] = "It is raining right now. I would wait for a break.",
+                            ["TL"] = "Umuulan ngayon. Maghihintay muna ako ng paghupa.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_FlowWeatherUnknown",
+                        ["text"] = {
+                            ["EN"] = "I cannot confirm the weather from here.",
+                            ["TL"] = "Hindi ko makumpirma ang panahon mula rito.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingGuarded",
+                        ["text"] = {
+                            ["EN"] = "State your business. Keep your distance.",
+                            ["TL"] = "Kumusta. Ano iyon?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingNeutral",
+                        ["text"] = {
+                            ["EN"] = "Hello. Good to see you.",
+                            ["TL"] = "Kumusta. Mabuti at nakita kita.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionGuarded",
+                        ["text"] = {
+                            ["EN"] = "How are things?",
+                            ["TL"] = "Kumusta ang lahat?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionNeutral",
+                        ["text"] = {
+                            ["EN"] = "How have you been?",
+                            ["TL"] = "Kumusta ka?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionTerse",
+                        ["text"] = {
+                            ["EN"] = "You okay?",
+                            ["TL"] = "Ayos ka lang?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionWarm",
+                        ["text"] = {
+                            ["EN"] = "How have you been holding up?",
+                            ["TL"] = "Kumusta ka? Kinakaya mo pa ba?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingTerse",
+                        ["text"] = {
+                            ["EN"] = "Hello.",
+                            ["TL"] = "Kumusta.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_RealizationGreetingWarm",
+                        ["text"] = {
+                            ["EN"] = "Hey! It is good to see you.",
+                            ["TL"] = "Uy! Mabuti at nakita kita.",
+                        },
+                    },
+                },
+                ["textTarget"] = "convo/SemanticResponses",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're welcome. Take care.",
+                                    },
+                                    ["TL"] = {
+                                        "Walang anuman. Mag-ingat ka.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "flow.greeting.responses",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "You're welcome. Take care.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.flow.greeting.responses.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_responses.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "You're welcome. Take care.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.flow.greeting.responses.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're welcome. Take care.",
+                    },
+                    ["TL"] = {
+                        "Walang anuman. Mag-ingat ka.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
 }

@@ -44,7 +44,7 @@ return {
     ["social.dispute_withdrawn"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__6e8e7425",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112",
         },
         ["id"] = "social.dispute_withdrawn",
         ["kind"] = "dialogue",
@@ -56,10 +56,19 @@ return {
         },
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__6e8e7425",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112",
         },
         ["id"] = "social.hostile_boundary",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json",
+    },
+    ["social.reaction.responses"] = {
+        ["domain"] = "social_reactions_ack_dispute",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112",
+        },
+        ["id"] = "social.reaction.responses",
+        ["kind"] = "dialogue",
+        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_reaction_responses.json",
     },
 }

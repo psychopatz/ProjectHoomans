@@ -155,20 +155,18 @@ class SocialApologyWordingShardTests(unittest.TestCase):
                     f"{language}/Conversation/Apology.json"
                 ).exists()
             )
-            for catalog_name in ("Responses", "Realizations"):
-                catalog = json.loads(
-                    (
-                        REPOSITORY
-                        / "Contents/mods/ProjectHoomans/common/media/translation/"
-                        f"{language}/Conversation/Semantic/{catalog_name}.json"
-                    ).read_text(encoding="utf-8")
-                )
-                self.assertTrue(RETIRED_KEYS.isdisjoint(catalog))
-                if catalog_name == "Responses":
-                    self.assertIn(
-                        "UI_PNC_Conversation_Semantic_ApologyTrusted",
-                        catalog,
-                    )
+            catalog = json.loads(
+                (
+                    REPOSITORY
+                    / "Contents/mods/ProjectHoomans/common/media/translation/"
+                    f"{language}/Conversation/Text/convo/SemanticResponses.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertTrue(RETIRED_KEYS.isdisjoint(catalog))
+            self.assertIn(
+                "UI_PNC_Conversation_Semantic_ApologyTrusted",
+                catalog,
+            )
 
         static_map = (
             REPOSITORY

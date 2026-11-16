@@ -1677,6 +1677,288 @@ return {
     {
         ["domain"] = "wellbeing_content",
         ["exchangeFamily"] = {
+            ["familyID"] = "question.wellbeing.follow_up.responses",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Doing okay, all things considered.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.question.wellbeing.follow_up.responses.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Doing okay, all things considered.",
+                                    },
+                                    ["TL"] = {
+                                        "Okay naman ako, sa lahat ng bagay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.wellbeing.follow_up",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Doing okay, all things considered.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.wellbeing.follow_up.responses.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Doing okay, all things considered.",
+                        },
+                        ["TL"] = {
+                            "Okay naman ako, sa lahat ng bagay.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "question.wellbeing.follow_up.responses",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "responses",
+            ["sourceId"] = "question.wellbeing.follow_up.responses",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_follow_up.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "question.wellbeing.follow_up",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["textRows"] = {
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetAllThingsConsidered",
+                        ["text"] = {
+                            ["EN"] = "Doing okay, all things considered.",
+                            ["TL"] = "Okay naman ako, sa lahat ng bagay.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetGettingBy",
+                        ["text"] = {
+                            ["EN"] = "I'm getting by, one day at a time. How about you?",
+                            ["TL"] = "Kinakaya ko araw-araw. Ikaw, kumusta?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHangingIn",
+                        ["text"] = {
+                            ["EN"] = "I'm hanging in there. Thanks for asking.",
+                            ["TL"] = "Kumakapit pa rin ako. Salamat sa pagtatanong.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHungry",
+                        ["text"] = {
+                            ["EN"] = "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
+                            ["TL"] = "Gutom ako, pero kakayanin ko. Kung may sobra kang pagkain, magpapasalamat ako.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetThirsty",
+                        ["text"] = {
+                            ["EN"] = "I'm pretty thirsty. If you have water, could you spare some?",
+                            ["TL"] = "Uhaw na uhaw ako. Kung may tubig ka, maaari ba akong makahingi?",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetTired",
+                        ["text"] = {
+                            ["EN"] = "I'm tired, though I can manage for now.",
+                            ["TL"] = "Pagod ako, pero kaya ko pa sa ngayon.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpDefault",
+                        ["text"] = {
+                            ["EN"] = "I don't have enough detail to say what's wrong yet.",
+                            ["TL"] = "Wala pa akong sapat na detalye para masabi kung ano ang mali.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpFatigue",
+                        ["text"] = {
+                            ["EN"] = "I'm still worn out.",
+                            ["TL"] = "Pagod na pagod pa rin ako.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpHunger",
+                        ["text"] = {
+                            ["EN"] = "I'm still hungry.",
+                            ["TL"] = "Gutom pa rin ako.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpInjured",
+                        ["text"] = {
+                            ["EN"] = "I took a bad hit. It's still bothering me.",
+                            ["TL"] = "Malakas ang tama sa akin. Masakit pa rin ito.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpPanic",
+                        ["text"] = {
+                            ["EN"] = "I'm still pretty shaken up.",
+                            ["TL"] = "Nanginginig pa rin ako sa nangyari.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpStress",
+                        ["text"] = {
+                            ["EN"] = "I'm still tense and having trouble settling down.",
+                            ["TL"] = "Tensiyonado pa rin ako at nahihirapan akong kumalma.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpThirst",
+                        ["text"] = {
+                            ["EN"] = "I'm still pretty thirsty.",
+                            ["TL"] = "Uhaw na uhaw pa rin ako.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpUnknown",
+                        ["text"] = {
+                            ["EN"] = "I don't have enough detail to say what's wrong yet.",
+                            ["TL"] = "Wala pa akong sapat na detalye para masabi kung ano ang mali.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyFact",
+                        ["text"] = {
+                            ["EN"] = "I took a bad hit, but I'm steady enough to keep moving.",
+                            ["TL"] = "Tinamaan ako nang malakas, pero kaya ko pa ring magpatuloy.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyTone",
+                        ["text"] = {
+                            ["EN"] = "Thanks for checking in.",
+                            ["TL"] = "Salamat sa pag-aalala.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnFact",
+                        ["text"] = {
+                            ["EN"] = "I'm hurt, but I'm managing.",
+                            ["TL"] = "Nasaktan ako, pero kinakaya ko.",
+                        },
+                    },
+                    {
+                        ["key"] = "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnTone",
+                        ["text"] = {
+                            ["EN"] = "I'd rather not make a big thing of it.",
+                            ["TL"] = "Ayoko sanang palakihin pa ito.",
+                        },
+                    },
+                },
+                ["textTarget"] = "convo/SemanticResponses",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Doing okay, all things considered.",
+                                    },
+                                    ["TL"] = {
+                                        "Okay naman ako, sa lahat ng bagay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.wellbeing.follow_up.responses",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Doing okay, all things considered.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.question.wellbeing.follow_up.responses.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_follow_up.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Doing okay, all things considered.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.wellbeing.follow_up.responses.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Doing okay, all things considered.",
+                    },
+                    ["TL"] = {
+                        "Okay naman ako, sa lahat ng bagay.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "wellbeing_content",
+        ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.hunger",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -3188,234 +3470,6 @@ return {
                         "Pinipilit ko lang mapanatili ang katinuan ko.",
                         "Bawat kaluskos napapahawak ako agad sa armas ko.",
                         "Mabigat dalhin ang lahat, pero tinitiis ko.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "wellbeing_content",
-        ["exchangeFamily"] = {
-            ["familyID"] = "question.wellbeing.thirst",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "I'm pretty thirsty. Could you spare some water?",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.question.wellbeing.thirst.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm pretty thirsty. Could you spare some water?",
-                                        "My throat feels parched. Got any clean water?",
-                                        "Really need a drink soon. Starting to feel dehydrated.",
-                                        "Could use a sip of water if you've got any to share.",
-                                        "Thirst is really slowing me down today.",
-                                        "My canteen ran dry a while back. Got any water?",
-                                        "Desperate for a drink of fresh water right now.",
-                                        "My mouth is bone dry. Can you spare a few drops?",
-                                        "Need water before my headache gets any worse.",
-                                        "Any spare water bottle on you? I'm drying up.",
-                                    },
-                                    ["TL"] = {
-                                        "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?",
-                                        "Tuyong-tuyo ang lalamunan ko. May malinis ka bang tubig?",
-                                        "Kailangan ko na talagang uminom. Nauuhaw na ako nang husto.",
-                                        "Kailangan ko ng kahit kaunting lagok ng tubig kung mayroon ka.",
-                                        "Pinapabagal talaga ako ng uhaw ngayong araw.",
-                                        "Natuyo na ang lalagyan ko kanina pa. May tubig ka ba?",
-                                        "Kailangang-kailangan ko ng maiinom na sariwang tubig ngayon.",
-                                        "Tuyot na tuyot ang bibig ko. Makakahingi ba ng kaunting tubig?",
-                                        "Kailangan ko ng tubig bago pa sumakit ang ulo ko sa uhaw.",
-                                        "May sobra ka bang botelya ng tubig? Uhaw na uhaw na ako.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "question.wellbeing",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "I'm pretty thirsty. Could you spare some water?",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.question.wellbeing.thirst.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm pretty thirsty. Could you spare some water?",
-                            "My throat feels parched. Got any clean water?",
-                            "Really need a drink soon. Starting to feel dehydrated.",
-                            "Could use a sip of water if you've got any to share.",
-                            "Thirst is really slowing me down today.",
-                            "My canteen ran dry a while back. Got any water?",
-                            "Desperate for a drink of fresh water right now.",
-                            "My mouth is bone dry. Can you spare a few drops?",
-                            "Need water before my headache gets any worse.",
-                            "Any spare water bottle on you? I'm drying up.",
-                        },
-                        ["TL"] = {
-                            "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?",
-                            "Tuyong-tuyo ang lalamunan ko. May malinis ka bang tubig?",
-                            "Kailangan ko na talagang uminom. Nauuhaw na ako nang husto.",
-                            "Kailangan ko ng kahit kaunting lagok ng tubig kung mayroon ka.",
-                            "Pinapabagal talaga ako ng uhaw ngayong araw.",
-                            "Natuyo na ang lalagyan ko kanina pa. May tubig ka ba?",
-                            "Kailangang-kailangan ko ng maiinom na sariwang tubig ngayon.",
-                            "Tuyot na tuyot ang bibig ko. Makakahingi ba ng kaunting tubig?",
-                            "Kailangan ko ng tubig bago pa sumakit ang ulo ko sa uhaw.",
-                            "May sobra ka bang botelya ng tubig? Uhaw na uhaw na ako.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "question.wellbeing.thirst",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "thirst",
-            ["sourceId"] = "question.wellbeing.thirst",
-            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
-        ["namespace"] = "question.wellbeing",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:wellbeing_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
-                ["responseAct"] = "REACT",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm pretty thirsty. Could you spare some water?",
-                                        "My throat feels parched. Got any clean water?",
-                                        "Really need a drink soon. Starting to feel dehydrated.",
-                                        "Could use a sip of water if you've got any to share.",
-                                        "Thirst is really slowing me down today.",
-                                        "My canteen ran dry a while back. Got any water?",
-                                        "Desperate for a drink of fresh water right now.",
-                                        "My mouth is bone dry. Can you spare a few drops?",
-                                        "Need water before my headache gets any worse.",
-                                        "Any spare water bottle on you? I'm drying up.",
-                                    },
-                                    ["TL"] = {
-                                        "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?",
-                                        "Tuyong-tuyo ang lalamunan ko. May malinis ka bang tubig?",
-                                        "Kailangan ko na talagang uminom. Nauuhaw na ako nang husto.",
-                                        "Kailangan ko ng kahit kaunting lagok ng tubig kung mayroon ka.",
-                                        "Pinapabagal talaga ako ng uhaw ngayong araw.",
-                                        "Natuyo na ang lalagyan ko kanina pa. May tubig ka ba?",
-                                        "Kailangang-kailangan ko ng maiinom na sariwang tubig ngayon.",
-                                        "Tuyot na tuyot ang bibig ko. Makakahingi ba ng kaunting tubig?",
-                                        "Kailangan ko ng tubig bago pa sumakit ang ulo ko sa uhaw.",
-                                        "May sobra ka bang botelya ng tubig? Uhaw na uhaw na ako.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "REACT",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "question.wellbeing.thirst",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "I'm pretty thirsty. Could you spare some water?",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.question.wellbeing.thirst.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "I'm pretty thirsty. Could you spare some water?",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.question.wellbeing.thirst.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm pretty thirsty. Could you spare some water?",
-                        "My throat feels parched. Got any clean water?",
-                        "Really need a drink soon. Starting to feel dehydrated.",
-                        "Could use a sip of water if you've got any to share.",
-                        "Thirst is really slowing me down today.",
-                        "My canteen ran dry a while back. Got any water?",
-                        "Desperate for a drink of fresh water right now.",
-                        "My mouth is bone dry. Can you spare a few drops?",
-                        "Need water before my headache gets any worse.",
-                        "Any spare water bottle on you? I'm drying up.",
-                    },
-                    ["TL"] = {
-                        "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?",
-                        "Tuyong-tuyo ang lalamunan ko. May malinis ka bang tubig?",
-                        "Kailangan ko na talagang uminom. Nauuhaw na ako nang husto.",
-                        "Kailangan ko ng kahit kaunting lagok ng tubig kung mayroon ka.",
-                        "Pinapabagal talaga ako ng uhaw ngayong araw.",
-                        "Natuyo na ang lalagyan ko kanina pa. May tubig ka ba?",
-                        "Kailangang-kailangan ko ng maiinom na sariwang tubig ngayon.",
-                        "Tuyot na tuyot ang bibig ko. Makakahingi ba ng kaunting tubig?",
-                        "Kailangan ko ng tubig bago pa sumakit ang ulo ko sa uhaw.",
-                        "May sobra ka bang botelya ng tubig? Uhaw na uhaw na ako.",
                     },
                 },
                 ["variantID"] = "neutral",

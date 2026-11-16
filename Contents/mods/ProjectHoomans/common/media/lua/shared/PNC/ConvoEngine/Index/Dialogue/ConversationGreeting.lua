@@ -72,4 +72,13 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_rain.json",
     },
+    ["flow.greeting.responses"] = {
+        ["domain"] = "conversation_greeting",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        },
+        ["id"] = "flow.greeting.responses",
+        ["kind"] = "dialogue",
+        ["source"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_responses.json",
+    },
 }

@@ -155,7 +155,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
         )
         for language in ("EN", "TL"):
             with self.subTest(language=language):
-                relative = f"{language}/Conversation/Patterns.json"
+                relative = f"{language}/Conversation/Text/convo/SemanticResponses.json"
                 self.assertIn(relative, manifest["languages"][language])
                 catalog = json.loads(
                     (repository / "Contents/mods/ProjectHoomans/common/media/translation"

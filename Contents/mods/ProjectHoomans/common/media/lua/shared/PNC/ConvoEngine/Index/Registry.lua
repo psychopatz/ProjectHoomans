@@ -214,7 +214,7 @@ return {
         ["domain"] = "companion_commands_replies",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCommandsReplies",
-        ["recordCount"] = 19,
+        ["recordCount"] = 20,
     },
     {
         ["domain"] = "companion_flows",
@@ -229,10 +229,16 @@ return {
         ["recordCount"] = 27,
     },
     {
+        ["domain"] = "conversation_context",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/ConversationContext",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "conversation_greeting",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/ConversationGreeting",
-        ["recordCount"] = 8,
+        ["recordCount"] = 9,
     },
     {
         ["domain"] = "conversation_needs",
@@ -268,7 +274,7 @@ return {
         ["domain"] = "core_knowledge_facts",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CoreKnowledgeFacts",
-        ["recordCount"] = 1,
+        ["recordCount"] = 2,
     },
     {
         ["domain"] = "core_knowledge_gossip",
@@ -397,6 +403,12 @@ return {
         ["recordCount"] = 2,
     },
     {
+        ["domain"] = "identity_exchange",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/IdentityExchange",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "medical_event_call",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalEventCall",
@@ -449,6 +461,18 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/QuestContent",
         ["recordCount"] = 4,
+    },
+    {
+        ["domain"] = "question_relationship_status",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/QuestionRelationshipStatus",
+        ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "question_residence",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/QuestionResidence",
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "social",
@@ -544,7 +568,7 @@ return {
         ["domain"] = "social_reactions_ack_dispute",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialReactionsAckDispute",
-        ["recordCount"] = 6,
+        ["recordCount"] = 7,
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",
@@ -574,7 +598,7 @@ return {
         ["domain"] = "static_suggestion_text",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/StaticSuggestionText",
-        ["recordCount"] = 33,
+        ["recordCount"] = 34,
     },
     {
         ["domain"] = "task_lifecycle",
@@ -598,7 +622,7 @@ return {
         ["domain"] = "wellbeing_content",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/WellbeingContent",
-        ["recordCount"] = 11,
+        ["recordCount"] = 12,
     },
     {
         ["domain"] = "trading",
