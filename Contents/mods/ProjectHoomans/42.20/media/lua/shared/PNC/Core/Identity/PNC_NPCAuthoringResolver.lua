@@ -147,6 +147,16 @@ local function relationshipPolicy(spec)
                 return playerSurname(context)
             end,
         }
+        policy.displayNameProjection = {
+            source = "derived",
+            rule = "relationship.name_projection",
+            dependencies = {
+                "identity.forename",
+                "identity.surname",
+                "player.surname",
+            },
+            editable = false,
+        }
     end
     if spec.sharesAppearance then
         policy.bindings["appearance.skinTexture"] = {
@@ -275,6 +285,71 @@ local function setResolved(outputBlueprint, fieldID, value)
     nextBlueprint = Blueprint.Set(outputBlueprint, fieldID, value)
     if not nextBlueprint then return nil, "resolved_field_invalid:" .. tostring(fieldID) end
     return nextBlueprint
+end
+
+local function projectDisplayName(outputBlueprint, authoredBlueprint, trace,
+    policy)
+    local projection = policy and policy.displayNameProjection
+    local surnameState
+    local surname
+    local forenameState
+    local forename
+    local displayState
+    local displayValue
+    local derivedForename
+    local derivedDisplayName
+    local reason
+    local binding
+    if not projection then return outputBlueprint end
+    surnameState, surname = Blueprint.Get(
+        outputBlueprint, "identity.surname")
+    if surnameState ~= "value" or not surname then
+        return outputBlueprint
+    end
+    forenameState, forename = Blueprint.Get(
+        outputBlueprint, "identity.forename")
+    displayState, displayValue = Blueprint.Get(
+        authoredBlueprint, "identity.displayName")
+    if forenameState ~= "value" and displayState == "value" then
+        derivedForename = string.match(tostring(displayValue), "^(%S+)")
+        if derivedForename then
+            outputBlueprint, reason = setResolved(
+                outputBlueprint, "identity.forename", derivedForename)
+            if not outputBlueprint then return nil, reason end
+            trace.fields["identity.forename"] = traceEntry(
+                "identity.forename",
+                "derived",
+                derivedForename,
+                {
+                    rule = "identity.display_name_parts",
+                    dependencies = { "identity.displayName" },
+                },
+                false
+            )
+            forename = derivedForename
+        end
+    end
+    if not forename then
+        forenameState, forename = Blueprint.Get(
+            outputBlueprint, "identity.forename")
+    end
+    if not forename then return outputBlueprint end
+    derivedDisplayName = tostring(forename) .. " " .. tostring(surname)
+    outputBlueprint, reason = setResolved(
+        outputBlueprint, "identity.displayName", derivedDisplayName)
+    if not outputBlueprint then return nil, reason end
+    binding = {
+        rule = projection.rule,
+        dependencies = projection.dependencies,
+    }
+    trace.fields["identity.displayName"] = traceEntry(
+        "identity.displayName",
+        projection.source or "derived",
+        derivedDisplayName,
+        binding,
+        projection.editable ~= false
+    )
+    return outputBlueprint
 end
 
 function Resolver.ResolvePlan(blueprint, context, policy, options)
@@ -406,6 +481,9 @@ function Resolver.ResolvePlan(blueprint, context, policy, options)
             end
         end
     end
+    outputBlueprint, reason = projectDisplayName(
+        outputBlueprint, normalized, trace, policy)
+    if not outputBlueprint then return nil, reason end
     trace.count = count
     return {
         blueprint = outputBlueprint,

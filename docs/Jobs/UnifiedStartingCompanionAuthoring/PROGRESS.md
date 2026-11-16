@@ -1,102 +1,104 @@
 # Progress — Unified Starting Companion Authoring
 
-**Status:** P3 implementation complete; accepted phase commit pending
+**Status:** P4 implementation complete; P5 developer verification next
 
 **Primary repository:** ProjectHoomans (`main`)
 
 **Participant repository:** PsychopatzCore (`main`), changed only for the
 provider-neutral character-creation seam in P2
 
-## P1 — canonical NPC authoring pipeline
+## Accepted phases
+
+### P1 — canonical NPC authoring pipeline
 
 Accepted in local commit `a6381bf4`.
 
-The shared pipeline is:
+The canonical registry, sparse blueprint, explicit-clear semantics, compact
+codec, fingerprints, policy resolver, bounded field trace, Unique NPC cutover,
+and canonical nickname round-trip are shared by debug authoring and starter
+contexts. Superseded authoring aliases are not registered or loaded.
 
-```text
-canonical field registry
-    -> sparse blueprint
-    -> context / binding policy
-    -> resolver and bounded trace
-    -> concrete definition
-    -> existing Unique NPC/runtime actions
-```
-
-Registry descriptors drive readable serialization, explicit-clear validation,
-compact encoding, fingerprints, resolver tracing, and the Unique NPC editor.
-`identity.nickname` is canonical and round-trips through the Unique NPC draft,
-save/load, resolution, and runtime identity. Superseded authoring aliases are
-not registered or loaded.
-
-## P2 — provider-neutral character-creation seam
+### P2 — provider-neutral character-creation seam
 
 Accepted in local commits `dfcf9f6e` (PsychopatzCore) and `9778522f`
 (ProjectHoomans).
 
-PsychopatzCore owns a bounded `CharacterCreationExtension` registry. It wraps
-the vanilla `CharacterCreationProfession` lifecycle and emits actual selected
-trait snapshots for creation, repopulation, visibility, build load/reset, and
-randomization. `CoopCharacterCreationProfession` inherits the same base path.
-Project Hoomans owns the starting-companion adapter and all companion policy.
+PsychopatzCore owns only the generic lifecycle extension. Project Hoomans owns
+the starting-companion adapter, trait IDs, policies, presets, and services.
+Normal and co-op profession screens use the same extension path.
 
-## P3 — session, composer, presets, and import sanitization
+### P3 — session, composer, presets, and import sanitization
+
+Accepted in local commit `c7904a78`.
+
+The selected-trait keyed session reconciles added/removed/unchanged slots,
+retains removed-slot caches, preserves deterministic seeds, reuses the generic
+composer and resolution trace, and serializes canonical whole/per-slot presets.
+Unique NPC import uses the shared relationship policy and reports preserved,
+removed, rebound, and regenerated fields.
+
+### P4 — authority handoff and lifecycle
+
+Implementation is complete in the current worktree; the exact phase-owned
+paths are ready for the local P4 commit.
 
 The implementation now provides:
 
-- a bounded per-character-creation session keyed by canonical starting-
-  companion trait ID;
-- actual selected-set reconciliation with added/removed/unchanged results,
-  inactive-slot caching, re-add restoration, and final active-only blueprints;
-- context rebuilding from the current descriptor plus the existing social-trait
-  resolver, so Lover orientation and family surname/appearance remain dynamic;
-- distinct per-slot `Randomize`, `Reset`, and `RevertToPreset` operations;
-- a reusable registry/policy/trace-backed NPC composer facade and character-
-  creation window with source indicators, blueprint-vs-preview presentation,
-  editable policy-permitted fields, and a final active-slot summary;
-- canonical whole-setup and individual-template preset serialization,
-  JSON encoding, dedicated local starter-preset storage, and no trait purchase
-  or automatic trait addition during load;
-- a shared Unique NPC import sanitizer that returns preserved, removed,
-  rebound, and regenerated field reports and strips runtime/authority data;
-- removal of the old flat Unique NPC persistence fallback and a dedicated
-  `starter` definition-store kind.
+- one versioned sparse-envelope handoff for SP, listen-server, and MP;
+- explicit registry/protocol compatibility and envelope fingerprints;
+- atomic compact decode with strict field/authority-key rejection;
+- authoritative sanitization against the same starter policy used for final
+  resolution;
+- final server resolution from the actual character UUID, player descriptor,
+  social orientation, relationship policy, and existing
+  `StartingCompanionService`;
+- bounded pending, received, validated, defaulted, and grants-complete state;
+- timeout fallback, payload-order tolerance, reconnect idempotence, and
+  replacement-survivor UUID semantics;
+- direct production command routing rather than debug-command customization;
+- shared resolver name projection so inherited surnames are visible in the
+  preview/trace as well as the final runtime record;
+- a server-clock fix preventing world-age hours from being mixed with
+  millisecond customization deadlines.
 
-No companion-only field registry, blueprint, resolver, or persistence schema
-was introduced. The composer consumes the same canonical registry and resolver
-trace as Unique NPC authoring and debug inspection.
-
-## P3 verification evidence
+## Verification evidence
 
 `TEST_VERIFIED`:
 
-- `python3 tests/run_tests.py unique_npc unique_npc_editor_model unique_npc_smoke identity_nickname identity_deterministic npc_authoring_schema starting_companion social_traits pnc_starting_companion_authoring puppet_opera_storage --jobs 4 --timeout 30` — **PASS 17/17**.
-- `lua tests/pnc_starting_companion_authoring_smoke.lua` — **PASS**; session reconciliation, cached re-add, policy locks, deterministic previews, all three slot actions, dynamic Lover orientation, preset JSON round-trip, current-player rebinding, and import sanitization.
-- `lua tests/pnc_social_traits_smoke.lua` — **PASS**; normal and inherited co-op extension paths still reach the adapter.
-- `lua tests/psychopatz_character_creation_extension_smoke.lua` in PsychopatzCore — **PASS**.
+- focused authoring/starter suite: **18/18 passed**;
+- full Project Hoomans harness: **1028/1032 passed**; the remaining four are
+  the pre-existing animation-scene debug route, context debug scene-lab,
+  population-director initialization, and dirty-work translation expectation
+  failures;
+- direct authority-resolution smoke covers canonical nickname preservation,
+  current-player surname/appearance rebinding, and relationship sex
+  authority;
+- customization smoke covers compact round-trip, explicit clear/value,
+  registry mismatch, spoofed authority, lifecycle ordering, timeout fallback,
+  and reconnect idempotence;
+- registry/serializer smoke covers immutable wire codes, fingerprints,
+  deterministic generation, resolution trace, and mandatory binding clears;
+- full focused test run includes existing Unique NPC, starter, social-trait,
+  composer, preset, and debug-inspector tests.
 
 `STATIC_ONLY`:
 
-- changed Lua passed `luac -p` and targeted `pz_verify --kahlua --severity ERROR`.
-- JSON translation catalogs parse successfully.
-- `git diff --check` passes.
+- all changed/new Lua files pass `luac -p`;
+- all changed production Lua files pass targeted `pz_verify --kahlua`;
+- `git diff --check` passes;
+- native Project Zomboid SP/MP acceptance has not been run, per repository
+  policy; it remains the user-owned P6 handoff.
 
-The full existing Hoomans suite remains at the previously observed four
-unrelated failures: animation-scene debug routes, context debug scene-lab
-route, population-director initialization, and the dirty-work translation
-expectation. No new P3-focused regression was introduced.
+## Next Chunk — P5 harness regression expansion
 
-## Next Chunk — P4 authority handoff and lifecycle
-
-Implement one semantic starter-customization service for SP and MP. Add the
-versioned compact blueprint envelope, registry-fingerprint rejection, final
-server-side resolution against the actual survivor/context, bounded pending /
-received / defaulted / grants-complete lifecycle, timeout/default fallback,
-spoofed-authority rejection, and reconnect/replacement-survivor idempotence.
-Keep `StartingCompanionService` the only spawn, recruitment, relationship,
-knowledge, faction, and community owner.
+Run the existing full harness after the P4 exact-path commit, close the
+remaining developer-side regression evidence, update the final handoff, and
+then hand the native SP/MP matrix to the user. Do not launch native PZ or
+publish Workshop content as part of this developer phase.
 
 ## Repository safety
 
-ProjectHoomans and PsychopatzCore remain on existing `main` branches. Unrelated
-dirty work is preserved. No new branch, push, Workshop publication, reset,
-stash, broad staging, or native Project Zomboid validation was used.
+ProjectHoomans and PsychopatzCore remain on existing `main` branches. No new
+branch, push, Workshop publication, reset, stash, broad staging, or native PZ
+validation was used. Unrelated dirty work remains preserved and will not be
+staged by the phase commit.

@@ -162,6 +162,73 @@ function H.BuildIdentity(player, npcID, spec, isFemale, seed)
     return identity
 end
 
+-- Resolve a starter blueprint on the authoritative side.  The client never
+-- supplies the player context, relationship kind, runtime identity, or
+-- generation source used here.
+function H.ResolveAuthoringDefinition(
+    player, character, npcID, spec, seed, blueprint
+)
+    local authoring = PNC.NPCAuthoring
+    local resolver
+    local policy
+    local plan
+    local reason
+    local context
+    local definition
+    local identity
+    local resolvedFemale
+    if not authoring or not authoring.Resolver then
+        return nil, "authoring_pipeline_unavailable"
+    end
+    resolver = authoring.Resolver
+    policy = resolver.PolicyForStartingCompanion(spec)
+    context = {
+        player = player,
+        playerSurname = H.PlayerSurname(player),
+        playerFemale = H.PlayerFemale(player),
+        playerAppearance = H.ResolveSharedAppearance(player, spec)
+            or (Identity.GetCharacterAppearance
+                and Identity.GetCharacterAppearance(player) or nil),
+        orientation = H.ResolveOrientation(character.uuid),
+        socialOrientation = H.ResolveOrientation(character.uuid),
+        archetypeID = "General",
+        generationSeed = seed,
+        seed = seed,
+        identitySeed = seed,
+    }
+    plan, reason = resolver.ResolvePlan(
+        blueprint,
+        context,
+        policy,
+        { id = npcID, version = 1 }
+    )
+    if not plan then return nil, reason or "starter_resolution_failed" end
+    definition = plan.definition
+    resolvedFemale = definition.identity and definition.identity.isFemale
+        or definition.isFemale
+    identity = Identity.GenerateResolvedIdentity({
+        id = npcID,
+        displayName = definition.displayName,
+        isFemale = resolvedFemale == true,
+        identity = definition.identity,
+        archetypeID = definition.archetypeID or "General",
+        identitySeed = seed,
+    })
+    if not identity then return nil, "identity_generation_failed" end
+    definition.id = npcID
+    definition.uniqueDefinitionId = nil
+    definition.uniqueDefinitionVersion = nil
+    definition.identitySeed = seed
+    definition.identity = identity
+    definition.displayName = identity.displayName
+    definition.name = identity.displayName
+    definition.isFemale = identity.isFemale == true
+    definition.archetypeID = definition.archetypeID or "General"
+    definition.resolutionTrace = plan.trace
+    definition.blueprintFingerprint = plan.blueprintFingerprint
+    return definition, plan
+end
+
 function H.ApplySharedSurname(player, record, spec)
     local surname = H.SharesSurname(spec) and H.PlayerSurname(player) or nil
     local identity = record and record.identity or nil

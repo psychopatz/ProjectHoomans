@@ -21,7 +21,7 @@ function H.DefinitionsForState(state)
     return output
 end
 
-function Starting.Ensure(player, characterUUID, at)
+function Starting.Ensure(player, characterUUID, at, options)
     if not player or not characterUUID then return false, "invalid_player" end
     local now = H.NowMs()
     if (Starting.NextRetryAt[characterUUID] or 0) > now then
@@ -86,11 +86,12 @@ function Starting.Ensure(player, characterUUID, at)
 
     local granted = {}
     local firstFailure
+    options = type(options) == "table" and options or {}
     for index = 1, #selections do
         local spec = selections[index]
         local ok
         ok, reason = H.EnsureOne(
-            player, character, state, spec, index, at
+            player, character, state, spec, index, at, options
         )
         if ok then
             granted[#granted + 1] = state.grants[spec.id].npcID

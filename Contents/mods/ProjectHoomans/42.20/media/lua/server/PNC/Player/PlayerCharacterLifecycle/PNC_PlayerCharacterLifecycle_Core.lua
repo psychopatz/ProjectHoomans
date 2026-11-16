@@ -51,7 +51,12 @@ function H.EnsureIdentityAndProfile(player, callback, at)
         -- before evaluating this character's starting-companion traits.
         PNC.Recruitment.ReconcileCharacterOwnership(player, uuid)
     end
-    if uuid and PNC.StartingCompanions and PNC.StartingCompanions.Ensure then
+    if uuid and PNC.StartingCompanionCustomizationService
+        and PNC.StartingCompanionCustomizationService.Ensure
+    then
+        PNC.StartingCompanionCustomizationService.Ensure(
+            player, uuid, at)
+    elseif uuid and PNC.StartingCompanions and PNC.StartingCompanions.Ensure then
         local granted = PNC.StartingCompanions.Ensure(player, uuid, at)
         if granted == true and PNC.Network
             and PNC.Network.SendColonyManagement and PNC.ColonyManagement

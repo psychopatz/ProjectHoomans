@@ -1,4 +1,5 @@
 require "PNC/Core/Traits/PNC_StartingCompanionTraits"
+require "PNC/Core/Identity/PNC_StartingCompanionCustomization"
 require "PsychopatzCore/Traits/PsychopatzTraitCharacterCreation"
 require "PNC/CharacterCreation/PNC_StartingCompanionSession"
 
@@ -8,6 +9,7 @@ PNC.StartingCompanionCharacterCreationAdapter =
 
 local Adapter = PNC.StartingCompanionCharacterCreationAdapter
 local StartingTraits = PNC.StartingCompanionTraits
+local Customization = PNC.StartingCompanionCustomization
 local Extension = PsychopatzCore.CharacterCreationExtension
 local CoreTraits = PsychopatzCore.Traits
 
@@ -18,6 +20,7 @@ Adapter.Session = Adapter.Session or nil
 Adapter.Sessions = Adapter.Sessions or {}
 Adapter.SessionOrder = Adapter.SessionOrder or {}
 Adapter.EventCache = Adapter.EventCache or {}
+Adapter.PendingEnvelopes = Adapter.PendingEnvelopes or {}
 
 local function copyList(source)
     local output = {}
@@ -139,11 +142,124 @@ function Adapter.HandleEvent(screen, payload)
         ),
     }
     cacheEvent(snapshot)
+    if snapshot.event == "screen_created"
+        and Customization.ClearLocalEnvelope
+    then
+        local index = tonumber(screen and screen.playerIndex)
+        if index == nil
+            and CoopCharacterCreation and CoopCharacterCreation.instance
+            and CoopCharacterCreation.instance.charCreationProfession == screen
+        then
+            index = tonumber(CoopCharacterCreation.instance.playerIndex) or 0
+        end
+        Customization.ClearLocalEnvelope()
+        Adapter.PendingEnvelopes[index or 0] = nil
+    end
     local result = session:HandleCharacterCreationEvent(snapshot)
     if snapshot.event == "screen_shown" then
         Adapter.OpenComposer(screen)
+    elseif snapshot.event == "screen_hidden" then
+        -- The base profession seam is also used by the co-op profession
+        -- screen.  Queue the latest selected-set snapshot here; final player
+        -- identity and server trait state are still resolved authoritatively
+        -- after OnCreatePlayer.
+        Adapter.Submit(screen, { defer = true })
     end
     return result
+end
+
+local function isRemoteClient()
+    if PNC.Core and PNC.Core.IsClientOnly then
+        return PNC.Core.IsClientOnly() == true
+    end
+    return isClient and isClient()
+        and (not isServer or not isServer()) or false
+end
+
+local function playerIndexFor(screen)
+    if screen and screen.playerIndex ~= nil then
+        return tonumber(screen.playerIndex) or 0
+    end
+    if CoopCharacterCreation and CoopCharacterCreation.instance
+        and CoopCharacterCreation.instance.charCreationProfession == screen
+    then
+        return tonumber(CoopCharacterCreation.instance.playerIndex) or 0
+    end
+    return 0
+end
+
+local function professionScreen(screen)
+    if screen and screen.listboxTraitSelected then return screen end
+    if MainScreen and MainScreen.instance then
+        return MainScreen.instance.charCreationProfession
+    end
+    return screen
+end
+
+function Adapter.Submit(screen, options)
+    local profession = professionScreen(screen)
+    local selected
+    local companionIDs
+    local session
+    local envelope
+    local reason
+    local index
+    local player
+    options = type(options) == "table" and options or {}
+    if not profession then return false, "profession_screen_unavailable" end
+    selected = Extension.ReadSelectedTraitIDs(profession)
+    companionIDs = companionTraitIDs(selected)
+    session = Adapter.GetSession(profession)
+    session:HandleCharacterCreationEvent({
+        event = "submission",
+        reason = "character_creation_commit",
+        screen = profession,
+        selectedTraitIDs = selected,
+        selectedCompanionTraitIDs = companionIDs,
+    })
+    envelope, reason = Customization.BuildEnvelope(session, companionIDs)
+    if not envelope then return false, reason end
+    index = playerIndexFor(profession)
+    Adapter.PendingEnvelopes[index] = envelope
+    if not isRemoteClient() then
+        return Customization.SetLocalEnvelope(envelope)
+    end
+    if options.defer == true then return true, "queued" end
+    player = getSpecificPlayer and getSpecificPlayer(index) or nil
+    if player and sendClientCommand then
+        sendClientCommand(
+            player,
+            PNC.Const.MODULE,
+            PNC.Const.CMD_STARTING_COMPANION_CUSTOMIZATION,
+            envelope
+        )
+        Adapter.PendingEnvelopes[index] = nil
+        return true, "sent"
+    end
+    return true, "queued"
+end
+
+function Adapter.SubmitPending(playerIndex, player)
+    local index = tonumber(playerIndex) or 0
+    local envelope = Adapter.PendingEnvelopes[index]
+    if not envelope or not isRemoteClient() then return false end
+    player = player or (getSpecificPlayer and getSpecificPlayer(index) or nil)
+    if not player or not sendClientCommand then return false end
+    sendClientCommand(
+        player,
+        PNC.Const.MODULE,
+        PNC.Const.CMD_STARTING_COMPANION_CUSTOMIZATION,
+        envelope
+    )
+    Adapter.PendingEnvelopes[index] = nil
+    return true
+end
+
+function Adapter.OnCreatePlayer(first, second)
+    local index = type(first) == "number" and first or 0
+    local player = second
+    if not player and type(first) == "table" then player = first end
+    return Adapter.SubmitPending(index, player)
 end
 
 Adapter.Provider = Adapter.Provider or {
@@ -153,5 +269,9 @@ Adapter.Provider = Adapter.Provider or {
 }
 
 Extension.Register(Adapter.PROVIDER_ID, Adapter.Provider)
+
+if Events and Events.OnCreatePlayer and Events.OnCreatePlayer.Add then
+    Events.OnCreatePlayer.Add(Adapter.OnCreatePlayer)
+end
 
 return Adapter

@@ -18,10 +18,18 @@ function H.SpawnOffset(index)
     return column + 1, row + 1
 end
 
-function H.EnsureOne(player, character, state, spec, index, at)
+function H.EnsureOne(player, character, state, spec, index, at, options)
     local grant = state.grants[spec.id]
     local npcID
     local record
+    local customization
+    local resolvedDefinition
+    local resolvedPlan
+    local resolveReason
+    local spawnDefinition
+    options = type(options) == "table" and options or {}
+    customization = options.blueprints
+        and options.blueprints[spec.id] or nil
     if not grant then return false, "starting_companion_grant_missing" end
     npcID = grant.npcID
     record = npcID and Registry.Get(npcID) or nil
@@ -61,6 +69,21 @@ function H.EnsureOne(player, character, state, spec, index, at)
         local resolvedIdentity = H.BuildIdentity(
             player, seedID, spec, isFemale, seed
         )
+        if customization and H.ResolveAuthoringDefinition then
+            resolvedDefinition, resolvedPlan = H.ResolveAuthoringDefinition(
+                player,
+                character,
+                seedID,
+                spec,
+                seed,
+                customization
+            )
+            if not resolvedDefinition then
+                return false, resolvedPlan or "starter_resolution_failed"
+            end
+            resolvedIdentity = resolvedDefinition.identity
+            isFemale = resolvedDefinition.isFemale == true
+        end
         if not npcID then
             npcID = H.MakeNPCID(character.uuid, spec.id, resolvedIdentity)
             if not npcID then return false, "npc_id_generation_failed" end
@@ -73,26 +96,27 @@ function H.EnsureOne(player, character, state, spec, index, at)
                 return false, recordReason
             end
         end
-        record = PNC.API.Spawn({
-            id = npcID,
-            archetypeID = "General",
-            tacticalClass = PNC.Const.TACTICAL_CLASS_NEUTRAL,
-            isFemale = isFemale,
-            identitySeed = seed,
-            identity = resolvedIdentity,
-            x = x + offsetX,
-            y = y + offsetY,
-            z = z,
-            forceLive = true,
-            persist = true,
-            generation = {
-                source = "starting_companion_trait",
-                traitID = spec.id,
-                relationshipKind = spec.relationshipKind,
-                relationshipSince = "before_outbreak",
-                playerCharacterUUID = character.uuid,
-            },
-        })
+        spawnDefinition = resolvedDefinition or {}
+        spawnDefinition.id = npcID
+        spawnDefinition.archetypeID = spawnDefinition.archetypeID or "General"
+        spawnDefinition.tacticalClass = spawnDefinition.tacticalClass
+            or PNC.Const.TACTICAL_CLASS_NEUTRAL
+        spawnDefinition.isFemale = isFemale
+        spawnDefinition.identitySeed = seed
+        spawnDefinition.identity = resolvedIdentity
+        spawnDefinition.x = x + offsetX
+        spawnDefinition.y = y + offsetY
+        spawnDefinition.z = z
+        spawnDefinition.forceLive = true
+        spawnDefinition.persist = true
+        spawnDefinition.generation = {
+            source = "starting_companion_trait",
+            traitID = spec.id,
+            relationshipKind = spec.relationshipKind,
+            relationshipSince = "before_outbreak",
+            playerCharacterUUID = character.uuid,
+        }
+        record = PNC.API.Spawn(spawnDefinition)
         if not record then return false, "spawn_failed" end
     end
     record.generation = record.generation or {}

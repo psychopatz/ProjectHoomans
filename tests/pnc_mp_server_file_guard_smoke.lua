@@ -169,7 +169,10 @@ listing:close()
 -- Twenty-four unified WorkOutputService, WorkZoneService, WorkToilRunner,
 -- FishingWorkAdapter, and FarmingWorkAdapter/FarmingService modules share
 -- the standard server guard.
-T.equal(#serverOnlyFiles, 1057,
+-- The starting-companion customization service and its production command
+-- handler are also server-only and loaded through the guarded composition and
+-- command-routing roots.
+T.equal(#serverOnlyFiles, 1059,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

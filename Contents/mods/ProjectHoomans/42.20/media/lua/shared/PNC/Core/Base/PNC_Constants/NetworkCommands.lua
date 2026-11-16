@@ -130,6 +130,8 @@ Const.CMD_PLAYER_EMOTE_INTERACTION = "PlayerEmoteInteraction"
 Const.CMD_PLAYER_EMOTE_INTERACTION_RESULT = "PlayerEmoteInteractionResult"
 Const.CMD_SOCIAL_GREETING = "SocialGreeting"
 Const.CMD_NPC_PRESENTATION_ANIMATION = "NPCPresentationAnimation"
+Const.CMD_STARTING_COMPANION_CUSTOMIZATION =
+    "StartingCompanionCustomization"
 
 -- The engine serializes each server command into a fixed per-connection packet
 -- buffer (1,000,000 bytes in the supported baseline) and throws

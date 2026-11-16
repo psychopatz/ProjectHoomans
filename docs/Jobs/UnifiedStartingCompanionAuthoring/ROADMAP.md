@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P0 DOCUMENTATION UPDATED — P1 DESIGN IMPLEMENTATION NEXT
+**Status:** P4 authority handoff implemented — P5 developer verification next
 
 **Primary repository:** ProjectHoomans (`main`)
 

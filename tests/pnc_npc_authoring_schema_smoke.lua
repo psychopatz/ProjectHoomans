@@ -103,6 +103,30 @@ T.equal(plan.trace.fields["identity.isFemale"].source, "derived",
 T.equal(plan.trace.fields["appearance.skinTexture"].value, "MaleBody03",
     "trace carries bounded inherited appearance value")
 
+local explicitDisplayName = Blueprint.Set(
+    Blueprint.New({ id = "starter:display", generationSeed = 23 }),
+    "identity.displayName",
+    "Riley Authored"
+)
+local displayPlan = Resolver.ResolvePlan(explicitDisplayName, {
+    playerSurname = "Current",
+    playerFemale = true,
+    playerAppearance = {
+        skinTexture = "FemaleBody03",
+        skinColor = { r = 0.8, g = 0.7, b = 0.6 },
+        hairColor = { r = 0.1, g = 0.2, b = 0.3 },
+    },
+}, policy, { id = "starter:display" })
+T.truthy(displayPlan, "starter name projection resolves")
+T.equal(displayPlan.definition.displayName, "Riley Current",
+    "inherited surname is reflected in the shared preview name")
+T.equal(displayPlan.definition.identity.survivor.forename, "Riley",
+    "explicit display name supplies the canonical forename")
+T.equal(displayPlan.trace.fields["identity.displayName"].source, "derived",
+    "name projection is visible as a derived trace field")
+T.equal(displayPlan.trace.fields["identity.displayName"].editable, false,
+    "relationship name projection is locked by policy")
+
 local retired = Registry.RetireWireCode(900)
 T.truthy(retired, "unused wire code can be retired")
 local registered, registerReason = Registry.Register({

@@ -28,7 +28,7 @@ local count = 0
 for _ in pairs(PNC.Const) do count = count + 1 end
 -- Change detector: update this when a constant is intentionally added or
 -- removed so the growth is reviewed instead of silent.
-T.equal(count, 659, "constant key count")
+T.equal(count, 660, "constant key count")
 T.equal(PNC.Const.PERSISTENCE_VERSION, 16, "persistence contract")
 T.equal(PNC.Const.NETWORK_PAYLOAD_BUDGET_BYTES, 786432,
     "server payload budget contract")
@@ -37,6 +37,9 @@ T.equal(PNC.Const.NETWORK_PAYLOAD_ENVELOPE, "pncOversize",
 T.equal(PNC.Const.NETWORK_PAYLOAD_CHUNK, "pncChunk",
     "payload chunk envelope contract")
 T.equal(PNC.Const.CMD_FULL_SYNC_REQUEST, "RequestFullSync", "network contract")
+T.equal(PNC.Const.CMD_STARTING_COMPANION_CUSTOMIZATION,
+    "StartingCompanionCustomization",
+    "starting-companion customization transport contract")
 T.equal(PNC.Const.CMD_BANDITS_INCOMING_DAMAGE, "BanditsIncomingDamage",
     "Bandits damage request contract")
 T.equal(PNC.Const.CMD_LLM_REQUEST_RESERVE, "LLMRequestReserve",

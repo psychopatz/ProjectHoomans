@@ -914,6 +914,9 @@ function Registry.DecodeCompact(envelope)
             if clearCount > Registry.MAX_CLEAR_FIELDS then
                 return nil, "too_many_compact_clears"
             end
+            if envelope.values[code] ~= nil then
+                return nil, "compact_value_clear_conflict"
+            end
             field = fieldByWireCode(code)
             if not field or not field.networkable then
                 return nil, "clear_wire_code_unknown"

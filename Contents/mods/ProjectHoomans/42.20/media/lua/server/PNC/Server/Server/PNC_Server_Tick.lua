@@ -27,6 +27,16 @@ function Server.OnTick()
         }, record, now)
     end
     H.SafePhase("server_tick.finish", H.FinishTick, nil, now)
+    if PNC.StartingCompanionCustomizationService
+        and PNC.StartingCompanionCustomizationService.Pump
+    then
+        H.SafePhase(
+            "server_tick.starting_companion_customization",
+            PNC.StartingCompanionCustomizationService.Pump,
+            nil,
+            now
+        )
+    end
     if timerName then Diagnostics.EndTiming(timerName, timerStart) end
     if Diagnostics then Diagnostics.LogRuntimeSummary(now) end
 end
