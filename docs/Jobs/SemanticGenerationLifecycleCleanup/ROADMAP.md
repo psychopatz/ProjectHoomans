@@ -66,7 +66,7 @@ No writes are allowed in check mode.
 
 ## G3 — Apply-mode safe cleanup and mixed-key ownership
 
-**Status:** NOT STARTED.
+**Status:** ACCEPTED (`CODE_VERIFIED`, `TEST_VERIFIED`).
 
 Implement apply mode using the validated desired ledger.
 
