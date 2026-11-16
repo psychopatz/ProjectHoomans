@@ -100,7 +100,7 @@ Do not delete active hash-sharded modules referenced by the current registry.
 
 ## G5 — Regression and determinism closure
 
-**Status:** NOT STARTED.
+**Status:** ACCEPTED (`CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED`).
 
 Add permanent regression coverage for:
 - source deletion removes obsolete generated file;
