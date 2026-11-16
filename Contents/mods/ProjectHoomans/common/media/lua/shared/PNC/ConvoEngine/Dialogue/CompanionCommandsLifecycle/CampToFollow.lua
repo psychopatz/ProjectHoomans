@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_commands_lifecycle",
+        ["domainPath"] = "companion_commands_lifecycle",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -1722,6 +1723,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_lifecycle",
+        ["domainPath"] = "companion_commands_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "command.follow",
             ["namespace"] = "command",

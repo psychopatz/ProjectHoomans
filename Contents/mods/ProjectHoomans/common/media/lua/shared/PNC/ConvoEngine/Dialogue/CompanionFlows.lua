@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_flows",
+        ["domainPath"] = "companion_flows",
         ["exchangeFamily"] = {
             ["familyID"] = "pnc.dialogue.follow",
             ["initiatingSay"] = {
@@ -212,6 +213,7 @@ return {
     },
     {
         ["domain"] = "companion_flows",
+        ["domainPath"] = "companion_flows",
         ["exchangeFamily"] = {
             ["familyID"] = "pnc.lab.stay_with_you",
             ["initiatingSay"] = {

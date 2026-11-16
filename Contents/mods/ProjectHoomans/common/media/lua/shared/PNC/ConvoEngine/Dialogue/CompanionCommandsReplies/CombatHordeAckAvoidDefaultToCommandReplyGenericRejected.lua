@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.avoid_default",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.avoid_relief",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.engage_default",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.engage_eager",
             ["initiatingSay"] = {
@@ -922,6 +926,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.engage_hesitant",
             ["initiatingSay"] = {
@@ -1152,6 +1157,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.engage_reserved",
             ["initiatingSay"] = {
@@ -1382,6 +1388,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.hold_default",
             ["initiatingSay"] = {
@@ -1612,6 +1619,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.hold_eager",
             ["initiatingSay"] = {
@@ -1842,6 +1850,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.ack.hold_hesitant",
             ["initiatingSay"] = {
@@ -2072,6 +2081,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.attack_auto",
             ["initiatingSay"] = {
@@ -2302,6 +2312,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.attack_melee",
             ["initiatingSay"] = {
@@ -2532,6 +2543,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.attack_none",
             ["initiatingSay"] = {
@@ -2762,6 +2774,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.attack_ranged",
             ["initiatingSay"] = {
@@ -2992,6 +3005,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.camp",
             ["initiatingSay"] = {
@@ -3222,6 +3236,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.camp_rejected",
             ["initiatingSay"] = {
@@ -3452,6 +3467,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.follow",
             ["initiatingSay"] = {
@@ -3682,6 +3698,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.generic_rejected",
             ["initiatingSay"] = {

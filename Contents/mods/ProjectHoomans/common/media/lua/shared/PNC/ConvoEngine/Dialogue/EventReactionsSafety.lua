@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "event_reactions_safety",
+        ["domainPath"] = "event_reactions_safety",
         ["exchangeFamily"] = {
             ["familyID"] = "conversation.safety.danger",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_safety",
+        ["domainPath"] = "event_reactions_safety",
         ["exchangeFamily"] = {
             ["familyID"] = "conversation.safety.default",
             ["initiatingSay"] = {

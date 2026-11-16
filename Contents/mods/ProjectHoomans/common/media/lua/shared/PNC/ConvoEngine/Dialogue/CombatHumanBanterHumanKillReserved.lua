@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_human_banter_human_kill_reserved",
+        ["domainPath"] = "combat_human_banter_human_kill_reserved",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.human_kill.reserved",
             ["initiatingSay"] = {

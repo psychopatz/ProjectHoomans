@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "event_reactions_companion",
+        ["domainPath"] = "event_reactions_companion",
         ["exchangeFamily"] = {
             ["familyID"] = "companion.reaction.abandonment",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_companion",
+        ["domainPath"] = "event_reactions_companion",
         ["exchangeFamily"] = {
             ["familyID"] = "companion.reaction.camp_rejected",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_companion",
+        ["domainPath"] = "event_reactions_companion",
         ["exchangeFamily"] = {
             ["familyID"] = "companion.reaction.default",
             ["initiatingSay"] = {

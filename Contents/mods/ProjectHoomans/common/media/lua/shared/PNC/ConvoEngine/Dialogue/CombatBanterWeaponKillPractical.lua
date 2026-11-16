@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_practical",
+        ["domainPath"] = "combat_banter_weapon_kill_practical",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.practical.axe_spear",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_practical",
+        ["domainPath"] = "combat_banter_weapon_kill_practical",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.practical.blade",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_practical",
+        ["domainPath"] = "combat_banter_weapon_kill_practical",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.practical.blunt",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_practical",
+        ["domainPath"] = "combat_banter_weapon_kill_practical",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.practical.firearm_high",
             ["initiatingSay"] = {
@@ -922,6 +926,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_practical",
+        ["domainPath"] = "combat_banter_weapon_kill_practical",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.practical.firearm_low",
             ["initiatingSay"] = {
@@ -1152,6 +1157,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_practical",
+        ["domainPath"] = "combat_banter_weapon_kill_practical",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.practical.unarmed",
             ["initiatingSay"] = {

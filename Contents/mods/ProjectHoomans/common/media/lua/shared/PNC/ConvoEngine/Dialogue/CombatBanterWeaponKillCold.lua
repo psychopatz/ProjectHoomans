@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_cold",
+        ["domainPath"] = "combat_banter_weapon_kill_cold",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.cold.blade_head",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_cold",
+        ["domainPath"] = "combat_banter_weapon_kill_cold",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.cold.firearm_high",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_cold",
+        ["domainPath"] = "combat_banter_weapon_kill_cold",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.cold.heavy_melee",
             ["initiatingSay"] = {

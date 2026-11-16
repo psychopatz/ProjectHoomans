@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.sexual",
             ["initiatingSay"] = {

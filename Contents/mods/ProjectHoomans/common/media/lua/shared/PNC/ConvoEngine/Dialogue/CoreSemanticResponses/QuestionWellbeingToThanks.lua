@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing",
             ["initiatingSay"] = {
@@ -575,6 +576,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.unknown",
             ["initiatingSay"] = {
@@ -797,6 +799,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "refuse",
             ["initiatingSay"] = {
@@ -1036,6 +1039,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "response_pool.question.identity",
             ["initiatingSay"] = {
@@ -1396,6 +1400,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "thanks",
             ["initiatingSay"] = {

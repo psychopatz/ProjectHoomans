@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["id"] = "conversation.landing.whats_up",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -62,6 +63,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.followup.default",
             ["initiatingSay"] = {
@@ -292,6 +294,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.followup.friendly",
             ["initiatingSay"] = {
@@ -522,6 +525,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.opening.default",
             ["initiatingSay"] = {
@@ -1133,6 +1137,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.opening.friendly",
             ["initiatingSay"] = {
@@ -1744,6 +1749,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.opening.question.default",
             ["initiatingSay"] = {
@@ -1974,6 +1980,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.opening.question.friendly",
             ["initiatingSay"] = {
@@ -2204,6 +2211,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.opening.rain",
             ["initiatingSay"] = {
@@ -2434,6 +2442,7 @@ return {
     },
     {
         ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.responses",
             ["initiatingSay"] = {

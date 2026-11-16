@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.offer.fatigue",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.offer.hunger",
             ["initiatingSay"] = {
@@ -843,6 +845,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.offer.thirst",
             ["initiatingSay"] = {
@@ -1073,6 +1076,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.offer.unknown",
             ["initiatingSay"] = {
@@ -1303,6 +1307,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.proposal.hunger",
             ["initiatingSay"] = {
@@ -1533,6 +1538,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.proposal.thirst",
             ["initiatingSay"] = {
@@ -1763,6 +1769,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.proposal.unknown",
             ["initiatingSay"] = {
@@ -1993,6 +2000,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.quantity.hunger",
             ["initiatingSay"] = {
@@ -2223,6 +2231,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.quantity.thirst",
             ["initiatingSay"] = {
@@ -2453,6 +2462,7 @@ return {
     },
     {
         ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.quantity.unknown",
             ["initiatingSay"] = {

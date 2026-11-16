@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_scene_travel_news",
+        ["domainPath"] = "social_interaction_scene_travel_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.grounded_news_answer",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_travel_news",
+        ["domainPath"] = "social_interaction_scene_travel_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.grounded_news_share",
             ["initiatingSay"] = {

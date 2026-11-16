@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_compliment",
             ["initiatingSay"] = {
@@ -373,6 +374,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_flirt",
             ["initiatingSay"] = {
@@ -744,6 +746,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_generic",
             ["initiatingSay"] = {
@@ -1115,6 +1118,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_hostile",
             ["initiatingSay"] = {
@@ -1486,6 +1490,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_insult",
             ["initiatingSay"] = {
@@ -1857,6 +1862,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_praise",
             ["initiatingSay"] = {
@@ -2228,6 +2234,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_romantic",
             ["initiatingSay"] = {
@@ -2599,6 +2606,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_sexual",
             ["initiatingSay"] = {
@@ -2970,6 +2978,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.rejected_game",
             ["initiatingSay"] = {
@@ -3341,6 +3350,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.rejected_generic",
             ["initiatingSay"] = {

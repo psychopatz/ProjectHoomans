@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -286,6 +287,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.needs_destination.tooltip",
             ["initiatingSay"] = {
@@ -452,6 +454,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -680,6 +683,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -908,6 +912,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.talk_again_about.label",
             ["initiatingSay"] = {
@@ -1074,6 +1079,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.talk_something_else.label",
             ["initiatingSay"] = {
@@ -1240,6 +1246,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -1468,6 +1475,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.unavailable.tooltip",
             ["initiatingSay"] = {
@@ -1634,6 +1642,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -1862,6 +1871,7 @@ return {
     },
     {
         ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.whats_up.label",
             ["initiatingSay"] = {

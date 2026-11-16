@@ -20,6 +20,7 @@ return {
         ["labelFallback"] = "Ask about needs",
         ["labelKey"] = "UI_PNC_Conversation_Suggestion_Needs_Label",
         ["order"] = 30,
+        ["owner"] = "ProjectHoomans",
         ["patternID"] = "pnc.question.needs_offer_plain",
         ["speechAct"] = "QUESTION",
         ["subject"] = "NEEDS",
@@ -54,6 +55,7 @@ return {
         ["labelFallback"] = "Ask about injuries",
         ["labelKey"] = "UI_PNC_Conversation_Suggestion_Health_Label",
         ["order"] = 40,
+        ["owner"] = "ProjectHoomans",
         ["patternID"] = "pnc.question.health.are_you_hurt",
         ["slots"] = {
             ["attribute"] = "health_state",
@@ -88,6 +90,7 @@ return {
         ["labelFallback"] = "Ask about gossip",
         ["labelKey"] = "UI_PNC_Conversation_Suggestion_Gossip_Label",
         ["order"] = 70,
+        ["owner"] = "ProjectHoomans",
         ["patternID"] = "pnc.social.gossip_event",
         ["speechAct"] = "GOSSIP",
         ["subject"] = "GOSSIP",

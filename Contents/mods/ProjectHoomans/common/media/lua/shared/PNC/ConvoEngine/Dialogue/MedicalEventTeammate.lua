@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "medical_event_teammate",
+        ["domainPath"] = "medical_event_teammate",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.teammate.default",
             ["initiatingSay"] = {
@@ -231,6 +232,7 @@ return {
     },
     {
         ["domain"] = "medical_event_teammate",
+        ["domainPath"] = "medical_event_teammate",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.teammate.found",
             ["initiatingSay"] = {
@@ -460,6 +462,7 @@ return {
     },
     {
         ["domain"] = "medical_event_teammate",
+        ["domainPath"] = "medical_event_teammate",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.teammate.missing",
             ["initiatingSay"] = {

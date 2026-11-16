@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_kill_witness_shaken",
+        ["domainPath"] = "combat_kill_witness_shaken",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.reaction.kill_witness_shaken",
             ["initiatingSay"] = {

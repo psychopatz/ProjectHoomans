@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_news",
+        ["domainPath"] = "social_interaction_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.news.acknowledge",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "navigation",
+        ["domainPath"] = "navigation",
         ["exchangeFamily"] = {
             ["familyID"] = "navigation.camp",
             ["initiatingSay"] = {
@@ -612,6 +613,7 @@ return {
     },
     {
         ["domain"] = "navigation",
+        ["domainPath"] = "navigation",
         ["exchangeFamily"] = {
             ["familyID"] = "navigation.camp_empty",
             ["initiatingSay"] = {
@@ -1222,6 +1224,7 @@ return {
     },
     {
         ["domain"] = "navigation",
+        ["domainPath"] = "navigation",
         ["exchangeFamily"] = {
             ["familyID"] = "navigation.default",
             ["initiatingSay"] = {
@@ -1832,6 +1835,7 @@ return {
     },
     {
         ["domain"] = "navigation",
+        ["domainPath"] = "navigation",
         ["exchangeFamily"] = {
             ["familyID"] = "navigation.orders",
             ["initiatingSay"] = {
@@ -2442,6 +2446,7 @@ return {
     },
     {
         ["domain"] = "navigation",
+        ["domainPath"] = "navigation",
         ["exchangeFamily"] = {
             ["familyID"] = "navigation.subject_change",
             ["initiatingSay"] = {

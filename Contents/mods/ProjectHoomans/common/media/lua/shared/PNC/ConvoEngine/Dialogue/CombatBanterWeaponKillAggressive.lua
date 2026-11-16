@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
+        ["domainPath"] = "combat_banter_weapon_kill_aggressive",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.aggressive.axe_head",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
+        ["domainPath"] = "combat_banter_weapon_kill_aggressive",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.aggressive.blade_head",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
+        ["domainPath"] = "combat_banter_weapon_kill_aggressive",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.aggressive.blunt",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
+        ["domainPath"] = "combat_banter_weapon_kill_aggressive",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.aggressive.firearm_high_named",
             ["initiatingSay"] = {
@@ -1077,6 +1081,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
+        ["domainPath"] = "combat_banter_weapon_kill_aggressive",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.aggressive.spear",
             ["initiatingSay"] = {

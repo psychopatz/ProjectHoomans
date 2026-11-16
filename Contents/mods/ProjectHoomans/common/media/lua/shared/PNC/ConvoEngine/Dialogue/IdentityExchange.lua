@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "identity_exchange",
+        ["domainPath"] = "identity_exchange",
         ["exchangeFamily"] = {
             ["familyID"] = "identity.exchange.responses",
             ["initiatingSay"] = {

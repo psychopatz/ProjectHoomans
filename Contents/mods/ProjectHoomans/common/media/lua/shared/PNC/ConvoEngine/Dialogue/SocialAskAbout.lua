@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_ask_about",
+        ["domainPath"] = "social_ask_about",
         ["id"] = "social.ask_about.member",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -194,6 +195,7 @@ return {
     },
     {
         ["domain"] = "social_ask_about",
+        ["domainPath"] = "social_ask_about",
         ["id"] = "social.ask_about.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -386,6 +388,7 @@ return {
     },
     {
         ["domain"] = "social_ask_about",
+        ["domainPath"] = "social_ask_about",
         ["id"] = "social.ask_about.special",
         ["kind"] = "dialogue",
         ["lineage"] = {

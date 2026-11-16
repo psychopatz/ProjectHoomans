@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "event_reactions_social",
+        ["domainPath"] = "event_reactions_social",
         ["exchangeFamily"] = {
             ["familyID"] = "social.reaction.default",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.dataset.getting_by",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.default",
             ["initiatingSay"] = {
@@ -1224,6 +1226,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.fatigue",
             ["initiatingSay"] = {
@@ -1454,6 +1457,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.fatigue_alt",
             ["initiatingSay"] = {
@@ -1684,6 +1688,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.follow_up.responses",
             ["initiatingSay"] = {
@@ -1968,6 +1973,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.hunger",
             ["initiatingSay"] = {
@@ -2198,6 +2204,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.hunger_alt",
             ["initiatingSay"] = {
@@ -2428,6 +2435,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.injured",
             ["initiatingSay"] = {
@@ -3039,6 +3047,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.panic",
             ["initiatingSay"] = {
@@ -3269,6 +3278,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.stress",
             ["initiatingSay"] = {

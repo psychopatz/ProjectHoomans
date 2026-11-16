@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "task_lifecycle",
+        ["domainPath"] = "task_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "task.refill",
             ["namespace"] = "task",
@@ -901,6 +902,7 @@ return {
     },
     {
         ["domain"] = "task_lifecycle",
+        ["domainPath"] = "task_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "task.wait_at",
             ["namespace"] = "task",

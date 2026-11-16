@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "conversation_context",
+        ["domainPath"] = "conversation_context",
         ["exchangeFamily"] = {
             ["familyID"] = "conversation.context.replies",
             ["initiatingSay"] = {

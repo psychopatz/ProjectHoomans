@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "conversation_whats_up",
+        ["domainPath"] = "conversation_whats_up",
         ["exchangeFamily"] = {
             ["familyID"] = "question.whats_up.busy",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "conversation_whats_up",
+        ["domainPath"] = "conversation_whats_up",
         ["exchangeFamily"] = {
             ["familyID"] = "question.whats_up.default",
             ["initiatingSay"] = {
@@ -1224,6 +1226,7 @@ return {
     },
     {
         ["domain"] = "conversation_whats_up",
+        ["domainPath"] = "conversation_whats_up",
         ["exchangeFamily"] = {
             ["familyID"] = "question.whats_up.default_alt",
             ["initiatingSay"] = {
@@ -1835,6 +1838,7 @@ return {
     },
     {
         ["domain"] = "conversation_whats_up",
+        ["domainPath"] = "conversation_whats_up",
         ["exchangeFamily"] = {
             ["familyID"] = "question.whats_up.traveling",
             ["initiatingSay"] = {
@@ -2446,6 +2450,7 @@ return {
     },
     {
         ["domain"] = "conversation_whats_up",
+        ["domainPath"] = "conversation_whats_up",
         ["exchangeFamily"] = {
             ["familyID"] = "question.whats_up.weather",
             ["initiatingSay"] = {

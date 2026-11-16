@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "core_knowledge_facts",
+        ["domainPath"] = "core_knowledge_facts",
         ["exchangeFamily"] = {
             ["familyID"] = "question.knowledge_and_bite.responses",
             ["initiatingSay"] = {

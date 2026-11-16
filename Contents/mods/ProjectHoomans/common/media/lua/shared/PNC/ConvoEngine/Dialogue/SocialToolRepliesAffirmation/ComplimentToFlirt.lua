@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.compliment",
             ["initiatingSay"] = {
@@ -514,6 +515,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.flirt",
             ["initiatingSay"] = {

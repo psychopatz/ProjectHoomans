@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "event_reactions_leader_loss",
+        ["domainPath"] = "event_reactions_leader_loss",
         ["exchangeFamily"] = {
             ["familyID"] = "leader_loss.close",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_leader_loss",
+        ["domainPath"] = "event_reactions_leader_loss",
         ["exchangeFamily"] = {
             ["familyID"] = "leader_loss.colonist",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_leader_loss",
+        ["domainPath"] = "event_reactions_leader_loss",
         ["exchangeFamily"] = {
             ["familyID"] = "leader_loss.default",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_leader_loss",
+        ["domainPath"] = "event_reactions_leader_loss",
         ["exchangeFamily"] = {
             ["familyID"] = "leader_loss.devoted",
             ["initiatingSay"] = {
@@ -922,6 +926,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_leader_loss",
+        ["domainPath"] = "event_reactions_leader_loss",
         ["exchangeFamily"] = {
             ["familyID"] = "leader_loss.dissent",
             ["initiatingSay"] = {
@@ -1152,6 +1157,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_leader_loss",
+        ["domainPath"] = "event_reactions_leader_loss",
         ["exchangeFamily"] = {
             ["familyID"] = "leader_loss.distant",
             ["initiatingSay"] = {

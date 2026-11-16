@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_first_contact",
+        ["domainPath"] = "social_interaction_first_contact",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.first_contact.challenge",
             ["initiatingSay"] = {

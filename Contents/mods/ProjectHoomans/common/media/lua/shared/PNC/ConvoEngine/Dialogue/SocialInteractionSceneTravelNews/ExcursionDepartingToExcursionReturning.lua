@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_scene_travel_news",
+        ["domainPath"] = "social_interaction_scene_travel_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.excursion_departing",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_travel_news",
+        ["domainPath"] = "social_interaction_scene_travel_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.excursion_failed",
             ["initiatingSay"] = {
@@ -1224,6 +1226,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_travel_news",
+        ["domainPath"] = "social_interaction_scene_travel_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.excursion_home",
             ["initiatingSay"] = {
@@ -1835,6 +1838,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_travel_news",
+        ["domainPath"] = "social_interaction_scene_travel_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.excursion_preparing",
             ["initiatingSay"] = {
@@ -2446,6 +2450,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_travel_news",
+        ["domainPath"] = "social_interaction_scene_travel_news",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.excursion_returning",
             ["initiatingSay"] = {

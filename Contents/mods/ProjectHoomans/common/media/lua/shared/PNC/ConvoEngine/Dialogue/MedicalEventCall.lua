@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.bandage",
             ["initiatingSay"] = {
@@ -231,6 +232,7 @@ return {
     },
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.bleedout",
             ["initiatingSay"] = {
@@ -460,6 +462,7 @@ return {
     },
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.default",
             ["initiatingSay"] = {
@@ -689,6 +692,7 @@ return {
     },
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.dehydration",
             ["initiatingSay"] = {
@@ -918,6 +922,7 @@ return {
     },
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.exhaustion",
             ["initiatingSay"] = {
@@ -1147,6 +1152,7 @@ return {
     },
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.mercy",
             ["initiatingSay"] = {
@@ -1376,6 +1382,7 @@ return {
     },
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.rescue",
             ["initiatingSay"] = {
@@ -1605,6 +1612,7 @@ return {
     },
     {
         ["domain"] = "medical_event_call",
+        ["domainPath"] = "medical_event_call",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.call.starvation",
             ["initiatingSay"] = {

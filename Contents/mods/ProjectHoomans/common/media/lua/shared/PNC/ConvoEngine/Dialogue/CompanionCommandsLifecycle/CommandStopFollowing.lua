@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_commands_lifecycle",
+        ["domainPath"] = "companion_commands_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "command.stop_following",
             ["namespace"] = "command",

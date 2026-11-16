@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_companion_topics",
+        ["domainPath"] = "social_companion_topics",
         ["id"] = "social.personal.special.trust",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -155,6 +156,7 @@ return {
     },
     {
         ["domain"] = "social_companion_topics",
+        ["domainPath"] = "social_companion_topics",
         ["id"] = "social.relationship.special.affinity",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -308,6 +310,7 @@ return {
     },
     {
         ["domain"] = "social_companion_topics",
+        ["domainPath"] = "social_companion_topics",
         ["id"] = "social.set_territory.member.claim",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -479,6 +482,7 @@ return {
     },
     {
         ["domain"] = "social_companion_topics",
+        ["domainPath"] = "social_companion_topics",
         ["id"] = "work_orders.member.status",
         ["kind"] = "dialogue",
         ["lineage"] = {

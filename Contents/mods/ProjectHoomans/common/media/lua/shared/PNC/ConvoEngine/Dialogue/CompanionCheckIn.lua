@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_check_in",
+        ["domainPath"] = "companion_check_in",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -252,6 +253,7 @@ return {
     },
     {
         ["domain"] = "companion_check_in",
+        ["domainPath"] = "companion_check_in",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {
@@ -511,6 +513,7 @@ return {
     },
     {
         ["domain"] = "companion_check_in",
+        ["domainPath"] = "companion_check_in",
         ["exchangeFamily"] = {
             ["affordance"] = {
                 ["consumers"] = {

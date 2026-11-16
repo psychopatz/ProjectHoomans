@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.return_home",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "command.reply.stay",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_replies",
+        ["domainPath"] = "companion_commands_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "companion.action.responses",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_reactions_ack_dispute",
+        ["domainPath"] = "social_reactions_ack_dispute",
         ["exchangeFamily"] = {
             ["familyID"] = "social.acknowledged",
             ["initiatingSay"] = {
@@ -1121,6 +1122,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_ack_dispute",
+        ["domainPath"] = "social_reactions_ack_dispute",
         ["exchangeFamily"] = {
             ["familyID"] = "social.dispute_friendly",
             ["initiatingSay"] = {
@@ -1732,6 +1734,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_ack_dispute",
+        ["domainPath"] = "social_reactions_ack_dispute",
         ["exchangeFamily"] = {
             ["familyID"] = "social.dispute_stressed",
             ["initiatingSay"] = {
@@ -2343,6 +2346,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_ack_dispute",
+        ["domainPath"] = "social_reactions_ack_dispute",
         ["exchangeFamily"] = {
             ["familyID"] = "social.dispute_trusted",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_commands_lifecycle",
+        ["domainPath"] = "companion_commands_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "command.return_home",
             ["namespace"] = "command",
@@ -1079,6 +1080,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_lifecycle",
+        ["domainPath"] = "companion_commands_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "command.stay",
             ["namespace"] = "command",

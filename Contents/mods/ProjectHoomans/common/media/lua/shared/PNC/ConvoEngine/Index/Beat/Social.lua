@@ -3,7 +3,7 @@ return {
     ["beat.argument_escalation"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Beat/Social",
+            "PsychopatzCore/ConvoEngine/Beat/Social/Conflict",
         },
         ["id"] = "beat.argument_escalation",
         ["kind"] = "beat",
@@ -13,12 +13,12 @@ return {
             "behavior.retaliate_verbally",
             "behavior.warn",
         },
-        ["source"] = "beat/social/argument_escalation.json",
+        ["source"] = "beat/social/conflict/argument_escalation.json",
     },
     ["beat.reconciliation"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Beat/Social",
+            "PsychopatzCore/ConvoEngine/Beat/Social/Repair",
         },
         ["id"] = "beat.reconciliation",
         ["kind"] = "beat",
@@ -27,12 +27,12 @@ return {
             "behavior.reconcile",
             "behavior.warn",
         },
-        ["source"] = "beat/social/reconciliation.json",
+        ["source"] = "beat/social/repair/reconciliation.json",
     },
     ["beat.suspicious_first_contact"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Beat/Social",
+            "PsychopatzCore/ConvoEngine/Beat/Social/FirstContact",
         },
         ["id"] = "beat.suspicious_first_contact",
         ["kind"] = "beat",
@@ -41,6 +41,6 @@ return {
             "behavior.deescalate",
             "behavior.warn",
         },
-        ["source"] = "beat/social/suspicious_first_contact.json",
+        ["source"] = "beat/social/first_contact/suspicious_first_contact.json",
     },
 }

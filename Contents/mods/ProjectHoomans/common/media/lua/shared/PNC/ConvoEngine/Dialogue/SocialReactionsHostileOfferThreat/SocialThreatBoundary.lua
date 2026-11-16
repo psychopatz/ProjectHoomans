@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_reactions_hostile_offer_threat",
+        ["domainPath"] = "social_reactions_hostile_offer_threat",
         ["exchangeFamily"] = {
             ["familyID"] = "social.threat_boundary",
             ["initiatingSay"] = {

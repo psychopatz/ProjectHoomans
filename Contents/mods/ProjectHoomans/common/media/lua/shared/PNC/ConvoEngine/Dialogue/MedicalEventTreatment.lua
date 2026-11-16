@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "medical_event_treatment",
+        ["domainPath"] = "medical_event_treatment",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.treatment.bandage",
             ["initiatingSay"] = {
@@ -231,6 +232,7 @@ return {
     },
     {
         ["domain"] = "medical_event_treatment",
+        ["domainPath"] = "medical_event_treatment",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.treatment.default",
             ["initiatingSay"] = {

@@ -3,6 +3,7 @@ return {
     {
         ["domain"] = "general",
         ["id"] = "accept",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "ACCEPT",
@@ -45,6 +46,7 @@ return {
     {
         ["domain"] = "general",
         ["id"] = "compliment",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "COMPLIMENT",
@@ -79,6 +81,7 @@ return {
     {
         ["domain"] = "weather",
         ["id"] = "flow.weather.raining",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "RAINING",
@@ -136,6 +139,7 @@ return {
     {
         ["domain"] = "general",
         ["id"] = "greeting",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "GREETING",
@@ -184,6 +188,7 @@ return {
     {
         ["domain"] = "general",
         ["id"] = "offer",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "OFFER",
@@ -238,6 +243,7 @@ return {
     {
         ["domain"] = "activity",
         ["id"] = "question.activity",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "ACTIVITY",
@@ -286,6 +292,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.ambiguous",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "AMBIGUOUS",
@@ -306,6 +313,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.follow_up.location",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "LOCATION",
@@ -326,6 +334,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.follow_up.miss",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "MISS",
@@ -346,6 +355,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "KNOWN",
@@ -369,6 +379,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known.education",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "EDUCATION",
@@ -392,6 +403,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known.family_background",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "FAMILY_BACKGROUND",
@@ -415,6 +427,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known.fear",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "FEAR",
@@ -438,6 +451,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known.former_job",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "FORMER_JOB",
@@ -461,6 +475,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known.hobby",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "HOBBY",
@@ -484,6 +499,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known.hometown",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "HOMETOWN",
@@ -507,6 +523,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.known.tragedy",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "TRAGEDY",
@@ -530,6 +547,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.refusal",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "REFUSAL",
@@ -550,6 +568,7 @@ return {
     {
         ["domain"] = "backstory",
         ["id"] = "question.backstory.suspected",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "SUSPECTED",
@@ -573,6 +592,7 @@ return {
     {
         ["domain"] = "needs",
         ["id"] = "question.needs.proposal",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "PROPOSAL",
@@ -635,6 +655,7 @@ return {
     {
         ["domain"] = "needs",
         ["id"] = "question.needs.quantity",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "QUANTITY",
@@ -692,6 +713,7 @@ return {
     {
         ["domain"] = "wellbeing",
         ["id"] = "question.wellbeing",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "WELLBEING",
@@ -812,6 +834,7 @@ return {
     {
         ["domain"] = "wellbeing",
         ["id"] = "question.wellbeing.unknown",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "UNKNOWN",
@@ -869,6 +892,7 @@ return {
     {
         ["domain"] = "general",
         ["id"] = "refuse",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "REFUSE",
@@ -911,6 +935,7 @@ return {
     {
         ["domain"] = "general",
         ["id"] = "thanks",
+        ["owner"] = "ProjectHoomans",
         ["variants"] = {
             {
                 ["dialogueAct"] = "THANKS",

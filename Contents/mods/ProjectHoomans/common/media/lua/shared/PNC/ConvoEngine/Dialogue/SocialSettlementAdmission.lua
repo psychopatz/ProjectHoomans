@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_settlement_admission",
+        ["domainPath"] = "social_settlement_admission",
         ["exchangeFamily"] = {
             ["familyID"] = "social.settlement_admission",
             ["initiatingSay"] = {

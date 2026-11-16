@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "event_reactions_corpse",
+        ["domainPath"] = "event_reactions_corpse",
         ["exchangeFamily"] = {
             ["familyID"] = "corpse.reaction.default",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_corpse",
+        ["domainPath"] = "event_reactions_corpse",
         ["exchangeFamily"] = {
             ["familyID"] = "corpse.reaction.revenge",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_context",
+        ["domainPath"] = "social_interaction_context",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.context.clarify",
             ["initiatingSay"] = {

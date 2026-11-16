@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "conversation.acknowledged.default",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.clap",
             ["initiatingSay"] = {
@@ -787,6 +789,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.insult",
             ["initiatingSay"] = {
@@ -961,6 +964,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.salute",
             ["initiatingSay"] = {
@@ -1135,6 +1139,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.thankyou",
             ["initiatingSay"] = {
@@ -1309,6 +1314,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.thumbsdown",
             ["initiatingSay"] = {
@@ -1483,6 +1489,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.thumbsup",
             ["initiatingSay"] = {
@@ -1657,6 +1664,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.wavebye",
             ["initiatingSay"] = {
@@ -1831,6 +1839,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.player.wavehi",
             ["initiatingSay"] = {
@@ -2005,6 +2014,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.clap",
             ["initiatingSay"] = {
@@ -2362,6 +2372,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.default",
             ["initiatingSay"] = {
@@ -2592,6 +2603,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.insult",
             ["initiatingSay"] = {
@@ -2949,6 +2961,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.salute",
             ["initiatingSay"] = {
@@ -3306,6 +3319,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.thankyou",
             ["initiatingSay"] = {
@@ -3663,6 +3677,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.thumbsdown",
             ["initiatingSay"] = {

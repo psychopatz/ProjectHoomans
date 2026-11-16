@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.accepted_generic",
             ["initiatingSay"] = {
@@ -373,6 +374,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.admire",
             ["initiatingSay"] = {
@@ -885,6 +887,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.apology",
             ["initiatingSay"] = {
@@ -1397,6 +1400,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.ask_name.named",
             ["initiatingSay"] = {
@@ -1909,6 +1913,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.ask_name.prompt",
             ["initiatingSay"] = {
@@ -2139,6 +2144,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.ask_name.rejected",
             ["initiatingSay"] = {
@@ -2510,6 +2516,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.ask_name.unnamed",
             ["initiatingSay"] = {
@@ -2881,6 +2888,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.comfort",
             ["initiatingSay"] = {

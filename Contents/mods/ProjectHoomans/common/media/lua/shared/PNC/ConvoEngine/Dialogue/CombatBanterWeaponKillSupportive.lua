@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_supportive",
+        ["domainPath"] = "combat_banter_weapon_kill_supportive",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.supportive.firearm",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_supportive",
+        ["domainPath"] = "combat_banter_weapon_kill_supportive",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.supportive.melee",
             ["initiatingSay"] = {

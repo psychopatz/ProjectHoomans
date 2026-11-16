@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_reactions_hostile_offer_threat",
+        ["domainPath"] = "social_reactions_hostile_offer_threat",
         ["exchangeFamily"] = {
             ["familyID"] = "social.hostile_short",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",
+        ["domainPath"] = "social_reactions_hostile_offer_threat",
         ["exchangeFamily"] = {
             ["familyID"] = "social.hostile_stressed",
             ["initiatingSay"] = {
@@ -1224,6 +1226,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",
+        ["domainPath"] = "social_reactions_hostile_offer_threat",
         ["exchangeFamily"] = {
             ["familyID"] = "social.hostile_withdrawn",
             ["initiatingSay"] = {
@@ -1835,6 +1838,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",
+        ["domainPath"] = "social_reactions_hostile_offer_threat",
         ["exchangeFamily"] = {
             ["familyID"] = "social.offer_friendly",
             ["initiatingSay"] = {
@@ -2954,6 +2958,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",
+        ["domainPath"] = "social_reactions_hostile_offer_threat",
         ["exchangeFamily"] = {
             ["familyID"] = "social.profanity",
             ["initiatingSay"] = {

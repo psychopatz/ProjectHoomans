@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "medical_event_overview",
+        ["domainPath"] = "medical_event_overview",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.default",
             ["initiatingSay"] = {
@@ -231,6 +232,7 @@ return {
     },
     {
         ["domain"] = "medical_event_overview",
+        ["domainPath"] = "medical_event_overview",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.mercy",
             ["initiatingSay"] = {
@@ -460,6 +462,7 @@ return {
     },
     {
         ["domain"] = "medical_event_overview",
+        ["domainPath"] = "medical_event_overview",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.urgent",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_reserved",
+        ["domainPath"] = "combat_banter_weapon_kill_reserved",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.reserved.blade",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_reserved",
+        ["domainPath"] = "combat_banter_weapon_kill_reserved",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.reserved.firearm",
             ["initiatingSay"] = {

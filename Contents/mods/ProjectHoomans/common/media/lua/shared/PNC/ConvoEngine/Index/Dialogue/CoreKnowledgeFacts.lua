@@ -3,7 +3,7 @@ return {
     ["question.knowledge"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeFacts__d73c98cf",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeFacts",
         },
         ["id"] = "question.knowledge",
         ["kind"] = "dialogue",

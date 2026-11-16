@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_reactions_ack_dispute",
+        ["domainPath"] = "social_reactions_ack_dispute",
         ["exchangeFamily"] = {
             ["familyID"] = "social.dispute_withdrawn",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_ack_dispute",
+        ["domainPath"] = "social_reactions_ack_dispute",
         ["exchangeFamily"] = {
             ["familyID"] = "social.hostile_boundary",
             ["initiatingSay"] = {
@@ -1224,6 +1226,7 @@ return {
     },
     {
         ["domain"] = "social_reactions_ack_dispute",
+        ["domainPath"] = "social_reactions_ack_dispute",
         ["exchangeFamily"] = {
             ["familyID"] = "social.reaction.responses",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_scene_combat",
+        ["domainPath"] = "social_interaction_scene_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.tactical_spatial.hostile.clock",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_combat",
+        ["domainPath"] = "social_interaction_scene_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.tactical_spatial.hostile.coarse",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_combat",
+        ["domainPath"] = "social_interaction_scene_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.tactical_spatial.zombie.clock",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_combat",
+        ["domainPath"] = "social_interaction_scene_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.tactical_spatial.zombie.coarse",
             ["initiatingSay"] = {

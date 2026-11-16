@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_apology",
+        ["domainPath"] = "social_apology",
         ["exchangeFamily"] = {
             ["familyID"] = "social.apology.default",
             ["initiatingSay"] = {
@@ -612,6 +613,7 @@ return {
     },
     {
         ["domain"] = "social_apology",
+        ["domainPath"] = "social_apology",
         ["exchangeFamily"] = {
             ["familyID"] = "social.apology.friendly",
             ["initiatingSay"] = {
@@ -1222,6 +1224,7 @@ return {
     },
     {
         ["domain"] = "social_apology",
+        ["domainPath"] = "social_apology",
         ["exchangeFamily"] = {
             ["familyID"] = "social.apology.stressed",
             ["initiatingSay"] = {
@@ -1832,6 +1835,7 @@ return {
     },
     {
         ["domain"] = "social_apology",
+        ["domainPath"] = "social_apology",
         ["exchangeFamily"] = {
             ["familyID"] = "social.apology.withdrawn",
             ["initiatingSay"] = {

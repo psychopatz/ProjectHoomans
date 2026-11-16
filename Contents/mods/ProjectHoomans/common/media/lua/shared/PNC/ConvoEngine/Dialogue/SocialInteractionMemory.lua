@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_memory",
+        ["domainPath"] = "social_interaction_memory",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.memory.acknowledge",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_memory",
+        ["domainPath"] = "social_interaction_memory",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.memory.acknowledge_flavor",
             ["initiatingSay"] = {
@@ -1224,6 +1226,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_memory",
+        ["domainPath"] = "social_interaction_memory",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.memory.followup",
             ["initiatingSay"] = {

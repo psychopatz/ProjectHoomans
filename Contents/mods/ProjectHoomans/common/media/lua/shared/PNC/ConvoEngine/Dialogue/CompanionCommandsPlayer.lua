@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.attack_auto",
             ["initiatingSay"] = {
@@ -176,6 +177,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.attack_melee",
             ["initiatingSay"] = {
@@ -350,6 +352,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.attack_none",
             ["initiatingSay"] = {
@@ -524,6 +527,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.attack_ranged",
             ["initiatingSay"] = {
@@ -698,6 +702,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.camp",
             ["initiatingSay"] = {
@@ -888,6 +893,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.camp_none",
             ["initiatingSay"] = {
@@ -1046,6 +1052,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.camp_rejected",
             ["initiatingSay"] = {
@@ -1220,6 +1227,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.follow",
             ["initiatingSay"] = {
@@ -1394,6 +1402,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.generic",
             ["initiatingSay"] = {
@@ -1552,6 +1561,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.return_home",
             ["initiatingSay"] = {
@@ -1726,6 +1736,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
             ["familyID"] = "command.player.stay",
             ["initiatingSay"] = {

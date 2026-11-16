@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.thirst",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "wellbeing_content",
+        ["domainPath"] = "wellbeing_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing.thirst_alt",
             ["initiatingSay"] = {

@@ -7,10 +7,16 @@ return {
         ["recordCount"] = 3,
     },
     {
+        ["domain"] = "scene",
+        ["kind"] = "behavior",
+        ["module"] = "PNC/ConvoEngine/Index/Behavior/Scene",
+        ["recordCount"] = 16,
+    },
+    {
         ["domain"] = "social",
         ["kind"] = "behavior",
         ["module"] = "PNC/ConvoEngine/Index/Behavior/Social",
-        ["recordCount"] = 30,
+        ["recordCount"] = 14,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",

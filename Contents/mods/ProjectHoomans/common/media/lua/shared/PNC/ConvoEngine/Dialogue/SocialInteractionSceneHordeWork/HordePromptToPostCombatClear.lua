@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_scene_horde_work",
+        ["domainPath"] = "social_interaction_scene_horde_work",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.horde_prompt",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_horde_work",
+        ["domainPath"] = "social_interaction_scene_horde_work",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.horde_reply_brave",
             ["initiatingSay"] = {
@@ -1224,6 +1226,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_horde_work",
+        ["domainPath"] = "social_interaction_scene_horde_work",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.horde_reply_cautious",
             ["initiatingSay"] = {
@@ -1835,6 +1838,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_horde_work",
+        ["domainPath"] = "social_interaction_scene_horde_work",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.horde_reply_steady",
             ["initiatingSay"] = {
@@ -2446,6 +2450,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_horde_work",
+        ["domainPath"] = "social_interaction_scene_horde_work",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.post_combat_clear",
             ["initiatingSay"] = {

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "task_lifecycle",
+        ["domainPath"] = "task_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "gift",
             ["replies"] = {
@@ -898,6 +899,7 @@ return {
     },
     {
         ["domain"] = "task_lifecycle",
+        ["domainPath"] = "task_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "task.consume",
             ["namespace"] = "task",
@@ -1797,6 +1799,7 @@ return {
     },
     {
         ["domain"] = "task_lifecycle",
+        ["domainPath"] = "task_lifecycle",
         ["exchangeFamily"] = {
             ["familyID"] = "task.drink",
             ["namespace"] = "task",

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "quest_content",
+        ["domainPath"] = "quest_content",
         ["exchangeFamily"] = {
             ["familyID"] = "quest.clinic_supplies.accept",
             ["namespace"] = "quest.clinic_supplies",
@@ -563,6 +564,7 @@ return {
     },
     {
         ["domain"] = "quest_content",
+        ["domainPath"] = "quest_content",
         ["exchangeFamily"] = {
             ["familyID"] = "quest.clinic_supplies.offer",
             ["namespace"] = "quest.clinic_supplies",
@@ -1124,6 +1126,7 @@ return {
     },
     {
         ["domain"] = "quest_content",
+        ["domainPath"] = "quest_content",
         ["exchangeFamily"] = {
             ["familyID"] = "quest.clinic_supplies.status",
             ["namespace"] = "quest.clinic_supplies",
@@ -1685,6 +1688,7 @@ return {
     },
     {
         ["domain"] = "quest_content",
+        ["domainPath"] = "quest_content",
         ["exchangeFamily"] = {
             ["familyID"] = "quest.clinic_supplies.turn_in",
             ["namespace"] = "quest.clinic_supplies",

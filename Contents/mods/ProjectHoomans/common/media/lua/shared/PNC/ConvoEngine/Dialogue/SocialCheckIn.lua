@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_check_in",
+        ["domainPath"] = "social_check_in",
         ["id"] = "social.small_talk.member",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -204,6 +205,7 @@ return {
     },
     {
         ["domain"] = "social_check_in",
+        ["domainPath"] = "social_check_in",
         ["id"] = "social.small_talk.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -406,6 +408,7 @@ return {
     },
     {
         ["domain"] = "social_check_in",
+        ["domainPath"] = "social_check_in",
         ["id"] = "social.small_talk.special",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -608,6 +611,7 @@ return {
     },
     {
         ["domain"] = "social_check_in",
+        ["domainPath"] = "social_check_in",
         ["id"] = "social.wellbeing.member",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -870,6 +874,7 @@ return {
     },
     {
         ["domain"] = "social_check_in",
+        ["domainPath"] = "social_check_in",
         ["id"] = "social.wellbeing.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -1132,6 +1137,7 @@ return {
     },
     {
         ["domain"] = "social_check_in",
+        ["domainPath"] = "social_check_in",
         ["id"] = "social.wellbeing.special",
         ["kind"] = "dialogue",
         ["lineage"] = {

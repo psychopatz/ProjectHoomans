@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.rejected_hostile",
             ["initiatingSay"] = {
@@ -373,6 +374,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.rejected_sexual",
             ["initiatingSay"] = {

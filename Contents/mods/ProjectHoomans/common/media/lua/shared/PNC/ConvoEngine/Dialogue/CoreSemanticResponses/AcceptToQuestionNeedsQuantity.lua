@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "accept",
             ["initiatingSay"] = {
@@ -241,6 +242,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "compliment",
             ["initiatingSay"] = {
@@ -458,6 +460,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.weather.raining",
             ["initiatingSay"] = {
@@ -663,6 +666,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "greeting",
             ["initiatingSay"] = {
@@ -939,6 +943,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "offer",
             ["initiatingSay"] = {
@@ -1234,6 +1239,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.activity",
             ["initiatingSay"] = {
@@ -1513,6 +1519,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.ambiguous",
             ["initiatingSay"] = {
@@ -1674,6 +1681,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.follow_up.location",
             ["initiatingSay"] = {
@@ -1835,6 +1843,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.follow_up.miss",
             ["initiatingSay"] = {
@@ -1996,6 +2005,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known",
             ["initiatingSay"] = {
@@ -2160,6 +2170,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known.education",
             ["initiatingSay"] = {
@@ -2324,6 +2335,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known.family_background",
             ["initiatingSay"] = {
@@ -2488,6 +2500,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known.fear",
             ["initiatingSay"] = {
@@ -2652,6 +2665,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known.former_job",
             ["initiatingSay"] = {
@@ -2816,6 +2830,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known.hobby",
             ["initiatingSay"] = {
@@ -2980,6 +2995,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known.hometown",
             ["initiatingSay"] = {
@@ -3144,6 +3160,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.known.tragedy",
             ["initiatingSay"] = {
@@ -3308,6 +3325,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.refusal",
             ["initiatingSay"] = {
@@ -3469,6 +3487,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.backstory.suspected",
             ["initiatingSay"] = {
@@ -3633,6 +3652,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.proposal",
             ["initiatingSay"] = {
@@ -3865,6 +3885,7 @@ return {
     },
     {
         ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
             ["familyID"] = "question.needs.quantity",
             ["initiatingSay"] = {

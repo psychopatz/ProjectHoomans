@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_scene_horde_work",
+        ["domainPath"] = "social_interaction_scene_horde_work",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.task_work_assigned",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_scene_horde_work",
+        ["domainPath"] = "social_interaction_scene_horde_work",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.scene.task_work_completed",
             ["initiatingSay"] = {

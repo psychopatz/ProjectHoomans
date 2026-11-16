@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.cooldown",
             ["initiatingSay"] = {
@@ -373,6 +374,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.order_camp",
             ["initiatingSay"] = {
@@ -885,6 +887,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.order_follow",
             ["initiatingSay"] = {
@@ -1397,6 +1400,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.order_generic",
             ["initiatingSay"] = {
@@ -1909,6 +1913,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.order_rejected",
             ["initiatingSay"] = {
@@ -2280,6 +2285,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.order_stay",
             ["initiatingSay"] = {
@@ -2651,6 +2657,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_admire",
             ["initiatingSay"] = {
@@ -3022,6 +3029,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_apology",
             ["initiatingSay"] = {
@@ -3393,6 +3401,7 @@ return {
     },
     {
         ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.queued_comfort",
             ["initiatingSay"] = {

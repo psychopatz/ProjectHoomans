@@ -1,136 +1,174 @@
-# Roadmap — G9 PSDL Package Ownership & Human-Readable Generated Layout
+# Roadmap — G9R Semantic Domain Decomposition & Generated Surface Normalization
 
 **Parent status:** COMPLETE.
-**Active phase:** G9E (Closed).
-**Completion boundary:** G9A–G9E accepted.
+**Active phase:** G9R5 (Closed).
+**Completion boundary:** G9R1–G9R5 accepted.
 
-## G9A — self-contained adopter packages
+## G9R1 — global generated-topology audit + semantic path contract
 
-Replace the current Core-owned federation package with real package descriptors at each semantic owner.
+Audit every generated semantic surface across PsychopatzCore, ProjectHoomans and DTCommon:
+- `Behavior/`;
+- `Behaviors/Director/`;
+- `Beat/`;
+- `Beats/Director/`;
+- `Dialogue/`;
+- `Realization/`;
+- `Index/`;
+- registries/manifests that compose them.
 
-Expected ownership:
-- PsychopatzCore package: compiler/stdlib/shared semantic primitives;
-- ProjectHoomans package: Hoomans-owned semantic programs;
-- DTCommon/DynamicTrading package: trading-owned semantic programs.
+For every monolithic bucket and every `__????????` module, identify:
+- source package/owner;
+- kind;
+- broad runtime domain;
+- source lineage;
+- exact naming collision partner;
+- whether the collision is cross-owner, cross-surface, long-name, or true same-namespace collision.
 
-Requirements:
-- each adopter source root has its own package descriptor and provenance/lock data as appropriate;
-- Core package identity is not `ProjectHoomans`;
-- Core package does not enumerate Hoomans/DT `externalSourceRoots` as adopter-specific knowledge;
-- adopter packages import Core/shared packages through a generic package/import mechanism;
-- package discovery remains descriptor/workspace driven and supports future unknown adopters;
-- normal production compile/reconcile still produces equivalent semantic output.
-
-**Gate:** an agent can open an adopter source root and find its complete package descriptor/import boundary there, while Core contains no adopter-specific source-root federation.
-
-## G9B — semantic ownership audit and migration
-
-Classify current non-dialogue semantic source by meaning, not historical location.
-
-Ownership rule:
+Define one canonical semantic-path concept. Preferred semantics:
 
 ```text
-reusable across unrelated games/mods → Core stdlib/shared package
-meaningful only for one adopter/domain → adopter package
+domain      = broad runtime meaning, e.g. social
+domainPath  = authored semantic hierarchy, e.g. social/conflict
 ```
 
-Audit at minimum:
-- all 3 beats;
-- all 30 behaviors;
-- all realizations/recognition rules used by adopters;
-- Core dialogue families;
-- Hoomans horde/excursion/task/companion semantics;
-- DynamicTrading-specific semantic logic.
+Equivalent naming such as `semanticPath`/`subdomain` is acceptable, but do not overload runtime `domain` if consumers depend on its broad meaning.
 
-Likely Hoomans-owned examples requiring proof/classification include:
-- `behavior.scene_horde_*`;
-- `behavior.scene_excursion_*`;
-- `behavior.scene_task_work_*`.
-
-Do not move generic constructs such as reusable social argument/reconciliation/deescalation merely because Hoomans currently consumes them.
-
-Migration must preserve semantic IDs, imports, capability contracts, generated behavior and source lineage.
-
-**Gate:** every semantic family has an explicit justified package owner, and adopter-specific programs no longer live in Core merely for compiler convenience.
-
-## G9C — readable deterministic generated shard naming
-
-Keep generated safety budgets:
-- max generated shard bytes: currently 192 KiB;
-- max records per shard: currently 32.
-
-Do not solve readability by removing safety chunking.
-
-Replace normal hash-first collision naming with deterministic semantic chunk names.
-
-Current bad UX example:
+Source hierarchy should derive this path automatically where possible:
 
 ```text
-CompanionCommandsLifecycle.lua
-CompanionCommandsLifecycle__3899a7d0.lua
-CompanionCommandsLifecycle__7d8bcf74.lua
+behavior/social/conflict/retaliate_verbally.json
+→ domain = social
+→ domainPath = social/conflict
 ```
 
-Preferred behavior:
-- base directory/module reflects semantic family/domain;
-- split chunks derive readable identity from contained semantic IDs or stable semantic ranges;
-- use subdirectories when they improve clarity;
-- long semantic names remain readable instead of being hashed solely because they exceed the current 32-character segment limit;
-- hash suffix remains available only when a true unresolved collision/length constraint remains.
+**Gate:** compiler model exposes a deterministic owner + kind + semantic-path grouping key and diagnostics can explain every current generated collision.
 
-Naming must be deterministic from semantic content/lineage, independent of file enumeration order.
+## G9R2 — semantically decompose source families
 
-Adding/removing one family must not rename unrelated generated modules unnecessarily.
+Reorganize broad source buckets into coherent semantic subdomains so variants of the same type live together.
 
-**Gate:** ordinary generated output contains no avoidable `__????????` names; any remaining hash suffix has an audit report explaining why a readable deterministic name was impossible.
+Do not invent arbitrary size partitions. Split by meaning first.
 
-## G9D — package/source navigation and audit UX
+Candidate Core behavior groupings to audit, not blindly hard-code:
+- acknowledgement/news/memory;
+- conflict/challenge/warning/retaliation;
+- repair/reconciliation/de-escalation/end-conversation;
+- context/follow-up;
+- world-event warning.
 
-Make ownership and generation discoverable without repository archaeology.
+Candidate Hoomans scene groupings:
+- horde;
+- excursion;
+- task/work;
+- news/follow-up;
+- post-combat/grounded scene events.
 
-Extend existing inspection tooling so an agent can locate a semantic ID and see:
-- package/owner;
-- authored source path;
-- imported package dependencies;
-- kind: dialogue/behavior/beat/recognition/realization;
-- capability requirements;
-- generated backend module(s);
-- consumers/references when available.
+Beats, dialogue and realizations should use the same hierarchy when they genuinely contain multiple semantic subdomains.
 
-Preferred CLI shape may be:
+Preserve:
+- stable semantic IDs;
+- package ownership;
+- capability contracts;
+- realization handles;
+- source-lineage diagnostics;
+- broad runtime domain semantics where required.
+
+Adding another variant to a type should normally mean adding a source file beside related variants, not growing a giant catch-all file.
+
+**Gate:** representative Core and Hoomans types have coherent source subdomains and compile to semantically equivalent canonical/portable plans.
+
+## G9R3 — normalize generated surfaces by owner + semantic path
+
+Remove hard-coded broad aggregation such as:
 
 ```text
-psdl locate <semantic-id>
-psdl get <semantic-id> --summary
-psdl impact <semantic-id>
+all behaviors → social
+all beats → social
 ```
 
-Do not create a duplicate index authority; derive from the canonical compiler/package model.
+Generated grouping should be based on:
 
-**Gate:** representative Hoomans/Core/DT semantic IDs are traceable source → package → portable plan → generated module with compact output.
+```text
+owner/package
++ kind
++ semantic domain path
+```
 
-## G9E — committed-vector migration/rebuild closure
+Both the dedicated director data and portable runtime-plan surfaces must use the same semantic decomposition.
 
-After G9A–D:
-1. run package/ownership/naming/navigation tests;
-2. canonical reconcile check clean before apply;
+Example shape:
+
+```text
+PsychopatzCore/ConvoEngine/
+  Behavior/Social/Acknowledgement.lua
+  Behavior/Social/Conflict.lua
+  Behavior/Social/Repair.lua
+
+  Behaviors/Director/Social/Acknowledgement.lua
+  Behaviors/Director/Social/Conflict.lua
+  Behaviors/Director/Social/Repair.lua
+```
+
+ProjectHoomans-owned scene behavior must not be serialized into a Core-owned director payload merely because it uses Core's director runtime.
+
+If a broad `Social.lua` compatibility/aggregator module is retained, it must be a small generated composition layer, not the monolithic semantic data payload.
+
+Fix naming-registry scope so distinct owner/module namespaces do not create false collisions.
+
+Do not create a second semantic authority. Both generated surfaces remain projections of the same canonical PSDL/Portable Dialogue Plan.
+
+**Gate:** generated module ownership mirrors package ownership, semantic groups are readable, and no broad director payload crosses package boundaries.
+
+## G9R4 — global readable naming + variant-growth stability
+
+Apply readable naming acceptance to every owner, not only ProjectHoomans.
+
+Required global result:
+
+```text
+PsychopatzCore avoidable __????????.lua = 0
+ProjectHoomans avoidable __????????.lua = 0
+DTCommon avoidable __????????.lua = 0
+```
+
+Hashes remain legal only for a proven true residual collision or hard backend/filesystem constraint.
+
+Size/record budgets remain safety limits inside an already coherent semantic group. If one semantic subdomain still exceeds a budget, split that group with readable deterministic semantic chunk labels.
+
+Stability tests must prove:
+- adding an unrelated subdomain does not rename existing modules;
+- adding a variant to `social/conflict` does not rename `social/repair` modules;
+- source enumeration order does not change names;
+- owner A cannot force a hash in owner B's namespace;
+- retired old hash modules/references reconcile automatically.
+
+Extend `locate`/audit output to report `domainPath` and generated surface(s).
+
+**Gate:** all avoidable hashes are gone globally and ordinary variant growth changes only the relevant semantic group.
+
+## G9R5 — committed-vector closure
+
+After G9R1–G9R4:
+1. run new domain/grouping/owner-isolation/naming-stability tests;
+2. run G9 package tests;
 3. run G8R7 portability tests and G8 production tests;
 4. run lifecycle tests;
-5. run naming/sharding determinism audit;
-6. reconstruct final participant commit vector;
-7. delete ledger-owned generated artifacts and rebuild;
-8. verify second build no-op and final check clean;
-9. verify no stale old hashed module references/artifacts remain;
-10. reconcile active docs to COMPLETE;
-11. commit participant repos first, ProjectHoomans/job docs last.
+5. canonical reconcile check clean before apply;
+6. run `audit-s6m8 --check-determinism`;
+7. reconstruct the final participant commit vector;
+8. delete ledger-owned generated artifacts and rebuild;
+9. verify second build no-op and final check clean;
+10. verify old `Social__*`, `CoreKnowledgeFacts__*`, and any other retired avoidable hash references/artifacts are absent;
+11. reconcile active docs to COMPLETE;
+12. commit participant repos first and ProjectHoomans/job docs last.
 
-**Gate:** package ownership is self-explanatory, generated naming is readable/stable, and final committed vector remains fully deterministic.
+**Gate:** source and generated layouts are semantically decomposed, package-isolated, readable and deterministic across the final committed vector.
 
 ## Non-goals
 
-- do not remove shard size/record safety budgets;
-- do not rename stable semantic IDs for aesthetics;
+- do not remove the 192 KiB / 32-record safety budgets merely to avoid shards;
+- do not rename stable semantic IDs for filesystem aesthetics;
 - do not move game mechanics into PSDL;
-- do not build Unity/Godot backends;
-- do not make Core know future adopters;
-- do not hand-rename generated Lua.
+- do not create file-per-phrase or arbitrary PartNN decomposition;
+- do not hand-rename generated Lua;
+- do not reopen backend portability architecture unless a regression is found.

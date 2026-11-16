@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.bandits.hooman_hurt.colonist",
             ["initiatingSay"] = {
@@ -160,6 +161,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.bandits.hooman_hurt.default",
             ["initiatingSay"] = {
@@ -318,6 +320,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.bandits.hooman_hurt.family",
             ["initiatingSay"] = {
@@ -476,6 +479,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.bandits.hooman_hurt.lover",
             ["initiatingSay"] = {
@@ -634,6 +638,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.companion_dogs.feed.female",
             ["initiatingSay"] = {
@@ -792,6 +797,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.companion_dogs.feed.male",
             ["initiatingSay"] = {
@@ -950,6 +956,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.companion_dogs.feed.unknown",
             ["initiatingSay"] = {
@@ -1108,6 +1115,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.companion_dogs.greeting.female",
             ["initiatingSay"] = {
@@ -1266,6 +1274,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.companion_dogs.greeting.male",
             ["initiatingSay"] = {
@@ -1424,6 +1433,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.companion_dogs.greeting.unknown",
             ["initiatingSay"] = {
@@ -1582,6 +1592,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.necroa.mask_warning.colonist",
             ["initiatingSay"] = {
@@ -1740,6 +1751,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.necroa.mask_warning.default",
             ["initiatingSay"] = {
@@ -1898,6 +1910,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.necroa.mask_warning.family",
             ["initiatingSay"] = {
@@ -2056,6 +2069,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.necroa.player_mask_removed.default",
             ["initiatingSay"] = {
@@ -2214,6 +2228,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.necroa.player_mask_removed.hostile",
             ["initiatingSay"] = {
@@ -2372,6 +2387,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.necroa.player_mask_removed.lover",
             ["initiatingSay"] = {
@@ -2530,6 +2546,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.encounter.friendly",
             ["initiatingSay"] = {
@@ -2688,6 +2705,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.encounter.hostile",
             ["initiatingSay"] = {
@@ -2846,6 +2864,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.encounter.unknown",
             ["initiatingSay"] = {
@@ -3004,6 +3023,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.faction.hostile",
             ["initiatingSay"] = {
@@ -3162,6 +3182,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.faction.incoming",
             ["initiatingSay"] = {
@@ -3320,6 +3341,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.faction.outgoing",
             ["initiatingSay"] = {
@@ -3478,6 +3500,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.meta.aircraft.heli",
             ["initiatingSay"] = {
@@ -3636,6 +3659,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.meta.aircraft.military",
             ["initiatingSay"] = {
@@ -3794,6 +3818,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.meta.ambience",
             ["initiatingSay"] = {
@@ -3952,6 +3977,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.meta.crash",
             ["initiatingSay"] = {
@@ -4110,6 +4136,7 @@ return {
     },
     {
         ["domain"] = "compatibility_content",
+        ["domainPath"] = "compatibility_content",
         ["exchangeFamily"] = {
             ["familyID"] = "integration.projectalife.meta.gunfire",
             ["initiatingSay"] = {

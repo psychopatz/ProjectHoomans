@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "event_reactions_farewell",
+        ["domainPath"] = "event_reactions_farewell",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.farewell.default",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_farewell",
+        ["domainPath"] = "event_reactions_farewell",
         ["exchangeFamily"] = {
             ["familyID"] = "flow.farewell.friendly",
             ["initiatingSay"] = {

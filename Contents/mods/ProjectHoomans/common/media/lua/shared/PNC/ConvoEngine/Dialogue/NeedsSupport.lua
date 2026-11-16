@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "needs_support",
+        ["domainPath"] = "needs_support",
         ["id"] = "needs.member.support",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -390,6 +391,7 @@ return {
     },
     {
         ["domain"] = "needs_support",
+        ["domainPath"] = "needs_support",
         ["id"] = "needs.neutral.support",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -778,6 +780,7 @@ return {
     },
     {
         ["domain"] = "needs_support",
+        ["domainPath"] = "needs_support",
         ["id"] = "needs.special.support",
         ["kind"] = "dialogue",
         ["lineage"] = {

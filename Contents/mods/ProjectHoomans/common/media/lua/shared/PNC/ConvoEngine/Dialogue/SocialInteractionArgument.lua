@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_interaction_argument",
+        ["domainPath"] = "social_interaction_argument",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.argument.deescalate",
             ["initiatingSay"] = {
@@ -613,6 +614,7 @@ return {
     },
     {
         ["domain"] = "social_interaction_argument",
+        ["domainPath"] = "social_interaction_argument",
         ["exchangeFamily"] = {
             ["familyID"] = "interaction.argument.retaliate",
             ["initiatingSay"] = {

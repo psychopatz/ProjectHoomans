@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.member.dusk",
             ["initiatingSay"] = {
@@ -257,6 +258,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.member.sunrise",
             ["initiatingSay"] = {
@@ -512,6 +514,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.member.sunset",
             ["initiatingSay"] = {
@@ -767,6 +770,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.member.twilight",
             ["initiatingSay"] = {

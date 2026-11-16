@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.choice.avoid",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.choice.engage",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.choice.hold",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.deescalated",
             ["initiatingSay"] = {
@@ -922,6 +926,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.default",
             ["initiatingSay"] = {
@@ -1152,6 +1157,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.escalated",
             ["initiatingSay"] = {
@@ -1382,6 +1388,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.prompt.default",
             ["initiatingSay"] = {
@@ -1612,6 +1619,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.prompt.eager",
             ["initiatingSay"] = {
@@ -1842,6 +1850,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.prompt.reserved",
             ["initiatingSay"] = {
@@ -2072,6 +2081,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.prompt.shaken",
             ["initiatingSay"] = {
@@ -2302,6 +2312,7 @@ return {
     },
     {
         ["domain"] = "companion_commands_combat",
+        ["domainPath"] = "companion_commands_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.horde.started",
             ["initiatingSay"] = {

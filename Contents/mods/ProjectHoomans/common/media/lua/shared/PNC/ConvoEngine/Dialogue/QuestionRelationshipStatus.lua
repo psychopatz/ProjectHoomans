@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "question_relationship_status",
+        ["domainPath"] = "question_relationship_status",
         ["exchangeFamily"] = {
             ["familyID"] = "question.relationship_status.responses",
             ["initiatingSay"] = {

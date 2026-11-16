@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.bandage",
             ["initiatingSay"] = {
@@ -231,6 +232,7 @@ return {
     },
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.bleedout",
             ["initiatingSay"] = {
@@ -460,6 +462,7 @@ return {
     },
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.default",
             ["initiatingSay"] = {
@@ -689,6 +692,7 @@ return {
     },
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.dehydration",
             ["initiatingSay"] = {
@@ -918,6 +922,7 @@ return {
     },
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.exhaustion",
             ["initiatingSay"] = {
@@ -1147,6 +1152,7 @@ return {
     },
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.mercy",
             ["initiatingSay"] = {
@@ -1376,6 +1382,7 @@ return {
     },
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.rescue",
             ["initiatingSay"] = {
@@ -1605,6 +1612,7 @@ return {
     },
     {
         ["domain"] = "medical_event_update",
+        ["domainPath"] = "medical_event_update",
         ["exchangeFamily"] = {
             ["familyID"] = "medical.distress.update.starvation",
             ["initiatingSay"] = {

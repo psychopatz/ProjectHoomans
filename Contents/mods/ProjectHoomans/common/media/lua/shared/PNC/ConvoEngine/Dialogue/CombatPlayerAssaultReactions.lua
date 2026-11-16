@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_player_assault_reactions",
+        ["domainPath"] = "combat_player_assault_reactions",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.player_assaulted.aggressive",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_player_assault_reactions",
+        ["domainPath"] = "combat_player_assault_reactions",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.player_assaulted.brave",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "combat_player_assault_reactions",
+        ["domainPath"] = "combat_player_assault_reactions",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.player_assaulted.default",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "combat_player_assault_reactions",
+        ["domainPath"] = "combat_player_assault_reactions",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.player_assaulted.reserved",
             ["initiatingSay"] = {
@@ -922,6 +926,7 @@ return {
     },
     {
         ["domain"] = "combat_player_assault_reactions",
+        ["domainPath"] = "combat_player_assault_reactions",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.player_assaulted.shaken",
             ["initiatingSay"] = {

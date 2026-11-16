@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.hostile",
             ["initiatingSay"] = {
@@ -514,6 +515,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.insult",
             ["initiatingSay"] = {
@@ -1026,6 +1028,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.orientation",
             ["initiatingSay"] = {
@@ -1397,6 +1400,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.personality",
             ["initiatingSay"] = {
@@ -1768,6 +1772,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.praise",
             ["initiatingSay"] = {
@@ -2280,6 +2285,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.relationship",
             ["initiatingSay"] = {
@@ -2651,6 +2657,7 @@ return {
     },
     {
         ["domain"] = "social_tool_replies_boundary_identity",
+        ["domainPath"] = "social_tool_replies_boundary_identity",
         ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.romantic",
             ["initiatingSay"] = {

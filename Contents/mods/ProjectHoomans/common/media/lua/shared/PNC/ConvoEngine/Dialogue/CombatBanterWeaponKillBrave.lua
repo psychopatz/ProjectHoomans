@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_brave",
+        ["domainPath"] = "combat_banter_weapon_kill_brave",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.brave.axe",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_brave",
+        ["domainPath"] = "combat_banter_weapon_kill_brave",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.brave.blade_head",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_brave",
+        ["domainPath"] = "combat_banter_weapon_kill_brave",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.brave.firearm_high",
             ["initiatingSay"] = {
@@ -692,6 +695,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_brave",
+        ["domainPath"] = "combat_banter_weapon_kill_brave",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.brave.spear",
             ["initiatingSay"] = {

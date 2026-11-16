@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.thumbsup",
             ["initiatingSay"] = {
@@ -359,6 +360,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.thumbsup.active",
             ["initiatingSay"] = {
@@ -589,6 +591,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.wavebye",
             ["initiatingSay"] = {
@@ -946,6 +949,7 @@ return {
     },
     {
         ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.wavehi",
             ["initiatingSay"] = {

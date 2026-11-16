@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "combat_banter_weapon_kill_shaken",
+        ["domainPath"] = "combat_banter_weapon_kill_shaken",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.shaken.blade_head",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_shaken",
+        ["domainPath"] = "combat_banter_weapon_kill_shaken",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.shaken.firearm_low",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "combat_banter_weapon_kill_shaken",
+        ["domainPath"] = "combat_banter_weapon_kill_shaken",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.kill.killer.shaken.unarmed",
             ["initiatingSay"] = {

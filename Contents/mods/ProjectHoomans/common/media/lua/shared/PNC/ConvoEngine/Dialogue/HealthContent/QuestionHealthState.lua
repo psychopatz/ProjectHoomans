@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "health_content",
+        ["domainPath"] = "health_content",
         ["exchangeFamily"] = {
             ["familyID"] = "question.health_state",
             ["namespace"] = "question",

@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "event_reactions_combat",
+        ["domainPath"] = "event_reactions_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.reaction.default",
             ["initiatingSay"] = {
@@ -232,6 +233,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_combat",
+        ["domainPath"] = "event_reactions_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.reaction.retreat",
             ["initiatingSay"] = {
@@ -462,6 +464,7 @@ return {
     },
     {
         ["domain"] = "event_reactions_combat",
+        ["domainPath"] = "event_reactions_combat",
         ["exchangeFamily"] = {
             ["familyID"] = "combat.reaction.threat",
             ["initiatingSay"] = {

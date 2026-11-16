@@ -2,6 +2,7 @@
 return {
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.acquaintance.dawn",
             ["initiatingSay"] = {
@@ -257,6 +258,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.acquaintance.dusk",
             ["initiatingSay"] = {
@@ -512,6 +514,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.acquaintance.sunrise",
             ["initiatingSay"] = {
@@ -767,6 +770,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.acquaintance.sunset",
             ["initiatingSay"] = {
@@ -1022,6 +1026,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.acquaintance.twilight",
             ["initiatingSay"] = {
@@ -1277,6 +1282,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.firstmeet.dawn",
             ["initiatingSay"] = {
@@ -1532,6 +1538,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.firstmeet.dusk",
             ["initiatingSay"] = {
@@ -1787,6 +1794,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.firstmeet.sunrise",
             ["initiatingSay"] = {
@@ -2042,6 +2050,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.firstmeet.sunset",
             ["initiatingSay"] = {
@@ -2297,6 +2306,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.firstmeet.twilight",
             ["initiatingSay"] = {
@@ -2552,6 +2562,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["id"] = "social.greetings.hostile.parley",
         ["kind"] = "dialogue",
         ["lineage"] = {
@@ -2716,6 +2727,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.lover.dawn",
             ["initiatingSay"] = {
@@ -2971,6 +2983,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.lover.dusk",
             ["initiatingSay"] = {
@@ -3226,6 +3239,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.lover.sunrise",
             ["initiatingSay"] = {
@@ -3481,6 +3495,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.lover.sunset",
             ["initiatingSay"] = {
@@ -3736,6 +3751,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.lover.twilight",
             ["initiatingSay"] = {
@@ -3991,6 +4007,7 @@ return {
     },
     {
         ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.member.dawn",
             ["initiatingSay"] = {
