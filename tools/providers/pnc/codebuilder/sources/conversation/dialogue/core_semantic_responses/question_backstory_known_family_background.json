@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.backstory.known",
-  "id": "family_background",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.backstory.known.family_background",
   "metadata": {
     "responsePoolID": "question.backstory.known.family_background",
     "responseAct": "FAMILY_BACKGROUND"

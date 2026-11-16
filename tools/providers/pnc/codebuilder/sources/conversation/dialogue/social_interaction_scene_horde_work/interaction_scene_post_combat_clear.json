@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.scene",
-  "id": "post_combat_clear",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.scene.post_combat_clear",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Looks clear now. That got rough for a minute.",
-            "Area is secure. Check yourselves for injuries.",
-            "They're all down. Take a breath and reload.",
-            "Fight's over. Good work holding the line.",
-            "Looks like the immediate threat is dealt with.",
-            "Clear. Everyone still in one piece?",
-            "Threat neutralized. Let's recover our stamina.",
-            "It's quiet again. Stay alert for stragglers.",
-            "Combat is finished. Reload and bandage up.",
-            "We held them off. Area appears clear."
-          ],
-          "TL": [
-            "Mukhang malinaw na. Naging delikado sandali.",
-            "Ligtas na ang lugar. Tingnan niyo kung may mga sugat kayo.",
-            "Tumba na silang lahat. Huminga at magkarga ng bala.",
-            "Tapos na ang laban. Magandang pagpigil sa linya.",
-            "Mukhang naasikaso na ang agarang banta.",
-            "Malinaw. Buo pa ba ang lahat?",
-            "Nalipol ang banta. Bawiin natin ang lakas natin.",
-            "Tahimik na ulit. Magbantay sa mga naiwan.",
-            "Tapos na ang bakbakan. Magkarga at magbenda.",
-            "Naitaboy natin sila. Mukhang malinis na ang lugar."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "Don't relax yet. Scan for stragglers.",
-            "Down, but keep your weapon ready. More could be coming.",
-            "Check your perimeter before you start celebrating.",
-            "Check every corpse. Make sure they stay down.",
-            "Gunfire brings more of them. We need to be ready to move.",
-            "Wipe your blade and reload immediately.",
-            "Are you bitten? Answer me right now.",
-            "Threat is dead, but noise travels fast out here.",
-            "Keep low. Don't silhouette yourself in the doorway.",
-            "Clear for now. Expect a second wave."
-          ],
-          "TL": [
-            "Huwag munang magpakampante. Maghanap ng mga naiwan.",
-            "Tumba na, pero ihanda ang armas. Baka may paparating pa.",
-            "Suriin ang paligid bago magdiwang.",
-            "Tingnan ang bawat bangkay. Tiyaking hindi na gagalaw.",
-            "Nakahahatak ng iba ang putok. Maging handa tayong umalis.",
-            "Punasan ang talim at magkarga agad ng bala.",
-            "Kinagat ka ba? Sagutin mo ako ngayon din.",
-            "Patay ang banta, pero mabilis kumalat ang ingay dito.",
-            "Yumuko ka. Huwag mong i-expose ang sarili mo sa pinto.",
-            "Malinis sa ngayon. Maghanda sa pangalawang bugso."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Clear.",
-            "All down.",
-            "Reload.",
-            "Check wounds.",
-            "Secure.",
-            "Done.",
-            "Quiet now.",
-            "Hold positions.",
-            "Breathe.",
-            "Threat gone."
-          ],
-          "TL": [
-            "Malinaw.",
-            "Tumba lahat.",
-            "Magkarga.",
-            "Tingnan ang sugat.",
-            "Ligtas.",
-            "Tapos.",
-            "Tahimik na.",
-            "Manatili sa pwesto.",
-            "Huminga.",
-            "Wala nang banta."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "We made it through! Is everyone okay?",
-            "Thank goodness you're alive. That was terrifying.",
-            "Great fighting, partner! I'm so glad we survived that.",
-            "Come here, let me check you over for bites or scratches.",
-            "We did it together. Nobody got left behind.",
-            "Take a breath, friend. We held the line.",
-            "I was worried for a second there, but you fought bravely.",
-            "Proud to stand beside you in that fight. We're safe now.",
-            "Rest for a minute. You earned it after that mess.",
-            "All clear! Hugely relieved we're both standing."
-          ],
-          "TL": [
-            "Nakalusot tayo! Ayos lang ba ang lahat?",
-            "Salamat sa Diyos at buhay ka. Napakatindi noon.",
-            "Napakagaling mong lumaban, kasama! Masayang-masaya ako't nakaligtas tayo.",
-            "Halika rito, titingnan ko kung may kagat o gasgas ka.",
-            "Nagawa natin nang magkasama. Walang naiwan sa atin.",
-            "Huminga ka muna, kaibigan. Naipagtanggol natin ang pwesto.",
-            "Nag-alala ako nang sandali, pero buong tapang kang lumaban.",
-            "Ipinagmamalaki kong tumabi sa 'yo sa laban. Ligtas na tayo ngayon.",
-            "Magpahinga ka muna. Karapat-dapat ka roon pagkatapos ng gulo.",
-            "Malinis na! Napakalaking ginhawa na nakatayo pa tayong pareho."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_scene_post_combat_clear.en.json",
+    "TL": "translations/interaction_scene_post_combat_clear.tl.json"
   }
 }

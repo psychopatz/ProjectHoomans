@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Naghahanda na tayong umalis.",
+      "Suriing muli ang bag at gamit bago tayo umalis.",
+      "Naghahanda na para sa pagbiyahe ngayon.",
+      "Tipunin ang kailangan mo. Aalis na agad.",
+      "Suriin ang armas, pagkain, at tubig.",
+      "Naghahanda para sa paglabas. Halos handa na.",
+      "Tiyaking walang mahahalagang gamit na maiiwan.",
+      "Inaayos ang lahat para sa paglalakbay.",
+      "Huling pagsusuri bago buksan ang tarangkahan.",
+      "Ihanda ang mga supply. Kikilos na tayo maya-maya."
+    ],
+    "guarded": [
+      "Maghanda muna. Aalis tayo kapag handa na ang lahat.",
+      "Kapag may naiwan kang mahalaga, walang babalik para sa 'yo.",
+      "Bilangin ang bala mo nang dalawang beses. Walang palusot.",
+      "Hasiin ang talim mo ngayon. Walang hinto para magkumpuni sa labas.",
+      "Magdala ng magaan at nakamamatay. Huwag magdala ng kalat.",
+      "Suriin ang sapatos mo. Nakamamatay ang maipit ang paa sa labas.",
+      "Maging handang-handa bago lumabas sa tarangkahang 'yan.",
+      "Tingnan ang gamot mo. Kapag nagdugo ka, gamutin mo sarili mo.",
+      "Naghahanda na. Maging disiplinado paglabas natin.",
+      "Magkarga ng armas. Huwag mong pabagalin ang grupo."
+    ],
+    "terse": [
+      "Maghanda. Aalis tayo agad.",
+      "Mag-impake.",
+      "Tingnan ang gamit.",
+      "Naghahanda.",
+      "Ihanda ang karga.",
+      "Malapit na.",
+      "Ihanda ang armas.",
+      "Aalis na agad.",
+      "Handa na ang supply.",
+      "Huling pagsusuri."
+    ],
+    "warm": [
+      "Naghahanda na tayo. Siguraduhin mong dala mo ang kailangan mo.",
+      "Maghanda nang mabuti, kaibigan. Mas mabuting handa.",
+      "Kailangan mo ba ng tulong sa pag-iimpake, kasama?",
+      "May sobra akong bendahe kung kailangan mo. Maghanda tayo nang maayos.",
+      "Kaba at sabik, pero magkasama tayo. Maghanda na!",
+      "Tiyaking nakakain at nakainom ka bago tayo umalis.",
+      "Naghahanda na! Gagawin nating matagumpay ang biyaheng ito.",
+      "Suriin ang bota at bendahe mo, kaibigan.",
+      "Nandito lang ako naghahanda kasabay mo. Magiging maayos tayo.",
+      "Inihahanda ang mga gamit. Maging positibo, kaya natin ito!"
+    ]
+  }
+}

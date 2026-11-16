@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.wellbeing",
-  "id": "injured",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.wellbeing.injured",
   "metadata": {
     "category": "projecthoomans:wellbeing_content",
     "contentOwner": "projecthoomans.dialogue_content.wellbeing",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "A little banged up, but I'll manage.",
-            "Took a hit during the last scrap. Need to bandage up.",
-            "I'm nursing a couple wounds, but nothing fatal.",
-            "Hurts to move quickly, but I can still walk.",
-            "Got tagged out there. Keeping an eye on the bleeding.",
-            "Bruised and aching all over, but I'll pull through.",
-            "Scraped up pretty bad, but still on two feet.",
-            "Need some clean bandages soon, but I'm holding together.",
-            "Took a rough fall earlier. Still feeling the sting.",
-            "Not in peak shape right now, but I can carry on."
-          ],
-          "TL": [
-            "Medyo may tama ako, pero kakayanin ko.",
-            "Tinamaan ako noong huling laban. Kailangan kong bendahan ito.",
-            "May iniinda akong ilang sugat, pero hindi naman nakamamatay.",
-            "Masakit kumilos nang mabilis, pero nakakalakad pa ako.",
-            "Tinamaan ako sa labas. Binabantayan ko ang pagdurugo.",
-            "Pasa-pasa at masakit ang buong katawan, pero makakaraos din.",
-            "Medyo malala ang gasgas ko, pero nakatayo pa rin sa dalawang paa.",
-            "Kailangan ko ng malinis na benda agad, pero maayos pa naman.",
-            "Medyo napasama ang bagsak ko kanina. Kumikirot pa rin.",
-            "Hindi ako nasa pinakamagandang kondisyon, pero kaya pang ituloy."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "I'm hurt. That's all I can say.",
-            "Took some damage. I'll patch it myself, don't worry.",
-            "Bleeding a little, but I can still defend myself.",
-            "It's just a flesh wound. Keep your distance.",
-            "I'm wounded, but I don't need charity.",
-            "Hurts like hell, but I'm holding my ground.",
-            "Got scraped up. Mind your own injuries.",
-            "Don't stare at the bandages. I'm still functional.",
-            "A rough encounter, but I survived it. Back off.",
-            "I'll manage the pain on my own, thanks."
-          ],
-          "TL": [
-            "Nasaktan ako. Iyon lang ang masasabi ko.",
-            "Tinamaan ako. Ako na ang gagamot dito, huwag kang mag-alala.",
-            "Dumudugo nang kaunti, pero kaya ko pa ring lumaban.",
-            "Daplis lang ito. Lumayo ka muna.",
-            "May sugat ako, pero hindi ko kailangan ng awa.",
-            "Sobrang sakit, pero hindi ako aatras.",
-            "Nagasgasan lang. Asikasuhin mo ang sarili mong sugat.",
-            "Huwag mong titigan ang benda ko. Kaya ko pang kumilos.",
-            "Medyo magulo ang engkuwentro, pero nakaligtas ako. Umatras ka.",
-            "Kakayanin ko ang sakit mag-isa, salamat."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "I'm hurt. I can manage.",
-            "Bleeding.",
-            "Took a hit.",
-            "Bruised up.",
-            "Hurts.",
-            "Need bandages.",
-            "Still walking.",
-            "Minor wound.",
-            "Stings like hell.",
-            "Managing the pain."
-          ],
-          "TL": [
-            "Nasaktan ako. Kaya ko.",
-            "Dumudugo.",
-            "Tinamaan ako.",
-            "May pasa.",
-            "Masakit.",
-            "Kailangan ng benda.",
-            "Nakakalakad pa.",
-            "Maliit na sugat lang.",
-            "Napakasakit.",
-            "Tinitiis ang sakit."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "I took a hit, but I'm steady enough to keep going.",
-            "Appreciate you checking. It stings, but I'll be fine.",
-            "Got banged up a bit. Having you around makes it easier.",
-            "Don't worry too much. I'll get this patched up in no time.",
-            "Took a knock, but seeing you safe helps take the edge off.",
-            "I'll pull through, friend. Thanks for watching out for me.",
-            "Nothing we can't patch up together. Appreciate the concern.",
-            "Just a bad scratch. I'll be back at full strength soon.",
-            "It hurts, but I know we've got each other's backs.",
-            "A bit bruised, but your concern means the world to me."
-          ],
-          "TL": [
-            "Nasaktan ako, pero kaya ko pang magpatuloy.",
-            "Salamat sa pag-alala. Kumikirot, pero magiging maayos din ako.",
-            "Medyo nasugatan ako. Mas gumaan ang loob ko dahil nandito ka.",
-            "Huwag kang masyadong mag-alala. Magagamot ko rin ito agad.",
-            "Tinamaan ako nang bahagya, pero nakakabawas ng sakit na ligtas ka.",
-            "Kakayanin ko ito, kaibigan. Salamat sa pagbabantay sa akin.",
-            "Kaya nating gamutin ito nang magkasama. Salamat sa malasakit.",
-            "Malalim na gasgas lang ito. Babalik din ang buong lakas ko agad.",
-            "Masakit, pero alam kong nagtutulungan tayo.",
-            "Pasa-pasa ako, pero malaking bagay sa akin ang pag-aalala mo."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/question_wellbeing_injured.en.json",
+    "TL": "translations/question_wellbeing_injured.tl.json"
   }
 }

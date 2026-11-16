@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "integration.companion_dogs.feed",
-  "id": "unknown",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "integration.companion_dogs.feed.unknown",
   "metadata": {
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",

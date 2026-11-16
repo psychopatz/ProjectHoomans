@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question",
-  "id": "activity",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.activity",
   "metadata": {
     "responsePoolID": "question.activity",
     "responseAct": "ACTIVITY"
@@ -12,10 +9,6 @@
     "variants": [
       {
         "id": "question.activity.dataset.keep_moving",
-        "text": {
-          "EN": "Just doing what I can to keep things moving.",
-          "TL": "Just doing what I can to keep things moving."
-        },
         "metadata": {
           "fallback": "Just doing what I can to keep things moving.",
           "templateID": "question.activity.dataset.keep_moving"
@@ -23,10 +16,6 @@
       },
       {
         "id": "question.activity.dataset.bit_of_everything",
-        "text": {
-          "EN": "A little bit of everything.",
-          "TL": "A little bit of everything."
-        },
         "metadata": {
           "fallback": "A little bit of everything.",
           "templateID": "question.activity.dataset.bit_of_everything"
@@ -34,15 +23,15 @@
       },
       {
         "id": "question.activity.dataset.taking_care",
-        "text": {
-          "EN": "Just taking care of what needs doing.",
-          "TL": "Just taking care of what needs doing."
-        },
         "metadata": {
           "fallback": "Just taking care of what needs doing.",
           "templateID": "question.activity.dataset.taking_care"
         }
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/question_activity.en.json",
+    "TL": "translations/question_activity.tl.json"
   }
 }

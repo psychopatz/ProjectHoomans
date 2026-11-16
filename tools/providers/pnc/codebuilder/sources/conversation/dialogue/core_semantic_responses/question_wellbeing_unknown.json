@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.wellbeing",
-  "id": "unknown",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.wellbeing.unknown",
   "metadata": {
     "responsePoolID": "question.wellbeing.unknown",
     "responseAct": "UNKNOWN"
@@ -16,20 +13,7 @@
           "EN": "I can tell something is off, but I do not know what caused it yet.",
           "TL": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito."
         },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.healthState",
-              "value": "unknown"
-            },
-            {
-              "op": "eq",
-              "path": "conversation.pattern",
-              "value": "pnc.dataset.question.wellbeing.what_is_going_on_with_you"
-            }
-          ]
-        },
+        "when": "conversation.healthState == \"unknown\" && conversation.pattern == \"pnc.dataset.question.wellbeing.what_is_going_on_with_you\"",
         "metadata": {
           "fallback": "I can tell something is off, but I do not know what caused it yet.",
           "plan": {

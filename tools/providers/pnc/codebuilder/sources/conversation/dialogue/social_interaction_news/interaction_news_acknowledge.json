@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.news",
-  "id": "acknowledge",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.news.acknowledge",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "That's good to know.",
-            "Appreciate the update.",
-            "I'll keep that intelligence in mind.",
-            "Good to have fresh news from the area.",
-            "Thanks for passing that along.",
-            "Understood. That changes how we look at the sector.",
-            "Good information. We'll plan around it.",
-            "Noted. Reliable news is hard to come by.",
-            "Thanks for keeping me informed.",
-            "That helps clear up a few rumors. Thanks."
-          ],
-          "TL": [
-            "Mabuting malaman iyan.",
-            "Salamat sa balita.",
-            "Isasaisip ko ang impormasyong iyan.",
-            "Mabuting makatanggap ng bagong balita mula sa lugar.",
-            "Salamat sa pagpasa niyan.",
-            "Naintindihan. Binabago niyan ang pananaw natin sa lugar.",
-            "Magandang impormasyon. Magpaplano tayo batay diyan.",
-            "Tala ko na. Mahirap makahanap ng maaasahang balita.",
-            "Salamat sa pagpapanatili sa aking may alam.",
-            "Nakatulong 'yan para maalis ang ilang sabi-sabi. Salamat."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "I'll keep it in mind.",
-            "Where did you hear that from?",
-            "I'll believe it when I see it with my own eyes.",
-            "Rumors can get people killed out here. Be sure of your facts.",
-            "Noted, but I'll verify that myself.",
-            "Could be a setup. Don't act on rumors too quickly.",
-            "Who gave you that information?",
-            "I'll take it under advisement, but keep my distance.",
-            "Don't spread that around until we know it's solid.",
-            "Heard. I'll watch for confirming signs."
-          ],
-          "TL": [
-            "Tatandaan ko iyan.",
-            "Saan mo narinig ang balitang 'yan?",
-            "Maniwala lang ako kapag nakita ko na ng sarili kong mata.",
-            "Ang tsismis ay nakamamatay dito. Tiyakin mo ang katotohanan.",
-            "Tala ko na, pero kumpirmahin ko muna sa sarili ko.",
-            "Baka bitag 'yan. Huwag kumilos sa sabi-sabi nang padalos-dalos.",
-            "Sinong nagbigay sa 'yo ng impormasyong 'yan?",
-            "Isasaalang-alang ko, pero magmamasid pa rin ako mula sa malayo.",
-            "Huwag mong ikalat 'yan hangga't di tiyak na totoo.",
-            "Narinig ko. Magmamasid ako ng mga patunay."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Got it.",
-            "Noted.",
-            "Heard.",
-            "Good info.",
-            "Understood.",
-            "Clear.",
-            "Thanks.",
-            "Right.",
-            "Acknowledged.",
-            "Useful."
-          ],
-          "TL": [
-            "Sige.",
-            "Tala ko na.",
-            "Narinig ko.",
-            "Magandang balita.",
-            "Naintindihan.",
-            "Malinaw.",
-            "Salamat.",
-            "Tama.",
-            "Kinikilala ko.",
-            "May silbi."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Thanks for telling me. I'll keep that in mind.",
-            "That's huge news, friend! Thank you for sharing.",
-            "Always glad to know you're looking out for me with news like this.",
-            "You have great sources! Thanks a ton.",
-            "I really appreciate you giving me the heads up first.",
-            "Good news is worth its weight in gold out here. Thanks!",
-            "Thanks for sharing that with me. It gives me hope.",
-            "I'm relieved to hear that. Thank you so much, partner.",
-            "That's fantastic information. Appreciate you keeping us safe.",
-            "Thanks! Let's make sure the others hear this too."
-          ],
-          "TL": [
-            "Salamat sa pagsabi. Tatandaan ko iyan.",
-            "Napakalaking balita niyan, kaibigan! Salamat sa pagbabahagi.",
-            "Lagi akong masaya na binabantayan mo ako sa mga ganitong balita.",
-            "Napakagaling ng mga pinagkukunan mo! Maraming salamat.",
-            "Talagang pinahahalagahan ko na ako ang unang pinaalalahanan mo.",
-            "Ang magandang balita ay ginto ang halaga rito. Salamat!",
-            "Salamat sa pagbabahagi niyan sa akin. Nagbibigay ito ng pag-asa.",
-            "Nakahinga ako nang maluwag nang marinig 'yan. Salamat nang marami, kasama.",
-            "Napakagandang impormasyon. Salamat sa pag-iingat sa atin.",
-            "Salamat! Tiyakin nating marinig din ito ng iba."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_news_acknowledge.en.json",
+    "TL": "translations/interaction_news_acknowledge.tl.json"
   }
 }

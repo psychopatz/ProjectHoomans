@@ -868,6 +868,10 @@ return {
             },
         },
         ["payload"] = {
+            ["action"] = {
+                ["capability"] = "hoomans.camp.establish",
+                ["mutating"] = true,
+            },
             ["affordance"] = {
                 ["consumers"] = {
                     "player",
@@ -1308,6 +1312,9 @@ return {
                         ["value"] = "out_of_range",
                     },
                 },
+            },
+            ["requiredCapabilities"] = {
+                "hoomans.camp.establish",
             },
             ["say"] = {
                 ["keyOrder"] = {

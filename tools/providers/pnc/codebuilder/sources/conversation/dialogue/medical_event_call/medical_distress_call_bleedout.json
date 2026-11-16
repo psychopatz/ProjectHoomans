@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "medical.distress.call",
-  "id": "bleedout",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "medical.distress.call.bleedout",
   "metadata": {
     "category": "projecthoomans:medical_event",
     "responseAct": "MEDICAL_RESPONSE"

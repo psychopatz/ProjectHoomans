@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.wellbeing.follow_up",
-  "id": "responses",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.wellbeing.follow_up.responses",
   "metadata": {
     "textTarget": "convo/SemanticResponses",
     "textRows": [

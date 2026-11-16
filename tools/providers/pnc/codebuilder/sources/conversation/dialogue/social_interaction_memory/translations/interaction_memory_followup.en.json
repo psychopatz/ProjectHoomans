@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "You did? What happened after that?",
+      "How did you manage to get through it?",
+      "Did anyone else make it out with you?",
+      "Where did you go once that went down?",
+      "What made you think of that just now?",
+      "How long ago was that?",
+      "Were there many casualties back then?",
+      "What did you end up doing about it?",
+      "That sounds intense. What came next?",
+      "Did you ever go back to that place?"
+    ],
+    "guarded": [
+      "Why are you telling me that?",
+      "What's the point of bringing that up now?",
+      "Are you testing my reaction?",
+      "Who else knows about that story?",
+      "Why share something so personal with me?",
+      "Sounds like an angle. What do you really want?",
+      "Does that story have anything to do with our safety here?",
+      "Be careful what details you hand out to people.",
+      "Are you trying to gauge where my loyalties lie?",
+      "Keep your personal history to yourself."
+    ],
+    "terse": [
+      "And then?",
+      "What happened?",
+      "After that?",
+      "How so?",
+      "Who survived?",
+      "When?",
+      "Outcome?",
+      "Next?",
+      "Details?",
+      "End result?"
+    ],
+    "warm": [
+      "Really? Tell me more about that.",
+      "That sounds like quite a memory. How did it feel?",
+      "I'd love to hear the rest of that story if you want to share.",
+      "It must have taken real courage. How did you hold up?",
+      "You went through so much. I'm glad you're here to talk about it.",
+      "Were you able to save anything from back then?",
+      "I'm listening, friend. Take all the time you need.",
+      "That sounds like someone who mattered deeply to you.",
+      "What a journey. What kept you holding on?",
+      "Thank you for trusting me with that memory. What happened next?"
+    ]
+  }
+}

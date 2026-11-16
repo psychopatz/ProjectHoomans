@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Please leave me alone.",
+      "I need to be on my own right now.",
+      "I'm asking for privacy. Please respect it.",
+      "Go on. I'll be fine by myself.",
+      "Let's not interact for the rest of today.",
+      "I'd prefer not to speak to anyone right now.",
+      "Please walk away.",
+      "Give me time to myself.",
+      "I need some quiet. Leave me be.",
+      "We're done talking for now."
+    ],
+    "guarded": [
+      "Leave me alone. Now.",
+      "Get out of my sight.",
+      "Don't come near me.",
+      "I have nothing to say to you. Go.",
+      "Walk away while you still can.",
+      "Leave me be.",
+      "I'm done with you. Get lost.",
+      "Stay away from my corner.",
+      "Leave. Immediately.",
+      "Don't speak to me."
+    ],
+    "terse": [
+      "Leave.",
+      "Go.",
+      "Away.",
+      "Alone.",
+      "Out.",
+      "Walk.",
+      "Done.",
+      "Quiet.",
+      "Not now.",
+      "Get lost."
+    ],
+    "warm": [
+      "I just need some time alone, friend. Please.",
+      "It's not you, I promise. I just need to be by myself.",
+      "Please give me some quiet time. We'll talk later.",
+      "I'm in a dark headspace. I don't want to bring you down with me.",
+      "I need to withdraw for a little while. Take care of yourself.",
+      "Let me sit in the quiet. I'll find you when I'm ready.",
+      "Thank you for understanding. I just need space today.",
+      "Don't worry about me, but please let me be for now.",
+      "I promise I'll be okay. Just give me this time.",
+      "See you later, friend. I need the silence right now."
+    ]
+  }
+}

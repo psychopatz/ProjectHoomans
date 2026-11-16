@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "navigation",
-  "id": "orders",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "navigation.orders",
   "metadata": {
     "category": "projecthoomans:navigation",
     "responseAct": "NAVIGATION_RESPONSE"
@@ -19,121 +8,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "All right. What do you need?",
-            "What are your orders?",
-            "I'm ready for instructions. What should I do?",
-            "What do you need me to handle?",
-            "Give me the task.",
-            "What are our next steps?",
-            "Standing by for orders.",
-            "What would you like me to do next?",
-            "Tell me what needs doing.",
-            "Awaiting your directive."
-          ],
-          "TL": [
-            "Sige. Ano ang kailangan mo?",
-            "Ano ang mga utos mo?",
-            "Handa na ako sa tagubilin. Ano'ng dapat kong gawin?",
-            "Ano ang kailangan mong asikasuhin ko?",
-            "Ibigay mo sa akin ang gawain.",
-            "Ano ang susunod nating mga hakbang?",
-            "Nakaabang sa mga utos.",
-            "Ano ang gusto mong gawin ko susunod?",
-            "Sabihin mo kung ano ang kailangang gawin.",
-            "Naghihintay sa tagubilin mo."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "All right. What is it?",
-            "What order? Keep it realistic.",
-            "What do you want me to do? Nothing reckless.",
-            "Give the order, but watch my back.",
-            "What's the directive? Make it sensible.",
-            "I'm listening to commands, but I judge safety.",
-            "What do you need done? Don't waste my time.",
-            "State the command quickly.",
-            "What's the plan? Don't get us trapped.",
-            "What are your orders?"
-          ],
-          "TL": [
-            "Sige. Ano iyon?",
-            "Anong utos? Siguraduhing makatwiran.",
-            "Ano'ng gusto mong gawin ko? Huwag mapusok.",
-            "Ibigay ang utos, pero bantayan mo likod ko.",
-            "Ano'ng direktiba? Gawing may kabuluhan.",
-            "Nakikinig ako sa utos, pero ako ang humahatol sa kaligtasan.",
-            "Ano'ng kailangang gawin? Huwag sayangin ang oras ko.",
-            "Sabihin ang utos agad.",
-            "Ano'ng plano? Huwag tayong ipitin.",
-            "Ano ang mga utos mo?"
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "What do you need?",
-            "Orders?",
-            "Command?",
-            "Directive?",
-            "What's next?",
-            "Task?",
-            "Say the word.",
-            "What now?",
-            "Instructions?",
-            "Give order."
-          ],
-          "TL": [
-            "Ano ang kailangan mo?",
-            "Mga utos?",
-            "Utos?",
-            "Tagubilin?",
-            "Ano'ng susunod?",
-            "Gawain?",
-            "Sabihin mo lang.",
-            "Ano ngayon?",
-            "Mga bilin?",
-            "Mag-utos ka."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Sure. What do you need?",
-            "Whatever you need, I'm glad to help.",
-            "Just tell me what to do and I'll see to it.",
-            "Ready to work together. What's the plan?",
-            "What would you like me to take care of?",
-            "Always happy to lend a hand. What's the task?",
-            "Tell me how I can help you right now.",
-            "I'm with you all the way. What do you need?",
-            "Happy to follow your lead. What's next?",
-            "Give me a job and I'll do my best."
-          ],
-          "TL": [
-            "Sige. Ano ang kailangan mo?",
-            "Kahit ano'ng kailangan mo, masaya akong tumulong.",
-            "Sabihin mo lang kung ano'ng gagawin at ako na ang bahala.",
-            "Handang magtulungan. Ano'ng plano?",
-            "Ano ang gusto mong asikasuhin ko?",
-            "Laging handang tumulong. Ano'ng gawain?",
-            "Sabihin mo kung paano ako makakatulong sa'yo ngayon.",
-            "Kasama mo ako sa lahat. Ano'ng kailangan mo?",
-            "Masayang sumunod sa pamumuno mo. Ano'ng susunod?",
-            "Bigyan mo ako ng gawain at gagawin ko ang makakaya ko."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/navigation_orders.en.json",
+    "TL": "translations/navigation_orders.tl.json"
   }
 }

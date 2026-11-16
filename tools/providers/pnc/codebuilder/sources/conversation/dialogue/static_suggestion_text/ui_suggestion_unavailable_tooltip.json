@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "ui.suggestion.unavailable",
-  "id": "tooltip",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "ui.suggestion.unavailable.tooltip",
   "metadata": {
     "textKey": "suggestion.unavailable.tooltip",
     "textTarget": "UI_PNC_Conversation",

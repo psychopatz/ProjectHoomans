@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question",
-  "id": "wellbeing",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.wellbeing",
   "metadata": {
     "responsePoolID": "question.wellbeing",
     "responseAct": "WELLBEING"
@@ -12,10 +9,6 @@
     "variants": [
       {
         "id": "question.wellbeing.dataset.hanging_in",
-        "text": {
-          "EN": "I'm hanging in there. Thanks for asking.",
-          "TL": "I'm hanging in there. Thanks for asking."
-        },
         "metadata": {
           "fallback": "I'm hanging in there. Thanks for asking.",
           "templateID": "question.wellbeing.dataset.hanging_in"
@@ -23,10 +16,6 @@
       },
       {
         "id": "question.wellbeing.dataset.all_things_considered",
-        "text": {
-          "EN": "Doing okay, all things considered.",
-          "TL": "Doing okay, all things considered."
-        },
         "metadata": {
           "fallback": "Doing okay, all things considered.",
           "templateID": "question.wellbeing.dataset.all_things_considered"
@@ -34,10 +23,6 @@
       },
       {
         "id": "question.wellbeing.dataset.getting_by",
-        "text": {
-          "EN": "I'm getting by, one day at a time. How about you?",
-          "TL": "I'm getting by, one day at a time. How about you?"
-        },
         "metadata": {
           "fallback": "I'm getting by, one day at a time. How about you?",
           "templateID": "question.wellbeing.dataset.getting_by"
@@ -45,29 +30,7 @@
       },
       {
         "id": "question.wellbeing.dataset.hungry",
-        "text": {
-          "EN": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-          "TL": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it."
-        },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.needType",
-              "value": "hunger"
-            },
-            {
-              "op": "in",
-              "path": "conversation.needUrgency",
-              "values": [
-                "moderate",
-                "severe",
-                "emergency",
-                "critical"
-              ]
-            }
-          ]
-        },
+        "when": "conversation.needType == \"hunger\" && conversation.needUrgency in [\"moderate\", \"severe\", \"emergency\", \"critical\"]",
         "metadata": {
           "fallback": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
           "priority": 2,
@@ -76,29 +39,7 @@
       },
       {
         "id": "question.wellbeing.dataset.thirsty",
-        "text": {
-          "EN": "I'm pretty thirsty. If you have water, could you spare some?",
-          "TL": "I'm pretty thirsty. If you have water, could you spare some?"
-        },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.needType",
-              "value": "thirst"
-            },
-            {
-              "op": "in",
-              "path": "conversation.needUrgency",
-              "values": [
-                "moderate",
-                "severe",
-                "emergency",
-                "critical"
-              ]
-            }
-          ]
-        },
+        "when": "conversation.needType == \"thirst\" && conversation.needUrgency in [\"moderate\", \"severe\", \"emergency\", \"critical\"]",
         "metadata": {
           "fallback": "I'm pretty thirsty. If you have water, could you spare some?",
           "priority": 3,
@@ -107,29 +48,7 @@
       },
       {
         "id": "question.wellbeing.dataset.tired",
-        "text": {
-          "EN": "I'm tired, though I can manage for now.",
-          "TL": "I'm tired, though I can manage for now."
-        },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.needType",
-              "value": "fatigue"
-            },
-            {
-              "op": "in",
-              "path": "conversation.needUrgency",
-              "values": [
-                "moderate",
-                "severe",
-                "emergency",
-                "critical"
-              ]
-            }
-          ]
-        },
+        "when": "conversation.needType == \"fatigue\" && conversation.needUrgency in [\"moderate\", \"severe\", \"emergency\", \"critical\"]",
         "metadata": {
           "fallback": "I'm tired, though I can manage for now.",
           "priority": 2,
@@ -137,5 +56,9 @@
         }
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/question_wellbeing.en.json",
+    "TL": "translations/question_wellbeing.tl.json"
   }
 }

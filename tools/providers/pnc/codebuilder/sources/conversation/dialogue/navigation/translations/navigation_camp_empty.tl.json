@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Wala akong nakikitang magandang mapagpuwestuhan dito.",
+      "Kulang ang lugar na 'to sa maayos na pwesto para sa kampo.",
+      "Walang praktikal na mapagtatayuan ng kampo rito.",
+      "Dapat tayong maghanap sa iba. Walang magandang campsite dito.",
+      "Mukhang hindi tayo makakapagkampo sa lugar na 'to.",
+      "Walang ligtas na gusali o maayos na lupa rito.",
+      "Walang makitang maayos na mahihigaan dito.",
+      "Walang campsite dito. Patuloy tayong maghanap.",
+      "Hindi angkop ang lokasyong 'to para magtayo ng kampo.",
+      "Walang angkop sa malapit. Kailangan nating magpatuloy."
+    ],
+    "guarded": [
+      "Walang ligtas na mapagpuwestuhan dito.",
+      "Masyadong lantad ang lugar na 'to. Papaslangin tayo rito.",
+      "Walang kublihan, walang depensa. Hindi tayo pwedeng manatili rito.",
+      "Hindi ako magkakampo sa bitag na 'to. Lakad pa.",
+      "Walang kaligtasan dito. Magiging madaling target tayo.",
+      "Wala man lang madedepensahang sulok. Tuloy sa paglakad.",
+      "Pagpapatiwakal ang pagtulog dito. Maghanap ng tunay na silungan.",
+      "Walang haharang sa mga patay dito. Walang kampo.",
+      "Masyadong lantad. Ayaw kong magpahinga rito.",
+      "Walang matataguan kapag dumaan ang kuyog. Kilos."
+    ],
+    "terse": [
+      "Walang magandang puwesto rito.",
+      "Wala rito.",
+      "Hindi pwede.",
+      "Hindi pwedeng magkampo rito.",
+      "Walang pwesto.",
+      "Masyadong hubad.",
+      "Walang mapagpapahingahan.",
+      "Lakad pa.",
+      "Huwag dito.",
+      "Pangit ang pwesto."
+    ],
+    "warm": [
+      "Wala akong nakikitang ligtas na mapagpuwestuhan dito.",
+      "Mas gusto kong humanap tayo ng mas komportable at ligtas na lugar.",
+      "Walang komportable o ligtas dito, sa kasamaang palad.",
+      "Maghanap pa tayo. Karapat-dapat ka sa mas magandang pahingahan.",
+      "Hindi maganda ang pakiramdam ko sa lugar na 'to. Lakad pa tayo.",
+      "Makakahanap pa tayo ng mas maayos kaysa rito. Maghanap tayo ng maayos na bubong.",
+      "Gusto kong ligtas tayong dalawa ngayong gabi. Walang magandang kampo rito.",
+      "Maghanap tayo ng mas maaliwalas bago huminto.",
+      "Sa tingin ko hindi tayo makakatulog nang mahimbing dito.",
+      "Halika, maghanap tayo sa unahan para sa totoong kampo."
+    ]
+  }
+}

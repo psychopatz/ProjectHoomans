@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "quest.clinic_supplies",
-  "id": "accept",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "quest.clinic_supplies.accept",
   "metadata": {
     "category": "projecthoomans:quest_content",
     "contentOwner": "projecthoomans.dialogue_content.quest",

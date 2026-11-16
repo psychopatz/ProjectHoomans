@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "social",
-  "id": "threat_boundary",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.threat_boundary",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Step back or we have a problem.",
-            "You need to back off right now.",
-            "Keep your distance. Don't make this turn ugly.",
-            "I'm giving you fair warning: stand down.",
-            "Back away. Neither of us needs this fight.",
-            "Step down. Let's not do something stupid.",
-            "I won't hesitate if you keep advancing.",
-            "Hold your ground right there. Do not advance.",
-            "Lower your weapon and step back.",
-            "This is your only warning. Back off."
-          ],
-          "TL": [
-            "Umatras ka o magkakaproblema tayo.",
-            "Kailangan mong lumayo ngayon din.",
-            "Panatilihin ang distansya. Huwag mong gawing madugo ito.",
-            "Binibigyan kita ng patas na babala: ibaba ang armas.",
-            "Umatras ka. Walang nangangailangan ng laban na 'to.",
-            "Huminahon ka. Huwag tayong gumawa ng katangahan.",
-            "Hindi ako magdadalawang-isip kapag lumapit ka pa.",
-            "Diyan ka lang. Huwag kang susulong.",
-            "Ibaba mo ang armas mo at umatras.",
-            "Ito na ang nag-iisang babala mo. Umatras ka."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "Back away. Now.",
-            "Take one more step and find out.",
-            "Keep your hands off your weapon and step back.",
-            "You're threatening the wrong survivor.",
-            "Back up before I put you down.",
-            "I am not afraid to defend myself. Back off.",
-            "Last chance to walk away alive.",
-            "You don't want this fight. Step back.",
-            "Back away immediately.",
-            "Hands where I can see them. Back off."
-          ],
-          "TL": [
-            "Umatras ka. Ngayon.",
-            "Humakbang ka pa nang isa at nang malaman mo.",
-            "Alisin ang kamay sa armas at umatras ka.",
-            "Maling tao ang tinatakot mo.",
-            "Umatras ka bago kita patumbahin.",
-            "Hindi ako natatakot ipagtanggol ang sarili ko. Lumayo ka.",
-            "Huling pagkakataon para lumakad palayo nang buhay.",
-            "Ayaw mo sa laban na ito. Umatras ka.",
-            "Lumayo ka agad-agad.",
-            "Kamay kung saan ko nakikita. Umatras ka."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Back off.",
-            "Step back.",
-            "Stand down.",
-            "Don't.",
-            "Back away.",
-            "Hands up.",
-            "Stop.",
-            "Freeze.",
-            "Last warning.",
-            "Drop it."
-          ],
-          "TL": [
-            "Umatras ka.",
-            "Lumayo ka.",
-            "Ibaba ang armas.",
-            "Huwag.",
-            "Lumayo ka.",
-            "Itaas ang kamay.",
-            "Tigil.",
-            "Huwag gagalaw.",
-            "Huling babala.",
-            "Ibaba mo 'yan."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Hey, please, don't do this. Step back.",
-            "We don't need blood spilled today. Put it down.",
-            "Listen to reason, friend. Step away before someone gets hurt.",
-            "I don't want to hurt you. Please, back off.",
-            "Don't throw your life away over this. Stand down.",
-            "We can still walk away peacefully. Step back.",
-            "Take a breath and think about what you're doing. Back up.",
-            "I value your life, but I will protect mine. Please stop.",
-            "Don't make me do something we'll both regret. Step back.",
-            "We're both survivors. Let's keep it that way. Back down."
-          ],
-          "TL": [
-            "Huy, pakiusap, huwag mong gawin 'to. Umatras ka.",
-            "Di natin kailangang magpadanak ng dugo ngayon. Ibaba mo 'yan.",
-            "Makinig ka sa katwiran, kaibigan. Lumayo ka bago may masaktan.",
-            "Ayaw kitang saktan. Pakiusap, umatras ka.",
-            "Huwag mong itapon ang buhay mo dahil dito. Ibaba ang armas.",
-            "Maaari pa tayong lumayo nang payapa. Umatras ka.",
-            "Huminga ka muna at isipin ang ginagawa mo. Umatras ka.",
-            "Mahalaga ang buhay mo, pero poprotektahan ko ang akin. Pakiusap tigil.",
-            "Huwag mo akong piliting gumawa ng pagsisisihan natin. Umatras ka.",
-            "Pareho tayong nakaligtas. Panatilihin nating ganoon. Huminahon ka."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/social_threat_boundary.en.json",
+    "TL": "translations/social_threat_boundary.tl.json"
   }
 }

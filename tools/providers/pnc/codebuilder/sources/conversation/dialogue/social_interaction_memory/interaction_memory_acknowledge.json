@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.memory",
-  "id": "acknowledge",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.memory.acknowledge",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I hear you.",
-            "I remember that.",
-            "Sounds familiar.",
-            "Makes sense given what happened.",
-            "I recall that well.",
-            "Yes, that was quite an event.",
-            "I understand why you bring that up.",
-            "Right. That was a significant moment.",
-            "I hear what you're saying about that.",
-            "Fair enough. That memory tracks."
-          ],
-          "TL": [
-            "Naririnig kita.",
-            "Naaalala ko iyan.",
-            "Pamilyar ang dating.",
-            "May katuturan base sa nangyari.",
-            "Maliwanag kong naaalala 'yon.",
-            "Oo, matinding pangyayari 'yon.",
-            "Nauunawaan ko kung bakit mo binuksan 'yan.",
-            "Tama. Mahalagang sandali 'yon.",
-            "Naiintindihan ko ang sinasabi mo tungkol doon.",
-            "Makatwiran. Tugma ang alaalang 'yan."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "All right. I heard you.",
-            "I remember, but let's not dwell on the past.",
-            "Past is past. Keep your focus here.",
-            "I know what happened. No need to rehash it.",
-            "Noted. But don't expect me to get sentimental.",
-            "Yeah, I remember. Why bring it up now?",
-            "I haven't forgotten. I never forget.",
-            "Heard. Let's move on.",
-            "I remember the lesson it taught us.",
-            "All right. Keep that to yourself moving forward."
-          ],
-          "TL": [
-            "Sige. Narinig kita.",
-            "Naaalala ko, pero huwag na nating balik-balikan ang nakaraan.",
-            "Nakalipas na. Magpokus ka sa kasalukuyan.",
-            "Alam ko ang nangyari. Di na kailangang ulitin pa.",
-            "Tala ko na. Pero huwag kang umasang magiging madrama ako.",
-            "Oo, tanda ko. Bakit mo binubuksan ngayon?",
-            "Hindi ko kinalimutan. Hindi ako kailanman nakalilimot.",
-            "Narinig ko. Lumipat na tayo ng usapan.",
-            "Naaalala ko ang aral na itinuro niyan sa atin.",
-            "Sige. Itago mo na lang sa sarili mo sa susunod."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Mm.",
-            "Remember.",
-            "Recall it.",
-            "Yeah.",
-            "Heard.",
-            "Right.",
-            "Got it.",
-            "True.",
-            "Yep.",
-            "Understood."
-          ],
-          "TL": [
-            "Mm.",
-            "Tanda ko.",
-            "Naalala ko.",
-            "Oo.",
-            "Narinig.",
-            "Tama.",
-            "Nakuha ko.",
-            "Totoo.",
-            "Oo nga.",
-            "Naintindihan."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Yeah. I can see why that stayed with you.",
-            "I remember that too. It meant a lot to me.",
-            "That was a special moment between us. Glad you remember.",
-            "It stayed in my heart as well, friend.",
-            "Thanks for reminding me of that. Good times.",
-            "Those memories keep us human out here.",
-            "I smile every time I think back on that day.",
-            "We made it through that together. I won't forget it.",
-            "I'm glad we share that memory.",
-            "That really stuck with both of us, didn't it?"
-          ],
-          "TL": [
-            "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan.",
-            "Naaalala ko rin 'yon. Malaking bagay 'yon para sa akin.",
-            "Espesyal na sandali 'yon sa atin. Mabuti at naaalala mo.",
-            "Nanatili rin 'yon sa puso ko, kaibigan.",
-            "Salamat sa pagpapaalala niyan. Magandang alaala.",
-            "Ang mga alaalang 'yan ang nagpapanatiling tao sa atin dito.",
-            "Napapangiti ako tuwing naaalala ko ang araw na 'yon.",
-            "Nalusutan natin 'yon nang magkasama. Di ko 'yon malilimutan.",
-            "Masaya ako at pinagsaluhan natin ang alaalang 'yon.",
-            "Talagang tumatak sa ating dalawa 'yon, 'di ba?"
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_memory_acknowledge.en.json",
+    "TL": "translations/interaction_memory_acknowledge.tl.json"
   }
 }

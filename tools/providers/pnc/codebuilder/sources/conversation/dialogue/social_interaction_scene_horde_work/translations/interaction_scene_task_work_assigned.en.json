@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "I've got work to do. I'll get on it.",
+      "Understood. Starting on the task now.",
+      "Task received. I'll take care of this.",
+      "Right. Getting down to business.",
+      "I'm on it. Shouldn't take too long.",
+      "Understood. I will handle this duty.",
+      "Got my assignment. Moving out to work.",
+      "Fair enough. Time to get my hands dirty.",
+      "I'll see that this gets done properly.",
+      "Acknowledged. Working on the assigned job."
+    ],
+    "guarded": [
+      "I'll do the work. Watch my back while I do.",
+      "I'll handle it, but keep an eye on our surroundings.",
+      "Understood. Don't crowd me while I'm working.",
+      "I'll do my share. Make sure you do yours.",
+      "Getting on it. Stay alert for threats.",
+      "I'll get it done. Just make sure the perimeter is secure.",
+      "Task noted. I'll finish it without distraction.",
+      "Fine. I'll see to the task.",
+      "I'll handle this. Keep your weapon ready.",
+      "Understood. Don't let anything sneak up on me."
+    ],
+    "terse": [
+      "On it.",
+      "Working.",
+      "Understood.",
+      "Doing it.",
+      "Got it.",
+      "Assigned.",
+      "Starting.",
+      "Handling it.",
+      "Right.",
+      "Moving."
+    ],
+    "warm": [
+      "Happy to help with this! I'll get right on it.",
+      "Leave it to me, friend. I'll make sure it's done right.",
+      "Glad to contribute to our camp. Heading over now.",
+      "You can count on me. I'll take good care of it.",
+      "On it! Always happy to do my part for the team.",
+      "Consider it handled, partner. Be back soon.",
+      "Happy to take this off your hands. Working on it now.",
+      "I'll pour my best effort into this for all of us.",
+      "Got the task! Thanks for trusting me with it.",
+      "Right away, friend! Let's keep our home running."
+    ]
+  }
+}

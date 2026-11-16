@@ -1,8 +1,7 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
+  "schema": "psychopatz.psdl.v2",
   "id": "offer",
-  "owner": "ProjectHoomans",
+  "kind": "dialogue",
   "metadata": {
     "responsePoolID": "offer",
     "responseAct": "OFFER"
@@ -15,25 +14,7 @@
           "EN": "That would help a lot. Could I have some?",
           "TL": "That would help a lot. Could I have some?"
         },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.needType",
-              "value": "hunger"
-            },
-            {
-              "op": "in",
-              "path": "conversation.needUrgency",
-              "values": [
-                "moderate",
-                "severe",
-                "emergency",
-                "critical"
-              ]
-            }
-          ]
-        },
+        "when": "conversation.needType == \"hunger\" && conversation.needUrgency in [\"moderate\", \"severe\", \"emergency\", \"critical\"]",
         "metadata": {
           "fallback": "That would help a lot. Could I have some?",
           "priority": 2,
@@ -46,25 +27,7 @@
           "EN": "I'd appreciate a bite. Would you share?",
           "TL": "I'd appreciate a bite. Would you share?"
         },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.needType",
-              "value": "hunger"
-            },
-            {
-              "op": "in",
-              "path": "conversation.needUrgency",
-              "values": [
-                "moderate",
-                "severe",
-                "emergency",
-                "critical"
-              ]
-            }
-          ]
-        },
+        "when": "conversation.needType == \"hunger\" && conversation.needUrgency in [\"moderate\", \"severe\", \"emergency\", \"critical\"]",
         "metadata": {
           "fallback": "I'd appreciate a bite. Would you share?",
           "priority": 2,

@@ -1,0 +1,68 @@
+{
+  "reply": {
+    "queued": {
+      "1": {
+        "neutral": [
+          "Okay, I'll set up camp there.",
+          "Understood. Setting up our camp now.",
+          "I'll go get the camp established.",
+          "On my way to set up camp.",
+          "Making camp in that spot. Understood.",
+          "Right. Setting up shelter over there.",
+          "I'll secure the camp site now.",
+          "Moving to establish camp as ordered.",
+          "Got it. Pitching camp.",
+          "Understood. Heading over to make camp."
+        ],
+        "friendly": [
+          "Sure, I'll set up camp there. Sounds cozy.",
+          "Happy to! Let's get a good fire going.",
+          "Good call, friend. I'll get our camp ready.",
+          "Leave it to me! I'll make sure it's safe and comfortable.",
+          "Great idea. I'll go set up camp for us.",
+          "Right on! Time to get off our feet. Setting up now.",
+          "Gladly. I'll have the beds laid out shortly.",
+          "Sounds wonderful. I'll get our shelter squared away.",
+          "Sure thing, partner! Camp will be ready in no time.",
+          "On it, friend! Rest easy, I'll handle camp."
+        ],
+        "repeated": [
+          "I'm still setting up camp there.",
+          "Already working on the camp. Give me a minute.",
+          "Still on it. Setting up takes a little time.",
+          "I'm already pitching the camp there.",
+          "Working as fast as I can on that camp.",
+          "Yeah, I heard you the first time. Still making camp.",
+          "I'm already in the middle of setting up.",
+          "Camp setup is already in progress.",
+          "Still securing the campsite. Hold tight.",
+          "Almost done with the camp. Don't rush me."
+        ],
+        "trusted": [
+          "All right, I'll make camp there.",
+          "I trust your eye for good ground. Setting up camp.",
+          "You picked the spot, I'll build the shelter.",
+          "Understood. I'll make sure our campsite is locked down tight.",
+          "I know you've got our safety in mind. Making camp.",
+          "Right away. We'll be secure there together.",
+          "I'll get it ready for both of us.",
+          "Trust your judgment completely. Camp is going up.",
+          "Setting up camp. We earned this rest.",
+          "Good call, partner. I'll secure the camp perimeter."
+        ],
+        "withdrawn": [
+          "I'll set up camp there.",
+          "Fine. Heading over to camp.",
+          "Understood. Camping.",
+          "If you say so. I'll make camp.",
+          "Going to set it up now.",
+          "All right. Pitching shelter.",
+          "I'll do it.",
+          "Making camp. Leave me to it.",
+          "Fine. Camping there.",
+          "Heard. Setting up."
+        ]
+      }
+    }
+  }
+}

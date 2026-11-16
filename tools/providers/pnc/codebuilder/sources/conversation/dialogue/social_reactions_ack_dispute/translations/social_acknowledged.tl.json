@@ -1,0 +1,100 @@
+{
+  "variants": {
+    "neutral": [
+      "Sige. Naiintindihan ko.",
+      "Narinig kita. May katuturan.",
+      "Nakuha ko. Pwede nating gamitin 'yan.",
+      "Natanggap ang mensahe. Magpapatuloy na.",
+      "Mukhang makatwiran para sa akin.",
+      "Nakuha ko ang punto mo.",
+      "Naiintindihan ko. Magpatuloy na tayo.",
+      "Sige. Pareho tayo ng takbo ng isip.",
+      "Makatwiran. Mabuting malaman.",
+      "Kinikilala ko. Tapusin na natin."
+    ],
+    "bond_guarded": [
+      "%s, naiintindihan ko. Tama na iyon.",
+      "%s, narinig kita. Mag-ingat na lang tayo.",
+      "%s, nakuha ko ang mensahe. Buksan ang mga mata.",
+      "%s, nakuha ko. Hindi na kailangang magpumilit.",
+      "%s, sige. Bantayan natin ang paligid.",
+      "%s, naintindihan. Huwag nating ibaba ang bantay.",
+      "%s, nakuha ko ang punto mo. Maging maingat tayo rito.",
+      "%s, sapat ang linaw. Iwan na natin doon.",
+      "%s, tala ko na. Manatili tayong alerto.",
+      "%s, makatwiran. Kumilos tayo nang maingat."
+    ],
+    "bond_neutral": [
+      "%s, sige.",
+      "%s, naiintindihan ko.",
+      "%s, naririnig ko ang sinasabi mo.",
+      "%s, nakuha ko. May katuturan.",
+      "%s, mukhang makatwiran.",
+      "%s, natanggap ang mensahe.",
+      "%s, may punto ka. Susundin natin 'yan.",
+      "%s, naintindihan. Simulan na natin ang trabaho.",
+      "%s, nakuha ko ang punto mo.",
+      "%s, sang-ayon ako sa 'yo riyan."
+    ],
+    "bond_terse": [
+      "%s, sige.",
+      "%s, naintindihan.",
+      "%s, nakuha ko.",
+      "%s, narinig ko.",
+      "%s, malinaw.",
+      "%s, tama.",
+      "%s, tala ko na.",
+      "%s, mabuti.",
+      "%s, sang-ayon.",
+      "%s, tapos."
+    ],
+    "bond_warm": [
+      "%s, sige. Narinig kita.",
+      "%s, nakuha ko. Laging magandang makausap ka.",
+      "%s, lubos kong naiintindihan. Kasama mo ako rito.",
+      "%s, magandang plano 'yan, kasama.",
+      "%s, narinig kita nang malakas at malinaw. Mag-ingat ka.",
+      "%s, nasa sa 'yo ang suporta ko. Gawin natin.",
+      "%s, mabuti at nagkasundo tayo. Manatiling ligtas.",
+      "%s, salamat sa pagbabahagi. Magandang kaisipan.",
+      "%s, kasing-linaw ng araw. Mabuti at kakampi kita.",
+      "%s, hawak ko ang likod mo. Sulitin natin ito."
+    ],
+    "guarded": [
+      "Naiintindihan ko. Tama na iyon.",
+      "Narinig kita. Huwag mo nang ipagpilitan pa.",
+      "Nakuha ko. Manatili ka sa puwesto mo.",
+      "Naintindihan. Maging alerto tayo.",
+      "Naiintindihan ko. Hindi na kailangan ng salita.",
+      "Sige. Babantayan ko ang likod ko, bantayan mo ang sa 'yo.",
+      "Tala ko na. Iwan mo ang paningin mo sa daan.",
+      "Narinig ko. Iiwan ko na roon.",
+      "Malinaw na. Magpokus na lang tayo sa pananatiling buhay.",
+      "Makatwiran. Umatras ka nang kaunti."
+    ],
+    "terse": [
+      "Sige.",
+      "Naintindihan.",
+      "Narinig ko.",
+      "Nakuha ko.",
+      "Malinaw.",
+      "Tama.",
+      "Tala ko na.",
+      "Mabuti.",
+      "Tapos.",
+      "Sang-ayon."
+    ],
+    "warm": [
+      "Sige. Narinig kita.",
+      "Nakuha ko, kaibigan. Mabuti at nagkausap tayo.",
+      "Lubos kong nauunawaan. Salamat sa pagpapaliwanag.",
+      "Napakaganda. Mabuti at magkasama tayo rito.",
+      "Naiintindihan ko. Ingatan mo ang sarili mo sa labas.",
+      "Kasama mo ako riyan. Magandang desisyon.",
+      "Narinig at pinahahalagahan. Kayang-kaya natin ito.",
+      "Napakalinaw. Masayang sumunod sa 'yo.",
+      "Nakuha ko. Laging masarap kang makatrabaho.",
+      "Sige. Magtulungan tayo sa isa't isa."
+    ]
+  }
+}

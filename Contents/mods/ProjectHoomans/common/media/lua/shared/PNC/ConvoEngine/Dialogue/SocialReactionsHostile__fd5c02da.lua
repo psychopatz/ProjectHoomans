@@ -291,7 +291,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_short.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         ["namespace"] = "social",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -900,7 +900,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_stressed.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         ["namespace"] = "social",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1509,7 +1509,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_withdrawn.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         ["namespace"] = "social",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2378,7 +2378,7 @@ return {
             ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_offer_friendly.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         ["namespace"] = "social",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2940,6 +2940,275 @@ return {
                     },
                 },
                 ["variantID"] = "warm",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["exchangeFamily"] = {
+            ["familyID"] = "social.profanity",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Watch your language.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.social.profanity.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Watch your language.",
+                                    },
+                                    ["TL"] = {
+                                        "Mag-ingat ka sa pananalita mo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "social",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Watch your language.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.profanity.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Watch your language.",
+                        },
+                        ["TL"] = {
+                            "Mag-ingat ka sa pananalita mo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "social.profanity",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "profanity",
+            ["sourceId"] = "social.profanity",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
+        ["namespace"] = "social",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social_reactions_hostile_offer_threat",
+                ["responseAct"] = "HOSTILE_REMARK",
+            },
+            ["recognition"] = {
+                ["concepts"] = {
+                    {
+                        ["aliases"] = {
+                            "fuck",
+                            "f*ck",
+                            "f**k",
+                            "f***",
+                            "f***k",
+                            "f*****",
+                            "fuckin",
+                            "fucking",
+                            "fucked",
+                            "shit",
+                            "sh*t",
+                            "s**t",
+                            "shitty",
+                            "bullshit",
+                            "bullsh*t",
+                            "horseshit",
+                            "damn",
+                            "dammit",
+                            "goddamn",
+                            "hell",
+                            "crap",
+                            "ass",
+                            "arse",
+                            "piss",
+                            "pissed",
+                            "pissing",
+                            "cock",
+                        },
+                        ["id"] = "profanity",
+                    },
+                },
+                ["ownerModID"] = "ProjectHoomans",
+                ["packID"] = "pack.projecthoomans.social_profanity",
+                ["patterns"] = {
+                    {
+                        ["confidence"] = 0.92,
+                        ["emit"] = {
+                            ["severity"] = "moderate",
+                            ["speechAct"] = "HOSTILE_REMARK",
+                        },
+                        ["id"] = "pnc.social.profanity",
+                        ["match"] = {
+                            "@PROFANITY",
+                        },
+                        ["priority"] = 80,
+                    },
+                    {
+                        ["confidence"] = 0.94,
+                        ["emit"] = {
+                            ["severity"] = "moderate",
+                            ["speechAct"] = "HOSTILE_REMARK",
+                        },
+                        ["id"] = "pnc.social.profanity_prefixed",
+                        ["match"] = {
+                            {
+                                ["kind"] = "literal",
+                                ["value"] = "hey",
+                            },
+                            {
+                                ["id"] = "PROFANITY",
+                                ["kind"] = "concept",
+                            },
+                        },
+                        ["priority"] = 70,
+                    },
+                    {
+                        ["confidence"] = 0.94,
+                        ["emit"] = {
+                            ["severity"] = "moderate",
+                            ["speechAct"] = "HOSTILE_REMARK",
+                        },
+                        ["id"] = "pnc.social.profanity_you",
+                        ["match"] = {
+                            {
+                                ["kind"] = "literal",
+                                ["value"] = "you",
+                            },
+                            {
+                                ["kind"] = "literal",
+                                ["optional"] = true,
+                                ["value"] = "are",
+                            },
+                            {
+                                ["kind"] = "literal",
+                                ["optional"] = true,
+                                ["value"] = "a",
+                            },
+                            {
+                                ["kind"] = "literal",
+                                ["optional"] = true,
+                                ["value"] = "an",
+                            },
+                            {
+                                ["id"] = "PROFANITY",
+                                ["kind"] = "concept",
+                            },
+                        },
+                        ["priority"] = 85,
+                    },
+                },
+                ["speechActs"] = {
+                    {
+                        ["id"] = "hostile_remark",
+                        ["intent"] = "HOSTILE_REMARK",
+                        ["polarity"] = "negative",
+                        ["tone"] = "hostile",
+                    },
+                },
+                ["version"] = 1,
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Watch your language.",
+                                    },
+                                    ["TL"] = {
+                                        "Mag-ingat ka sa pananalita mo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "HOSTILE_REMARK",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "social.profanity",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Watch your language.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.social.profanity.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Watch your language.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.profanity.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Watch your language.",
+                    },
+                    ["TL"] = {
+                        "Mag-ingat ka sa pananalita mo.",
+                    },
+                },
+                ["variantID"] = "neutral",
             },
         },
         ["when"] = nil,

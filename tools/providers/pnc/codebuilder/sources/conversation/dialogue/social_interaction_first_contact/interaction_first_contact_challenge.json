@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.first_contact",
-  "id": "challenge",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.first_contact.challenge",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Hold it. Who are you?",
-            "Hold up a second. What's your name?",
-            "Who goes there? Speak up.",
-            "Stop there for a moment. Are you friendly?",
-            "Hold on. What brings you to this area?",
-            "State who you are and what you're doing here.",
-            "Hold it right there. Let's talk before you come closer.",
-            "Who are you and who are you with?",
-            "Stop there. Just want to make sure you're not a threat.",
-            "Hold up. Give me a name and a reason you're here."
-          ],
-          "TL": [
-            "Sandali. Sino ka?",
-            "Teka sandali. Anong pangalan mo?",
-            "Sino 'yan? Magsalita ka.",
-            "Tigil muna diyan. Kaibigan ka ba?",
-            "Teka muna. Anong ginagawa mo sa lugar na 'to?",
-            "Sabihin kung sino ka at anong ginagawa mo rito.",
-            "Diyan ka muna. Mag-usap tayo bago ka lumapit pa.",
-            "Sino ka at sinong kasama mo?",
-            "Tigil diyan. Nais ko lang tiyakin na di ka banta.",
-            "Teka lang. Bigyan mo ako ng pangalan at dahilan kung bakit ka narito."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "That's close enough. What do you want?",
-            "Hands where I can see them. Who are you?",
-            "Stop right there. State your business.",
-            "Keep your distance. What brings you over here?",
-            "Don't take another step. Who sent you?",
-            "Hold it. Are you armed?",
-            "Stay where you are. Why are you approaching me?",
-            "Hold ground. What are you after?",
-            "Keep your hands clear of your waist. Who are you?",
-            "One wrong twitch and we have a problem. Speak up."
-          ],
-          "TL": [
-            "Hanggang diyan ka lang. Ano ang gusto mo?",
-            "Kamay kung saan ko nakikita. Sino ka?",
-            "Tigil diyan. Sabihin mo ang pakay mo.",
-            "Panatilihin ang distansya. Anong nagdala sa 'yo rito?",
-            "Huwag ka nang humakbang pa. Sinong nagpadala sa 'yo?",
-            "Sandali. May armas ka ba?",
-            "Diyan ka lang. Bakit ka lumalapit sa akin?",
-            "Diyan ka lang. Anong hinahabol mo?",
-            "Ilayo ang kamay sa baywang. Sino ka?",
-            "Isang maling galaw at magkakaproblema tayo. Magsalita ka."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Who are you?",
-            "Halt.",
-            "Identify.",
-            "Stop.",
-            "Name?",
-            "Hands up.",
-            "Purpose?",
-            "Freeze.",
-            "State business.",
-            "Who's there?"
-          ],
-          "TL": [
-            "Sino ka?",
-            "Hinto.",
-            "Magpakilala.",
-            "Tigil.",
-            "Pangalan?",
-            "Itaas ang kamay.",
-            "Pakay?",
-            "Huwag gagalaw.",
-            "Sabihin ang sadya.",
-            "Sino 'yan?"
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Easy. I don't know you yet.",
-            "Hold on there, stranger. Let's introduce ourselves first.",
-            "Easy does it. Are you alone out here?",
-            "Hey there. Don't be frightened, just tell me your name.",
-            "Slow down, friend. Let's see who we're talking to.",
-            "Peace. Just hold up so we can get acquainted.",
-            "Hello. I don't recognize your face—who might you be?",
-            "Easy now. Just looking out for safety. Who are you?",
-            "Stay there a second, stranger. Where are you heading?",
-            "Welcome, but take it slow. What's your story?"
-          ],
-          "TL": [
-            "Dahan-dahan. Hindi pa kita kilala.",
-            "Teka muna, estranghero. Magpakilala muna tayo.",
-            "Dahan-dahan lang. Nag-iisa ka ba rito?",
-            "Kumusta. Huwag kang matakot, sabihin mo lang pangalan mo.",
-            "Dahan-dahan lang, kaibigan. Tingnan natin kung sino ang kausap.",
-            "Kapayapaan. Huminto ka muna para magkakilala tayo.",
-            "Kumusta. Di ko pamilyar ang mukha mo—sino ka?",
-            "Dahan-dahan lang. Nag-iingat lang. Sino ka?",
-            "Diyan ka muna sandali, estranghero. Saan ang punta mo?",
-            "Maligayang pagdating, pero dahan-dahan lang. Ano ang kuwento mo?"
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_first_contact_challenge.en.json",
+    "TL": "translations/interaction_first_contact_challenge.tl.json"
   }
 }

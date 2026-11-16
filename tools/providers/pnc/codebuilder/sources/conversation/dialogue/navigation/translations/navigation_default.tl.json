@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Sige. Ano ang gusto mong pag-usapan?",
+      "Nakikinig ako. Ano ang gusto mong pag-usapan?",
+      "Ano'ng nasa isip mo?",
+      "Sige lang. Ano ang kailangang pag-usapan?",
+      "Nandito ako. Ano ang gusto mong sabihin?",
+      "Ano'ng iniisip mo?",
+      "Handa na ako. Ano'ng meron?",
+      "Oo? Ano ang gusto mong talakayin?",
+      "May sandali ako. Ano 'yon?",
+      "Sige, ano'ng nasa isip mo?"
+    ],
+    "guarded": [
+      "Sige. Ano ngayon?",
+      "Ano 'yon? Iklian mo lang.",
+      "Bilisan mo. Lantad tayo.",
+      "Ano'ng kailangan mo? Buksan ang mata.",
+      "Magsalita ka, pero huwag kang mag-ingay.",
+      "Ano'ng iniisip mo? Bantayan ang kalsada.",
+      "Ano ngayon? Hindi tayo pwedeng tumambay rito.",
+      "Nakikinig ako, pero patuloy na magmasid.",
+      "Sabihin mo agad ang kailangan mo.",
+      "Ano 'yon? May gulo ba?"
+    ],
+    "terse": [
+      "Ano?",
+      "Oo?",
+      "Salita.",
+      "Ano 'yon?",
+      "Sige.",
+      "Nakikinig.",
+      "Ano meron?",
+      "Sabihin mo.",
+      "Bilisan mo.",
+      "Usap."
+    ],
+    "warm": [
+      "Sige. Ano ang gusto mong pag-usapan?",
+      "Laging masayang makausap ka. Ano'ng nasa isip mo?",
+      "Nakikinig ako nang buo. Ano'ng gusto mong ibahagi?",
+      "Huwag kang magmadali. Ano ang gusto mong pag-usapan?",
+      "Masayang makipagkwentuhan. Ano'ng nangyayari?",
+      "Mabuting makausap ka. Ano'ng nilalaman ng puso mo?",
+      "Nandito lang ako kasama mo. Ano'ng kailangan mo?",
+      "Kahit ano'ng gusto mong pag-usapan, nakikinig ako.",
+      "Walang anuman. Ano ang gusto mong linawin?",
+      "Laging magandang kamustahin ka. Ano 'yon?"
+    ]
+  }
+}

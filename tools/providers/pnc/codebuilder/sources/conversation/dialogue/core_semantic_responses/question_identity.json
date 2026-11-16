@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "response_pool.question",
-  "id": "identity",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "response_pool.question.identity",
   "metadata": {
     "responsePoolID": "question.identity",
     "responseAct": "IDENTITY"
@@ -12,10 +9,6 @@
     "variants": [
       {
         "id": "question.identity.dataset.stranger_alt_1",
-        "text": {
-          "EN": "I keep my name to myself until I know someone better. What should I call you?",
-          "TL": "I keep my name to myself until I know someone better. What should I call you?"
-        },
         "metadata": {
           "fallback": "I keep my name to myself until I know someone better. What should I call you?",
           "templateID": "question.identity.stranger_alt_1"
@@ -23,10 +16,6 @@
       },
       {
         "id": "question.identity.dataset.stranger_alt_2",
-        "text": {
-          "EN": "Let's get to know each other first. What do people call you?",
-          "TL": "Let's get to know each other first. What do people call you?"
-        },
         "metadata": {
           "fallback": "Let's get to know each other first. What do people call you?",
           "templateID": "question.identity.stranger_alt_2"
@@ -34,15 +23,7 @@
       },
       {
         "id": "question.identity.dataset.wary_alt_1",
-        "text": {
-          "EN": "I don't trust you enough to share my name. Who are you, really?",
-          "TL": "I don't trust you enough to share my name. Who are you, really?"
-        },
-        "when": {
-          "op": "eq",
-          "path": "conversation.identityTrust",
-          "value": "untrustworthy"
-        },
+        "when": "conversation.identityTrust == \"untrustworthy\"",
         "metadata": {
           "fallback": "I don't trust you enough to share my name. Who are you, really?",
           "priority": 2,
@@ -51,15 +32,7 @@
       },
       {
         "id": "question.identity.dataset.wary_alt_2",
-        "text": {
-          "EN": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-          "TL": "After that lie, I'm not telling you my name. Tell me the truth about yours."
-        },
-        "when": {
-          "op": "eq",
-          "path": "conversation.identityTrust",
-          "value": "untrustworthy"
-        },
+        "when": "conversation.identityTrust == \"untrustworthy\"",
         "metadata": {
           "fallback": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
           "priority": 2,
@@ -67,5 +40,9 @@
         }
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/question_identity.en.json",
+    "TL": "translations/question_identity.tl.json"
   }
 }

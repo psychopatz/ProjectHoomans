@@ -3,7 +3,7 @@ return {
     ["social.hostile_short"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         },
         ["id"] = "social.hostile_short",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["social.hostile_stressed"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         },
         ["id"] = "social.hostile_stressed",
         ["kind"] = "dialogue",
@@ -24,7 +24,7 @@ return {
         },
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         },
         ["id"] = "social.hostile_withdrawn",
         ["kind"] = "dialogue",
@@ -33,11 +33,23 @@ return {
     ["social.offer_friendly"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
         },
         ["id"] = "social.offer_friendly",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_offer_friendly.json",
+    },
+    ["social.profanity"] = {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
+        },
+        ["id"] = "social.profanity",
+        ["kind"] = "dialogue",
+        ["related"] = {
+            "pack.projecthoomans.social_profanity",
+        },
+        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
     },
     ["social.threat_boundary"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",

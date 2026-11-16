@@ -1,7 +1,6 @@
 {
-  "kind": "dialogue",
-  "id": "whats_up",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "conversation.landing.whats_up",
   "participants": {
     "speaker": [
       "player"
@@ -31,7 +30,5 @@
   "response": {
     "act": "QUESTION",
     "variants": []
-  },
-  "namespace": "conversation.landing",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

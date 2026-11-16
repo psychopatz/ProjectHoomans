@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.wellbeing",
-  "id": "thirst",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.wellbeing.thirst",
   "metadata": {
     "category": "projecthoomans:wellbeing_content",
     "contentOwner": "projecthoomans.dialogue_content.wellbeing",

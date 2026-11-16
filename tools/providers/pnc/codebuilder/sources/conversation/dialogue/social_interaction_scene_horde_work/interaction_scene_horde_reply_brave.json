@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.scene",
-  "id": "horde_reply_brave",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.scene.horde_reply_brave",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "We can take them.",
-            "We've handled worse. Let's clear them.",
-            "Stand firm. We fight through.",
-            "We have the weapons. Let's put them down.",
-            "Ready up. We're not running from this.",
-            "We take the fight to them. Stay sharp.",
-            "Line them up. We can win this.",
-            "No backing down. We push through.",
-            "We hold here and eliminate the threat.",
-            "I'm ready. Let's make every strike count."
-          ],
-          "TL": [
-            "Kaya natin sila.",
-            "Nakalusot na tayo sa mas malala. Ubusin natin sila.",
-            "Tumayo nang matatag. Lalabanan natin sila.",
-            "Nasa atin ang armas. Patumbahin natin sila.",
-            "Humanda ka. Hindi natin tatakbuhan ito.",
-            "Sasalubungin natin sila. Maging alerto.",
-            "Pilahin sila. Kayang-kaya natin ito.",
-            "Walang atrasan. Babasagin natin 'to.",
-            "Dito tayo tatayo at aalisin ang banta.",
-            "Handa na ako. Tiyaking may tama ang bawat palo."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "If we commit, we hit hard and stay together.",
-            "No heroics. Funnel them into a choke point and execute.",
-            "Watch your stamina. Don't swing wild and get exhausted.",
-            "Keep the line tight. If one falls, we both die.",
-            "Target the leaders first. Clear them systematically.",
-            "We fight, but maintain an escape route behind us.",
-            "Every strike must be lethal. No wasted energy.",
-            "Don't let them surround us. Push when I push.",
-            "We can win this if we keep cool heads and steady hands.",
-            "Agreed. Take out the front rank and hold the doorway."
-          ],
-          "TL": [
-            "Kung lalaban tayo, sabay at todo ang tira.",
-            "Walang magpapakabayani. Ipitin sila sa sikip at tapusin.",
-            "Bantayan ang lakas. Huwag magwala para di kapusin ng hangin.",
-            "Higpitan ang pormasyon. Kapag may bumagsak, patay tayong dalawa.",
-            "Unahin ang mga nasa harap. Ubusin nang may sistema.",
-            "Lalaban tayo, pero tiyaking may takasan sa likod natin.",
-            "Bawat tama dapat nakamamatay. Walang sayang na lakas.",
-            "Huwag magpapaligid sa kanila. Sumulong kapag sumulong ako.",
-            "Mananalo tayo kung mananatiling malamig ang ulo at matatag ang kamay.",
-            "Sang-ayon. Patumbahin ang unahan at hawakan ang pinto."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Stand and fight.",
-            "We take them.",
-            "No retreat.",
-            "Draw weapons.",
-            "Kill them all.",
-            "Fight through.",
-            "Ready.",
-            "Holding ground.",
-            "Let's do this.",
-            "Bring them on."
-          ],
-          "TL": [
-            "Tumayo at lumaban.",
-            "Kaya natin sila.",
-            "Walang urungan.",
-            "Bunot ng armas.",
-            "Ubusin sila.",
-            "Lumaban pasulong.",
-            "Handa.",
-            "Hawak ang pwesto.",
-            "Gawin na natin.",
-            "Ilabas sila."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "I'm with you. We can take them.",
-            "Together, nothing can stop us! Let's do this.",
-            "I've got your back, friend. We fight as one.",
-            "We survive together, we fight together. Let's clear them out!",
-            "With you beside me, I'm not afraid. Let's take them down.",
-            "Let's show them what real survivors are made of!",
-            "Right by your side, partner. We won't lose today.",
-            "I trust us. Let's stand tall and fight.",
-            "We've got this, friend. Watch my back and I'll watch yours.",
-            "Stay close and hit hard! We'll celebrate after."
-          ],
-          "TL": [
-            "Kasama mo ako. Kaya natin sila.",
-            "Kapag magkasama tayo, walang makapipigil sa atin! Tara na.",
-            "Hawak ko ang likod mo, kaibigan. Iisang laban tayo.",
-            "Sabay tayong nabubuhay, sabay tayong lalaban. Ubusin natin sila!",
-            "Dahil katabi kita, hindi ako natatakot. Patumbahin natin sila.",
-            "Ipakita natin sa kanila kung ano ang tunay na nakaligtas!",
-            "Nasa tabi mo lang ako, kasama. Hindi tayo matatalo ngayon.",
-            "Tiwala ako sa atin. Tumindig tayo at lumaban.",
-            "Kayang-kaya natin, kaibigan. Bantayan ang isa't isa.",
-            "Manatiling dikit at humampas nang malakas! Magdiriwang tayo mamaya."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_scene_horde_reply_brave.en.json",
+    "TL": "translations/interaction_scene_horde_reply_brave.tl.json"
   }
 }

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Mataas ang tensiyon. Ipagpaliban muna natin mamaya.",
+      "Pareho tayong pagod. Huwag tayong gumawa ng maling desisyon.",
+      "Hindi ngayon ang oras para pagtalunan ito.",
+      "Huminga muna tayo bago magpatuloy sa pagtatalo.",
+      "Kailangan natin ng malinaw na isip, hindi bangayan.",
+      "Naiintindihan kong galit ka, pero kaligtasan muna.",
+      "Iwan muna natin ito hanggang sa maging ligtas tayo.",
+      "Ang pagtatalo ngayon ay pabor lang sa mga patay.",
+      "Naririnig ko ang inis mo. Magpokus tayo sa banta.",
+      "Maaayos natin ito kapag nasa loob na tayo ng pader."
+    ],
+    "guarded": [
+      "Naririnig kita. Hindi ngayon.",
+      "Wala tayong oras para mag-away. Tumigil ka.",
+      "Masyadong malaki ang nakataya para magtalo. Itigil mo na.",
+      "Pagod ako, pagod ka. Hayaan mo na.",
+      "Huwag kang magpumilit makipagtalo habang delikado.",
+      "Isa pang salita tungkol dito at aalis ako.",
+      "Itabi ang bangayan bago tayo mapatay nito.",
+      "Hindi ito ang tamang oras. Tumingin sa unahan.",
+      "Tapos na akong makipagtalo sa gitna ng tensiyon.",
+      "Putulin mo ang pagtatalo ngayon din."
+    ],
+    "terse": [
+      "Hindi ngayon.",
+      "Tigil.",
+      "Kumalma ka.",
+      "Mamaya na.",
+      "Hayaan mo na.",
+      "Masyadong delikado.",
+      "Pigilin ang dila.",
+      "Magpokus.",
+      "Sapat na.",
+      "Tahimik."
+    ],
+    "warm": [
+      "Huy, pagod tayong pareho ngayon. Huminga muna tayo nang malalim.",
+      "Alam kong nahihirapan ka at tensiyonado. Narito lang ako. Huminto muna tayo.",
+      "Huwag nating hayaang paglayuin tayo ng pagod. Magkasama tayo.",
+      "Naririnig ko ang kaba mo, pero lumipat muna tayo sa ligtas.",
+      "Mahalaga sa akin ang opinyon mo, pero huwag habang nasa panganib.",
+      "Maglaan tayo ng sandali para kumalma. Magkakampi tayo.",
+      "Sumabay kang huminga sa akin. Aayusin natin ito mamaya.",
+      "Hindi kita kalaban. Panatilihin nating buhay ang isa't isa.",
+      "Pagod lang ang nagsasalita ngayon. Maging mahinahon tayo.",
+      "Pag-uusapan natin ito kapag humupa na ang gulo, pangako."
+    ]
+  }
+}

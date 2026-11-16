@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Talagang sinusubok mo ang pasensya ko ngayon.",
+      "Huwag mo nang isugal pa ang suwerte mo.",
+      "Sumusobra ka na, at hindi ako papayag diyan.",
+      "Ikaw ang nagsimula, pero tatapusin ko kung kailangan.",
+      "Napakalaking pagkakamali ang kausapin ako nang ganyan.",
+      "Pag-isipan mong mabuti ang susunod mong sasabihin.",
+      "Sapat na ang pambabastos mo sa akin.",
+      "Tumatawid ka sa hangganang hindi mo na mababawi.",
+      "Umatras ka bago pa tuluyang magkagulo.",
+      "Sasagutin kita nang patas: itigil mo na 'yan."
+    ],
+    "guarded": [
+      "Sabihin mo ulit at tingnan natin kung saan ka aabot.",
+      "Gusto mong isagad ito? Mas malakas akong gaganti.",
+      "Huwag kang magbanta ng hindi mo kayang maligtasan.",
+      "Subukan mo ako. Tingnan mo kung anong mangyayari sa 'yo.",
+      "Hinuhukay mo ang sarili mong libingan sa salitang 'yan.",
+      "Sige, magpatuloy ka sa kadadaldal at nang malaman mo.",
+      "Hindi ako ang taong dapat mong ginagalit dito.",
+      "Sumulong ka pa nang isang pulgada at magkakadugo.",
+      "Ulitin mo pa nang isang beses. Hinahamon kita.",
+      "Pagsisisihan mo ang pagbangga sa akin."
+    ],
+    "terse": [
+      "Sige, magsalita ka pa.",
+      "Subukan mo.",
+      "Hamon ko sa 'yo.",
+      "Itulak mo ako.",
+      "Maling hakbang.",
+      "Malaking pagkakamali.",
+      "Huling pagkakataon.",
+      "Sige, ilabas mo.",
+      "Huwag mo akong subukan.",
+      "Mag-ingat ka."
+    ],
+    "warm": [
+      "Sobra na ang ginagawa mo.",
+      "Matiisin ako sa 'yo, pero lumalagpas ka na.",
+      "Huwag mo akong piliting tratuhin ka na parang estranghero.",
+      "Di ko akalaing kakalabanin mo ako nang ganito.",
+      "Sinasaktan mo ang taong may tunay na malasakit sa 'yo.",
+      "Tigilan mo ang pagtataboy sa akin gamit ang lupit na 'yan.",
+      "Kung patuloy mo akong aatakihin, ipagtatanggol ko ang sarili ko.",
+      "Itinatapon mo ang samahan natin mismo sa harap ko.",
+      "Umasa ako ng mas maayos sa 'yo. Huwag mo na akong itulak.",
+      "Ayusin mo sarili mo. Di ako tatayo lang dito para magpaabuso."
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Patuloy akong gumagalaw at binabantayan ang nasa unahan.",
+      "Naglalakad lang mula pwesto hanggang pwesto. Medyo kalmado ang kalsada.",
+      "Bumabaybay habang mataas pa ang araw.",
+      "Marami-rami na ring nalakad ngayon. Kumusta ang daan sa pinanggalingan mo?",
+      "Nasa kalsada na naman. Kailangang gumalaw para maghanap ng gamit.",
+      "Nag-iikot para magmanman. Mukhang tahimik naman ang lahat.",
+      "Tuloy lang sa paghakbang. Nakakatulong magpalinaw ng isip.",
+      "Lumilipat lang ng silungan. Ayokong tumambay nang matagal sa iisang lugar.",
+      "Naglalakad sa kalsada. Sana walang makasalubong na kumpol ng patay.",
+      "Patawid ako sa kabilang bahagi. Kumusta ang kalagayan sa direksyon mo?"
+    ],
+    "guarded": [
+      "Patuloy lang sa paggalaw. Huwag mo akong pabagalin.",
+      "Naglalakbay ako. Huwag kang humarang sa daan ko.",
+      "Mapanganib ang daan ngayon. Tabi muna.",
+      "Tuloy-tuloy ang lakad ko. Hindi ako tumatambay nang matagal.",
+      "Mabilis ang lakad, magaan ang dala. Walang oras makipag-usap.",
+      "Huwag kang masyadong lumapit. Nag-iisa akong naglalakad.",
+      "Dumadaan lang. Asikasuhin mo ang sarili mong daan.",
+      "May pupuntahan ako bago magdilim. Lumakad ka na.",
+      "Magaan ang dala at laging tumitingin sa likod. Tabi ka riyan.",
+      "Lumilipat ng pwesto. Huwag mong sirain ang ruta ko."
+    ],
+    "terse": [
+      "Patuloy lang sa paggalaw.",
+      "Nasa daan.",
+      "Naglalakbay.",
+      "Umaalis.",
+      "Dumadaan lang.",
+      "Naglalakad.",
+      "Kumikilos.",
+      "Papunta na.",
+      "Bumabyahe.",
+      "Pasulong."
+    ],
+    "warm": [
+      "Patuloy akong gumagalaw at binabantayan ang nasa unahan. Sumama ka kung gusto mo.",
+      "Nasa daan ngayon! Laging mas ligtas at masaya kapag may kasamang maglakad.",
+      "Magaan ang dala. Sumabay ka kung papunta ka rin doon.",
+      "Bumabagtas sa daan. Masaya akong nakasalubong kita ngayong araw.",
+      "Nagmamadali man, masaya pa ring huminto para kumustahin ang kaibigan.",
+      "Naglalakad patungo sa kabilang kampo. Ingat sa biyahe mo, kaibigan.",
+      "Aalis lang sandali. Mag-ingat sa paghakbang, at magkikita rin tayo mamaya.",
+      "Hindi nakakalungkot ang daan kapag nakakasalubong kita.",
+      "Lumalakad, pero masayang nagkasalubong tayo. Mag-ingat ka palagi sa labas.",
+      "Tinitingnan ang hangganan ng kampo. Masarap kang makitang nasa maayos na lagay."
+    ]
+  }
+}

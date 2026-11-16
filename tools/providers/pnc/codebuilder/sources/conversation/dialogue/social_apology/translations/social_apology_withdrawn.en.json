@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "All right. Let's leave it there.",
+      "Okay. Let's drop the subject.",
+      "Understood. Moving past it.",
+      "No need to say more. It's settled.",
+      "We've said what we needed to say.",
+      "Let's leave it at that and get back to work.",
+      "Fine by me. Subject closed.",
+      "Nothing more to discuss. Let's move.",
+      "Fair enough. We'll leave it alone.",
+      "All right. That's the end of it."
+    ],
+    "guarded": [
+      "All right. Leave it there.",
+      "Don't bring it up again.",
+      "Drop it while you're ahead.",
+      "I'm done hearing about it.",
+      "Leave it where it lies.",
+      "We're not reopening this. Ever.",
+      "That's enough out of you.",
+      "Keep your distance from that subject.",
+      "Consider this matter closed.",
+      "Leave it there and don't test me."
+    ],
+    "terse": [
+      "Leave it.",
+      "Drop it.",
+      "Enough.",
+      "Done.",
+      "Subject closed.",
+      "No more.",
+      "Let it be.",
+      "Finished.",
+      "Moving on.",
+      "End of discussion."
+    ],
+    "warm": [
+      "All right. Let's leave it there for now.",
+      "We can give it some space. We're still good.",
+      "Take your time. We don't have to talk about it anymore.",
+      "I hear you, and it's okay. We can put it to rest.",
+      "It's okay. We can take a break from this topic.",
+      "No worries at all. We'll leave it behind us.",
+      "I understand. Let's just focus on each other and staying safe.",
+      "All good. No pressure to explain anything more.",
+      "We're okay. Let's leave it there peacefully.",
+      "I'm with you. We don't need to rehash it."
+    ]
+  }
+}

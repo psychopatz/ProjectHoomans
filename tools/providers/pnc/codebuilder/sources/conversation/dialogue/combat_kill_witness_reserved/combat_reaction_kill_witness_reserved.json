@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "combat.reaction",
-  "id": "kill_witness_reserved",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "combat.reaction.kill_witness_reserved",
   "metadata": {
     "category": "projecthoomans:combat_kill",
     "contentOwner": "projecthoomans.dialogue_content.events",

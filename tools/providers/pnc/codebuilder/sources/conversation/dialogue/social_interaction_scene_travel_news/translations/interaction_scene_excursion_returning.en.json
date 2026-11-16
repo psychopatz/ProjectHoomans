@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "We're heading home.",
+      "Turn around. Time to get back to base.",
+      "Objective done. Heading back now.",
+      "Let's retrace our steps and get home safe.",
+      "Heading inbound. Keep your guard up until we're inside.",
+      "Pack up what we found. We're going home.",
+      "Time to head back. Watch the trail behind us.",
+      "Return journey begins now. Stay together.",
+      "We're bound for home. Almost there.",
+      "Moving back to safe ground. Keep alert."
+    ],
+    "guarded": [
+      "We're returning. Stay alert until we're home.",
+      "The trip back is when most scavengers get ambushed. Watch the trees.",
+      "Don't let your guard down just because we're heading home.",
+      "Check your rear. Make sure nothing is following our scent.",
+      "Keep the haul hidden. We don't want to draw bandit eyes.",
+      "Returning now. Speed up without making noise.",
+      "We're inbound. Stay ready to drop the bags and fight.",
+      "Watch our backtrail. Stragglers could be tailing us.",
+      "Almost at the gates, but keep checking corners.",
+      "Returning. No relaxing until the deadbolt is thrown."
+    ],
+    "terse": [
+      "Heading home.",
+      "Returning.",
+      "Homeward.",
+      "Back to base.",
+      "Time to return.",
+      "Turn back.",
+      "Inbound.",
+      "Done. Home.",
+      "Retracing steps.",
+      "Going back."
+    ],
+    "warm": [
+      "Time to head home. Let's get everyone back safe.",
+      "We're going home, friend! Can't wait to rest.",
+      "Great work out here. Let's get back home together.",
+      "Heading home, partner! A warm fire is waiting for us.",
+      "Almost back to safety. Keep your spirits up, friend.",
+      "We did good today! Let's get this haul home.",
+      "Heading back! I'm so glad we're both still standing.",
+      "Just a little further and we're home safe. Stay close.",
+      "Homeward bound, partner. You did amazing.",
+      "Let's get back to our camp and take a well-deserved rest."
+    ]
+  }
+}

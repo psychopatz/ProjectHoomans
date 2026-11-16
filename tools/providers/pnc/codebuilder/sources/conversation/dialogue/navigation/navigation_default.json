@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "navigation",
-  "id": "default",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "navigation.default",
   "metadata": {
     "category": "projecthoomans:navigation",
     "responseAct": "NAVIGATION_RESPONSE"
@@ -19,121 +8,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "All right. What would you like to discuss?",
-            "I'm listening. What did you want to talk about?",
-            "What's on your mind?",
-            "Go ahead. What do you need to discuss?",
-            "I'm here. What would you like to say?",
-            "What are you thinking?",
-            "Ready when you are. What's up?",
-            "Yes? What did you want to bring up?",
-            "I have a moment. What is it?",
-            "Sure, what's on your mind?"
-          ],
-          "TL": [
-            "Sige. Ano ang gusto mong pag-usapan?",
-            "Nakikinig ako. Ano ang gusto mong pag-usapan?",
-            "Ano'ng nasa isip mo?",
-            "Sige lang. Ano ang kailangang pag-usapan?",
-            "Nandito ako. Ano ang gusto mong sabihin?",
-            "Ano'ng iniisip mo?",
-            "Handa na ako. Ano'ng meron?",
-            "Oo? Ano ang gusto mong talakayin?",
-            "May sandali ako. Ano 'yon?",
-            "Sige, ano'ng nasa isip mo?"
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "All right. What now?",
-            "What is it? Keep it short.",
-            "Make it quick. We're exposed.",
-            "What do you want? Eyes open.",
-            "Speak up, but don't draw attention.",
-            "What's on your mind? Watch the street.",
-            "What now? We can't linger here.",
-            "I'm listening, but keep scanning.",
-            "State your business quickly.",
-            "What is it? Trouble?"
-          ],
-          "TL": [
-            "Sige. Ano ngayon?",
-            "Ano 'yon? Iklian mo lang.",
-            "Bilisan mo. Lantad tayo.",
-            "Ano'ng kailangan mo? Buksan ang mata.",
-            "Magsalita ka, pero huwag kang mag-ingay.",
-            "Ano'ng iniisip mo? Bantayan ang kalsada.",
-            "Ano ngayon? Hindi tayo pwedeng tumambay rito.",
-            "Nakikinig ako, pero patuloy na magmasid.",
-            "Sabihin mo agad ang kailangan mo.",
-            "Ano 'yon? May gulo ba?"
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "What is it?",
-            "Yes?",
-            "Speak.",
-            "What?",
-            "Go on.",
-            "Listening.",
-            "What's up?",
-            "Say it.",
-            "Make it quick.",
-            "Talk."
-          ],
-          "TL": [
-            "Ano?",
-            "Oo?",
-            "Salita.",
-            "Ano 'yon?",
-            "Sige.",
-            "Nakikinig.",
-            "Ano meron?",
-            "Sabihin mo.",
-            "Bilisan mo.",
-            "Usap."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Sure. What would you like to discuss?",
-            "Always glad to talk with you. What's on your mind?",
-            "I'm all ears. What did you want to share?",
-            "Take your time. What would you like to discuss?",
-            "Happy to chat. What's going on?",
-            "Good to talk to you. What's on your heart?",
-            "I'm right here with you. What did you need?",
-            "Whatever you need to talk about, I'm listening.",
-            "Sure thing. What did you want to talk through?",
-            "It's always nice catching up with you. What is it?"
-          ],
-          "TL": [
-            "Sige. Ano ang gusto mong pag-usapan?",
-            "Laging masayang makausap ka. Ano'ng nasa isip mo?",
-            "Nakikinig ako nang buo. Ano'ng gusto mong ibahagi?",
-            "Huwag kang magmadali. Ano ang gusto mong pag-usapan?",
-            "Masayang makipagkwentuhan. Ano'ng nangyayari?",
-            "Mabuting makausap ka. Ano'ng nilalaman ng puso mo?",
-            "Nandito lang ako kasama mo. Ano'ng kailangan mo?",
-            "Kahit ano'ng gusto mong pag-usapan, nakikinig ako.",
-            "Walang anuman. Ano ang gusto mong linawin?",
-            "Laging magandang kamustahin ka. Ano 'yon?"
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/navigation_default.en.json",
+    "TL": "translations/navigation_default.tl.json"
   }
 }

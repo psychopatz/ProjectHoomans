@@ -1,15 +1,6 @@
 {
-  "kind": "dialogue",
-  "id": "parley",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.greetings.hostile.parley",
   "metadata": {
     "runtimeBlockID": "projecthoomans:hostile_parley",
     "category": "projecthoomans:greetings",
@@ -82,7 +73,5 @@
         ]
       }
     ]
-  },
-  "namespace": "social.greetings.hostile",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

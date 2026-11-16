@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Kinakaya ko, isang araw bawat pagkakataon. Ikaw?",
+      "Kinakaya gaya ng sinuman dito sa labas. Ikaw?",
+      "Hindi naman masyadong makapagreklamo. Tinitiis bawat araw.",
+      "Nakatayo pa rin. Malaking bagay na 'yon sa panahong ito.",
+      "Maayos naman. Kumusta ang lagay sa parte mo?",
+      "Nakakaraos sa bawat oras. Kumusta naman ikaw?",
+      "Maayos naman, sa kabila ng lahat ng nangyayari.",
+      "Sumusulong pa rin. Kumusta ang biyahe mo?",
+      "Kumakapit pa rin. Sana ikaw rin.",
+      "Buhay at lumalaban. Ano pa bang mahihiling natin?"
+    ],
+    "guarded": [
+      "Kinakaya ko. Tama na iyon.",
+      "Nabubuhay pa. Iyon lang ang kailangan mong malaman.",
+      "Kaya ko ang sarili ko. Huwag mo nang alalahanin.",
+      "Nakatayo pa rin. Manatili tayo sa pakay natin.",
+      "Maayos ang lagay ko. Hindi kailangang mag-usisa.",
+      "Ginagawa ang dapat gawin. Sapat na 'yon.",
+      "Huminga pa. Wala nang iba pang sasabihin tungkol doon.",
+      "Ayos lang ako sa sarili ko, salamat.",
+      "Kinakaya nang maayos nang walang nangingialam.",
+      "Kinakaya ko nang maayos. Hayaan na natin."
+    ],
+    "terse": [
+      "Kinakaya.",
+      "Kinakaya pa.",
+      "Nakatayo pa.",
+      "Matatag pa.",
+      "Nabubuhay.",
+      "Ayos sa ngayon.",
+      "Huminga pa.",
+      "Puwede namang mas malala.",
+      "Maayos naman.",
+      "Araw-araw lang."
+    ],
+    "warm": [
+      "Kinakaya ko. Salamat sa pagtatanong.",
+      "Maayos naman ako, lalo na at may kasamang maaasahan.",
+      "Kinakaya naman. Salamat talaga sa pangangamusta.",
+      "Matatag pa rin. Mas madali kapag may nagmamalasakit.",
+      "Maayos ang araw ko. Sana maganda rin ang pakiramdam mo.",
+      "Kumakapit pa rin. Salamat sa pag-alala sa akin.",
+      "Medyo maayos ang pakiramdam ko ngayon, salamat. Ikaw?",
+      "Sama-sama nating nalalagpasan ito. Iyon ang mahalaga.",
+      "Nakangiti pa rin sa kabila ng lahat. Masaya akong nandito ka.",
+      "Maayos ako, kaibigan. Salamat sa paglalaan ng oras magtanong."
+    ]
+  }
+}

@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "social",
-  "id": "dispute_withdrawn",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.dispute_withdrawn",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "All right. Let's step back from this.",
-            "We're not getting anywhere. Let's move on.",
-            "I think we've said enough on the matter.",
-            "Let's take a break from this topic.",
-            "Fair enough. Let's focus on other priorities.",
-            "No point spinning our wheels. Let's work.",
-            "Understood. We'll leave it at that.",
-            "Agreed. Moving past it now.",
-            "We can revisit this when things settle down.",
-            "All right. Let's put our energy elsewhere."
-          ],
-          "TL": [
-            "Sige. Umatras muna tayo sa usapang ito.",
-            "Wala tayong mararating. Magpatuloy na tayo.",
-            "Sa tingin ko sapat na ang nasabi natin sa usapin.",
-            "Magpahinga muna tayo sa paksang ito.",
-            "Makatwiran. Magpokus na lang tayo sa ibang gawain.",
-            "Walang silbing magpaulit-ulit. Magtrabaho na tayo.",
-            "Naintindihan. Diyan na muna natin iiwan.",
-            "Sang-ayon. Lumilipas na tayo roon.",
-            "Mababalikan natin ito kapag maayos na ang lahat.",
-            "Sige. Dalhin na lang natin ang lakas sa iba."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "Let's leave it there.",
-            "I'm not arguing with you anymore.",
-            "Done talking about this.",
-            "Subject is closed. Back off.",
-            "I've said my piece. Leave it alone.",
-            "Drop it before I get angry.",
-            "Nothing more to say.",
-            "We're done here.",
-            "Walk away.",
-            "I'm finished with this conversation."
-          ],
-          "TL": [
-            "Tama na iyon.",
-            "Hindi na ako makikipagtalo sa 'yo.",
-            "Tapos na akong pag-usapan ito.",
-            "Sarado na ang paksa. Umatras ka.",
-            "Nasabi ko na ang parte ko. Hayaan mo na.",
-            "Itigil mo 'yan bago pa ako magalit.",
-            "Wala nang dapat sabihin pa.",
-            "Tapos na tayo rito.",
-            "Umalis ka na.",
-            "Tapos na ako sa usapang ito."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Drop it.",
-            "Done.",
-            "Enough.",
-            "No more.",
-            "Moving on.",
-            "Leave it.",
-            "Finished.",
-            "Closed.",
-            "End of it.",
-            "Drop the topic."
-          ],
-          "TL": [
-            "Hayaan mo na.",
-            "Tapos na.",
-            "Sapat na.",
-            "Wala na.",
-            "Tuloy na.",
-            "Tama na.",
-            "Tapos.",
-            "Sarado.",
-            "Diyan nagtatapos.",
-            "Iwan ang paksa."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Let's leave it there for now, friend. We're still good.",
-            "I don't want this to come between us. Let's rest on it.",
-            "We've said what we needed to say. All love here.",
-            "Let's pause this. You're more important to me than this argument.",
-            "All good. Let's go grab a drink and clear our heads.",
-            "I hear you, and I respect you. Let's let the dust settle.",
-            "We don't need to fight. We're on the same team.",
-            "It's all right. We can let this one slide.",
-            "I value our partnership too much to push this.",
-            "We'll be okay. Let's take a breather."
-          ],
-          "TL": [
-            "Tama na muna iyon, kaibigan. Maayos pa rin tayo.",
-            "Ayokong masira tayo dahil dito. Ipahinga na muna natin.",
-            "Nasabi na natin ang kailangan. Maayos ang kalooban dito.",
-            "Tigil muna. Mas mahalaga ka sa akin kaysa sa pagtatalong ito.",
-            "Ayos lang. Uminom muna tayo para mahimasmasan.",
-            "Narinig kita, at iginagalang kita. Hayaang lumipas ang alikabok.",
-            "Di natin kailangang mag-away. Nasa iisang koponan tayo.",
-            "Ayos lang. Pwede nating palampasin ang isang 'to.",
-            "Masyadong mahalaga ang samahan natin para ipagpilitan ito.",
-            "Magiging maayos tayo. Huminga muna tayo nang malalim."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/social_dispute_withdrawn.en.json",
+    "TL": "translations/social_dispute_withdrawn.tl.json"
   }
 }

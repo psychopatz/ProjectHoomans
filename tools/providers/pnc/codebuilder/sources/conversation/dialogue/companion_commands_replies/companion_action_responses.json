@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "companion.action",
-  "id": "responses",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "companion.action.responses",
   "metadata": {
     "textTarget": "convo/SemanticResponses",
     "textRows": [

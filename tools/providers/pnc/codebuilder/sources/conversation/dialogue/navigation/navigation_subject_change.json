@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "navigation",
-  "id": "subject_change",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "navigation.subject_change",
   "metadata": {
     "category": "projecthoomans:navigation",
     "responseAct": "NAVIGATION_RESPONSE"
@@ -19,121 +8,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "All right. What did you want to talk about?",
-            "Sure, what else did you want to discuss?",
-            "Changing subject. What's on your mind?",
-            "What other topic would you like to cover?",
-            "I'm open. What did you want to talk about next?",
-            "Understood. What else is on your mind?",
-            "Switching gears. What's the next matter?",
-            "Go ahead with what you wanted to say.",
-            "Sure thing. What did you want to bring up?",
-            "What's the next topic?"
-          ],
-          "TL": [
-            "Sige. Ano ang gusto mong pag-usapan?",
-            "Sige, ano pa ang gusto mong pag-usapan?",
-            "Paglipat ng usapan. Ano'ng nasa isip mo?",
-            "Anong iba pang paksa ang gusto mong talakayin?",
-            "Bukas ako. Ano'ng gusto mong pag-usapan kasunod?",
-            "Naintindihan ko. Ano pa ang nasa isip mo?",
-            "Lilipat tayo ng usapan. Ano'ng susunod na bagay?",
-            "Sige lang sa kung ano ang gusto mong sabihin.",
-            "Walang anuman. Ano ang gusto mong talakayin?",
-            "Ano ang susunod na paksa?"
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "All right. What is it?",
-            "Changing topics? Fine, make it quick.",
-            "What else do you want to bring up?",
-            "Switching subjects. What now?",
-            "Go ahead, but keep your head on a swivel.",
-            "Different topic? Keep it relevant to surviving.",
-            "What else? We don't have all day.",
-            "Say what you need to say.",
-            "New subject? What is it?",
-            "Listening, but don't waste time."
-          ],
-          "TL": [
-            "Sige. Ano iyon?",
-            "Ibang usapan? Sige, bilisan mo.",
-            "Ano pa ang gusto mong banggitin?",
-            "Lilipat ng paksa. Ano ngayon?",
-            "Sige lang, pero patuloy na magmatyag.",
-            "Ibang paksa? Siguraduhing may kinalaman sa kaligtasan.",
-            "Ano pa? Wala tayong buong araw.",
-            "Sabihin mo ang dapat mong sabihin.",
-            "Bagong usapan? Ano 'yon?",
-            "Nakikinig ako, pero huwag mag-aksaya ng oras."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "What else?",
-            "Next topic?",
-            "What now?",
-            "Go on.",
-            "Different topic?",
-            "What is it?",
-            "Speak.",
-            "Next?",
-            "Listening.",
-            "Say it."
-          ],
-          "TL": [
-            "Ano pa?",
-            "Susunod na paksa?",
-            "Ano ngayon?",
-            "Sige.",
-            "Ibang usapan?",
-            "Ano 'yon?",
-            "Salita.",
-            "Susunod?",
-            "Nakikinig.",
-            "Sabihin mo."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Sure. What did you want to talk about?",
-            "I'd love to chat about whatever you like.",
-            "What else would you like to talk through, friend?",
-            "Always happy to hear what's on your mind.",
-            "Sure thing! What other thoughts do you have?",
-            "Take your time. What should we talk about next?",
-            "I'm glad to discuss whatever matters to you.",
-            "Go right ahead, I'm listening closely.",
-            "What else is on your heart today?",
-            "I'm right here with you. What's next?"
-          ],
-          "TL": [
-            "Sige. Ano ang gusto mong pag-usapan?",
-            "Gusto kong makipag-usap tungkol sa kahit anong naisin mo.",
-            "Ano pa ang gusto mong pag-usapan natin, kaibigan?",
-            "Laging masayang marinig kung ano'ng nasa isip mo.",
-            "Oo naman! Ano pa ang mga iniisip mo?",
-            "Huwag magmadali. Ano'ng susunod nating pag-uusapan?",
-            "Masaya akong pag-usapan ang anumang mahalaga sa'yo.",
-            "Sige lang, nakikinig ako nang mabuti.",
-            "Ano pa ang nasa puso mo ngayon?",
-            "Nandito lang ako kasama mo. Ano'ng susunod?"
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/navigation_subject_change.en.json",
+    "TL": "translations/navigation_subject_change.tl.json"
   }
 }

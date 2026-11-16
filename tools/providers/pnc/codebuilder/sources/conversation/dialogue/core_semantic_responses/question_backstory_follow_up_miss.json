@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.backstory.follow_up",
-  "id": "miss",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.backstory.follow_up.miss",
   "metadata": {
     "responsePoolID": "question.backstory.follow_up.miss",
     "responseAct": "MISS"

@@ -1,8 +1,7 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
+  "schema": "psychopatz.psdl.v2",
   "id": "accept",
-  "owner": "ProjectHoomans",
+  "kind": "dialogue",
   "metadata": {
     "responsePoolID": "accept",
     "responseAct": "ACCEPT"
@@ -15,11 +14,7 @@
           "EN": "Okay, I'll get started.",
           "TL": "Okay, I'll get started."
         },
-        "when": {
-          "op": "eq",
-          "path": "conversation.hasPendingRequest",
-          "value": true
-        },
+        "when": "conversation.hasPendingRequest == true",
         "metadata": {
           "fallback": "Okay, I'll get started.",
           "priority": 1,
@@ -32,11 +27,7 @@
           "EN": "All right. I can take care of that.",
           "TL": "All right. I can take care of that."
         },
-        "when": {
-          "op": "eq",
-          "path": "conversation.hasPendingRequest",
-          "value": true
-        },
+        "when": "conversation.hasPendingRequest == true",
         "metadata": {
           "fallback": "All right. I can take care of that.",
           "priority": 1,

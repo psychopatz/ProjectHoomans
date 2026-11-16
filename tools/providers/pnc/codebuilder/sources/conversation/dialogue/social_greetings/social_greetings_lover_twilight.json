@@ -1,40 +1,7 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "social.greetings.lover",
-  "id": "twilight",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
-  "when": {
-    "all": [
-      {
-        "path": "relationship.speakerToAddressee.state",
-        "op": "eq",
-        "value": "Lover"
-      },
-      {
-        "any": [
-          {
-            "path": "world.time.hour",
-            "op": "gte",
-            "value": 21
-          },
-          {
-            "path": "world.time.hour",
-            "op": "lt",
-            "value": 5
-          }
-        ]
-      }
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.greetings.lover.twilight",
+  "when": "relationship.speakerToAddressee.state == \"Lover\" && (world.time.hour >= 21 || world.time.hour < 5)",
   "metadata": {
     "runtimeBlockID": "projecthoomans:greeting_lover_twilight",
     "category": "projecthoomans:greetings",

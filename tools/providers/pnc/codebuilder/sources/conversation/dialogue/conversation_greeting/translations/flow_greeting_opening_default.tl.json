@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Uy, mabuti at nakita kita.",
+      "Kumusta. Kumusta ang lagay?",
+      "Mabuti at nakita kita.",
+      "Magandang umaga. Sana maayos ang araw mo.",
+      "Uy ulit. Anong nangyayari?",
+      "Nandiyan ka pala. Tahimik ba ang lahat?",
+      "Magandang hapon. Ligtas ka ba sa gulo?",
+      "Kumusta. Mabuti at may nakasalubong akong buhay pa.",
+      "Uy. Kumusta ang paligid?",
+      "Magandang gabi. Nakatayo ka pa rin pala."
+    ],
+    "guarded": [
+      "Sabihin mo ang pakay mo. Lumayo ka.",
+      "Diyan ka lang. Anong gusto mo?",
+      "Itaas ang mga kamay. Sino ka?",
+      "Huwag kang lalapit hangga't hindi ko alam ang pakay mo.",
+      "Ilayo mo ang mga kamay mo. Magsalita ka riyan.",
+      "Binabantayan kita. Anong nagdala sa 'yo rito?",
+      "Dahan-dahan lang. Umatras ka at sabihin mo ang sasabihin mo.",
+      "Lumayo ka. Masyadong mapanganib ang panahon para sa mga estranghero.",
+      "Tama na ang lapit na 'yan. Anong hinahanap mo?",
+      "Diyan ka lang. Hindi pa kita kilala."
+    ],
+    "terse": [
+      "Kumusta.",
+      "Hi.",
+      "Uy.",
+      "Magandang umaga.",
+      "Nandiyan ka pala.",
+      "Nandito pa rin.",
+      "Magandang hapon.",
+      "Tahimik na araw.",
+      "Maayos ka ba?",
+      "Magandang gabi."
+    ],
+    "warm": [
+      "Uy! Mabuti at nakita kita.",
+      "Uy, mabuti at buo ka pa.",
+      "Masaya akong nakita kita. Kumusta ang lagay mo?",
+      "Uy. Masaya talaga akong nakabalik ka nang ligtas.",
+      "Bumalik ka na agad? Mabuti at nandito ka.",
+      "Laging nakakagaan ng loob makita kang dumarating.",
+      "Mabuti at nakatayo ka pa rin ngayon.",
+      "Uy! Kumusta ang araw mo?",
+      "Laging magandang makakita ng pamilyar na mukha rito.",
+      "Maligayang pagbabalik. Sana tahimik lang sa labas."
+    ]
+  }
+}

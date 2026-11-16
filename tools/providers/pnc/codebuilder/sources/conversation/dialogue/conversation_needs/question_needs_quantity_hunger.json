@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.needs.quantity",
-  "id": "hunger",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.needs.quantity.hunger",
   "metadata": {
     "category": "projecthoomans:conversation_content",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",

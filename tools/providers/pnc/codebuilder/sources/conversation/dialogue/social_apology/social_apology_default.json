@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "social.apology",
-  "id": "default",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.apology.default",
   "metadata": {
     "category": "projecthoomans:social.apology",
     "responseAct": "APOLOGY_RESPONSE"
@@ -19,121 +8,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "What are you apologizing for?",
-            "What is that for?",
-            "Why are you saying sorry?",
-            "What did you do?",
-            "Did something happen that I missed?",
-            "No need to apologize unless something went wrong.",
-            "What's the apology about?",
-            "You don't owe me an apology unless you broke something.",
-            "Hold on, what are you apologizing for?",
-            "What brought this on?"
-          ],
-          "TL": [
-            "Ano ang hinihingi mo ng tawad?",
-            "Para saan iyan?",
-            "Bakit ka humihingi ng pasensya?",
-            "Anong ginawa mo?",
-            "May nangyari ba na hindi ko napansin?",
-            "Walang kailangang ihingi ng tawad maliban kung may nagkamali.",
-            "Tungkol saan ang paumanhin?",
-            "Wala kang utang na tawad sa 'kin maliban kung may nasira ka.",
-            "Teka, para saan ang tawad mo?",
-            "Bakit mo biglang sinabi 'yan?"
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "What are you apologizing for?",
-            "Why are you apologizing? What happened?",
-            "What went wrong that I should know about?",
-            "People only apologize when they messed up. What was it?",
-            "What are you trying to get ahead of?",
-            "Did you touch something you shouldn't have?",
-            "Hold on. Why are you saying sorry to me?",
-            "What's the damage?",
-            "Tell me what you did before I find out myself.",
-            "Don't apologize until you tell me what you did."
-          ],
-          "TL": [
-            "Ano ang hinihingi mo ng tawad?",
-            "Bakit ka nagpapaumanhin? Anong nangyari?",
-            "Anong pumalpak na dapat kong malaman?",
-            "Nagsasabi lang ng sorry ang tao kapag pumalpak. Ano 'yon?",
-            "Ano ang inuunahan mong sabihin?",
-            "May ginalaw ka ba na hindi dapat?",
-            "Teka. Bakit ka humihingi ng tawad sa akin?",
-            "Gaano kalaki ang sira?",
-            "Sabihin mo ang ginawa mo bago ko pa matuklasan.",
-            "Huwag kang mag-sorry hangga't di mo sinasabi ang ginawa mo."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "What are you apologizing for?",
-            "Why?",
-            "For what?",
-            "What did you break?",
-            "Explain.",
-            "What happened?",
-            "Apologizing for what?",
-            "Spit it out.",
-            "Why are you sorry?",
-            "What did you do now?"
-          ],
-          "TL": [
-            "Ano ang hinihingi mo ng tawad?",
-            "Bakit?",
-            "Dahil saan?",
-            "Anong sinira mo?",
-            "Ipaliwanag mo.",
-            "Anong nangyari?",
-            "Hihingi ng tawad para saan?",
-            "Diretsuhin mo na.",
-            "Bakit ka nagso-sorry?",
-            "Anong ginawa mo ngayon?"
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "What are you apologizing for?",
-            "Hey, you don't have to apologize to me.",
-            "What's this for? We're good.",
-            "Don't sweat it. What's on your mind?",
-            "You didn't do anything wrong. What happened?",
-            "You don't need to apologize. We look out for each other.",
-            "Why the apology? Everything is okay between us.",
-            "You're too hard on yourself. What's wrong?",
-            "No need for apologies here. We're on the same side.",
-            "It's all right. You really don't have to apologize."
-          ],
-          "TL": [
-            "Ano ang hinihingi mo ng tawad?",
-            "Huy, hindi mo kailangang humingi ng tawad sa akin.",
-            "Para saan ito? Ayos tayo.",
-            "Huwag mong alalahanin. Anong iniisip mo?",
-            "Wala kang ginawang mali. Anong nangyari?",
-            "Di mo kailangang magpaumanhin. Nagtutulungan tayo rito.",
-            "Bakit ka nagpapaumanhin? Maayos ang lahat sa atin.",
-            "Masyado mong pinahihirapan ang sarili mo. May problema ba?",
-            "Walang kailangang tawad dito. Magkakampi tayo.",
-            "Ayos lang talaga. Hindi mo kailangang mag-sorry."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/social_apology_default.en.json",
+    "TL": "translations/social_apology_default.tl.json"
   }
 }

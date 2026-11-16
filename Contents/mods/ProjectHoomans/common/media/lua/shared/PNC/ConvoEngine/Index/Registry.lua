@@ -574,7 +574,7 @@ return {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialReactionsHostileOfferThreat",
-        ["recordCount"] = 5,
+        ["recordCount"] = 6,
     },
     {
         ["domain"] = "social_settlement_admission",
@@ -623,6 +623,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/WellbeingContent",
         ["recordCount"] = 12,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["kind"] = "pack",
+        ["module"] = "PNC/ConvoEngine/Index/Pack/SocialReactionsHostileOfferThreat",
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "trading",

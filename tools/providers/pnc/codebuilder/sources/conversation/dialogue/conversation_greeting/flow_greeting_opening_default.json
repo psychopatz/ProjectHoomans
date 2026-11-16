@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "flow.greeting.opening",
-  "id": "default",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "flow.greeting.opening.default",
   "metadata": {
     "category": "projecthoomans:conversation_content",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Hey there. Good to see you.",
-            "Hello there. How are things?",
-            "Good to see you.",
-            "Morning. Hope the day treats you well.",
-            "Hey again. What's going on?",
-            "There you are. Everything quiet?",
-            "Afternoon. Staying out of trouble?",
-            "Hello. Good to run into another living person.",
-            "Hey. How's the perimeter looking?",
-            "Evening. Still on your feet, I see."
-          ],
-          "TL": [
-            "Uy, mabuti at nakita kita.",
-            "Kumusta. Kumusta ang lagay?",
-            "Mabuti at nakita kita.",
-            "Magandang umaga. Sana maayos ang araw mo.",
-            "Uy ulit. Anong nangyayari?",
-            "Nandiyan ka pala. Tahimik ba ang lahat?",
-            "Magandang hapon. Ligtas ka ba sa gulo?",
-            "Kumusta. Mabuti at may nakasalubong akong buhay pa.",
-            "Uy. Kumusta ang paligid?",
-            "Magandang gabi. Nakatayo ka pa rin pala."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "State your business. Keep your distance.",
-            "Hold it right there. What do you want?",
-            "Hands where I can see them. Who are you?",
-            "Don't come any closer until I know your business.",
-            "Keep your hands clear. Talk from there.",
-            "I'm watching you. What brings you here?",
-            "Easy now. Step back and speak your piece.",
-            "Keep your distance. Times are too dangerous for strangers.",
-            "That's close enough. What are you looking for?",
-            "Stay where you are. I don't know you yet."
-          ],
-          "TL": [
-            "Sabihin mo ang pakay mo. Lumayo ka.",
-            "Diyan ka lang. Anong gusto mo?",
-            "Itaas ang mga kamay. Sino ka?",
-            "Huwag kang lalapit hangga't hindi ko alam ang pakay mo.",
-            "Ilayo mo ang mga kamay mo. Magsalita ka riyan.",
-            "Binabantayan kita. Anong nagdala sa 'yo rito?",
-            "Dahan-dahan lang. Umatras ka at sabihin mo ang sasabihin mo.",
-            "Lumayo ka. Masyadong mapanganib ang panahon para sa mga estranghero.",
-            "Tama na ang lapit na 'yan. Anong hinahanap mo?",
-            "Diyan ka lang. Hindi pa kita kilala."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Hello.",
-            "Hi.",
-            "Hey.",
-            "Morning.",
-            "There you are.",
-            "Still here.",
-            "Afternoon.",
-            "Quiet day.",
-            "You good?",
-            "Evening."
-          ],
-          "TL": [
-            "Kumusta.",
-            "Hi.",
-            "Uy.",
-            "Magandang umaga.",
-            "Nandiyan ka pala.",
-            "Nandito pa rin.",
-            "Magandang hapon.",
-            "Tahimik na araw.",
-            "Maayos ka ba?",
-            "Magandang gabi."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Hey! It is good to see you.",
-            "Hey, good to see you in one piece.",
-            "Glad to see you. How are you holding up?",
-            "Hey. Really glad you made it back safe.",
-            "Back already? Good to have you around.",
-            "It's always a relief seeing you walk through.",
-            "Good to see you on your feet today.",
-            "Hey there! How's your day been treating you?",
-            "Always good seeing a friendly face out here.",
-            "Welcome back. Hope things were quiet out there."
-          ],
-          "TL": [
-            "Uy! Mabuti at nakita kita.",
-            "Uy, mabuti at buo ka pa.",
-            "Masaya akong nakita kita. Kumusta ang lagay mo?",
-            "Uy. Masaya talaga akong nakabalik ka nang ligtas.",
-            "Bumalik ka na agad? Mabuti at nandito ka.",
-            "Laging nakakagaan ng loob makita kang dumarating.",
-            "Mabuti at nakatayo ka pa rin ngayon.",
-            "Uy! Kumusta ang araw mo?",
-            "Laging magandang makakita ng pamilyar na mukha rito.",
-            "Maligayang pagbabalik. Sana tahimik lang sa labas."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/flow_greeting_opening_default.en.json",
+    "TL": "translations/flow_greeting_opening_default.tl.json"
   }
 }

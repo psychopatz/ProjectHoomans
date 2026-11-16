@@ -1,8 +1,7 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
+  "schema": "psychopatz.psdl.v2",
   "id": "greeting",
-  "owner": "ProjectHoomans",
+  "kind": "dialogue",
   "metadata": {
     "responsePoolID": "greeting",
     "responseAct": "GREETING"
@@ -11,10 +10,6 @@
     "variants": [
       {
         "id": "greeting.dataset.holding_up",
-        "text": {
-          "EN": "Hey. How are you holding up?",
-          "TL": "Hey. How are you holding up?"
-        },
         "metadata": {
           "fallback": "Hey. How are you holding up?",
           "templateID": "greeting.dataset.holding_up"
@@ -22,10 +17,6 @@
       },
       {
         "id": "greeting.dataset.good_to_see",
-        "text": {
-          "EN": "Good to see you again.",
-          "TL": "Good to see you again."
-        },
         "metadata": {
           "fallback": "Good to see you again.",
           "templateID": "greeting.dataset.good_to_see"
@@ -33,15 +24,15 @@
       },
       {
         "id": "greeting.dataset.how_things",
-        "text": {
-          "EN": "Hey. How are things going?",
-          "TL": "Hey. How are things going?"
-        },
         "metadata": {
           "fallback": "Hey. How are things going?",
           "templateID": "greeting.dataset.how_things"
         }
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/greeting.en.json",
+    "TL": "translations/greeting.tl.json"
   }
 }

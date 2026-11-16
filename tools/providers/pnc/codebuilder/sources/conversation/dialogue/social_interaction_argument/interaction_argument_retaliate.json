@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.argument",
-  "id": "retaliate",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.argument.retaliate",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "You're really testing me right now.",
-            "Don't push your luck any further.",
-            "You're out of line, and I won't stand for it.",
-            "You started this, but I'll finish it if I have to.",
-            "You're making a massive mistake talking to me like that.",
-            "Think very carefully about what you say next.",
-            "I've had about enough of your disrespect.",
-            "You're crossing a boundary you can't walk back.",
-            "Back down before this escalates completely.",
-            "I'm answering in kind: knock it off."
-          ],
-          "TL": [
-            "Talagang sinusubok mo ang pasensya ko ngayon.",
-            "Huwag mo nang isugal pa ang suwerte mo.",
-            "Sumusobra ka na, at hindi ako papayag diyan.",
-            "Ikaw ang nagsimula, pero tatapusin ko kung kailangan.",
-            "Napakalaking pagkakamali ang kausapin ako nang ganyan.",
-            "Pag-isipan mong mabuti ang susunod mong sasabihin.",
-            "Sapat na ang pambabastos mo sa akin.",
-            "Tumatawid ka sa hangganang hindi mo na mababawi.",
-            "Umatras ka bago pa tuluyang magkagulo.",
-            "Sasagutin kita nang patas: itigil mo na 'yan."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "Say that again and see how far it gets you.",
-            "You want to push this? I will push back harder.",
-            "Don't make threats you can't survive.",
-            "Try me. See what happens to you.",
-            "You're digging your own grave with that talk.",
-            "Keep running that mouth and find out.",
-            "I'm not the one to mess with out here.",
-            "Push one more inch and we have bloodshed.",
-            "Say it one more time. I dare you.",
-            "You will regret crossing me."
-          ],
-          "TL": [
-            "Sabihin mo ulit at tingnan natin kung saan ka aabot.",
-            "Gusto mong isagad ito? Mas malakas akong gaganti.",
-            "Huwag kang magbanta ng hindi mo kayang maligtasan.",
-            "Subukan mo ako. Tingnan mo kung anong mangyayari sa 'yo.",
-            "Hinuhukay mo ang sarili mong libingan sa salitang 'yan.",
-            "Sige, magpatuloy ka sa kadadaldal at nang malaman mo.",
-            "Hindi ako ang taong dapat mong ginagalit dito.",
-            "Sumulong ka pa nang isang pulgada at magkakadugo.",
-            "Ulitin mo pa nang isang beses. Hinahamon kita.",
-            "Pagsisisihan mo ang pagbangga sa akin."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Keep talking.",
-            "Try it.",
-            "Dare you.",
-            "Push me.",
-            "Wrong move.",
-            "Big mistake.",
-            "Last chance.",
-            "Bring it.",
-            "Don't test me.",
-            "Watch yourself."
-          ],
-          "TL": [
-            "Sige, magsalita ka pa.",
-            "Subukan mo.",
-            "Hamon ko sa 'yo.",
-            "Itulak mo ako.",
-            "Maling hakbang.",
-            "Malaking pagkakamali.",
-            "Huling pagkakataon.",
-            "Sige, ilabas mo.",
-            "Huwag mo akong subukan.",
-            "Mag-ingat ka."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "You're pushing this too far.",
-            "I've been patient with you, but you're crossing the line.",
-            "Don't make me treat you like a stranger.",
-            "I didn't think you would turn on me like this.",
-            "You're hurting someone who actually cared about you.",
-            "Stop pushing me away with this cruelty.",
-            "If you keep attacking me, I will protect myself.",
-            "You're throwing our bond away right in front of me.",
-            "I expected better from you. Don't push me further.",
-            "Check yourself. I won't just stand here and take abuse."
-          ],
-          "TL": [
-            "Sobra na ang ginagawa mo.",
-            "Matiisin ako sa 'yo, pero lumalagpas ka na.",
-            "Huwag mo akong piliting tratuhin ka na parang estranghero.",
-            "Di ko akalaing kakalabanin mo ako nang ganito.",
-            "Sinasaktan mo ang taong may tunay na malasakit sa 'yo.",
-            "Tigilan mo ang pagtataboy sa akin gamit ang lupit na 'yan.",
-            "Kung patuloy mo akong aatakihin, ipagtatanggol ko ang sarili ko.",
-            "Itinatapon mo ang samahan natin mismo sa harap ko.",
-            "Umasa ako ng mas maayos sa 'yo. Huwag mo na akong itulak.",
-            "Ayusin mo sarili mo. Di ako tatayo lang dito para magpaabuso."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_argument_retaliate.en.json",
+    "TL": "translations/interaction_argument_retaliate.tl.json"
   }
 }

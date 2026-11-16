@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "social",
-  "id": "hostile_boundary",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.hostile_boundary",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "That tone isn't acceptable.",
-            "Speak to me with respect or don't speak to me at all.",
-            "We need to keep this professional and decent.",
-            "There's no call for hostility here.",
-            "I won't be spoken to that way.",
-            "Keep your hostility out of this conversation.",
-            "We have boundaries here. Respect them.",
-            "That kind of talk isn't going to get you anywhere.",
-            "Lower your voice and adjust your attitude.",
-            "I expect basic decency from the people around me."
-          ],
-          "TL": [
-            "Hindi katanggap-tanggap ang ganyang tono.",
-            "Kausapin mo ako nang may galang o huwag na lang.",
-            "Kailangan nating panatilihing maayos at magalang ito.",
-            "Walang dahilan para maging marahas dito.",
-            "Hindi ako papayag na ganyanin ang pananalita sa akin.",
-            "Alisin mo ang galit sa usapang ito.",
-            "May mga hangganan tayo rito. Igalang mo ang mga 'yon.",
-            "Walang patutunguhan ang ganyang pananalita.",
-            "Hinaan mo ang boses mo at ayusin ang asal mo.",
-            "Umaasa ako sa simpleng respeto mula sa mga kasama ko."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "Don't talk to me like that.",
-            "Check yourself before you speak to me again.",
-            "You're stepping way out of line.",
-            "Mind your mouth around me.",
-            "I don't take disrespect from anyone.",
-            "You cross that boundary again and see what happens.",
-            "Watch how you address me.",
-            "Keep your tone in check.",
-            "You are playing with a short fuse.",
-            "Back off that attitude."
-          ],
-          "TL": [
-            "Huwag mo akong kausapin nang ganyan.",
-            "Pagsabihan mo ang sarili mo bago ka makipag-usap sa 'kin ulit.",
-            "Sumusobra ka na sa linya.",
-            "Bantayan mo ang bibig mo sa harap ko.",
-            "Hindi ako pumapayag na bastusin ng kahit sino.",
-            "Tawirin mo ulit ang hangganang 'yan at tingnan natin.",
-            "Bantayan mo kung paano mo ako kausapin.",
-            "Ayusin mo ang tono mo.",
-            "Naglalaro ka sa maikling mitsa.",
-            "Alisin mo ang ganyang ugali."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Watch it.",
-            "Out of line.",
-            "Stop.",
-            "Tone it down.",
-            "Respect.",
-            "Check yourself.",
-            "Enough.",
-            "Not with me.",
-            "Line crossed.",
-            "Back off."
-          ],
-          "TL": [
-            "Mag-ingat ka.",
-            "Sobra na.",
-            "Tigil.",
-            "Hinaan mo.",
-            "Respeto.",
-            "Ayusin mo sarili mo.",
-            "Sapat na.",
-            "Huwag sa akin.",
-            "Lumagpas ka na.",
-            "Umatras ka."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Hey, where is this hostility coming from? We're allies.",
-            "Don't snap at me like that. I've only ever helped you.",
-            "I care about you, but that doesn't mean you can disrespect me.",
-            "Please, let's treat each other better than this.",
-            "That hurt, coming from you. Let's dial it back.",
-            "We've got enough enemies out there without turning on each other.",
-            "Take a breath. I'm not your enemy.",
-            "I don't deserve that kind of anger from you.",
-            "Let's remember who we are to each other.",
-            "Don't burn this bridge over a bad temper."
-          ],
-          "TL": [
-            "Huy, saan nanggagaling ang galit na 'yan? Magkakampi tayo.",
-            "Huwag mo akong sigawan nang ganyan. Tumulong lang ako sa 'yo.",
-            "Nagmamalasakit ako sa 'yo, pero di ibig sabihing pwede mo akong bastusin.",
-            "Pakiusap, magtrato tayo nang mas maayos kaysa rito.",
-            "Masakit marinig galing sa 'yo. Bawiin mo 'yan.",
-            "Marami na tayong kaaway sa labas, huwag na tayong mag-away.",
-            "Huminga ka muna. Hindi mo ako kalaban.",
-            "Hindi ako karapat-dapat sa ganyang galit mo.",
-            "Tandaan natin kung sino tayo sa isa't isa.",
-            "Huwag mong sirain ang samahan natin dahil sa init ng ulo."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/social_hostile_boundary.en.json",
+    "TL": "translations/social_hostile_boundary.tl.json"
   }
 }

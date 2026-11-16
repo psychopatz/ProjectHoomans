@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.relationship_status",
-  "id": "responses",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.relationship_status.responses",
   "metadata": {
     "textTarget": "convo/SemanticResponses",
     "textRows": [

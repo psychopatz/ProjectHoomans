@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "pnc.dialogue",
-  "id": "follow",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "pnc.dialogue.follow",
   "on": {
     "action": "FOLLOW",
     "intent": "REQUEST",

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "We can take them.",
+      "We've handled worse. Let's clear them.",
+      "Stand firm. We fight through.",
+      "We have the weapons. Let's put them down.",
+      "Ready up. We're not running from this.",
+      "We take the fight to them. Stay sharp.",
+      "Line them up. We can win this.",
+      "No backing down. We push through.",
+      "We hold here and eliminate the threat.",
+      "I'm ready. Let's make every strike count."
+    ],
+    "guarded": [
+      "If we commit, we hit hard and stay together.",
+      "No heroics. Funnel them into a choke point and execute.",
+      "Watch your stamina. Don't swing wild and get exhausted.",
+      "Keep the line tight. If one falls, we both die.",
+      "Target the leaders first. Clear them systematically.",
+      "We fight, but maintain an escape route behind us.",
+      "Every strike must be lethal. No wasted energy.",
+      "Don't let them surround us. Push when I push.",
+      "We can win this if we keep cool heads and steady hands.",
+      "Agreed. Take out the front rank and hold the doorway."
+    ],
+    "terse": [
+      "Stand and fight.",
+      "We take them.",
+      "No retreat.",
+      "Draw weapons.",
+      "Kill them all.",
+      "Fight through.",
+      "Ready.",
+      "Holding ground.",
+      "Let's do this.",
+      "Bring them on."
+    ],
+    "warm": [
+      "I'm with you. We can take them.",
+      "Together, nothing can stop us! Let's do this.",
+      "I've got your back, friend. We fight as one.",
+      "We survive together, we fight together. Let's clear them out!",
+      "With you beside me, I'm not afraid. Let's take them down.",
+      "Let's show them what real survivors are made of!",
+      "Right by your side, partner. We won't lose today.",
+      "I trust us. Let's stand tall and fight.",
+      "We've got this, friend. Watch my back and I'll watch yours.",
+      "Stay close and hit hard! We'll celebrate after."
+    ]
+  }
+}

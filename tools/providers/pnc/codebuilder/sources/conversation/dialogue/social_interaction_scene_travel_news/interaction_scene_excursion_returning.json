@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.scene",
-  "id": "excursion_returning",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.scene.excursion_returning",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "We're heading home.",
-            "Turn around. Time to get back to base.",
-            "Objective done. Heading back now.",
-            "Let's retrace our steps and get home safe.",
-            "Heading inbound. Keep your guard up until we're inside.",
-            "Pack up what we found. We're going home.",
-            "Time to head back. Watch the trail behind us.",
-            "Return journey begins now. Stay together.",
-            "We're bound for home. Almost there.",
-            "Moving back to safe ground. Keep alert."
-          ],
-          "TL": [
-            "Pauwi na tayo.",
-            "Lumingon na. Oras na para bumalik sa base.",
-            "Tapos na ang sadya. Pabalik na ngayon.",
-            "Balikan natin ang dinaanan at umuwi nang ligtas.",
-            "Papasok na. Huwag ibaba ang bantay hanggang makapasok.",
-            "Iimpake ang nahanap. Uuwi na tayo.",
-            "Oras nang bumalik. Bantayan ang bakas sa likod natin.",
-            "Pabalik na biyahe simula na. Magsama-sama.",
-            "Pauwi na tayo. Malapit na.",
-            "Babalik na sa ligtas na lugar. Maging alerto."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "We're returning. Stay alert until we're home.",
-            "The trip back is when most scavengers get ambushed. Watch the trees.",
-            "Don't let your guard down just because we're heading home.",
-            "Check your rear. Make sure nothing is following our scent.",
-            "Keep the haul hidden. We don't want to draw bandit eyes.",
-            "Returning now. Speed up without making noise.",
-            "We're inbound. Stay ready to drop the bags and fight.",
-            "Watch our backtrail. Stragglers could be tailing us.",
-            "Almost at the gates, but keep checking corners.",
-            "Returning. No relaxing until the deadbolt is thrown."
-          ],
-          "TL": [
-            "Pabalik na tayo. Mag-ingat hanggang makauwi.",
-            "Sa pagbalik karaniwang tinatambangan ang tao. Bantayan ang puno.",
-            "Huwag ibaba ang bantay dahil lang pauwi na tayo.",
-            "Tingnan ang likod. Tiyaking walang sumusunod sa amoy natin.",
-            "Itago ang mga nakuha. Ayaw nating makahikayat ng magnanakaw.",
-            "Babalik na. Bilis-bilisan nang walang ginagawang ingay.",
-            "Papasok na. Maging handang ibaba ang bag at lumaban.",
-            "Bantayan ang dinaanan. Baka may sumusunod sa atin.",
-            "Malapit na sa tarangkahan, pero suriin pa rin ang mga kanto.",
-            "Pabalik na. Walang magpapahinga hangga't di nakakandado."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Heading home.",
-            "Returning.",
-            "Homeward.",
-            "Back to base.",
-            "Time to return.",
-            "Turn back.",
-            "Inbound.",
-            "Done. Home.",
-            "Retracing steps.",
-            "Going back."
-          ],
-          "TL": [
-            "Pauwi na.",
-            "Babalik na.",
-            "Pauwi.",
-            "Balik sa base.",
-            "Oras nang bumalik.",
-            "Bumalik na.",
-            "Papasok na.",
-            "Tapos. Uwi na.",
-            "Binabalikan ang daan.",
-            "Pabalik na."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Time to head home. Let's get everyone back safe.",
-            "We're going home, friend! Can't wait to rest.",
-            "Great work out here. Let's get back home together.",
-            "Heading home, partner! A warm fire is waiting for us.",
-            "Almost back to safety. Keep your spirits up, friend.",
-            "We did good today! Let's get this haul home.",
-            "Heading back! I'm so glad we're both still standing.",
-            "Just a little further and we're home safe. Stay close.",
-            "Homeward bound, partner. You did amazing.",
-            "Let's get back to our camp and take a well-deserved rest."
-          ],
-          "TL": [
-            "Oras nang umuwi. Iuwi nating ligtas ang lahat.",
-            "Uuwi na tayo, kaibigan! Sabik na akong magpahinga.",
-            "Magaling ang ginawa mo rito. Sabay na tayong umuwi.",
-            "Pauwi na, kasama! May mainit na apoy na naghihintay sa 'tin.",
-            "Malapit na sa ligtas. Pasiglahin ang loob, kaibigan.",
-            "Maganda ang nagawa natin ngayon! Iuwi na natin ang nakuha.",
-            "Pabalik na! Masayang-masaya ako't nakatayo pa tayong pareho.",
-            "Kaunti na lang at ligtas na tayo sa bahay. Dumikit ka.",
-            "Pauwi na, kasama. Napakahusay mo.",
-            "Bumalik na tayo sa kampo para sa nararapat na pahinga."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_scene_excursion_returning.en.json",
+    "TL": "translations/interaction_scene_excursion_returning.tl.json"
   }
 }

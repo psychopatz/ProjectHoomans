@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.backstory.known",
-  "id": "former_job",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.backstory.known.former_job",
   "metadata": {
     "responsePoolID": "question.backstory.known.former_job",
     "responseAct": "FORMER_JOB"

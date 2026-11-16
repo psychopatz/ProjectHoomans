@@ -1,17 +1,17 @@
 ---
 handoff_schema: 2
-checkpoint_mode: "clean_closure"
+checkpoint_mode: "committed_vector"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 state: "COMPLETE"
 parent_status: "COMPLETE"
-phase: "G8"
-chunk: "G8A-G8F complete — G7R + G8 portable PSDL toolchain closed cleanly"
+phase: "G8R6"
+chunk: "G8R6 — final closure"
 retrieval_tier: "auditor"
 ---
 
 # Session Handoff
 
-## Completion summary
+**Status:** COMPLETE.
 
-All G7R1–G7R3 and G8A–G8F gates are complete and verified across `psychopatzCore`, `ProjectHoomans`, and `DynamicTrading`.
+All G8R1–G8R6 production integration gates are implemented, committed on `main` across `DynamicTrading`, `psychopatzCore`, and `ProjectHoomans`, and verified on an isolated committed-vector clean rebuild.

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Hold here. Don't rush it.",
+      "Wait for them to thin out before making a move.",
+      "Stay in position. Let's see which way they drift.",
+      "Hold your ground and observe their path.",
+      "No sudden movements. Let them pass if possible.",
+      "Keep calm and hold the line right here.",
+      "Patience. Let's wait for the right opening.",
+      "Hold steady. We decide when we have better information.",
+      "Don't panic. Hold position behind cover.",
+      "Steady now. Let's assess before we commit."
+    ],
+    "guarded": [
+      "No rush. Hold position and watch the pressure.",
+      "Hold here. If you twitch, you draw the whole pack.",
+      "Stay rooted. Wait until their lead walkers pass.",
+      "Maintain silence and hold the corner.",
+      "Do not engage prematurely. Let the herd scatter.",
+      "Hold your breath if you have to, but don't move.",
+      "We wait for an exploitable mistake. Stay still.",
+      "Keep your weapon ready, but do not fire yet. Hold.",
+      "Hold tight against the wall. Let them walk past.",
+      "Steady. Any sound will turn this into a slaughterhouse."
+    ],
+    "terse": [
+      "Hold. Watch them.",
+      "Hold position.",
+      "Wait.",
+      "Stay low.",
+      "Steady.",
+      "Do not move.",
+      "Hold.",
+      "Patience.",
+      "Freeze.",
+      "Quiet. Watch."
+    ],
+    "warm": [
+      "Stay together. Let's hold before we commit.",
+      "Breathe easy, friend. We hold right here by each other.",
+      "I'm right beside you. Let's wait for a safe moment.",
+      "Hold steady, partner. We don't have to rush into danger.",
+      "Stay low with me. Let's watch their movements together.",
+      "Keep calm. As long as we hold together, we'll be fine.",
+      "Just hold on for a minute. Let the worst of the herd pass.",
+      "Steady, friend. I'm right here with you in the quiet.",
+      "Don't be scared. We hold this spot until we have a clean shot.",
+      "Together and steady. Let's let them drift away."
+    ]
+  }
+}

@@ -1,8 +1,7 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
+  "schema": "psychopatz.psdl.v2",
   "id": "compliment",
-  "owner": "ProjectHoomans",
+  "kind": "dialogue",
   "metadata": {
     "responsePoolID": "compliment",
     "responseAct": "COMPLIMENT"

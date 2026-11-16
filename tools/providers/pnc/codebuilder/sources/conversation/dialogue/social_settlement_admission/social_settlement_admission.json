@@ -1,22 +1,7 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "social",
-  "id": "settlement_admission",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
-  "when": {
-    "path": "relationship.settlementVisit.active",
-    "op": "eq",
-    "value": true
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.settlement_admission",
+  "when": "relationship.settlementVisit.active == true",
   "metadata": {
     "runtimeBlockID": "projecthoomans:settlement_admission",
     "category": "projecthoomans:greetings",

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Umatras ka o magkakaproblema tayo.",
+      "Kailangan mong lumayo ngayon din.",
+      "Panatilihin ang distansya. Huwag mong gawing madugo ito.",
+      "Binibigyan kita ng patas na babala: ibaba ang armas.",
+      "Umatras ka. Walang nangangailangan ng laban na 'to.",
+      "Huminahon ka. Huwag tayong gumawa ng katangahan.",
+      "Hindi ako magdadalawang-isip kapag lumapit ka pa.",
+      "Diyan ka lang. Huwag kang susulong.",
+      "Ibaba mo ang armas mo at umatras.",
+      "Ito na ang nag-iisang babala mo. Umatras ka."
+    ],
+    "guarded": [
+      "Umatras ka. Ngayon.",
+      "Humakbang ka pa nang isa at nang malaman mo.",
+      "Alisin ang kamay sa armas at umatras ka.",
+      "Maling tao ang tinatakot mo.",
+      "Umatras ka bago kita patumbahin.",
+      "Hindi ako natatakot ipagtanggol ang sarili ko. Lumayo ka.",
+      "Huling pagkakataon para lumakad palayo nang buhay.",
+      "Ayaw mo sa laban na ito. Umatras ka.",
+      "Lumayo ka agad-agad.",
+      "Kamay kung saan ko nakikita. Umatras ka."
+    ],
+    "terse": [
+      "Umatras ka.",
+      "Lumayo ka.",
+      "Ibaba ang armas.",
+      "Huwag.",
+      "Lumayo ka.",
+      "Itaas ang kamay.",
+      "Tigil.",
+      "Huwag gagalaw.",
+      "Huling babala.",
+      "Ibaba mo 'yan."
+    ],
+    "warm": [
+      "Huy, pakiusap, huwag mong gawin 'to. Umatras ka.",
+      "Di natin kailangang magpadanak ng dugo ngayon. Ibaba mo 'yan.",
+      "Makinig ka sa katwiran, kaibigan. Lumayo ka bago may masaktan.",
+      "Ayaw kitang saktan. Pakiusap, umatras ka.",
+      "Huwag mong itapon ang buhay mo dahil dito. Ibaba ang armas.",
+      "Maaari pa tayong lumayo nang payapa. Umatras ka.",
+      "Huminga ka muna at isipin ang ginagawa mo. Umatras ka.",
+      "Mahalaga ang buhay mo, pero poprotektahan ko ang akin. Pakiusap tigil.",
+      "Huwag mo akong piliting gumawa ng pagsisisihan natin. Umatras ka.",
+      "Pareho tayong nakaligtas. Panatilihin nating ganoon. Huminahon ka."
+    ]
+  }
+}

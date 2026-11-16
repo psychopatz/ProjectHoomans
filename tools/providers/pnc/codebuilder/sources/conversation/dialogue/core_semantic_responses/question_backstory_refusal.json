@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.backstory",
-  "id": "refusal",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.backstory.refusal",
   "metadata": {
     "responsePoolID": "question.backstory.refusal",
     "responseAct": "REFUSAL"

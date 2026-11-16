@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "tool_reply",
-  "id": "rejected_sexual",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "tool_reply.rejected_sexual",
   "metadata": {
     "category": "projecthoomans:tool_replies",
     "contentOwner": "projecthoomans.dialogue_content.tool_replies",

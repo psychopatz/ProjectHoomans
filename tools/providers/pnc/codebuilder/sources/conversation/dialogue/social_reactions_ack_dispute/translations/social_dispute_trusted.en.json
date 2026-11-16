@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "I trust your judgment usually, but not on this.",
+      "We've earned the right to speak plainly: I disagree.",
+      "Because I trust you, I'm telling you this is a mistake.",
+      "I value our track record, but I have to push back here.",
+      "You're one of the best survivors I know, but I disagree.",
+      "Let's examine the facts together. Something doesn't add up.",
+      "I respect you too much to nod along when you're wrong.",
+      "We see this from two different angles.",
+      "Hear me out before you lock in your stance.",
+      "We have solid trust, so let's weigh the risks properly."
+    ],
+    "guarded": [
+      "I still don't agree. Leave it there.",
+      "Even between us, I draw the line here.",
+      "I trust you, but I won't back this decision.",
+      "We've been through a lot, but I disagree on this.",
+      "Don't lean on our history to push a bad idea.",
+      "I trust your survival skills, not this specific take.",
+      "Stand down on this. I won't follow blindly.",
+      "Trust goes both ways. Hear my disagreement.",
+      "I won't let friendship blind me to a bad risk.",
+      "We're close, but on this, you're dead wrong."
+    ],
+    "terse": [
+      "Not this time.",
+      "Trust you, but no.",
+      "Bad call.",
+      "Disagree, partner.",
+      "Can't back it.",
+      "Wrong move.",
+      "Reconsider.",
+      "I'm out on that.",
+      "No dice.",
+      "Think again."
+    ],
+    "warm": [
+      "You know I'd follow you through hell, but not into this.",
+      "I love how bold you are, but this risk is too steep.",
+      "Because I care about you, I have to say no to this.",
+      "We've kept each other alive this long. Trust me on this disagreement.",
+      "You're my closest ally, so listen to my gut on this one.",
+      "I'm telling you this because I want us both to live to see tomorrow.",
+      "No matter what happens, we're solid. But I disagree here.",
+      "Let's find a compromise that keeps both of us safe.",
+      "I value our bond above any single disagreement.",
+      "We'll work it out together like we always do."
+    ]
+  }
+}

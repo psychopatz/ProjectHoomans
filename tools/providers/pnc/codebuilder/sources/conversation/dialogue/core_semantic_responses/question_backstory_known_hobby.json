@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.backstory.known",
-  "id": "hobby",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.backstory.known.hobby",
   "metadata": {
     "responsePoolID": "question.backstory.known.hobby",
     "responseAct": "HOBBY"

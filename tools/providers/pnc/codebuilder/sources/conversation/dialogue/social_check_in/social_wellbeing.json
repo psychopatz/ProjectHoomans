@@ -1,15 +1,6 @@
 {
-  "kind": "dialogue",
-  "id": "neutral",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.wellbeing.neutral",
   "metadata": {
     "runtimeBlockID": "projecthoomans:wellbeing_neutral",
     "category": "projecthoomans:wellbeing",
@@ -125,7 +116,5 @@
         ]
       }
     ]
-  },
-  "namespace": "social.wellbeing",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Hey there. Good to see you.",
+      "Hello there. How are things?",
+      "Good to see you.",
+      "Morning. Hope the day treats you well.",
+      "Hey again. What's going on?",
+      "There you are. Everything quiet?",
+      "Afternoon. Staying out of trouble?",
+      "Hello. Good to run into another living person.",
+      "Hey. How's the perimeter looking?",
+      "Evening. Still on your feet, I see."
+    ],
+    "guarded": [
+      "State your business. Keep your distance.",
+      "Hold it right there. What do you want?",
+      "Hands where I can see them. Who are you?",
+      "Don't come any closer until I know your business.",
+      "Keep your hands clear. Talk from there.",
+      "I'm watching you. What brings you here?",
+      "Easy now. Step back and speak your piece.",
+      "Keep your distance. Times are too dangerous for strangers.",
+      "That's close enough. What are you looking for?",
+      "Stay where you are. I don't know you yet."
+    ],
+    "terse": [
+      "Hello.",
+      "Hi.",
+      "Hey.",
+      "Morning.",
+      "There you are.",
+      "Still here.",
+      "Afternoon.",
+      "Quiet day.",
+      "You good?",
+      "Evening."
+    ],
+    "warm": [
+      "Hey! It is good to see you.",
+      "Hey, good to see you in one piece.",
+      "Glad to see you. How are you holding up?",
+      "Hey. Really glad you made it back safe.",
+      "Back already? Good to have you around.",
+      "It's always a relief seeing you walk through.",
+      "Good to see you on your feet today.",
+      "Hey there! How's your day been treating you?",
+      "Always good seeing a friendly face out here.",
+      "Welcome back. Hope things were quiet out there."
+    ]
+  }
+}

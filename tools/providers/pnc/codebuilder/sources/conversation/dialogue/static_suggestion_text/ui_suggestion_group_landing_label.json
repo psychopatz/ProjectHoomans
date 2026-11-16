@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "ui.suggestion.group.landing",
-  "id": "label",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "ui.suggestion.group.landing.label",
   "metadata": {
     "textKey": "suggestion.group.landing.label",
     "textTarget": "UI_PNC_Conversation",

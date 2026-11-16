@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Food would help, but I don't have an exact amount yet.",
+      "Any food you could spare would make a difference.",
+      "I'm definitely hungry. Whatever rations you have would be welcome.",
+      "A meal would be great, even if it's just something small.",
+      "I could really use some food right now.",
+      "My stomach is empty. Any edible supplies would help.",
+      "Food would keep me on my feet. I'll take whatever you offer.",
+      "Running low on food out here. Appreciate whatever you can share.",
+      "Haven't eaten a decent bite today. Food would go a long way.",
+      "Could use rations soon. Let's see what you've got."
+    ],
+    "guarded": [
+      "I need food. Keep your distance.",
+      "If that food has strings attached, forget it.",
+      "I'm hungry, but don't try anything funny.",
+      "Put the food down on the ground and step back.",
+      "I could use rations, but I won't owe you my life.",
+      "Is that sealed? I don't take spoiled or poisoned rations.",
+      "I need food, but keep your hands where I can see them.",
+      "Only take what you're offering freely. No hidden deals.",
+      "I'm starving, but I'm still armed. Remember that.",
+      "Leave the supplies right there. No sudden moves."
+    ],
+    "terse": [
+      "I need food.",
+      "Hungry.",
+      "Got food?",
+      "Need rations.",
+      "Food helps.",
+      "Starving.",
+      "Spare a bite.",
+      "Any cans?",
+      "Food. Please.",
+      "Empty stomach."
+    ],
+    "warm": [
+      "Food would help, if you can spare it.",
+      "I'd truly appreciate a bite to eat, friend, if you have extra.",
+      "You're very kind to offer. Some food would really lift my spirits.",
+      "I could definitely use a meal. Thank you for thinking of me.",
+      "Sharing rations is generous out here. I'd be grateful for anything.",
+      "A bit of food would mean the world right now, thank you.",
+      "If you've got food to share, I won't say no. You're a lifesaver.",
+      "I'm hungry, and your generosity means a lot. Thank you.",
+      "Happy to accept any food you can spare. Let's eat together.",
+      "Thank you for asking. A warm meal or small ration would be wonderful."
+    ]
+  }
+}

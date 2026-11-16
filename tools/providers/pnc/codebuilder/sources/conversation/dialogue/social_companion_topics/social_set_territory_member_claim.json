@@ -1,29 +1,7 @@
 {
-  "kind": "dialogue",
-  "id": "claim",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
-  "when": {
-    "all": [
-      {
-        "path": "conversation.audience",
-        "op": "eq",
-        "value": "member"
-      },
-      {
-        "path": "scene.baseEstablished",
-        "op": "eq",
-        "value": false
-      }
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.set_territory.member.claim",
+  "when": "conversation.audience == \"member\" && scene.baseEstablished == false",
   "metadata": {
     "runtimeBlockID": "projecthoomans:set_territory_member",
     "category": "projecthoomans:set_territory",
@@ -90,7 +68,5 @@
         ]
       }
     ]
-  },
-  "namespace": "social.set_territory.member",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

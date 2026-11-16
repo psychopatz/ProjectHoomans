@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "combat.kill.killer.aggressive",
-  "id": "blunt",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "combat.kill.killer.aggressive.blunt",
   "metadata": {
     "category": "projecthoomans:combat_kill",
     "contentOwner": "projecthoomans.dialogue_content.events",

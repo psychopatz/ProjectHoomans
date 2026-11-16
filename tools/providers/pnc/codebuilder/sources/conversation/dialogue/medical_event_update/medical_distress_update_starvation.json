@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "medical.distress.update",
-  "id": "starvation",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "medical.distress.update.starvation",
   "metadata": {
     "category": "projecthoomans:medical_event",
     "responseAct": "MEDICAL_RESPONSE"

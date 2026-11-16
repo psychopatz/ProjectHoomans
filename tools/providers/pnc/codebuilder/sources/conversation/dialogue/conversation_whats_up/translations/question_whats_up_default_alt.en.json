@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Same as ever. Staying alive and watching the road.",
+      "Doing what needs to be done to see tomorrow.",
+      "One foot in front of the other. Road's quiet so far.",
+      "Keeping a low profile and taking care of business.",
+      "Just staying alert out here. How have you been?",
+      "Watching the tree lines. Routine stuff.",
+      "Still on the right side of the dirt. That's plenty.",
+      "Taking each hour as it comes. How about yourself?",
+      "Alive and alert. Hoping the peace lasts.",
+      "Watching the perimeter, making sure we're unbothered."
+    ],
+    "guarded": [
+      "Staying alive. Keep your eyes open.",
+      "Watching the road. Don't stand in my line of sight.",
+      "Alive, but cautious. You should be too.",
+      "Just staying on high alert. Danger doesn't take days off.",
+      "Focusing on staying off the radar. Step aside.",
+      "Watching the fence lines. Nothing for you here.",
+      "Alive, and keeping it that way by not gossiping.",
+      "Eyes on the horizon. Don't make unnecessary noise.",
+      "Surviving. That requires vigilance, not conversation.",
+      "Just keeping myself safe. You do the same."
+    ],
+    "terse": [
+      "Staying alive.",
+      "Watching the road.",
+      "Same old.",
+      "Alert.",
+      "On watch.",
+      "Still upright.",
+      "Road's clear.",
+      "Keeping sharp.",
+      "Nothing to report.",
+      "Breathing."
+    ],
+    "warm": [
+      "Same as ever. Staying alive and watching the road. What about you?",
+      "Still here, still kicking. Seeing you makes the watch feel shorter.",
+      "Watching the perimeter, but always glad to share a few words with you.",
+      "Making sure the road stays safe for all of us. Hope you're doing well.",
+      "Alive and well, friend. Truly good to run into you today.",
+      "Taking in the daylight while we can. Glad you're walking safe.",
+      "Another day on our feet together. What could be better than that?",
+      "Just keeping an eye out for our people. Thanks for checking in.",
+      "Holding the line with a glad heart today. How are things on your end?",
+      "Still here, thankful for good companions like you. Stay safe."
+    ]
+  }
+}

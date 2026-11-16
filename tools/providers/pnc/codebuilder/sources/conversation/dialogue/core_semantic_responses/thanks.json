@@ -1,8 +1,7 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
+  "schema": "psychopatz.psdl.v2",
   "id": "thanks",
-  "owner": "ProjectHoomans",
+  "kind": "dialogue",
   "metadata": {
     "responsePoolID": "thanks",
     "responseAct": "THANKS"
@@ -11,10 +10,6 @@
     "variants": [
       {
         "id": "thanks.dataset.no_problem",
-        "text": {
-          "EN": "No problem at all.",
-          "TL": "No problem at all."
-        },
         "metadata": {
           "fallback": "No problem at all.",
           "templateID": "thanks.dataset.no_problem"
@@ -22,10 +17,6 @@
       },
       {
         "id": "thanks.dataset.anytime",
-        "text": {
-          "EN": "Anytime.",
-          "TL": "Anytime."
-        },
         "metadata": {
           "fallback": "Anytime.",
           "templateID": "thanks.dataset.anytime"
@@ -33,15 +24,15 @@
       },
       {
         "id": "thanks.dataset.glady",
-        "text": {
-          "EN": "Glad I could help.",
-          "TL": "Glad I could help."
-        },
         "metadata": {
           "fallback": "Glad I could help.",
           "templateID": "thanks.dataset.glady"
         }
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/thanks.en.json",
+    "TL": "translations/thanks.tl.json"
   }
 }

@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "command",
-  "id": "stop_following",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "command.stop_following",
   "metadata": {
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
@@ -24,149 +13,19 @@
         "1": {
           "variants": [
             {
-              "id": "neutral",
-              "text": {
-                "EN": [
-                  "Okay, I'll stop following.",
-                  "Understood. Breaking off pursuit.",
-                  "I'll stop here and hold.",
-                  "Ceasing follow. Standing down.",
-                  "Understood. I'll remain in this area.",
-                  "Right. Not following anymore.",
-                  "Stopping here. You go on.",
-                  "Got it. Halting my movement.",
-                  "Breaking off. I'll hold ground.",
-                  "Understood. Stopping follow routine."
-                ],
-                "TL": [
-                  "Sige, titigil ako sa pagsunod.",
-                  "Naintindihan. Titigil na sa pagsunod.",
-                  "Hihinto ako rito at magbabantay.",
-                  "Ititigil ang pagsunod. Uurong sa pwesto.",
-                  "Naiintindihan ko. Mananatili ako sa lugar na 'to.",
-                  "Sige. Di na susunod pa.",
-                  "Hihinto rito. Mauna ka na.",
-                  "Nakuha ko. Hihinto sa paglakad.",
-                  "Bumibitiw na. Hahawakan ko ang pwesto.",
-                  "Naintindihan. Ititigil ang pagsunod."
-                ]
-              }
+              "id": "neutral"
             },
             {
-              "id": "friendly",
-              "text": {
-                "EN": [
-                  "Got it, I'll stop following. Take care out there, friend!",
-                  "Sure thing! I'll hold down this spot for you, partner.",
-                  "Happy to give you some space. Holler if you need me!",
-                  "I'll stop following here, friend. Be careful on your solo run.",
-                  "Understood, partner! I'll be right here waiting.",
-                  "Stopping here with a smile. Don't be a stranger!",
-                  "Sure! I'll catch my breath while you scout ahead.",
-                  "All right, friend! I'll stay put until you return.",
-                  "Halting here. Good luck out there, partner!",
-                  "No worries! I'll stop following and guard our rear."
-                ],
-                "TL": [
-                  "Nakuha ko, titigil ako sa pagsunod. Mag-ingat ka sa labas, kaibigan!",
-                  "Walang anuman! Babantayan ko ang pwestong ito para sa 'yo, kasama.",
-                  "Masayang bibigyan kita ng puwang. Tawagin mo ako kapag kailangan mo ako!",
-                  "Hihinto ako sa pagsunod dito, kaibigan. Mag-ingat sa sarili mong lakad.",
-                  "Naintindihan, kasama! Narito lang ako naghihintay.",
-                  "Hihinto rito nang may ngiti. Magpakita ka agad!",
-                  "Sige! Hihinga muna ako habang nagmamanman ka sa unahan.",
-                  "Sige, kaibigan! Dito lang ako hanggang makabalik ka.",
-                  "Hihinto rito. Magandang suwerte sa 'yo sa labas, kasama!",
-                  "Walang problema! Titigil sa pagsunod at babantayan ang likod."
-                ]
-              }
+              "id": "friendly"
             },
             {
-              "id": "repeated",
-              "text": {
-                "EN": [
-                  "I've already stopped following.",
-                  "I'm already standing still. Not following you.",
-                  "Already halted. Look, I'm not moving.",
-                  "I stopped following after the first command.",
-                  "Still not following you. I'm right here.",
-                  "Already stopped. Go ahead without me.",
-                  "I'm not following anymore, I promise.",
-                  "Already stationary. No need to tell me again.",
-                  "I've been stopped for a while now.",
-                  "Still halted. Move along freely."
-                ],
-                "TL": [
-                  "Tumigil na ako sa pagsunod.",
-                  "Nakatayo na nga ako. Di na kita sinusundan.",
-                  "Huminto na. Tingnan mo, di ako gumagalaw.",
-                  "Huminto na ako sa pagsunod pagkatapos ng unang utos.",
-                  "Di pa rin kita sinusundan. Narito lang ako.",
-                  "Huminto na. Sige na, mauna ka nang wala ako.",
-                  "Di na kita sinusundan, pangako.",
-                  "Nakatigil na ako. Di na kailangang sabihin ulit.",
-                  "Kanina pa ako huminto.",
-                  "Nakatigil pa rin. Lumakad ka na nang malaya."
-                ]
-              }
+              "id": "repeated"
             },
             {
-              "id": "trusted",
-              "text": {
-                "EN": [
-                  "Understood, I'll stop. I trust your solo judgment.",
-                  "I'll hold here, partner. Come back safe.",
-                  "Stopping follow. I know you can handle what's ahead.",
-                  "Understood. I'll secure this spot while you work.",
-                  "I'll let you move alone, friend. Shout if you need backup.",
-                  "Stopping here. You've earned my complete trust.",
-                  "Halting follow. Watch your corners out there.",
-                  "I'll hold this ground for you until you return, partner.",
-                  "Understood. Stopping here and maintaining watch.",
-                  "I trust you know what you're doing. Standing down."
-                ],
-                "TL": [
-                  "Naiintindihan ko, titigil ako. Tiwala ako sa sarili mong desisyon.",
-                  "Dito muna ako, kasama. Bumalik kang ligtas.",
-                  "Hihinto sa pagsunod. Alam kong kaya mo ang nasa unahan.",
-                  "Naintindihan. Seselyuhan ko ang pwestong ito habang nagtatrabaho ka.",
-                  "Hahayaan kitang mag-isang lumakad, kaibigan. Sumigaw kapag kailangan mo ng saklolo.",
-                  "Hihinto rito. Nakuha mo na ang buo kong tiwala.",
-                  "Hihinto sa pagsunod. Bantayan ang mga kanto sa labas.",
-                  "Hahawakan ko ang pwestong ito para sa 'yo hanggang sa bumalik ka, kasama.",
-                  "Naiintindihan ko. Hihinto rito at magbabantay.",
-                  "Tiwala akong alam mo ang ginagawa mo. Uurong sa pwesto."
-                ]
-              }
+              "id": "trusted"
             },
             {
-              "id": "withdrawn",
-              "text": {
-                "EN": [
-                  "Okay, I'll stop.",
-                  "Fine. Not following.",
-                  "Stopping here.",
-                  "Understood. Halting.",
-                  "I'll stay behind.",
-                  "Ceasing follow.",
-                  "Fine. Go on.",
-                  "Stopped.",
-                  "All right. Done following.",
-                  "Halting."
-                ],
-                "TL": [
-                  "Sige, titigil ako.",
-                  "Sige. Di susunod.",
-                  "Hihinto rito.",
-                  "Naintindihan. Hihinto.",
-                  "Maiiwan ako.",
-                  "Ititigil ang pagsunod.",
-                  "Sige. Mauna ka.",
-                  "Huminto na.",
-                  "Sige. Tapos na ang pagsunod.",
-                  "Humihinto."
-                ]
-              }
+              "id": "withdrawn"
             }
           ]
         }
@@ -230,5 +89,9 @@
         ]
       }
     }
+  },
+  "textSidecars": {
+    "EN": "translations/command_stop_following.en.json",
+    "TL": "translations/command_stop_following.tl.json"
   }
 }

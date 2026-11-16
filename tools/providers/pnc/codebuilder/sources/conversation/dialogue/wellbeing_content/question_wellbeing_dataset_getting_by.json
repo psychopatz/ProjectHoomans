@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.wellbeing.dataset",
-  "id": "getting_by",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.wellbeing.dataset.getting_by",
   "metadata": {
     "category": "projecthoomans:wellbeing_content",
     "contentOwner": "projecthoomans.dialogue_content.wellbeing",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'm getting by, one day at a time. How about you?",
-            "Managing as best as anyone can out here. You?",
-            "Can't complain too much. Taking things as they come.",
-            "Still on my feet. That's a win these days.",
-            "Holding up okay. How are things on your side?",
-            "Getting through the hours. What about yourself?",
-            "Doing alright, all things considered.",
-            "Pushing forward. How's the road treating you?",
-            "Hanging in there. Hopefully you are too.",
-            "Alive and kicking. What more can we ask for?"
-          ],
-          "TL": [
-            "Kinakaya ko, isang araw bawat pagkakataon. Ikaw?",
-            "Kinakaya gaya ng sinuman dito sa labas. Ikaw?",
-            "Hindi naman masyadong makapagreklamo. Tinitiis bawat araw.",
-            "Nakatayo pa rin. Malaking bagay na 'yon sa panahong ito.",
-            "Maayos naman. Kumusta ang lagay sa parte mo?",
-            "Nakakaraos sa bawat oras. Kumusta naman ikaw?",
-            "Maayos naman, sa kabila ng lahat ng nangyayari.",
-            "Sumusulong pa rin. Kumusta ang biyahe mo?",
-            "Kumakapit pa rin. Sana ikaw rin.",
-            "Buhay at lumalaban. Ano pa bang mahihiling natin?"
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "I'm getting by. Leave it there.",
-            "Surviving. That's all you need to know.",
-            "I manage on my own. Don't worry about it.",
-            "Still upright. Let's keep it to business.",
-            "I'm coping fine. No need to pry.",
-            "Doing what I have to do. That's enough.",
-            "Still breathing. Nothing more to say about it.",
-            "I'm alright on my own, thanks.",
-            "Managing well enough without interference.",
-            "Getting by just fine. Let's drop it."
-          ],
-          "TL": [
-            "Kinakaya ko. Tama na iyon.",
-            "Nabubuhay pa. Iyon lang ang kailangan mong malaman.",
-            "Kaya ko ang sarili ko. Huwag mo nang alalahanin.",
-            "Nakatayo pa rin. Manatili tayo sa pakay natin.",
-            "Maayos ang lagay ko. Hindi kailangang mag-usisa.",
-            "Ginagawa ang dapat gawin. Sapat na 'yon.",
-            "Huminga pa. Wala nang iba pang sasabihin tungkol doon.",
-            "Ayos lang ako sa sarili ko, salamat.",
-            "Kinakaya nang maayos nang walang nangingialam.",
-            "Kinakaya ko nang maayos. Hayaan na natin."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Getting by.",
-            "Managing.",
-            "Still standing.",
-            "Holding.",
-            "Surviving.",
-            "Fine for now.",
-            "Still breathing.",
-            "Could be worse.",
-            "Doing fine.",
-            "One day at a time."
-          ],
-          "TL": [
-            "Kinakaya.",
-            "Kinakaya pa.",
-            "Nakatayo pa.",
-            "Matatag pa.",
-            "Nabubuhay.",
-            "Ayos sa ngayon.",
-            "Huminga pa.",
-            "Puwede namang mas malala.",
-            "Maayos naman.",
-            "Araw-araw lang."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "I'm getting by. Thanks for asking.",
-            "Doing okay, especially with good company around.",
-            "Managing well enough. Truly appreciate you checking in.",
-            "Holding steady. Knowing people care makes it easier.",
-            "Doing alright today. Hope you're feeling good too.",
-            "I'm hanging in there. Thank you for thinking of me.",
-            "Feeling decent today, thank you. How are you holding up?",
-            "Getting through it together. That's what counts.",
-            "Still smiling through it all. Glad to see you around.",
-            "I'm doing well, friend. Thanks for taking the time to ask."
-          ],
-          "TL": [
-            "Kinakaya ko. Salamat sa pagtatanong.",
-            "Maayos naman ako, lalo na at may kasamang maaasahan.",
-            "Kinakaya naman. Salamat talaga sa pangangamusta.",
-            "Matatag pa rin. Mas madali kapag may nagmamalasakit.",
-            "Maayos ang araw ko. Sana maganda rin ang pakiramdam mo.",
-            "Kumakapit pa rin. Salamat sa pag-alala sa akin.",
-            "Medyo maayos ang pakiramdam ko ngayon, salamat. Ikaw?",
-            "Sama-sama nating nalalagpasan ito. Iyon ang mahalaga.",
-            "Nakangiti pa rin sa kabila ng lahat. Masaya akong nandito ka.",
-            "Maayos ako, kaibigan. Salamat sa paglalaan ng oras magtanong."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/question_wellbeing_dataset_getting_by.en.json",
+    "TL": "translations/question_wellbeing_dataset_getting_by.tl.json"
   }
 }

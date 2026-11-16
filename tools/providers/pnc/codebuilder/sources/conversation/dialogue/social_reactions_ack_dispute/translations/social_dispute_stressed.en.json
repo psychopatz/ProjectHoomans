@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Tensions are high. Let's table this for later.",
+      "We're both stressed. Let's not make bad calls right now.",
+      "Now isn't the moment to hash this out.",
+      "Let's catch our breath before we argue further.",
+      "We need clear heads right now, not arguments.",
+      "I understand you're upset, but we need to survive first.",
+      "Let's put a pin in this until we're safe.",
+      "Arguing right now only helps the dead.",
+      "I hear the frustration. Let's focus on the threat.",
+      "We can settle this once we're behind walls."
+    ],
+    "guarded": [
+      "I hear you. Not now.",
+      "We don't have time to fight. Stand down.",
+      "Too much on the line to argue. Shut it down.",
+      "I'm stressed, you're stressed. Drop it.",
+      "Don't push an argument while we're in danger.",
+      "One more word about this and I walk away.",
+      "Save the bickering before it gets us killed.",
+      "Not the time. Eyes forward.",
+      "I'm done debating under pressure.",
+      "Cut the argument right now."
+    ],
+    "terse": [
+      "Not now.",
+      "Stop.",
+      "Cool it.",
+      "Later.",
+      "Drop it.",
+      "Too tense.",
+      "Hold your tongue.",
+      "Focus.",
+      "Enough.",
+      "Quiet."
+    ],
+    "warm": [
+      "Hey, we're both frayed right now. Let's take a breath.",
+      "I know you're hurting and tense. I'm right here. Let's pause.",
+      "Don't let the stress tear us apart. We're partners.",
+      "I hear your worry, but let's get somewhere safe first.",
+      "I care about what you think, just not while we're in danger.",
+      "Let's take a second to reset. We're on the same side.",
+      "Breathe with me. We'll work through this disagreement later.",
+      "I'm not fighting you. Let's keep each other alive.",
+      "Stress is talking right now. Let's be gentle on each other.",
+      "We'll talk this through when the dust settles, I promise."
+    ]
+  }
+}

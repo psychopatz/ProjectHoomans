@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "interaction.scene",
-  "id": "horde_reply_cautious",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "interaction.scene.horde_reply_cautious",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,121 +9,21 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Too many. We should pull back.",
-            "The odds are terrible. Let's retreat and find another way.",
-            "Fighting here is a death sentence. Fall back.",
-            "We don't have the ammunition or stamina for this. Pull back.",
-            "Better to live and fight another day. Let's withdraw.",
-            "We're completely outmatched. Retreat orderly.",
-            "Back up slowly. Don't make sudden noises.",
-            "Let's slip away while they haven't locked onto us.",
-            "Too risky. We need to withdraw immediately.",
-            "I agree with retreating. Turn around and move quietly."
-          ],
-          "TL": [
-            "Sobra sila. Dapat umatras tayo.",
-            "Napakasama ng tsansa. Umatras tayo at maghanap ng ibang daan.",
-            "Kamatayan ang lumaban dito. Umatras na.",
-            "Kulang tayo sa bala at lakas para rito. Umatras.",
-            "Mas mabuting mabuhay para lumaban sa ibang araw. Umatras tayo.",
-            "Lupig tayo sa dami nila. Umatras nang maayos.",
-            "Umatras nang dahan-dahan. Huwag gumawa ng ingay.",
-            "Tumakas na tayo habang hindi pa sila nakapokus sa atin.",
-            "Masyadong mapanganib. Kailangan nating umatras agad.",
-            "Sang-ayon akong umatras. Lumingon at lumakad nang tahimik."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "Bad odds. Give them space.",
-            "Fighting that pack is suicide. Withdraw in formation.",
-            "Step back quietly. Do not alert the rear flank.",
-            "Keep your weapon raised, but reverse your footsteps.",
-            "We have zero tactical advantage. We fall back immediately.",
-            "Don't let adrenaline make you stupid. We withdraw.",
-            "Back away into the shadows. Let them wander past.",
-            "I refuse to be butchered in an open field. Retreat.",
-            "Keep low and retreat to the last secure building.",
-            "Orderly withdrawal. If anyone runs screaming, they're dead."
-          ],
-          "TL": [
-            "Masama ang tsansa. Lumayo tayo.",
-            "Pagpapakamatay ang labanang 'yan. Umatras nang may pormasyon.",
-            "Umatras nang tahimik. Huwag gisingin ang nasa likod.",
-            "Itaas ang armas, pero ihakbang pabalik ang paa.",
-            "Wala tayong kalamangan sa posisyon. Aatras tayo agad.",
-            "Huwag magpadala sa kaba at maging tanga. Aatras tayo.",
-            "Umatras sa dilim. Hayaang lumampas sila.",
-            "Ayokong malapa sa bukas na damuhan. Umatras.",
-            "Yumuko at umatras sa huling ligtas na gusali.",
-            "Maayos na pag-atras. Kapag may nagpanic at sumigaw, patay 'yon."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Pull back.",
-            "Too many. Run.",
-            "Retreat.",
-            "Fall back now.",
-            "Bad odds. Leave.",
-            "Out. Now.",
-            "Back up.",
-            "Not here. Move.",
-            "Escape.",
-            "Away."
-          ],
-          "TL": [
-            "Umatras.",
-            "Sobra sila. Takbo.",
-            "Urong.",
-            "Atras na ngayon.",
-            "Masamang tsansa. Alis.",
-            "Labas. Ngayon.",
-            "Umatras.",
-            "Huwag dito. Kilos.",
-            "Takas.",
-            "Malayo."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "I'd rather get us out of this alive. Pull back.",
-            "I care too much about you to risk this. Let's retreat, friend.",
-            "Please, let's fall back together. We don't have to die here.",
-            "I need you alive, partner. Turn around, let's go.",
-            "Let's save our strength for our people back home. Retreat.",
-            "Take my hand if you need to, but we have to pull back now.",
-            "There's no shame in living to fight tomorrow. Fall back with me.",
-            "Let's back away gently, together. I've got you.",
-            "We can find supplies elsewhere. Let's keep each other safe and run.",
-            "I'm not leaving without you, so let's both back up right now."
-          ],
-          "TL": [
-            "Mas gusto kong makaalis tayong buhay. Umatras tayo.",
-            "Masyado kitang pinahahalagahan para isugal ito. Umatras tayo, kaibigan.",
-            "Pakiusap, sabay tayong umatras. Di natin kailangang mamatay rito.",
-            "Kailangan kitang buhay, kasama. Lumingon ka, tara na.",
-            "Itabi natin ang lakas natin para sa kasama sa kampo. Umatras.",
-            "Hawakan mo ang kamay ko kung kailangan, pero aatras na tayo ngayon.",
-            "Walang kahihiyan sa pananatiling buhay. Umatras ka kasama ko.",
-            "Umatras tayo nang marahan, nang magkasama. Hawak kita.",
-            "Makakahanap tayo ng gamit sa iba. Manatiling ligtas at tumakbo.",
-            "Di ako aalis nang wala ka, kaya umatras tayong pareho ngayon."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/interaction_scene_horde_reply_cautious.en.json",
+    "TL": "translations/interaction_scene_horde_reply_cautious.tl.json"
   }
 }

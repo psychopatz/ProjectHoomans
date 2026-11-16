@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Good to see you.",
+      "I was hoping we'd cross paths today.",
+      "Good to see you. How's the camp holding?",
+      "There you are. Ready for another day?",
+      "Back again. How's the scavenging going?",
+      "Good to see you again. Need a hand with anything?",
+      "Hey there. Glad we ran into each other.",
+      "Morning! How are things on your end?",
+      "Hey! What's the plan for today?",
+      "Good to catch up. How are you doing?"
+    ],
+    "guarded": [
+      "Hey. Everything holding together?",
+      "Good timing. We could use your help.",
+      "Hey again. Everything quiet around here?",
+      "Back again? Keep your weapon close.",
+      "Hey. You notice anything strange out there?",
+      "Good to see you. Stay watchful though.",
+      "You made it back. Keep low and stay alert.",
+      "Glad you're safe. We've got to watch the treeline.",
+      "Hey. Hope nobody followed you in.",
+      "There you are. Let's keep our eyes sharp."
+    ],
+    "terse": [
+      "Back again? You holding up?",
+      "Good to see you again.",
+      "Hey. How have you been?",
+      "Didn't expect to see you so soon.",
+      "Hey again. How's it going?",
+      "There you are again.",
+      "Holding steady?",
+      "Good. You're here.",
+      "All clear?",
+      "Hey. Need something?"
+    ],
+    "warm": [
+      "There you are! Good to see you.",
+      "I was hoping I'd run into you today.",
+      "Back so soon? Glad you're safe.",
+      "I was hoping you'd come back in one piece.",
+      "There you are. You doing alright today?",
+      "Good to see you. Pull up a chair.",
+      "Always makes my day better seeing you back safe.",
+      "Hey there! Really glad you're around today.",
+      "It's good to see your face. How're you feeling?",
+      "Welcome back, my friend. Good to see you."
+    ]
+  }
+}

@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.needs",
-  "id": "quantity",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.needs.quantity",
   "metadata": {
     "responsePoolID": "question.needs.quantity",
     "responseAct": "QUANTITY"
@@ -16,20 +13,7 @@
           "EN": "I can confirm water is a need, but which item do you mean?",
           "TL": "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?"
         },
-        "when": {
-          "all": [
-            {
-              "op": "eq",
-              "path": "conversation.lastIntent",
-              "value": "CLARIFY"
-            },
-            {
-              "op": "eq",
-              "path": "conversation.needType",
-              "value": "thirst"
-            }
-          ]
-        },
+        "when": "conversation.lastIntent == \"CLARIFY\" && conversation.needType == \"thirst\"",
         "metadata": {
           "fallback": "I can confirm water is a need, but which item do you mean?",
           "plan": {

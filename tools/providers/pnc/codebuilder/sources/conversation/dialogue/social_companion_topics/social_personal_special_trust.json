@@ -1,20 +1,7 @@
 {
-  "kind": "dialogue",
-  "id": "trust",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
-  "when": {
-    "path": "relationship.speakerToAddressee.familiarity",
-    "op": "gte",
-    "value": 10
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.personal.special.trust",
+  "when": "relationship.speakerToAddressee.familiarity >= 10",
   "metadata": {
     "runtimeBlockID": "projecthoomans:personal_special",
     "category": "projecthoomans:personal",
@@ -72,7 +59,5 @@
         ]
       }
     ]
-  },
-  "namespace": "social.personal.special",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

@@ -1,15 +1,6 @@
 {
-  "kind": "dialogue",
-  "id": "status",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "work_orders.member.status",
   "metadata": {
     "runtimeBlockID": "projecthoomans:work_orders_member",
     "category": "projecthoomans:work_orders",
@@ -85,7 +76,5 @@
         ]
       }
     ]
-  },
-  "namespace": "work_orders.member",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

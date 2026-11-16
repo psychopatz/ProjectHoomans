@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Okay naman ako. Ikaw, kumusta?",
+      "Maayos naman. Paano mo nakakayanan?",
+      "Hindi naman masama. Kumusta ang araw mo?",
+      "Maayos naman ako. Sana payapa rin sa parte mo.",
+      "Medyo maganda naman ang lagay. Maayos ka rin ba?",
+      "Nandito pa rin at lumalaban. Kumusta ka naman?",
+      "Medyo maayos naman ang sitwasyon sa akin. Ikaw?",
+      "Maayos akong nakakaraos. Sana ligtas ka rin.",
+      "Hindi masyadong makapagreklamo ngayon. Kumusta ka?",
+      "Matatag pa rin. Kumusta ang pag-iingat mo?"
+    ],
+    "guarded": [
+      "Kinakaya ko. Huwag mo nang ipilit.",
+      "Ayos lang ako. Ituon mo ang pansin sa sarili mong gawain.",
+      "Walang problema rito. Iyon lang ang masasabi ko.",
+      "Kaya kong alagaan ang sarili ko. Huwag nang magtanong.",
+      "Ginagawa ang kailangang gawin. Lumayo ka nang kaunti.",
+      "Hindi ako basta-basta nagkukuwento tungkol sa sarili ko.",
+      "Kaya ko pang ipagtanggol ang sarili ko. Sapat na 'yon.",
+      "Walang dapat ireklamo sa mga hindi ko kakilala.",
+      "Ayos lang ako. Bantayan mo ang sarili mong parte.",
+      "Buhay at alerto. Hanggang doon na lang."
+    ],
+    "terse": [
+      "Ayos lang ako.",
+      "Maayos naman.",
+      "Lahat maayos.",
+      "Kinakaya.",
+      "Walang problema.",
+      "Matatag.",
+      "Nakatayo pa.",
+      "Ayos.",
+      "Buhay.",
+      "Maayos ang lagay."
+    ],
+    "warm": [
+      "Ayos lang ako. Salamat sa pagtatanong.",
+      "Maayos ako! Nakakagaan ng loob na nagtanong ka.",
+      "Maganda ang pakiramdam ko ngayon. Kumusta ka naman?",
+      "Kumakapit pa rin, kaibigan. Masayang makita ka rito.",
+      "Mas gumaan ang pakiramdam ko ngayong nakakita ako ng kaibigan.",
+      "Maayos ang lahat sa akin. Salamat sa pag-alala mo sa akin.",
+      "Matatag pa rin. Malaking tulong ang suporta mo rito.",
+      "Napakaganda ng araw ko, salamat. Sana ikaw rin.",
+      "Maganda ang disposisyon ko ngayon. Masarap kang makita.",
+      "Maayos naman ako. Siguraduhin nating pareho tayong ligtas."
+    ]
+  }
+}

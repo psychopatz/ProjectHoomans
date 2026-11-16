@@ -1,17 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "social",
-  "id": "offer_friendly",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.offer_friendly",
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
@@ -20,237 +9,33 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Thanks. I'll keep that in mind.",
-            "Thank you for the offer.",
-            "I appreciate you offering. I'll let you know.",
-            "Good to know. I might take you up on that.",
-            "Thanks. That's a helpful gesture.",
-            "I'll consider it. Thanks.",
-            "Much obliged for the thought.",
-            "Appreciate the option. Thank you.",
-            "Thanks. We'll see how the day goes.",
-            "Kind offer. Thank you."
-          ],
-          "TL": [
-            "Salamat. Tatandaan ko iyan.",
-            "Salamat sa alok mo.",
-            "Salamat sa pag-alok. Sasabihan kita.",
-            "Mabuting malaman. Baka tanggapin ko 'yan.",
-            "Salamat. Nakatutulong ang malasakit mo.",
-            "Isasaalang-alang ko. Salamat.",
-            "Maraming salamat sa magandang kaisipan.",
-            "Salamat sa pagbibigay ng opsyon.",
-            "Salamat. Tingnan natin ang takbo ng araw.",
-            "Mabuting alok. Salamat."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "bond_guarded",
-        "text": {
-          "EN": [
-            "%s, no thanks. I'll handle it.",
-            "%s, I appreciate the thought, but I've got this.",
-            "%s, keep your supplies. I can manage.",
-            "%s, no need. Save it for when we really need it.",
-            "%s, I'll pass for now, but thanks.",
-            "%s, thanks, but I don't need charity.",
-            "%s, I'm good on my own, thanks.",
-            "%s, hold onto that. You might need it more.",
-            "%s, no thanks. Let's stay focused.",
-            "%s, appreciated, but I prefer to carry my own weight."
-          ],
-          "TL": [
-            "%s, hindi salamat. Ako na ang bahala.",
-            "%s, salamat sa alok, pero kaya ko na ito.",
-            "%s, itabi mo ang gamit mo. Kaya ko na.",
-            "%s, di kailangan. Itabi mo kapag talagang kailangan na.",
-            "%s, tatanggihan ko muna ngayon, pero salamat.",
-            "%s, salamat, pero di ko kailangan ng limos.",
-            "%s, ayos lang ako mag-isa, salamat.",
-            "%s, hawakan mo 'yan. Baka mas kailanganin mo.",
-            "%s, hindi salamat. Manatili tayong nakapokus.",
-            "%s, salamat, pero mas gusto kong buhatin ang sarili ko."
-          ]
-        }
+        "id": "bond_guarded"
       },
       {
-        "id": "bond_neutral",
-        "text": {
-          "EN": [
-            "%s, that's kind of you. I'll keep it in mind.",
-            "%s, thanks for the offer. I'll think about it.",
-            "%s, I appreciate the offer. Let's see how things go.",
-            "%s, good to know. Thank you.",
-            "%s, I might take you up on that later.",
-            "%s, thanks for putting that on the table.",
-            "%s, that's helpful. Thanks.",
-            "%s, generous offer. Appreciate it.",
-            "%s, noted with thanks. I'll let you know.",
-            "%s, thanks for looking out for me."
-          ],
-          "TL": [
-            "%s, mabuti iyon. Tatandaan ko.",
-            "%s, salamat sa alok. Pag-iisipan ko.",
-            "%s, salamat sa alok. Tingnan natin kung ano ang mangyayari.",
-            "%s, mabuting malaman. Maraming salamat.",
-            "%s, baka tanggapin ko 'yan mamaya.",
-            "%s, salamat sa paglalatag niyan.",
-            "%s, makatutulong 'yan. Salamat.",
-            "%s, bukas-palad na alok. Salamat.",
-            "%s, tala ko na kalakip ang pasasalamat. Sasabihan kita.",
-            "%s, salamat sa pag-alaga sa akin."
-          ]
-        }
+        "id": "bond_neutral"
       },
       {
-        "id": "bond_terse",
-        "text": {
-          "EN": [
-            "%s, thanks.",
-            "%s, got it.",
-            "%s, noted.",
-            "%s, I'm good.",
-            "%s, keep it.",
-            "%s, pass.",
-            "%s, appreciated.",
-            "%s, good.",
-            "%s, later maybe.",
-            "%s, thank you."
-          ],
-          "TL": [
-            "%s, salamat.",
-            "%s, nakuha ko.",
-            "%s, tala ko na.",
-            "%s, ayos ako.",
-            "%s, itago mo.",
-            "%s, tanggi muna.",
-            "%s, pinahahalagahan.",
-            "%s, mabuti.",
-            "%s, baka mamaya.",
-            "%s, salamat sa 'yo."
-          ]
-        }
+        "id": "bond_terse"
       },
       {
-        "id": "bond_warm",
-        "text": {
-          "EN": [
-            "%s, thank you. I'll keep it in mind.",
-            "%s, you're always so generous. Thank you, friend.",
-            "%s, that means a lot coming from you. Thanks!",
-            "%s, I truly appreciate the gesture. You're great.",
-            "%s, you don't have to share, but thank you so much.",
-            "%s, thanks! It's rare to find such kindness out here.",
-            "%s, warm thanks. We always take care of our own.",
-            "%s, that touches my heart. Thank you, partner.",
-            "%s, you're a lifesaver. I appreciate you.",
-            "%s, thanks a million! I'll return the favor."
-          ],
-          "TL": [
-            "%s, salamat. Tatandaan ko.",
-            "%s, napakabait mo talaga palagi. Salamat, kaibigan.",
-            "%s, malaking bagay 'yan galing sa 'yo. Salamat!",
-            "%s, talagang pinahahalagahan ko ang malasakit mo. Napakagaling mo.",
-            "%s, di mo kailangang magbahagi, pero maraming salamat talaga.",
-            "%s, salamat! Bihira ang ganitong kabaitan dito.",
-            "%s, taos-pusong pasasalamat. Inaalagaan natin ang kasama.",
-            "%s, tumatagos sa puso ko 'yan. Salamat, kasama.",
-            "%s, tagapagligtas ka. Salamat sa 'yo.",
-            "%s, milyong salamat! Babalikan ko ang pabor na 'to."
-          ]
-        }
+        "id": "bond_warm"
       },
       {
-        "id": "guarded",
-        "text": {
-          "EN": [
-            "No thanks. I can handle it.",
-            "I don't need hand-outs. Thanks anyway.",
-            "Keep your supplies. You'll need them more than me.",
-            "I prefer to rely on myself, but thanks.",
-            "No thank you. What's the catch?",
-            "I'm managing fine on my own.",
-            "Pass. I carry what I need.",
-            "Thanks, but no. Save it.",
-            "I'll take care of my own needs.",
-            "Not interested, but thanks for offering."
-          ],
-          "TL": [
-            "Hindi salamat. Kaya ko na.",
-            "Di ko kailangan ng limos. Salamat pa rin.",
-            "Itago mo ang gamit mo. Mas kailangan mo 'yan kaysa sa akin.",
-            "Mas gusto kong umasa sa sarili ko, pero salamat.",
-            "Hindi salamat. May kapalit ba 'yan?",
-            "Maayos ang pamamahala ko sa sarili ko.",
-            "Tatanggihan ko. Dala ko ang kailangan ko.",
-            "Salamat, pero hindi. Itabi mo.",
-            "Ako na ang bahala sa mga pangangailangan ko.",
-            "Di ako interesado, pero salamat sa pag-alok."
-          ]
-        }
+        "id": "guarded"
       },
       {
-        "id": "terse",
-        "text": {
-          "EN": [
-            "Thanks.",
-            "I'm good.",
-            "Keep it.",
-            "Pass.",
-            "Noted.",
-            "Appreciated.",
-            "Got it.",
-            "No thanks.",
-            "Maybe later.",
-            "Thank you."
-          ],
-          "TL": [
-            "Salamat.",
-            "Ayos ako.",
-            "Itabi mo.",
-            "Tanggi muna.",
-            "Tala ko na.",
-            "Pinahahalagahan.",
-            "Nakuha ko.",
-            "Hindi salamat.",
-            "Baka mamaya.",
-            "Salamat sa 'yo."
-          ]
-        }
+        "id": "terse"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Thank you, I appreciate the offer.",
-            "That is so kind of you! Thank you so much.",
-            "I'm grateful for that. You're a true friend.",
-            "That makes life a little easier out here. Thanks!",
-            "Always generous. Thank you, partner.",
-            "Thank you! I won't forget your kindness.",
-            "You didn't have to, but thank you from the bottom of my heart.",
-            "That's wonderful of you. Thank you!",
-            "Appreciate you so much. Let me return the favor soon.",
-            "Thank you, friend. We look after one another."
-          ],
-          "TL": [
-            "Salamat, pinahahalagahan ko ang alok mo.",
-            "Napakabait mo naman! Maraming-maraming salamat.",
-            "Nagpapasalamat ako riyan. Tunay kang kaibigan.",
-            "Gumagaan ang buhay rito dahil diyan. Salamat!",
-            "Laging bukas-palad. Salamat, kasama.",
-            "Salamat! Hindi ko malilimutan ang kabaitan mo.",
-            "Hindi mo naman kailangang gawin, pero salamat mula sa puso.",
-            "Napakaganda ng ginawa mo. Salamat!",
-            "Salamat nang marami. Hayaan mong masuklian ko 'to agad.",
-            "Salamat, kaibigan. Nag-aalagaan tayo rito."
-          ]
-        }
+        "id": "warm"
       }
     ]
+  },
+  "textSidecars": {
+    "EN": "translations/social_offer_friendly.en.json",
+    "TL": "translations/social_offer_friendly.tl.json"
   }
 }

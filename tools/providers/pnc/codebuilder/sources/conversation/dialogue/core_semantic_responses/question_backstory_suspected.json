@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "question.backstory",
-  "id": "suspected",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "question.backstory.suspected",
   "metadata": {
     "responsePoolID": "question.backstory.suspected",
     "responseAct": "SUSPECTED"

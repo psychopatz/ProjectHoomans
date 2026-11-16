@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "619b21e895b85f6c0994bcee8bc18afc81222fa2595fe31ad982942f4f0d6011"
+Registry.WHOLE_MODEL_FINGERPRINT = "e722eac2adb6d5e64c76b4266d48fd2e3f2519cc5c040867eed2bcf0cdef9de2"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -109,6 +109,7 @@ appendFlows(require "PNC/ConvoEngine/Flows/Semantic/PncDialogueFollowFlow")
 appendFlows(require "PNC/ConvoEngine/Flows/Semantic/PncLabStayWithYouFlow")
 appendBehaviors(require "PsychopatzCore/ConvoEngine/Behaviors/Director/Social")
 appendBeats(require "PsychopatzCore/ConvoEngine/Beats/Director/Social")
+appendPacks(require "PNC/ConvoEngine/Packs/Dialogue/SocialReactionsHostile__48471f22")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold")
@@ -196,7 +197,7 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelN
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews__f95eb4d7")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__5b998e54")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialSettlementAdmission")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation")

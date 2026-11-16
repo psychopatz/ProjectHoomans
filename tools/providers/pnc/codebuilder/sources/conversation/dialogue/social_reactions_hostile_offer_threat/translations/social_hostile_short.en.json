@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Watch your language.",
+      "That kind of talk is dangerous here.",
+      "Keep your words civil.",
+      "I'm warning you to calm down.",
+      "Don't escalate this situation.",
+      "Control your temper.",
+      "There's no place for that attitude here.",
+      "Watch your mouth and think before you speak.",
+      "You need to rein that in.",
+      "Keep it civil or step away."
+    ],
+    "guarded": [
+      "Watch your mouth. Now.",
+      "Shut your mouth before I shut it for you.",
+      "You're pushing me. Stop.",
+      "One more word out of you.",
+      "Mind yourself right now.",
+      "You're testing the wrong survivor.",
+      "Quiet. Before things get violent.",
+      "You want trouble? Keep talking.",
+      "Hold your tongue.",
+      "Bite your tongue now."
+    ],
+    "terse": [
+      "Shut it.",
+      "Watch it.",
+      "Enough.",
+      "Quiet.",
+      "Careful.",
+      "Bite it.",
+      "Stop.",
+      "Cool it.",
+      "Done.",
+      "Last warning."
+    ],
+    "warm": [
+      "Hey, watch your mouth, friend. We're better than that.",
+      "Don't talk like that. You're better than this anger.",
+      "Come on, watch your tone with me.",
+      "Take a breath before you say something you'll regret.",
+      "I know you're frustrated, but don't lash out at me.",
+      "Easy now. We're on the same team.",
+      "Check yourself, partner. I'm with you, not against you.",
+      "Don't let the anger win today. Stay with me.",
+      "I'm giving you space, but watch what you say.",
+      "Hold your words. We can talk when you're calmer."
+    ]
+  }
+}

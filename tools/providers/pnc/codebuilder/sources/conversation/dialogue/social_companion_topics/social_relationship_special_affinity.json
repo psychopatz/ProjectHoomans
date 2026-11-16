@@ -1,20 +1,7 @@
 {
-  "kind": "dialogue",
-  "id": "affinity",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
-  "when": {
-    "path": "relationship.speakerToAddressee.approval",
-    "op": "gte",
-    "value": 20
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.relationship.special.affinity",
+  "when": "relationship.speakerToAddressee.approval >= 20",
   "metadata": {
     "runtimeBlockID": "projecthoomans:relationship_special",
     "category": "projecthoomans:relationship",
@@ -72,7 +59,5 @@
         ]
       }
     ]
-  },
-  "namespace": "social.relationship.special",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

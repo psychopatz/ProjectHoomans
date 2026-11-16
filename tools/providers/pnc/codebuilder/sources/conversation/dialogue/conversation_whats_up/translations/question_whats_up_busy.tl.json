@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Abala ako at sinusubukan kong maging kapaki-pakinabang.",
+      "Inaayos ko lang ang mga kailangan kong gawin ngayong araw.",
+      "Maraming gawain para hindi maisip ang mga patay.",
+      "Inaasikaso ang mga kailangan sa kampo. Laging may aayusin.",
+      "Nagtatrabaho para manatiling ligtas tayong lahat.",
+      "Pinananatiling abala ang sarili. Nakatutulong magpalipas ng oras.",
+      "Gumagawa ng mga gawain. Kumusta naman ikaw?",
+      "May ilang proyekto akong inaasikaso ngayon.",
+      "Inaayos lang ang mga gamit dito.",
+      "Gumagalaw palagi. Ang kawalan ng gawa ang nagpapahamak sa tao."
+    ],
+    "guarded": [
+      "Abala ako. Huwag mo akong gambalain.",
+      "May trabaho pa ako. Magpatuloy ka na.",
+      "Marami akong ginagawa ngayon. Hayaan mo muna ako.",
+      "May ginagawa ako. Huwag kang humarang dito.",
+      "Masyadong maraming gagawin para tumambay at makipag-usap.",
+      "Abala ako sa pagpapatuloy. Dapat ikaw rin.",
+      "Nakatutok ako sa tungkulin ko. Umatras ka.",
+      "Hindi hihinto ang trabaho dahil lang gusto mong makipag-usap.",
+      "Abala ako rito. Bumalik ka kapag tapos na ako.",
+      "May mahalagang gawain akong tatapusin. Huwag kang humarang."
+    ],
+    "terse": [
+      "Abala ako.",
+      "Nagtatrabaho.",
+      "Abala.",
+      "Mga gawain.",
+      "Maraming hawak.",
+      "May ginagawa.",
+      "Ginagawa pa.",
+      "Walang tigil.",
+      "Gawain sa kampo.",
+      "Tinatapos ito."
+    ],
+    "warm": [
+      "Abala ako at sinusubukan kong maging kapaki-pakinabang. Laging may kailangang gawin.",
+      "Nagsusumikap para sa kampo. Masayang dumaan ka!",
+      "Abala man, hindi mawawalan ng oras para kumustahin ka.",
+      "Gumagawa ng gawain. Masarap magpahinga sandali kasama ang kaibigan.",
+      "Ginagawa lang ang parte ko sa komunidad. Kumusta ka naman?",
+      "Nawawala ang kaba kapag may ginagawa. Laging magandang makita ka.",
+      "Nagtatrabaho lang! Sabihan mo ako kung kailangan mo ng tulong sa gawain mo.",
+      "Maraming trabaho, pero gumagaan kapag may mabubuting kasama.",
+      "Tinatapos lang ang ilang bagay. Masarap kang makita ngayong araw.",
+      "Tumutulong sa abot ng makakaya. Salamat sa pangangamusta mo."
+    ]
+  }
+}

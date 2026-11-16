@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "neutral": [
+      "Dahan-dahan. Hindi natin kailangang palalain pa ito.",
+      "Kumalma tayo at pag-usapan ito nang maayos.",
+      "Huminga ka nang malalim. Walang maaayos ang bangayan.",
+      "Di kailangang mag-init ang ulo. Ayusin natin.",
+      "Dahan-dahan lang. Magkasama tayo rito.",
+      "Umatras muna tayo at tingnan ang sitwasyon nang mahinahon.",
+      "Maaayos natin ito nang hindi sumisigaw.",
+      "Kumalma ka lang. Maghanap tayo ng maayos na solusyon.",
+      "Dahan-dahan lang. Huwag mawalan ng katinuan dahil dito.",
+      "Teka muna. Huminahon tayo bago may masaktan."
+    ],
+    "guarded": [
+      "Sige. Hinaan mo lang ang boses mo.",
+      "Hinaan mo ang tono mo bago ka makahatak ng pansin.",
+      "Huwag kang sumigaw. Gusto mo bang marinig tayo ng mga patay?",
+      "Sige. Hinaan ang boses at umatras.",
+      "Sapat na. Hinaan mo ang boses mo ngayon din.",
+      "Narinig kita. Ngayon tigilan mo ang pagsigaw.",
+      "Shh! Hinaan mo ang boses mo.",
+      "Maging maayos at tahimik. Nasa panganib tayo.",
+      "Hinaan mo ang boses. Hindi ako bingi.",
+      "Sige. Hinaan mo lang."
+    ],
+    "terse": [
+      "Dahan-dahan.",
+      "Kumalma ka.",
+      "Tama na.",
+      "Tahimik.",
+      "Huminga ka.",
+      "Palamig ka muna.",
+      "Magpakatatag.",
+      "Sapat na.",
+      "Teka lang.",
+      "Tigil."
+    ],
+    "warm": [
+      "Kumalma ka. Walang naitutulong ito sa atin.",
+      "Huy, tingnan mo ako. Magkaibigan tayo, tandaan mo.",
+      "Huminga ka muna. Narito lang ako kasama mo. Aayusin natin 'to.",
+      "Alam kong pagod ka. Huminto muna tayo at magpahinga.",
+      "Huwag mong hayaang lamunin ka ng galit. May malasakit tayo sa isa't isa.",
+      "Malalampasan natin ito, pangako. Kumalma ka na.",
+      "Naririnig ko ang hirap mo. Mag-usap tayo nang mahinahon.",
+      "Ayos lang. Nakikinig ako. Ibaba mo lang ang init ng ulo.",
+      "Masyado na tayong maraming pinagdaanan para mag-away nang ganito.",
+      "Kapayapaan, kaibigan. Mas malakas tayo kapag magkasama."
+    ]
+  }
+}

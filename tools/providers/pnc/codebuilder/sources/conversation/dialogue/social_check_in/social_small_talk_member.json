@@ -1,15 +1,6 @@
 {
-  "kind": "dialogue",
-  "id": "member",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "social.small_talk.member",
   "metadata": {
     "runtimeBlockID": "projecthoomans:small_talk_member",
     "category": "projecthoomans:small_talk",
@@ -88,7 +79,5 @@
         ]
       }
     ]
-  },
-  "namespace": "social.small_talk",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

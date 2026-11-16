@@ -1,15 +1,6 @@
 {
-  "kind": "dialogue",
-  "id": "support",
-  "owner": "ProjectHoomans",
-  "participants": {
-    "speaker": [
-      "participant"
-    ],
-    "addressee": [
-      "participant"
-    ]
-  },
+  "schema": "psychopatz.psdl.v2",
+  "id": "needs.member.support",
   "target": {
     "type": "entity.any",
     "required": false,
@@ -211,7 +202,5 @@
         ]
       }
     ]
-  },
-  "namespace": "needs.member",
-  "schema": "psychopatz.convo-engine.v1"
+  }
 }

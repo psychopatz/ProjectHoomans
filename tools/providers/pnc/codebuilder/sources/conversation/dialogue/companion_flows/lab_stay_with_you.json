@@ -1,9 +1,6 @@
 {
-  "schema": "psychopatz.convo-engine.v1",
-  "kind": "dialogue",
-  "namespace": "pnc.lab",
-  "id": "stay_with_you",
-  "owner": "ProjectHoomans",
+  "schema": "psychopatz.psdl.v2",
+  "id": "pnc.lab.stay_with_you",
   "on": {
     "action": "STAY",
     "intent": "REQUEST",

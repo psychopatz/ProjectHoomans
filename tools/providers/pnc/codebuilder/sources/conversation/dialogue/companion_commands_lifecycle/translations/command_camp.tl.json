@@ -1,0 +1,68 @@
+{
+  "reply": {
+    "queued": {
+      "1": {
+        "neutral": [
+          "Sige, magse-set up ako ng kampo roon.",
+          "Naintindihan. Itatayo na ang kampo natin ngayon.",
+          "Pupunta ako para itayo ang kampo.",
+          "Papunta na para magtayo ng kampo.",
+          "Magtatayo ng kampo sa pwestong 'yon. Naintindihan.",
+          "Sige. Magtatayo ng silungan doon.",
+          "Seselyuhan ko ang kampo ngayon.",
+          "Kikilos para magtayo ng kampo ayon sa utos.",
+          "Nakuha ko. Maglalatag ng kampo.",
+          "Naiintindihan ko. Pupunta roon para magkampo."
+        ],
+        "friendly": [
+          "Sige, magse-set up ako ng kampo roon. Mukhang maaliwalas.",
+          "Masayang gagawin! Magpaningas tayo ng maayos na apoy.",
+          "Magandang pasya, kaibigan. Ihahanda ko ang kampo.",
+          "Ipaubaya mo sa akin! Titiyakin kong ligtas at komportable.",
+          "Magandang ideya. Pupunta ako para itayo ang kampo natin.",
+          "Aba oo! Oras na para magpahinga. Magtatayo na ngayon.",
+          "Malugod kong gagawin. Ilalatag ko ang higaan maya-maya.",
+          "Napakaganda. Aayusin ko ang silungan natin.",
+          "Walang anuman, kasama! Handa na ang kampo agad.",
+          "Inaasikaso na, kaibigan! Magpahinga ka, ako na sa kampo."
+        ],
+        "repeated": [
+          "Nagtatayo pa rin ako ng kampo roon.",
+          "Ginagawa ko na ang kampo. Bigyan mo ako ng sandali.",
+          "Inaasikaso pa rin. May katagalan ang pagtatayo.",
+          "Naglalatag na ako ng kampo roon.",
+          "Ginagawa ko nang mabilis ang kampong 'yon.",
+          "Oo, narinig ko sa una pa lang. Ginagawa pa rin ang kampo.",
+          "Kasalukuyan na akong nagtatayo roon.",
+          "Kasalukuyan nang isinasagawa ang pagkakampo.",
+          "Sinisigurado pa rin ang kampo. Maghintay lang.",
+          "Halos tapos na sa kampo. Huwag mo akong madaliin."
+        ],
+        "trusted": [
+          "Sige, magtatayo ako ng kampo roon.",
+          "Tiwala ako sa pagpili mo ng lupa. Magtatayo ng kampo.",
+          "Pinili mo ang pwesto, itatayo ko ang silungan.",
+          "Naintindihan. Titiyakin kong saradong-sarado ang kampo natin.",
+          "Alam kong kaligtasan natin ang iniisip mo. Magkakampo.",
+          "Agad-agad. Ligtas tayo roon nang magkasama.",
+          "Ihahanda ko para sa ating dalawa.",
+          "Lubos akong nagtitiwala sa pasya mo. Itatayo na ang kampo.",
+          "Nagtatayo ng kampo. Karapat-dapat tayo sa pahingang ito.",
+          "Magandang pasya, kasama. Seselyuhan ko ang paligid ng kampo."
+        ],
+        "withdrawn": [
+          "Magtatayo ako ng kampo roon.",
+          "Sige. Pupunta roon para magkampo.",
+          "Naintindihan. Magkakampo.",
+          "Kung sinasabi mo. Magtatayo ako ng kampo.",
+          "Pupunta para itayo ngayon.",
+          "Sige. Magtatayo ng silong.",
+          "Gagawin ko.",
+          "Nagtatayo ng kampo. Hayaan mo na ako rito.",
+          "Sige. Magkakampo roon.",
+          "Narinig ko. Nagtatayo na."
+        ]
+      }
+    }
+  }
+}
