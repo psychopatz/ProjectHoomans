@@ -34,7 +34,7 @@ Do not delete anything in G0.
 
 ## G1 — Generation recipe and desired-artifact ledger
 
-**Status:** NOT STARTED.
+**Status:** ACCEPTED (`CODE_VERIFIED`, `TEST_VERIFIED`).
 
 Add the compact CodeBuilder generation recipe in PsychopatzCore and a validated recipe schema.
 

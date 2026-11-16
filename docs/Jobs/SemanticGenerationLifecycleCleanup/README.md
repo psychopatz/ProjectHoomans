@@ -1,6 +1,6 @@
 # Semantic Generation Lifecycle Cleanup
 
-**Status:** IN_PROGRESS — G0 accepted; proceeding into G1.
+**Status:** IN_PROGRESS — G0 and G1 accepted; proceeding into G2.
 
 ## Parent objective
 
