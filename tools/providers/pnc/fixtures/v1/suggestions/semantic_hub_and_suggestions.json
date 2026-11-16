@@ -1,0 +1,389 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.suggestions.semantic_hub_and_suggestions",
+  "domain": "suggestions",
+  "cases": [
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.whats_up_root_phrase_activates_hub",
+      "tags": ["suggestions", "semantic_hub", "whats_up"],
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.speechAct": "QUESTION",
+            "ir.subject": "CONVERSATION_TOPIC",
+            "ir.extensions.topic": "whats_up",
+            "ir.extensions.route": "semantic_hub",
+            "ir.extensions.hubID": "whats_up",
+            "ir.extensions.categoryID": {"absent": true},
+            "observation.conversationBlock": {"absent": true},
+            "observation.conversationGraph.graphKind": "semantic_hub",
+            "observation.suggestions.activeHub.id": "whats_up",
+            "observation.suggestions.activeHub.route": "semantic_hub",
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.suggestions.choiceRegistry.providers": {"minCount": 1},
+            "observation.suggestions.choiceRegistry.collectionDiagnostics": {"count": 0}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.whats_up_alias_whats_new",
+      "tags": ["suggestions", "semantic_hub", "whats_up"],
+      "turns": [
+        {
+          "text": "whats new",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.route": "semantic_hub",
+            "ir.extensions.hubID": "whats_up",
+            "observation.conversationBlock": {"absent": true},
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up"
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.whats_up_alias_anything_going_on",
+      "tags": ["suggestions", "semantic_hub", "whats_up"],
+      "turns": [
+        {
+          "text": "anything going on",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.route": "semantic_hub",
+            "ir.extensions.hubID": "whats_up",
+            "observation.conversationBlock": {"absent": true},
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up"
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.direct_topic_bypasses_generic_hub_gossip",
+      "tags": ["suggestions", "semantic_hub", "direct_topic"],
+      "turns": [
+        {
+          "text": "Any gossip?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "GOSSIP",
+            "observation.conversationBlock": {"absent": true}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.direct_topic_bypasses_generic_hub_needs",
+      "tags": ["suggestions", "semantic_hub", "direct_topic"],
+      "turns": [
+        {
+          "text": "Do you need anything?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NEEDS",
+            "observation.conversationBlock": {"absent": true}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.direct_topic_bypasses_generic_hub_activity",
+      "tags": ["suggestions", "semantic_hub", "direct_topic"],
+      "turns": [
+        {
+          "text": "What have you been doing?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "ACTIVITY",
+            "observation.conversationBlock": {"absent": true}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.time_topic_grouping_and_click",
+      "tags": ["suggestions", "time", "click"],
+      "turns": [
+        {
+          "text": "what time is it",
+          "expect": {
+            "observation.suggestions.currentTopic": "time",
+            "observation.suggestions.currentGroupID": "topic:time",
+            "observation.suggestions.rootGroupID": "conversation_landing"
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "question.time"},
+          "expect": {
+            "accepted": true,
+            "ir.subject": "TIME",
+            "messages.0.payload.text": "It's 1:30 PM.",
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.unowned_npc_exposes_no_companion_actions",
+      "tags": ["suggestions", "authority", "safety"],
+      "scenario": {
+        "npc": {
+          "actorAuthority": {
+            "companion": false,
+            "owned": false,
+            "eligible": false
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "observation.suggestions.permittedCapabilities": {"count": 0}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.accepted_follow_refreshes_action_surface",
+      "tags": ["suggestions", "actions", "follow"],
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "suggestionClick": {"permittedAction": "FOLLOW"},
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 1},
+            "observation.suggestions.actorConversationContext.situation.activeBehavior": "following",
+            "observation.suggestions.currentGroupID": "companion.orders",
+            "observation.suggestions.permittedCapabilities.1.action": "STAY",
+            "observation.suggestions.permittedCapabilities.1.status": "eligible"
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.neutral_survivor_safe_avenues_and_activity_click",
+      "tags": ["suggestions", "semantic_hub", "neutral"],
+      "scenario": {
+        "npc": {
+          "actorAuthority": {"companion": false, "owned": false, "eligible": false, "status": "not_companion"},
+          "recruited": false,
+          "hostility": {"attackPlayers": false}
+        }
+      },
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.activeHub.id": "whats_up",
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.conversationBlock": {"absent": true},
+            "observation.conversationGraph.graphKind": "semantic_hub"
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "question.activity"},
+          "expect": {
+            "accepted": true,
+            "ir.subject": "ACTIVITY",
+            "ir.provenance.parser": "semantic_click_frame",
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.companion_injured_ranks_health_first",
+      "tags": ["suggestions", "semantic_hub", "companion", "ranking"],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "actorAuthority": {"companion": true, "owned": true, "eligible": true, "status": "eligible"},
+          "recruited": true,
+          "hostility": {"attackPlayers": false},
+          "healthState": "injured"
+        },
+        "world": {
+          "hunger": 0.9,
+          "thirst": 0.2,
+          "fatigue": 0.1
+        }
+      },
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.suggestions.candidates.0.id": "question.health",
+            "observation.suggestions.candidates.0.rank": 1
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.companion_severe_needs_ranks_needs_first",
+      "tags": ["suggestions", "semantic_hub", "companion", "ranking"],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "actorAuthority": {"companion": true, "owned": true, "eligible": true, "status": "eligible"},
+          "recruited": true,
+          "hostility": {"attackPlayers": false},
+          "needs": {"hunger": 0.95, "thirst": 0.9, "fatigue": 0.1}
+        }
+      },
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.suggestions.candidates.0.id": "question.needs",
+            "observation.suggestions.candidates.0.rank": 1
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.trusted_lover_unlocks_personal_check_in",
+      "tags": ["suggestions", "semantic_hub", "relationship", "trust"],
+      "scenario": {
+        "npc": {
+          "startingRelationship": {"kind": "lover", "source": "starting_companion_trait"},
+          "relationship": {"approval": 80, "respect": 70, "familiarity": 80}
+        }
+      },
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up"
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "social.personal_check_in"},
+          "expect": {
+            "accepted": true,
+            "ir.subject": "WELLBEING"
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.enemy_hub_keeps_only_public_weather_avenue",
+      "tags": ["suggestions", "semantic_hub", "enemy"],
+      "scenario": {
+        "npc": {
+          "activeBehavior": "hostile",
+          "actorAuthority": {"companion": false, "owned": false, "eligible": false, "status": "hostile"},
+          "recruited": false,
+          "hostility": {"attackPlayers": true},
+          "startingRelationship": {"kind": "lover", "source": "starting_companion_trait"},
+          "relationship": {"approval": 90, "respect": 80, "familiarity": 100}
+        }
+      },
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.suggestions.groups.1.id": "semantic_hub.whats_up",
+            "observation.suggestions.groups.1.candidates": {"count": 1},
+            "observation.suggestions.groups.1.candidates.0.id": "question.weather"
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.safe_gossip_context_gated_and_clickable",
+      "tags": ["suggestions", "semantic_hub", "gossip"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc_alice",
+          "forename": "Alice",
+          "id": "npc_alice",
+          "coreActorID": "actor:alice",
+          "name": "Alice",
+          "affiliation": {"factionID": "faction:one"}
+        },
+        "runtime": {
+          "semanticCognitionResponses": {"GOSSIP": {"targetID": "self"}},
+          "worldKnowledge": {
+            "actors": [
+              {"id": "npc_alice", "coreActorID": "actor:alice", "name": "Alice", "alive": true},
+              {"id": "npc_bob", "coreActorID": "actor:bob", "name": "Bob", "alive": true}
+            ],
+            "facts": [
+              {
+                "producer": "semantic_lab:scenario",
+                "kind": "zombie.pressure",
+                "eventID": "lab:zombie:episode:1",
+                "subject": {"id": "actor:alice", "kind": "npc"},
+                "occurredAt": 50,
+                "observedAt": 50,
+                "severity": 0.8,
+                "retention": "historical",
+                "payload": {"band": "heavy", "scenarioOwned": true}
+              }
+            ],
+            "acquisitions": [
+              {
+                "actorID": "actor:alice",
+                "factIndex": 1,
+                "provenance": "witnessed",
+                "confidence": 0.95,
+                "source": "scenario_authority",
+                "acquisitionPath": "scenario_authority"
+              }
+            ]
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "Any gossip?",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "What's up?",
+          "expect": {"accepted": true}
+        },
+        {
+          "suggestionClick": {"candidateID": "question.gossip"},
+          "expect": {
+            "accepted": true,
+            "ir.subject": "GOSSIP"
+          }
+        }
+      ],
+      "domain": "suggestions"
+    }
+  ]
+}

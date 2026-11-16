@@ -1,10 +1,10 @@
-# Semantic Test Subsystem — Final Cleanup
+# Semantic Test Subsystem — Cross-Repo Closure
 
 **Status:** COMPLETE.
 
 ## Objective
 
-All-in-one PSDL semantic tester with one declarative behavioral fixture authority, descriptive domain-first test naming, method-level fixture ownership, and committed durable policy.
+All-in-one PSDL semantic tester across ProjectHoomans and PsychopatzCore with one declarative behavioral fixture authority, descriptive domain-first naming in both repositories, contextual suggestion/hub behavioral ownership in fixtures, and cross-repo naming guards.
 
 Accepted architecture:
 
@@ -17,11 +17,10 @@ Accepted architecture:
 
 Final accepted baseline:
 
-- PsychopatzCore `3dfdf0dc15b4`
+- PsychopatzCore `d1d4097ee4ce`
 - ProjectHoomans (recorded in `HANDOFF.md` / Git HEAD)
-- Core fixture/authority: **18/18 PASS**
-- canonical fixture corpus: **211/211 PASS**
-- focused retained/migrated Python suites: **24/24 PASS**
-- lint: **38 files / 211 cases / 0 errors** (7 legitimate cross-domain overlap groups, 0 exact duplicates, 0 naming violations, 0 domain/path mismatches)
-- classification ledger: **174 modules / 715 methods** with implementation-specific contracts
+- Core fixture/authority & naming gate: **19/19 PASS**
+- canonical fixture corpus: **226/226 PASS**
+- lint: **39 files / 226 cases / 0 errors** (0 exact duplicates, 0 naming violations, 0 domain/path mismatches)
+- classification ledger: **171 modules / 702 methods** with implementation-specific contracts
 - one GUI behavioral fixture authority; old regression/C0A surfaces removed.

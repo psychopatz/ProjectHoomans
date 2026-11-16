@@ -5,29 +5,30 @@ target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 state: COMPLETE
 parent_status: COMPLETE
-phase: A6R15
+phase: A6R18
 phase_commit: self
 participant_commits:
-  PsychopatzCore: "3dfdf0dc15b4"
+  PsychopatzCore: "d1d4097ee4ce"
 ---
 
 # Session Handoff
 
 ## Accepted vector
 
-- PsychopatzCore `3dfdf0dc15b4`
+- PsychopatzCore `d1d4097ee4ce`
 - ProjectHoomans `self` (committed primary HEAD)
 
-Verified independently:
+Independent exact-vector verification:
 
-- Core fixture/authority 18/18 PASS;
-- lint 38 files / 211 cases / 0 errors (0 exact duplicates, 0 naming violations, 0 domain/path mismatches, 7 legitimate cross-domain overlap groups);
-- focused retained/migrated Python suites 24/24 PASS;
-- full canonical semantic fixture corpus 211/211 PASS;
-- `TEST_CLASSIFICATION.json` regenerated for 174 modules / 715 methods with specific implementation contracts.
+- Core fixture/authority & naming gate: 19/19 PASS;
+- ProjectHoomans naming/static boundary gate: 4/4 PASS;
+- fixture lint: 39 files / 226 cases / 0 errors (0 exact duplicates, 0 naming violations, 0 domain/path mismatches);
+- focused retained suggestion/ranking/protocol/heldout suites: PASS;
+- full canonical semantic fixture corpus: 226/226 PASS;
+- `TEST_CLASSIFICATION.json`: 171 modules / 702 methods.
 
 ## Closure summary
 
-- A6R13: `_find_history_tokens()` fixed generically; milestone-coded test files renamed/split (`test_identity_label_and_speech_realization.py`, `test_provider_worker_manifest_startup.py`, `test_semantic_harness_gui_journeys.py`, `test_heldout_precision_and_dataset_compilation.py`, `test_backstory_spec_and_interaction_history_cli.py`); historical class/docstring/ledger labels cleaned.
-- A6R14: Behavioral scenarios migrated to canonical fixtures with parity (`test_conversation_intent_routing_and_followups.py` and `test_conversation_proposal_and_clarification_contracts.py` retired; `test_conversation_multi_turn_coherence_contract.py` and `test_wellbeing_projection.py` split to retain only imperative projection/validation/API contracts; `test_unified_authority_event_followup.py` retained for event-window worker RPCs).
-- A6R15: Goal-owned durable policies committed in both root `AGENTS.md` files; all active job docs reconciled to COMPLETE.
+- A6R16: Normalized Core semantic-harness test/module/UI/CLI/API identities and added Core-side naming guard.
+- A6R17: Added generic `candidateID`/`permittedAction` `suggestionClick` resolution; migrated contextual hub/suggestion behavioral outcomes to `suggestions/semantic_hub_and_suggestions.json`; retained registry/ranking/stale-frame protocol tests; regenerated `TEST_CLASSIFICATION.json`.
+- A6R18: Reconciled all active docs to COMPLETE and verified the exact committed Core + ProjectHoomans vector via clean Git worktrees.

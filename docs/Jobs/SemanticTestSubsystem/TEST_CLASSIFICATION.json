@@ -1,11 +1,11 @@
 {
   "schema": "semantic.test-classification.v1",
-  "totalModules": 174,
-  "totalMethods": 715,
+  "totalModules": 171,
+  "totalMethods": 702,
   "categoryCounts": {
     "COMPILER_CONTRACT": 11,
     "GUI_CONTRACT": 38,
-    "LOW_LEVEL_RUNTIME_CONTRACT": 86,
+    "LOW_LEVEL_RUNTIME_CONTRACT": 83,
     "NATIVE_INTEGRATION": 13,
     "PERFORMANCE_RESOURCE": 7,
     "SAVE_PERSISTENCE": 11,
@@ -143,21 +143,21 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (generic provider discovery and existing authority-lane contracts.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Candidate provider registry and authority-lane contract: verifies generic provider discovery, registration order, and authority-lane invariants."
     },
     {
       "module": "test_contextual_choice_registry.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (choice-registry contract tests through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Candidate registry normalization contract: verifies semantic.choice.v1 candidate normalization and provider-registry collection."
     },
     {
       "module": "test_contextual_dialogue_persona_choices.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (freeze tests for the current production suggestion path.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Contextual choice projection structure contract: verifies persona-choice projection structure and frame wiring."
     },
     {
       "module": "test_contextual_friend_promotion_runtime.py",
@@ -178,7 +178,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (precedence, contextual ranking, and privacy contracts.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Contextual ranking precedence and privacy-field invariance contract: verifies ranking precedence, situation-fit ordering, and private-field invariance."
     },
     {
       "module": "test_contextual_relationship_preview.py",
@@ -216,13 +216,6 @@
       "justification": "Performance/resource contract (Bounded latency and multi-scope isolation on real Lua workers.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
-      "module": "test_contextual_semantic_hub.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 6,
-      "usesDirectWorker": true,
-      "justification": "Implementation runtime contract: Contextual What's Up hub projection through the production Lua worker."
-    },
-    {
       "module": "test_contextual_social_reactions.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 12,
@@ -244,25 +237,11 @@
       "justification": "Implementation runtime contract: transient speech-style and realization-family contracts."
     },
     {
-      "module": "test_contextual_suggestions_followup.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 4,
-      "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (Corrective dynamic-topic and owned-action suggestion coverage.): verifies suggestion frame projection, ranking stability, or provider registry."
-    },
-    {
       "module": "test_contextual_suggestions_hub_presentation.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (Daily What's Up presentation suppression through the production worker.): verifies suggestion frame projection, ranking stability, or provider registry."
-    },
-    {
-      "module": "test_contextual_suggestions_whats_up.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 3,
-      "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (What's Up activates the semantic hub through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Suggestion frame stale/replay protocol and daily presentation-cache persistence contract: verifies stale_suggestion rejection, reset_conversation cache preservation, and per-NPC/day cache scoping."
     },
     {
       "module": "test_contextual_talk_parity.py",
@@ -283,7 +262,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Generated-affordance suggestion projection and click-frame convergence contract: verifies pending-question affordance projection, reply-to frame wiring, and typed-vs-click convergence."
+      "justification": "Generated-affordance click-frame convergence contract: verifies pending-question affordance projection, reply-to frame wiring, and typed-vs-click convergence."
     },
     {
       "module": "test_conversation_response_plan_and_variation.py",
@@ -1067,14 +1046,14 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 6,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (Production semantic suggestion projections through the real Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Generated-affordance candidate projection structure contract: verifies suggestion candidate schema and projection invariants."
     },
     {
       "module": "test_suggestion_eligibility_and_filtering.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (Constraint and privacy checks through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Suggestion eligibility and privacy-predicate contract: verifies constraint evaluation and privacy-predicate filtering."
     },
     {
       "module": "test_suggestion_presentation_and_frames.py",
@@ -1088,7 +1067,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 8,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (Canonical suggestion clicks through the production dialogue path.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Suggestion ranking stability and frame-click protocol contract: verifies deterministic ranking stability and canonical frame-click protocol."
     },
     {
       "module": "test_suite.py",

@@ -1,30 +1,26 @@
-# Harness Acceptance — Final Cleanup
+# Harness Acceptance — Cross-Repo Closure
 
 **Status:** COMPLETE.
 
-## A6R13
+## A6R16
 
-- naming guard rejects S10-style milestone forms as well as existing history tokens;
-- four remaining S10-named files/classes are renamed/split descriptively;
-- historical-only class/docstring/classification labels are removed;
-- legitimate protocol/synthetic IDs are preserved.
+- Core 23 milestone-coded test files and 3 implementation/data files renamed descriptively;
+- canonical UI/CLI/API/schema `S6M8` identity replaced by `ConvoEngine Integrity Audit` / `audit-integrity` / `run_convo_engine_integrity_audit`;
+- Core-side naming guard added and green.
 
-## A6R14
+## A6R17
 
-- mandatory direct-worker suites reviewed method-by-method;
-- behavior moved to fixtures with parity;
-- retained imperative methods have specific implementation reasons;
-- classification ledger matches current filenames and responsibilities (174 modules / 715 methods);
-- no ordinary semantic scenario is LOW_LEVEL only because it uses the production worker.
+- contextual semantic hub, follow-up, and "What's up?" behavioral scenarios migrated to `suggestions/semantic_hub_and_suggestions.json` with parity;
+- candidate registry, ranking, privacy, and stale-frame/cache protocol tests retained as imperative contracts;
+- `TEST_CLASSIFICATION.json` regenerated (171 modules / 702 methods) with specific implementation reasons.
 
-## A6R15
+## A6R18
 
-From exact committed Core (`3dfdf0dc15b4`) + Hoomans vector:
+From exact committed Core (`d1d4097ee4ce`) + Hoomans vector:
 
-- Core fixture/authority PASS (18/18);
-- lint PASS with zero exact duplicates, zero naming violations, zero domain/path mismatches (38 files / 211 cases);
-- Python filename/static boundary gate PASS;
-- focused retained/migrated suites PASS (24/24);
-- full semantic fixture corpus PASS (211/211);
-- root durable policies are committed in both repos;
+- Core fixture/authority & naming gate PASS (19/19);
+- ProjectHoomans naming/static boundary gate PASS (4/4);
+- lint PASS with zero exact duplicates, zero naming violations, zero domain/path mismatches (39 files / 226 cases);
+- focused retained suggestion/ranking/protocol/heldout suites PASS;
+- full canonical semantic fixture corpus PASS (226/226);
 - README/ROADMAP/PROGRESS/HANDOFF/ARCHITECTURE/AUDIT/HARNESS_ACCEPTANCE/RUNBOOK agree on COMPLETE.

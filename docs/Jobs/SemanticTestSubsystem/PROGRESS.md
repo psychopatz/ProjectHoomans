@@ -1,23 +1,23 @@
-# Progress — Final Cleanup
+# Progress — Cross-Repo Closure
 
 **Status:** COMPLETE.
-**Current phase:** A6R15.
+**Current phase:** A6R18.
 **Next Chunk:** None (parent goal complete).
 
 ## Verified final vector
 
-- Core: `3dfdf0dc15b4`
+- Core: `d1d4097ee4ce`
 - Hoomans: committed primary HEAD (see `HANDOFF.md` / Git log)
-- 18/18 Core fixture/authority PASS
-- 211/211 canonical fixtures PASS
-- 24/24 focused retained/migrated Python suites PASS
-- lint: 38 files / 211 cases / 0 errors (0 exact duplicates, 0 naming violations, 0 domain/path mismatches)
-- `TEST_CLASSIFICATION.json`: 174 modules / 715 methods, zero history tokens, zero generic boilerplate
+- Core fixture/authority & naming gate: 19/19 PASS
+- ProjectHoomans naming/static boundary gate: 4/4 PASS
+- lint: 39 files / 226 cases / 0 errors (0 exact duplicates, 0 naming violations, 0 domain/path mismatches)
+- canonical semantic fixtures: 226/226 PASS
+- `TEST_CLASSIFICATION.json`: 171 modules / 702 methods
 
 ## Closure checklist
 
-1. Naming guard catches S10-style milestone suffixes without false positives — DONE.
-2. Remaining S10 files renamed/split and historical class/docstring/ledger labels cleaned — DONE.
-3. Mandatory behavioral worker suites migrated to fixtures with parity; retained suites carry specific implementation contracts — DONE.
-4. Both root `AGENTS.md` durable semantic-test policies committed — DONE.
-5. All job documents agree on COMPLETE — DONE.
+1. Core 23 test files + 3 implementation/data files descriptively renamed and `S6M8` canonical identity normalized — DONE.
+2. Core-side naming guard added and green — DONE.
+3. Contextual suggestion/hub behavioral outcomes migrated to canonical fixtures with parity; registry/ranking/protocol mechanics retained — DONE.
+4. `TEST_CLASSIFICATION.json` regenerated with specific implementation contracts — DONE.
+5. Exact committed vector reconstructed and verified green; all active docs agree on COMPLETE — DONE.

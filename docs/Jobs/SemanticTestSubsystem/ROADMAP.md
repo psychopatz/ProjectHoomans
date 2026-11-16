@@ -1,11 +1,11 @@
-# Roadmap — A6R13–A6R15 Final Cleanup
+# Roadmap — A6R16–A6R18 Cross-Repo Closure
 
 **Parent status:** COMPLETE.
-**Final phase:** A6R15.
-**Completion boundary:** A6R13–A6R15 accepted.
+**Final phase:** A6R18.
+**Completion boundary:** A6R16–A6R18 accepted.
 
 ## Accepted summary
 
-- **A6R13 (Descriptive naming closure):** Fixed `_find_history_tokens()` in `psychopatzCore/tools/semantic_harness/testing/lint.py` to catch milestone families with suffixes (`s10a`, `s10c`, `s10r1`, `s6m5`, `g8r7`, `a6r13`, etc.) without false positives on legitimate protocol/data IDs (`v1`, `i18n`, `l10n`, `e2e`, `utf8`). Renamed/split the four milestone-coded PNC test files and removed roadmap provenance from active test class names, docstrings, and `TEST_CLASSIFICATION.json`.
-- **A6R14 (Behavioral fixture ownership):** Migrated behavioral recognition/safety, proposal/clarification, multi-turn discourse/referent/beat, and wellbeing projection scenarios into canonical fixtures (`semantic_safety_and_fuzzy_controls.json`, `multi_turn_topic_and_hostility.json`, `wellbeing_inquiries_and_reports.json`) with side-by-side parity, retained imperative contracts with specific justifications, and regenerated `TEST_CLASSIFICATION.json` (174 modules, 715 methods).
-- **A6R15 (Durable closure):** Committed goal-owned durable policies in both root `AGENTS.md` files, committed `PsychopatzCore` participant (`3dfdf0dc15b4`) first and `ProjectHoomans` primary last, reconciled all job docs to `COMPLETE`, and verified the exact committed vector.
+- **A6R16 (PsychopatzCore identity):** Normalized all 23 milestone-coded Core semantic-harness test files and 3 implementation/data files (`convo_engine_integrity_audit.py`, `heldout_conversation_eval.py`, `heldout_conversations.json`) by current responsibility; replaced canonical `S6M8` UI/CLI/API/schema identities with `Run ConvoEngine Integrity Audit`, `audit-integrity`, `run_convo_engine_integrity_audit()`, and `psychopatz.convo-engine.integrity-audit.v1` (retaining explicit deprecated aliases where appropriate); added Core-side static naming guard in `test_fixture_authority.py`.
+- **A6R17 (Contextual suggestion/hub ownership):** Added generic `candidateID` / `permittedAction` `suggestionClick` resolution in Core `executor.py`; migrated contextual semantic hub, follow-up, and "What's up?" behavioral scenarios into `suggestions/semantic_hub_and_suggestions.json` (15 cases) with side-by-side parity; retired `test_contextual_suggestions_whats_up.py`, `test_contextual_suggestions_followup.py`, and `test_contextual_semantic_hub.py`; retained registry, ranking, privacy, and stale-frame/cache protocol tests; regenerated `TEST_CLASSIFICATION.json` (171 modules / 702 methods).
+- **A6R18 (Exact-vector closure):** Committed `PsychopatzCore` participant (`d1d4097ee4ce`) first and `ProjectHoomans` primary last; reconciled all active docs to `COMPLETE`; verified exact committed vector from clean Git worktrees.

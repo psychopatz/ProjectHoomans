@@ -332,7 +332,7 @@ class SemanticHarnessGuiJourneyTests(SemanticLabGuiTestCase):
             "timed out waiting for Studio editors",
         )
 
-        # Toggle developer drawer and invoke read-only Studio preview & S6M8 audit
+        # Toggle developer drawer and invoke read-only Studio preview & integrity audit
         app.main_tabs.select(app.studio_tab)
         app.developer_tools_button.invoke()
         root.update_idletasks()
@@ -342,8 +342,8 @@ class SemanticHarnessGuiJourneyTests(SemanticLabGuiTestCase):
         self.assertTrue(_invoke_button_with_text(app.studio_tab, "Refresh families"))
         self.assertTrue(pane._families)
         self.assertTrue(_invoke_button_with_text(app.studio_tab, "Validate & trace"))
-        self.assertTrue(_invoke_button_with_text(app.studio_tab, "Run S6M8 Audit"))
-        self.assertIn("s6m8 audit", pane._status_var.get().lower())
+        self.assertTrue(_invoke_button_with_text(app.studio_tab, "Run ConvoEngine Integrity Audit"))
+        self.assertIn("convoengine integrity audit", pane._status_var.get().lower())
 
         # Hermetic temp workspace for New family -> Write canonical source -> Duplicate -> Delete
         with tempfile.TemporaryDirectory(prefix="s10c-studio-hermetic-") as tmp:

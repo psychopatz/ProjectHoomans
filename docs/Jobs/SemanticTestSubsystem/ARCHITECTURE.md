@@ -17,16 +17,12 @@ GUI Regression actions are fixture presets, not parallel behavioral matrices.
 
 ## Ownership
 
-Fixtures own semantic scenario/outcome behavior.
+Fixtures own semantic scenario/outcome behavior (including contextual hub/suggestion availability, trust/ownership gating, click routes, and action-surface refresh).
 
-Imperative tests own implementation contracts such as compiler/parser/generation determinism, worker protocol and payload validation, GUI mechanics, save/native/network boundaries, performance/resource budgets, observatory/sweep/quality algorithms, event-window worker RPCs, and static architecture.
+Imperative tests own implementation contracts such as compiler/parser/generation determinism, worker protocol and payload validation, GUI mechanics, save/native/network boundaries, performance/resource budgets, observatory/sweep/quality algorithms, candidate registry/ranking/privacy mechanics, stale-frame/cache replay protocol, event-window worker RPCs, and static architecture/naming guards.
 
 Calling `LuaSemanticWorker` does not make a test low-level.
 
 ## Naming
 
-Active paths, suites, case IDs, test filenames, class names, and human-facing descriptions describe current semantic/implementation responsibility. Historical phase provenance belongs in Git.
-
-## Migration rule
-
-Split mixed suites at method responsibility. Migrate behavioral methods only after fixture parity; retain implementation methods with specific justifications.
+Active paths, suites, case IDs, test filenames, class names, canonical UI/CLI/API identities, and human-facing descriptions across both repositories describe current semantic/implementation responsibility. Historical phase provenance belongs in Git.
