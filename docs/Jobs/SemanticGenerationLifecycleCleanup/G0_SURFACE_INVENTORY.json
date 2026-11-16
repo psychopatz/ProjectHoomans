@@ -1,0 +1,344 @@
+{
+  "schema": "psychopatz.semantic-generation.g0-inventory.v1",
+  "anchors": {
+    "ProjectHoomans": "02c7fb18e714bf1a3adce052c0659a972313f081",
+    "PsychopatzCore": "e3eb7ddce389dd86129f3a40651f8e646b09afec",
+    "DynamicTrading": "9c8cb3dead56d66e32fccb901b9abd3dd6c2f393"
+  },
+  "modelFingerprint": "378c3e2c710385fdd0d7566e54615724754d13e78313864e68c9e818bc6ebc72",
+  "surfaces": [
+    {
+      "id": "conversation_lua",
+      "generator": "conversation",
+      "owners": [
+        "PsychopatzCore",
+        "ProjectHoomans",
+        "DTCommon"
+      ],
+      "policy": "owned_fileset",
+      "classification": "mixed_root_with_generated_marker",
+      "generatedMarker": "-- Generated",
+      "roots": {
+        "PsychopatzCore": "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine",
+        "ProjectHoomans": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/ConvoEngine",
+        "DTCommon": "Contents/mods/DTCommon/common/media/lua/shared/DTCommon/ConvoEngine"
+      },
+      "preservedAuthoredModules": {
+        "PsychopatzCore": [
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/ActionContract.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/Affordance.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/DialogueFlow.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/DialogueRouter.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/DialogueState.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/DialogueState_Events.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/DialogueState_References.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/DialogueTurn.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/Foundation.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/Offer.lua",
+          "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/ConvoEngine/TextBinding.lua"
+        ],
+        "ProjectHoomans": [
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/ConvoEngine/DialogueBlocks.lua"
+        ],
+        "DTCommon": []
+      },
+      "desiredCounts": {
+        "PsychopatzCore": 41,
+        "ProjectHoomans": 218,
+        "DTCommon": 5
+      },
+      "activeHashShardCount": 27,
+      "activeHashShards": [
+        "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__057e5fa8",
+        "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__45514287",
+        "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__67f43293",
+        "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__9990bc04",
+        "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__3899a7d0",
+        "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__7d8bcf74",
+        "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__a9d02707",
+        "PNC/ConvoEngine/Dialogue/CoreSemanticResponses__5fef31e4",
+        "PNC/ConvoEngine/Dialogue/HealthContent__f18c9e18",
+        "PNC/ConvoEngine/Dialogue/SocialEmotes__cb245da6",
+        "PNC/ConvoEngine/Dialogue/SocialGreetings__b02b846f",
+        "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork__74d92e89",
+        "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews__f95eb4d7",
+        "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__6e8e7425",
+        "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__4e8f61d4",
+        "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__5b998e54",
+        "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation__b7b74460",
+        "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__25339a92",
+        "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__f0e430f3",
+        "PNC/ConvoEngine/Dialogue/StaticSuggestionText__f8a0a58c",
+        "PNC/ConvoEngine/Dialogue/TaskLifecycle__f0e914b3",
+        "PNC/ConvoEngine/Dialogue/TaskLifecycle__f61ddfca",
+        "PNC/ConvoEngine/Dialogue/TaskToolReplies__adda9390",
+        "PNC/ConvoEngine/Dialogue/TaskToolReplies__fc2eba07",
+        "PNC/ConvoEngine/Dialogue/WellbeingContent__5728baa5",
+        "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__becaffc7",
+        "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__d405232f"
+      ]
+    },
+    {
+      "id": "conversation_ui",
+      "generator": "conversation",
+      "owners": [
+        "PsychopatzCore",
+        "ProjectHoomans",
+        "DTCommon"
+      ],
+      "policy": "mixed_key_catalog",
+      "classification": "mixed_authored_and_generated",
+      "paths": {
+        "PsychopatzCore": [
+          "Contents/mods/PsychopatzCore/common/media/translation/EN/Conversation/UI.json",
+          "Contents/mods/PsychopatzCore/common/media/translation/TL/Conversation/UI.json"
+        ],
+        "ProjectHoomans": [
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/UI.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/UI.json"
+        ],
+        "DTCommon": [
+          "Contents/mods/DTCommon/common/media/translation/EN/Conversation/UI.json",
+          "Contents/mods/DTCommon/common/media/translation/TL/Conversation/UI.json"
+        ]
+      },
+      "desiredGeneratedKeyCounts": {
+        "PsychopatzCore": 16,
+        "ProjectHoomans": 42,
+        "DTCommon": 16
+      }
+    },
+    {
+      "id": "conversation_text",
+      "generator": "conversation_text",
+      "owners": [
+        "PsychopatzCore",
+        "ProjectHoomans",
+        "DTCommon"
+      ],
+      "policy": "owned_fileset",
+      "classification": "fully_codebuilder_owned",
+      "roots": {
+        "PsychopatzCore": "Contents/mods/PsychopatzCore/common/media/translation/<LANG>/Conversation/Text",
+        "ProjectHoomans": "Contents/mods/ProjectHoomans/common/media/translation/<LANG>/Conversation/Text",
+        "DTCommon": "Contents/mods/DTCommon/common/media/translation/<LANG>/Conversation/Text"
+      },
+      "desiredPerLocaleCounts": {
+        "PsychopatzCore": 8,
+        "ProjectHoomans": 39,
+        "DTCommon": 2
+      }
+    },
+    {
+      "id": "conversation_translations",
+      "generator": "conversation",
+      "owners": [
+        "PsychopatzCore",
+        "ProjectHoomans",
+        "DTCommon"
+      ],
+      "policy": "owned_fileset",
+      "classification": "fully_codebuilder_owned_with_preserved_neighbors",
+      "roots": {
+        "PsychopatzCore": "Contents/mods/PsychopatzCore/common/media/translation/<LANG>/Conversation",
+        "ProjectHoomans": "Contents/mods/ProjectHoomans/common/media/translation/<LANG>/Conversation",
+        "DTCommon": "Contents/mods/DTCommon/common/media/translation/<LANG>/Conversation"
+      },
+      "manifestPaths": {
+        "PsychopatzCore": "Contents/mods/PsychopatzCore/common/media/translation/manifests/Conversation.json",
+        "ProjectHoomans": "Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json",
+        "DTCommon": "Contents/mods/DTCommon/common/media/translation/manifests/Conversation.json"
+      },
+      "preservedPackageCatalogs": {
+        "PsychopatzCore": [],
+        "ProjectHoomans": [
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Flows.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Flows.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Identity/Responses.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Identity/Responses.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Journal/Events.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Journal/Events.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/PBrainZ/Interface.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/PBrainZ/Interface.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Patterns.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Patterns.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Addressing.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/Addressing.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Availability.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/Availability.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Realizations.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/Realizations.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Responses.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/Responses.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Telemetry/Diagnostics.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Telemetry/Diagnostics.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/WorldEvents/Events.json",
+          "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/WorldEvents/Events.json"
+        ],
+        "DTCommon": []
+      }
+    },
+    {
+      "id": "lexicon_lua",
+      "generator": "lexicon",
+      "owners": [
+        "PsychopatzCore"
+      ],
+      "policy": "owned_fileset",
+      "classification": "fully_codebuilder_owned",
+      "roots": {
+        "PsychopatzCore": "Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/Semantics/Generated/Lexicon"
+      },
+      "fileCount": 17
+    }
+  ],
+  "confirmedRetired": [
+    {
+      "id": "retired.hoomans.conversation.command_en",
+      "owner": "ProjectHoomans",
+      "surface": "conversation_translations",
+      "kind": "file",
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Command.json",
+      "presentInWorkspace": true,
+      "sha256": "26152f0a97fd73824950cd5df6c1c491dbaf7b67e6316ec7dea7b3ccb03c6c02",
+      "sourceLineage": "Former content/command/* and content/event/combat_horde_reactions.json shards migrated to ConvoEngine in e7e44b80; ConvoPlanFamily registers inline text at runtime.",
+      "evidence": "All 571 keys use conversation.content.semantic.* prefix; zero runtime Lua callers; peer domain files (Task.json, Event.json, Social.json, Greeting.json, Needs.json, Health.json, Wellbeing.json) were removed in S5 (1c88d83c, 19bbf8e3, 9eaab231, 9f7ea815)."
+    },
+    {
+      "id": "retired.hoomans.conversation.command_tl",
+      "owner": "ProjectHoomans",
+      "surface": "conversation_translations",
+      "kind": "file",
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Command.json",
+      "presentInWorkspace": true,
+      "sha256": "45e8c197547e2ea9c1a4fb9ef572a6e7d3b0b48da8a96362f9316ba63f9bca82",
+      "sourceLineage": "Former content/command/* and content/event/combat_horde_reactions.json shards migrated to ConvoEngine in e7e44b80; ConvoPlanFamily registers inline text at runtime.",
+      "evidence": "All 571 keys use conversation.content.semantic.* prefix; zero runtime Lua callers; peer domain files removed in S5."
+    },
+    {
+      "id": "retired.hoomans.ui_catalog.obsolete_generated_keys",
+      "owner": "ProjectHoomans",
+      "surface": "conversation_ui",
+      "kind": "mixed_keys",
+      "paths": [
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/UI.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/UI.json"
+      ],
+      "presentInWorkspace": true,
+      "keys": [
+        "UI_PNC_Conversation_SemanticSuggestions_Title",
+        "UI_PNC_Conversation_Suggestion_Back_Label",
+        "UI_PNC_Conversation_Suggestion_Identity_Lie_Utterance",
+        "UI_PNC_Conversation_Suggestion_Identity_Real_Utterance",
+        "UI_PNC_Conversation_Suggestion_Identity_Rude_Utterance",
+        "UI_PNC_Conversation_Suggestion_Trade_Label",
+        "UI_PNC_Conversation_Suggestion_Trade_Utterance"
+      ],
+      "sourceLineage": "Formerly generated from PsychopatzCore tools/semantic_harness/codebuilder/sources/conversation/ui/suggestion_text_actions.json and suggestion_text_context.json (removed in e3e1cab8). Identity choice utterances were removed in S10A (fdee7542) and trade suggestions moved to DTCommon (UI_DT_Conversation_Suggestion_Trade_*).",
+      "evidence": "Zero runtime or test references in any repository; proven formerly generated via validate_ui_shard(textNamespace='UI_PNC_Conversation') in 3c926573/e3e1cab8."
+    },
+    {
+      "id": "retired.root.legacy_semantics_generated_conversation",
+      "owners": [
+        "PsychopatzCore",
+        "ProjectHoomans",
+        "DTCommon"
+      ],
+      "surface": "conversation_lua",
+      "kind": "directory_glob",
+      "pattern": "Contents/mods/*/common/media/lua/shared/*/Semantics/Generated/Conversation",
+      "presentInWorkspace": false,
+      "sourceLineage": "Pre-S6M2B generated Conversation Lua root replaced by <Owner>/ConvoEngine.",
+      "evidence": "Anti-regression tombstone for retired generated root."
+    },
+    {
+      "id": "retired.root.legacy_conversation_psdl",
+      "owners": [
+        "PsychopatzCore",
+        "ProjectHoomans",
+        "DTCommon"
+      ],
+      "surface": "conversation_lua",
+      "kind": "directory_glob",
+      "pattern": "Contents/mods/*/common/media/lua/shared/*/Conversation/PSDL",
+      "presentInWorkspace": false,
+      "sourceLineage": "Pre-S6M2B PSDL adapter directory.",
+      "evidence": "Anti-regression tombstone for retired PSDL wrapper directory."
+    },
+    {
+      "id": "retired.root.legacy_text_psdl",
+      "owners": [
+        "PsychopatzCore",
+        "ProjectHoomans",
+        "DTCommon"
+      ],
+      "surface": "conversation_text",
+      "kind": "directory_glob",
+      "pattern": "Contents/mods/*/common/media/translation/*/Conversation/Text/psdl",
+      "presentInWorkspace": false,
+      "sourceLineage": "Pre-S8R Conversation/Text/psdl/* output directory migrated to Conversation/Text/convo/* in a21cfd5f.",
+      "evidence": "Anti-regression tombstone for retired psdl text catalog root."
+    },
+    {
+      "id": "retired.hoomans.conversation.legacy_content_domains",
+      "owner": "ProjectHoomans",
+      "surface": "conversation_translations",
+      "kind": "file_list",
+      "paths": [
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Apology.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Combat.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Combat_Banter.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Combat_Human_Banter.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Compatibility.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Conversation.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Event.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Greeting.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Health.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Knowledge.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Navigation.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Needs.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Quest.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Social.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Task.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Wellbeing.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/CommonInteractions.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/DialogueContent.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Generated.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/GroundedPersonalDialogue.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Suggestions.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Apology.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Combat.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Combat_Banter.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Combat_Human_Banter.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Compatibility.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Conversation.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Event.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Greeting.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Health.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Knowledge.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Navigation.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Needs.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Quest.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Social.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Task.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Wellbeing.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/CommonInteractions.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/DialogueContent.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/Generated.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/GroundedPersonalDialogue.json",
+        "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/Suggestions.json"
+      ],
+      "presentInWorkspace": false,
+      "sourceLineage": "Pre-S5 generated phrase-family domain catalogs retired during P11B/S5 ConvoEngine migration.",
+      "evidence": "Anti-regression tombstones for previously retired generated translation domain files."
+    }
+  ],
+  "bugsDiscoveredInG0": [
+    {
+      "id": "bug.ui_key_owner_collision_on_record_id",
+      "location": "psychopatzCore/tools/semantic_harness/codebuilder/conversation_compiler.py:937",
+      "summary": "conversation_translation_catalogs_by_owner resolves UI suggestion owner via model['locations'] before model['uiLocations'], causing question.wellbeing and question.activity UI keys to be attributed to ProjectHoomans instead of PsychopatzCore."
+    }
+  ],
+  "ambiguous": []
+}
