@@ -1,4 +1,4 @@
-"""C7B grounded factual-question probes on the production Lua worker."""
+"""Grounded factual-question probes on the production Lua worker."""
 
 from __future__ import annotations
 

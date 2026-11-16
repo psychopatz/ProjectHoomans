@@ -1,12 +1,18 @@
-# Agent Runbook — Semantic Test Subsystem Repair
+# Agent Runbook — A6R9–A6R12 Final Closure Hardening
 
-1. Inspect branch/HEAD/status and root `AGENTS.md` in ProjectHoomans and PsychopatzCore. Preserve unrelated work.
-2. Read `PROGRESS.md`, `HANDOFF.md`, active ROADMAP phase and ARCHITECTURE before edits.
-3. Treat production Lua/runtime behavior and explicit semantic contracts as stronger evidence than stale fixture expectations.
-4. Keep generic fixture machinery in Core and provider-specific data in provider packages.
-5. Migrate callers to provider-aware discovery before deleting duplicate fixture files.
-6. Never implement Python semantic-policy logic merely to make fixtures pass.
-7. For a failing fixture, inspect exact runtime record: IR, action result, authority transport, response/flow and diagnostics. Decide whether fixture or production is wrong before editing.
-8. Validate focused changes first, then full 116-case corpus and entrypoint parity.
-9. At accepted phase boundaries, reconcile docs, stage exact phase-owned paths, commit Core participant first and ProjectHoomans/job docs last. No push/publication without authorization.
-10. Continue automatically through R1–R5 unless blocked.
+1. Inspect branch/HEAD/status in ProjectHoomans and PsychopatzCore and read both root AGENTS files. Preserve unrelated work.
+2. Read PROGRESS, HANDOFF, active ROADMAP gate, ARCHITECTURE and HARNESS_ACCEPTANCE.
+3. Treat the 180-case canonical fixture architecture as accepted; do not create another tester/schema.
+4. A6R9: remove dead `kind="regression"` helpers and route the general GUI Regression action through semantic fixtures.
+5. Preserve useful GUI buttons as fixture presets/filters, not separate behavioral matrices.
+6. A6R10: strengthen realization fixtures so their assertions match their names; consolidate response-pool overlap when redundant.
+7. Remove obsolete milestone vocabulary from active descriptions/docstrings/classification where it is provenance rather than a current protocol/data ID.
+8. Add an automated naming guard for retained semantic Python test filenames.
+9. A6R11: review direct-worker tests at method responsibility. Migrate behavioral scenarios with side-by-side parity; retain genuine API/protocol/editor/quality/save/native/performance/static contracts.
+10. Never classify a test low-level merely because it uses `LuaSemanticWorker`.
+11. Keep fixture lint and full canonical corpus green after each accepted phase.
+12. A6R12: reconcile all active docs and root durable policies before closure.
+13. At accepted phase boundaries stage exact phase-owned paths only. Commit PsychopatzCore participant work first and ProjectHoomans/provider/job docs last.
+14. Final HANDOFF must use `checkpoint_mode: committed_handoff`, include `phase_commit: self`, participant commit vector, and residual-work notes.
+15. Do not reset/stash unrelated work, broad-stage, push, publish, amend, rebase, tag, or force-update without authorization.
+16. Continue automatically through A6R9–A6R12 unless genuinely blocked.

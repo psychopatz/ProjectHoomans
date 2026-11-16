@@ -1,4 +1,4 @@
-"""C7A conversational competence probes on the real Lua worker.
+"""Conversational competence probes on the real Lua worker.
 
 These tests exercise the production Project Hoomans semantic catalog, fact
 resolver, response catalog, translation adapter, and lifecycle. They do not

@@ -1,4 +1,4 @@
-"""R6 acceptance: pragmatic resolution and generic one-shot behavior arbitration."""
+"""Acceptance: pragmatic resolution and generic one-shot behavior arbitration."""
 
 from __future__ import annotations
 

@@ -49,7 +49,7 @@
           "payload": {
             "poolID": "semantic.combat.human_kill.aggressive",
             "context": {},
-            "salt": "a6r2"
+            "salt": "selection-seed"
           },
           "expect": {
             "operation.status": "ok",
@@ -61,7 +61,7 @@
           "payload": {
             "poolID": "semantic.combat.human_kill.aggressive",
             "context": {},
-            "salt": "a6r2"
+            "salt": "selection-seed"
           },
           "expect": {
             "operation.status": "ok",

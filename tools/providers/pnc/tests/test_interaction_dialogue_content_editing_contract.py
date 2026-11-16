@@ -1,4 +1,4 @@
-"""R2 recovery acceptance: behaviors use ordinary Dialogue Content."""
+"""Recovery acceptance: behaviors use ordinary Dialogue Content."""
 
 from __future__ import annotations
 

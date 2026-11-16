@@ -1,4 +1,4 @@
-"""C7C conversational initiative probes on the real Lua worker."""
+"""Conversational initiative probes on the real Lua worker."""
 
 from __future__ import annotations
 

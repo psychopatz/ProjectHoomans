@@ -1,4 +1,4 @@
-"""B0 real-worker regression for social apparel evaluations vs inventory queries."""
+"""Real-worker regression for social apparel evaluations vs inventory queries."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""S3 canonical suggestion clicks through the production dialogue path."""
+"""Canonical suggestion clicks through the production dialogue path."""
 
 from __future__ import annotations
 

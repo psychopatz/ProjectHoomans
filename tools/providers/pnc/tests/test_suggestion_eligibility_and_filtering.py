@@ -1,4 +1,4 @@
-"""S2 constraint and privacy checks through the production Lua worker."""
+"""Constraint and privacy checks through the production Lua worker."""
 
 from __future__ import annotations
 

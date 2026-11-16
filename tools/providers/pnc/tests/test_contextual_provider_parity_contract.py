@@ -1,4 +1,4 @@
-"""C6-C optional-provider parity and non-authorizing fallback."""
+"""Optional-provider parity and non-authorizing fallback."""
 
 from __future__ import annotations
 

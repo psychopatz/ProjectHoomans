@@ -1,12 +1,14 @@
 ---
 handoff_schema: 2
-checkpoint_mode: "committed"
+checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 state: "COMPLETE"
 parent_status: "COMPLETE"
-phase: "A6R8"
-chunk: "A6R5-A6R8 Semantic Test Estate Normalization complete"
+phase: "A6R12"
+phase_commit: "self"
+participant_commits:
+  PsychopatzCore: "b73132a88986aec05c09b3f1d2952077f9cde76d"
 retrieval_tier: "auditor"
 ---
 
@@ -14,11 +16,10 @@ retrieval_tier: "auditor"
 
 ## Final state
 
-The active test estate is domain-first, descriptively named, single-authority (`semantic.harness-test.v1`), duplicate-guarded, and free of historical C0A/legacy-regression parallel roots.
+The `semantic.harness-test.v1` fixture system is the sole declarative behavioral acceptance authority for PSDL / ConvoEngine semantics. All parallel regression lanes, historical C0A artifacts, subsumed response-pool duplicates, and milestone-coded active test names are retired.
 
-## Key artifacts
+## Verification summary
 
-- `psychopatzCore/tools/semantic_harness/testing/lint.py`: Global exact-duplicate detection, bounded stimulus-overlap reporting, history/milestone naming guard, and domain/path mismatch guard.
-- `psychopatzCore/tools/semantic_harness/ui/regression_controller.py`: Canonical `semantic` fixture routing for all Regression-tab actions (`kind="regression"` retired).
-- `ProjectHoomans/tools/providers/pnc/fixtures/v1/`: 38 domain-first fixture files, 180 cases, 11 semantic domains, 0 lint violations.
-- `ProjectHoomans/docs/Jobs/SemanticTestSubsystem/TEST_CLASSIFICATION.json`: 177 retained imperative modules (745 methods) classified with concrete implementation-contract justifications.
+- `psychopatzCore` (`b73132a88986aec05c09b3f1d2952077f9cde76d`): Core fixture, operation, authority, acceptance, and dispatch suites 27/27 PASS; fixture linter 38 files / 184 cases / 0 errors.
+- `ProjectHoomans`: 184/184 canonical semantic fixtures PASS; static boundaries & filename guard 4/4 PASS; 175 retained imperative modules (741 methods) classified in `TEST_CLASSIFICATION.json`.
+- Residual unrelated work preserved: root `AGENTS.md` edits in both repositories.

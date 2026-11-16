@@ -1,4 +1,4 @@
-"""S3 declarative codeblock round-trip contracts."""
+"""Declarative codeblock round-trip contracts."""
 
 from __future__ import annotations
 

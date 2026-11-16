@@ -1,4 +1,4 @@
-"""G3B acceptance for the semantic Clinic Supplies quest contract."""
+"""Acceptance for the semantic Clinic Supplies quest contract."""
 
 from __future__ import annotations
 

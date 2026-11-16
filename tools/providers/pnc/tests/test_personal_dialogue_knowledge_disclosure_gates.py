@@ -1,4 +1,4 @@
-"""H3 real-worker regressions for grounded backstory conversations."""
+"""Real-worker regressions for grounded backstory conversations."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""S10R1 migrated real-worker acceptance for C7F precision, patterns, backstory specs, and interaction history."""
+"""Migrated real-worker acceptance for C7F precision, patterns, backstory specs, and interaction history."""
 
 from __future__ import annotations
 

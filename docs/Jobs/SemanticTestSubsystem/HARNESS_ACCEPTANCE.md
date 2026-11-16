@@ -1,52 +1,48 @@
-# Harness Acceptance — Fixture Authority Repair
+# Harness Acceptance — Final Closure Hardening
 
-## Discovery
+## A6R9 regression-authority gate
 
-Test provider-aware fixture discovery with:
-- current PNC provider;
-- explicit fixture-file override;
-- synthetic second provider/root;
-- missing/invalid fixture-root diagnostics.
+Require:
 
-Generic Core code must not require ProjectHoomans path constants.
+- no active GUI behavioral path using `kind="regression"`;
+- no hard-coded greeting/follow behavioral matrix bypassing semantic fixtures;
+- lifecycle/rejection/selection/general Regression actions resolve canonical semantic fixtures;
+- dead legacy regression helpers removed;
+- existing GUI fixture acceptance remains green.
 
-## Corpus authority
+## A6R10 assertion and naming gate
 
-Require exactly one active PNC v1 behavioural corpus.
+Require:
 
-Fail acceptance if:
-- active Core fixtures still use `pnc.semantic-test.v1`;
-- default runner discovers a stale duplicate;
-- GUI and CLI resolve different PNC fixture authorities.
+- realization cases assert their named realization outcome or are renamed/reclassified;
+- response-pool fixture overlap reviewed and redundant coverage consolidated;
+- fixture overlap report remains bounded;
+- obsolete phase labels removed from active test descriptions/docstrings/classification where they are historical-only;
+- retained Python test filename policy has an automated guard.
 
-## Full corpus
+## A6R11 migration gate
 
-Run all current PNC provider fixtures through real production Lua.
+For high-value direct-worker candidates:
 
-Expected current case count: 116 unless fixture additions/removals are explicitly justified and documented.
+- compare current Python behavior to fixture coverage;
+- add missing fixture assertions/cases where necessary;
+- rerun parity;
+- remove redundant behavioral methods only after parity;
+- retain exact API/protocol/editor/quality/save/native/performance contracts;
+- regenerate classification with current descriptive reasons.
 
-All cases must pass. The two audited mutating-request fixtures must assert current semantic safety rather than zero telemetry.
+Fail the gate if ordinary semantic scenario→input→outcome tests remain LOW_LEVEL solely because they call the production worker.
 
-## Entrypoint parity
+## A6R12 final gate
 
-Mandatory tests:
-- standalone testing CLI, no explicit file;
-- main harness `--run-semantic-tests`, no explicit file;
-- explicit `--semantic-test-file`;
-- suite/filter selection;
-- GUI regression fixture resolution;
-- lint;
-- real-Lua batch/resume.
+From exact committed participant vector:
 
-## No false green
+- Core fixture/authority tests PASS;
+- fixture lint PASS with zero exact duplicates/naming/domain-path violations;
+- full semantic corpus PASS;
+- focused retained/migrated Python suites PASS;
+- no historical C0A/legacy regression fixture authority remains;
+- no active parallel GUI behavioral regression lane remains;
+- active job docs and durable policies agree on COMPLETE.
 
-Do not change production semantics solely to satisfy stale fixtures. If runtime behavior and prior semantic contract agree, update the fixture. If they disagree, treat it as a semantic regression and fix production.
-
-## Final closure
-
-From exact committed Core + ProjectHoomans vector:
-- canonical provider corpus lint PASS;
-- full corpus PASS;
-- parity/batch/default CLI/GUI tests PASS;
-- no stale duplicate provider corpus in Core;
-- docs agree on COMPLETE.
+The final handoff must be a committed handoff containing the participant commit vector.

@@ -1,4 +1,4 @@
-"""S10A acceptance tests for real manifest-selected PNC provider worker startup."""
+"""Acceptance tests for real manifest-selected PNC provider worker startup."""
 
 from __future__ import annotations
 

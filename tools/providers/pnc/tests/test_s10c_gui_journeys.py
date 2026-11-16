@@ -1,4 +1,4 @@
-"""S10C real Tk/Xvfb GUI end-to-end journeys through SemanticHarnessApp."""
+"""Real Tk/Xvfb GUI end-to-end journeys through SemanticHarnessApp."""
 
 from __future__ import annotations
 

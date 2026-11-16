@@ -1,4 +1,4 @@
-"""G0A acceptance for metadata-driven simple-command flow generation."""
+"""Acceptance for metadata-driven simple-command flow generation."""
 
 from __future__ import annotations
 

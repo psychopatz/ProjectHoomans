@@ -1,4 +1,4 @@
-"""C6 portable actor matrix over the real worker and adopter Lua harnesses."""
+"""Portable actor matrix over the real worker and adopter Lua harnesses."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""C7G full conversational acceptance on the production Lua worker."""
+"""Full conversational acceptance on the production Lua worker."""
 
 from __future__ import annotations
 

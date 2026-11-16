@@ -1,4 +1,4 @@
-"""B2 real-worker coverage for authoritative offline NPC backstory facts."""
+"""Real-worker coverage for authoritative offline NPC backstory facts."""
 
 from __future__ import annotations
 

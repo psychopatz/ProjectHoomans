@@ -1,4 +1,4 @@
-"""S10A acceptance for label-versus-speech separation and identity realization."""
+"""Acceptance for label-versus-speech separation and identity realization."""
 
 from __future__ import annotations
 

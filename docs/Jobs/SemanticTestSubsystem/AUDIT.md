@@ -1,69 +1,97 @@
-# Audit — Semantic Test Subsystem After PSDL Refactors
+# Audit — Final Semantic Test Closure
 
+**Status:** COMPLETE.
 **Evidence:** CODE_VERIFIED, TEST_VERIFIED, RUNTIME_VERIFIED.
 
-## Tester engine
+## Accepted implementation
 
-The declarative fixture engine remains functional:
-- current schema/validator works;
-- loader expands matrices deterministically;
-- executor runs isolated cases through real `LuaSemanticWorker`;
-- comparator/projection remains active;
-- lint works;
-- bounded batch/cancel/resume works, including real Lua execution.
+Current committed vector:
 
-## Maintained corpus
+- PsychopatzCore `2e47dd256cfc`
+- ProjectHoomans `1638edbc57de`
 
-`ProjectHoomans/tools/providers/pnc/fixtures/v1` contains:
-- 17 files;
-- 116 expanded cases;
-- current schema `semantic.harness-test.v1`.
-
-Explicit execution works through both fixture CLI paths.
-
-## Default-discovery regression
-
-Core still contains a duplicate 17-file corpus under `tools/semantic_harness/fixtures/v1` using retired `pnc.semantic-test.v1`.
-
-Both:
-- `python -m tools.semantic_harness.testing.cli` default discovery;
-- main `python -m tools.semantic_harness --run-semantic-tests` without explicit files;
-
-select the stale Core directory and fail schema validation before running cases.
-
-Existing mandatory CLI acceptance missed this because it always supplies a temporary `--semantic-test-file`.
-
-## Duplicate-content drift
-
-After normalizing only the schema field, 16/17 v1 duplicate files are otherwise equivalent.
-
-`observatory/core.json` also differs in two identity-key prefix expectations: provider copy uses `question.identity`, while Core stale copy uses `question.identity.`.
-
-GUI regression controller additionally loads older PNC observatory fixtures directly from Core `tools/semantic_harness/fixtures/`; ProjectHoomans has provider-owned copies and some have diverged.
-
-## Full-corpus execution
-
-Full maintained provider corpus through production Lua:
+Independent isolated verification:
 
 ```text
-PASS 114
-FAIL   2
-TOTAL 116
+Core fixture/authority tests   17/17 PASS
+fixture files                  38
+expanded cases                 180
+domains                        11
+exact duplicate violations     0
+fixture naming violations      0
+domain/path mismatches         0
+stimulus overlap groups        6 informational
+full semantic corpus           180/180 PASS
+runtime                        272.87s
 ```
 
-Failures:
+A6R5 naming/layout and most of A6R6/A6R7 are successful.
 
-1. `c0a.corpus.valid_mutating_request_control` / `give me water`
-   - historical semantic contract: explicit authoritative mutation allowed;
-   - current runtime: GIVE accepted, `SemanticTaskRequest` sent;
-   - fixture expectation of zero dispatch/tool calls is stale.
+## Remaining parallel regression lane
 
-2. `c0a.corpus.malformed_mutating_request_tail_typo` / `give me waterr`
-   - current runtime: confidence 0.89, action rejected/blocked with `clarification_required`;
-   - authoritative `dispatchTransport` remains empty;
-   - one rejected diagnostic `action_dispatch` appears in `toolCalls`;
-   - zero-tool-call assertion is stale; authoritative-mutation safety remains intact.
+Provider metadata no longer has `fixtureRoots.regression`, and old C0A/Observatory fixture files are gone.
+
+However Core `ui/regression_controller.py` still contains:
+
+- unused `_resolve_regression_fixture()`;
+- unused `_fixture_cases()`;
+- a `kind="regression"` legacy path;
+- active `run_regression()` with a hard-coded four-case greeting/follow matrix using `run_quality_matrix`.
+
+The general Regression GUI action therefore still bypasses the canonical fixture authority.
+
+## Assertion-fidelity gap
+
+The old exact duplicate was fixed and suggestions now assert candidate evidence.
+
+But several `realization/social_reply_outcomes.json` cases still assert only recognition/generic response existence while their names imply a stronger realization outcome.
+
+The two response-pool fixture files also appear substantially overlapping.
+
+## Internal naming remnants
+
+Current filenames and canonical fixture IDs are clean.
+
+Historical labels remain inside active metadata:
+
+- 35 Python test files / 73 matching lines;
+- 29 classification entries / 115 methods;
+- 17 fixture descriptions.
+
+These are mostly docstrings/descriptions such as C6-B, R9, H4, S3, C4-A, etc.
+
+The classification ledger therefore still carries historical roadmap vocabulary even after filenames were normalized.
+
+## Python filename guard gap
+
+Fixture lint protects fixture path/suite/case IDs.
+
+No equivalent automated gate was found for retained Python test filenames, so future agents can reintroduce milestone-coded filenames without a failing test.
+
+## Remaining behavioral migration debt
+
+Current ledger:
+
+- 177 modules / 745 methods;
+- 90 LOW_LEVEL_RUNTIME_CONTRACT modules;
+- 74 direct-worker LOW_LEVEL modules / 326 methods.
+
+Structural scan:
+
+- 34 LOW_LEVEL direct-worker modules / 154 methods use only worker operations already supported by fixtures.
+
+Not all should migrate. Sweep/editor/quality-analyzer/API tests are legitimate imperative contracts.
+
+Clear behavioral review candidates remain, including contextual acceptance, compound/topic resumption, conversation routing/coherence/proposal clarification, wellbeing projection, event follow-up, and some suggestion-choice scenarios.
+
+## Durable closure gap
+
+ProjectHoomans and Core still have dirty durable-policy/doc edits.
+
+Committed PROGRESS/ROADMAP/HANDOFF claim COMPLETE, while committed ARCHITECTURE/AUDIT/HARNESS_ACCEPTANCE/RUNBOOK are older documents.
+
+The accepted phase-boundary committed-handoff protocol has therefore not been satisfied.
 
 ## Conclusion
 
-Repair fixture authority/discovery rather than rebuilding the tester. Move all PNC fixture ownership to the provider, update stale expectations, add default-discovery acceptance, and retire Core duplicates only after every caller migrates.
+Do not redesign the harness. Complete A6R9–A6R12: remove the last parallel GUI lane, improve assertion fidelity and naming hygiene, perform the final method-level behavioral migration pass, then commit and verify one exact durable closure vector.

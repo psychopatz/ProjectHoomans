@@ -1,0 +1,229 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.interaction.compound_and_topic_resumption",
+  "domain": "interaction",
+  "cases": [
+    {
+      "id": "interaction.compound_and_topic_resumption.mandatory_grounded_conversation",
+      "description": "Grounded 7-turn contextual conversation across wellbeing, thirst needs, proposal, weather switch, and resume in EN and TL.",
+      "tags": ["interaction", "multi_turn", "needs", "weather", "localization"],
+      "matrix": {
+        "language": ["EN", "TL"]
+      },
+      "scenario": {
+        "npc": {
+          "healthState": "unknown",
+          "needs": {"thirst": 0.9},
+          "conditionStats": {}
+        },
+        "world": {"weather": "rain"}
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "WELLBEING",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        },
+        {
+          "text": "What happened?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "WELLBEING",
+            "decision.response.plan.groundedFactRefs": {"count": 0},
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "Do you need anything?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NEEDS",
+            "decision.response.plan.groundedFactRefs": ["npc.needs.thirst"],
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "How many?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "QUANTITY",
+            "decision.response.plan.dialogueAct": "NEEDS_QUANTITY",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "I'll get some",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "PROMISE",
+            "ir.action": {"absent": true},
+            "decision.response.plan.uncertainty": "pending",
+            "contextAfter.dialogue.pendingFollowUp.status": "open",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "Can we talk about the weather",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "WEATHER",
+            "ir.provenance.pattern": "pnc.dataset.question.weather.can_we_talk_about_the_weather",
+            "decision.response.plan.groundedFactRefs": ["world.weather.raining"],
+            "observation.flow.transition": "interrupt_start",
+            "contextAfter.dialogue.currentTopic": "weather",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "Okay",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "ACCEPT",
+            "observation.flow.transition": "resume_match",
+            "contextAfter.dialogue.currentTopic": "needs",
+            "contextAfter.dialogue.previousTopic": "weather",
+            "contextAfter.dialogue.pendingFollowUp.status": "open",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0,
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "interaction.compound_and_topic_resumption.causal_and_reciprocal_compound",
+      "description": "Causal context-reference follow-up and compound reciprocal wellbeing turn without dispatch.",
+      "tags": ["interaction", "multi_turn", "compound"],
+      "turns": [
+        {
+          "text": "where do you live",
+          "expect": {
+            "ir.subject": "NPC_RESIDENCE",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "text": "why is it so?",
+          "expect": {
+            "ir.provenance.pattern": "pnc.question.context_reference.why_is_it_so",
+            "ir.subject": "CONTEXT_REFERENCE",
+            "messages.0.payload.text": {"contains": "why"},
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "hello",
+          "expect": {
+            "messages": {"count": 2},
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "im fine, how about you",
+          "expect": {
+            "result.compound.parts.0.pattern": "pnc.state.self_wellbeing_im_plain_fine",
+            "result.compound.parts.1.pattern": "pnc.question.wellbeing_reciprocal_how_about_you",
+            "result.compound.parts.0.accepted": true,
+            "ir.subject": "WELLBEING_RECIPROCAL",
+            "messages": {"count": 1},
+            "contextAfter.dialogue.pendingFollowUp": {"absent": true},
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ]
+    },
+    {
+      "id": "interaction.compound_and_topic_resumption.compound_reciprocal_tl",
+      "description": "Compound reciprocal wellbeing turn localizes cleanly in Tagalog.",
+      "tags": ["interaction", "compound", "localization"],
+      "scenario": {
+        "runtime": {"language": "TL"}
+      },
+      "turns": [
+        {
+          "text": "im fine, how about you",
+          "expect": {
+            "translation.language": "TL",
+            "result.compound.parts.1.pattern": "pnc.question.wellbeing_reciprocal_how_about_you",
+            "observation.translation.fallbackCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "interaction.compound_and_topic_resumption.wellbeing_survives_weather_and_resumes",
+      "description": "Open wellbeing pending follow-up survives weather interruption and resumes on follow-up question.",
+      "tags": ["interaction", "multi_turn", "wellbeing", "weather"],
+      "scenario": {
+        "npc": {
+          "healthState": "injured",
+          "activeBehavior": "treatment",
+          "needs": {},
+          "conditionStats": {}
+        },
+        "world": {"weather": "rain"}
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "contextAfter.dialogue.pendingFollowUp.topic": "wellbeing",
+            "contextAfter.dialogue.pendingFollowUp.status": "open",
+            "contextAfter.dialogue.agenda.0.status": "open",
+            "observation.response.templateID": "question.wellbeing.injured",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        },
+        {
+          "text": "Is it raining?",
+          "expect": {
+            "ir.subject": "WEATHER",
+            "ir.diagnostics.contextualFollowUp.status": "interrupted",
+            "contextAfter.dialogue.currentTopic": "weather",
+            "contextAfter.dialogue.previousTopic": "wellbeing",
+            "contextAfter.dialogue.pendingFollowUp.topic": "wellbeing",
+            "observation.flow.transition": "interrupt_start",
+            "observation.flow.activeAfter.0.suspended.0.flowId": "wellbeing",
+            "observation.response.templateID": "semantic.flow.weather.raining.default",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        },
+        {
+          "text": "What happened?",
+          "expect": {
+            "ir.diagnostics.contextualFollowUp.status": "matched",
+            "ir.provenance.pattern": "pnc.recovery.contextual_question_wellbeing",
+            "observation.flow.transition": "resume_match",
+            "contextAfter.dialogue.currentTopic": "wellbeing",
+            "contextAfter.dialogue.previousTopic": "weather",
+            "contextAfter.dialogue.pendingFollowUp": {"absent": true},
+            "contextAfter.dialogue.lastFollowUp.status": "fulfilled",
+            "contextAfter.dialogue.agenda.0.status": "fulfilled",
+            "observation.response.templateID": "question.wellbeing.injured",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        }
+      ]
+    }
+  ]
+}

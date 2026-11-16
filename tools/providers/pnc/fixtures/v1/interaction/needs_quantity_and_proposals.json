@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "interaction.needs_quantity_and_proposals.required_sequence_needs_and_weather_interrupt",
-      "description": "C0 required 7-turn contextual conversation advancing needs, quantity, proposal, weather interrupt, and resume.",
+      "description": "Required 7-turn contextual conversation advancing needs, quantity, proposal, weather interrupt, and resume.",
       "tags": [
         "interaction",
         "multi_turn",
@@ -107,7 +107,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.get_some_unconfirmed_proposal",
-      "description": "C3-C confirmation-safe needs promise across EN and TL.",
+      "description": "Confirmation-safe needs promise across EN and TL.",
       "tags": [
         "interaction",
         "multi_turn",
@@ -187,7 +187,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.weather_interrupts_and_resumes_proposal",
-      "description": "C3-D weather interruption and needs-proposal resumption across EN and TL.",
+      "description": "Weather interruption and needs-proposal resumption across EN and TL.",
       "tags": [
         "interaction",
         "multi_turn",
@@ -276,7 +276,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.reviewed_promise_mapping",
-      "description": "C4-A reviewed promise mapping is localized and non-dispatching.",
+      "description": "Reviewed promise mapping is localized and non-dispatching.",
       "tags": [
         "interaction",
         "multi_turn",
@@ -342,7 +342,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.reviewed_negative_abstains",
-      "description": "C4-A negative promise does not become a promise or command.",
+      "description": "Negative promise does not become a promise or command.",
       "tags": [
         "interaction",
         "negative"
@@ -386,7 +386,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.reviewed_clarification_keeps_quantity_open",
-      "description": "C4-B reviewed clarification keeps quantity obligation open across EN and TL.",
+      "description": "Reviewed clarification keeps quantity obligation open across EN and TL.",
       "tags": [
         "interaction",
         "multi_turn",
@@ -450,7 +450,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.nearby_negative_abstains",
-      "description": "C4-B plural nearby negative abstains without dispatch.",
+      "description": "Plural nearby negative abstains without dispatch.",
       "tags": [
         "interaction",
         "negative"
@@ -491,7 +491,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.weather_topic_switch_preserves_proposal",
-      "description": "C4-C reviewed weather topic switch preserves and resumes needs proposal across EN and TL.",
+      "description": "Reviewed weather topic switch preserves and resumes needs proposal across EN and TL.",
       "tags": [
         "interaction",
         "multi_turn",
@@ -580,7 +580,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.nearby_negative_abstains_2",
-      "description": "C4-C missing-determiner weather negative abstains without dispatch.",
+      "description": "Missing-determiner weather negative abstains without dispatch.",
       "tags": [
         "interaction",
         "negative"
@@ -614,7 +614,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.causal_wellbeing_followup_unknown",
-      "description": "C4-D reviewed causal wellbeing follow-up stays unknown and truthful across EN and TL.",
+      "description": "Reviewed causal wellbeing follow-up stays unknown and truthful across EN and TL.",
       "tags": [
         "interaction",
         "multi_turn",
@@ -674,7 +674,7 @@
     },
     {
       "id": "interaction.needs_quantity_and_proposals.first_person_negative_abstains",
-      "description": "C4-D first-person negative abstains without dispatch.",
+      "description": "First-person negative abstains without dispatch.",
       "tags": [
         "interaction",
         "negative"

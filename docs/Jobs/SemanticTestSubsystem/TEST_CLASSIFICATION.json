@@ -1,11 +1,11 @@
 {
   "schema": "semantic.test-classification.v1",
-  "totalModules": 177,
-  "totalMethods": 745,
+  "totalModules": 175,
+  "totalMethods": 741,
   "categoryCounts": {
     "COMPILER_CONTRACT": 10,
     "GUI_CONTRACT": 38,
-    "LOW_LEVEL_RUNTIME_CONTRACT": 90,
+    "LOW_LEVEL_RUNTIME_CONTRACT": 88,
     "NATIVE_INTEGRATION": 13,
     "PERFORMANCE_RESOURCE": 7,
     "SAVE_PERSISTENCE": 11,
@@ -31,7 +31,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 11,
       "usesDirectWorker": true,
-      "justification": "Authoring/capability/grievance contract (G0A acceptance for metadata-driven simple-command flow generation.): verifies worker authoring validation, capability ABI, or grievance evidence invariants."
+      "justification": "Authoring/capability/grievance contract (Acceptance for metadata-driven simple-command flow generation.): verifies worker authoring validation, capability ABI, or grievance evidence invariants."
     },
     {
       "module": "test_cli_parity.py",
@@ -45,14 +45,14 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (S3 declarative codeblock round-trip contracts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Declarative codeblock round-trip contracts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_commitment_authority_and_reload.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Save/persistence contract (C2-A sparse, owner-linked commitments on the real Lua worker.): verifies save-file serialization, ModData rehydration, or version migration."
+      "justification": "Save/persistence contract (Sparse, owner-linked commitments on the real Lua worker.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_companion_orders_hub.py",
@@ -66,42 +66,35 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (C7C conversational initiative probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Conversational initiative probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_competence_interruption_and_context_repair.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (C7D discourse continuity probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Discourse continuity probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_competence_localization_and_fallback_safety.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "LLM/fallback protocol contract (C7G full conversational acceptance on the production Lua worker.): verifies bounded prompt, timeout, or safety-rejection envelope."
+      "justification": "LLM/fallback protocol contract (Full conversational acceptance on the production Lua worker.): verifies bounded prompt, timeout, or safety-rejection envelope."
     },
     {
       "module": "test_competence_needs_and_offer_resolution.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (C7B grounded factual-question probes on the production Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Grounded factual-question probes on the production Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_competence_social_and_wellbeing_gates.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (C7A conversational competence probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
-    },
-    {
-      "module": "test_contextual_acceptance_and_safety_gates.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 2,
-      "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (C6-B mandatory contextual conversation and negative-language matrix.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Conversational competence probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_actor_context.py",
@@ -153,13 +146,6 @@
       "justification": "Suggestion/choice-provider contract (choice-registry contract tests through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
-      "module": "test_contextual_compound_and_topic_resumption.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 3,
-      "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (C1-A pending follow-up and topic interruption on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
-    },
-    {
       "module": "test_contextual_dialogue_persona_choices.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
@@ -178,7 +164,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (C6-C optional-provider parity and non-authorizing fallback.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Optional-provider parity and non-authorizing fallback.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_ranking.py",
@@ -220,7 +206,7 @@
       "category": "PERFORMANCE_RESOURCE",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Performance/resource contract (C6-A bounded latency and multi-scope isolation on real Lua workers.): verifies execution latency, population scale, or memory/payload size budgets."
+      "justification": "Performance/resource contract (Bounded latency and multi-scope isolation on real Lua workers.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_contextual_semantic_hub.py",
@@ -234,7 +220,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 12,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (Phase 3 bounded social-reaction probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Bounded social-reaction probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_speech_behavior.py",
@@ -479,21 +465,21 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (R9 headless acceptance for the integrated interaction workbench.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Headless acceptance for the integrated interaction workbench.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_interaction_dialogue_content_editing_contract.py",
       "category": "COMPILER_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Compiler/catalog contract (R2 recovery acceptance: behaviors use ordinary Dialogue Content.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (Recovery acceptance: behaviors use ordinary Dialogue Content.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_interaction_preview_and_contextual_resolution.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (R6 acceptance: pragmatic resolution and generic one-shot behavior arbitration.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Acceptance: pragmatic resolution and generic one-shot behavior arbitration.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_inventory_gift_workbench.py",
@@ -514,7 +500,7 @@
       "category": "SAVE_PERSISTENCE",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Save/persistence contract (H4 sparse persistence and optional-context acceptance checks.): verifies save-file serialization, ModData rehydration, or version migration."
+      "justification": "Save/persistence contract (Sparse persistence and optional-context acceptance checks.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_lexicon_compiler.py",
@@ -633,21 +619,21 @@
       "category": "STATIC_ARCHITECTURE",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Static architecture contract (B0 real-worker regression for social apparel evaluations vs inventory queries.): verifies repository ownership boundaries, file layout, or source hygiene."
+      "justification": "Static architecture contract (Real-worker regression for social apparel evaluations vs inventory queries.): verifies repository ownership boundaries, file layout, or source hygiene."
     },
     {
       "module": "test_personal_dialogue_immutable_backstory_facts.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (B2 real-worker coverage for authoritative offline NPC backstory facts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Real-worker coverage for authoritative offline NPC backstory facts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_personal_dialogue_knowledge_disclosure_gates.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (H3 real-worker regressions for grounded backstory conversations.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Real-worker regressions for grounded backstory conversations.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_player_engine_state.py",
@@ -661,7 +647,7 @@
       "category": "NATIVE_INTEGRATION",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Native/integration contract (C6 portable actor matrix over the real worker and adopter Lua harnesses.): verifies subprocess bridge, MP/network transport, or live integration boundary."
+      "justification": "Native/integration contract (Portable actor matrix over the real worker and adopter Lua harnesses.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_pragmatic_interaction_authoring.py",
@@ -738,7 +724,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Authoring/capability/grievance contract (G3B acceptance for the semantic Clinic Supplies quest contract.): verifies worker authoring validation, capability ABI, or grievance evidence invariants."
+      "justification": "Authoring/capability/grievance contract (Acceptance for the semantic Clinic Supplies quest contract.): verifies worker authoring validation, capability ABI, or grievance evidence invariants."
     },
     {
       "module": "test_real_save_production_runtime.py",
@@ -787,28 +773,28 @@
       "category": "GUI_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "GUI/inspector contract (S10A acceptance for label-versus-speech separation and identity realization.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Acceptance for label-versus-speech separation and identity realization.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_s10a_provider_worker_startup.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (S10A acceptance tests for real manifest-selected PNC provider worker startup.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Acceptance tests for real manifest-selected PNC provider worker startup.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_s10c_gui_journeys.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "GUI/inspector contract (S10C real Tk/Xvfb GUI end-to-end journeys through SemanticHarnessApp.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Real Tk/Xvfb GUI end-to-end journeys through SemanticHarnessApp.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_s10r1_worker_precision_and_history.py",
       "category": "COMPILER_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Compiler/catalog contract (S10R1 migrated real-worker acceptance for C7F precision, patterns, backstory specs, and interaction history.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (Migrated real-worker acceptance for C7F precision, patterns, backstory specs, and interaction history.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_save_backed_conversation.py",
@@ -864,7 +850,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (S2 reusable-block registry contracts over the real production catalog.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Reusable-block registry contracts over the real production catalog.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_category_ownership.py",
@@ -897,7 +883,7 @@
     {
       "module": "test_semantic_harness_static_boundaries.py",
       "category": "STATIC_ARCHITECTURE",
-      "methods": 3,
+      "methods": 4,
       "usesDirectWorker": false,
       "justification": "Static architecture contract (Static Phase 6 guards for semantic submission ownership.): verifies repository ownership boundaries, file layout, or source hygiene."
     },
@@ -983,7 +969,7 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Worker runtime/protocol contract (Phase 5 optional-provider parity probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
+      "justification": "Worker runtime/protocol contract (Optional-provider parity probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_scene_observatory.py",
@@ -1088,28 +1074,28 @@
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 6,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (S1 production semantic suggestion projections through the real Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Suggestion/choice-provider contract (Production semantic suggestion projections through the real Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_suggestion_eligibility_and_filtering.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (S2 constraint and privacy checks through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Suggestion/choice-provider contract (Constraint and privacy checks through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_suggestion_presentation_and_frames.py",
       "category": "GUI_CONTRACT",
       "methods": 7,
       "usesDirectWorker": false,
-      "justification": "GUI/inspector contract (S4 interaction checks for the existing Tk Semantic Lab surface.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Interaction checks for the existing Tk Semantic Lab surface.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_suggestion_ranking_and_stability.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 8,
       "usesDirectWorker": true,
-      "justification": "Suggestion/choice-provider contract (S3 canonical suggestion clicks through the production dialogue path.): verifies suggestion frame projection, ranking stability, or provider registry."
+      "justification": "Suggestion/choice-provider contract (Canonical suggestion clicks through the production dialogue path.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_suite.py",

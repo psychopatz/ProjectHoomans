@@ -1,69 +1,79 @@
-# Architecture — Semantic Test Fixture Authority
+# Architecture — Final Semantic Test Authority
 
-## Ownership
+## One behavioral authority
 
-PsychopatzCore owns generic testing machinery:
-- fixture schema/validation;
-- loader and deterministic matrix expansion;
-- expectation comparator/projection;
-- real-worker execution coordination;
-- batching/resume;
-- generic fixture-root resolution.
-
-Providers own provider-specific fixture data:
-
-```text
-ProjectHoomans provider
-  PNC semantic/observatory fixtures
-
-DT provider
-  DT-specific fixtures when needed
-```
-
-Core must not contain a mirrored PNC behavioural corpus.
-
-## Resolution flow
-
-```text
-active harness provider/workspace
-→ provider manifest/descriptor
-→ declared fixture roots
-→ generic fixture resolver
-→ schema/loader
-→ LuaSemanticWorker
-→ real production Lua
-→ bounded observation/assertions
-```
-
-Explicit fixture paths remain an override for focused tests.
-
-## Fixture schema
-
-Canonical envelope:
+All provider semantic behavior is tested through:
 
 ```text
 semantic.harness-test.v1
+→ generic resolver/loader
+→ typed operation registry
+→ compiler probe and/or production Lua worker
+→ generic comparator
+→ CLI / GUI / batch
 ```
 
-Schema is provider-neutral. Provider identity belongs in fixture ownership/discovery, not the schema name.
+No GUI-specific hard-coded behavioral regression matrix may act as a second authority.
 
-## Safety assertions
+Named GUI Regression actions are presets over canonical semantic fixtures.
 
-Assert semantic authority outcomes, not brittle incidental telemetry.
+## Imperative tests
 
-For mutating requests distinguish:
-- recognized intent/action;
-- authorization/gate outcome;
-- accepted vs blocked action result;
-- authoritative transport emitted or absent;
-- clarification/rejection reason.
+Imperative Python tests remain for implementation contracts:
 
-A blocked action may still appear in diagnostic `toolCalls`; that alone is not authoritative mutation.
+- compiler/generation algorithms and determinism;
+- fixture-engine internals;
+- exact API validation/error/protocol envelopes;
+- GUI widget/controller mechanics;
+- save/persistence/native/network boundaries;
+- performance/resource budgets;
+- observatory/sweep/quality-analyzer algorithms;
+- static ownership rules.
 
-## UI/CLI parity
+Running through `LuaSemanticWorker` is not itself evidence that a test is low-level.
 
-CLI, GUI regression tools and batch execution must resolve fixture data through the same authority. No surface may maintain a private hard-coded PNC fixture path.
+## Identity and naming
 
-## Efficiency invariant
+Active fixture identity remains domain-first:
 
-Declarative fixtures are the compact behavioural acceptance surface. Imperative Lua/Python tests remain for low-level contracts that are not naturally declarative.
+```text
+fixtures/v1/<domain>/<semantic-concern>.json
+suite = pnc.<domain>.<semantic-concern>
+case  = <domain>.<semantic-concern>.<condition>
+```
+
+Retained imperative test files describe the implementation contract.
+
+Human-facing descriptions, module docstrings, class names, and classification reasons should also use current semantic/contract language rather than obsolete roadmap milestones when practical.
+
+Git history is the provenance archive.
+
+## Assertion fidelity
+
+A case must prove the concern named by its domain and ID.
+
+Recognition evidence alone does not prove realization, suggestions, behavior, or flow outcome.
+
+Prefer stable canonical evidence over prose text when available:
+
+- semantic IDs;
+- response pool/template/realization IDs;
+- dialogue act/branch;
+- flow transition;
+- candidate/group IDs;
+- grounded fact refs;
+- typed action/result.
+
+## Duplicate/overlap policy
+
+- global exact behavioral duplicate → fail;
+- same stimulus with distinct cross-domain assertions → allowed and reported;
+- substantially subsumed fixture → consolidate unless a distinct contract is documented.
+
+## Migration rule
+
+Behavioral scenarios belong in fixtures after parity.
+
+Imperative methods remain only when their primary responsibility is implementation-level.
+
+Mixed files may be split at method responsibility.

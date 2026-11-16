@@ -1,4 +1,4 @@
-"""S2 reusable-block registry contracts over the real production catalog."""
+"""Reusable-block registry contracts over the real production catalog."""
 
 from __future__ import annotations
 

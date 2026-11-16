@@ -1,4 +1,4 @@
-"""H4 sparse persistence and optional-context acceptance checks."""
+"""Sparse persistence and optional-context acceptance checks."""
 
 from __future__ import annotations
 

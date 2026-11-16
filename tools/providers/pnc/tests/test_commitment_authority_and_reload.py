@@ -1,4 +1,4 @@
-"""C2-A sparse, owner-linked commitments on the real Lua worker."""
+"""Sparse, owner-linked commitments on the real Lua worker."""
 
 from __future__ import annotations
 

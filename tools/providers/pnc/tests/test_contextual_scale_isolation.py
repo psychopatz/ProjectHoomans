@@ -1,4 +1,4 @@
-"""C6-A bounded latency and multi-scope isolation on real Lua workers."""
+"""Bounded latency and multi-scope isolation on real Lua workers."""
 
 from __future__ import annotations
 

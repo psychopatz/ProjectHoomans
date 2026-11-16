@@ -1,4 +1,4 @@
-"""R9 headless acceptance for the integrated interaction workbench."""
+"""Headless acceptance for the integrated interaction workbench."""
 
 from __future__ import annotations
 

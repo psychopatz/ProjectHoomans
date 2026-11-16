@@ -1,4 +1,4 @@
-"""C7D discourse continuity probes on the real Lua worker."""
+"""Discourse continuity probes on the real Lua worker."""
 
 from __future__ import annotations
 

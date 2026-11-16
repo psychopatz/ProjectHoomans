@@ -1,4 +1,4 @@
-"""Phase 3 bounded social-reaction probes on the real Lua worker."""
+"""Bounded social-reaction probes on the real Lua worker."""
 
 from __future__ import annotations
 

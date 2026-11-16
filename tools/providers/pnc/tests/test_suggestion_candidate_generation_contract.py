@@ -1,4 +1,4 @@
-"""S1 production semantic suggestion projections through the real Lua worker."""
+"""Production semantic suggestion projections through the real Lua worker."""
 
 from __future__ import annotations
 

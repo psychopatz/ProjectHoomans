@@ -1,4 +1,4 @@
-"""S4 interaction checks for the existing Tk Semantic Lab surface."""
+"""Interaction checks for the existing Tk Semantic Lab surface."""
 
 from __future__ import annotations
 

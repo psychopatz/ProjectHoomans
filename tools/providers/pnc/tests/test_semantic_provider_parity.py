@@ -1,4 +1,4 @@
-"""Phase 5 optional-provider parity probes on the real Lua worker."""
+"""Optional-provider parity probes on the real Lua worker."""
 
 from __future__ import annotations
 

@@ -5,6 +5,7 @@
   "cases": [
     {
       "id": "realization.social_reply_outcomes.retaliation_mirror",
+      "domain": "realization",
       "tags": [
         "realization",
         "personality"
@@ -29,16 +30,21 @@
           "text": "fuck you",
           "expect": {
             "ir.intent": "INSULT",
+            "decision.branch": "HOSTILE_REMARK_RECEIVED",
+            "decision.response.sourcePoolID": "semantic.hostile_remark",
+            "decision.response.templateID": "interaction.argument.retaliate",
+            "decision.response.plan.dialogueAct": "RETALIATE_VERBALLY",
+            "decision.director.selectedBehavior.id": "behavior.retaliate_verbally",
             "dispatchTransport": {
               "count": 0
             }
           }
         }
-      ],
-      "domain": "realization"
+      ]
     },
     {
       "id": "realization.social_reply_outcomes.agreement",
+      "domain": "realization",
       "tags": [
         "realization"
       ],
@@ -47,14 +53,19 @@
           "text": "yes",
           "expect": {
             "ir.intent": "ACCEPT",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "decision.response.sourcePoolID": "semantic.accept",
+            "decision.response.templateID": "social.acknowledged",
+            "decision.response.plan.dialogueAct": "ASK_CLARIFICATION",
+            "decision.director.selectedBehavior.id": "behavior.clarify_context",
             "response.exists": true
           }
         }
-      ],
-      "domain": "realization"
+      ]
     },
     {
       "id": "realization.social_reply_outcomes.disagreement",
+      "domain": "realization",
       "tags": [
         "realization"
       ],
@@ -63,14 +74,19 @@
           "text": "not really",
           "expect": {
             "ir.intent": "DISAGREE",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "decision.response.sourcePoolID": "semantic.refuse",
+            "decision.response.templateID": "social.acknowledged",
+            "decision.response.plan.dialogueAct": "ASK_CLARIFICATION",
+            "decision.director.selectedBehavior.id": "behavior.clarify_context",
             "response.exists": true
           }
         }
-      ],
-      "domain": "realization"
+      ]
     },
     {
       "id": "realization.social_reply_outcomes.acknowledgement",
+      "domain": "realization",
       "tags": [
         "realization"
       ],
@@ -79,14 +95,19 @@
           "text": "thanks",
           "expect": {
             "ir.intent": "THANK",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "decision.response.sourcePoolID": "semantic.thanks",
+            "decision.response.templateID": "interaction.context.clarify",
+            "decision.response.plan.dialogueAct": "ASK_CLARIFICATION",
+            "decision.director.selectedBehavior.id": "behavior.clarify_context",
             "response.exists": true
           }
         }
-      ],
-      "domain": "realization"
+      ]
     },
     {
-      "id": "realization.social_reply_outcomes.apology_deescalation",
+      "id": "realization.social_reply_outcomes.apology_context_clarification",
+      "domain": "realization",
       "tags": [
         "realization"
       ],
@@ -95,14 +116,19 @@
           "text": "sorry",
           "expect": {
             "ir.intent": "APOLOGIZE",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "decision.response.sourcePoolID": "semantic.apology",
+            "decision.response.templateID": "interaction.context.clarify",
+            "decision.response.plan.dialogueAct": "ASK_CLARIFICATION",
+            "decision.director.selectedBehavior.id": "behavior.clarify_context",
             "response.exists": true
           }
         }
-      ],
-      "domain": "realization"
+      ]
     },
     {
       "id": "realization.social_reply_outcomes.greeting_opening_realization",
+      "domain": "realization",
       "tags": [
         "realization"
       ],
@@ -116,8 +142,7 @@
             "response.exists": true
           }
         }
-      ],
-      "domain": "realization"
+      ]
     }
   ]
 }

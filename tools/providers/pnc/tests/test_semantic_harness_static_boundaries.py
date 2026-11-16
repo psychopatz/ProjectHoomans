@@ -88,6 +88,19 @@ class Phase6StaticBoundaryTests(unittest.TestCase):
         ):
             self.assertIn(marker, admission_lease)
 
+    def test_retained_python_test_filenames_are_descriptive_not_milestone_coded(
+        self,
+    ) -> None:
+        from tools.semantic_harness.testing.lint import _find_history_tokens
+
+        tests_dir = Path(__file__).resolve().parent
+        violations = [
+            (path.name, _find_history_tokens(path.stem))
+            for path in sorted(tests_dir.glob("test_*.py"))
+            if _find_history_tokens(path.stem)
+        ]
+        self.assertEqual(violations, [])
+
 
 if __name__ == "__main__":
     unittest.main()
