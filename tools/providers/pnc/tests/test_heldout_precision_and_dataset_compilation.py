@@ -9,8 +9,8 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.codebuilder.heldout_conversation_eval import (
     HOLDOUT_PATH,
-    load_heldout_conversations,
-    score_heldout_conversations,
+    load_heldout_conversation_eval,
+    score_heldout_conversation_eval,
 )
 from tools.semantic_harness.codebuilder.dialogue_dataset import compile_dialogue_dataset
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
@@ -53,7 +53,7 @@ class HeldoutPrecisionAndDatasetCompilationTests(unittest.TestCase):
         self.assertTrue(report["previewOnly"])
         self.assertEqual(report["writes"], [])
 
-        holdout = load_heldout_conversations(HOLDOUT_PATH)
+        holdout = load_heldout_conversation_eval(HOLDOUT_PATH)
         cases = holdout["cases"]
         turns = []
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
@@ -63,7 +63,7 @@ class HeldoutPrecisionAndDatasetCompilationTests(unittest.TestCase):
                     worker.input(setup)
                 turns.append(worker.input(case["utterance"]))
 
-        scored = score_heldout_conversations(cases, turns)
+        scored = score_heldout_conversation_eval(cases, turns)
         self.assertEqual(scored["caseCount"], len(cases))
         self.assertEqual(scored["precision"], 1.0)
         self.assertEqual(scored["recall"], 1.0)
