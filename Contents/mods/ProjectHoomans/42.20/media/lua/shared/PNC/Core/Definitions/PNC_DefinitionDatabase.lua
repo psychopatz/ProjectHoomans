@@ -132,6 +132,7 @@ local function emptyIndex()
         schemaVersion = 2,
         kind = "ProjectHoomans.DefinitionIndex",
         entries = {},
+        files = {},
     }
 end
 
