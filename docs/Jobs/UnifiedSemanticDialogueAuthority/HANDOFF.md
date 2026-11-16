@@ -2,50 +2,33 @@
 handoff_schema: 1
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-head: "9572b548f19b6229a7c5e7887047baa9cc783993"
-worktree_fingerprint: "2df2e4506ef67cb2e23e85b75ad91699f068d4c488acd8a0fc7b482b736a318a"
-codebase_memory_indexed_commit: "9572b548f19b6229a7c5e7887047baa9cc783993"
-state: "DIRTY_RESUMABLE"
-parent_status: "IN_PROGRESS"
-phase: "P11 modular conversation migration"
-chunk: "Task Fetch"
+head: "f3fd184c7784a450b1e67249a966c2db9b1f3b14"
+worktree_fingerprint: "f2298f091f43d63b3f1e0af16611ffa25b0b1677e61cdef297d1af6e36d2b7c4"
+state: "SUPERSEDED"
+parent_status: "SUPERSEDED"
+phase: "accepted foundation preserved"
+chunk: "none"
 retrieval_tier: "verify"
 ---
 
 # Session Handoff
 
-## What became true
+## Successor
 
-- The job is explicitly PAUSED / READY TO RESUME.
-- Accepted foundation and compiler/translation cleanup are preserved in `PROGRESS.md`; generated Conversation artifacts remain downstream-only.
+Active first-party semantic dialogue authoring/migration is now owned by:
 
-## Remaining
+```text
+/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/
+```
 
-- Resume P11B with the recommended next domain: Task Fetch.
-- After P11B, continue P11C-P11I automatically unless a genuine blocker appears.
+Do not resume Task Fetch or P11B–P11I from this handoff.
+
+## What remains valid
+
+The accepted Unified Semantic Dialogue Authority foundation and completed domain migrations remain evidence for PSDL. Generated artifacts remain downstream-only, locale generation remains data-driven, and the old split source model must not be extended as a parallel standard.
 
 ## Resume
 
-1. Verify checkpoint and read `PROGRESS.md` first.
-2. Use Codebase Memory Verify tier to characterize Task Fetch callers/placeholders and current canonical Conversation ownership.
-3. Migrate the domain through canonical Conversation shards, regenerate through CodeBuilder, run focused tests plus full native Lua, and retire superseded keys only after caller search reaches zero.
+Read the successor job's `PROGRESS.md` and `HANDOFF.md`.
 
-## Evidence
-
-- `RECORDED_NOT_RERUN`: prior accepted foundation/cleanup validation is recorded in `PROGRESS.md`.
-- `UNVERIFIED`: Task Fetch migration has not been accepted.
-
-## Expensive discoveries worth preserving
-
-- Do not hand-edit generated JSON/Lua or restore parked/recovery branches wholesale.
-- The Next Chunk is Task Fetch, but completing it does not end the parent P11 roadmap.
-
-## Blockers / open decisions
-
-No developer blocker.
-
-## Acceptance
-
-Task Fetch is fully owned by canonical modular Conversation sources, generated output is downstream-only, focused/full Lua gates pass, caller search proves retired keys safe, and progress advances to the next mandatory P11 chunk.
-
-> Replace this file on the next handoff. Do not append a chronological diary.
+> Git history is the archive for the former P11 baton.

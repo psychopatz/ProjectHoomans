@@ -1,6 +1,7 @@
 # Roadmap — Semantic Social Conversation Director
 
 **Status:** DEVELOPER COMPLETE — D0-D8 accepted; READY FOR USER LIVE TEST.
+**Authoring successor:** `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/` owns future first-party dialogue/offer/behavior/beat authoring standardization; do not reopen D0–D8 to create a separate NPC dialogue language.
 
 **Parent objective:** implement the complete agnostic Social Conversation Director so multiple Project Hoomans NPCs can engage in grounded, performant, emergent semantic conversations by reusing the existing Scene Runtime and semantic affordance/choice system across companions, neutral/faction NPCs, hostile teams and player-participating scenes.
 

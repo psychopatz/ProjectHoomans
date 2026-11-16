@@ -1,5 +1,7 @@
 # Architecture — Semantic Social Conversation Director
 
+> **PSDL standardization:** this accepted actor-neutral runtime remains a foundation. `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/` now owns authored offers/dialogue/behavior/beat syntax so player buttons and NPC affordances converge on one PSDL semantic source instead of separate authoring systems.
+
 ## 1. Target architecture
 
 ```text

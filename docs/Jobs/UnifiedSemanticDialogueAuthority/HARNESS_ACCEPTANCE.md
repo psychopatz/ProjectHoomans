@@ -1,6 +1,6 @@
 # Harness Acceptance — Remaining P11
 
-Use this contract for future P11B–P11I work.
+**Historical contract:** remaining P11B–P11I work is superseded by `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/`. Reuse the accepted validation principles below only where the PSDL roadmap calls for them; do not execute this as an independent migration plan.
 
 ## Authority
 

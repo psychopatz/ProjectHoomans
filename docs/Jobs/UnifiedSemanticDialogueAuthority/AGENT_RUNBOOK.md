@@ -1,6 +1,6 @@
 # Agent Runbook — Unified Semantic Dialogue Authority
 
-Use this only when actively implementing the current P11 roadmap.
+**Superseded for active migration.** Use `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/AGENT_RUNBOOK.md` for new authoring/migration work. This file remains historical procedure for the accepted P11 foundation and must not be used to restart P11B–P11I independently.
 
 ## Read order
 

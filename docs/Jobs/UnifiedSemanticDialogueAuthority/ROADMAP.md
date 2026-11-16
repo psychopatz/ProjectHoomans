@@ -1,7 +1,9 @@
 # Roadmap — Unified Semantic Dialogue Authority
 
-**Parent status:** IN PROGRESS / PAUSED.
-**Developer completion boundary:** P11I.
+**Parent status:** SUPERSEDED FOR ACTIVE AUTHORING / MIGRATION.
+**Successor authority:** `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/`.
+
+The accepted P0–P10/P11A/P11B0 foundation and completed P11B domain work remain valid evidence. Remaining P11B–P11I concerns are absorbed by the PSDL S0–S8 roadmap and must not be resumed as an independent authoring/migration program. This file remains historical architectural evidence for the accepted foundation.
 
 ## Accepted foundation
 
@@ -17,7 +19,7 @@ work.
 
 ## P11B — one first-party wording authority
 
-**Status:** IN PROGRESS.
+**Status:** SUPERSEDED AS AN ACTIVE PHASE; historical requirements absorbed by PSDL S5/S6.
 
 Completed domains:
 

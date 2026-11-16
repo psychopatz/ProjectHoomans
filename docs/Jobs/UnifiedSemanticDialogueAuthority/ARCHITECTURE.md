@@ -1,5 +1,7 @@
 # Architecture — Unified Semantic Dialogue Authority
 
+> **Successor authoring standard:** `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/` now owns new first-party dialogue authoring and remaining source migration. The authority/runtime invariants below remain accepted foundation; do not extend the old split source model as a parallel standard.
+
 ## Authority model
 
 ```text

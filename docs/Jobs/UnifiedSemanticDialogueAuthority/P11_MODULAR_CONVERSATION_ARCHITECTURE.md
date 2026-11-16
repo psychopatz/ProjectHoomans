@@ -1,11 +1,12 @@
 # P11 — Remaining Modular Conversation Architecture
 
+**Historical/superseded plan:** `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/` absorbs the remaining authoring/migration work. Preserve accepted P11A/P11B0 evidence, but do not create new work from the remaining P11 sections below.
+
 P11A and P11B0 are complete and no longer have separate active phase docs.
-This document describes only the remaining P11 product work.
 
 ## P11B — one first-party wording authority
 
-**Status:** IN PROGRESS.
+**Status:** HISTORICAL / SUPERSEDED AS ACTIVE WORK; requirements are absorbed by PSDL S5/S6.
 
 Completed domains:
 

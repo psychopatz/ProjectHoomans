@@ -1,81 +1,48 @@
-# Semantic Generation Lifecycle Cleanup
+# Portable PSDL / ConvoEngine Portability Closure
 
-**Status:** REOPENED — G0–G6 remain accepted groundwork; G7 structural ownership refactor is active.
+**Status:** IN PROGRESS — G8R7 portability closure.
 
 ## Parent objective
 
-Make Semantic CodeBuilder generation a closed-set, ownership-aware reconciliation process so obsolete generated Lua, translations, manifests and legacy output paths are removed automatically and safely instead of becoming repository archaeology for future coding agents.
-
-The permanent workflow should be:
+Finish the remaining portability boundary so ConvoEngine selects backends from target descriptors and proves the same Portable Dialogue Plan behaves equivalently in the reference runtime and generated Project Zomboid Lua runtime.
 
 ```text
-canonical semantic sources
-        ↓
-CodeBuilder generation recipe
-        ↓
-compile complete desired artifact plan
-        ↓
-validate before mutation
-        ↓
-reconcile owned outputs
-        ├── rewrite current artifacts
-        ├── prune proven stale artifacts
-        ├── prune stale generated keys from mixed catalogs
-        └── reject unexpected/unowned leftovers
-        ↓
-post-generation closure check
+compact PSDL
+→ canonical Semantic Dialogue IR
+→ Portable Dialogue Plan
+→ descriptor-selected backend
+→ generated runtime
+→ typed game capability adapter
 ```
 
-Agents should not manually inspect hundreds of generated files to decide what is stale. They should read the compact recipe and run the canonical reconciliation command.
+## Accepted baseline
 
-## Scope
+Already verified and no longer active work:
+- all 577 production semantic families use compact `psychopatz.psdl.v2`;
+- production package/provenance data exists;
+- production compilation lowers through `compile_portable_plan()`;
+- PZ generated output is rendered from the portable plan;
+- profanity recognition is source/generated rather than handwritten registration;
+- camp uses a typed capability boundary;
+- current PZ owner/output routing is descriptor-driven;
+- synthetic adopter routing through the normal generator works;
+- isolated committed-vector canonical check, deterministic rebuild, and naming/sharding audit pass.
 
-Primary job/document owner:
-- `ProjectHoomans`
+Git history is the archive for those completed changes.
 
-Implementation owner:
-- `psychopatzCore/tools/semantic_harness/codebuilder/`
+## Remaining closure
 
-Generated adopter/output surfaces:
-- `ProjectHoomans`
-- `psychopatzCore`
-- `DynamicTrading/DTCommon` when present/enabled
-
-This is a lifecycle/cleanup job, not a semantic behavior redesign.
-
-## Core outcomes
-
-1. Introduce one compact machine-readable **CodeBuilder generation recipe** describing generated surfaces, ownership and cleanup strategy.
-2. Introduce one canonical **check/apply reconciliation entrypoint** so an agent does not perform manual semantic generated-file cleanup.
-3. Make all CodeBuilder-owned artifact families closed-set after successful generation.
-4. Structurally separate hand-written engine/adaptor code, canonical CodeBuilder semantic source, generated runtime output, and ordinary application/tooling translations.
-5. Eliminate legacy hand-authored runtime dialogue content by migrating it into canonical CodeBuilder families.
-6. Keep the permanent recipe compact and policy-based; do not grow per-file preserve/retirement inventories.
-7. Add deletion/migration regressions so stale artifacts cannot quietly return.
-8. Keep `AGENTS.md` guidance brief: edit canonical source, run the recipe/reconciler, never patch generated output as source-of-truth.
-9. Preserve all accepted ConvoEngine naming, stable-ID, realization, owner-routing, and semantic sharding rules while simplifying lifecycle ownership.
-
-## Non-goals
-
-- Do not redesign NLU, dialogue arbitration, response wording, or semantic gameplay behavior.
-- Do not collapse legitimate generated shard files merely because their names contain hashes.
-- Do not delete files using broad age/name heuristics.
-- Do not convert ordinary application/tooling translations into ConvoEngine content merely to simplify cleanup.
-- Do not preserve legacy hand-authored dialogue text merely because it is currently a runtime translation file.
-- Do not create a second semantic generator beside CodeBuilder.
-- Do not require native Project Zomboid for developer-side acceptance.
+Only four concerns remain:
+1. backend selection is still hard-coded to `pz-lua` in the generic compiler path;
+2. G8R5 compares the Reference VM with PZ projection tables, not an executed Lua/PZ semantic trace;
+3. normalized lineage reports the canonical schema as if it were the authored source schema;
+4. final ROADMAP/PROGRESS/HANDOFF committed closure is inconsistent.
 
 ## Minimal read order
 
 1. root `AGENTS.md`
-2. this README
-3. `PROGRESS.md`
-4. `AGENT_RUNBOOK.md`
-5. relevant phase in `ROADMAP.md`
-6. `ARCHITECTURE.md` when changing lifecycle contracts
-7. `AUDIT.md` only when baseline evidence is needed
-8. `G7_STRUCTURAL_OWNERSHIP_REFACTOR.md` for the active corrective architecture
-9. `psychopatzCore/Docs/semantic_dialogue_language_standard/CONVO_ENGINE.md` and `NAMING_AND_LAYOUT.md` when touching naming/sharding
-10. `HARNESS_ACCEPTANCE.md` when accepting a phase
-
-The chat-delivered `/goal` is not checked into the repository.
+2. `PROGRESS.md`
+3. `HANDOFF.md`
+4. active `ROADMAP.md`
+5. `ARCHITECTURE.md` when modifying backend/runtime contracts
+6. `HARNESS_ACCEPTANCE.md` before closure

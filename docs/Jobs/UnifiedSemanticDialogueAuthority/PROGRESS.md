@@ -1,8 +1,11 @@
 # Progress — Unified Semantic Dialogue Authority
 
-**Status:** PAUSED / READY TO RESUME.
+**Status:** SUPERSEDED FOR ACTIVE AUTHORING / MIGRATION; accepted foundation preserved.
+**Successor authority:** `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/`.
 **Current branch:** `main`.
 **Last accepted published baseline before this cleanup:** `c78a97fc`.
+
+Do not resume P11B–P11I independently. PSDL now owns the de-facto authoring standard, remaining first-party migration, naming/layout cleanup, participant-neutral affordances, beat/behavior authoring standardization and final old-authority removal.
 
 ## Accepted foundation
 
@@ -63,22 +66,11 @@ remain separate legacy/current runtime surfaces pending their documented P11B/
 P11E migration. Do not hand-clean them; change their owning generator/authority
 when their migration phase is reached.
 
-## Next chunk when resumed
+## Successor execution
 
-Resume **P11B by coherent domain**, not by individual string.
+There is no active Next Chunk in this job.
 
-Recommended next domain: **Task Fetch**.
-
-For each domain:
-
-1. characterize callers/placeholders once;
-2. migrate the domain through canonical Conversation shards;
-3. regenerate through CodeBuilder;
-4. run focused tests plus full native Lua;
-5. retire superseded keys only after caller search reaches zero;
-6. keep generated files downstream-only.
-
-After P11B completes, continue P11C–P11I in `ROADMAP.md`.
+Resume from `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/PROGRESS.md`. The former Task Fetch/P11B continuation is now migration input to the PSDL domain-migration phase rather than an independently executable roadmap.
 
 ## Stop / safety rules
 

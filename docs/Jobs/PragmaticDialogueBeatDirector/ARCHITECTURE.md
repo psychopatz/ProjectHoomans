@@ -1,5 +1,7 @@
 # Architecture — Coherent Semantic Conversation
 
+> **PSDL standardization:** the accepted runtime layering below remains authoritative. New first-party dialogue/behavior/beat authoring and remaining source migration are now owned by `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/`; do not add a parallel beat/dialogue authoring format here.
+
 ## Principle
 
 Conversation meaning is layered. No single subsystem should try to solve every problem from raw text to gameplay effect.

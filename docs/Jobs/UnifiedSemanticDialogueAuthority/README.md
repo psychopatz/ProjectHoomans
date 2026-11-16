@@ -1,6 +1,9 @@
 # Unified Semantic Dialogue Authority
 
-**Status:** PAUSED / READY TO RESUME.
+**Status:** SUPERSEDED FOR ACTIVE AUTHORING / MIGRATION; accepted foundation preserved.
+**Successor:** `/home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/semantic_dialogue_language_standard/`.
+
+Do not resume the remaining P11 roadmap from this directory. Use this job only as historical/accepted-foundation evidence where the PSDL roadmap references it.
 
 P0–P10, P11A, and P11B0 are accepted foundation. P11B has completed the
 Wellbeing, Needs, Health, and Social Apology wording domains. No agent is
