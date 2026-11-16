@@ -16,10 +16,29 @@ function Window:effectiveDraft()
 end
 
 function Window:refreshPreview(force)
+    if not self.draft then
+        if self.portraitPanel then
+            self.portraitPanel:setVisible(false)
+        end
+        return false
+    end
     if self.presentationAdapter and not self._skipAdapterCommit
         and not self._committingAdapter
     then
         self:commitAdapterDraft()
+    end
+    if self.presentationAdapter then
+        local identity = self.presentationAdapter.PreviewIdentity
+            and self.presentationAdapter:PreviewIdentity() or nil
+        local generationIdentity = self.presentationAdapter.PreviewGenerationIdentity
+            and self.presentationAdapter:PreviewGenerationIdentity() or identity
+        if identity ~= self.previewIdentity then
+            self.previewIdentity = identity
+        end
+        if generationIdentity ~= self.previewGenerationIdentity then
+            self.previewGenerationIdentity = generationIdentity
+            self.previewDraft = nil
+        end
     end
     self.previewDraft = Model.UpdatePreviewDraft(self.previewDraft, self.draft)
     local valid, reason = Model.Validate(self.draft)
@@ -28,8 +47,13 @@ function Window:refreshPreview(force)
     local rendered = false
     if previewRecord then
         local spec = Model.BuildPortraitSpec(self.previewDraft)
+        self.previewSpecKey = spec and spec.key or nil
+        self.portraitTarget = spec
+        self.portraitPanel:setVisible(true)
         rendered = self.portraitPanel:setTarget(
             nil, spec, force == true) == true
+    elseif self.portraitPanel then
+        self.portraitPanel:setVisible(false)
     end
     self:refreshDetails()
     if valid and rendered then
@@ -41,6 +65,7 @@ function Window:refreshPreview(force)
         self:setStatus(tostring(previewReason or reason
             or "preview unavailable"):gsub("_", " "))
     end
+    return rendered == true
 end
 
 function Window:onFormChanged(force)
@@ -49,7 +74,6 @@ function Window:onFormChanged(force)
 end
 
 function Window:onAppearanceChanged()
-    self.previewDraft = nil
     self:syncControls()
     if self.appearanceTab then
         self.appearanceTab.draft = self.draft

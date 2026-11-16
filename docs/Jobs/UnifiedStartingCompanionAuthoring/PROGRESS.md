@@ -1,6 +1,6 @@
 # Progress — Unified Starting Companion Authoring
 
-**Status:** P5R2 developer gate complete — native P6 acceptance pending
+**Status:** P5R2 developer repair accepted — P6 native SP/MP/co-op acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -242,26 +242,85 @@ ProjectHoomans worktree:
 
 Developer evidence:
 
-- focused shared-editor, adapter, P5R journey, starter-authority,
-  customization, and Unique NPC model/editor suites: **9/9 passed**;
-- extended owner regression set: **18/18 passed**;
-- full harness: **1031/1035 passed**; the four failures remain the documented
+- R1-R5 interaction/layout/collection, shared-editor, adapter, P5R journey,
+  starter-authority, customization, relationship, and Unique NPC suites passed;
+- full harness: **1035/1039 passed**; the four failures remain the documented
   unrelated animation-scene route, context scene-lab, population-director
   initialization, and dirty-work translation expectation failures;
 - `luac -p`, targeted production `pz_verify --kahlua`, refactor-binding smoke,
   translation JSON parsing, and `git diff --check` passed;
 - no native Project Zomboid session, push, or Workshop publication was run.
 
+## USER_VERIFIED regression — native selector/preview desynchronization and layout debt
+
+The latest native Build 42.20 acceptance proves the shared P5R2 editor opens
+and is structurally richer, but full P5R2 acceptance fails.
+
+Visible native symptoms:
+
+- selecting another companion in the top combo can change the displayed label
+  while the form and portrait continue showing the previous companion;
+- the same desync can leave the footer/status at `No starting companion trait
+  selected` while stale Brother/Sister data remains visible;
+- after that state divergence, outer Randomize can silently do nothing;
+- preset selection is subject to the same selector callback contract;
+- General still behaves like a transplanted debug form: large dead regions and
+  Add-skill/Add-trait controls without a normal visible/removable configured
+  collection;
+- Appearance is too dense for character creation and exposes long per-body-slot
+  authoring lists, including raw/internal `base:*`-style locations.
+
+`CODE_VERIFIED` root cause and supporting evidence:
+
+- vanilla `ISComboBox` invokes `onChange(target, combo, ...)`;
+- `PNC_StartingCompanionComposerWindow.addCombo()` assigns the window as
+  `combo.target`, but its slot and preset callbacks currently treat their first
+  argument as the combo;
+- when that callback path loses `selectedTraitID`, `refreshSelected()` detaches
+  the adapter but does not clear the old shared-editor draft/portrait, producing
+  stale visible state;
+- the outer Randomize/Reset/Revert action exits early when
+  `selectedTraitID == nil`, explaining the native Randomize no-op after selector
+  desynchronization;
+- session-level `RandomizeSlot()` itself changes the canonical generation seed
+  correctly; existing tests cover that lower layer but do not exercise the real
+  native widget callback signature;
+- existing P5R2 smoke tests are mostly structural/model tests and still pass,
+  proving they are insufficient as UI acceptance coverage;
+- companion mode hides the existing details collection used by the mature debug
+  editor for configured skills/traits while retaining the Add rows;
+- the shared Appearance editor enumerates every Human body location, which is
+  useful for advanced/debug authoring but too dense as the default companion
+  creation workflow.
+
+The P5R2 shared component and fixed-window work remain accepted. R1-R5 repair
+is closed in the local Project Hoomans phase commit rather than replaced by
+another parallel editor.
+
+## P5R2 repair state
+
+- **R1 UI event/state correctness:** ACCEPTED
+- **R2 preview identity/invalidation:** ACCEPTED
+- **R3 General-tab character-creation UX:** ACCEPTED
+- **R4 Appearance normal/advanced UX:** ACCEPTED
+- **R5 native-style UI interaction/layout harness:** ACCEPTED
+
+P5R2 is accepted for developer-side work. P6 remains user-owned native
+SP/MP/co-op acceptance.
+
 ## Next Chunk
 
-**P6 — user-owned native SP/MP/co-op acceptance of the completed P5R2
-editor and the preserved P5R/P4 creation and authority journeys.**
+**P6 — user-owned native SP/MP/co-op acceptance after the local P5R2 developer
+repair commit. Start a fresh Build 42.20 session and validate the final-screen
+Companions workflow, relationship policy, presets, default/no-op paths, visual
+preview, and SP/MP/co-op reconnect/replacement-survivor authority behavior.**
 
 ## Repository safety
 
 ProjectHoomans and PsychopatzCore remain on existing `main` branches. Current
-ProjectHoomans HEAD at this checkpoint is `70bc2a2d98da91ff07f9c2602dd4ba567d721b9b`.
+ProjectHoomans HEAD observed during this audit is
+`1c7fe2c87908fd5cf0aa4b3b3995baf5eaa3c9c1`.
 The worktree contains unrelated active semantic/UI edits; preserve them. No new
 branch, push, Workshop publication, reset, stash, broad staging, or agent-run
-native PZ validation is authorized. Both native regressions were supplied by
+native PZ validation is authorized. All native regressions were supplied by
 the user and are acceptance evidence, not agent-run native tests.

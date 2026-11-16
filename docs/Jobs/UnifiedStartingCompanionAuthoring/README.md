@@ -5,10 +5,10 @@ Project Hoomans.
 
 Native user testing first exposed a missing entry-point journey after the
 original P5 verification; P5R repaired and developer-verified that final-screen
-integration. A second native acceptance pass proved the button is reachable but
-exposed a deeper editor-usability regression: the companion surface was a raw
-registry/diagnostic form rather than the reusable Unique NPC creator UI. P5R2
-developer work is now complete; native P6 resumes as user-owned acceptance.
+integration. A second native pass exposed the split/raw editor problem and led
+to the P5R2 shared presentation component. The latest developer pass closes the
+P5R2 R1-R5 interaction, preview, General, Appearance, and layout gates. P6 is
+now the user-owned native SP/MP/co-op acceptance matrix.
 
 The goal is not to build a second NPC creator. The existing debug/Unique NPC
 creator, character-creation companions, presets, and future NPC authoring

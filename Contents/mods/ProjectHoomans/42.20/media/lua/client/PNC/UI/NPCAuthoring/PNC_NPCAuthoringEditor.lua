@@ -79,15 +79,64 @@ function ISPNCNPCAuthoringEditor:createChildren()
 end
 
 function ISPNCNPCAuthoringEditor:setAdapter(adapter)
-    self.presentationAdapter = adapter
-    if adapter and adapter.Attach then adapter:Attach(self) end
     if not adapter then
-        self.inspectorVisible = false
-        if self.details then self.details:setVisible(false) end
+        self:clearPresentation()
+        return
     end
-    if self.draft and self.presentationAdapter then
-        self:refreshFromAdapter(true)
+    self.presentationAdapter = adapter
+    if adapter.Attach then adapter:Attach(self) end
+    self.inspectorVisible = false
+    if self.formView and self.formView.setVisible then
+        self.formView:setVisible(true)
     end
+    if self.appearanceTab and self.appearanceTab.setVisible then
+        self.appearanceTab:setVisible(true)
+    end
+    if self.configuredDetails and self.configuredDetails.setVisible then
+        self.configuredDetails:setVisible(self.presentationMode == "companion")
+    end
+    self:refreshFromAdapter(true)
+end
+
+-- Clear every visible preview surface when the host has no valid current
+-- companion.  Detaching the adapter alone is not enough: the old draft and
+-- portrait are independent UI state and would otherwise remain on screen.
+function ISPNCNPCAuthoringEditor:clearPresentation()
+    self.presentationAdapter = nil
+    self.draft = nil
+    self.previewDraft = nil
+    self.previewIdentity = nil
+    self.previewGenerationIdentity = nil
+    self.previewSpecKey = nil
+    self.inspectorVisible = false
+    if self.formView and self.formView.setVisible then
+        self.formView:setVisible(false)
+    end
+    if self.appearanceTab then
+        self.appearanceTab.draft = nil
+        if self.appearanceTab.setVisible then
+            self.appearanceTab:setVisible(false)
+        end
+    end
+    if self.configuredDetails and self.configuredDetails.setVisible then
+        self.configuredDetails:setVisible(false)
+    end
+    if self.details and self.details.setVisible then
+        self.details:setVisible(false)
+    end
+    if self.portraitPanel then
+        self.portraitPanel.targetKey = nil
+        self.portraitPanel.targetSpec = nil
+        self.portraitPanel.targetCharacter = nil
+        self.portraitPanel:setVisible(false)
+    end
+    if self.statusLabel then
+        local message = PNC.Translation and PNC.Translation.GetKey
+            and PNC.Translation.GetKey("UI_PNC_NPCAuthoring_NoSelection",
+                "No companion selected") or "No companion selected"
+        self:setStatus(message)
+    end
+    self:requestResponsiveLayout(true)
 end
 
 function ISPNCNPCAuthoringEditor:isFieldVisible(fieldID)
@@ -105,10 +154,28 @@ end
 function ISPNCNPCAuthoringEditor:refreshFromAdapter(force)
     local adapter = self.presentationAdapter
     if not adapter or not adapter.BuildDraft then return false end
+    local previousPreview = self.previewDraft
+    local previousGenerationIdentity = self.previewGenerationIdentity
+    local previewIdentity = adapter.PreviewIdentity
+        and adapter:PreviewIdentity() or nil
+    local generationIdentity = adapter.PreviewGenerationIdentity
+        and adapter:PreviewGenerationIdentity() or previewIdentity
     local draft = adapter:BuildDraft()
     if not draft then return false end
     self.draft = draft
-    self.previewDraft = nil
+    self.previewIdentity = previewIdentity or draft.previewIdentity
+    self.previewGenerationIdentity = generationIdentity
+    if previousPreview and previousGenerationIdentity == generationIdentity
+        and force ~= true and Internal.Model.UpdatePreviewDraft
+    then
+        -- Keep the existing runtime record for ordinary edits.  The model
+        -- patches explicit fields in place, so generated clothing/traits do
+        -- not reroll merely because a text field changed.
+        self.previewDraft = Internal.Model.UpdatePreviewDraft(
+            previousPreview, self.draft)
+    else
+        self.previewDraft = nil
+    end
     if self.appearanceTab then
         self.appearanceTab.draft = self.draft
         if self.appearanceTab.refreshGenderOptions then

@@ -474,20 +474,51 @@ Those details belong in the Resolution Inspector/advanced diagnostics.
 All companion/relationship labels shown in the normal editor must be resolved
 through translations and human-facing relationship names.
 
+### UI event contract
+
+Native Project Zomboid widget callback signatures are part of the integration
+contract. In particular, `ISComboBox` change handlers receive
+`onChange(target, combo, ...)`; adapters must not treat the first argument as
+the combo merely because a headless stub accepted that shape.
+
+Starting-companion slot selection and preset selection must flow through bounded
+selection methods rather than mutating several state fields inside widget
+callbacks. A valid slot-selection transaction updates, as one coherent state:
+
+- selected companion trait ID;
+- relationship-aware adapter;
+- shared editor draft and controls;
+- current summary/highlight;
+- status text;
+- resolved preview identity and portrait.
+
+Invalid/no selection clears or hides the editable/portrait state. The previous
+companion must never remain visible while the session reports no active selected
+slot.
+
 ### Portrait and deterministic preview
 
 Both debug and starter surfaces use the same portrait/runtime-preview component
 and preview-spec path. Edits refresh the current preview in place.
 
 ```text
-same blueprint + same context + same generation seed
+same active slot + same blueprint + same context + same generation seed
+        -> same preview identity
         -> same resolved preview
         -> same rendered portrait
 ```
 
-Only explicit Randomize changes generation state. Rebinding player surname,
-sex, skin, hair, or orientation changes resolved/inherited preview values
-without rewriting authored blueprint intent.
+Preview identity/invalidation is explicit. It is derived from the active
+canonical companion trait ID plus the canonical blueprint fingerprint,
+generation seed, and relevant current-player/context fingerprint. Switching
+active companion slots or explicit Randomize changes preview identity and must
+rebuild the preview runtime record. Ordinary same-slot edits preserve generated
+fallbacks and update the existing preview in place. Rebinding player surname,
+sex, skin, hair, or orientation invalidates only the context-dependent preview
+result without rewriting authored blueprint intent.
+
+The selector, adapter, form, summary, portrait target/spec, and status must
+always describe the same active preview identity.
 
 ### Companion window behavior
 
@@ -495,6 +526,27 @@ The starting-companion editor is a focused character-creation workflow and must
 not be collapsible/pinnable. Use the existing `PsychopatzFixedWindow` behavior
 (or the same Core primitive) so title-bar pin/collapse controls are absent while
 the window remains closeable, responsive, and resizable.
+
+Shared primitive controls do not require identical surface composition. The
+debug creator may expose dense diagnostic/authoring workflows, while the
+character-creation companion profile must compose those same primitives into a
+clear normal workflow.
+
+Normal companion **General** presentation is sectioned and scrollable rather
+than a sparse debug form with large dead regions. It must make configured skills
+and traits visible and removable, not merely expose Add controls while hiding
+the collection.
+
+Normal companion **Appearance** prioritizes common character-authoring choices:
+outfit, skin, hair, beard where applicable, voice/style/sample/pitch, and other
+high-value appearance controls. Per-body-location overrides belong under an
+explicit Advanced Clothing Overrides surface with its own bounded scroll area.
+Raw/internal engine location IDs such as `base:*` are diagnostic/advanced data,
+not the primary normal presentation.
+
+Locked relationship values are rendered as read-only human values plus compact
+source explanation, not as controls that visually appear interactive but happen
+to be disabled.
 
 The debug Unique NPC editor may retain its own normal window behavior unless a
 separate product decision changes it.

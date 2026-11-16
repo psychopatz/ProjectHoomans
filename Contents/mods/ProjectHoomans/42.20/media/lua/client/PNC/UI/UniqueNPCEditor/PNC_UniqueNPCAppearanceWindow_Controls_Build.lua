@@ -36,6 +36,17 @@ local function buildAppearanceTopControls(self)
     self.topControls = {
         self.randomizeButton, self.playVoiceButton, self.stopVoiceButton,
     }
+    if self.parentEditor and self.parentEditor.presentationMode == "companion" then
+        self.advancedClothingButton = UI.CreateButton(self, {
+            id = "advancedClothing",
+            title = tr("UI_PNC_NPCAuthoring_AdvancedClothing",
+                "ADVANCED CLOTHING OVERRIDES"),
+            target = self,
+            onclick = ISPNCUniqueNPCAppearanceWindow.onAction,
+            variant = "quiet",
+        })
+        self.topControls[#self.topControls + 1] = self.advancedClothingButton
+    end
     self.content = ISPNCUniqueNPCAppearanceScrollPanel:new(0, 0, 1, 1)
     self.content:initialise()
     self.content:instantiate()
@@ -113,19 +124,56 @@ local function buildAppearanceSkinControls(self)
     self.content:addChild(self.skinValue)
 end
 
+local function buildAppearanceIdentityControls(self)
+    self.hairLabel = ISLabel:new(0, 0, 24,
+        tr("UI_PNC_UniqueNPCEditor_Hair", "Hair style"),
+        0.72, 0.78, 0.84, 1, UIFont.Small, true)
+    self.hairLabel:initialise()
+    self.content:addChild(self.hairLabel)
+    self.hairCombo = ISComboBox:new(0, 0, 1, 24, self,
+        ISPNCUniqueNPCAppearanceWindow.onHairChanged)
+    self.hairCombo:initialise()
+    self.content:addChild(self.hairCombo)
+
+    self.beardLabel = ISLabel:new(0, 0, 24,
+        tr("UI_PNC_UniqueNPCEditor_Beard", "Beard"),
+        0.72, 0.78, 0.84, 1, UIFont.Small, true)
+    self.beardLabel:initialise()
+    self.content:addChild(self.beardLabel)
+    self.beardCombo = ISComboBox:new(0, 0, 1, 24, self,
+        ISPNCUniqueNPCAppearanceWindow.onBeardChanged)
+    self.beardCombo:initialise()
+    self.content:addChild(self.beardCombo)
+end
+
+local function buildAdvancedLabel(self)
+    self.advancedLabel = ISLabel:new(0, 0, 24,
+        tr("UI_PNC_NPCAuthoring_AdvancedClothing",
+            "ADVANCED CLOTHING OVERRIDES"),
+        0.72, 0.78, 0.84, 1, UIFont.Small, true)
+    self.advancedLabel:initialise()
+    self.content:addChild(self.advancedLabel)
+end
+
 local function finishAppearanceControls(self)
     self:buildOutfitOptions()
     self:buildVoiceOptions()
+    self:refreshHairBeardOptions()
     for _, location in ipairs(locations()) do self:addLocationRow(location) end
+    if self.syncAdvancedVisibility then self:syncAdvancedVisibility() end
     self:syncFromDraft()
 end
 
 function ISPNCUniqueNPCAppearanceWindow:createChildren()
     ISPanel.createChildren(self)
     initializeAppearanceState(self)
+    self.advancedVisible = not (self.parentEditor
+        and self.parentEditor.presentationMode == "companion")
     buildAppearanceTopControls(self)
     buildAppearanceVoiceControls(self)
     buildAppearanceSkinControls(self)
+    buildAppearanceIdentityControls(self)
+    buildAdvancedLabel(self)
     finishAppearanceControls(self)
 end
 

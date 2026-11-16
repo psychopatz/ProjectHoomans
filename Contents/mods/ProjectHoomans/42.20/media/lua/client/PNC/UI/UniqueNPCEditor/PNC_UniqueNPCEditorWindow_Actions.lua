@@ -23,14 +23,53 @@ local function sourceLabel(capability)
         and capability.sourceLabel or nil
 end
 
+local function setLabelText(control, value)
+    if not control then return end
+    if Internal.UI and Internal.UI.SetLabelText then
+        Internal.UI.SetLabelText(control, tostring(value or ""))
+    elseif control.setName then
+        control:setName(tostring(value or ""))
+    end
+end
+
+local function companionRowVisible(self, row, capability)
+    if capability.visible == false then return false end
+    if self.presentationMode == "companion"
+        and (row.id == "hair" or row.id == "beard")
+    then
+        -- Hair and beard are shared controls, composed in the normal
+        -- Appearance tab for character creation rather than repeated in
+        -- General.
+        return false
+    end
+    return true
+end
+
+local function lockedValue(self, row)
+    if row.id == "surname" then
+        local _, surname = Model.NameParts(self.draft)
+        return surname or "—"
+    end
+    if row.id == "gender" then
+        return self.draft and self.draft.isFemale == true
+            and tr("UI_PNC_UniqueNPCEditor_Female", "Female")
+            or tr("UI_PNC_UniqueNPCEditor_Male", "Male")
+    end
+    return "—"
+end
+
 local function updatePresentation(self)
     for _, row in ipairs(self.coreRows or {}) do
         local fieldID = row.fieldID or row.id
         local capability = self:fieldCapability(fieldID)
         capability = capability or { visible = true, editable = true }
+        local visible = companionRowVisible(self, row, capability)
+        local locked = self.presentationMode == "companion"
+            and capability.editable == false
+            and (row.id == "surname" or row.id == "gender")
         local label = Profile and Profile.Label(fieldID) or row.label
         local help = sourceLabel(capability)
-        if help then label = label .. " (" .. tostring(help) .. ")" end
+        if help and not locked then label = label .. " (" .. tostring(help) .. ")" end
         row.label = label
         if row.labelControl then
             if Internal.UI and Internal.UI.SetLabelText then
@@ -40,13 +79,19 @@ local function updatePresentation(self)
             end
         end
         if row.labelControl and row.labelControl.setVisible then
-            row.labelControl:setVisible(capability.visible ~= false)
+            row.labelControl:setVisible(visible)
         end
         if row.entry and row.entry.setVisible then
-            row.entry:setVisible(capability.visible ~= false)
+            row.entry:setVisible(visible and not locked)
         end
         setControlEnabled(row.entry,
-            capability.visible ~= false and capability.editable ~= false)
+            visible and capability.editable ~= false and not locked)
+        if row.readOnlyValue then
+            setLabelText(row.readOnlyValue, locked
+                and (tostring(lockedValue(self, row)) .. " · "
+                    .. tostring(help or "")) or "")
+            row.readOnlyValue:setVisible(visible and locked)
+        end
     end
     for _, row in ipairs(self.addRows or {}) do
         local capability = self:fieldCapability(row.fieldID or row.id)
@@ -171,6 +216,7 @@ function Window:syncControls()
     selectCombo(self.equipmentModeCombo,
         self.draft.equipmentSpawnMode or "none")
     updatePresentation(self)
+    self:refreshConfiguredDetails()
 end
 
 function Window:showTab(tabID)
@@ -232,6 +278,8 @@ function ISPNCNPCAuthoringEditor:onAction(button)
         self:showTab("Appearance")
     elseif action == "remove_detail" then
         self:removeSelectedDetail()
+    elseif action == "remove_configured" then
+        self:removeSelectedConfigured()
     elseif action == "reset_details" then
         self:resetDetails()
     elseif action == "add_skill" then

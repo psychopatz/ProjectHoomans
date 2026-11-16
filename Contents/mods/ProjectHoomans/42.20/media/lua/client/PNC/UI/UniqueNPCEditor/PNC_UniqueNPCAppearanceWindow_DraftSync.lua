@@ -91,7 +91,38 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
             a = 1,
         }
     end
-    setLabelText(self.skinValue, skinToneLabel(skinTone))
+    local skinEditable = true
+    local skinSource
+    if self.parentEditor and self.parentEditor.presentationMode == "companion"
+        and self.parentEditor.fieldCapability
+    then
+        local skin = self.parentEditor:fieldCapability("appearance.skinTexture")
+        local skinColor = self.parentEditor:fieldCapability("appearance.skinColor")
+        skinEditable = skin and skin.editable ~= false
+            and skinColor and skinColor.editable ~= false
+        skinSource = skin and skin.sourceLabel or skinColor and skinColor.sourceLabel
+    end
+    if self.skinModeCombo then
+        if self.skinModeCombo.setEnabled then
+            self.skinModeCombo:setEnabled(skinEditable == true)
+        end
+        if self.skinModeCombo.setVisible
+            and self.parentEditor
+            and self.parentEditor.presentationMode == "companion"
+        then
+            self.skinModeCombo:setVisible(skinEditable == true)
+        end
+    end
+    local skinText = skinToneLabel(skinTone)
+    if not skinEditable and skinSource then
+        skinText = skinText .. " · " .. tostring(skinSource)
+    end
+    setLabelText(self.skinValue, skinText)
+    if self.hairCombo then selectData(self.hairCombo, survivor.hairModel) end
+    if self.beardCombo then selectData(self.beardCombo, survivor.beardModel) end
+    if self.beardCombo and self.beardCombo.setEnabled then
+        self.beardCombo:setEnabled(self.draft and self.draft.isFemale ~= true)
+    end
     for _, row in ipairs(self.rows) do
         local policy = appearance.slots and appearance.slots[row.location]
             or { mode = "none" }
@@ -99,6 +130,7 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
         if policy.type then selectData(row.item, policy.type) end
         row.item:setEnabled(policy.mode == "item")
     end
+    if self.syncAdvancedVisibility then self:syncAdvancedVisibility() end
     self.syncing = false
 end
 

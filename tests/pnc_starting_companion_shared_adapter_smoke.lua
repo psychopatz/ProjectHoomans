@@ -74,6 +74,14 @@ local adapter = Adapter.New(session, TID.BROTHER)
 local initialFingerprint = Blueprint.Fingerprint(session:GetBlueprint(TID.BROTHER))
 local draft = adapter:BuildDraft()
 T.truthy(draft, "shared adapter builds a resolved authoring draft")
+local initialPreviewIdentity = adapter:PreviewIdentity()
+local initialGenerationIdentity = adapter:PreviewGenerationIdentity()
+T.contains(initialPreviewIdentity, TID.BROTHER,
+    "preview identity contains the active companion trait")
+T.contains(initialPreviewIdentity, tostring(draft.previewSeed),
+    "preview identity contains the generation seed")
+T.truthy(string.find(initialPreviewIdentity, "context:", 1, true),
+    "preview identity contains a context fingerprint")
 T.falsy(adapter:CommitDraft(draft),
     "opening and closing without edits does not author customization")
 T.equal(Blueprint.Fingerprint(session:GetBlueprint(TID.BROTHER)),
@@ -112,8 +120,23 @@ T.equal(seedState, "value", "unrelated identity remains authored")
 T.equal(seedValue, "Riley", "visual edit does not reroll unrelated values")
 T.equal(visualBlueprint.generationSeed, generationSeed,
     "visual edit does not advance the generation seed")
+T.equal(adapter:PreviewGenerationIdentity(), initialGenerationIdentity,
+    "ordinary visual edit preserves preview generation identity")
+T.truthy(adapter:PreviewIdentity() ~= initialPreviewIdentity,
+    "ordinary visual edit changes full preview identity")
 
-local reboundFingerprint = Blueprint.Fingerprint(visualBlueprint)
+local randomizedBlueprint = session:RandomizeSlot(TID.BROTHER)
+local randomizedSeed = randomizedBlueprint.generationSeed
+local randomizedIdentity = adapter:PreviewIdentity()
+T.truthy(randomizedSeed ~= generationSeed,
+    "explicit randomize changes the canonical generation seed")
+T.truthy(randomizedIdentity ~= initialPreviewIdentity,
+    "explicit randomize changes the preview identity")
+T.equal(adapter.traitID, TID.BROTHER,
+    "randomize keeps the adapter bound to the selected companion")
+
+local reboundFingerprint = Blueprint.Fingerprint(
+    session:GetBlueprint(TID.BROTHER))
 session:Refresh(context("Cruz", false, "straight"))
 local rebound = adapter:BuildDraft()
 local _, reboundSurname = Model.NameParts(rebound)

@@ -46,7 +46,7 @@ local function layoutEditorFrame(self, rect)
     return leftWidth, viewHeight, portraitX, portraitY, portraitWidth, portraitHeight, top, stacked
 end
 
-local function layoutEditorForm(self, leftWidth, viewHeight)
+local function layoutDebugForm(self, leftWidth, viewHeight)
     local formWidth = leftWidth
     local formHeight = viewHeight
     local y = Layout.Pixels(10, self.uiScale)
@@ -120,6 +120,152 @@ local function layoutEditorForm(self, leftWidth, viewHeight)
     return addY, detailsY, twoColumns
 end
 
+local function companionRowVisible(self, row)
+    local capability = self:fieldCapability(row.fieldID or row.id)
+    if not capability or capability.visible == false then return false end
+    return row.id ~= "faction" and row.id ~= "hair" and row.id ~= "beard"
+end
+
+local function companionRowLocked(self, row)
+    local capability = self:fieldCapability(row.fieldID or row.id)
+    return capability and capability.editable == false
+        and (row.id == "surname" or row.id == "gender")
+end
+
+local function layoutCompanionRow(self, row, y, width)
+    local labelWidth = math.min(Layout.Pixels(132, self.uiScale),
+        math.max(Layout.Pixels(96, self.uiScale), math.floor(width * 0.32)))
+    local rowHeight = Layout.Pixels(30, self.uiScale)
+    local gap = Layout.Pixels(8, self.uiScale)
+    Layout.SetBounds(row.labelControl, 0, y, labelWidth, rowHeight)
+    Layout.SetBounds(companionRowLocked(self, row)
+        and row.readOnlyValue or row.entry,
+        labelWidth + gap, y, width - labelWidth - gap, rowHeight)
+    if row.entry and row.entry.setVisible then
+        row.entry:setVisible(not companionRowLocked(self, row))
+    end
+    if row.readOnlyValue and row.readOnlyValue.setVisible then
+        row.readOnlyValue:setVisible(companionRowLocked(self, row))
+    end
+    return y + rowHeight + Layout.Pixels(4, self.uiScale)
+end
+
+local function layoutCompanionAddRow(self, row, y, width)
+    local labelWidth = math.min(Layout.Pixels(132, self.uiScale),
+        math.max(Layout.Pixels(96, self.uiScale), math.floor(width * 0.32)))
+    local rowHeight = Layout.Pixels(30, self.uiScale)
+    local gap = Layout.Pixels(8, self.uiScale)
+    local buttonWidth = Layout.Pixels(58, self.uiScale)
+    local inputWidth = math.max(Layout.Pixels(1, self.uiScale),
+        width - labelWidth - gap - buttonWidth - gap)
+    Layout.SetBounds(row.labelControl, 0, y, labelWidth, rowHeight)
+    Layout.SetBounds(row.button, width - buttonWidth, y,
+        buttonWidth, rowHeight)
+    if #row.entries == 2 then
+        local each = math.max(Layout.Pixels(1, self.uiScale),
+            math.floor((inputWidth - gap) / 2))
+        Layout.SetBounds(row.entries[1], labelWidth + gap, y, each, rowHeight)
+        Layout.SetBounds(row.entries[2], labelWidth + gap + each + gap,
+            y, each, rowHeight)
+    else
+        Layout.SetBounds(row.entries[1], labelWidth + gap, y,
+            inputWidth, rowHeight)
+    end
+    return y + rowHeight + Layout.Pixels(4, self.uiScale)
+end
+
+local function layoutCompanionForm(self, formWidth, viewHeight)
+    local y = Layout.Pixels(10, self.uiScale)
+    local gap = Layout.Pixels(8, self.uiScale)
+    local sectionHeight = Layout.Pixels(24, self.uiScale)
+    local listHeight = Layout.Pixels(116, self.uiScale)
+    local rowByID = {}
+    for _, row in ipairs(self.coreRows or {}) do rowByID[row.id] = row end
+
+    local function section(name)
+        local label = self.sectionLabels and self.sectionLabels[name]
+        if label then
+            Layout.SetBounds(label, 0, y, formWidth, sectionHeight)
+            label:setVisible(true)
+        end
+        y = y + sectionHeight + gap
+    end
+
+    local function rows(ids)
+        for _, id in ipairs(ids) do
+            local row = rowByID[id]
+            if row and companionRowVisible(self, row) then
+                y = layoutCompanionRow(self, row, y, formWidth)
+            elseif row then
+                Layout.SetBounds(row.labelControl, 0, 0, 0, 0)
+                Layout.SetBounds(row.entry, 0, 0, 0, 0)
+                if row.readOnlyValue then
+                    Layout.SetBounds(row.readOnlyValue, 0, 0, 0, 0)
+                end
+            end
+        end
+    end
+
+    section("identity")
+    rows({ "forename", "nickname", "surname", "gender" })
+    y = y + gap
+    section("background")
+    rows({ "archetype", "equipmentMode" })
+    y = y + gap
+    section("skills")
+    local listY = y
+    local list = self.inspectorVisible and self.details or self.configuredDetails
+    if list then
+        Layout.SetBounds(list, 0, listY, formWidth,
+            math.min(listHeight, math.max(Layout.Pixels(70, self.uiScale),
+                viewHeight * 0.26)))
+    end
+    if self.configuredDetails then
+        self.configuredDetails:setVisible(self.inspectorVisible ~= true
+            and self.draft ~= nil)
+    end
+    if self.details then self.details:setVisible(self.inspectorVisible == true) end
+    y = listY + listHeight
+    if self.removeConfiguredButton then
+        Layout.SetBounds(self.removeConfiguredButton, 0, y,
+            Layout.Pixels(80, self.uiScale), sectionHeight)
+        self.removeConfiguredButton:setVisible(
+            self.inspectorVisible ~= true and self.draft ~= nil)
+    end
+    if self.removeButton then self.removeButton:setVisible(false) end
+    if self.resetDetailsButton then self.resetDetailsButton:setVisible(false) end
+    y = y + sectionHeight + gap
+    section("traits")
+    for _, row in ipairs(self.addRows or {}) do
+        local capability = self:fieldCapability(row.fieldID or row.id)
+        local visible = capability and capability.visible ~= false
+        if visible then
+            y = layoutCompanionAddRow(self, row, y, formWidth)
+        else
+            Layout.SetBounds(row.labelControl, 0, 0, 0, 0)
+            Layout.SetBounds(row.button, 0, 0, 0, 0)
+            for _, entry in ipairs(row.entries or {}) do
+                Layout.SetBounds(entry, 0, 0, 0, 0)
+            end
+        end
+    end
+    Layout.SetBounds(self.statusLabel, 0, y, formWidth, sectionHeight)
+    y = y + sectionHeight + gap
+
+    if self.formView.setScrollHeight then self.formView:setScrollHeight(y) end
+    self.formView.contentHeight = math.max(viewHeight, y)
+    self.formView.maxScroll = math.max(0, self.formView.contentHeight - viewHeight)
+    self.companionLayout = {
+        contentHeight = self.formView.contentHeight,
+        collectionY = listY,
+        collectionHeight = listHeight,
+        statusY = y - sectionHeight - gap,
+        statusHeight = sectionHeight,
+        scrollBounded = self.formView.contentHeight >= viewHeight,
+    }
+    return y, listY, true
+end
+
 local function layoutEditorPortrait(self, portraitX, portraitY, portraitWidth, portraitHeight)
     self.portraitPanel:setVisible(true)
     Layout.SetBounds(self.portraitPanel, portraitX, portraitY,
@@ -134,14 +280,22 @@ function ISPNCNPCAuthoringEditor:onResponsiveLayout()
     local rect = self:getContentRect({ top = 0, bottom = 0 })
     local leftWidth, viewHeight, portraitX, portraitY, portraitWidth, portraitHeight, top, stacked =
         layoutEditorFrame(self, rect)
-    local addY, detailsY, twoColumns =
-        layoutEditorForm(self, leftWidth, viewHeight)
+    local addY, detailsY, twoColumns
+    if self.presentationMode == "companion" then
+        addY, detailsY, twoColumns = layoutCompanionForm(self,
+            leftWidth, viewHeight)
+    else
+        addY, detailsY, twoColumns = layoutDebugForm(self,
+            leftWidth, viewHeight)
+    end
     layoutEditorPortrait(self, portraitX, portraitY, portraitWidth, portraitHeight)
     self.layout = {
         x = rect.x, y = top, leftWidth = leftWidth,
         addY = addY, detailsY = detailsY, portraitX = portraitX,
-        portraitWidth = portraitWidth,
+        portraitY = portraitY, portraitWidth = portraitWidth,
+        portraitHeight = portraitHeight,
         twoColumns = twoColumns, stacked = stacked,
+        companion = self.companionLayout,
     }
 end
 

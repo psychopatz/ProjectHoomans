@@ -68,14 +68,16 @@ end
 
 function ISPNCStartingCompanionComposerWindow:createChildren()
     PsychopatzFixedWindow.createChildren(self)
-    self.slotCombo = addCombo(self, self, function(combo)
+    -- ISComboBox invokes onChange as (target, combo, arg1, arg2).  Keep the
+    -- callback boundary faithful to the vanilla widget and route all state
+    -- changes through the bounded selection transactions below.
+    self.slotCombo = addCombo(self, self, function(target, combo)
         local option = combo.options and combo.options[combo.selected]
-        self.selectedTraitID = option and option.data or nil
-        self:refreshSelected()
+        target:SelectCompanion(option and option.data or nil)
     end)
-    self.presetCombo = addCombo(self, self, function(combo)
+    self.presetCombo = addCombo(self, self, function(target, combo)
         local option = combo.options and combo.options[combo.selected]
-        self.selectedPresetFile = option and option.data or nil
+        target:SelectPreset(option and option.data or nil)
     end)
 
     self.loadButton = UI.CreateButton(self, {
@@ -146,54 +148,112 @@ function ISPNCStartingCompanionComposerWindow:setStatus(value)
     end
 end
 
+local function activeSlot(session, traitID)
+    if not session or type(session.GetSlot) ~= "function" then return nil end
+    return session:GetSlot(traitID, false)
+end
+
+function ISPNCStartingCompanionComposerWindow:SelectCompanion(traitID)
+    local slot = activeSlot(self.session, traitID)
+    local selectedID = slot and slot.traitID or nil
+
+    if not selectedID then
+        self.selectedTraitID = nil
+        self.currentSelection = nil
+        self.adapter = nil
+        if self.slotCombo then self.slotCombo.selected = 0 end
+        if self.editor then self.editor:setAdapter(nil) end
+        self:refreshSummary()
+        self:setStatus(tr("UI_PNC_StartingCompanion_NoSelection",
+            "No starting companion trait selected"))
+        return false, "slot_not_active"
+    end
+
+    self.selectedTraitID = selectedID
+    if self.slotCombo and self.slotCombo.selectData then
+        self.slotCombo:selectData(selectedID)
+    end
+    self.adapter = Adapter.New(self.session, selectedID)
+    self.currentSelection = {
+        traitID = selectedID,
+        relationshipKind = slot.spec and slot.spec.relationshipKind,
+    }
+    self.editor:setAdapter(self.adapter)
+    self:refreshSummary()
+    self:setStatus(self.editor.statusText
+        or tr("UI_PNC_StartingCompanion_Ready", "Companion ready"))
+    return true
+end
+
+function ISPNCStartingCompanionComposerWindow:SelectPreset(fileName)
+    self.selectedPresetFile = fileName
+    self.currentPresetFile = fileName
+    if not self.presetCombo then return fileName end
+    if fileName and self.presetCombo.selectData then
+        self.presetCombo:selectData(fileName)
+    elseif not fileName then
+        self.presetCombo.selected = 1
+    end
+    return fileName
+end
+
 function ISPNCStartingCompanionComposerWindow:refreshSlots()
     local active = self.session and self.session.GetActiveSlots
         and self.session:GetActiveSlots() or {}
     local selected = self.selectedTraitID
+    local selectedIsActive = false
     self.slotCombo:clear()
     for _, slot in ipairs(active) do
         local spec = slot.spec or StartingTraits.GetDefinition(slot.traitID)
         local label = spec and tr(spec.uiName, spec.relationshipKind)
             or tr("UI_PNC_StartingCompanion_Companion", "Companion")
         self.slotCombo:addOptionWithData(label, slot.traitID)
+        if selected == slot.traitID then selectedIsActive = true end
         if not selected then selected = slot.traitID end
     end
+    if #active == 0 then
+        selected = nil
+    elseif selected and not selectedIsActive then
+        selected = active[1].traitID
+    end
     self.selectedTraitID = selected
-    if selected then self.slotCombo:selectData(selected) end
+    if selected then
+        self.slotCombo:selectData(selected)
+    else
+        self.slotCombo.selected = 0
+    end
 end
 
 function ISPNCStartingCompanionComposerWindow:refreshPresets()
     local selected = self.selectedPresetFile
+    local selectedIsAvailable = false
     self.presetCombo:clear()
     self.presetCombo:addOptionWithData(
         tr("UI_PNC_StartingCompanion_NoPreset", "No saved preset"), nil)
     for _, entry in ipairs(Store.List()) do
+        if selected == entry.fileName then selectedIsAvailable = true end
         self.presetCombo:addOptionWithData(
             tostring(entry.label or entry.fileName), entry.fileName)
     end
-    self.selectedPresetFile = selected
-    if selected then self.presetCombo:selectData(selected) end
+    if not selectedIsAvailable then selected = nil end
+    self:SelectPreset(selected)
 end
 
 function ISPNCStartingCompanionComposerWindow:refreshSelected()
-    if not self.session or not self.selectedTraitID then
-        self.editor:setAdapter(nil)
-        self:refreshSummary()
-        self:setStatus(tr("UI_PNC_StartingCompanion_NoSelection",
-            "No starting companion trait selected"))
-        return
-    end
-    self.adapter = Adapter.New(self.session, self.selectedTraitID)
-    self.editor:setAdapter(self.adapter)
-    self:refreshSummary()
+    return self:SelectCompanion(self.selectedTraitID)
 end
 
 function ISPNCStartingCompanionComposerWindow:refreshSummary()
     self.summary:clear()
+    self.summary.currentTraitID = self.selectedTraitID
     if not self.session then return end
     for _, item in ipairs(self.session:FinalSummary()) do
+        local label = relationshipLabel(item.relationshipKind)
+        if item.traitID == self.selectedTraitID then
+            label = "• " .. label
+        end
         addListItem(self.summary,
-            relationshipLabel(item.relationshipKind),
+            label,
             item.displayName or tr("UI_PNC_StartingCompanion_PreviewUnavailable",
                 "Preview unavailable"),
             item.error ~= nil)
@@ -275,8 +335,12 @@ function ISPNCStartingCompanionComposerWindow:loadSelected()
     local result
     result, reason = Presets.ApplyToSession(self.session, payload)
     if not result then return false, reason end
-    if payload.kind == "template" then
-        self.selectedTraitID = payload.companionTraitID
+    local nextTraitID = payload.kind == "template"
+        and payload.companionTraitID or self.selectedTraitID
+    if activeSlot(self.session, nextTraitID) then
+        self:SelectCompanion(nextTraitID)
+    else
+        self:refreshSelected()
     end
     return true
 end
@@ -289,7 +353,15 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
         self:close()
         return
     end
-    if not self.session or not self.selectedTraitID then return end
+    if not self.session then
+        self:setStatus(tr("UI_PNC_StartingCompanion_NoSession",
+            "Starting companion session unavailable"))
+        return
+    end
+    if not self.selectedTraitID or not activeSlot(self.session, self.selectedTraitID) then
+        self:SelectCompanion(nil)
+        return
+    end
     if id == "save" then
         ok, reason = self:saveTemplate()
         self:setStatus(ok and tr("UI_PNC_StartingCompanion_Saved",
@@ -308,6 +380,8 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
     elseif id == "randomize" or id == "reset" or id == "revert" then
         ok = self.editor:invokeWorkflow(id)
         self:refreshSummary()
+        self:setStatus(self.editor.statusText
+            or tr("UI_PNC_StartingCompanion_Ready", "Companion ready"))
         if not ok and id == "revert" then
             self:setStatus(tr("UI_PNC_StartingCompanion_NoPresetBaseline",
                 "No preset baseline is loaded"))

@@ -71,6 +71,15 @@ end
 function ISPNCUniqueNPCAppearanceWindow:onAction(button)
     local action = button and button.internal or ""
     if action == "randomize" then
+        if self.parentEditor and self.parentEditor.presentationAdapter
+            and self.parentEditor.invokeWorkflow
+        then
+            -- Companion Randomize is a session operation.  Do not mutate a
+            -- local resolved draft and accidentally leave the canonical seed
+            -- unchanged.
+            self.parentEditor:invokeWorkflow("randomize")
+            return
+        end
         self.draft.previewSeed = nil
         Model.Randomize(self.draft)
         self:markChanged()
@@ -78,6 +87,10 @@ function ISPNCUniqueNPCAppearanceWindow:onAction(button)
         self:onPlayVoice()
     elseif action == "stopVoice" then
         self:onStopVoice()
+    elseif action == "advancedClothing" then
+        self.advancedVisible = not (self.advancedVisible == true)
+        self:syncAdvancedVisibility()
+        if self.onResponsiveLayout then self:onResponsiveLayout() end
     end
 end
 

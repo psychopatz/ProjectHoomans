@@ -13,6 +13,10 @@ local Profile = Internal.Presentation
 local function initializeEditorState(self)
     self.draft = Model.New()
     self.previewDraft = nil
+    self.previewIdentity = nil
+    self.previewGenerationIdentity = nil
+    self.previewSpecKey = nil
+    self.portraitTarget = nil
     self.coreRows = {}
     self.addRows = {}
     self.toolbar = {}
@@ -53,7 +57,9 @@ local function buildEditorTabs(self)
     self.tabPanel.allowTornOffTabs = false
     self:addChild(self.tabPanel)
 
-    self.formView = ISPanel:new(0, 0, 1, 1)
+    local formClass = self.presentationMode == "companion"
+        and ISPNCUniqueNPCAppearanceScrollPanel or ISPanel
+    self.formView = formClass:new(0, 0, 1, 1)
     self.formView:initialise()
     self.formView:instantiate()
     self.formView:noBackground()
@@ -121,6 +127,42 @@ local function buildEditorForm(self)
         "UI_PNC_UniqueNPCEditor_AddDynamicTrait", "Dynamic trait",
         { self.dynamicTraitCombo }, "UI_PNC_UniqueNPCEditor_Add",
         "traits.dynamic")
+
+    self.sectionLabels = {
+        identity = addLabel(self.formView,
+            tr("UI_PNC_NPCAuthoring_IdentitySection", "IDENTITY")),
+        background = addLabel(self.formView,
+            tr("UI_PNC_NPCAuthoring_BackgroundSection", "BACKGROUND")),
+        skills = addLabel(self.formView,
+            tr("UI_PNC_NPCAuthoring_SkillsSection", "SKILLS")),
+        traits = addLabel(self.formView,
+            tr("UI_PNC_NPCAuthoring_TraitsSection", "TRAITS")),
+    }
+    for _, label in pairs(self.sectionLabels) do
+        label:setVisible(self.presentationMode == "companion")
+    end
+
+    if self.presentationMode == "companion" then
+        for _, row in ipairs(self.coreRows) do
+            if row.id == "surname" or row.id == "gender" then
+                row.readOnlyValue = addLabel(self.formView, "")
+                row.readOnlyValue:setVisible(false)
+            end
+        end
+        self.configuredDetails = UI.CreateList(self.formView, {
+            itemHeight = Layout.Pixels(25, self.uiScale),
+            doDrawItem = drawDetail,
+        })
+        self.removeConfiguredButton = UI.CreateButton(self.formView, {
+            id = "remove_configured",
+            title = tr("UI_PNC_UniqueNPCEditor_Remove", "REMOVE"),
+            target = self,
+            onclick = ISPNCNPCAuthoringEditor.onAction,
+            variant = "quiet",
+        })
+        self.configuredDetails:setVisible(false)
+        self.removeConfiguredButton:setVisible(false)
+    end
 
     self.details = UI.CreateList(self.formView, {
         itemHeight = Layout.Pixels(25, self.uiScale),

@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R2 developer gate complete — native P6 acceptance pending
+**Status:** P5R2 developer repair accepted — P6 native SP/MP/co-op acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -615,12 +615,145 @@ is visually/practically usable with portrait + real controls + preset actions,
 relationship policy modifies that shared editor rather than replacing it, and
 all P1-P5R behavior remains verified. Native P6 resumes only afterward.
 
-**Developer gate result:** accepted in the local P5R2 phase commit. The
-shared component, fixed companion host, translated/profile-driven controls,
-portrait parity, Resolution Inspector separation, starter preset actions,
-relationship locking, deterministic preview/rebinding behavior, and focused
-plus existing regression suites are green. Native SP/MP/co-op acceptance is
-the next user-owned P6 responsibility.
+**Developer gate result:** R1-R5 are accepted in the local Project Hoomans
+repair commit. The shared component now uses the real vanilla combo callback
+contract and one atomic selected-slot transaction; preview identity and
+invalidation cover slot, blueprint, seed, and relevant context; General and
+Appearance use character-creation composition with visible collections,
+bounded Advanced Clothing Overrides, and explicit no-selection clearing. The
+definition-index `files` initialization repair remains accepted. Full harness
+verification is 1035/1039, with four unrelated documented failures. Native
+SP/MP/co-op acceptance remains user-owned.
+
+### P5R2-R1 — UI event and selected-slot state correctness
+
+Fix the real native event contract before further visual polish.
+
+Vanilla `ISComboBox` invokes change callbacks as `onChange(target, combo, ...)`.
+The current starting-companion host assigns `combo.target = window` but its slot
+and preset callbacks treat the first argument as the combo. Native selection can
+therefore change the visible dropdown while clearing or retaining the wrong
+internal `selectedTraitID`/`selectedPresetFile`.
+
+R1 requirements:
+
+- use the real vanilla combo callback signature for companion-slot and preset
+  selection;
+- centralize companion selection through one bounded method such as
+  `SelectCompanion(traitID)` rather than duplicating state mutation in callbacks;
+- validate the chosen trait ID against the currently active session slots;
+- on valid selection, atomically update selected trait ID, adapter, shared
+  editor draft, form controls, summary/current selection, status, and portrait;
+- on invalid/no selection, clear or hide stale editor/portrait state rather than
+  leaving the previous companion visible;
+- make Load/preset selection obey the same event contract;
+- Randomize, Reset, Revert, and Load must target the same currently-selected
+  slot visible in the UI and must never silently no-op because the selector and
+  internal state diverged.
+
+**R1 gate:** a native-style UI harness invoking the real
+`onChange(target, combo, ...)` signature proves Brother -> Sister and preset
+selection update internal IDs and all visible state atomically.
+
+### P5R2-R2 — Preview identity and invalidation correctness
+
+Make preview freshness an explicit contract rather than relying on scattered
+`previewDraft = nil` / `force = true` calls.
+
+The effective preview identity must include the active companion slot plus the
+state that can change its resolved visual result, including at least:
+
+- canonical companion trait ID;
+- canonical blueprint fingerprint;
+- generation seed;
+- current player/context fingerprint relevant to bindings.
+
+Switching companion slots or explicit Randomize must invalidate/rebuild the
+preview runtime record. Ordinary same-slot edits should preserve deterministic
+fallback values and update in place. Player surname/sex/appearance/orientation
+rebinding must update the same companion preview without mutating blueprint
+intent.
+
+The form, relationship summary, current selection, resolved draft, portrait
+spec/target, and status must always describe the same active slot and preview
+identity.
+
+**R2 gate:** tests prove slot switch changes portrait/form identity, Randomize
+changes seed and preview identity, ordinary edits do not reroll, and context
+rebinding updates inherited/derived values deterministically.
+
+### P5R2-R3 — General-tab character-creation UX
+
+The shared primitive editor remains shared, but the companion presentation must
+be reorganized for character creation instead of inheriting debug layout gaps.
+
+Use a scrollable/sectioned normal companion presentation such as:
+
+- Identity — first name, nickname, human read-only surname/gender source rows;
+- Background — archetype/equipment choices where policy allows;
+- Skills — visible currently-added skills with level and Remove, plus an Add
+  control;
+- Traits — visible currently-added NPC/vanilla/dynamic traits with Remove, plus
+  Add controls.
+
+Do not hide the normal configured-skill/trait list while leaving only Add
+controls. Locked relationship fields should look read-only and explain the
+source; they should not look like enabled dropdowns merely disabled by policy.
+Avoid large dead regions created by hidden debug-only controls.
+
+**R3 gate:** a player can inspect, add, and remove every supported skill/trait
+without opening the Resolution Inspector, and representative window sizes/UI
+scales remain usable without overlap or unusable empty regions.
+
+### P5R2-R4 — Appearance workflow UX
+
+Keep the shared appearance engine, but separate common character creation from
+advanced equipment-slot authoring.
+
+Normal Appearance should prioritize:
+
+- outfit;
+- skin;
+- hair;
+- beard where applicable;
+- voice/style/sample/pitch;
+- other high-value appearance controls already supported by the shared model.
+
+Per-body-location overrides move under an explicit **Advanced Clothing
+Overrides** section/panel. Translate/group native body locations where possible
+and do not expose raw/internal `base:*` slot IDs as the normal experience.
+The advanced list must own its own bounded scrolling area and must not collide
+with the companion summary/footer/portrait.
+
+**R4 gate:** the normal Appearance tab is concise and understandable; advanced
+clothing remains available without overwhelming or clipping the primary flow.
+
+### P5R2-R5 — Native-style UI interaction and layout harness
+
+Extend the existing harness rather than creating another framework.
+
+Required interaction coverage includes:
+
+1. construct the real companion window with multiple active slots;
+2. invoke slot combo change using vanilla `onChange(target, combo)` semantics;
+3. assert selected trait ID, adapter trait ID, form gender/name, summary, status,
+   and portrait target/spec all move to the new companion;
+4. invoke Randomize and assert generation seed + preview identity change while
+   the selected slot remains unchanged;
+5. invoke preset combo with the same native callback contract and prove Load
+   applies the selected file;
+6. invalid/no active selection clears stale editor/portrait instead of showing
+   the previous companion;
+7. configured skills/traits are visible and removable in normal General UI;
+8. normal Appearance does not expose raw `base:*` slot IDs as the primary list;
+9. layout-bound checks cover representative 16:9 and smaller supported window
+   sizes/UI scales, with portrait, tabs, footer/summary, and scroll regions not
+   overlapping;
+10. existing P5R/P4/default/no-op/authored paths remain green.
+
+**P5R2 repair gate:** ACCEPTED for developer-side work. R1-R5 interaction,
+layout, preview, policy, persistence, and regression gates pass. The roadmap
+now returns to the user-owned P6 native acceptance matrix.
 
 ### P6 — Native acceptance
 

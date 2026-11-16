@@ -34,6 +34,10 @@ T.contains(profileSource, "identity.nickname",
     "presentation profile owns canonical nickname metadata")
 T.contains(editorSource, "ISPNCNPCAuthoringEditor",
     "shared authoring component has a stable class")
+T.contains(editorSource, "clearPresentation",
+    "shared authoring component clears stale no-selection state")
+T.contains(editorSource, "self:refreshFromAdapter(true)",
+    "shared authoring component rebuilds after every valid adapter bind")
 T.contains(debugSource, "ISPNCNPCAuthoringEditor:new",
     "debug creator hosts the shared authoring component")
 T.contains(debugSource, 'mode = "debug"',
@@ -58,6 +62,14 @@ T.contains(lifecycleSource, "ISPNCNPCAuthoringEditor",
     "mature editor lifecycle is attached to the shared component")
 T.contains(previewSource, "Model.BuildPortraitSpec",
     "both hosts retain the mature portrait preview path")
+T.contains(previewSource, "previewSpecKey",
+    "portrait preview exposes an explicit current spec identity")
+T.contains(adapterSource, "PreviewGenerationIdentity",
+    "companion adapter exposes deterministic preview generation identity")
+T.contains(companionSource, "SelectCompanion",
+    "companion selection uses one bounded state transaction")
+T.contains(companionSource, "target, combo",
+    "companion callbacks use the vanilla combo argument order")
 T.contains(segmentSource, "NPCAuthoring = \"Character\"",
     "authoring labels resolve through the Character catalog")
 T.contains(segmentSource, "Relationship = \"Character\"",

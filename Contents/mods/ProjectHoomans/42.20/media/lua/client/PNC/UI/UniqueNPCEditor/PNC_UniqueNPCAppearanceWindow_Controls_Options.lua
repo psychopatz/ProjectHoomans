@@ -13,6 +13,17 @@ local labelFor = Internal.labelFor
 local itemOptions = Internal.itemOptions
 local runtimeItemFor = Internal.runtimeItemFor
 
+local function parentComboOptions(combo)
+    local output = {}
+    for _, option in ipairs(combo and combo.options or {}) do
+        output[#output + 1] = {
+            id = option.data,
+            label = option.text or option.label or tostring(option.data or ""),
+        }
+    end
+    return output
+end
+
 function ISPNCUniqueNPCAppearanceWindow:buildVoiceOptions()
     self.voiceStyles = voiceOptions(self.draft and self.draft.isFemale == true)
     local options = {
@@ -69,7 +80,19 @@ function ISPNCUniqueNPCAppearanceWindow:refreshGenderOptions()
         skinToneOptions(self.draft and self.draft.isFemale == true))
     self:buildOutfitOptions()
     self:buildVoiceOptions()
+    self:refreshHairBeardOptions()
     self:syncFromDraft()
+end
+
+function ISPNCUniqueNPCAppearanceWindow:refreshHairBeardOptions()
+    local parent = self.parentEditor
+    if not self.hairCombo or not parent then return end
+    addOptions(self.hairCombo, parentComboOptions(parent.hairCombo))
+    addOptions(self.beardCombo, parentComboOptions(parent.beardCombo))
+    if self.beardCombo and self.beardCombo.setEnabled then
+        self.beardCombo:setEnabled(not (self.draft
+            and self.draft.isFemale == true))
+    end
 end
 
 function ISPNCUniqueNPCAppearanceWindow:addLocationRow(location)

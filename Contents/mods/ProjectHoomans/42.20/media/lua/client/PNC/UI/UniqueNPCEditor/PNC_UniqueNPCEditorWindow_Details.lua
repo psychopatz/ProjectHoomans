@@ -14,6 +14,90 @@ local function inspectorRows(self)
     return adapter:InspectorRows(64)
 end
 
+local function humanize(value)
+    local output = tostring(value or "")
+    output = string.gsub(output, "[%._:%-]+", " ")
+    output = string.gsub(output, "([a-z])([A-Z])", "%1 %2")
+    output = string.gsub(output, "^%s+", "")
+    output = string.gsub(output, "%s+$", "")
+    output = string.gsub(output, "^UI PNC Trait%s+", "")
+    output = string.gsub(output, "^PNC%s+", "")
+    if output == "" then return "Configured value" end
+    return string.upper(string.sub(output, 1, 1)) .. string.sub(output, 2)
+end
+
+local function skillLabel(id)
+    for _, group in ipairs(PNC.SkillCatalog and PNC.SkillCatalog.GetGroups
+        and PNC.SkillCatalog.GetGroups() or {}) do
+        for _, skill in ipairs(group.skills or {}) do
+            if tostring(skill.id) == tostring(id) then
+                return tostring(skill.display or skill.id)
+            end
+        end
+    end
+    return humanize(id)
+end
+
+local function npcTraitLabel(id)
+    for _, definition in ipairs(PNC.NPCTraits
+        and PNC.NPCTraits.GetDefinitions
+        and PNC.NPCTraits.GetDefinitions() or {}) do
+        if tostring(definition.id) == tostring(id) then
+            return tr(definition.labelKey,
+                definition.label or humanize(definition.id))
+        end
+    end
+    return humanize(id)
+end
+
+local function vanillaTraitLabel(id)
+    if CharacterTraitDefinition and CharacterTraitDefinition.getTraits then
+        local list = CharacterTraitDefinition.getTraits()
+        if list and list.size and list.get then
+            for index = 0, list:size() - 1 do
+                local trait = list:get(index)
+                local traitType = trait and trait.getType and trait:getType()
+                local traitID = traitType and traitType.getName
+                    and traitType:getName() or nil
+                if traitID and tostring(traitID) == tostring(id) then
+                    return tostring(trait:getLabel() or humanize(id))
+                end
+            end
+        end
+    end
+    return humanize(id)
+end
+
+local function configuredRows(self)
+    local draft = self.draft or {}
+    local rows = {}
+    local function add(label, value, kind, key)
+        rows[#rows + 1] = {
+            label = label,
+            value = value == nil and "—" or tostring(value),
+            kind = kind,
+            key = key,
+            removable = true,
+        }
+    end
+    for _, skillID in ipairs(collectionIDs(draft.skillLevels, true)) do
+        add(skillLabel(skillID),
+            "Level " .. tostring(draft.skillLevels[skillID]),
+            "skill", skillID)
+    end
+    for _, traitID in ipairs(collectionIDs(draft.npcTraits)) do
+        add(npcTraitLabel(traitID), "NPC trait", "npcTrait", traitID)
+    end
+    for _, traitID in ipairs(collectionIDs(draft.vanillaTraits)) do
+        add(vanillaTraitLabel(traitID), "Physiological trait",
+            "vanillaTrait", traitID)
+    end
+    for _, traitID in ipairs(collectionIDs(draft.dynamicTraits)) do
+        add(npcTraitLabel(traitID), "Dynamic trait", "dynamicTrait", traitID)
+    end
+    return rows
+end
+
 function Window:buildDetails()
     if self.presentationAdapter then
         local rows = {}
@@ -109,6 +193,17 @@ end
 
 function Window:refreshDetails()
     if not self.details then return end
+    if self.presentationMode == "companion" and not self.inspectorVisible then
+        self.details:clear()
+        self.detailRows = {}
+        self.details:setVisible(false)
+        if self.removeButton then self.removeButton:setVisible(false) end
+        if self.resetDetailsButton then
+            self.resetDetailsButton:setVisible(false)
+        end
+        self:refreshConfiguredDetails()
+        return
+    end
     if self.presentationAdapter and not self.inspectorVisible then
         self.details:clear()
         self.detailRows = {}
@@ -157,6 +252,31 @@ function Window:refreshDetails()
     if self.removeButton then self.removeButton:setEnable(enabled == true) end
 end
 
+function Window:refreshConfiguredDetails()
+    local list = self.configuredDetails
+    if not list then return end
+    list:clear()
+    self.configuredRows = configuredRows(self)
+    for _, row in ipairs(self.configuredRows) do
+        list:addItem(row.label, row)
+    end
+    list.selected = #self.configuredRows > 0 and 1 or 0
+    local selected = list.getItem and list:getItem() or nil
+    if self.removeConfiguredButton then
+        if self.removeConfiguredButton.setEnable then
+            self.removeConfiguredButton:setEnable(selected ~= nil)
+        elseif self.removeConfiguredButton.setEnabled then
+            self.removeConfiguredButton:setEnabled(selected ~= nil)
+        end
+        self.removeConfiguredButton:setVisible(
+            self.presentationMode == "companion"
+                and self.inspectorVisible ~= true
+                and self.draft ~= nil)
+    end
+    list:setVisible(self.presentationMode == "companion"
+        and self.inspectorVisible ~= true and self.draft ~= nil)
+end
+
 function Window:addSkill()
     local skill = comboData(self.skillCombo)
     local level = comboData(self.skillLevelCombo)
@@ -173,7 +293,8 @@ function Window:addSkill()
     end
     self.pendingDetailKey = "skill:" .. tostring(id)
     self:refreshPreview(false)
-    self:setStatus("Skill added")
+    self:refreshConfiguredDetails()
+    self:setStatus(tr("UI_PNC_NPCAuthoring_SkillAdded", "Skill added"))
 end
 
 function Window:addTrait(kind, combo)
@@ -194,7 +315,29 @@ function Window:addTrait(kind, combo)
     end
     self.pendingDetailKey = kind .. ":" .. tostring(normalized or id)
     self:refreshPreview(false)
-    self:setStatus("Trait added")
+    self:refreshConfiguredDetails()
+    self:setStatus(tr("UI_PNC_NPCAuthoring_TraitAdded", "Trait added"))
+end
+
+function Window:removeSelectedConfigured()
+    local selected = self.configuredDetails and self.configuredDetails:getItem()
+    local row = selected and selected.item or nil
+    if not row or not row.removable or not self.draft then return end
+    if row.kind == "skill" then
+        if self.draft.skillLevels then self.draft.skillLevels[row.key] = nil end
+        self.draft.authoredFields = self.draft.authoredFields or {}
+        self.draft.authoredFields.skillLevels = true
+    else
+        local field = row.kind == "npcTrait" and "npcTraits"
+            or row.kind == "vanillaTrait" and "vanillaTraits"
+            or "dynamicTraits"
+        self.draft[field] = removeCollection(self.draft[field], row.key)
+        self.draft.authoredFields = self.draft.authoredFields or {}
+        self.draft.authoredFields[field] = true
+    end
+    self.draft._dirty = true
+    self:refreshPreview(false)
+    self:refreshConfiguredDetails()
 end
 
 function Window:removeSelectedDetail()
@@ -220,6 +363,7 @@ function Window:removeSelectedDetail()
     end
     self.draft._dirty = true
     self:refreshPreview(false)
+    self:refreshConfiguredDetails()
 end
 
 function Window:resetDetails()

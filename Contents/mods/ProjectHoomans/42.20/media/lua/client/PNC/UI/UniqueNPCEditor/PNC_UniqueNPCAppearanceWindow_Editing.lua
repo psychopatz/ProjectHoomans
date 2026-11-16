@@ -112,6 +112,32 @@ function ISPNCUniqueNPCAppearanceWindow:onOutfitChanged(combo)
     self:markChanged()
 end
 
+function ISPNCUniqueNPCAppearanceWindow:onHairChanged(combo)
+    if self.syncing or not self.draft then return end
+    local survivor = self.draft.identity and self.draft.identity.survivor or {}
+    local value = comboData(combo)
+    self.draft.identity.survivor = survivor
+    survivor.hairModel = value == "__random" and nil or value
+    self.draft.appearanceAuthored = self.draft.appearanceAuthored or {}
+    self.draft.appearanceAuthored.hairModel = true
+    self.draft.authoringClears = self.draft.authoringClears or {}
+    self.draft.authoringClears["appearance.hairModel"] = value == nil
+    self:markChanged()
+end
+
+function ISPNCUniqueNPCAppearanceWindow:onBeardChanged(combo)
+    if self.syncing or not self.draft then return end
+    local survivor = self.draft.identity and self.draft.identity.survivor or {}
+    local value = comboData(combo)
+    self.draft.identity.survivor = survivor
+    survivor.beardModel = value == "__random" and nil or value
+    self.draft.appearanceAuthored = self.draft.appearanceAuthored or {}
+    self.draft.appearanceAuthored.beardModel = true
+    self.draft.authoringClears = self.draft.authoringClears or {}
+    self.draft.authoringClears["appearance.beardModel"] = value == nil
+    self:markChanged()
+end
+
 function ISPNCUniqueNPCAppearanceWindow:setVoiceDraft(profile)
     if not profile then return end
     self.draft.identity = self.draft.identity or { survivor = {} }

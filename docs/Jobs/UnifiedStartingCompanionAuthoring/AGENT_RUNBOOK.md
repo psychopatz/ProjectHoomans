@@ -179,8 +179,70 @@ Repair the presentation layer around those accepted foundations:
 10. Preserve P5R opt-in/default behavior, one-session ownership, pre-commit
     ordering, dynamic inheritance, and P4 server authority.
 
+#### P5R2-R1 — real widget event/state repair
+
+- Treat vanilla `ISComboBox` as `onChange(target, combo, ...)` and update both
+  companion-slot and preset selectors accordingly.
+- Centralize slot selection through one method that validates active membership
+  and atomically refreshes selected ID, adapter, editor draft, summary, status,
+  and portrait.
+- Clear/hide stale form and portrait state when no valid active slot exists.
+- Route Load/Randomize/Reset/Revert through the authoritative selected-slot
+  state and never silently return because the visible combo and internal ID
+  disagree.
+
+#### P5R2-R2 — preview identity/invalidation
+
+- Introduce or derive an explicit preview identity from active trait ID,
+  blueprint fingerprint, generation seed, and relevant player/context
+  fingerprint.
+- Slot switch and Randomize rebuild preview runtime state.
+- Same-slot edits preserve deterministic generated fallbacks and update in
+  place.
+- Context rebinding updates inherited/derived preview state without mutating
+  blueprint intent.
+- Selector, adapter, form, summary, status, and portrait must agree on one
+  active preview identity after every operation.
+
+#### P5R2-R3 — General UX
+
+- Recompose shared primitives into scrollable Identity, Background, Skills,
+  and Traits sections for companion mode.
+- Show already-configured skills/traits with Remove actions.
+- Do not hide the configured collection while leaving only Add controls.
+- Render relationship-bound fields as read-only values with source explanation,
+  not disabled controls that still look interactive.
+
+#### P5R2-R4 — Appearance UX
+
+- Keep common Outfit/Skin/Hair/Beard/Voice controls in the normal flow.
+- Move per-body-location controls behind explicit Advanced Clothing Overrides.
+- Translate/group locations and keep raw/internal `base:*` identifiers out of
+  the normal presentation.
+- Give advanced clothing its own bounded scroll area; it must not collide with
+  portrait, summary, footer, or host controls.
+
+#### P5R2-R5 — native-style UI harness
+
+- Instantiate the real companion window with multiple active slots.
+- Invoke combo callbacks using the vanilla target/combo argument order.
+- Assert Brother -> Sister changes selected trait, adapter, form gender/name,
+  summary/status, and portrait target/spec together.
+- Assert Randomize changes generation seed and preview identity while retaining
+  the selected slot.
+- Exercise preset selection/Load through the same native combo callback.
+- Assert invalid selection clears stale form/portrait.
+- Assert configured skills/traits are visible/removable.
+- Assert normal Appearance does not expose raw `base:*` identifiers as its
+  primary list.
+- Add layout-bound assertions across representative supported sizes/UI scales.
+
 Do not solve the registry-field leakage by adding a large companion-only hidden
 field list. The presentation profile is shared and policy-aware.
+
+Do not mark P5R2 accepted from source-presence tests alone. Structural sharing
+is necessary, but real widget interaction and layout/state coherence are now
+mandatory acceptance evidence.
 
 ## Required focused verification
 

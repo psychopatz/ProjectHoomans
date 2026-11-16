@@ -96,6 +96,9 @@ function Window:refreshStyleOptions()
     selectCombo(self.hairCombo, survivor.hairModel)
     selectCombo(self.beardCombo, survivor.beardModel)
     self.beardCombo:setEnabled(not female)
+    if self.appearanceTab and self.appearanceTab.refreshHairBeardOptions then
+        self.appearanceTab:refreshHairBeardOptions()
+    end
 end
 
 function Window:refreshRepeaterOptions()

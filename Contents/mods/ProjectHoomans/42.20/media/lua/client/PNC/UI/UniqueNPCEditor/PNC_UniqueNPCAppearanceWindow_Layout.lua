@@ -1,6 +1,33 @@
 local Window = ISPNCUniqueNPCAppearanceWindow
 local Internal = Window.Internal or {}
 local Layout = Internal.Layout
+local tr = Internal.tr
+
+function ISPNCUniqueNPCAppearanceWindow:syncAdvancedVisibility()
+    local companion = self.parentEditor
+        and self.parentEditor.presentationMode == "companion"
+    local visible = not companion or self.advancedVisible == true
+    local showIdentityAppearance = companion == true
+    if self.hairLabel then self.hairLabel:setVisible(showIdentityAppearance) end
+    if self.hairCombo then self.hairCombo:setVisible(showIdentityAppearance) end
+    if self.beardLabel then self.beardLabel:setVisible(showIdentityAppearance) end
+    if self.beardCombo then self.beardCombo:setVisible(showIdentityAppearance) end
+    if self.advancedLabel and self.advancedLabel.setVisible then
+        self.advancedLabel:setVisible(visible and companion)
+    end
+    for _, row in ipairs(self.rows or {}) do
+        if row.labelControl then row.labelControl:setVisible(visible) end
+        if row.policy then row.policy:setVisible(visible) end
+        if row.item then row.item:setVisible(visible) end
+    end
+    if self.advancedClothingButton and self.advancedClothingButton.setTitle then
+        self.advancedClothingButton:setTitle(visible
+            and tr("UI_PNC_NPCAuthoring_HideAdvancedClothing",
+                "HIDE ADVANCED CLOTHING")
+            or tr("UI_PNC_NPCAuthoring_AdvancedClothing",
+                "ADVANCED CLOTHING OVERRIDES"))
+    end
+end
 
 function Window:onResponsiveLayout()
     local scale = self.uiScale or 1
@@ -62,11 +89,45 @@ function Window:onResponsiveLayout()
             innerWidth - labelWidth - Layout.Pixels(230, scale)),
         rowHeight)
     y = y + rowHeight + gap
+    local showIdentityAppearance = self.parentEditor
+        and self.parentEditor.presentationMode == "companion"
+    if showIdentityAppearance and self.hairLabel and self.hairCombo then
+        Layout.SetBounds(self.hairLabel, 0, y, labelWidth, rowHeight)
+        Layout.SetBounds(self.hairCombo, labelWidth + gap, y,
+            innerWidth - labelWidth - gap, rowHeight)
+        y = y + rowHeight + gap
+    end
+    if showIdentityAppearance and self.beardLabel and self.beardCombo then
+        Layout.SetBounds(self.beardLabel, 0, y, labelWidth, rowHeight)
+        Layout.SetBounds(self.beardCombo, labelWidth + gap, y,
+            innerWidth - labelWidth - gap, rowHeight)
+        y = y + rowHeight + gap
+    end
+    if not showIdentityAppearance then
+        if self.hairLabel then Layout.SetBounds(self.hairLabel, 0, 0, 0, 0) end
+        if self.hairCombo then Layout.SetBounds(self.hairCombo, 0, 0, 0, 0) end
+        if self.beardLabel then Layout.SetBounds(self.beardLabel, 0, 0, 0, 0) end
+        if self.beardCombo then Layout.SetBounds(self.beardCombo, 0, 0, 0, 0) end
+    end
+    local advancedStart = y
+    if self.advancedLabel then
+        Layout.SetBounds(self.advancedLabel, 0, y, innerWidth, rowHeight)
+        y = y + rowHeight + gap
+    end
+    local advancedVisible = not (self.parentEditor
+        and self.parentEditor.presentationMode == "companion")
+        or self.advancedVisible == true
     for _, row in ipairs(self.rows) do
         Layout.SetBounds(row.labelControl, 0, y, labelWidth, rowHeight)
         Layout.SetBounds(row.policy, labelWidth + gap, y, policyWidth, rowHeight)
         Layout.SetBounds(row.item, itemX, y, itemWidth, rowHeight)
-        y = y + rowHeight
+        if not advancedVisible then
+            Layout.SetBounds(row.labelControl, 0, 0, 0, 0)
+            Layout.SetBounds(row.policy, 0, 0, 0, 0)
+            Layout.SetBounds(row.item, 0, 0, 0, 0)
+        else
+            y = y + rowHeight
+        end
     end
     self.content.contentHeight = math.max(contentHeight, y + rowHeight + gap)
     self.content:setScrollHeight(self.content.contentHeight)
@@ -79,5 +140,15 @@ function Window:onResponsiveLayout()
         self.content.vscroll:setHeight(self.content.height)
     end
     if self.content.onResize then self.content:onResize() end
+    self:syncAdvancedVisibility()
+    self.layout = {
+        x = rect.x, y = rect.y, width = rect.width, height = rect.height,
+        contentHeight = self.content.contentHeight,
+        normalBottom = advancedStart,
+        advancedStart = advancedStart,
+        advancedEnd = y,
+        advancedVisible = advancedVisible,
+        scrollBounded = self.content.contentHeight >= self.content.height,
+    }
 end
 

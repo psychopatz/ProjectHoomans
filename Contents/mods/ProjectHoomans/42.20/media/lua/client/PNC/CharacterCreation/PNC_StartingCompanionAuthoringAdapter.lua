@@ -44,6 +44,22 @@ local function sourceHelp(source)
     return Profile.SourceHelp(source)
 end
 
+local function contextFingerprint(context)
+    context = type(context) == "table" and context or {}
+    -- Do not hash the live player/descriptor userdata.  These are the
+    -- semantic context values that the relationship resolver actually reads
+    -- and they remain stable across UI refreshes while still invalidating a
+    -- preview when the final player changes.
+    return Registry.Hash({
+        playerSurname = context.playerSurname,
+        playerFemale = context.playerFemale,
+        orientation = context.orientation,
+        socialOrientation = context.socialOrientation,
+        playerAppearance = copy(context.playerAppearance),
+        socialTraitIDs = copy(context.socialTraitIDs),
+    })
+end
+
 function Adapter.New(session, traitID)
     local object = {
         session = session,
@@ -65,6 +81,33 @@ end
 
 function Adapter:BlueprintIntent()
     return self.composer and self.composer:BlueprintIntent() or nil
+end
+
+function Adapter:ContextFingerprint()
+    local context = self.session and self.session.GetContext
+        and self.session:GetContext() or {}
+    return contextFingerprint(context)
+end
+
+function Adapter:PreviewGenerationIdentity()
+    local intent = self:BlueprintIntent() or {}
+    return table.concat({
+        "companion", tostring(self.traitID),
+        tostring(intent.generationSeed or "none"),
+        "context", self:ContextFingerprint(),
+    }, ":")
+end
+
+function Adapter:PreviewIdentity()
+    local intent = self:BlueprintIntent() or {}
+    local fingerprint = Blueprint.Fingerprint(intent)
+        or Registry.Hash(intent)
+    return table.concat({
+        "companion", tostring(self.traitID),
+        tostring(fingerprint),
+        "seed", tostring(intent.generationSeed or "none"),
+        "context", self:ContextFingerprint(),
+    }, ":")
 end
 
 function Adapter:FieldCapability(fieldID)
@@ -127,6 +170,8 @@ function Adapter:BuildDraft()
     local draft = Model.FromDefinition(preview)
     if not draft then return nil end
     draft.previewSeed = intent.generationSeed
+    draft.previewIdentity = self:PreviewIdentity()
+    draft.previewGenerationIdentity = self:PreviewGenerationIdentity()
     draft.identityIDLocked = true
     self._viewSnapshot = self:_snapshotDraft(draft)
     return draft
