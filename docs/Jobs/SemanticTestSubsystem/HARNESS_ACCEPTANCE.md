@@ -1,48 +1,30 @@
-# Harness Acceptance — Final Closure Hardening
+# Harness Acceptance — Final Cleanup
 
-## A6R9 regression-authority gate
+**Status:** COMPLETE.
 
-Require:
+## A6R13
 
-- no active GUI behavioral path using `kind="regression"`;
-- no hard-coded greeting/follow behavioral matrix bypassing semantic fixtures;
-- lifecycle/rejection/selection/general Regression actions resolve canonical semantic fixtures;
-- dead legacy regression helpers removed;
-- existing GUI fixture acceptance remains green.
+- naming guard rejects S10-style milestone forms as well as existing history tokens;
+- four remaining S10-named files/classes are renamed/split descriptively;
+- historical-only class/docstring/classification labels are removed;
+- legitimate protocol/synthetic IDs are preserved.
 
-## A6R10 assertion and naming gate
+## A6R14
 
-Require:
+- mandatory direct-worker suites reviewed method-by-method;
+- behavior moved to fixtures with parity;
+- retained imperative methods have specific implementation reasons;
+- classification ledger matches current filenames and responsibilities (174 modules / 715 methods);
+- no ordinary semantic scenario is LOW_LEVEL only because it uses the production worker.
 
-- realization cases assert their named realization outcome or are renamed/reclassified;
-- response-pool fixture overlap reviewed and redundant coverage consolidated;
-- fixture overlap report remains bounded;
-- obsolete phase labels removed from active test descriptions/docstrings/classification where they are historical-only;
-- retained Python test filename policy has an automated guard.
+## A6R15
 
-## A6R11 migration gate
+From exact committed Core (`3dfdf0dc15b4`) + Hoomans vector:
 
-For high-value direct-worker candidates:
-
-- compare current Python behavior to fixture coverage;
-- add missing fixture assertions/cases where necessary;
-- rerun parity;
-- remove redundant behavioral methods only after parity;
-- retain exact API/protocol/editor/quality/save/native/performance contracts;
-- regenerate classification with current descriptive reasons.
-
-Fail the gate if ordinary semantic scenario→input→outcome tests remain LOW_LEVEL solely because they call the production worker.
-
-## A6R12 final gate
-
-From exact committed participant vector:
-
-- Core fixture/authority tests PASS;
-- fixture lint PASS with zero exact duplicates/naming/domain-path violations;
-- full semantic corpus PASS;
-- focused retained/migrated Python suites PASS;
-- no historical C0A/legacy regression fixture authority remains;
-- no active parallel GUI behavioral regression lane remains;
-- active job docs and durable policies agree on COMPLETE.
-
-The final handoff must be a committed handoff containing the participant commit vector.
+- Core fixture/authority PASS (18/18);
+- lint PASS with zero exact duplicates, zero naming violations, zero domain/path mismatches (38 files / 211 cases);
+- Python filename/static boundary gate PASS;
+- focused retained/migrated suites PASS (24/24);
+- full semantic fixture corpus PASS (211/211);
+- root durable policies are committed in both repos;
+- README/ROADMAP/PROGRESS/HANDOFF/ARCHITECTURE/AUDIT/HARNESS_ACCEPTANCE/RUNBOOK agree on COMPLETE.

@@ -14,7 +14,7 @@ from tools.semantic_harness.ui.suggestion_projection import semantic_suggestion_
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
+class SuggestionPresentationAndFramesTests(SemanticLabGuiTestCase):
 
     def test_topic_combobox_uses_the_worker_group_click_contract(self) -> None:
         if not os.environ.get("DISPLAY"):

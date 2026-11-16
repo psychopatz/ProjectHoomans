@@ -18,7 +18,7 @@ def generated(turn: dict) -> list[dict]:
     ]
 
 
-class CoherentConversationC8Tests(unittest.TestCase):
+class ConversationMultiTurnCoherenceContractTests(unittest.TestCase):
     def test_npc_pending_question_drives_current_player_affordances(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("how are you doing?")
@@ -139,96 +139,6 @@ class CoherentConversationC8Tests(unittest.TestCase):
         self.assertEqual(declined["observation"]["flow"]["transition"], "cancel")
         self.assertIsNone(
             declined["contextAfter"]["dialogue"].get("pendingFollowUp")
-        )
-
-    def test_topic_interrupt_and_resume_use_same_bounded_discourse_state(self) -> None:
-        scenario = deepcopy(DEFAULT_SCENARIO)
-        scenario["npc"]["needs"]["hunger"] = 0.9
-        scenario["world"]["weather"] = "rain"
-        with LuaSemanticWorker(scenario) as worker:
-            worker.input("do you need anything")
-            worker.input("how many")
-            worker.input("i will get some")
-            weather = worker.input("what is the weather")
-            resumed = worker.input("okay")
-
-        weather_dialogue = weather["contextAfter"]["dialogue"]
-        self.assertEqual(weather_dialogue["currentTopic"], "weather")
-        self.assertEqual(weather_dialogue["previousTopic"], "needs")
-        self.assertEqual(
-            weather["result"]["ir"]["extensions"]["contextualFollowUp"][
-                "status"
-            ],
-            "interrupted",
-        )
-        self.assertEqual(
-            weather_dialogue["pendingFollowUp"]["flowID"],
-            "needs",
-        )
-
-        resumed_dialogue = resumed["contextAfter"]["dialogue"]
-        self.assertEqual(
-            resumed["observation"]["flow"]["transition"],
-            "resume_match",
-        )
-        self.assertEqual(resumed_dialogue["currentTopic"], "needs")
-        self.assertEqual(resumed_dialogue["previousTopic"], "weather")
-        self.assertEqual(
-            resumed["result"]["ir"]["extensions"]["contextualFollowUp"][
-                "status"
-            ],
-            "matched",
-        )
-
-    def test_referent_reuse_comes_from_prior_semantic_turn_not_raw_text(self) -> None:
-        scenario = deepcopy(DEFAULT_SCENARIO)
-        scenario["npc"]["residence"] = {"label": "Riverside Camp"}
-        with LuaSemanticWorker(scenario) as worker:
-            worker.input("where is your home")
-            follow = worker.input("what about it")
-
-        target = follow["result"]["ir"]["target"]
-        self.assertEqual(target["resolvedReference"], "IT")
-        self.assertEqual(target["concept"], "NPC_RESIDENCE")
-        self.assertEqual(
-            follow["result"]["decision"]["response"]["selectionSource"],
-            "conversation_reference",
-        )
-        self.assertIn(
-            "Riverside Camp",
-            follow["messages"][-1]["payload"]["text"],
-        )
-
-    def test_hostility_repair_transitions_one_shared_beat_state(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            hostile = worker.input("go away")
-            # Use a direct hostile input if this lower-intensity utterance does
-            # not enter the argument beat on the selected personality.
-            if (
-                hostile["observation"]["director"]
-                .get("contextAfter", {})
-                .get("active", {})
-                .get("id")
-                != "beat.argument_escalation"
-            ):
-                hostile = worker.input("you are useless")
-            apology = worker.input("sorry")
-
-        self.assertEqual(
-            hostile["observation"]["director"]["contextAfter"]["active"]["id"],
-            "beat.argument_escalation",
-        )
-        self.assertEqual(
-            apology["observation"]["director"]["exited"]["id"],
-            "beat.argument_escalation",
-        )
-        self.assertEqual(
-            apology["observation"]["director"]["entered"]["id"],
-            "beat.reconciliation",
-        )
-        self.assertEqual(
-            apology["observation"]["director"]["contextAfter"]["active"]["id"],
-            "beat.reconciliation",
         )
 
 

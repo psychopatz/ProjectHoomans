@@ -30,7 +30,7 @@ def _scenario(language: str, character_uuid: str = "c6-player-a") -> dict:
     )
 
 
-class PortableC6MatrixTests(unittest.TestCase):
+class PortableRuntimeEquivalenceMatrixTests(unittest.TestCase):
     def test_real_worker_dialogue_inspector_restart_and_translation_matrix(self) -> None:
         expected = {
             "EN": {

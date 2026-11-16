@@ -58,7 +58,7 @@ def _identity_requests(turn: dict) -> list[dict]:
     ]
 
 
-class S10ALabelSpeechRealWorkerTests(unittest.TestCase):
+class IdentityLabelAndSpeechRealizationTests(unittest.TestCase):
     def test_truthful_identity_choice_realizes_bound_name_and_preserves_authority(
         self,
     ) -> None:
@@ -211,7 +211,7 @@ class S10ALabelSpeechRealWorkerTests(unittest.TestCase):
         self.assertEqual(reason_same, "valid_initiating_say")
 
 
-class S10ALabelSpeechTkJourneyTests(SemanticLabGuiTestCase):
+class IdentityLabelAndSpeechTkJourneyTests(SemanticLabGuiTestCase):
     def test_tk_open_conversation_identity_exchange_click_and_restart_repeat(
         self,
     ) -> None:

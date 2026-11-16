@@ -14,7 +14,7 @@ PROJECT_HOOMANS_ROOT = Path(__file__).resolve().parents[4]
 CORE_ROOT = PROJECT_HOOMANS_ROOT.parent / "psychopatzCore"
 
 
-class S10AProviderWorkerStartupTests(unittest.TestCase):
+class ProviderWorkerManifestStartupTests(unittest.TestCase):
     def _create_manifest_worker(self) -> LuaSemanticWorker:
         config = HarnessConfig.discover(
             repository=PROJECT_HOOMANS_ROOT,

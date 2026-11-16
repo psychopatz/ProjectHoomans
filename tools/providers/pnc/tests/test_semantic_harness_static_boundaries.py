@@ -1,4 +1,4 @@
-"""Static Phase 6 guards for semantic submission ownership."""
+"""Static guards for semantic submission ownership and descriptive test naming."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ SERVER_HANDLER_ROOT = (
 TICK_REGISTRATION = re.compile(r"\bEvents\s*\.\s*OnTick\b|\bOnTick\s*\.\s*Add\b")
 
 
-class Phase6StaticBoundaryTests(unittest.TestCase):
+class SemanticHarnessStaticBoundaryTests(unittest.TestCase):
     def test_semantic_input_modules_have_no_tick_polling_registration(self) -> None:
         paths = sorted(SEMANTIC_INPUT_ROOT.glob("Input*.lua"))
         self.assertTrue(paths, "semantic input modules were not found")

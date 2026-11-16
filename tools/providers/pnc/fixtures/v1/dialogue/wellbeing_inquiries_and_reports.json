@@ -130,6 +130,374 @@
         }
       ],
       "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_routed_normal",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "healthState": "normal",
+          "needs": {"hunger": 0.05, "thirst": 0.05, "fatigue": 0.05},
+          "conditionStats": {"stress": 0.0, "panic": 0.0, "boredom": 0.0}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "decision.route": "deterministic",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "routedSituation.npc.healthState": "normal",
+            "routedSituation.npc.needs.highest": "thirst",
+            "routedSituation.npc.needs.urgency": "normal",
+            "response.templateID": {"prefix": "question.wellbeing.default"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_routed_injured",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "healthState": "injured",
+          "needs": {"hunger": 0.05, "thirst": 0.05, "fatigue": 0.05},
+          "conditionStats": {"stress": 0.0, "panic": 0.0, "boredom": 0.0}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "routedSituation.npc.healthState": "injured",
+            "routedSituation.npc.needs.highest": "thirst",
+            "routedSituation.npc.needs.urgency": "normal",
+            "response.templateID": {"prefix": "question.wellbeing.injured"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_routed_thirst",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "healthState": "normal",
+          "needs": {"hunger": 0.05, "thirst": 0.95, "fatigue": 0.05},
+          "conditionStats": {"stress": 0.0, "panic": 0.0, "boredom": 0.0}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "routedSituation.npc.healthState": "normal",
+            "routedSituation.npc.needs.highest": "thirst",
+            "routedSituation.npc.needs.urgency": {"oneOf": ["severe", "emergency", "critical"]},
+            "response.templateID": {"prefix": "question.wellbeing.thirst"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_routed_panic",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "healthState": "normal",
+          "needs": {"hunger": 0.05, "thirst": 0.05, "fatigue": 0.05},
+          "conditionStats": {"stress": 0.0, "panic": 95, "boredom": 0.0}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "routedSituation.npc.healthState": "normal",
+            "routedSituation.npc.emotion.highest": "panic",
+            "response.templateID": {"prefix": "question.wellbeing.panic"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_routed_stress",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "healthState": "normal",
+          "needs": {"hunger": 0.05, "thirst": 0.05, "fatigue": 0.05},
+          "conditionStats": {"stress": 95, "panic": 0.0, "boredom": 0.0}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "routedSituation.npc.healthState": "normal",
+            "response.templateID": {"prefix": "question.wellbeing.stress"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_unknown_health_and_empty_state",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "healthState": null,
+          "activeBehavior": null,
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": {"absent": true},
+            "routedSituation.npc.needs.highest": {"absent": true},
+            "routedSituation.npc.activity.id": "unknown",
+            "routedSituation.npc.emotion.highest": {"absent": true},
+            "response.templateID": {"prefix": "question.wellbeing.unknown"},
+            "messages.0.payload.semanticTemplateID": "question.wellbeing.unknown"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_unknown_health_defers_to_thirst",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {"healthState": null, "needs": {"thirst": 0.95}, "conditionStats": {}}
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": {"absent": true},
+            "response.templateID": {"prefix": "question.wellbeing.thirst"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_unknown_health_defers_to_panic",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {"healthState": null, "needs": {}, "conditionStats": {"panic": 95}}
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": {"absent": true},
+            "response.templateID": {"prefix": "question.wellbeing.panic"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_unknown_health_panic_precedes_thirst",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {"healthState": null, "needs": {"thirst": 0.95}, "conditionStats": {"panic": 95}}
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": {"absent": true},
+            "response.templateID": {"prefix": "question.wellbeing.panic"}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_world_needs_and_activity",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {"activeBehavior": "fishing"},
+        "world": {"thirst": 0.95}
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.activity.id": "fishing",
+            "routedSituation.npc.needs.highest": "thirst",
+            "routedSituation.npc.healthState": "normal"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_live_minor_wound_injured",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "healthState": "normal",
+          "hpCurrent": 95,
+          "hpMax": 100,
+          "bodyHealth": {
+            "overallPercent": 95,
+            "openWoundCount": 0,
+            "bandagedWoundCount": 1,
+            "wounds": {"lower_torso": {"type": "scratch"}}
+          },
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": "injured",
+            "response.templateID": "question.wellbeing.injured"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_canonical_health_normal",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "health": {
+            "state": "normal",
+            "current": 100,
+            "max": 100,
+            "body": {"openWoundCount": 0, "bandagedWoundCount": 0, "infected": false, "overallPercent": 100, "wounds": {}}
+          },
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": "normal",
+            "response.templateID": "question.wellbeing.default"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_canonical_health_injured",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {
+          "health": {
+            "state": "normal",
+            "current": 95,
+            "max": 100,
+            "body": {"openWoundCount": 1, "bandagedWoundCount": 0, "infected": false, "overallPercent": 98, "wounds": {"Hand_L": {"type": "scratch"}}}
+          },
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": "injured",
+            "response.templateID": "question.wellbeing.injured"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_live_incapacitated_injured",
+      "tags": ["dialogue", "wellbeing", "projection"],
+      "scenario": {
+        "npc": {"healthState": "incapacitated", "needs": {}, "conditionStats": {}}
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "routedSituation.npc.healthState": "injured",
+            "response.templateID": "question.wellbeing.injured"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_followup_injured",
+      "tags": ["dialogue", "wellbeing", "multi_turn"],
+      "scenario": {
+        "npc": {"healthState": "injured", "needs": {}, "conditionStats": {}}
+      },
+      "turns": [
+        {"text": "Are you okay?", "expect": {"accepted": true}},
+        {"text": "What's wrong?", "expect": {"response.templateID": "semantic.question.wellbeing.follow_up.injured", "llmCalls": 0, "dispatchTransport": {"count": 0}, "toolCalls": {"count": 0}}}
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_followup_thirst",
+      "tags": ["dialogue", "wellbeing", "multi_turn"],
+      "scenario": {
+        "npc": {"healthState": "normal", "needs": {"thirst": 0.95}, "conditionStats": {}}
+      },
+      "turns": [
+        {"text": "Are you okay?", "expect": {"accepted": true}},
+        {"text": "What's wrong?", "expect": {"response.templateID": "semantic.question.wellbeing.follow_up.thirst", "llmCalls": 0, "dispatchTransport": {"count": 0}, "toolCalls": {"count": 0}}}
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_followup_panic",
+      "tags": ["dialogue", "wellbeing", "multi_turn"],
+      "scenario": {
+        "npc": {"healthState": "normal", "needs": {}, "conditionStats": {"panic": 95}}
+      },
+      "turns": [
+        {"text": "Are you okay?", "expect": {"accepted": true}},
+        {"text": "What's wrong?", "expect": {"response.templateID": "semantic.question.wellbeing.follow_up.panic", "llmCalls": 0, "dispatchTransport": {"count": 0}, "toolCalls": {"count": 0}}}
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_followup_unknown",
+      "tags": ["dialogue", "wellbeing", "multi_turn"],
+      "scenario": {
+        "npc": {"healthState": null, "activeBehavior": null, "needs": {}, "conditionStats": {}}
+      },
+      "turns": [
+        {"text": "Are you okay?", "expect": {"accepted": true}},
+        {"text": "What's wrong?", "expect": {"response.templateID": "semantic.question.wellbeing.follow_up.unknown", "llmCalls": 0, "dispatchTransport": {"count": 0}, "toolCalls": {"count": 0}}}
+      ],
+      "domain": "dialogue"
     }
   ]
 }

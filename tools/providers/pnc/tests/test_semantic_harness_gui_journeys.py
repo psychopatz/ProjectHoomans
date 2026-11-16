@@ -70,7 +70,7 @@ def _invoke_button_with_text(widget: object, text: str) -> bool:
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
-class S10CGuiJourneyTests(SemanticLabGuiTestCase):
+class SemanticHarnessGuiJourneyTests(SemanticLabGuiTestCase):
     def test_tk_selection_validate_apply_and_preset_reconfiguration(self) -> None:
         root = tk.Tk()
         app = self.make_gui_app(root)
@@ -232,7 +232,7 @@ class S10CGuiJourneyTests(SemanticLabGuiTestCase):
 
             # Controlled worker error + restart button recovery
             def broken_request(_worker: object) -> dict[str, object]:
-                raise RuntimeError("injected S10C worker request failure")
+                raise RuntimeError("injected worker request failure")
 
             app._start_operation(broken_request, lambda _resp: None)
             self.wait_for(
@@ -240,7 +240,7 @@ class S10CGuiJourneyTests(SemanticLabGuiTestCase):
                 lambda: not app.busy and bool(msgbox.errors),
                 "expected actionable non-modal error capture on worker failure",
             )
-            self.assertIn("injected S10C worker request failure", msgbox.errors[-1][1])
+            self.assertIn("injected worker request failure", msgbox.errors[-1][1])
 
             app.restart_button.invoke()
             self.wait_for(

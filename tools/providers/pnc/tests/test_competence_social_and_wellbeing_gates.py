@@ -14,7 +14,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class ConversationalCompetenceC7ATests(unittest.TestCase):
+class SocialAndWellbeingGatesTests(unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]

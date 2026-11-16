@@ -26,7 +26,7 @@ def generated_rows(turn: dict) -> list[dict]:
     ]
 
 
-class CoherentConversationC6C7Tests(unittest.TestCase):
+class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
     def test_hostility_generates_semantically_diverse_affordances_and_keeps_authored(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("fuckyouuuu")

@@ -40,7 +40,7 @@ def grounded_scenario(*, language: str = "EN", provider: bool = False) -> dict:
     )
 
 
-class ConversationalCompetenceC7GTests(unittest.TestCase):
+class LocalizationAndFallbackSafetyTests(unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]

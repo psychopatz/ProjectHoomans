@@ -1,4 +1,4 @@
-"""Pure checks for the bounded Phase 6 Semantic Lab measurement helpers."""
+"""Pure checks for the bounded Semantic Lab latency and memory measurement helpers."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import unittest
 from tools.semantic_harness.testing.performance import _distribution, _percentile
 
 
-class Phase6PerformanceHelperTests(unittest.TestCase):
+class SemanticWorkerLatencyAndMemoryBudgetTests(unittest.TestCase):
     def test_percentile_interpolates_bounded_samples(self) -> None:
         self.assertEqual(_percentile([1, 2, 3, 4], 0), 1)
         self.assertEqual(_percentile([1, 2, 3, 4], 100), 4)

@@ -9,7 +9,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class ConversationalCompetenceC7BTests(unittest.TestCase):
+class NeedsAndOfferResolutionTests(unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]

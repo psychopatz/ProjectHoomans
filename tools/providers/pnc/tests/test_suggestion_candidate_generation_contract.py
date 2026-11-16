@@ -9,7 +9,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class ContextualSuggestionsS1Tests(unittest.TestCase):
+class SuggestionCandidateGenerationContractTests(unittest.TestCase):
     def test_preview_is_bounded_repeatable_and_non_executing(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             before = worker.snapshot()

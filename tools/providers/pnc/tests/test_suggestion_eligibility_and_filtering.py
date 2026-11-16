@@ -9,7 +9,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class ContextualSuggestionsS2Tests(unittest.TestCase):
+class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
     def test_typed_all_any_not_predicates_and_fail_closed_results(self) -> None:
         private_scenario = deepcopy(DEFAULT_SCENARIO)
         private_scenario["npc"]["semanticAuthorization"] = {"private": True}

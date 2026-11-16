@@ -37,7 +37,7 @@ def acknowledged_scenario() -> dict:
     )
 
 
-class ContextualConversationC2Tests(unittest.TestCase):
+class CommitmentAuthorityAndReloadTests(unittest.TestCase):
     def test_acknowledged_commitment_survives_knowledge_reload(self) -> None:
         with LuaSemanticWorker(acknowledged_scenario()) as worker:
             accepted = worker.commitment(

@@ -9,7 +9,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class ContextualSuggestionsS3Tests(unittest.TestCase):
+class SuggestionRankingAndStabilityTests(unittest.TestCase):
     def test_semantic_question_click_appends_one_player_turn(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             typed = worker.input("Are you okay?")

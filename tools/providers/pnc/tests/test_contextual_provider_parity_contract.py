@@ -27,7 +27,7 @@ def provider_scenario(enabled: bool) -> dict:
     )
 
 
-class ContextualProviderParityC6CTests(unittest.TestCase):
+class ContextualProviderParityContractTests(unittest.TestCase):
     def test_provider_enabled_reuses_the_same_contextual_plan_and_effects(self) -> None:
         phrases = (
             "Are you okay?",

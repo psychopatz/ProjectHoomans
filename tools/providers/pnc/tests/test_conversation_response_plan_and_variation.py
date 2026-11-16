@@ -18,7 +18,7 @@ from tools.semantic_harness.testing.conversation_fuzz import (
 PROVIDER = "projecthoomans.generated_affordances"
 
 
-class CoherentConversationC10Tests(unittest.TestCase):
+class ConversationResponsePlanAndVariationTests(unittest.TestCase):
     def test_bounded_mutation_matrix_uses_real_worker_and_preserves_action_safety(self) -> None:
         report = run_mutation_matrix()
         self.assertEqual(report["caseCount"], len(DEFAULT_CASES))

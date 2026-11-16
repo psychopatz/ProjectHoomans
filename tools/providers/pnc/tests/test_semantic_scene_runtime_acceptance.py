@@ -59,7 +59,7 @@ ACK = {
 }
 
 
-class SemanticSceneRuntimeS8Acceptance(unittest.TestCase):
+class SemanticSceneRuntimeAcceptanceTests(unittest.TestCase):
     def test_future_domain_registers_without_generic_algorithm_changes(self) -> None:
         fixture = {
             "eventID": "s8:worker:future-domain",

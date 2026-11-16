@@ -1,29 +1,27 @@
-# Semantic Test Subsystem — Final Closure Hardening
+# Semantic Test Subsystem — Final Cleanup
 
 **Status:** COMPLETE.
 
 ## Objective
 
-Finish the All-in-One PSDL Semantic Tester without redesigning its working architecture.
+All-in-one PSDL semantic tester with one declarative behavioral fixture authority, descriptive domain-first test naming, method-level fixture ownership, and committed durable policy.
 
-The current committed vector is healthy:
+Accepted architecture:
 
-- PsychopatzCore `2e47dd256cfc`
-- ProjectHoomans `1638edbc57de`
-- Core fixture/authority acceptance: **17/17 PASS**
-- canonical semantic fixture corpus: **180/180 PASS**
-- fixture files: **38**
-- semantic domains: **11**
-- exact duplicate lint violations: **0**
-- naming violations in active fixture path/suite/case identity: **0**
-- domain/path mismatches: **0**
+    semantic.harness-test.v1
+    → provider resolver
+    → typed fixture operations
+    → compiler probe and/or production Lua worker
+    → comparator
+    → CLI / GUI / batch
 
-The remaining work is closure hardening:
+Final accepted baseline:
 
-1. remove the last ad-hoc GUI regression lane and dead legacy resolver helpers;
-2. make realization/response fixtures assert the behavior their names claim and consolidate redundant response-pool coverage;
-3. finish semantic naming hygiene inside docstrings/descriptions/classification and enforce retained Python test filename policy;
-4. migrate or split the clearest remaining behavioral direct-worker Python tests;
-5. reconcile and commit the durable docs/policies, then rerun the exact committed vector.
-
-Do not create another tester or schema.
+- PsychopatzCore `3dfdf0dc15b4`
+- ProjectHoomans (recorded in `HANDOFF.md` / Git HEAD)
+- Core fixture/authority: **18/18 PASS**
+- canonical fixture corpus: **211/211 PASS**
+- focused retained/migrated Python suites: **24/24 PASS**
+- lint: **38 files / 211 cases / 0 errors** (7 legitimate cross-domain overlap groups, 0 exact duplicates, 0 naming violations, 0 domain/path mismatches)
+- classification ledger: **174 modules / 715 methods** with implementation-specific contracts
+- one GUI behavioral fixture authority; old regression/C0A surfaces removed.

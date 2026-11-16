@@ -15,6 +15,10 @@
         {
           "text": "fuckyou",
           "expect": {
+            "ir.intent": "INSULT",
+            "ir.normalizedText": "fuckyou",
+            "ir.provenance.surfaceRecovery.kind": "compact_alias",
+            "ir.provenance.surfaceRecovery.mutationSafe": false,
             "dispatchTransport": {
               "count": 0
             },
@@ -38,6 +42,10 @@
         {
           "text": "fuckyouuuu",
           "expect": {
+            "ir.intent": "INSULT",
+            "ir.normalizedText": "fuckyouuuu",
+            "ir.provenance.surfaceRecovery.kind": "elongated_compact_alias",
+            "ir.provenance.surfaceRecovery.mutationSafe": false,
             "dispatchTransport": {
               "count": 0
             },
@@ -61,6 +69,10 @@
         {
           "text": "shutthefuckup",
           "expect": {
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.normalizedText": "shutthefuckup",
+            "ir.provenance.surfaceRecovery.kind": "compact_alias",
+            "ir.provenance.surfaceRecovery.mutationSafe": false,
             "dispatchTransport": {
               "count": 0
             },
@@ -84,6 +96,10 @@
         {
           "text": "youidiot",
           "expect": {
+            "ir.intent": "INSULT",
+            "ir.normalizedText": "youidiot",
+            "ir.provenance.surfaceRecovery.kind": "compact_alias",
+            "ir.provenance.surfaceRecovery.mutationSafe": false,
             "dispatchTransport": {
               "count": 0
             },
@@ -107,6 +123,10 @@
         {
           "text": "youreuseless",
           "expect": {
+            "ir.intent": "INSULT",
+            "ir.normalizedText": "youreuseless",
+            "ir.provenance.surfaceRecovery.kind": "compact_alias",
+            "ir.provenance.surfaceRecovery.mutationSafe": false,
             "dispatchTransport": {
               "count": 0
             },
@@ -130,6 +150,10 @@
         {
           "text": "illkillyou",
           "expect": {
+            "ir.intent": "THREATEN",
+            "ir.normalizedText": "illkillyou",
+            "ir.provenance.surfaceRecovery.kind": "compact_alias",
+            "ir.provenance.surfaceRecovery.mutationSafe": false,
             "dispatchTransport": {
               "count": 0
             },
@@ -199,6 +223,10 @@
         {
           "text": "gooo away",
           "expect": {
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.normalizedText": "gooo away",
+            "ir.provenance.surfaceRecovery.kind": "elongation",
+            "ir.provenance.surfaceRecovery.mutationSafe": false,
             "dispatchTransport": {
               "count": 0
             },
@@ -222,6 +250,15 @@
         {
           "text": "i hope you die",
           "expect": {
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.socialContext.maliciousWish": true,
+            "ir.extensions.socialFeatures.directedness": "RECIPIENT",
+            "ir.extensions.socialFeatures.hostility": {
+              "min": 0.8
+            },
+            "ir.extensions.socialFeatures.threat": {
+              "max": 0.499
+            },
             "dispatchTransport": {
               "count": 0
             },
@@ -268,6 +305,11 @@
         {
           "text": "i fucking hate this rain",
           "expect": {
+            "ir.intent": "COMPLAIN",
+            "ir.subject": "WORLD",
+            "ir.extensions.socialFeatures.directedness": "WORLD",
+            "ir.extensions.socialFeatures.hostility": 0,
+            "ir.extensions.socialFeatures.threat": 0,
             "dispatchTransport": {
               "count": 0
             },
@@ -291,6 +333,13 @@
         {
           "text": "i'm fucking starving",
           "expect": {
+            "ir.intent": "INFORM",
+            "ir.subject": "HUNGER",
+            "ir.socialContext.identityClaim": {
+              "absent": true
+            },
+            "ir.extensions.socialFeatures.directedness": "SELF",
+            "ir.extensions.socialFeatures.hostility": 0,
             "dispatchTransport": {
               "count": 0
             },
@@ -314,6 +363,15 @@
         {
           "text": "you're not bad",
           "expect": {
+            "ir.intent": "COMPLIMENT",
+            "ir.socialContext.negatedNegative": true,
+            "ir.extensions.socialFeatures.negatedNegative": true,
+            "ir.extensions.socialFeatures.valence": {
+              "min": 0.01
+            },
+            "ir.extensions.socialFeatures.hostility": {
+              "max": 0.1
+            },
             "dispatchTransport": {
               "count": 0
             },
@@ -337,6 +395,10 @@
         {
           "text": "not really",
           "expect": {
+            "ir.extensions.discourseFrame.replyTo": {
+              "absent": true
+            },
+            "ir.extensions.discourseFrame.contextualSupport": 0,
             "dispatchTransport": {
               "count": 0
             },
@@ -454,6 +516,10 @@
           "expect": {
             "ir.intent": "REQUEST",
             "ir.action": "GIVE",
+            "ir.object.unresolved": false,
+            "decision.branch": "COMMAND_ACCEPTED",
+            "decision.diagnostics.riskAssessment.accepted": true,
+            "decision.diagnostics.riskAssessment.reason": "strict_mutation_admitted",
             "actionResult.accepted": true,
             "actionResult.status": "accepted",
             "actionResult.reason": "network_queued",
@@ -523,12 +589,151 @@
         {
           "text": "give me waterr",
           "expect": {
+            "ir.intent": "REQUEST",
+            "ir.action": "GIVE",
+            "ir.object.unresolved": true,
+            "decision.branch": "ASK_CLARIFICATION",
+            "decision.diagnostics.riskAssessment.accepted": false,
+            "decision.diagnostics.riskAssessment.riskClass": "mutating",
+            "decision.diagnostics.riskAssessment.reason": "unresolved_action_reference",
+            "decision.diagnostics.riskAssessment.unresolvedField": "object",
             "dispatchTransport": {
               "count": 0
             },
             "actionResult.accepted": false,
             "actionResult.status": "semantic_dispatch_blocked",
             "actionResult.reason": "clarification_required"
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.exact_insult_unrecovered",
+      "tags": [
+        "recognition",
+        "safety",
+        "directed_insult"
+      ],
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "ir.intent": "INSULT",
+            "ir.provenance.candidatePass": "exact",
+            "ir.provenance.surfaceRecovery": {
+              "absent": true
+            },
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.recovered_mutating_followme",
+      "tags": [
+        "recognition",
+        "safety",
+        "mutating_rejection"
+      ],
+      "turns": [
+        {
+          "text": "followme",
+          "expect": {
+            "ir.action": {
+              "absent": true
+            },
+            "candidateDiagnostics.reason": "no_eligible_candidate",
+            "candidateDiagnostics.rejections.0.patternID": "pnc.command.follow",
+            "candidateDiagnostics.rejections.0.reason": "recovered_mutating_action",
+            "candidateDiagnostics.rejections.0.details.recovery.mutationSafe": false,
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.recovered_mutating_gohome",
+      "tags": [
+        "recognition",
+        "safety",
+        "mutating_rejection"
+      ],
+      "turns": [
+        {
+          "text": "gohome",
+          "expect": {
+            "ir.action": {
+              "absent": true
+            },
+            "candidateDiagnostics.reason": "no_eligible_candidate",
+            "candidateDiagnostics.rejections.0.patternID": "pnc.command.go_home",
+            "candidateDiagnostics.rejections.0.reason": "recovered_mutating_action",
+            "candidateDiagnostics.rejections.0.details.recovery.mutationSafe": false,
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.direct_threat_ill_kill_you",
+      "tags": [
+        "recognition",
+        "safety",
+        "directed_threat"
+      ],
+      "turns": [
+        {
+          "text": "i'll kill you",
+          "expect": {
+            "ir.intent": "THREATEN",
+            "ir.extensions.socialFeatures.threat": {
+              "min": 0.9
+            },
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.fuzzy_disagree_yeah_rigt",
+      "tags": [
+        "recognition",
+        "fuzzy",
+        "social"
+      ],
+      "turns": [
+        {
+          "text": "yeah rigt",
+          "expect": {
+            "ir.intent": "DISAGREE",
+            "ir.provenance.candidatePass": "fuzzy",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "decision.diagnostics.riskAssessment.accepted": true
           }
         }
       ],

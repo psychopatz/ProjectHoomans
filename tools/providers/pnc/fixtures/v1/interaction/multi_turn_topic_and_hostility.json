@@ -23,8 +23,50 @@
           "text": "not really",
           "expect": {
             "ir.intent": "DISAGREE",
+            "ir.subject": "greeting",
+            "ir.extensions.topic": "greeting",
+            "ir.extensions.discourseFrame.topic": "greeting",
+            "ir.extensions.discourseFrame.topicSource": "pending_interaction",
+            "ir.extensions.discourseFrame.subjectSource": "pending_interaction",
+            "ir.extensions.discourseFrame.replyTo.kind": "pending_interaction",
+            "ir.extensions.discourseFrame.replyTo.flowID": "greeting",
+            "ir.extensions.discourseFrame.contextualSupport": {
+              "min": 0.01
+            },
+            "candidateDiagnostics.reason": "contextual_discourse_candidate",
+            "decision.flow.topic": "greeting",
             "decision.branch": "SOCIAL_ACKNOWLEDGED",
             "response.templateID": "social.acknowledged"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.pending_question_contextual_skepticism",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "social",
+        "disagree",
+        "skeptical"
+      ],
+      "description": "NPC greeting flow followed by player short skeptical disagreement",
+      "turns": [
+        {
+          "text": "hello there",
+          "expect": {
+            "ir.intent": "GREET"
+          }
+        },
+        {
+          "text": "yeah right",
+          "expect": {
+            "ir.intent": "DISAGREE",
+            "ir.modifiers.skeptical": true,
+            "ir.subject": "greeting",
+            "ir.extensions.discourseFrame.replyTo.kind": "pending_interaction",
+            "ir.extensions.discourseFrame.topic": "greeting"
           }
         }
       ],
@@ -143,6 +185,130 @@
           "expect": {
             "ir.subject": "WELLBEING",
             "decision.branch": "QUESTION_RECEIVED"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.topic_interrupt_and_resume_discourse_state",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "topic",
+        "interruption",
+        "resumption"
+      ],
+      "scenario": {
+        "npc": {
+          "needs": {
+            "hunger": 0.9
+          }
+        },
+        "world": {
+          "weather": "rain"
+        }
+      },
+      "turns": [
+        {
+          "text": "do you need anything",
+          "expect": {
+            "ir.intent": "QUESTION"
+          }
+        },
+        {
+          "text": "how many",
+          "expect": {
+            "ir.intent": "QUESTION"
+          }
+        },
+        {
+          "text": "i will get some",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "text": "what is the weather",
+          "expect": {
+            "contextAfter.dialogue.currentTopic": "weather",
+            "contextAfter.dialogue.previousTopic": "needs",
+            "ir.extensions.contextualFollowUp.status": "interrupted",
+            "contextAfter.dialogue.pendingFollowUp.flowID": "needs"
+          }
+        },
+        {
+          "text": "okay",
+          "expect": {
+            "observation.flow.transition": "resume_match",
+            "contextAfter.dialogue.currentTopic": "needs",
+            "contextAfter.dialogue.previousTopic": "weather",
+            "ir.extensions.contextualFollowUp.status": "matched"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.referent_reuse_from_prior_semantic_turn",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "reference",
+        "residence"
+      ],
+      "scenario": {
+        "npc": {
+          "residence": {
+            "label": "Riverside Camp"
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "where is your home",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "text": "what about it",
+          "expect": {
+            "ir.target.resolvedReference": "IT",
+            "ir.target.concept": "NPC_RESIDENCE",
+            "decision.response.selectionSource": "conversation_reference",
+            "messages.0.payload.text": {
+              "contains": "Riverside Camp"
+            }
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.hostility_repair_beat_transition",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "hostility",
+        "apology",
+        "beat"
+      ],
+      "turns": [
+        {
+          "text": "you are useless",
+          "expect": {
+            "ir.intent": "INSULT",
+            "observation.director.contextAfter.active.id": "beat.argument_escalation"
+          }
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "ir.intent": "APOLOGIZE",
+            "observation.director.exited.id": "beat.argument_escalation",
+            "observation.director.entered.id": "beat.reconciliation",
+            "observation.director.contextAfter.active.id": "beat.reconciliation"
           }
         }
       ],
