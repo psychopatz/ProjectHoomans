@@ -1,18 +1,14 @@
-# Progress — Semantic Test Subsystem Fixture Authority Repair
+# Progress — All-in-One PSDL Semantic Tester
 
 **Status:** COMPLETE.
-**Current phase:** R5 (R1–R5 accepted).
-**Next Chunk:** None (all developer-side R1–R5 gates passed).
+**Current phase:** A1–A6 COMPLETE.
+**Next Chunk:** None (parent objective achieved).
 
-## Verified closure state
+## Completed phases
 
-- **R1 (Provider-aware fixture authority):** `ModManager` / `ProviderSpec` / `ActivationPlan` support `fixtureRoots` in `provider.json`; `tools/semantic_harness/testing/resolver.py` resolves `semantic` and `regression` fixture roots from active providers; `ProjectHoomans/tools/providers/pnc/provider.json` declares `semantic` (`tools/providers/pnc/fixtures/v1`) and `regression` (`tools/providers/pnc/fixtures`).
-- **R2 (Retire duplicate Core fixtures):** All 26 PNC-specific duplicate fixture files under `psychopatzCore/tools/semantic_harness/fixtures/` were removed after migrating `testing/cli.py`, `testing/lint.py`, `entrypoints/cli.py`, and `ui/regression_controller.py` to `resolve_fixture_roots` / `resolve_fixture_file`. Active `pnc.semantic-test.v1` fixture authority = 0; duplicate PNC corpus under Core = 0.
-- **R3 (Repair stale fixture expectations):** Updated `c0a.corpus.valid_mutating_request_control` and `c0a.corpus.malformed_mutating_request_tail_typo` in `ProjectHoomans/tools/providers/pnc/fixtures/v1/c0a/semantic_corpus.json` to assert authoritative `actionResult` and `dispatchTransport` safety rather than incidental telemetry counts.
-- **R4 (CLI / GUI / batch parity):** Added `tools/semantic_harness/tests/test_fixture_authority.py` covering active PNC resolution, synthetic second provider isolation, missing/invalid root diagnostics, duplicate-corpus/retired-schema guards, GUI regression controller resolution, default `testing.cli --list`, and default main CLI `--run-semantic-tests` without `--semantic-test-file`.
-- **R5 (Full corpus & parity acceptance):**
-  - canonical PNC fixture lint (`17` files, `116` cases): PASS;
-  - full maintained PNC corpus via default discovery + `LuaSemanticWorker`: `116 / 116` PASS;
-  - behavior, pilot, and observatory parity suites (`16` tests): PASS;
-  - lint, subsystem, and real-Lua batch/cancel/resume (`17` tests): PASS;
-  - Core `test_fixture_authority` + `test_mod_manager` (`20` tests): PASS.
+- **A1 (Typed fixture operation registry):** Implemented `tools/semantic_harness/testing/operations.py` in `psychopatzCore` with allowlisted action IDs (`beat.*`, `behavior.*`, `interaction.preview`, `knowledge.*`, `backstory.*`, `commitment.apply`, `response.*`, `flow.*`, `fact.catalog`, `event.catalog`, `preview`), strict payload validation, and normalized `operation` + `result` envelopes. Added real-production declarative acceptance in `tools/providers/pnc/fixtures/v1/operations/a1_operation_registry.json`.
+- **A2 (Declarative compiler probes):** Implemented `tools/semantic_harness/testing/compiler_probes.py` in `psychopatzCore` exposing `compiler.psdl_validate`, `compiler.psdl_inspect`, `compiler.canonical_ir`, `compiler.portable_plan`, `compiler.backend_projection`, and `compiler.source_lineage` over canonical CodeBuilder APIs, with lazy worker startup in `executor.py`. Added end-to-end `command.camp` + `beat.argument_escalation` acceptance in `tools/providers/pnc/fixtures/v1/compiler/a2_compiler_end_to_end.json`.
+- **A3 (Domain model & all-in-one CLI/GUI):** Added provider-neutral `domain` and `semanticID` metadata in `schema.py` and `loader.py` (`filter_cases`, `discover_domains`), `--domain` / `--semantic-id` / `--list-domains` / `--batch-state` / `--batch-size` in `cli.py`, `execute_cases_batch` (cancel/resume) in `executor.py`, and domain/semantic-ID filtering + batch cancel/resume in the existing GUI Regression tab (`ui/regression_controller.py`, `ui/trace_conversation_builder.py`, `ui/shell.py`).
+- **A4 (Behavioural migration with parity):** Migrated beat/arbitration (`pragmatic_beats_and_arbitration.json`), world knowledge gossip (`world_knowledge_gossip.json`), and follow/stay/wait_at (`follow_and_stay_wait_at.json`) after proving side-by-side parity, and removed the 6 superseded Python behavioural modules while retaining minimal API/inspector contracts (`test_pragmatic_interaction_authoring.py`, `test_world_knowledge_inspector.py`, `test_flow_catalog_contract`, etc.).
+- **A5 (Exhaustive remaining-test classification):** Audited and classified all 194 remaining `tools/providers/pnc/tests/test_*.py` modules (801 methods) in `docs/Jobs/SemanticTestSubsystem/TEST_CLASSIFICATION.json`.
+- **A6 (Final all-in-one acceptance & closure):** Verified full provider-aware fixture corpus (137/137 PASS, including original 116 baseline) and Core fixture/acceptance/authority/dispatch suites from committed vector.

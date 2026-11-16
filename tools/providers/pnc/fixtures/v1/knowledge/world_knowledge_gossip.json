@@ -1,0 +1,193 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.knowledge.gossip",
+  "domain": "knowledge",
+  "cases": [
+    {
+      "id": "knowledge.gossip.alice_witnessed_then_propagate_to_bob",
+      "description": "Alice witnesses zombie pressure, reports it, and propagates told provenance to Bob.",
+      "tags": ["knowledge", "gossip", "multi_turn"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc_alice",
+          "id": "npc_alice",
+          "coreActorID": "actor:alice",
+          "name": "Alice",
+          "forename": "Alice",
+          "affiliation": {"factionID": "faction:one"}
+        },
+        "runtime": {
+          "language": "EN",
+          "semanticCognitionResponses": {
+            "GOSSIP": {"targetID": "self"}
+          },
+          "worldKnowledge": {
+            "actors": [
+              {"id": "npc_alice", "coreActorID": "actor:alice", "name": "Alice", "alive": true},
+              {"id": "npc_bob", "coreActorID": "actor:bob", "name": "Bob", "alive": true}
+            ],
+            "facts": [
+              {
+                "producer": "semantic_lab:scenario",
+                "kind": "zombie.pressure",
+                "eventID": "lab:zombie:episode:1",
+                "subject": {"id": "actor:alice", "kind": "npc"},
+                "occurredAt": 50,
+                "observedAt": 50,
+                "severity": 0.8,
+                "retention": "historical",
+                "payload": {"band": "heavy", "scenarioOwned": true}
+              }
+            ],
+            "acquisitions": [
+              {
+                "actorID": "actor:alice",
+                "factIndex": 1,
+                "provenance": "witnessed",
+                "confidence": 0.95,
+                "source": "scenario_authority",
+                "acquisitionPath": "scenario_authority"
+              }
+            ]
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any gossip?",
+          "expect": {
+            "messages.0.payload.text": {"contains": "I saw"}
+          }
+        },
+        {
+          "action": "knowledge.inspect",
+          "payload": {"actorID": "actor:alice"},
+          "expect": {
+            "operation.status": "ok",
+            "result.finalRealization.statements.0": {"contains": "I saw"}
+          }
+        },
+        {
+          "action": "knowledge.inspect",
+          "payload": {"actorID": "actor:bob"},
+          "expect": {
+            "operation.status": "ok",
+            "result.finalRealization.statements": {"count": 0}
+          }
+        },
+        {
+          "action": "knowledge.propagate",
+          "payload": {
+            "fromActorID": "actor:alice",
+            "toActorID": "actor:bob",
+            "channel": "conversation"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.transferred": {"minCount": 1}
+          }
+        },
+        {
+          "action": "knowledge.inspect",
+          "payload": {"actorID": "actor:bob"},
+          "expect": {
+            "operation.status": "ok",
+            "result.finalRealization.statements.0": "I heard there is heavy zombie pressure nearby."
+          }
+        }
+      ]
+    },
+    {
+      "id": "knowledge.gossip.bob_unknown",
+      "description": "Bob without acquired world knowledge answers unknown gossip.",
+      "tags": ["knowledge", "gossip"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc_bob",
+          "id": "npc_bob",
+          "coreActorID": "actor:bob",
+          "name": "Bob",
+          "forename": "Bob",
+          "affiliation": {"factionID": "faction:one"}
+        },
+        "runtime": {
+          "language": "EN",
+          "semanticCognitionResponses": {
+            "GOSSIP": {"targetID": "self"}
+          },
+          "worldKnowledge": {
+            "actors": [
+              {"id": "npc_alice", "coreActorID": "actor:alice", "name": "Alice", "alive": true},
+              {"id": "npc_bob", "coreActorID": "actor:bob", "name": "Bob", "alive": true}
+            ],
+            "facts": [],
+            "acquisitions": []
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any gossip?",
+          "expect": {
+            "decision.response.selectionID": "semantic.gossip.unknown",
+            "messages.0.payload.text": {"contains": "haven't heard"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "knowledge.gossip.alice_witnessed_tl",
+      "description": "Witnessed world gossip is localized in TL.",
+      "tags": ["knowledge", "gossip", "localization"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc_alice",
+          "id": "npc_alice",
+          "coreActorID": "actor:alice",
+          "name": "Alice",
+          "forename": "Alice",
+          "affiliation": {"factionID": "faction:one"}
+        },
+        "runtime": {
+          "language": "TL",
+          "semanticCognitionResponses": {
+            "GOSSIP": {"targetID": "self"}
+          },
+          "worldKnowledge": {
+            "actors": [
+              {"id": "npc_alice", "coreActorID": "actor:alice", "name": "Alice", "alive": true}
+            ],
+            "facts": [
+              {
+                "producer": "semantic_lab:scenario",
+                "kind": "zombie.pressure",
+                "eventID": "lab:zombie:episode:1",
+                "subject": {"id": "actor:alice", "kind": "npc"},
+                "occurredAt": 50,
+                "observedAt": 50,
+                "severity": 0.8,
+                "retention": "historical",
+                "payload": {"band": "heavy", "scenarioOwned": true}
+              }
+            ],
+            "acquisitions": [
+              {
+                "actorID": "actor:alice",
+                "factIndex": 1,
+                "provenance": "witnessed"
+              }
+            ]
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any gossip?",
+          "expect": {
+            "messages.0.payload.text": "Nakakita ako ng malaking grupo ng mga zombie."
+          }
+        }
+      ]
+    }
+  ]
+}

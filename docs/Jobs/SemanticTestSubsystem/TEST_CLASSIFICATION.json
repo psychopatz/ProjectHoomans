@@ -1,0 +1,1374 @@
+{
+  "schema": "semantic.test-classification.v1",
+  "totalModules": 194,
+  "totalMethods": 801,
+  "categoryCounts": {
+    "COMPILER_CONTRACT": 10,
+    "GUI_CONTRACT": 38,
+    "LOW_LEVEL_RUNTIME_CONTRACT": 112,
+    "NATIVE_INTEGRATION": 14,
+    "PERFORMANCE_RESOURCE": 7,
+    "SAVE_PERSISTENCE": 8,
+    "STATIC_ARCHITECTURE": 5
+  },
+  "modules": [
+    {
+      "module": "test_actor_inspectors.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_app.py",
+      "category": "GUI_CONTRACT",
+      "methods": 9,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_automatic_flow_generation.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 11,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_behavior_fixture_parity.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_c0a_baseline.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 9,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_cli_parity.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_codeblocks.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_coherent_conversation_c10.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_coherent_conversation_c1_c2.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 8,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_coherent_conversation_c3_c4.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 7,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_coherent_conversation_c6_c7.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 8,
+      "usesDirectWorker": true,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_coherent_conversation_c8.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 6,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_companion_orders_hub.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_acceptance_c6b.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_actor_context.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_actor_needs_runtime.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_baseline_matrix.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_bond_catalog_runtime.py",
+      "category": "GUI_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_bonds.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 6,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_choice_provider.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_choice_registry.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c0.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c1.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c2.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c3.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c3b.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c3c.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c3d.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c4a.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c4b.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c4c.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_conversation_c4d.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_dialogue_persona_choices.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_friend_promotion_runtime.py",
+      "category": "GUI_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_provider_parity_c6c.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_ranking.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_relationship_preview.py",
+      "category": "GUI_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_relationship_proposal_runtime.py",
+      "category": "GUI_CONTRACT",
+      "methods": 7,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_runtime_graph.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_runtime_speech.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_scale_isolation.py",
+      "category": "PERFORMANCE_RESOURCE",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+    },
+    {
+      "module": "test_contextual_semantic_hub.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 6,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_social_reactions.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 12,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_speech_behavior.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_speech_style.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_suggestions_followup.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_suggestions_hub_presentation.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_suggestions_s1.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 6,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_suggestions_s2.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_suggestions_s3.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 8,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_suggestions_s4.py",
+      "category": "GUI_CONTRACT",
+      "methods": 7,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_suggestions_whats_up.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_contextual_talk_parity.py",
+      "category": "GUI_CONTRACT",
+      "methods": 22,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_contextual_weather_gate.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_conversation_inspector.py",
+      "category": "GUI_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_conversation_semantic_composition.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_conversational_competence_c7a.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_conversational_competence_c7b.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_conversational_competence_c7c.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_conversational_competence_c7d.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_conversational_competence_c7g.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_core_codebuilder_boundary.py",
+      "category": "STATIC_ARCHITECTURE",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+    },
+    {
+      "module": "test_dialogue_anti_duplication.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_dynamic_camp_destinations.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_faction_community_workbench.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_fixture_provider.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_flow_editor.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 11,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_generation_ownership.py",
+      "category": "STATIC_ARCHITECTURE",
+      "methods": 8,
+      "usesDirectWorker": false,
+      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+    },
+    {
+      "module": "test_gift_capability_binding.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_grounded_personal_dialogue_b0.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_grounded_personal_dialogue_b2.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_grounded_personal_dialogue_b3.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_grounded_personal_dialogue_h3.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_grounded_personal_dialogue_h4.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_gui_saved_pair_entrypoint.py",
+      "category": "GUI_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_gui_test_isolation.py",
+      "category": "GUI_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_harness.py",
+      "category": "PERFORMANCE_RESOURCE",
+      "methods": 24,
+      "usesDirectWorker": true,
+      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+    },
+    {
+      "module": "test_health_wording_authority.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_hub_diagnostics_graph_history.py",
+      "category": "GUI_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_inventory_gift_workbench.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_kahlua_verifier.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_lexicon_compiler.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 9,
+      "usesDirectWorker": false,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_lint.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_live_profiler_provider.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_live_regression_l1.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_live_regression_l2.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_live_regression_l3.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_live_regression_l4.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_live_regression_l5.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_missing_state_audit.py",
+      "category": "STATIC_ARCHITECTURE",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+    },
+    {
+      "module": "test_native_effect_acceptance.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_needs_wording_authority.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_observatory_fixture_parity.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 7,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_open_ended_semantic_combat_awareness.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_operational_acceptance.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_operational_world_browser.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_package_boundaries.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_package_entrypoint.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_phase6_performance.py",
+      "category": "PERFORMANCE_RESOURCE",
+      "methods": 2,
+      "usesDirectWorker": false,
+      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+    },
+    {
+      "module": "test_phase6_static_boundaries.py",
+      "category": "STATIC_ARCHITECTURE",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+    },
+    {
+      "module": "test_pilot_parity.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_player_engine_state.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_portable_c6_matrix.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_pragmatic_interaction_authoring.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_pragmatic_interaction_beat_inspector.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_pragmatic_interaction_compiler.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_pragmatic_interaction_observations.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_pragmatic_interaction_r6.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_pragmatic_interaction_r9.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_pragmatic_interaction_recovery_r2.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_production_faction_rehydration.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_production_inventory_rehydration.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_production_leave_group.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_production_mutations.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_production_rehydration.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_production_social_context.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_python_acceptance_runner.py",
+      "category": "PERFORMANCE_RESOURCE",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+    },
+    {
+      "module": "test_quest_flow_binding.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_real_save_production_runtime.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_response_observatory.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 10,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_response_observatory_matrix.py",
+      "category": "GUI_CONTRACT",
+      "methods": 20,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_runner.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_runtime_config.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_runtime_package.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_s10a_label_speech_realization.py",
+      "category": "GUI_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_s10a_provider_worker_startup.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_s10c_gui_journeys.py",
+      "category": "GUI_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_s10r1_worker_precision_and_history.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_save_backed_conversation.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_save_backed_snapshot.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_save_browser.py",
+      "category": "GUI_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_save_catalog.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 7,
+      "usesDirectWorker": false,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_save_import.py",
+      "category": "SAVE_PERSISTENCE",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+    },
+    {
+      "module": "test_saved_world_relationship_lens.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_semantic_authority_boundaries.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 11,
+      "usesDirectWorker": false,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_semantic_blocks.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_category_ownership.py",
+      "category": "STATIC_ARCHITECTURE",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+    },
+    {
+      "module": "test_semantic_combat_observatory.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_definition_compiler.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_semantic_dialogue_flows.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 8,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_identity_wellbeing_collision.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 13,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_interaction_continuation_contract.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_semantic_interaction_lifecycle.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_interaction_lifecycle_acceptance.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_lab_npc_profiles.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_lab_persona_surface.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_lab_persona_workflow.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_semantic_live_parity.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_semantic_observatory_codebuilder_lineage.py",
+      "category": "GUI_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_semantic_observatory_scale.py",
+      "category": "PERFORMANCE_RESOURCE",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+    },
+    {
+      "module": "test_semantic_observatory_translation_coverage.py",
+      "category": "GUI_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_semantic_paraphrases.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_provider_parity.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_scene_observatory.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_scene_runtime_s8_acceptance.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_simulation_ux.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_semantic_test_subsystem.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 10,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_semantic_translation_integration.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_semantic_tree_projection.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_session_envelope_contract.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_shared_actor_conversation_service.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_simulation_workbench.py",
+      "category": "GUI_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_social_apology_wording_authority.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": true,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_startup_session_parity.py",
+      "category": "GUI_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_stateful_capability_refresh.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_structured_inventory.py",
+      "category": "GUI_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_suite.py",
+      "category": "PERFORMANCE_RESOURCE",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+    },
+    {
+      "module": "test_surface_consolidation.py",
+      "category": "GUI_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_sweep_acceptance.py",
+      "category": "PERFORMANCE_RESOURCE",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+    },
+    {
+      "module": "test_sweep_batch.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 6,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_sweep_foundation.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 10,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_sweep_planner.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 9,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_sweep_quality.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_sweep_reachability.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 8,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_sweep_ui.py",
+      "category": "GUI_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_tool_call_formatting.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_transcript.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_transport_evidence.py",
+      "category": "NATIVE_INTEGRATION",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+    },
+    {
+      "module": "test_ui_organization.py",
+      "category": "GUI_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_ui_state_persistence.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_unified_authority_event_followup.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_unified_evidence_e0.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_unified_evidence_e1.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_unified_evidence_e2.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_unified_evidence_e3.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_unified_evidence_e4.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 4,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_unified_evidence_e5.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_unified_evidence_e6.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_unified_evidence_e7.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 5,
+      "usesDirectWorker": false,
+      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+    },
+    {
+      "module": "test_wellbeing_projection.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 12,
+      "usesDirectWorker": true,
+      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+    },
+    {
+      "module": "test_wellbeing_wording_authority.py",
+      "category": "COMPILER_CONTRACT",
+      "methods": 3,
+      "usesDirectWorker": true,
+      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+    },
+    {
+      "module": "test_worker_session.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_world_knowledge_gui.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": false,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    },
+    {
+      "module": "test_world_knowledge_inspector.py",
+      "category": "GUI_CONTRACT",
+      "methods": 1,
+      "usesDirectWorker": true,
+      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+    }
+  ]
+}

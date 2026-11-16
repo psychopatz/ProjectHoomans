@@ -1,0 +1,410 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.operations.a1",
+  "cases": [
+    {
+      "id": "ops.beat.catalog_validate_register_preview",
+      "description": "Verify beat.catalog, beat.validate, beat.register, and beat.preview against production Lua.",
+      "tags": ["operations", "beats"],
+      "turns": [
+        {
+          "action": "beat.catalog",
+          "expect": {
+            "operation.status": "ok",
+            "result.beatCount": {"min": 1},
+            "result.behaviorCount": {"min": 1}
+          }
+        },
+        {
+          "action": "beat.validate",
+          "payload": {
+            "definition": {
+              "id": "beat.fixture_a1_argument",
+              "owner": "SemanticTest",
+              "version": 1,
+              "domain": "social",
+              "domainPath": "social/conflict",
+              "group": "beat_group.social_primary",
+              "baseRelevance": 0.99,
+              "cooldownTurns": 3,
+              "maxTurns": 6,
+              "stimuli": ["HUMAN_UTTERANCE", "NPC_SEMANTIC_ACT"],
+              "entry": {
+                "op": "in",
+                "path": "stimulus.semantic.speechAct",
+                "values": ["INSULT", "HOSTILE_REMARK", "THREATEN"]
+              },
+              "maintain": {
+                "op": "gt",
+                "path": "history.hostilityCount",
+                "value": 0
+              },
+              "exit": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "APOLOGIZE"
+              },
+              "candidates": [
+                {"behavior": "behavior.warn", "relevance": 1.0}
+              ]
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true
+          }
+        },
+        {
+          "action": "beat.register",
+          "payload": {
+            "definition": {
+              "id": "beat.fixture_a1_argument",
+              "owner": "SemanticTest",
+              "version": 1,
+              "domain": "social",
+              "domainPath": "social/conflict",
+              "group": "beat_group.social_primary",
+              "baseRelevance": 0.99,
+              "cooldownTurns": 3,
+              "maxTurns": 6,
+              "stimuli": ["HUMAN_UTTERANCE", "NPC_SEMANTIC_ACT"],
+              "entry": {
+                "op": "in",
+                "path": "stimulus.semantic.speechAct",
+                "values": ["INSULT", "HOSTILE_REMARK", "THREATEN"]
+              },
+              "maintain": {
+                "op": "gt",
+                "path": "history.hostilityCount",
+                "value": 0
+              },
+              "exit": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "APOLOGIZE"
+              },
+              "candidates": [
+                {"behavior": "behavior.warn", "relevance": 1.0}
+              ]
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.registered": true
+          }
+        },
+        {
+          "action": "beat.preview",
+          "payload": {
+            "definition": {
+              "id": "beat.fixture_a1_preview",
+              "owner": "SemanticTest",
+              "version": 1,
+              "domain": "social",
+              "domainPath": "social/conflict",
+              "group": "beat_group.social_primary",
+              "baseRelevance": 0.99,
+              "cooldownTurns": 3,
+              "maxTurns": 6,
+              "stimuli": ["HUMAN_UTTERANCE", "NPC_SEMANTIC_ACT"],
+              "entry": {
+                "op": "in",
+                "path": "stimulus.semantic.speechAct",
+                "values": ["INSULT", "HOSTILE_REMARK", "THREATEN"]
+              },
+              "maintain": {
+                "op": "gt",
+                "path": "history.hostilityCount",
+                "value": 0
+              },
+              "exit": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "APOLOGIZE"
+              },
+              "candidates": [
+                {"behavior": "behavior.warn", "relevance": 1.0}
+              ]
+            },
+            "text": "you are an idiot"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true,
+            "result.previewed": true,
+            "result.mutatedConversation": false,
+            "result.registered": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "ops.behavior.validate_and_register",
+      "description": "Verify behavior.validate and behavior.register in a disposable worker.",
+      "tags": ["operations", "behaviors"],
+      "turns": [
+        {
+          "action": "behavior.validate",
+          "payload": {
+            "definition": {
+              "id": "behavior.fixture_a1_ack",
+              "owner": "SemanticTest",
+              "version": 1,
+              "act": "ACKNOWLEDGE",
+              "domain": "scene",
+              "domainPath": "scene/excursion",
+              "baseRelevance": 1.0,
+              "mode": "one_shot",
+              "modifiers": [],
+              "requiredCapabilities": [],
+              "stimuli": ["NPC_SEMANTIC_ACT"],
+              "when": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "ACKNOWLEDGE_EXCURSION"
+              },
+              "outputs": {
+                "speech": {
+                  "contentTemplateID": "social.acknowledged",
+                  "dialogueAct": "ACKNOWLEDGE"
+                }
+              },
+              "continuation": {
+                "inheritEventRefs": true,
+                "inheritFactRefs": true,
+                "mode": "terminate",
+                "target": "none"
+              }
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true
+          }
+        },
+        {
+          "action": "behavior.register",
+          "payload": {
+            "definition": {
+              "id": "behavior.fixture_a1_ack",
+              "owner": "SemanticTest",
+              "version": 1,
+              "act": "ACKNOWLEDGE",
+              "domain": "scene",
+              "domainPath": "scene/excursion",
+              "baseRelevance": 1.0,
+              "mode": "one_shot",
+              "modifiers": [],
+              "requiredCapabilities": [],
+              "stimuli": ["NPC_SEMANTIC_ACT"],
+              "when": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "ACKNOWLEDGE_EXCURSION"
+              },
+              "outputs": {
+                "speech": {
+                  "contentTemplateID": "social.acknowledged",
+                  "dialogueAct": "ACKNOWLEDGE"
+                }
+              },
+              "continuation": {
+                "inheritEventRefs": true,
+                "inheritFactRefs": true,
+                "mode": "terminate",
+                "target": "none"
+              }
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.registered": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "ops.knowledge.inspect_and_propagate",
+      "description": "Verify world knowledge inspection and propagation through production Lua.",
+      "tags": ["operations", "knowledge"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc_alice",
+          "id": "npc_alice",
+          "coreActorID": "actor:alice",
+          "name": "Alice"
+        },
+        "runtime": {
+          "worldKnowledge": {
+          "actors": [
+            {
+              "id": "npc_alice",
+              "coreActorID": "actor:alice",
+              "name": "Alice",
+              "alive": true
+            },
+            {
+              "id": "npc_bob",
+              "coreActorID": "actor:bob",
+              "name": "Bob",
+              "alive": true
+            }
+          ],
+          "facts": [
+            {
+              "producer": "semantic_lab:scenario",
+              "kind": "zombie.pressure",
+              "eventID": "lab:zombie:episode:1",
+              "subject": {"id": "actor:alice", "kind": "npc"},
+              "occurredAt": 50,
+              "observedAt": 50,
+              "severity": 0.8,
+              "retention": "historical",
+              "payload": {"band": "heavy", "scenarioOwned": true}
+            }
+          ],
+          "acquisitions": [
+            {
+              "actorID": "actor:alice",
+              "factIndex": 1,
+              "provenance": "witnessed",
+              "confidence": 0.95,
+              "source": "scenario_authority",
+              "acquisitionPath": "scenario_authority"
+            }
+          ]
+          }
+        }
+      },
+      "turns": [
+        {
+          "action": "knowledge.inspect",
+          "payload": {
+            "actorID": "actor:alice"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.finalRealization.statements": {"minCount": 1}
+          }
+        },
+        {
+          "action": "knowledge.propagate",
+          "payload": {
+            "fromActorID": "actor:alice",
+            "toActorID": "actor:bob",
+            "channel": "conversation"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.transferred": {"minCount": 1}
+          }
+        },
+        {
+          "action": "knowledge.inspect",
+          "payload": {
+            "actorID": "actor:bob"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.finalRealization.statements": {"minCount": 1}
+          }
+        }
+      ]
+    },
+    {
+      "id": "ops.backstory.inspect_and_fact",
+      "description": "Verify deterministic backstory projection and fact lookup.",
+      "tags": ["operations", "backstory"],
+      "turns": [
+        {
+          "action": "backstory.inspect",
+          "payload": {
+            "identitySeed": 104729,
+            "tacticalClass": "colonist"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.profile.identitySeed": 104729
+          }
+        },
+        {
+          "action": "backstory.fact",
+          "payload": {
+            "identitySeed": 104729,
+            "kind": "former_job",
+            "tacticalClass": "colonist",
+            "language": "EN"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.fact.kind": "former_job",
+            "result.fact.value": "farmer"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ops.response.list_explain_sample",
+      "description": "Verify response pool listing, explanation, and sampling.",
+      "tags": ["operations", "realization"],
+      "turns": [
+        {
+          "action": "response.list",
+          "payload": {
+            "limit": 8
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.pools": {"minCount": 1}
+          }
+        },
+        {
+          "action": "response.explain",
+          "payload": {
+            "poolID": "semantic.combat.human_kill.aggressive",
+            "context": {},
+            "salt": "a1-seed"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.poolID": "semantic.combat.human_kill.aggressive"
+          }
+        },
+        {
+          "action": "response.sample",
+          "payload": {
+            "poolID": "semantic.combat.human_kill.aggressive",
+            "context": {},
+            "salt": "a1-seed"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.poolID": "semantic.combat.human_kill.aggressive"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ops.flow.coverage_and_catalog",
+      "description": "Verify flow coverage and catalog operations.",
+      "tags": ["operations", "flows"],
+      "turns": [
+        {
+          "action": "flow.coverage",
+          "expect": {
+            "operation.status": "ok",
+            "result.count": {"min": 1},
+            "result.capabilityCoverage": {"minCount": 1}
+          }
+        },
+        {
+          "action": "flow.catalog",
+          "expect": {
+            "operation.status": "ok",
+            "result.flows": {"minCount": 1}
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.actions.follow_stay_wait_at",
+  "domain": "actions",
+  "cases": [
+    {
+      "id": "actions.follow.preview_commit_and_negation",
+      "description": "Verify FOLLOW preview is pure, committed FOLLOW dispatches pnc:companion.follow, and negated/question/ambiguous do not dispatch.",
+      "tags": ["actions", "command", "follow"],
+      "turns": [
+        {
+          "action": "preview",
+          "text": "Follow me",
+          "expect": {
+            "type": "preview",
+            "observation.ir.action": "FOLLOW",
+            "observation.capabilityBinding.id": "pnc:companion.follow",
+            "observation.sideEffects.noGameplayEffects": true,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "text": "Follow me",
+          "expect": {
+            "ir.intent": "REQUEST",
+            "ir.action": "FOLLOW",
+            "ir.provenance.pattern": "pnc.command.follow",
+            "decision.branch": "COMMAND_ACCEPTED",
+            "observation.flow.generated": true,
+            "observation.flow.matched": true,
+            "observation.flow.resultNodeId": "queued",
+            "actionResult.commandID": "follow",
+            "actionResult.accepted": true,
+            "actionResult.reason": "network_queued",
+            "actionResult.capabilityID": "pnc:companion.follow"
+          }
+        },
+        {
+          "text": "Don't follow me",
+          "expect": {
+            "ir.action": "STOP",
+            "actionResult.commandID": "stay",
+            "dispatchTransport.0.payload.commandID": {"notEquals": "follow"}
+          }
+        },
+        {
+          "text": "Are you following me?",
+          "expect": {
+            "ir.intent": {"notEquals": "REQUEST"},
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "maybe follow me",
+          "expect": {
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ]
+    },
+    {
+      "id": "actions.stay_and_wait_at.distinct_routes",
+      "description": "Verify STAY uses pnc:companion.stay and WAIT_AT uses pnc:task.wait_at.",
+      "tags": ["actions", "command", "stay", "wait_at"],
+      "turns": [
+        {
+          "action": "preview",
+          "text": "Wait at the campfire",
+          "expect": {
+            "observation.ir.action": "WAIT_AT",
+            "observation.capabilityBinding.id": "pnc:task.wait_at",
+            "observation.sideEffects.noGameplayEffects": true,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "text": "Stay here",
+          "expect": {
+            "ir.action": "STAY",
+            "ir.provenance.pattern": "pnc.command.wait",
+            "actionResult.commandID": "stay",
+            "actionResult.accepted": true,
+            "actionResult.capabilityID": "pnc:companion.stay"
+          }
+        },
+        {
+          "text": "Wait at the campfire",
+          "expect": {
+            "ir.action": "WAIT_AT",
+            "actionResult.accepted": true,
+            "actionResult.capabilityID": "pnc:task.wait_at"
+          }
+        },
+        {
+          "text": "Are you waiting at the campfire?",
+          "expect": {
+            "ir.intent": {"notEquals": "REQUEST"},
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ]
+    }
+  ]
+}

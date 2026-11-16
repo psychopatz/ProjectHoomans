@@ -1,0 +1,131 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.compiler.a2",
+  "domain": "compiler",
+  "cases": [
+    {
+      "id": "compiler.command_camp_end_to_end",
+      "description": "Trace command.camp from authored PSDL source through canonical IR, Portable Dialogue Plan, PZ backend projection, source lineage, and live Lua runtime.",
+      "tags": ["compiler", "actions", "end_to_end"],
+      "semanticID": "command.camp",
+      "turns": [
+        {
+          "action": "compiler.psdl_validate",
+          "payload": {
+            "recordID": "command.camp"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true,
+            "result.record.id": "command.camp",
+            "result.record.kind": "dialogue"
+          }
+        },
+        {
+          "action": "compiler.psdl_inspect",
+          "payload": {
+            "recordID": "command.camp",
+            "mode": "summary"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.id": "command.camp",
+            "result.kind": "dialogue",
+            "result.owner": "ProjectHoomans",
+            "result.action.capability": "hoomans.camp.establish",
+            "result.outcomes": {"contains": "queued"}
+          }
+        },
+        {
+          "action": "compiler.canonical_ir",
+          "payload": {
+            "recordID": "command.camp"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.id": "command.camp",
+            "result.payload.action.capability": "hoomans.camp.establish"
+          }
+        },
+        {
+          "action": "compiler.portable_plan",
+          "payload": {
+            "recordID": "command.camp",
+            "section": "dialogues"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.id": "command.camp",
+            "result.entry.action.capability": "hoomans.camp.establish",
+            "result.entry.reply.queued": {"exists": true}
+          }
+        },
+        {
+          "action": "compiler.backend_projection",
+          "payload": {
+            "recordID": "command.camp",
+            "backend": "pz-lua"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.backend": "pz-lua",
+            "result.id": "command.camp",
+            "result.projection.payload.action.capability": "hoomans.camp.establish"
+          }
+        },
+        {
+          "action": "compiler.source_lineage",
+          "payload": {
+            "recordID": "command.camp"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.id": "command.camp",
+            "result.package": "ProjectHoomans",
+            "result.portablePlanSection": "dialogues",
+            "result.generatedModules": {"minCount": 1}
+          }
+        },
+        {
+          "text": "make camp here",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "REQUEST",
+            "ir.action": "CAMP"
+          }
+        }
+      ]
+    },
+    {
+      "id": "compiler.beat_argument_escalation_linkage",
+      "description": "Verify PSDL inspection and lineage for beat.argument_escalation.",
+      "tags": ["compiler", "beats"],
+      "semanticID": "beat.argument_escalation",
+      "turns": [
+        {
+          "action": "compiler.psdl_inspect",
+          "payload": {
+            "recordID": "beat.argument_escalation",
+            "mode": "impact"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.id": "beat.argument_escalation",
+            "result.kind": "beat",
+            "result.directDependencies": {"contains": "behavior.warn"}
+          }
+        },
+        {
+          "action": "compiler.source_lineage",
+          "payload": {
+            "recordID": "beat.argument_escalation"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.portablePlanSection": "beats"
+          }
+        }
+      ]
+    }
+  ]
+}
