@@ -1,8 +1,8 @@
 -- Shared local definition index for Project Hoomans authoring tools.
 --
--- The index intentionally stays at Hoomans/UniqueNPCIndex.txt for backwards
--- compatibility.  Individual definitions are separated by kind so the
--- Unique NPC and Puppet Opera editors can never collide on filenames.
+-- The index is shared by the canonical local authoring stores.  Individual
+-- definitions are separated by kind so NPC, starter-preset, and Puppet Opera
+-- editors can never collide on filenames.
 
 PNC = PNC or {}
 PNC.DefinitionDatabase = PNC.DefinitionDatabase or {}
@@ -18,6 +18,7 @@ local MAX_FILE_LINES = 16384
 
 local DIRECTORIES = {
     npc = "NPC Definitions",
+    starter = "Starting Companion Presets",
     opera = "Opera Definitions",
 }
 
@@ -131,9 +132,6 @@ local function emptyIndex()
         schemaVersion = 2,
         kind = "ProjectHoomans.DefinitionIndex",
         entries = {},
-        -- Keep the old field as a compatibility view for older tools. It
-        -- contains only NPC basenames and is never the source of truth.
-        files = {},
     }
 end
 
@@ -148,22 +146,6 @@ local function loadIndex()
     if type(payload) == "table" and type(payload.entries) == "table" then
         for _, rawEntry in ipairs(payload.entries) do
             entry = normalizeEntry(rawEntry)
-            if entry and not seen[entryKey(entry.definitionType, entry.fileName)] then
-                seen[entryKey(entry.definitionType, entry.fileName)] = true
-                index.entries[#index.entries + 1] = entry
-            end
-        end
-    end
-
-    -- Old UniqueNPCIndex files only listed flat NPC files. Keep them readable
-    -- and migrate their records into the new NPC Definitions namespace on the
-    -- next write.
-    if type(payload) == "table" and type(payload.files) == "table" then
-        for _, fileName in ipairs(payload.files) do
-            entry = normalizeEntry({
-                definitionType = "npc",
-                fileName = fileName,
-            })
             if entry and not seen[entryKey(entry.definitionType, entry.fileName)] then
                 seen[entryKey(entry.definitionType, entry.fileName)] = true
                 index.entries[#index.entries + 1] = entry
@@ -187,11 +169,6 @@ end
 local function saveIndex(index)
     local payload = emptyIndex()
     payload.entries = index.entries or {}
-    for _, entry in ipairs(payload.entries) do
-        if entry.definitionType == "npc" then
-            payload.files[#payload.files + 1] = entry.fileName
-        end
-    end
     return writeText(INDEX_PATH, encode(payload))
 end
 
@@ -229,14 +206,6 @@ function Database.ReadFile(kind, fileName)
     if not path then return nil, "invalid_definition_path" end
     local content, reason = readText(path)
     if content then return content, path end
-
-    -- Existing NPC drafts were written directly under Hoomans. Read them as
-    -- a migration fallback, but never write new definitions there.
-    if validKind(kind) == "npc" then
-        local legacyPath = ROOT .. "/" .. tostring(fileName)
-        content, reason = readText(legacyPath)
-        if content then return content, legacyPath end
-    end
     return nil, reason or "file_missing"
 end
 

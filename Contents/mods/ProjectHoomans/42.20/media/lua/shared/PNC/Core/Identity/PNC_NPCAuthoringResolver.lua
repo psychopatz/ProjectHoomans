@@ -110,6 +110,25 @@ local function relationshipPolicy(spec)
     local policy = {
         id = "starting-companion:" .. tostring(spec and spec.id or "unknown"),
         bindings = {},
+        -- Starter authority is applied by StartingCompanionService after
+        -- character creation.  The same policy metadata is consumed by the
+        -- client import sanitizer; it is not a UI-only deny list.
+        serverControlledFields = {
+            ["factionID"] = true,
+        },
+        serverControlledKeys = {
+            id = true,
+            uniqueDefinitionId = true,
+            runtimeID = true,
+            npcID = true,
+            ownerID = true,
+            ownerUsername = true,
+            playerUUID = true,
+            communityID = true,
+            position = true,
+            debug = true,
+            debugAuthorized = true,
+        },
         required = {
             ["identity.forename"] = true,
             ["identity.surname"] = true,
