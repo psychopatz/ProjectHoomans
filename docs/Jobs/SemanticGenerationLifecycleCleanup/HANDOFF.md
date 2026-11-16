@@ -4,17 +4,17 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "G1"
-phase_commit_message: "phase(G1): add CodeBuilder generation recipe and effect-free desired-artifact ledger"
-updated_at: "2026-11-16T12:48:24.258516Z"
+phase_commit_phase: "G2"
+phase_commit_message: "phase(G2): implement dry/check-mode reconciler and fixture detection tests"
+updated_at: "2026-11-16T12:54:33.223519Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
-phase: "G2"
-chunk: "G2A — Implement check-mode reconciler and fixture detection tests"
+phase: "G3"
+chunk: "G3A — Unify apply-mode cleanup, mixed UI key ownership, and transaction-safety tests"
 retrieval_tier: "verify"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=8ad666bc9dd524ea99cea17093aac1101dad90f2;dynamic-trading=9c8cb3dead56d66e32fccb901b9abd3dd6c2f393"
-phase_residual_vector: "project-hoomans=360b2b3e6e567149dd34fcc418f6a02441393d0be8fc6378c06cd7ceabd93167;psychopatz-core=98c4feb14bac393496f4679faf59200587d2260968b87ce88648bec1aff92c8e;dynamic-trading=3ed15f0cd080d9eb1ebcf5d1bbab66bbfdb230223af48407f02091a54ce020a5"
-residual_worktree_fingerprint: "360b2b3e6e567149dd34fcc418f6a02441393d0be8fc6378c06cd7ceabd93167"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=2ecec30164c553110e4b8cb14c33709ab1a50ed5;dynamic-trading=9c8cb3dead56d66e32fccb901b9abd3dd6c2f393"
+phase_residual_vector: "project-hoomans=b7afdbb8d6a67793eb7a15d2b5142e7305e0b9cb0d423ac4bd500fbe07bbddc3;psychopatz-core=98c4feb14bac393496f4679faf59200587d2260968b87ce88648bec1aff92c8e;dynamic-trading=3ed15f0cd080d9eb1ebcf5d1bbab66bbfdb230223af48407f02091a54ce020a5"
+residual_worktree_fingerprint: "b7afdbb8d6a67793eb7a15d2b5142e7305e0b9cb0d423ac4bd500fbe07bbddc3"
 codebase_memory_indexed_commit: "02c7fb18e714bf1a3adce052c0659a972313f081"
 ---
 
@@ -23,12 +23,12 @@ codebase_memory_indexed_commit: "02c7fb18e714bf1a3adce052c0659a972313f081"
 
 ## What became true
 
-- Accepted G1: added `generation_recipe.json` and `generation_recipe.py` in `psychopatzCore/tools/semantic_harness/codebuilder/`, fixed `uiLocations` owner precedence in `conversation_compiler.py`, extracted effect-free `plan_runtime_text_catalogs()` in `conversation_text_catalog.py`, and implemented `build_desired_artifact_ledger()`.
-- Verified with unit tests that the recipe fails closed on unknown owners/policies/generators and builds the complete 3-repo desired ledger without touching disk.
+- Accepted G2: implemented `reconcile.py` (`reconcile_check`, `check_owner_surface_state`, CLI `--check`) in `psychopatzCore/tools/semantic_harness/codebuilder/reconcile.py`.
+- Added `test_reconcile_check.py` proving accurate detection of `missing`, `drifted`, `stale` (Lua and `Conversation/Text`), `retired_present` (files and mixed keys), `ambiguous` unknown neighbors, and `preserved` authored modules/keys with zero filesystem writes.
 
 ## Remaining
 
-- Implement G2–G6: check-mode reconciler (G2), apply-mode safe cleanup + mixed UI key ownership (G3), programmatic legacy retirement and repository cleanup (G4), regression and determinism closure (G5), and durable agent workflow/documentation acceptance (G6).
+- Implement G3–G6: apply-mode safe cleanup + mixed UI key ownership unification (G3), programmatic legacy retirement and repository cleanup (G4), regression and determinism closure (G5), and durable agent workflow/documentation acceptance (G6).
 
 ## Resume
 
@@ -37,16 +37,15 @@ Retrieve current structure rather than relying on a copied dependency inventory.
 
 Exact next action:
 
-1. Implement `psychopatzCore/tools/semantic_harness/codebuilder/reconcile.py` with check-mode inspection and fixture tests covering Lua, ordinary translation, `Conversation/Text`, retired paths, unknown neighbors, and mixed UI catalogs.
-2. Run G2 tests, commit G2, and continue into G3.
+1. Wire `write_conversation_output()` in `build.py` and `reconcile_apply()` to share unified closed-set reconciliation and mixed UI key ownership, add `test_reconcile_apply.py`, and accept G3.
 
 ## Evidence
 
-- `TEST_VERIFIED`: 19 tests pass across `test_generation_recipe`, `test_codebuilder`, `test_conversation_text_catalog`, and `test_convo_engine_s9h6_build_planner`.
+- `TEST_VERIFIED`: `tools.semantic_harness.tests.test_reconcile_check` and `tools.semantic_harness.tests.test_generation_recipe` pass.
 
 ## Expensive discoveries worth preserving
 
-- `build_desired_artifact_ledger()` includes preserved package catalogs from `conversation_translations` in `manifests/Conversation.json` when present on disk so package-authored translation files remain registered in `CustomTranslationManager` while retired catalogs disappear automatically once pruned.
+- When an owner has an existing `Conversation/UI.json` on disk (or in a fixture) even with 0 currently emitted generated UI keys, `build_desired_artifact_ledger()` emits an empty-generated-keys `mixed_key_catalog` row so formerly generated keys or retired keys in that `UI.json` are still reconciled while authored keys remain preserved.
 
 ## Blockers / open decisions
 
@@ -54,4 +53,4 @@ Exact next action:
 
 ## Acceptance
 
-G1 gate passed: recipe + ledger describe current generation with zero runtime writes and fail closed on unknown owners/policies.
+G2 gate passed: fixture tests demonstrate accurate check-mode detection across Lua, ordinary translation, Text translation, retired paths, unknown neighbors, and mixed UI catalog cases with zero writes.

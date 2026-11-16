@@ -46,7 +46,7 @@ The ledger must cover all enabled owners and artifact classes required by this j
 
 ## G2 — Check-mode reconciler
 
-**Status:** NOT STARTED.
+**Status:** ACCEPTED (`CODE_VERIFIED`, `TEST_VERIFIED`).
 
 Implement the canonical reconciliation entrypoint in dry/check mode.
 
