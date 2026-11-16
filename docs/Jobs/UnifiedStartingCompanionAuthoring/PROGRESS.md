@@ -1,6 +1,6 @@
 # Progress — Unified Starting Companion Authoring
 
-**Status:** P4 implementation complete; P5 developer verification next
+**Status:** P5 developer gates complete; P6 native acceptance is user-owned
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -39,66 +39,58 @@ removed, rebound, and regenerated fields.
 
 ### P4 — authority handoff and lifecycle
 
-Implementation is complete in the current worktree; the exact phase-owned
-paths are ready for the local P4 commit.
+Accepted in local commit `e15aefea`.
 
-The implementation now provides:
+The versioned sparse envelope supports SP, listen-server, and MP with explicit
+protocol/registry compatibility, atomic compact decode, strict authority-key
+rejection, and a bounded pending/received/validated/defaulted/grants-complete
+state machine. Final resolution uses the actual character UUID, descriptor,
+social orientation, relationship policy, and existing
+`StartingCompanionService`. Timeout/default behavior, payload ordering,
+reconnect idempotence, replacement-survivor UUID semantics, and the
+millisecond-vs-world-age clock boundary are covered.
 
-- one versioned sparse-envelope handoff for SP, listen-server, and MP;
-- explicit registry/protocol compatibility and envelope fingerprints;
-- atomic compact decode with strict field/authority-key rejection;
-- authoritative sanitization against the same starter policy used for final
-  resolution;
-- final server resolution from the actual character UUID, player descriptor,
-  social orientation, relationship policy, and existing
-  `StartingCompanionService`;
-- bounded pending, received, validated, defaulted, and grants-complete state;
-- timeout fallback, payload-order tolerance, reconnect idempotence, and
-  replacement-survivor UUID semantics;
-- direct production command routing rather than debug-command customization;
-- shared resolver name projection so inherited surnames are visible in the
-  preview/trace as well as the final runtime record;
-- a server-clock fix preventing world-age hours from being mixed with
-  millisecond customization deadlines.
-
-## Verification evidence
+## P5 verification evidence
 
 `TEST_VERIFIED`:
 
 - focused authoring/starter suite: **18/18 passed**;
-- full Project Hoomans harness: **1028/1032 passed**; the remaining four are
-  the pre-existing animation-scene debug route, context debug scene-lab,
-  population-director initialization, and dirty-work translation expectation
-  failures;
-- direct authority-resolution smoke covers canonical nickname preservation,
-  current-player surname/appearance rebinding, and relationship sex
-  authority;
+- full Project Hoomans harness: **1028/1032 passed**; the four remaining
+  failures are the pre-existing animation-scene debug route, context debug
+  scene-lab, population-director initialization, and dirty-work translation
+  expectation failures;
+- direct authoritative-resolution smoke covers canonical nickname
+  preservation, current-player surname/appearance rebinding, relationship sex
+  authority, and the shared resolution trace;
 - customization smoke covers compact round-trip, explicit clear/value,
-  registry mismatch, spoofed authority, lifecycle ordering, timeout fallback,
-  and reconnect idempotence;
+  registry/protocol mismatch, spoofed authority, lifecycle ordering, timeout
+  fallback, and reconnect idempotence;
 - registry/serializer smoke covers immutable wire codes, fingerprints,
-  deterministic generation, resolution trace, and mandatory binding clears;
-- full focused test run includes existing Unique NPC, starter, social-trait,
-  composer, preset, and debug-inspector tests.
+  deterministic generation, source tracing, mandatory binding clears, and
+  inherited-name projection;
+- existing Unique NPC editor/storage, Unique NPC resolver, debug Resolution
+  Inspector, starter relationship, social-trait, preset, and character-
+  creation extension tests remain green.
 
 `STATIC_ONLY`:
 
 - all changed/new Lua files pass `luac -p`;
 - all changed production Lua files pass targeted `pz_verify --kahlua`;
 - `git diff --check` passes;
-- native Project Zomboid SP/MP acceptance has not been run, per repository
-  policy; it remains the user-owned P6 handoff.
+- no native Project Zomboid SP/MP session has been run, per repository policy;
+- no Workshop publication or push was performed.
 
-## Next Chunk — P5 harness regression expansion
+## P6 — native acceptance handoff
 
-Run the existing full harness after the P4 exact-path commit, close the
-remaining developer-side regression evidence, update the final handoff, and
-then hand the native SP/MP matrix to the user. Do not launch native PZ or
-publish Workshop content as part of this developer phase.
+The remaining acceptance is user-owned: run the native SP, MP host/remote,
+local/co-op, preset/import, orientation, rebinding, no-reroll, and
+Resolution-Inspector matrix described in `ROADMAP.md`. Developer-side code,
+test, compile, and static gates are complete. Do not launch native PZ or
+publish Workshop content without explicit user authorization.
 
 ## Repository safety
 
 ProjectHoomans and PsychopatzCore remain on existing `main` branches. No new
 branch, push, Workshop publication, reset, stash, broad staging, or native PZ
-validation was used. Unrelated dirty work remains preserved and will not be
-staged by the phase commit.
+validation was used. Unrelated dirty work remains preserved and is excluded
+from the exact phase commits.

@@ -472,14 +472,15 @@ function Session:FinalSummary()
     for _, id in ipairs(self.selectedOrder) do
         local slot = self.slots[id]
         local identity
+        local resolved
         if slot and slot.active then
-            identity = slot.resolvedDefinition
-                and slot.resolvedDefinition.identity or {}
+            resolved = slot.resolvedDefinition or {}
+            identity = resolved.identity or {}
             output[#output + 1] = {
                 traitID = id,
                 relationshipKind = slot.spec.relationshipKind,
                 displayName = identity and identity.displayName
-                    or slot.resolvedDefinition.displayName,
+                    or resolved.displayName,
                 nickname = identity and identity.nickname or nil,
                 isFemale = identity and identity.isFemale or nil,
                 trace = self:ResolutionRows(id, 12),

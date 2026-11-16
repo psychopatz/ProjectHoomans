@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P4 authority handoff implemented — P5 developer verification next
+**Status:** P5 developer gates complete — P6 native acceptance is user-owned
 
 **Primary repository:** ProjectHoomans (`main`)
 

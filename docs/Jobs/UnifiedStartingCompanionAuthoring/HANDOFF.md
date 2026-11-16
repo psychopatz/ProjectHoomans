@@ -4,59 +4,57 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P4"
-phase_commit_message: "phase(P4): phase(P4): add authoritative starter customization handoff"
+phase_commit_phase: "P5"
+phase_commit_message: "phase(P5): phase(P5): close authoring verification and native handoff"
 phase_commit_vector: "project-hoomans=self;psychopatz-core=8395ee4d7511662b08b85e580da4f1364494f4d3;dynamic-trading=9c8cb3dead56d66e32fccb901b9abd3dd6c2f393"
-phase_residual_vector: "project-hoomans=edbf93f0b55968857a56e0b67a0364c4ee03474eb0086fb1dd0c600619da51a3;psychopatz-core=b3fb7704462505dd808d24f4613c55d1d3fa16d6552d9db31707df536f668329;dynamic-trading=3ed15f0cd080d9eb1ebcf5d1bbab66bbfdb230223af48407f02091a54ce020a5"
-residual_worktree_fingerprint: "edbf93f0b55968857a56e0b67a0364c4ee03474eb0086fb1dd0c600619da51a3"
-updated_at: "2026-11-16T02:14:54.249158Z"
-state: "CLEAN_CHECKPOINT"
+phase_residual_vector: "project-hoomans=f7c4b306b468c5385d3887290d5c055b26f47dcfc5994f34ab273a73a1e90fe0;psychopatz-core=de179b0fcbbad13876eb0646725b8151bd35f6310a451fcecd82ec19d881ebf3;dynamic-trading=3ed15f0cd080d9eb1ebcf5d1bbab66bbfdb230223af48407f02091a54ce020a5"
+residual_worktree_fingerprint: "f7c4b306b468c5385d3887290d5c055b26f47dcfc5994f34ab273a73a1e90fe0"
+updated_at: "2026-11-16T02:16:35.000181Z"
+state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
-phase: "P3"
-chunk: "Close P3, then implement P4 authority handoff and MP lifecycle"
+phase: "P5"
+chunk: "Complete developer verification; hand off native SP/MP acceptance"
 retrieval_tier: "verify"
 codebase_memory_indexed_commit: "539bcb63d49148b5468f0bf611efb8c355f2ceea"
 ---
-
 
 
 # Session Handoff
 
 ## What became true
 
-- P1 and P2 remain accepted in their recorded local commits.
-- P3 now has one selected-trait keyed session model, one canonical blueprint
-  path, one resolver/trace path, and a reusable composer facade/window.
-- Add/remove/re-add reconciliation preserves authored slot state; removed slots
-  are inactive and never included in final active blueprints.
-- Whole and per-companion presets serialize only canonical sparse intent and
-  generation state. Loading does not purchase or add traits and resolves later
-  against the current player.
-- Unique NPC import uses the shared starter policy sanitizer and reports
-  preserved, removed, rebound, and regenerated values. Runtime IDs, owner,
-  faction, debug, and other authority fields do not enter the starter
-  blueprint.
-- The old flat Unique NPC persistence fallback is gone; starter presets have a
-  dedicated definition-store kind.
+- P1 through P4 are implemented through one canonical NPC registry,
+  blueprint, policy resolver, trace, serializer, composer, and runtime action
+  path.
+- P4 is committed locally as `e15aefea`; the compact starter envelope is
+  protocol/fingerprint gated and is resolved authoritatively by the existing
+  `StartingCompanionService`.
+- The pending customization lifecycle has safe default fallback, payload
+  ordering tolerance, reconnect idempotence, and replacement-survivor UUID
+  semantics.
+- The session summary is safe when a slot has a resolution error and cannot
+  dereference a missing preview.
+- P5 focused and static developer gates are complete. Four full-harness
+  failures remain pre-existing and unrelated to this goal.
 
 ## Validation
 
-The focused P3 suite passed 17/17. The direct session smoke, social-trait
-character-creation smoke, PsychopatzCore extension smoke, targeted Kahlua
-verification, Lua compilation, JSON parsing, and diff checks passed. The full
-Hoomans suite still reports the four unrelated baseline failures documented in
-`PROGRESS.md`.
+- focused authoring/starter suite: **18/18 passed**;
+- full Project Hoomans harness: **1028/1032 passed** with the four documented
+  baseline failures;
+- `luac -p`, targeted `pz_verify --kahlua`, and `git diff --check` passed;
+- native Project Zomboid SP/MP acceptance was not run;
+- no push or Workshop publication was performed.
 
 ## Next action
 
-After the P3 exact-path local phase commit, implement P4: the semantic starter
-customization service, compact SP/MP envelope, authoritative final resolver,
-bounded payload lifecycle/default fallback, authority sanitization, and
-reconnect idempotence. Then continue through the remaining roadmap gates.
+User-owned P6 native acceptance: exercise the SP, MP host/remote,
+local/co-op, presets/import, orientation, final-player rebinding, deterministic
+preview, Reset/Randomize/Revert, final summary, and Resolution Inspector
+matrix in `ROADMAP.md`.
 
 ## Acceptance condition
 
-P3 is accepted when the exact phase-owned paths and this handoff are committed
-locally, the handoff/vector verifies, unrelated work remains unabsorbed, and
-the next chunk points to P4 rather than treating the P3 chunk as the parent
-goal completion boundary.
+The developer-side goal is complete when this P5 checkpoint is committed and
+verified. Parent-goal completion additionally requires the user-owned native
+matrix or an explicit user acceptance of that remaining live validation.
