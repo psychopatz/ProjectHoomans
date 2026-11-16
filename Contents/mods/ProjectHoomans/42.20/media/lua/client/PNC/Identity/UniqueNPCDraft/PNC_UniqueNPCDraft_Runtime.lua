@@ -40,6 +40,15 @@ local function applyExplicitIdentity(record, def, draft)
             survivor[key] = copy(draft.identity.survivor[key])
         end
     end
+    if def.identity and def.identity.nickname ~= nil then
+        record.identity.nickname = copy(def.identity.nickname)
+    elseif draft.identity and draft.identity.nickname == nil
+        and (draft.nicknameCleared == true
+            or draft.authoringClears
+            and draft.authoringClears["identity.nickname"] == true)
+    then
+        record.identity.nickname = nil
+    end
     record.identity.displayName = def.displayName
     record.identity.name = def.displayName
     return cleared
@@ -184,7 +193,7 @@ function Model.ApplyDraftToRuntime(draft)
     appearanceChanged = previousAppearanceSignature ~= nextAppearanceSignature
     authoredFields = draft.authoredFields or {}
     for _, key in ipairs({
-        "displayName", "name", "isFemale", "archetypeID", "archetypeLabel",
+        "displayName", "isFemale", "archetypeID", "archetypeLabel",
         "tacticalClass", "weaponMode", "attackType",
         "equipmentSpawnMode", "equipmentPoolID", "chanceWeight", "spawnChance",
         "skillLevels", "vanillaTraits", "dynamicTraits", "npcTraits",
@@ -212,6 +221,7 @@ function Model.ApplyDraftToRuntime(draft)
     record.identitySeed = identitySeed
     record.startingItems = copy(def.startingItems or {})
     local clearedAppearance = applyExplicitIdentity(record, def, draft)
+    record.name = def.displayName
     applyPreviewAppearance(record, clearedAppearance)
     if appearanceChanged and Inventory and Inventory.CreateFromTemplate then
         record.runtime = record.runtime or {}

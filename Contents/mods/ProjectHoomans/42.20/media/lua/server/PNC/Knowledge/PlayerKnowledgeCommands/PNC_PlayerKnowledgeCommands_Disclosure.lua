@@ -19,14 +19,14 @@ end
 function H.NicknameText(npcID)
     local record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcID)
     local identity = record and record.identity or nil
-    local nickname = identity and (identity.nickname or identity.alias) or nil
+    local nickname = identity and identity.nickname or nil
     if (not nickname or tostring(nickname) == "")
         and PNC.IdentityNames
         and type(PNC.IdentityNames.ResolveNickname) == "function"
     then
         local survivor = identity and identity.survivor or {}
         nickname = PNC.IdentityNames.ResolveNickname(
-            survivor and (survivor.forename or survivor.firstName),
+            survivor and survivor.forename,
             identity and identity.seed or record and record.identitySeed,
             { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
         )

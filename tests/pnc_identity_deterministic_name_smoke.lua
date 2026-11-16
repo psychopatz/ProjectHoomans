@@ -53,7 +53,7 @@ local sharedForename = PNC.Identity.GenerateResolvedIdentity({
     identitySeed = "identity-seed-shared",
     saveSeed = "save-seed-a",
     isFemale = false,
-    firstName = "RelativeFirst",
+    forename = "RelativeFirst",
 })
 T.truthy(string.find(sharedForename.displayName, "RelativeFirst", 1, true)
     ~= nil, "explicit first-name override is retained")

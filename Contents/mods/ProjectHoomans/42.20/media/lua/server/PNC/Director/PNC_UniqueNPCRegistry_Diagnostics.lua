@@ -189,6 +189,8 @@ local function buildDefinitionDiagnostic(definition, entry, errors)
             startingItemCount = definition.startingItems
                 and #definition.startingItems or 0,
         } or nil,
+        resolutionTrace = definition and copy(definition.resolutionTrace or {}) or nil,
+        blueprintFingerprint = definition and definition.blueprintFingerprint or nil,
         integrity = integrity,
     }
 end

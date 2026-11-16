@@ -141,7 +141,7 @@ Providers.Register("pnc_identity", {
             and (field == "displayName" or field == "nickname")
         then
             local name = field == "nickname"
-                and (identity.nickname or identity.alias)
+                and identity.nickname
                 or identity.displayName
             if field == "nickname" and not name
                 and PNC.IdentityNames
@@ -150,7 +150,7 @@ Providers.Register("pnc_identity", {
                 local survivor = type(identity.survivor) == "table"
                     and identity.survivor or {}
                 name = PNC.IdentityNames.ResolveNickname(
-                    survivor.forename or survivor.firstName,
+                    survivor.forename,
                     identity.seed or record.identitySeed,
                     { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
                 )
@@ -163,8 +163,8 @@ Providers.Register("pnc_identity", {
             local survivor = type(identity.survivor) == "table"
                 and identity.survivor or {}
             local name = field == "forename"
-                and (survivor.forename or survivor.firstName)
-                or (survivor.surname or survivor.lastName)
+                and survivor.forename
+                or survivor.surname
             if type(name) == "string" and name ~= "" then return name end
         end
         local summary = PNC.Identity and PNC.Identity.GetCharacterSummary

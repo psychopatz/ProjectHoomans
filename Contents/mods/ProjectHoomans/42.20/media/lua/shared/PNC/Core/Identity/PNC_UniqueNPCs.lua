@@ -3,11 +3,15 @@
 PNC = PNC or {}
 PNC.UniqueNPCs = PNC.UniqueNPCs or {}
 
-pcall(require, "PNC/Core/Identity/PNC_Identity_Appearance")
+require "PNC/Core/Identity/PNC_Identity_Appearance"
+require "PNC/Core/Identity/PNC_NPCAuthoring"
 
 local Unique = PNC.UniqueNPCs
 local Identity = PNC.Identity
 local Appearance = Identity.Appearance
+local Authoring = PNC.NPCAuthoring
+local Blueprint = Authoring.Blueprint
+local Resolver = Authoring.Resolver
 
 Unique.SCHEMA_VERSION = 2
 Unique.Definitions = Unique.Definitions or {}
@@ -58,7 +62,7 @@ local function rememberError(definition, reason)
     end
     Unique.Errors[key] = {
         id = id,
-        displayName = stringValue(source.displayName or source.name),
+        displayName = stringValue(source.displayName),
         reason = tostring(reason or "invalid_definition"),
     }
 end
@@ -69,19 +73,53 @@ function Unique.NormalizeDefinition(definition)
     local displayName
     local output
     local spawnChance
+    local identity
+    local fieldValue
+    local normalizedFieldValue
+    local fieldReason
     if type(definition) ~= "table" then
         return nil, "invalid_definition"
     end
-    source = copy(definition)
+    if definition.schemaId == Authoring.Registry.SCHEMA_ID
+        or type(definition.blueprint) == "table"
+    then
+        local payload = definition.blueprint or definition
+        local canonical
+        local canonicalReason
+        canonical, canonicalReason = Blueprint.Deserialize(payload)
+        if not canonical then return nil, canonicalReason end
+        source, canonicalReason = Blueprint.ToDefinition(canonical, {
+            id = definition.id or definition.uniqueDefinitionId
+                or canonical.id,
+            version = definition.version,
+        })
+        if not source then return nil, canonicalReason end
+        source.generationSeed = canonical.generationSeed
+    else
+        source = copy(definition)
+    end
     id = safeID(source.uniqueDefinitionId or source.id)
     if not id then return nil, "unique_definition_id_required" end
-    displayName = stringValue(source.displayName or source.name)
+    displayName = stringValue(source.displayName)
     if not displayName then return nil, "display_name_required:" .. id end
     if type(source.isFemale) ~= "boolean" then
         return nil, "is_female_boolean_required:" .. id
     end
     if source.spawnChance ~= nil then
         spawnChance = math.max(0, math.min(1, tonumber(source.spawnChance) or 0))
+    end
+    identity = type(source.identity) == "table" and copy(source.identity) or nil
+    if identity then
+        -- Unique authoring has one canonical identity vocabulary.  Runtime
+        -- projections such as identity.name and superseded input aliases
+        -- must not become a second persisted truth.
+        identity.name = nil
+        identity.alias = nil
+        if type(identity.survivor) == "table" then
+            identity.survivor.firstName = nil
+            identity.survivor.lastName = nil
+            identity.survivor.alias = nil
+        end
     end
     output = {
         id = id,
@@ -94,10 +132,12 @@ function Unique.NormalizeDefinition(definition)
                 or 1
         )),
         displayName = displayName,
+        -- `name` is a derived runtime projection retained for existing PNC
+        -- records; it is never read from authored input or serialized output.
         name = displayName,
         isFemale = source.isFemale,
-        identity = type(source.identity) == "table"
-            and copy(source.identity) or nil,
+        identity = identity,
+        generationSeed = tonumber(source.generationSeed) or nil,
         identitySeed = tonumber(source.identitySeed) or nil,
         archetypeID = stringValue(source.archetypeID),
         archetypeLabel = stringValue(source.archetypeLabel),
@@ -124,17 +164,14 @@ function Unique.NormalizeDefinition(definition)
             and copy(source.patrolPoints) or nil,
         hostility = type(source.hostility) == "table"
             and copy(source.hostility) or nil,
-        inventoryTemplateRef = stringValue(
-            source.inventoryTemplateRef or source.startingInventoryTemplate
-        ),
+        inventoryTemplateRef = stringValue(source.inventoryTemplateRef),
         startingItems = type(source.startingItems) == "table"
             and copy(source.startingItems) or nil,
         skillLevels = PNC.Types and PNC.Types.NormalizeSkillLevels
-            and PNC.Types.NormalizeSkillLevels(
-                source.skillLevels or source.skillBaseLevels
-            ) or copy(source.skillLevels or source.skillBaseLevels),
+            and PNC.Types.NormalizeSkillLevels(source.skillLevels)
+            or copy(source.skillLevels),
         vanillaTraits = normalizeTraits(
-            source.vanillaTraits or source.physiologicalTraits,
+            source.vanillaTraits,
             PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.NormalizeTraits
         ),
         dynamicTraits = normalizeTraits(
@@ -165,8 +202,27 @@ function Unique.NormalizeDefinition(definition)
         recipeKnowledge = type(source.recipeKnowledge) == "table"
             and copy(source.recipeKnowledge) or nil,
     }
+    -- Keep concrete normalization registry-driven for authorable fields.  The
+    -- explicit runtime projections above preserve existing PNC contracts,
+    -- while this pass means a future registered field does not disappear
+    -- merely because Unique.NormalizeDefinition predates it.
+    for _, fieldDescriptor in ipairs(Authoring.Registry.List()) do
+        if fieldDescriptor.authorable then
+            fieldValue = Authoring.Registry.Read(source, fieldDescriptor.id)
+            if fieldValue ~= nil then
+                normalizedFieldValue, fieldReason =
+                    Authoring.Registry.NormalizeValue(
+                        fieldDescriptor.id, fieldValue)
+                if normalizedFieldValue == nil then
+                    return nil, "invalid_field:" .. tostring(fieldDescriptor.id)
+                        .. ":" .. tostring(fieldReason)
+                end
+                Authoring.Registry.Write(
+                    output, fieldDescriptor.id, normalizedFieldValue)
+            end
+        end
+    end
     output.vanillaTraitsAuthored = source.vanillaTraits ~= nil
-        or source.physiologicalTraits ~= nil
     output.dynamicTraitsAuthored = source.dynamicTraits ~= nil
     if Appearance and Appearance.Validate then
         local appearanceValid, appearanceReason = Appearance.Validate(
@@ -187,6 +243,27 @@ function Unique.Register(definition, options)
     if not normalized then
         rememberError(definition, reason)
         return false, reason
+    end
+    do
+        local blueprint
+        local plan
+        local traceReason
+        blueprint, traceReason = Blueprint.FromDefinition(definition, {
+            id = normalized.id,
+            generationSeed = normalized.generationSeed or normalized.identitySeed,
+        })
+        if blueprint then
+            plan, traceReason = Resolver.ResolvePlan(
+                blueprint,
+                { seed = blueprint.generationSeed, generationSeed = blueprint.generationSeed },
+                Resolver.Policies.Debug,
+                { id = normalized.id, version = normalized.version }
+            )
+            if plan then
+                normalized.resolutionTrace = plan.trace
+                normalized.blueprintFingerprint = plan.blueprintFingerprint
+            end
+        end
     end
     existing = Unique.Definitions[normalized.id]
     if existing and optionsValue.override ~= true then
@@ -282,7 +359,9 @@ local function resolveSeed(definition, context)
     local seed
     local worldSeed
     context = type(context) == "table" and context or {}
-    seed = tonumber(context.identitySeed) or tonumber(definition.identitySeed)
+    seed = tonumber(context.identitySeed)
+        or tonumber(definition.generationSeed)
+        or tonumber(definition.identitySeed)
     if seed then return Identity.NormalizeSeed(seed, definition.id) end
     worldSeed = tonumber(context.worldSeed) or tonumber(context.seed)
     if worldSeed then
@@ -294,6 +373,9 @@ end
 function Unique.Resolve(definition, context)
     local normalized
     local reason
+    local blueprint
+    local plan
+    local planReason
     local output
     local seed
     local identity
@@ -301,6 +383,26 @@ function Unique.Resolve(definition, context)
     normalized, reason = Unique.NormalizeDefinition(definition)
     if not normalized then return nil, reason end
     seed = resolveSeed(normalized, context)
+    blueprint, reason = Blueprint.FromDefinition(definition, {
+        id = normalized.id,
+        generationSeed = seed,
+    })
+    if not blueprint then return nil, reason end
+    plan, planReason = Resolver.ResolvePlan(
+        blueprint,
+        {
+            seed = seed,
+            generationSeed = seed,
+            identitySeed = seed,
+            archetypeID = normalized.archetypeID or context.archetypeID,
+            authoritativeFields = context.authoritativeFields,
+        },
+        Resolver.Policies.Debug,
+        { id = normalized.id, version = normalized.version }
+    )
+    if not plan then return nil, planReason end
+    normalized, reason = Unique.NormalizeDefinition(plan.definition)
+    if not normalized then return nil, reason end
     identity = Identity.GenerateResolvedIdentity({
         id = normalized.id,
         displayName = normalized.displayName,
@@ -346,6 +448,10 @@ function Unique.Resolve(definition, context)
         )
         output.dynamicTraitsAuthored = true
     end
+    output.blueprintFingerprint = plan.blueprintFingerprint
+    output.resolutionTrace = Resolver.AttachIdentityTrace(
+        plan.trace, identity
+    )
     return output
 end
 

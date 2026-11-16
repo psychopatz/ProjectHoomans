@@ -89,14 +89,14 @@ end
 
 local function npcNickname(record)
     local identity = record and record.identity or nil
-    local nickname = clean(identity and (identity.nickname or identity.alias))
+    local nickname = clean(identity and identity.nickname)
     if nickname ~= "" then return nickname end
     if PNC.IdentityNames
         and type(PNC.IdentityNames.ResolveNickname) == "function"
     then
         local survivor = identity and identity.survivor or {}
         local resolved = clean(PNC.IdentityNames.ResolveNickname(
-            survivor and (survivor.forename or survivor.firstName),
+            survivor and survivor.forename,
             identity and identity.seed or record and record.identitySeed,
             { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
         ))

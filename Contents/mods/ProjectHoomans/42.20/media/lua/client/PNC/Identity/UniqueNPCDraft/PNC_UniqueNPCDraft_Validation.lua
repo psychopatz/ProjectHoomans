@@ -7,6 +7,7 @@ local Internal = Model.Internal or {}
 local Unique = PNC.UniqueNPCs
 local Identity = PNC.Identity
 local Appearance = Identity and Identity.Appearance
+local Authoring = PNC.NPCAuthoring or require "PNC/Core/Identity/PNC_NPCAuthoring"
 local text = Internal.text
 
 
@@ -239,6 +240,13 @@ function Model.Validate(draft)
         valid, reason = Appearance.Validate(draft.appearance)
         if not valid then return false, reason end
     end
+    local blueprint
+    blueprint, reason = Model.BuildBlueprint(draft)
+    if not blueprint then return false, reason end
+    valid, reason = Authoring.Blueprint.Validate(
+        blueprint, Authoring.Resolver.Policies.Debug
+    )
+    if not valid then return false, reason end
     local normalized, reason = Unique.NormalizeDefinition(Model.BuildDefinition(draft))
     if not normalized then return false, reason end
     return true, normalized

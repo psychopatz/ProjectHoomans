@@ -113,11 +113,10 @@ function Identity.GetIdentityParts(npc)
         fullName = fullName or clean(identity and identity.displayName
             or source and (source.displayName or source.name))
         firstName = firstName or clean(survivor.forename
-            or survivor.firstName or source and source.forename)
+            or source and source.forename)
         surname = surname or clean(survivor.surname
-            or survivor.lastName or source and source.surname)
-        nickname = nickname or clean(identity and (identity.nickname
-            or identity.alias))
+            or source and source.surname)
+        nickname = nickname or clean(identity and identity.nickname)
     end
 
     if fullName and (not firstName or not surname) then

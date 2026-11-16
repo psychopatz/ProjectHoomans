@@ -4,6 +4,9 @@ PNC = PNC or {}
 PNC.UniqueNPCDebugModel = PNC.UniqueNPCDebugModel or {}
 
 local Model = PNC.UniqueNPCDebugModel
+local Authoring = PNC.NPCAuthoring
+    or require "PNC/Core/Identity/PNC_NPCAuthoring"
+local Resolver = Authoring.Resolver
 
 local function scalar(value)
     if value == nil then return "none" end
@@ -310,6 +313,26 @@ function Model.BuildDetailRows(entry)
     appendIdentityRows(rows, entry, entry.integrity)
     appendLiveRows(rows, runtime(entry))
     appendAuthoredRows(rows, entry.authored)
+    for _, row in ipairs(Model.BuildResolutionRows(entry.resolutionTrace)) do
+        rows[#rows + 1] = row
+    end
+    return rows
+end
+
+function Model.BuildResolutionRows(trace, limit)
+    local rows = {}
+    local summary = Resolver.BuildResolutionSummary(trace, limit or 64)
+    for _, field in ipairs(summary) do
+        local value = field.value
+        local suffix = value == nil and "" or " | " .. valueText(value)
+        rows[#rows + 1] = {
+            key = "resolution:" .. tostring(field.fieldID),
+            labelKey = "UI_PNC_UniqueNPCDebug_ResolutionField",
+            fallback = tostring(field.fieldID),
+            value = tostring(field.source or "unknown") .. suffix,
+            colorName = field.editable == false and "muted" or "text",
+        }
+    end
     return rows
 end
 

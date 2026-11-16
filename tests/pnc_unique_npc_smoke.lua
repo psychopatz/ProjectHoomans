@@ -65,7 +65,10 @@ ok, reason = Unique.Register({
     id = "gorgon_ramsee",
     displayName = "Gorgon Ramsee",
     isFemale = true,
-    identity = { survivor = { surname = "Ramsee" } },
+    identity = {
+        nickname = "Gorgie",
+        survivor = { surname = "Ramsee" },
+    },
     hpMax = 175,
     combatProfile = { meleeDamage = 42 },
     equipment = { primaryFullType = "Base.KitchenKnife" },
@@ -85,6 +88,8 @@ T.equal(resolved.identity.survivor.forename, "Gorgon",
     "display name supplies readable forename")
 T.equal(resolved.identity.survivor.surname, "Ramsee",
     "surname override")
+T.equal(resolved.identity.nickname, "Gorgie",
+    "canonical nickname survives Unique resolution")
 T.equal(resolved.identity.survivor.voicePrefix, "factory_voice",
     "voice prefix comes from SurvivorFactory")
 T.equal(resolved.identity.survivor.voiceType, 2,

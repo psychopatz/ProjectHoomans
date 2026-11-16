@@ -101,6 +101,7 @@ T.equal(draft.displayName, "", "preview fallback does not mutate the draft")
 draft.displayName = "Gorgon Ramsee"
 draft.isFemale = true
 draft.archetypeID = "Chef"
+draft.factionID = "faction:editor"
 draft.skillLevels = { Cooking = 10 }
 draft.identity.survivor.forename = "Gorgon"
 draft.identity.survivor.surname = "Ramsee"
@@ -129,6 +130,8 @@ local valid = PNC.UniqueNPCEditorModel.Validate(draft)
 T.equal(valid, true, "separate first and surname fields validate")
 T.equal(definition.skillLevels.Cooking, 10, "authored skill preserved")
 T.equal(definition.identity.survivor.hairModel, "Long", "authored appearance preserved")
+T.equal(definition.factionID, "faction:editor",
+    "registry keeps the existing Unique faction authoring field")
 T.equal(#definition.startingItems, 1, "generated inventory omitted")
 T.equal(definition.startingItems[1].stack, 1000, "custom money preserved")
 T.equal(definition.startingItems[1].itemState.visualTextureChoice, 2,
@@ -234,11 +237,14 @@ local loaded = PNC.UniqueNPCEditorModel.FromDefinition({
     id = "unique:loaded",
     displayName = "Loaded Person",
     isFemale = false,
+    identity = { nickname = "Loady" },
     startingItems = { { type = "Base.Money", stack = 1000 } },
 })
 local loadedDefinition = PNC.UniqueNPCEditorModel.BuildDefinition(loaded)
 T.equal(loadedDefinition.startingItems[1].stack, 1000,
     "loaded authored inventory survives before preview")
+T.equal(loadedDefinition.identity.nickname, "Loady",
+    "draft definition keeps canonical nickname")
 -- Definition persistence uses the same authoring API without a window.
 local files, entries = {}, {}
 local Database = { ROOT = "Hoomans", INDEX_PATH = "Hoomans/UniqueNPCIndex.txt" }
@@ -275,7 +281,12 @@ T.equal(payload.schemaVersion, 2)
 T.equal(payload.kind, "ProjectHoomans.UniqueNPC")
 T.truthy(payload.produced)
 T.falsy(payload.definition.identitySeed, "preview seed leaked into definition")
-T.equal(Storage.LoadFile(fileName).id, stored.id)
+T.equal(payload.definition.fields["identity.nickname"], "Loady",
+    "storage uses canonical nickname field")
+local loadedAgain = Storage.LoadFile(fileName)
+T.equal(loadedAgain.id, stored.id)
+T.equal(loadedAgain.identity.nickname, "Loady",
+    "canonical nickname survives save and load")
 T.equal(#Storage.List(), 1)
 local rejected, reason = Storage.LoadFile("../bad.txt")
 T.falsy(rejected)

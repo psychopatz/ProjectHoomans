@@ -37,6 +37,16 @@ local snapshot = {
                 skillLevels = { Cooking = 10 },
                 startingItemCount = 1,
             },
+            resolutionTrace = {
+                fields = {
+                    ["identity.nickname"] = {
+                        fieldID = "identity.nickname",
+                        source = "explicit",
+                        value = "Gorgie",
+                        editable = true,
+                    },
+                },
+            },
         },
         {
             definitionId = "lost_unique",
@@ -76,6 +86,7 @@ T.equal(#searched, 1, "name search")
 local rows = PNC.UniqueNPCDebugModel.BuildDetailRows(snapshot.entries[1])
 local sawFaction = false
 local sawSkills = false
+local sawResolution = false
 for _, row in ipairs(rows) do
     if row.key == "faction" then
         sawFaction = true
@@ -85,9 +96,14 @@ for _, row in ipairs(rows) do
         sawSkills = true
         T.contains(row.value, "Cooking=10", "skill detail")
     end
+    if row.key == "resolution:identity.nickname" then
+        sawResolution = true
+        T.contains(row.value, "explicit", "resolution source detail")
+    end
 end
 T.truthy(sawFaction, "faction detail row")
 T.truthy(sawSkills, "skill detail row")
+T.truthy(sawResolution, "resolution inspector consumes shared trace")
 T.falsy(PNC.UniqueNPCDebugModel.IsLocatable(snapshot.entries[2]),
     "dead unique cannot be located")
 T.finish("pnc_unique_npc_debug_model_smoke")

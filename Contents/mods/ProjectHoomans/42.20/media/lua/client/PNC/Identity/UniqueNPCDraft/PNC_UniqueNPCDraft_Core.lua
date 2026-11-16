@@ -45,15 +45,16 @@ local function filePart(value)
 end
 
 local function nextSeed()
+    local value
     if Identity and Identity.RollSeed then
-        local ok, value = pcall(Identity.RollSeed)
-        if ok and tonumber(value) and tonumber(value) > 0 then
+        value = Identity.RollSeed()
+        if tonumber(value) and tonumber(value) > 0 then
             return tonumber(value)
         end
     end
     if type(ZombRand) == "function" then
-        local ok, value = pcall(ZombRand, 2147483646)
-        if ok and tonumber(value) then return math.max(1, tonumber(value) + 1) end
+        value = ZombRand(2147483646)
+        if tonumber(value) then return math.max(1, tonumber(value) + 1) end
     end
     if type(getTimestampMs) == "function" then
         return math.max(1, tonumber(getTimestampMs()) or 1)
@@ -232,10 +233,11 @@ function Model.New()
         schemaVersion = 2,
         displayName = "",
         isFemale = false,
-        -- Preview-only seed.  The authored definition intentionally does not
-        -- contain a seed: runtime identity generation owns it per world save.
+        -- Stable slot seed.  The concrete runtime definition may omit it, but
+        -- the canonical sparse blueprint persists it for deterministic edits.
         previewSeed = nextSeed(),
-        identity = { survivor = {} },
+        identity = { nickname = nil, survivor = {} },
+        authoringClears = {},
         appearanceAuthored = {},
         -- A new authored NPC starts without inherited factory clothing.
         -- Random remains an explicit choice through the appearance tab or

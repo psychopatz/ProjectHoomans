@@ -1,7 +1,8 @@
 local register = require "PNC/Generated/PNC_UniqueNPCRegistrar"
+local Authoring = require "PNC/Core/Identity/PNC_NPCAuthoring"
+local Blueprint = Authoring.Blueprint
 
-register(
-{
+local sourceDefinition = {
     ["appearance"] = {
         ["outfit"] = {
             ["id"] = "CostumeFrogman",
@@ -22,7 +23,6 @@ register(
     },
     ["archetypeID"] = "General",
     ["chanceWeight"] = 1,
-    ["debug"] = false,
     ["displayName"] = "Robert Furhrer",
     ["dynamicTraits"] = {
         ["pnc_berserker"] = true,
@@ -31,7 +31,6 @@ register(
         ["pnc_reckless"] = true
     },
     ["equipmentSpawnMode"] = "both",
-    ["forceLive"] = false,
     ["id"] = "unique:robertfurhrer",
     ["identity"] = {
         ["survivor"] = {
@@ -47,10 +46,7 @@ register(
         }
     },
     ["isFemale"] = false,
-    ["name"] = "Robert Furhrer",
     ["npcTraits"] = {},
-    ["persist"] = true,
-    ["recruited"] = false,
     ["skillLevels"] = {
         ["Aiming"] = 10,
         ["Spear"] = 10
@@ -282,6 +278,19 @@ register(
     ["uniqueDefinitionId"] = "unique:robertfurhrer",
     ["version"] = 1
 }
-)
+
+-- Generated catalog data is compiled through the same sparse canonical
+-- blueprint used by the editor.  The source table above remains readable
+-- runtime-shaped input, while the registered payload persists stable field
+-- IDs and omits runtime-only authoring noise.
+local blueprint, blueprintReason = Blueprint.FromDefinition(sourceDefinition)
+if not blueprint then
+    error("generated_unique_blueprint_invalid:" .. tostring(blueprintReason))
+end
+local payload, payloadReason = Blueprint.Serialize(blueprint)
+if not payload then
+    error("generated_unique_blueprint_serialize_failed:" .. tostring(payloadReason))
+end
+register(payload)
 
 return true

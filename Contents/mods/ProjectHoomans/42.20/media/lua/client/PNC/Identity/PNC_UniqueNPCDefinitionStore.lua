@@ -10,12 +10,15 @@ PNC.UniqueNPCEditorStorage = PNC.UniqueNPCEditorStorage or {}
 local Storage = PNC.UniqueNPCEditorStorage
 local Model = PNC.UniqueNPCEditorModel
 local Database = PNC.DefinitionDatabase
+local Authoring = PNC.NPCAuthoring or require "PNC/Core/Identity/PNC_NPCAuthoring"
+local Blueprint = Authoring.Blueprint
 local Json = require "PsychopatzCore/Bridge/PsychopatzBridgeJson"
 
 local ROOT = Database.ROOT
 local INDEX = Database.INDEX_PATH
 local DIRECTORY = Database.GetDirectory("npc")
 local LIMITS = { maxString = 65536, maxDepth = 12, maxCollection = 512 }
+local FILE_SCHEMA_VERSION = 2
 
 local function safeFileName(value)
     return Database.SafeFileName(value)
@@ -57,17 +60,27 @@ end
 
 function Storage.Save(draft, produced)
     local valid, normalized = Model.Validate(draft)
+    local blueprint
+    local serialized
+    local blueprintReason
     local fileName
     local payload
     if not valid then return false, normalized end
     Model.SyncFromRuntime(draft)
     normalized = Model.BuildDefinition(draft)
+    if not normalized then return false, "definition_build_failed" end
+    blueprint, blueprintReason = Model.BuildBlueprint(draft)
+    if not blueprint then return false, blueprintReason end
+    serialized, blueprintReason = Blueprint.Serialize(blueprint)
+    if not serialized then return false, blueprintReason end
     fileName = Storage.FileName(draft)
     payload = {
-        schemaVersion = 2,
+        schemaId = Authoring.Registry.SCHEMA_ID,
+        schemaVersion = FILE_SCHEMA_VERSION,
+        authoringSchemaVersion = Authoring.Registry.SCHEMA_VERSION,
         kind = "ProjectHoomans.UniqueNPC",
         produced = produced == true,
-        definition = normalized,
+        definition = serialized,
     }
     local ok, reason = Database.WriteFile("npc", fileName, encode(payload))
     if not ok then return false, reason end
@@ -94,11 +107,23 @@ function Storage.LoadFile(fileName)
     if not content then return nil, reason end
     payload, reason = decode(content)
     if type(payload) ~= "table" then return nil, reason or "invalid_file" end
+    if tostring(payload.schemaId or "") ~= Authoring.Registry.SCHEMA_ID
+        or tonumber(payload.schemaVersion) ~= FILE_SCHEMA_VERSION
+        or tonumber(payload.authoringSchemaVersion)
+            ~= Authoring.Registry.SCHEMA_VERSION
+    then
+        return nil, "unsupported_schema"
+    end
     local definition = payload.definition or payload
     if type(definition) ~= "table" then return nil, "definition_missing" end
-    local valid, normalized = Model.Validate(Model.FromDefinition(definition, fileName))
+    if tostring(definition.schemaId or "") ~= Authoring.Registry.SCHEMA_ID then
+        return nil, "unsupported_schema"
+    end
+    local draft, draftReason = Model.FromDefinition(definition, fileName)
+    if not draft then return nil, draftReason end
+    local valid, normalized = Model.Validate(draft)
     if not valid then return nil, normalized end
-    return Model.FromDefinition(normalized, fileName)
+    return draft
 end
 
 function Storage.List()

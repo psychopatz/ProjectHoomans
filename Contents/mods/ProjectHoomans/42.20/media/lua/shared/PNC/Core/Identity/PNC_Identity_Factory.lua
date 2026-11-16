@@ -121,21 +121,13 @@ function Identity.GenerateResolvedIdentity(source)
     if desc and desc.setFemale then
         desc:setFemale(resolvedFemale)
     end
-    local explicitForename = normalizeString(source and (
-        source.forename or source.firstName
-    )) or normalizeString(
-        survivorOverride.forename or survivorOverride.firstName
-    )
-    local explicitSurname = normalizeString(source and (
-        source.surname or source.lastName
-    )) or normalizeString(
-        survivorOverride.surname or survivorOverride.lastName
-    )
-    local explicitNickname = normalizeString(source and (
-        source.nickname or source.alias
-    )) or normalizeString(
-        identityOverride and (identityOverride.nickname or identityOverride.alias)
-    ) or normalizeString(survivorOverride.nickname)
+    local explicitForename = normalizeString(source and source.forename)
+        or normalizeString(survivorOverride.forename)
+    local explicitSurname = normalizeString(source and source.surname)
+        or normalizeString(survivorOverride.surname)
+    local explicitNickname = normalizeString(source and source.nickname)
+        or normalizeString(identityOverride and identityOverride.nickname)
+        or normalizeString(survivorOverride.nickname)
     if (not explicitForename or not explicitSurname)
         and Names and type(Names.Generate) == "function"
     then

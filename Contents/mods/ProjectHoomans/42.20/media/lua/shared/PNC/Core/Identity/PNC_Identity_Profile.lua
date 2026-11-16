@@ -183,7 +183,7 @@ function Identity.ApplyRecordIdentity(record, source)
         local survivor = type(resolvedIdentity.survivor) == "table"
             and resolvedIdentity.survivor or {}
         resolvedIdentity.nickname = Names.ResolveNickname(
-            survivor.forename or survivor.firstName,
+            survivor.forename,
             seed,
             { version = Names.NICKNAME_GENERATOR_VERSION }
         )

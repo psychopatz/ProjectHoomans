@@ -8,6 +8,8 @@ local Internal = Model.Internal or {}
 local Unique = PNC.UniqueNPCs
 local Identity = PNC.Identity
 local Appearance = Identity and Identity.Appearance
+local Authoring = PNC.NPCAuthoring or require "PNC/Core/Identity/PNC_NPCAuthoring"
+local Blueprint = Authoring.Blueprint
 local copy = Internal.copy
 local text = Internal.text
 local hasEntries = Internal.hasEntries
@@ -17,9 +19,27 @@ local exportItems = Internal.exportItems
 local captureAppearanceItems = Internal.captureAppearanceItems
 
 function Model.FromDefinition(definition, fileName)
+    local source = copy(definition or {})
+    local canonical
+    local reason
+    local canonicalClears
+    local canonicalSeed
+    if source.schemaId == Authoring.Registry.SCHEMA_ID
+        or source.fields and source.schemaId
+    then
+        canonical, reason = Blueprint.Deserialize(source)
+        if not canonical then return nil, reason end
+        canonicalClears = copy(canonical.clears or {})
+        canonicalSeed = canonical.generationSeed
+        source, reason = Blueprint.ToDefinition(canonical, {
+            id = source.id or canonical.id,
+            version = source.version,
+        })
+        if not source then return nil, reason end
+    end
     local output = Model.New()
-    for key, value in pairs(copy(definition or {})) do output[key] = value end
-    output.displayName = text(output.displayName or output.name) or ""
+    for key, value in pairs(source) do output[key] = value end
+    output.displayName = text(output.displayName) or ""
     output.isFemale = output.isFemale == true
     output.identity = type(output.identity) == "table" and output.identity or { survivor = {} }
     output.identity.survivor = type(output.identity.survivor) == "table"
@@ -32,13 +52,14 @@ function Model.FromDefinition(definition, fileName)
     if Appearance and Appearance.Normalize then
         output.appearance = Appearance.Normalize(output.appearance,
             output.outfit)
-        output.appearanceAuthored.appearance = definition.appearance ~= nil
+        output.appearanceAuthored.appearance = source.appearance ~= nil
     end
     output.authoredFields = type(output.authoredFields) == "table"
         and output.authoredFields or {}
+    output.authoringClears = canonicalClears or {}
     for _, key in ipairs({ "skillLevels", "vanillaTraits", "dynamicTraits",
-        "npcTraits" }) do
-        if definition[key] ~= nil then output.authoredFields[key] = true end
+        "npcTraits", "startingItems" }) do
+        if source[key] ~= nil then output.authoredFields[key] = true end
     end
     for _, key in ipairs({ "hairModel", "beardModel", "skinTexture",
         "hairColor", "skinColor", "voice", "voicePrefix", "voiceType",
@@ -50,6 +71,8 @@ function Model.FromDefinition(definition, fileName)
     -- Older files may contain identitySeed.  Use it only to keep the loaded
     -- preview stable during this editing session; never emit it again.
     output.previewSeed = tonumber(output.previewSeed)
+        or tonumber(canonicalSeed)
+        or tonumber(source.generationSeed)
         or tonumber(output.identitySeed) or nextSeed()
     output.identitySeed = nil
     output.id = output.id or output.uniqueDefinitionId
@@ -63,72 +86,55 @@ function Model.FromDefinition(definition, fileName)
     return output
 end
 
-function Model.BuildDefinition(draft)
-    local def = {}
-    local survivor = draft.identity and draft.identity.survivor or {}
+function Model.BuildBlueprint(draft, options)
+    local source = copy(draft or {})
+    local survivor = source.identity and source.identity.survivor or {}
     local appearance
     local voice
-    local fields = {
-        "archetypeID", "archetypeLabel", "tacticalClass",
-        "weaponMode", "attackType", "equipmentSpawnMode",
-        "equipmentPoolID", "chanceWeight", "spawnChance", "skillLevels",
-        "vanillaTraits", "dynamicTraits", "npcTraits", "factionID",
-        "membershipStatus", "factionRole", "factionRank", "ownerUsername",
-        "forceLive", "debug", "persist", "recruited", "social", "hostility",
-        "equipment", "combatProfile", "orderSpec", "patrolPoints",
-        "allowedJobs", "jobPriorities", "mapPresentation", "recipeKnowledge",
-        "inventoryTemplateRef", "ownerOnlineID", "factionJoinedAt",
-    }
-    def.id = Model.BuildID(draft)
-    def.uniqueDefinitionId = def.id
-    def.version = 1
-    local forename, surname = Model.NameParts(draft)
-    local displayName = nil
-    if forename and surname then
-        displayName = tostring(forename) .. " " .. tostring(surname)
-    else
-        displayName = text(draft.displayName)
-    end
-    def.displayName = displayName
-    def.name = def.displayName
-    def.isFemale = draft.isFemale == true
-    for _, key in ipairs(fields) do
-        if draft[key] ~= nil and draft[key] ~= "" then def[key] = copy(draft[key]) end
-    end
-    local explicit = {}
-    for _, key in ipairs({ "forename", "surname", "hairModel", "beardModel",
-        "skinTexture", "hairColor", "skinColor", "voice", "voicePrefix",
-        "voiceType", "voicePitch" }) do
-        if survivor[key] ~= nil
-            and (survivor[key] ~= ""
-                or draft.appearanceAuthored
-                and draft.appearanceAuthored[key] == true)
-        then
-            explicit[key] = copy(survivor[key])
-        end
-    end
+    local startingItems
+    local optionsValue = type(options) == "table" and options or {}
+    local blueprint
+    local reason
     appearance = Appearance and Appearance.Normalize
-        and Appearance.Normalize(draft.appearance) or nil
+        and Appearance.Normalize(source.appearance) or nil
     if appearance then captureAppearanceItems(draft, appearance) end
+    source.appearance = appearance
+    source.appearanceAuthored = source.appearanceAuthored or {}
+    if appearance then source.appearanceAuthored.appearance = true end
     voice = appearance and appearance.voice or nil
     if voice and voice.mode == "item" then
-        if voice.prefix ~= nil then explicit.voice = copy(voice.prefix) end
-        if voice.prefix ~= nil then explicit.voicePrefix = copy(voice.prefix) end
-        if voice.type ~= nil then explicit.voiceType = copy(voice.type) end
-        if voice.pitch ~= nil then explicit.voicePitch = copy(voice.pitch) end
+        source.identity = source.identity or {}
+        source.identity.survivor = source.identity.survivor or {}
+        if voice.prefix ~= nil then source.identity.survivor.voice = copy(voice.prefix) end
+        if voice.prefix ~= nil then source.identity.survivor.voicePrefix = copy(voice.prefix) end
+        if voice.type ~= nil then source.identity.survivor.voiceType = copy(voice.type) end
+        if voice.pitch ~= nil then source.identity.survivor.voicePitch = copy(voice.pitch) end
     end
-    if hasEntries(explicit) then def.identity = { survivor = explicit } end
-    def.startingItems = exportItems(draft)
-    if #def.startingItems == 0 then def.startingItems = nil end
-    if Appearance and Appearance.Normalize then
-        def.appearance = appearance
-        if appearance and Appearance.HasExplicitSlots
-            and Appearance.HasExplicitSlots(appearance)
-        then
-            def.appearanceVersion = 2
-        end
+    startingItems = exportItems(draft)
+    if #startingItems == 0 then startingItems = nil end
+    blueprint, reason = Blueprint.FromDraft(source, {
+        id = optionsValue.id or Model.BuildID(source),
+        generationSeed = optionsValue.generationSeed or source.previewSeed,
+        startingItems = startingItems,
+        explicitClears = source.authoringClears,
+    })
+    if source.nicknameCleared == true then
+        blueprint, reason = Blueprint.Clear(blueprint, "identity.nickname")
     end
-    return def
+    if not blueprint then return nil, reason end
+    return blueprint
+end
+
+function Model.BuildDefinition(draft)
+    local blueprint, reason = Model.BuildBlueprint(draft)
+    local definition
+    if not blueprint then return nil, reason end
+    definition, reason = Blueprint.ToDefinition(blueprint, {
+        id = Model.BuildID(draft),
+        version = 1,
+    })
+    if not definition then return nil, reason end
+    return definition
 end
 
 return Model
