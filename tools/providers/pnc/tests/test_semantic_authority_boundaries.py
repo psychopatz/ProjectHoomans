@@ -168,16 +168,13 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
     def test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog(self) -> None:
         root = PROJECT / "Contents/mods/ProjectHoomans/common/media/translation"
         for language in ("EN", "TL"):
-            command = root / language / "Conversation/Command.json"
             semantic = root / language / "Conversation/Semantic/Responses.json"
             ui_json = root / language / "Conversation/UI.json"
-            for path in (command, semantic, ui_json):
+            text_ui = root / language / "Conversation/Text/UI_PNC_Conversation.json"
+            for path in (semantic, ui_json, text_ui):
                 self.assertTrue(path.exists(), str(path))
                 self.assertTrue(json.loads(path.read_text()), str(path))
-            self.assertIn(
-                "conversation.content.semantic.combat.horde.ack.avoid_default.neutral.01",
-                json.loads(command.read_text()),
-            )
+            self.assertFalse((root / language / "Conversation/Command.json").exists())
             self.assertIn(
                 "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
                 json.loads(semantic.read_text()),

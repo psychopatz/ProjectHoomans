@@ -1,7 +1,6 @@
 {
   "languages": {
     "EN": [
-      "EN/Conversation/Command.json",
       "EN/Conversation/Flows.json",
       "EN/Conversation/Identity/Responses.json",
       "EN/Conversation/Journal/Events.json",
@@ -16,7 +15,6 @@
       "EN/Conversation/WorldEvents/Events.json"
     ],
     "TL": [
-      "TL/Conversation/Command.json",
       "TL/Conversation/Flows.json",
       "TL/Conversation/Identity/Responses.json",
       "TL/Conversation/Journal/Events.json",

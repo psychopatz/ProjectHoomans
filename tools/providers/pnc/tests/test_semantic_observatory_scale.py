@@ -64,7 +64,7 @@ class ObservatoryScaleTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[4]
         watched = [
             root / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/Dialogue/ResponseCatalog_Selection.lua",
-            root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Command.json",
+            root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/UI.json",
         ]
         hashes = lambda: [sha256(path.read_bytes()).hexdigest() for path in watched]
         before_files = hashes()

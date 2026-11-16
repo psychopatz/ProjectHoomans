@@ -86,7 +86,7 @@ Unify or delegate existing `Conversation/Text` desired-set cleanup through the s
 
 ## G4 — Programmatic legacy retirement and repository cleanup
 
-**Status:** NOT STARTED.
+**Status:** ACCEPTED (`CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED`).
 
 Using G0 evidence, encode confirmed obsolete outputs as recipe retirements/tombstones.
 
