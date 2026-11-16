@@ -55,7 +55,7 @@ return {
             ["shardOwner"] = "PsychopatzCore",
             ["sourceOwner"] = "PsychopatzCore",
             ["sourcePath"] = "tools/semantic_harness/codebuilder/sources/conversation/patterns/common/identity.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/psychopatzCore",
+            ["sourceRepository"] = "psychopatzCore",
             ["sourceShard"] = "patterns/common/identity.json",
         },
         {
@@ -74,7 +74,7 @@ return {
             ["shardOwner"] = "PsychopatzCore",
             ["sourceOwner"] = "PsychopatzCore",
             ["sourcePath"] = "tools/semantic_harness/codebuilder/sources/conversation/patterns/common/identity_facets.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/psychopatzCore",
+            ["sourceRepository"] = "psychopatzCore",
             ["sourceShard"] = "patterns/common/identity_facets.json",
         },
         {
@@ -197,7 +197,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/core_semantic_responses/accept.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/accept.json",
         },
         {
@@ -464,7 +464,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
         },
         {
@@ -484,7 +484,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
         },
         {
@@ -503,7 +503,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
         },
         {
@@ -525,7 +525,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
         },
         {
@@ -543,7 +543,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
         },
         {
@@ -562,7 +562,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_blade_head.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_blade_head.json",
         },
         {
@@ -580,7 +580,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
         },
         {
@@ -597,7 +597,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_human_banter_human_kill_aggressive/combat_human_kill_aggressive.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_aggressive/combat_human_kill_aggressive.json",
         },
         {
@@ -614,7 +614,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
         },
         {
@@ -631,7 +631,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
         },
         {
@@ -648,7 +648,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_human_banter_human_kill_practical/combat_human_kill_practical.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_practical/combat_human_kill_practical.json",
         },
         {
@@ -665,7 +665,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_human_banter_human_kill_reserved/combat_human_kill_reserved.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_reserved/combat_human_kill_reserved.json",
         },
         {
@@ -682,7 +682,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
         },
         {
@@ -699,7 +699,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive.json",
         },
         {
@@ -716,7 +716,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
         },
         {
@@ -733,7 +733,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
         },
         {
@@ -750,7 +750,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
         },
         {
@@ -767,7 +767,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_killer_practical/combat_reaction_kill_killer_practical.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_practical/combat_reaction_kill_killer_practical.json",
         },
         {
@@ -784,7 +784,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
         },
         {
@@ -801,7 +801,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
         },
         {
@@ -818,7 +818,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
         },
         {
@@ -835,7 +835,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
         },
         {
@@ -852,7 +852,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_witness_brave/combat_reaction_kill_witness_brave.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_brave/combat_reaction_kill_witness_brave.json",
         },
         {
@@ -869,7 +869,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
         },
         {
@@ -886,7 +886,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
         },
         {
@@ -903,7 +903,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved.json",
         },
         {
@@ -920,7 +920,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken.json",
         },
         {
@@ -937,7 +937,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_kill_witness_supportive/combat_reaction_kill_witness_supportive.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_supportive/combat_reaction_kill_witness_supportive.json",
         },
         {
@@ -958,7 +958,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
         },
         {
@@ -977,7 +977,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_check_in/question_gossip.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_check_in/question_gossip.json",
         },
         {
@@ -1004,7 +1004,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
         },
         {
@@ -1022,7 +1022,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_commands_lifecycle/command_camp.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp.json",
         },
         {
@@ -1040,7 +1040,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_commands_lifecycle/command_return_home.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home.json",
         },
         {
@@ -1057,7 +1057,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_commands_lifecycle/command_stop_following.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following.json",
         },
         {
@@ -1084,7 +1084,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_commands_player/command_player_attack_auto.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_player/command_player_attack_auto.json",
         },
         {
@@ -1117,7 +1117,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_commands_replies/combat_horde_ack_avoid_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_avoid_default.json",
         },
         {
@@ -1136,7 +1136,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_commands_replies/command_reply_return_home.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_return_home.json",
         },
         {
@@ -1154,7 +1154,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_flows/follow.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_flows/follow.json",
         },
         {
@@ -1197,7 +1197,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
         },
         {
@@ -1214,7 +1214,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/conversation_context/conversation_context_replies.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_context/conversation_context_replies.json",
         },
         {
@@ -1239,7 +1239,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/conversation_greeting/conversation_landing_whats_up.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/conversation_landing_whats_up.json",
         },
         {
@@ -1265,7 +1265,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/conversation_needs/question_needs_offer_fatigue.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
         },
         {
@@ -1286,7 +1286,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/conversation_whats_up/question_whats_up_busy.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
         },
         {
@@ -1303,7 +1303,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
         },
         {
@@ -1340,7 +1340,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/core_semantic_responses/accept.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/accept.json",
         },
         {
@@ -1361,7 +1361,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/core_semantic_responses/question_wellbeing.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_wellbeing.json",
         },
         {
@@ -1380,7 +1380,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/event_reactions_combat/combat_reaction_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
         },
         {
@@ -1399,7 +1399,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/event_reactions_companion/companion_reaction_abandonment.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_abandonment.json",
         },
         {
@@ -1417,7 +1417,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/event_reactions_corpse/corpse_reaction_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
         },
         {
@@ -1435,7 +1435,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/event_reactions_farewell/flow_farewell_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell_default.json",
         },
         {
@@ -1457,7 +1457,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/event_reactions_leader_loss/leader_loss_close.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_close.json",
         },
         {
@@ -1475,7 +1475,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/event_reactions_safety/conversation_safety_danger.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_danger.json",
         },
         {
@@ -1492,7 +1492,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/event_reactions_social/social_reaction_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
         },
         {
@@ -1509,7 +1509,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/health_content/question_health_state.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/health_content/question_health_state.json",
         },
         {
@@ -1526,7 +1526,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/health_content/question_medical_bite.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/health_content/question_medical_bite.json",
         },
         {
@@ -1543,7 +1543,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/identity_exchange/identity_exchange_responses.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/identity_exchange/identity_exchange_responses.json",
         },
         {
@@ -1567,7 +1567,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/medical_event_call/medical_distress_call_bandage.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bandage.json",
         },
         {
@@ -1586,7 +1586,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/medical_event_overview/medical_distress_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_default.json",
         },
         {
@@ -1610,7 +1610,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
         },
         {
@@ -1629,7 +1629,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
         },
         {
@@ -1647,7 +1647,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
         },
         {
@@ -1671,7 +1671,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/medical_event_update/medical_distress_update_bandage.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_bandage.json",
         },
         {
@@ -1692,7 +1692,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/navigation/navigation_camp.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
         },
         {
@@ -1711,7 +1711,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/needs_support/needs_member_support.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
         },
         {
@@ -1731,7 +1731,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/quest_content/quest_clinic_supplies_accept.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept.json",
         },
         {
@@ -1748,7 +1748,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/question_relationship_status/question_relationship_status.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/question_relationship_status/question_relationship_status.json",
         },
         {
@@ -1765,7 +1765,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/question_residence/question_residence.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/question_residence/question_residence.json",
         },
         {
@@ -1785,7 +1785,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_apology/social_apology_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
         },
         {
@@ -1804,7 +1804,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_ask_about/social_ask_about_member.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_member.json",
         },
         {
@@ -1826,7 +1826,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_check_in/social_small_talk_member.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk_member.json",
         },
         {
@@ -1846,7 +1846,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_companion_topics/social_personal_special_trust.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_personal_special_trust.json",
         },
         {
@@ -1877,7 +1877,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_emotes/conversation_acknowledged_default.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
         },
         {
@@ -1897,7 +1897,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_emotes/emote_reply_thumbsup.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
         },
         {
@@ -1930,7 +1930,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_greetings/social_greetings_acquaintance_dawn.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_dawn.json",
         },
         {
@@ -1950,7 +1950,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_greetings/social_greetings_member_dusk.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_dusk.json",
         },
         {
@@ -1968,7 +1968,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         },
         {
@@ -1985,7 +1985,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_context/interaction_context_clarify.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
         },
         {
@@ -2002,7 +2002,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
         },
         {
@@ -2021,7 +2021,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         },
         {
@@ -2038,7 +2038,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_news/interaction_news_acknowledge.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
         },
         {
@@ -2058,7 +2058,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
         },
         {
@@ -2079,7 +2079,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
         },
         {
@@ -2097,7 +2097,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
         },
         {
@@ -2118,7 +2118,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
         },
         {
@@ -2136,7 +2136,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
         },
         {
@@ -2156,7 +2156,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
         },
         {
@@ -2175,7 +2175,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
         },
         {
@@ -2195,7 +2195,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_reactions_hostile_offer_threat/social_hostile_short.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_short.json",
         },
         {
@@ -2212,7 +2212,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
         },
         {
@@ -2229,7 +2229,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_settlement_admission/social_settlement_admission.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
         },
         {
@@ -2253,7 +2253,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json",
         },
         {
@@ -2271,7 +2271,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
         },
         {
@@ -2294,7 +2294,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json",
         },
         {
@@ -2311,7 +2311,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
         },
         {
@@ -2351,7 +2351,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
         },
         {
@@ -2377,7 +2377,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
         },
         {
@@ -2396,7 +2396,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/task_lifecycle/gift.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/gift.json",
         },
         {
@@ -2415,7 +2415,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/task_lifecycle/task_eat.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat.json",
         },
         {
@@ -2433,7 +2433,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/task_lifecycle/task_refill.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill.json",
         },
         {
@@ -2458,7 +2458,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/task_tool_replies/tool_reply_cooldown.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_cooldown.json",
         },
         {
@@ -2484,7 +2484,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/task_tool_replies/tool_reply_queued_compliment.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_compliment.json",
         },
         {
@@ -2502,7 +2502,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/task_tool_replies/tool_reply_rejected_hostile.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_rejected_hostile.json",
         },
         {
@@ -2528,7 +2528,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
         },
         {
@@ -2546,7 +2546,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/wellbeing_content/question_wellbeing_thirst.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
         },
         {
@@ -3003,7 +3003,7 @@ return {
             ["shardOwner"] = "ProjectHoomans",
             ["sourceOwner"] = "ProjectHoomans",
             ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/dialogue/companion_check_in/question_needs.json",
-            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceRepository"] = "ProjectHoomans",
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_check_in/question_needs.json",
         },
         {
