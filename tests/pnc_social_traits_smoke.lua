@@ -100,6 +100,9 @@ CharacterTraitDefinition = {
             getCost = function(self)
                 return self.cost
             end,
+            getType = function(self)
+                return self.trait
+            end,
             isFree = function(self)
                 return self.isProfession
             end,
@@ -250,6 +253,9 @@ CharacterCreationProfession = {
         populateCalls = populateCalls + 1
         target.items = {}
     end,
+    repopulateTraitLists = function(self)
+        self.repopulateCalls = (self.repopulateCalls or 0) + 1
+    end,
     isTraitEnabled = function()
         return true
     end,
@@ -284,6 +290,38 @@ T.load(
 screen:populateTraitList(list)
 T.equal(populateCalls, 2, "UI adapter idempotent")
 T.equal(#list.items, 8, "UI adapter avoids duplicates")
+
+-- Project Hoomans consumes the provider-neutral Core seam. The adapter reads
+-- the actual selected list and normal/co-op screens inherit the same wrapper.
+screen.listboxTraitSelected = {
+    items = {
+        { item = engineDefinitions[PsychopatzCore.Traits.EngineTraits[
+            StartingTraits.IDS.BROTHER
+        ]] },
+    },
+}
+screen:repopulateTraitLists()
+local adapter = PNC.StartingCompanionCharacterCreationAdapter
+local lastEvent = adapter.GetLastEvent()
+T.truthy(lastEvent, "starting companion adapter observed normal screen")
+T.equal(lastEvent.selectedCompanionTraitIDs[1], StartingTraits.IDS.BROTHER,
+    "normal screen selected companion trait")
+
+local coopScreen = setmetatable({
+    listboxTraitSelected = {
+        items = {
+            { item = engineDefinitions[PsychopatzCore.Traits.EngineTraits[
+                StartingTraits.IDS.SISTER
+            ]] },
+        },
+    },
+}, { __index = CharacterCreationProfession })
+coopScreen:repopulateTraitLists()
+lastEvent = adapter.GetLastEvent()
+T.equal(lastEvent.screen, coopScreen,
+    "co-op screen uses the same Core extension path")
+T.equal(lastEvent.selectedCompanionTraitIDs[1], StartingTraits.IDS.SISTER,
+    "co-op selected companion trait")
 
 -- Default and each individual trait resolve to canonical primitive profile.
 local defaults = Traits.ResolveTraits({})

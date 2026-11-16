@@ -1,8 +1,5 @@
-if not PsychopatzCore or not PsychopatzCore.Traits
-    or not PsychopatzCore.Traits.AppendZeroPointTraits
-then
-    require "PsychopatzCore/Traits/PsychopatzTraitCharacterCreation"
-end
+require "PsychopatzCore/Traits/PsychopatzTraitCharacterCreation"
+require "PNC/CharacterCreation/PNC_StartingCompanionCharacterCreationAdapter"
 
 PNC = PNC or {}
 PNC.SocialTraitCharacterCreationPatch =
