@@ -1,23 +1,40 @@
 ---
 handoff_schema: 2
-checkpoint_mode: "clean_closure"
+checkpoint_mode: "dirty_snapshot"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-state: "COMPLETE"
-parent_status: "COMPLETE"
-phase: "G7"
-chunk: "G7E — G0-G7 complete; structural ownership refactor closed cleanly"
+state: "DIRTY_RESUMABLE"
+parent_status: "IN_PROGRESS"
+phase: "G8"
+chunk: "G8A — compact authoring schema + formal compiler boundary"
 retrieval_tier: "auditor"
 ---
 
 # Session Handoff
 
-## Completion summary
+## Resume truth
 
-All G0–G7 phases are complete and verified across `psychopatzCore`, `ProjectHoomans`, and `DynamicTrading`:
+Close G7R before extracting the portable backend/toolchain.
 
-- `generation_recipe.json` has `0` preserved translation files and only `3` compact structural `directory_glob` anti-regression rules.
-- All `ProjectHoomans` `Conversation/` runtime text is 100% CodeBuilder-generated (`Conversation/UI.json` + `Conversation/Text/...` + `manifests/Conversation.json`).
-- Ordinary application translations live outside `Conversation/` (`Character/Character.json`, `Debug/Debug.json`).
-- Adding and removing future semantic families requires zero edits to `generation_recipe.json`, even without persisted receipts.
-- Canonical CLI (`python3 tools/semantic_harness/codebuilder/reconcile.py --recipe tools/semantic_harness/codebuilder/generation_recipe.json --check` / `--apply`) runs directly from `psychopatzCore` and closes cleanly across all 3 owners (`missing=0, drifted=0, stale=0, retired_present=0, ambiguous=0`).
+Verified future-direction evidence:
+- canonical IR is already actor-neutral;
+- beats/behaviors are largely declarative;
+- camp already demonstrates typed capability separation;
+- profanity still contains recreatable handwritten recognition/policy logic;
+- fuzzy matching belongs in standard runtime semantics.
+
+Compactness audit:
+- 571 semantic source files, ~1.4 MB;
+- every file repeats schema/kind/owner;
+- 558 repeat namespace;
+- 371/372 participant declarations are identical.
+
+G8A should therefore introduce compact authoring source that expands into the explicit current IR, not weaken the IR.
+
+## Exact next action
+
+Complete G7R1, then G7R2–G7R3. After the clean committed checkpoint, begin G8A.
+
+## Safety
+
+Preserve unrelated concurrent work. Do not reset/stash/discard, broad-stage, create a branch, or publish.

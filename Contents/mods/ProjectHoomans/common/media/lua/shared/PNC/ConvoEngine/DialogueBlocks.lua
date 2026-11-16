@@ -1,3 +1,4 @@
+-- ConvoEngine: hand-written
 -- Project Hoomans adopter projection for ConvoEngine dialogue plans.
 --
 -- ConvoEngine remains authored and compiled by PsychopatzCore.  This module only
