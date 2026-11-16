@@ -1,7 +1,7 @@
 # Progress — Semantic Generation Lifecycle Cleanup
 
-**Status:** IN_PROGRESS.
-**Current phase:** G6 — Agent workflow and documentation acceptance.
+**Status:** COMPLETE — all developer-side phases G0–G6 accepted.
+**Current phase:** COMPLETE (G0–G6 accepted).
 **Primary repository:** ProjectHoomans.
 **Participant implementation repository:** psychopatzCore.
 **Conditional participant:** DynamicTrading/DTCommon.
@@ -32,18 +32,21 @@ Evidence: `CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED` (`genera
 
 Evidence: `CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED` (`tools.semantic_harness.tests.test_semantic_generation_lifecycle_g5`, `test_convo_engine_s6m8_audit`, `test_convo_engine_s9r_closure`, `test_convo_engine_s9_regressions`, `test_generation_ownership`).
 
-- Added permanent lifecycle regression suite `psychopatzCore/tools/semantic_harness/tests/test_semantic_generation_lifecycle_g5.py` covering source deletion, source rename, owner migration (`ProjectHoomans → PsychopatzCore → DTCommon`), mixed UI generated-key deletion with authored key preservation, obsolete translation domain pruning, `Conversation/Text` closed-set pruning, retired path reintroduction detection and cleanup, unknown/unowned neighbor preservation + strict-closure failure, active hash-shard preservation, and two-pass byte/mtime determinism.
-- Verified 70 tests across 13 CodeBuilder/ConvoEngine/ownership test suites pass.
-- Verified a second consecutive `reconcile_apply()` on the real three-repository workspace writes 0 files, prunes 0 files/keys, and leaves Git status unchanged.
+### G6 — Agent workflow and documentation acceptance (`ACCEPTED`)
 
-## Parent completion boundary
+Evidence: `CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED` (`ProjectHoomans/AGENTS.md`, `psychopatzCore/AGENTS.md`, `psychopatzCore/tools/semantic_harness/codebuilder/README.md`, `test_g6_agent_workflow_and_cli_discoverability`).
 
-The parent goal remains IN PROGRESS until G0–G6 are accepted.
+- Finalized the durable `Semantic CodeBuilder generated artifacts` workflow rule in `ProjectHoomans/AGENTS.md` and `psychopatzCore/AGENTS.md`.
+- Updated `psychopatzCore/tools/semantic_harness/codebuilder/README.md` and `reconcile.py --help` so the canonical source locations and `--check` / `--apply` commands are self-discoverable without manual generated-tree inspection.
+- Verified final canonical reconciliation across all enabled owners (`PsychopatzCore`, `ProjectHoomans`, `DTCommon`):
+  - `desired = 371` (`DTCommon = 12`, `ProjectHoomans = 299`, `PsychopatzCore = 60`)
+  - `missing = 0`
+  - `drifted = 0`
+  - `stale = 0`
+  - `retired_present = 0`
+  - `ambiguous = 0`
+  - `preserved = 38`
 
 ## Next Chunk
 
-**G6 — Finalize the durable `AGENTS.md` workflow, update CodeBuilder documentation, and verify agent discoverability and final closure.**
-
-1. Inspect and finalize the brief semantic-generation workflow in root `AGENTS.md` files (`ProjectHoomans`, `psychopatzCore`) and `psychopatzCore/tools/semantic_harness/codebuilder/README.md` so documentation and CLI agree and no instruction tells agents to manually patch/delete generated semantic runtime artifacts.
-2. Add a G6 workflow/discoverability test verifying that the recipe, `--help` output, and `--explain` / report output answer which source to edit, which command checks state, which command applies cleanup, and why a candidate was deleted or preserved without reading the full generated tree.
-3. Run final canonical `reconcile.py --check` across all enabled owners and full regression suites to close G6 and the parent goal.
+None — all G0–G6 developer-side phases are complete and accepted.

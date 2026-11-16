@@ -1,6 +1,6 @@
 # Semantic Generation Lifecycle Cleanup
 
-**Status:** IN_PROGRESS — G0–G5 accepted; proceeding into G6.
+**Status:** COMPLETE — all developer-side phases G0–G6 accepted.
 
 ## Parent objective
 

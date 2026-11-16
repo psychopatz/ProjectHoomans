@@ -38,6 +38,12 @@ Project Zomboid recursively watches every loaded mod's `media/` tree with `Debug
 - Preserve unrelated user/agent work. Never use blind `git pull`, force-push, destructive reset, destructive rebase, automatic stash/discard, or conflict resolution that overwrites uncertain changes.
 - If safe integration cannot be proven, report the concrete conflict or ownership ambiguity rather than creating another branch or discarding work.
 
+## Semantic CodeBuilder generated artifacts
+
+- Treat canonical semantic source/manifests and the PsychopatzCore CodeBuilder recipe/reconciler as authority. Generated Lua/translation artifacts are downstream output, not hand-edit targets.
+- For semantic generation drift or cleanup, use the canonical recipe-driven check/apply workflow. Do not manually delete or patch suspected generated leftovers, and do not infer staleness from hash-suffixed filenames.
+- Safe cleanup must be owner-scoped and closed-set: remove only artifacts/keys proven CodeBuilder-owned, preserve authored or mixed-package content, and treat unexpected leftovers as a generator-lifecycle defect to fix at the source.
+
 ## Native runtime and publication authority
 
 - A Git commit or GitHub push is not Steam Workshop publication.

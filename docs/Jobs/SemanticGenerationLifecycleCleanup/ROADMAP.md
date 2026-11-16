@@ -1,6 +1,6 @@
 # Roadmap — Semantic Generation Lifecycle Cleanup
 
-**Parent status:** IN_PROGRESS.
+**Parent status:** COMPLETE.
 **Completion boundary:** all developer-side phases G0–G6 accepted.
 **Parent objective:** eliminate confirmed semantic generation leftovers and make future cleanup automatic, safe, closed-set and recipe-driven.
 
@@ -120,7 +120,7 @@ Run affected Python tests, full CodeBuilder generation tests and relevant reposi
 
 ## G6 — Agent workflow and documentation acceptance
 
-**Status:** NOT STARTED.
+**Status:** ACCEPTED (`CODE_VERIFIED`, `TEST_VERIFIED`, `GENERATED_OUTPUT_VERIFIED`).
 
 Finalize the small root `AGENTS.md` semantic-generation rule.
 
