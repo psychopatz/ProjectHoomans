@@ -41,7 +41,11 @@
       "pythonScenario": "tools.providers.pnc.runtime.scenario:DEFAULT_SCENARIO",
       "workerScript": "${repository}/tools/providers/pnc/lua/worker.lua",
       "workerProfile": "pnc",
-      "workerPriority": 100
+      "workerPriority": 100,
+      "fixtureRoots": {
+        "semantic": "${repository}/tools/providers/pnc/fixtures/v1",
+        "regression": "${repository}/tools/providers/pnc/fixtures"
+      }
     }
   ],
   "conversationManifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"

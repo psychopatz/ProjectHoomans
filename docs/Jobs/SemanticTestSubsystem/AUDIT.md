@@ -1,15 +1,69 @@
-# Audit — baseline and migration hazards
+# Audit — Semantic Test Subsystem After PSDL Refactors
 
-Source inspected on local ProjectHoomans main at HEAD **507fca06** (2026-11-01); worktree was clean during initial audit. Counts are limited to files matching tests/pnc_semantic*_smoke.lua, **not** all semantic-related test files.
+**Evidence:** CODE_VERIFIED, TEST_VERIFIED, RUNTIME_VERIFIED.
 
-- **146** matching Lua smoke tests, approximately **26,072** lines.
-- All 146 require tests/support/test; 115 explicitly invoke T.addPackagePaths(); 145 contain T.finish(); 33 reset PsychopatzCore and 56 reset PNC.
-- tests/pnc_semantic_local_response_questions_smoke.lua independently constructs semantic IR/context and checks "What's up?", wellbeing, world time/date/weather, and responses; tests/pnc_semantic_nlu_smoke.lua separately boots parser/catalog/policy and asserts conversational and self-state inputs.
-- Existing fixtures include **nine JSON files** under tools/semantic_harness/fixtures, split between observatory_* and fixtures/c0a (semantic_corpus, multi_turn_scenarios, suggestion_cases, reply_realization_cases). Existing formats must be inventoried before conversion.
-- c0a_baseline.py is a substantial production-worker-backed characterization tool. It must not be removed before proving all unique coverage and outputs are preserved.
-- LuaSemanticWorker at tools/semantic_harness/runtime/worker.py imports disposable scenario state into a persistent production-Lua process. Its existing session/worker is the primary execution seam.
-- Existing Observatory/Simulation and Python tests have already established authority, read-only and user-save protection contracts; this job must not undo them.
-- Classification must distinguish declarative behaviour cases, mixed suites, imperative unit contracts and engine-native acceptance. A test filename or line count alone is not proof that the test can be safely converted.
-- Native SP/MP acceptance has not been performed by this documentation-only audit. No new baseline test runs were performed here.
+## Tester engine
 
-Risks: hidden assertion coverage loss; Python duplicating policy; scenario projection not matching real gameplay; expected values overfitted to fixed prose; fixture-expansion explosion; slow startup per case; saves/real source mutation; breaking existing CLI/GUI; removing exceptional negative cases.
+The declarative fixture engine remains functional:
+- current schema/validator works;
+- loader expands matrices deterministically;
+- executor runs isolated cases through real `LuaSemanticWorker`;
+- comparator/projection remains active;
+- lint works;
+- bounded batch/cancel/resume works, including real Lua execution.
+
+## Maintained corpus
+
+`ProjectHoomans/tools/providers/pnc/fixtures/v1` contains:
+- 17 files;
+- 116 expanded cases;
+- current schema `semantic.harness-test.v1`.
+
+Explicit execution works through both fixture CLI paths.
+
+## Default-discovery regression
+
+Core still contains a duplicate 17-file corpus under `tools/semantic_harness/fixtures/v1` using retired `pnc.semantic-test.v1`.
+
+Both:
+- `python -m tools.semantic_harness.testing.cli` default discovery;
+- main `python -m tools.semantic_harness --run-semantic-tests` without explicit files;
+
+select the stale Core directory and fail schema validation before running cases.
+
+Existing mandatory CLI acceptance missed this because it always supplies a temporary `--semantic-test-file`.
+
+## Duplicate-content drift
+
+After normalizing only the schema field, 16/17 v1 duplicate files are otherwise equivalent.
+
+`observatory/core.json` also differs in two identity-key prefix expectations: provider copy uses `question.identity`, while Core stale copy uses `question.identity.`.
+
+GUI regression controller additionally loads older PNC observatory fixtures directly from Core `tools/semantic_harness/fixtures/`; ProjectHoomans has provider-owned copies and some have diverged.
+
+## Full-corpus execution
+
+Full maintained provider corpus through production Lua:
+
+```text
+PASS 114
+FAIL   2
+TOTAL 116
+```
+
+Failures:
+
+1. `c0a.corpus.valid_mutating_request_control` / `give me water`
+   - historical semantic contract: explicit authoritative mutation allowed;
+   - current runtime: GIVE accepted, `SemanticTaskRequest` sent;
+   - fixture expectation of zero dispatch/tool calls is stale.
+
+2. `c0a.corpus.malformed_mutating_request_tail_typo` / `give me waterr`
+   - current runtime: confidence 0.89, action rejected/blocked with `clarification_required`;
+   - authoritative `dispatchTransport` remains empty;
+   - one rejected diagnostic `action_dispatch` appears in `toolCalls`;
+   - zero-tool-call assertion is stale; authoritative-mutation safety remains intact.
+
+## Conclusion
+
+Repair fixture authority/discovery rather than rebuilding the tester. Move all PNC fixture ownership to the provider, update stale expectations, add default-discovery acceptance, and retire Core duplicates only after every caller migrates.

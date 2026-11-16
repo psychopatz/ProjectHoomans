@@ -432,11 +432,13 @@
         {
           "text": "give me water",
           "expect": {
+            "ir.intent": "REQUEST",
+            "ir.action": "GIVE",
+            "actionResult.accepted": true,
+            "actionResult.status": "accepted",
+            "actionResult.reason": "network_queued",
             "dispatchTransport": {
-              "count": 0
-            },
-            "toolCalls": {
-              "count": 0
+              "count": 1
             }
           }
         }
@@ -501,9 +503,9 @@
             "dispatchTransport": {
               "count": 0
             },
-            "toolCalls": {
-              "count": 0
-            }
+            "actionResult.accepted": false,
+            "actionResult.status": "semantic_dispatch_blocked",
+            "actionResult.reason": "clarification_required"
           }
         }
       ]
