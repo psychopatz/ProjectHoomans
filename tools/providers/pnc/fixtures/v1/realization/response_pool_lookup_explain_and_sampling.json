@@ -1,0 +1,75 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.realization.response_pool_lookup_explain_and_sampling",
+  "domain": "realization",
+  "cases": [
+    {
+      "id": "realization.response_pool_lookup_explain_and_sampling.response_pools_lookup_list_detail_explain_sample",
+      "description": "Verify response.list, response.detail, response.lookup, response.explain, and response.sample.",
+      "tags": [
+        "realization"
+      ],
+      "turns": [
+        {
+          "action": "response.list",
+          "payload": {
+            "limit": 8
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.pools": {
+              "minCount": 1
+            }
+          }
+        },
+        {
+          "action": "response.detail",
+          "payload": {
+            "poolID": "semantic.combat.human_kill.aggressive",
+            "limit": 8
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.variants": {
+              "minCount": 1
+            }
+          }
+        },
+        {
+          "action": "response.lookup",
+          "payload": {
+            "key": "UI_PNC_Conversation_Semantic_FlowWeatherRaining"
+          },
+          "expect": {
+            "operation.status": "ok"
+          }
+        },
+        {
+          "action": "response.explain",
+          "payload": {
+            "poolID": "semantic.combat.human_kill.aggressive",
+            "context": {},
+            "salt": "a6r2"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.poolID": "semantic.combat.human_kill.aggressive"
+          }
+        },
+        {
+          "action": "response.sample",
+          "payload": {
+            "poolID": "semantic.combat.human_kill.aggressive",
+            "context": {},
+            "salt": "a6r2"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.poolID": "semantic.combat.human_kill.aggressive"
+          }
+        }
+      ],
+      "domain": "realization"
+    }
+  ]
+}

@@ -5,8 +5,8 @@ target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 state: "COMPLETE"
 parent_status: "COMPLETE"
-phase: "A6R4"
-chunk: "A6R1-A6R4 Behavioral Fixture Consolidation & Closure Hardening complete"
+phase: "A6R8"
+chunk: "A6R5-A6R8 Semantic Test Estate Normalization complete"
 retrieval_tier: "auditor"
 ---
 
@@ -14,10 +14,11 @@ retrieval_tier: "auditor"
 
 ## Final state
 
-The `semantic.harness-test.v1` fixture system is the single declarative behavioural acceptance surface for the PSDL / ConvoEngine semantic stack across all 11 discovered domains (`actions`, `beats`, `behaviors`, `compiler`, `dialogue`, `flows`, `interaction`, `knowledge`, `realization`, `recognition`, `suggestions`), with 180/180 cases passing against real production Lua and canonical CodeBuilder compiler probes.
+The active test estate is domain-first, descriptively named, single-authority (`semantic.harness-test.v1`), duplicate-guarded, and free of historical C0A/legacy-regression parallel roots.
 
 ## Key artifacts
 
-- `psychopatzCore/tools/semantic_harness/tests/test_fixture_authority.py`: Includes GUI Regression-tab domain discovery, semantic-ID filtering, batch execution, and cancel acceptance.
-- `ProjectHoomans/tools/providers/pnc/fixtures/v1/`: Expanded maintained PNC corpus (31 files, 180 cases, 180/180 PASS) with explicit semantic domains and real-production coverage for all registered operations.
-- `ProjectHoomans/docs/Jobs/SemanticTestSubsystem/TEST_CLASSIFICATION.json`: Exhaustive classification of all 181 remaining `test_*.py` modules (772 methods) with specific implementation-contract justifications.
+- `psychopatzCore/tools/semantic_harness/testing/lint.py`: Global exact-duplicate detection, bounded stimulus-overlap reporting, history/milestone naming guard, and domain/path mismatch guard.
+- `psychopatzCore/tools/semantic_harness/ui/regression_controller.py`: Canonical `semantic` fixture routing for all Regression-tab actions (`kind="regression"` retired).
+- `ProjectHoomans/tools/providers/pnc/fixtures/v1/`: 38 domain-first fixture files, 180 cases, 11 semantic domains, 0 lint violations.
+- `ProjectHoomans/docs/Jobs/SemanticTestSubsystem/TEST_CLASSIFICATION.json`: 177 retained imperative modules (745 methods) classified with concrete implementation-contract justifications.

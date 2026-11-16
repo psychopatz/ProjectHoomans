@@ -1,0 +1,114 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.whats_up_and_ambient_context",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.whats_up_and_ambient_context.whats_up_basic_en",
+      "tags": [
+        "dialogue",
+        "whats_up",
+        "nlu"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "clear"
+        }
+      },
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "ir.subject": "CONVERSATION_TOPIC",
+            "ir.extensions.topic": "whats_up",
+            "response.sourcePoolID": "semantic.question.whats_up",
+            "response.templateID": "question.whats_up.default",
+            "response.exists": true,
+            "flow.noFlow": true
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.whats_up_and_ambient_context.whats_up_weather_variant_rain",
+      "tags": [
+        "dialogue",
+        "whats_up",
+        "weather"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "rain"
+        }
+      },
+      "turns": [
+        {
+          "text": "what's up",
+          "expect": {
+            "ir.subject": "CONVERSATION_TOPIC",
+            "ir.extensions.topic": "whats_up",
+            "response.sourcePoolID": "semantic.question.whats_up",
+            "response.exists": true
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.whats_up_and_ambient_context.whats_up_time_context",
+      "tags": [
+        "dialogue",
+        "whats_up",
+        "time"
+      ],
+      "scenario": {
+        "world": {
+          "time": {
+            "hour": 21,
+            "minute": 5
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "what time is it",
+          "expect": {
+            "ir.subject": "TIME",
+            "response.templateID": "semantic.question.time",
+            "response.exists": true
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.whats_up_and_ambient_context.whats_up_date_context",
+      "tags": [
+        "dialogue",
+        "whats_up",
+        "date"
+      ],
+      "scenario": {
+        "world": {
+          "calendar": {
+            "year": 1993,
+            "month": 10,
+            "day": 19
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "what day is it",
+          "expect": {
+            "ir.subject": "DATE",
+            "response.templateID": "semantic.question.date",
+            "response.exists": true
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

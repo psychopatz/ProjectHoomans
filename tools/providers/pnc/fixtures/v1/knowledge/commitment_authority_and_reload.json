@@ -1,0 +1,71 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.knowledge.commitment_authority_and_reload",
+  "domain": "knowledge",
+  "cases": [
+    {
+      "id": "knowledge.commitment_authority_and_reload.commitment_acknowledged_survives_reload",
+      "description": "Acknowledged commitment binds to authoritative player UUID and survives save_reload.",
+      "tags": [
+        "knowledge",
+        "commitment"
+      ],
+      "scenario": {
+        "npc": {
+          "runtime": {
+            "conversationLease": {
+              "token": "harness-lease",
+              "playerOnlineID": 1,
+              "playerUsername": "Patrick Patz",
+              "startedAt": 1000,
+              "expiresAt": 4000,
+              "maximumDistance": 6,
+              "dangerRadius": 8,
+              "processedConversationRequests": {
+                "ack-1": {
+                  "success": true,
+                  "npcID": "npc_mara",
+                  "outcomeID": "promise.accepted"
+                }
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "action": "commitment.apply",
+          "payload": {
+            "operation": "record",
+            "npcID": "npc_mara",
+            "commitmentID": "bandages-1",
+            "topic": "medical",
+            "intent": "bring bandages",
+            "sourceFactRefs": [
+              "conversation:ack-1"
+            ],
+            "acknowledgementRequestID": "ack-1",
+            "characterUUID": "char_other"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.result.accepted": true,
+            "result.result.committed": true,
+            "result.result.characterUUID": "char_patrick"
+          }
+        },
+        {
+          "action": "commitment.apply",
+          "payload": {
+            "operation": "save_reload",
+            "npcID": "npc_mara"
+          },
+          "expect": {
+            "operation.status": "ok"
+          }
+        }
+      ],
+      "domain": "knowledge"
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.interaction.multi_turn_topic_and_hostility",
+  "domain": "interaction",
+  "cases": [
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.npc_question_player_not_really",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "social"
+      ],
+      "description": "NPC greeting flow followed by player short disagreement",
+      "turns": [
+        {
+          "text": "hello there",
+          "expect": {
+            "ir.intent": "GREET",
+            "response.exists": true
+          }
+        },
+        {
+          "text": "not really",
+          "expect": {
+            "ir.intent": "DISAGREE",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "response.templateID": "social.acknowledged"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.hostility_then_apology",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "hostility",
+        "apology"
+      ],
+      "description": "Hostility followed by an apology and de-escalation",
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "ir.intent": "INSULT",
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "ir.intent": "APOLOGIZE",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "response.templateID": "social.apology.friendly"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.hostility_then_continued_challenge",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "hostility",
+        "challenge"
+      ],
+      "description": "Hostility followed by a skeptical short utterance",
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "ir.intent": "INSULT",
+            "dispatchTransport": {
+              "count": 0
+            }
+          }
+        },
+        {
+          "text": "yeah right",
+          "expect": {
+            "ir.intent": "DISAGREE",
+            "decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "response.templateID": "social.acknowledged"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.topic_continuation",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "topic",
+        "time",
+        "date"
+      ],
+      "description": "Adjacent time and date queries across consecutive turns",
+      "turns": [
+        {
+          "text": "what time is it",
+          "expect": {
+            "ir.subject": "TIME",
+            "response.templateID": "semantic.question.time"
+          }
+        },
+        {
+          "text": "what day is it",
+          "expect": {
+            "ir.subject": "DATE",
+            "response.templateID": "semantic.question.date"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.multi_turn_topic_and_hostility.topic_change",
+      "tags": [
+        "interaction",
+        "multi_turn",
+        "topic",
+        "wellbeing"
+      ],
+      "description": "Time question followed by wellbeing query",
+      "turns": [
+        {
+          "text": "what time is it",
+          "expect": {
+            "ir.subject": "TIME",
+            "response.templateID": "semantic.question.time"
+          }
+        },
+        {
+          "text": "how are you",
+          "expect": {
+            "ir.subject": "WELLBEING",
+            "decision.branch": "QUESTION_RECEIVED"
+          }
+        }
+      ],
+      "domain": "interaction"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.knowledge.backstory_question_recognition",
+  "domain": "knowledge",
+  "cases": [
+    {
+      "id": "knowledge.backstory_question_recognition.backstory_fail_closed_questions",
+      "description": "Compositional backstory questions emit backstoryKind and fail closed when undisclosed.",
+      "tags": [
+        "knowledge",
+        "backstory",
+        "preview"
+      ],
+      "turns": [
+        {
+          "action": "preview",
+          "text": "what did you do before",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "NPC_BACKSTORY",
+            "ir.slots.backstoryKind": "former_job",
+            "ir.extensions.facts.NPC_BACKSTORY.status": "unknown",
+            "ir.extensions.facts.NPC_BACKSTORY.reason": "backstory_not_disclosed",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.former_job",
+            "decision.route": "deterministic"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "what was your job",
+          "expect": {
+            "ir.slots.backstoryKind": "former_job",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.former_job"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "where are you from",
+          "expect": {
+            "ir.slots.backstoryKind": "hometown",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.hometown"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "what is your hobby",
+          "expect": {
+            "ir.slots.backstoryKind": "hobby",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.hobby"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "tell me about your family",
+          "expect": {
+            "ir.slots.backstoryKind": "family_background",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.family_background"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "what are you afraid of",
+          "expect": {
+            "ir.slots.backstoryKind": "fear",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.fear"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "what happened to you",
+          "expect": {
+            "ir.slots.backstoryKind": "tragedy",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.tragedy"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "how did you survive",
+          "expect": {
+            "ir.slots.backstoryKind": "survival_origin",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.survival_origin"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "when is your birthday",
+          "expect": {
+            "ir.slots.backstoryKind": "date_of_birth",
+            "ir.extensions.facts.NPC_BACKSTORY.topicID": "backstory.date_of_birth"
+          }
+        }
+      ],
+      "domain": "knowledge"
+    }
+  ]
+}

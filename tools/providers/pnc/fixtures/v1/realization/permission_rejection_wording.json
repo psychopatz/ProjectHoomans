@@ -1,0 +1,139 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.realization.permission_rejection_wording",
+  "domain": "realization",
+  "cases": [
+    {
+      "id": "realization.permission_rejection_wording.permissions_follow_rejected_en",
+      "tags": [
+        "realization",
+        "permissions",
+        "rejected",
+        "follow"
+      ],
+      "scenario": {
+        "runtime": {
+          "commandResponses": {
+            "follow": {
+              "accepted": false,
+              "reason": "permission_denied"
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "follow me",
+          "language": "EN",
+          "expect": {
+            "ir.action": "FOLLOW",
+            "actionResult.accepted": false,
+            "actionResult.status": "rejected",
+            "actionResult.reason": "permission_denied"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.permission_rejection_wording.permissions_follow_rejected_tl",
+      "tags": [
+        "realization",
+        "permissions",
+        "rejected",
+        "follow",
+        "localization"
+      ],
+      "scenario": {
+        "runtime": {
+          "commandResponses": {
+            "follow": {
+              "accepted": false,
+              "reason": "permission_denied"
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "follow me",
+          "language": "TL",
+          "expect": {
+            "ir.action": "FOLLOW",
+            "actionResult.accepted": false,
+            "actionResult.status": "rejected",
+            "actionResult.reason": "permission_denied",
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.permission_rejection_wording.permissions_stay_rejected_en",
+      "tags": [
+        "realization",
+        "permissions",
+        "rejected",
+        "stay"
+      ],
+      "scenario": {
+        "runtime": {
+          "commandResponses": {
+            "stay": {
+              "accepted": false,
+              "reason": "permission_denied"
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "wait here",
+          "language": "EN",
+          "expect": {
+            "ir.action": "STAY",
+            "actionResult.accepted": false,
+            "actionResult.status": "rejected",
+            "actionResult.reason": "permission_denied"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.permission_rejection_wording.permissions_stay_rejected_tl",
+      "tags": [
+        "realization",
+        "permissions",
+        "rejected",
+        "stay",
+        "localization"
+      ],
+      "scenario": {
+        "runtime": {
+          "commandResponses": {
+            "stay": {
+              "accepted": false,
+              "reason": "permission_denied"
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "wait here",
+          "language": "TL",
+          "expect": {
+            "ir.action": "STAY",
+            "actionResult.accepted": false,
+            "actionResult.status": "rejected",
+            "actionResult.reason": "permission_denied",
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    }
+  ]
+}

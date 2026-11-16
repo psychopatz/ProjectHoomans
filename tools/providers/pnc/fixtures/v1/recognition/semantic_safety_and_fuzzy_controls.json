@@ -1,0 +1,538 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.recognition.semantic_safety_and_fuzzy_controls",
+  "domain": "recognition",
+  "cases": [
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_compact_fuckyou",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_insult"
+      ],
+      "turns": [
+        {
+          "text": "fuckyou",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_compact_fuckyou_elongated",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_insult"
+      ],
+      "turns": [
+        {
+          "text": "fuckyouuuu",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_compact_shutthefuckup",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_hostility"
+      ],
+      "turns": [
+        {
+          "text": "shutthefuckup",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_compact_youidiot",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_insult"
+      ],
+      "turns": [
+        {
+          "text": "youidiot",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_compact_youreuseless",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_insult"
+      ],
+      "turns": [
+        {
+          "text": "youreuseless",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_compact_illkillyou",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_threat"
+      ],
+      "turns": [
+        {
+          "text": "illkillyou",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_elongated_spaced_hostility",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_insult"
+      ],
+      "turns": [
+        {
+          "text": "fuck youuuu",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_typo_insult",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_insult"
+      ],
+      "turns": [
+        {
+          "text": "you are an idot",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_elongated_hostility",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_hostility"
+      ],
+      "turns": [
+        {
+          "text": "gooo away",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_hope_you_die",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_malicious_hostility"
+      ],
+      "turns": [
+        {
+          "text": "i hope you die",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_hate_you",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "directed_hostility"
+      ],
+      "turns": [
+        {
+          "text": "i hate you",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_hate_rain",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "world_complaint"
+      ],
+      "turns": [
+        {
+          "text": "i fucking hate this rain",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_starving_self_state",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "self_state_or_need"
+      ],
+      "turns": [
+        {
+          "text": "i'm fucking starving",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_not_bad_affirmation",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "positive_assessment"
+      ],
+      "turns": [
+        {
+          "text": "you're not bad",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_not_really_contextual",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "contextual_disagreement"
+      ],
+      "turns": [
+        {
+          "text": "not really",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_yeah_right_contextual",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "contextual_skepticism"
+      ],
+      "turns": [
+        {
+          "text": "yeah right",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_benign_greeting",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "benign_greeting"
+      ],
+      "turns": [
+        {
+          "text": "hello there",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_benign_beautiful_day",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "benign_world_observation"
+      ],
+      "turns": [
+        {
+          "text": "this is a beautiful day",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_benign_identity_question",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "benign_identity_question"
+      ],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_valid_mutating_request_control",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "explicit_give_request"
+      ],
+      "turns": [
+        {
+          "text": "give me water",
+          "expect": {
+            "ir.intent": "REQUEST",
+            "ir.action": "GIVE",
+            "actionResult.accepted": true,
+            "actionResult.status": "accepted",
+            "actionResult.reason": "network_queued",
+            "dispatchTransport": {
+              "count": 1
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_malformed_mutating_request_typo",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "uncertain_give_request"
+      ],
+      "turns": [
+        {
+          "text": "gimme wate",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_malformed_mutating_request_elongated",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "uncertain_give_request"
+      ],
+      "turns": [
+        {
+          "text": "givee me water",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_safety_and_fuzzy_controls.corpus_malformed_mutating_request_tail_typo",
+      "tags": [
+        "recognition",
+        "corpus",
+        "safety",
+        "uncertain_give_request"
+      ],
+      "turns": [
+        {
+          "text": "give me waterr",
+          "expect": {
+            "dispatchTransport": {
+              "count": 0
+            },
+            "actionResult.accepted": false,
+            "actionResult.status": "semantic_dispatch_blocked",
+            "actionResult.reason": "clarification_required"
+          }
+        }
+      ],
+      "domain": "recognition"
+    }
+  ]
+}

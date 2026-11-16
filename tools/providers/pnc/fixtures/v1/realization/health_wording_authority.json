@@ -1,0 +1,189 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.realization.health_wording_authority",
+  "domain": "realization",
+  "cases": [
+    {
+      "id": "realization.health_wording_authority.health_injured_en",
+      "tags": [
+        "realization",
+        "health",
+        "wellbeing"
+      ],
+      "scenario": {
+        "npc": {
+          "healthState": "injured"
+        }
+      },
+      "turns": [
+        {
+          "text": "how are you",
+          "language": "EN",
+          "expect": {
+            "lastKey": "conversation.content.semantic.question.wellbeing.injured.neutral.01"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.health_wording_authority.health_injured_tl",
+      "tags": [
+        "realization",
+        "health",
+        "wellbeing",
+        "localization"
+      ],
+      "scenario": {
+        "npc": {
+          "healthState": "injured"
+        }
+      },
+      "turns": [
+        {
+          "text": "how are you",
+          "language": "TL",
+          "expect": {
+            "lastKey": "conversation.content.semantic.question.wellbeing.injured.neutral.01",
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.health_wording_authority.health_healthy_en",
+      "tags": [
+        "realization",
+        "health",
+        "wellbeing"
+      ],
+      "scenario": {
+        "npc": {
+          "healthState": "healthy"
+        }
+      },
+      "turns": [
+        {
+          "text": "how are you",
+          "language": "EN",
+          "expect": {
+            "lastSemanticKey": {
+              "prefix": "question.wellbeing."
+            }
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.health_wording_authority.health_healthy_tl",
+      "tags": [
+        "realization",
+        "health",
+        "wellbeing",
+        "localization"
+      ],
+      "scenario": {
+        "npc": {
+          "healthState": "healthy"
+        }
+      },
+      "turns": [
+        {
+          "text": "how are you",
+          "language": "TL",
+          "expect": {
+            "lastSemanticKey": {
+              "prefix": "question.wellbeing."
+            },
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.health_wording_authority.health_companion_wait_en",
+      "tags": [
+        "realization",
+        "command",
+        "stay"
+      ],
+      "turns": [
+        {
+          "text": "wait here",
+          "language": "EN",
+          "expect": {
+            "ir.action": "STAY",
+            "lastKey": "command.stay.queued"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.health_wording_authority.health_companion_wait_tl",
+      "tags": [
+        "realization",
+        "command",
+        "stay",
+        "localization"
+      ],
+      "turns": [
+        {
+          "text": "wait here",
+          "language": "TL",
+          "expect": {
+            "ir.action": "STAY",
+            "lastKey": "command.stay.queued",
+            "fallbackLookups": 0,
+            "response.text": {
+              "contains": "Sige, mananatili ako rito."
+            }
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.health_wording_authority.health_hostile_boundary_en",
+      "tags": [
+        "realization",
+        "hostile",
+        "boundary"
+      ],
+      "turns": [
+        {
+          "text": "fuck you",
+          "language": "EN",
+          "expect": {
+            "ir.intent": "INSULT",
+            "lastSemanticKey": "social.hostile_boundary"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.health_wording_authority.health_hostile_boundary_tl",
+      "tags": [
+        "realization",
+        "hostile",
+        "boundary",
+        "localization"
+      ],
+      "turns": [
+        {
+          "text": "fuck you",
+          "language": "TL",
+          "expect": {
+            "ir.intent": "INSULT",
+            "lastSemanticKey": "social.hostile_boundary"
+          }
+        }
+      ],
+      "domain": "realization"
+    }
+  ]
+}

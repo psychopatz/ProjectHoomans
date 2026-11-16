@@ -92,16 +92,18 @@ class ResponseObservatoryTests(unittest.TestCase):
                 worker.response_key_lookup("")
 
     def test_production_lua_coverage_distinguishes_dominance_from_unreachable(self):
-        import json
-        from pathlib import Path
         from tools.semantic_harness.inspection.response_selection_coverage import (
             selection_coverage,
         )
-        root = Path(__file__).resolve().parents[4]
-        fixture = json.loads(
-            (root / "tools/providers/pnc/fixtures"
-             / "observatory_greeting_selection.json").read_text()
-        )
+        fixture = {
+            "poolID": "semantic.flow.greeting.opening",
+            "cases": [
+                {"label": "unknown evidence", "context": {"npcID": "obs-unknown"}},
+                {"label": "rainy weather", "context": {"npcID": "obs-rain", "worldContext": {"weather": {"raining": True}}}},
+                {"label": "friendly social style", "context": {"npcID": "obs-friendly", "socialStyle": "friendly"}},
+                {"label": "friendly in rain", "context": {"npcID": "obs-both", "socialStyle": "friendly", "worldContext": {"weather": {"raining": True}}}},
+            ],
+        }
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             before = worker.explain_response_selection(
                 "semantic.flow.greeting.opening",

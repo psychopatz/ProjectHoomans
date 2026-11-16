@@ -1,0 +1,180 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.beats.beat_catalog_and_authoring",
+  "domain": "beats",
+  "cases": [
+    {
+      "id": "beats.beat_catalog_and_authoring.beat_catalog_validate_register_preview",
+      "domain": "beats",
+      "description": "Verify beat.catalog, beat.validate, beat.register, and beat.preview against production Lua.",
+      "tags": [
+        "beats"
+      ],
+      "turns": [
+        {
+          "action": "beat.catalog",
+          "expect": {
+            "operation.status": "ok",
+            "result.beatCount": {
+              "min": 1
+            },
+            "result.behaviorCount": {
+              "min": 1
+            }
+          }
+        },
+        {
+          "action": "beat.validate",
+          "payload": {
+            "definition": {
+              "id": "beat.fixture_a1_argument",
+              "owner": "SemanticTest",
+              "version": 1,
+              "domain": "social",
+              "domainPath": "social/conflict",
+              "group": "beat_group.social_primary",
+              "baseRelevance": 0.99,
+              "cooldownTurns": 3,
+              "maxTurns": 6,
+              "stimuli": [
+                "HUMAN_UTTERANCE",
+                "NPC_SEMANTIC_ACT"
+              ],
+              "entry": {
+                "op": "in",
+                "path": "stimulus.semantic.speechAct",
+                "values": [
+                  "INSULT",
+                  "HOSTILE_REMARK",
+                  "THREATEN"
+                ]
+              },
+              "maintain": {
+                "op": "gt",
+                "path": "history.hostilityCount",
+                "value": 0
+              },
+              "exit": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "APOLOGIZE"
+              },
+              "candidates": [
+                {
+                  "behavior": "behavior.warn",
+                  "relevance": 1.0
+                }
+              ]
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true
+          }
+        },
+        {
+          "action": "beat.register",
+          "payload": {
+            "definition": {
+              "id": "beat.fixture_a1_argument",
+              "owner": "SemanticTest",
+              "version": 1,
+              "domain": "social",
+              "domainPath": "social/conflict",
+              "group": "beat_group.social_primary",
+              "baseRelevance": 0.99,
+              "cooldownTurns": 3,
+              "maxTurns": 6,
+              "stimuli": [
+                "HUMAN_UTTERANCE",
+                "NPC_SEMANTIC_ACT"
+              ],
+              "entry": {
+                "op": "in",
+                "path": "stimulus.semantic.speechAct",
+                "values": [
+                  "INSULT",
+                  "HOSTILE_REMARK",
+                  "THREATEN"
+                ]
+              },
+              "maintain": {
+                "op": "gt",
+                "path": "history.hostilityCount",
+                "value": 0
+              },
+              "exit": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "APOLOGIZE"
+              },
+              "candidates": [
+                {
+                  "behavior": "behavior.warn",
+                  "relevance": 1.0
+                }
+              ]
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.registered": true
+          }
+        },
+        {
+          "action": "beat.preview",
+          "payload": {
+            "definition": {
+              "id": "beat.fixture_a1_preview",
+              "owner": "SemanticTest",
+              "version": 1,
+              "domain": "social",
+              "domainPath": "social/conflict",
+              "group": "beat_group.social_primary",
+              "baseRelevance": 0.99,
+              "cooldownTurns": 3,
+              "maxTurns": 6,
+              "stimuli": [
+                "HUMAN_UTTERANCE",
+                "NPC_SEMANTIC_ACT"
+              ],
+              "entry": {
+                "op": "in",
+                "path": "stimulus.semantic.speechAct",
+                "values": [
+                  "INSULT",
+                  "HOSTILE_REMARK",
+                  "THREATEN"
+                ]
+              },
+              "maintain": {
+                "op": "gt",
+                "path": "history.hostilityCount",
+                "value": 0
+              },
+              "exit": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "APOLOGIZE"
+              },
+              "candidates": [
+                {
+                  "behavior": "behavior.warn",
+                  "relevance": 1.0
+                }
+              ]
+            },
+            "text": "you are an idiot"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true,
+            "result.previewed": true,
+            "result.mutatedConversation": false,
+            "result.registered": false
+          }
+        }
+      ]
+    }
+  ]
+}

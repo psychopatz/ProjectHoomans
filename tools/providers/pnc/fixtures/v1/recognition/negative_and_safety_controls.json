@@ -1,0 +1,132 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.recognition.negative_and_safety_controls",
+  "domain": "recognition",
+  "cases": [
+    {
+      "id": "recognition.negative_and_safety_controls.negative_negated_wellbeing",
+      "tags": [
+        "recognition",
+        "negative",
+        "wellbeing"
+      ],
+      "turns": [
+        {
+          "text": "I am not fine",
+          "expect": {
+            "ir.intent": {
+              "absent": true
+            },
+            "ir.subject": {
+              "absent": true
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.negative_and_safety_controls.negative_double_negation_stop",
+      "tags": [
+        "recognition",
+        "negative",
+        "command"
+      ],
+      "turns": [
+        {
+          "text": "Don't stop following me",
+          "expect": {
+            "ir.action": {
+              "absent": true
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.negative_and_safety_controls.negative_negative_desire_not_promoted",
+      "tags": [
+        "recognition",
+        "negative",
+        "command"
+      ],
+      "turns": [
+        {
+          "text": "I don't want you to retrieve food",
+          "expect": {
+            "ir.action": {
+              "absent": true
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.negative_and_safety_controls.negative_unknown_language",
+      "tags": [
+        "recognition",
+        "negative",
+        "unknown"
+      ],
+      "turns": [
+        {
+          "text": "Can you do something about this?",
+          "expect": {
+            "ir.intent": {
+              "absent": true
+            },
+            "ir.confidence": {
+              "max": 0.5
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.negative_and_safety_controls.negative_embedded_statement_not_question",
+      "tags": [
+        "recognition",
+        "negative",
+        "wellbeing"
+      ],
+      "turns": [
+        {
+          "text": "I wonder how you have been",
+          "expect": {
+            "ir.intent": {
+              "absent": true
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.negative_and_safety_controls.negative_preview_does_not_mutate_or_dispatch",
+      "tags": [
+        "recognition",
+        "negative",
+        "preview",
+        "safety"
+      ],
+      "turns": [
+        {
+          "text": "follow me",
+          "action": "preview",
+          "expect": {
+            "toolCalls": {
+              "count": 0
+            },
+            "dispatchTransport": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    }
+  ]
+}

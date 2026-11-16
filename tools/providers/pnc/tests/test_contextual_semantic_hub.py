@@ -8,7 +8,7 @@ import unittest
 from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.tests.test_grounded_world_knowledge_gossip import (
+from tools.providers.pnc.tests.world_knowledge_test_support import (
     scenario_for as world_gossip_scenario,
 )
 

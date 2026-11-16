@@ -80,27 +80,6 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertEqual(result["failed"], 1)
 
-    def test_command_rejections_are_server_declared_not_accepted_effects(self):
-        root = Path(__file__).resolve().parents[4]
-        path = (root / "tools/providers/pnc/fixtures"
-                / "observatory_permission_rejections_en_tl.json")
-        matrix = run_quality_matrix(json.loads(path.read_text())["cases"])
-        self.assertTrue(matrix["ok"], matrix)
-        self.assertEqual(matrix["passed"], 4)
-        self.assertEqual(matrix["failed"], 0)
-        for case in matrix["cases"]:
-            self.assertEqual(case["executionStatus"], "rejected")
-            self.assertIs(case["commandAccepted"], False)
-            self.assertEqual(case["rejectionReason"], "permission_denied")
-            self.assertEqual(case["actions"], 1)
-            self.assertEqual(case["actionCountKind"], "attempted_dispatch")
-            self.assertEqual(case["transportCount"], 2)
-            self.assertEqual(case["companionCommandTransportCount"], 1)
-            self.assertEqual(case["commandDecisionKind"],
-                             "CONFIGURED_FIXTURE_NETWORK_REPLY")
-            self.assertFalse(case["nativeServerAuthorityVerified"])
-            self.assertTrue(all(case["checks"].values()), case)
-
     def test_matrix_rejects_unknown_unsupported_or_unbounded_assertions(self):
         with self.assertRaisesRegex(ValueError, "unsupported matrix expectation"):
             run_quality_matrix([
@@ -366,23 +345,6 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                             "susundan" in text or "mananatili" in text
                             for text in npc
                         ), npc)
-
-    def test_bundled_real_lua_context_matrices(self):
-        from tools.semantic_harness.inspection.response_observatory import run_quality_matrix
-        root = Path(__file__).resolve().parents[4]
-        for filename in (
-            "observatory_core_en_tl.json",
-            "observatory_health_authority_en_tl.json",
-            "observatory_lifecycle_en_tl.json",
-        ):
-            with self.subTest(matrix=filename):
-                path = root / "tools/providers/pnc/fixtures" / filename
-                result = run_quality_matrix(json.loads(path.read_text())["cases"])
-                expected = 8
-                self.assertEqual(result["caseCount"], expected)
-                self.assertEqual(result["passed"], expected, result["cases"])
-                self.assertEqual(result["failed"], 0)
-                self.assertFalse(result["truncated"])
 
     def test_comparison_flags_regressions_and_missing_cases(self):
         row = {

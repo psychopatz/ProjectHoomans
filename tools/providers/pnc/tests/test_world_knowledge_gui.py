@@ -10,7 +10,7 @@ import tempfile
 import tkinter as tk
 import unittest
 
-from tools.providers.pnc.tests.test_grounded_world_knowledge_gossip import (
+from tools.providers.pnc.tests.world_knowledge_test_support import (
     scenario_for,
 )
 from tools.semantic_harness.ui.shell import SemanticHarnessApp

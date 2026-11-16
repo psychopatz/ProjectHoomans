@@ -1,0 +1,99 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.behaviors.behavior_validation_and_registration",
+  "domain": "behaviors",
+  "cases": [
+    {
+      "id": "behaviors.behavior_validation_and_registration.behavior_validate_and_register",
+      "domain": "behaviors",
+      "description": "Verify behavior.validate and behavior.register in a disposable worker.",
+      "tags": [
+        "behaviors"
+      ],
+      "turns": [
+        {
+          "action": "behavior.validate",
+          "payload": {
+            "definition": {
+              "id": "behavior.fixture_a1_ack",
+              "owner": "SemanticTest",
+              "version": 1,
+              "act": "ACKNOWLEDGE",
+              "domain": "scene",
+              "domainPath": "scene/excursion",
+              "baseRelevance": 1.0,
+              "mode": "one_shot",
+              "modifiers": [],
+              "requiredCapabilities": [],
+              "stimuli": [
+                "NPC_SEMANTIC_ACT"
+              ],
+              "when": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "ACKNOWLEDGE_EXCURSION"
+              },
+              "outputs": {
+                "speech": {
+                  "contentTemplateID": "social.acknowledged",
+                  "dialogueAct": "ACKNOWLEDGE"
+                }
+              },
+              "continuation": {
+                "inheritEventRefs": true,
+                "inheritFactRefs": true,
+                "mode": "terminate",
+                "target": "none"
+              }
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true
+          }
+        },
+        {
+          "action": "behavior.register",
+          "payload": {
+            "definition": {
+              "id": "behavior.fixture_a1_ack",
+              "owner": "SemanticTest",
+              "version": 1,
+              "act": "ACKNOWLEDGE",
+              "domain": "scene",
+              "domainPath": "scene/excursion",
+              "baseRelevance": 1.0,
+              "mode": "one_shot",
+              "modifiers": [],
+              "requiredCapabilities": [],
+              "stimuli": [
+                "NPC_SEMANTIC_ACT"
+              ],
+              "when": {
+                "op": "eq",
+                "path": "stimulus.semantic.intent",
+                "value": "ACKNOWLEDGE_EXCURSION"
+              },
+              "outputs": {
+                "speech": {
+                  "contentTemplateID": "social.acknowledged",
+                  "dialogueAct": "ACKNOWLEDGE"
+                }
+              },
+              "continuation": {
+                "inheritEventRefs": true,
+                "inheritFactRefs": true,
+                "mode": "terminate",
+                "target": "none"
+              }
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.registered": true
+          }
+        }
+      ]
+    }
+  ]
+}

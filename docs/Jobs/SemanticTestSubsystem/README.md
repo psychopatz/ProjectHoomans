@@ -1,36 +1,51 @@
-# Semantic Test Subsystem — A6R Behavioral Fixture Consolidation
+# Semantic Test Subsystem — A6R5–A6R8 Semantic Test Estate Normalization
 
 **Status:** COMPLETE.
 
 ## Objective
 
-Finish the All-in-One PSDL Semantic Tester by consolidating remaining behavioural acceptance into the provider-owned fixture pipeline, proving every registered fixture operation against real production authority where appropriate, and tightening domain/GUI discoverability before final closure.
+Finish the All-in-One PSDL Semantic Tester by making the active test estate self-describing, domain-first, single-authority, duplicate-resistant, and easy for humans/agents to navigate without opening files merely to learn what they test.
 
-Accepted foundation:
+The execution architecture is already accepted:
 
 ```text
 provider fixture
-→ generic loader/resolver
+→ generic resolver/loader
 → typed operation registry
 → compiler probe and/or real LuaSemanticWorker
-→ normalized bounded result
-→ generic comparator
+→ normalized result
+→ comparator
 → CLI / GUI / batch
 ```
 
-A1–A3 infrastructure is implemented and independently verified. The first A4 migration batch is valid. A5/A6 closure was premature because many behavioural direct-worker tests were blanket-classified as low-level contracts without concrete justification.
+The remaining problem is test-estate hygiene, not another harness redesign.
 
-## Verified audit baseline
+## Verified current baseline
 
-- Exact committed vector audited: Core `1199980f00a1`, ProjectHoomans `f1dcf5c5cdac`.
-- Core fixture operation/authority tests: 15/15 PASS.
-- Provider fixture corpus: 137/137 PASS.
-- Compiler domain: 2/2 PASS.
-- Beats domain: 10/10 PASS.
-- Provider parity/lint/batch suite: 33/33 PASS.
-- Current classification ledger: 194 modules / 801 methods.
-- 91 direct-worker modules / 374 methods are labeled `LOW_LEVEL_RUNTIME_CONTRACT` with one generic justification.
-- Conservative scan found 34 small modules / 83 methods whose worker calls are already expressible by the current fixture pipeline.
-- A targeted 23-test easy-migration batch was rerun from the committed vector and passed completely.
+Audited committed vector:
 
-Git history remains the archive for the original Fixture Authority Repair and A1–A6 implementation.
+- PsychopatzCore `dde5b8c225c8`
+- ProjectHoomans `5b4da57d9cb3`
+
+Verified:
+
+- Core fixture/authority acceptance: **16/16 PASS**
+- canonical semantic fixture corpus: **180/180 PASS**
+- discovered semantic domains: **11**
+- active v1 fixture files: **33**
+- remaining Python test modules: **181 / 772 methods**
+
+## Audit findings that reopen closure
+
+- **96 / 180** expanded fixture cases still expose historical/migration terminology in suite or case IDs.
+- **14** active v1 fixture files carry milestone/batch names such as `c0a`, `a6r2`, `b3`, or `batch1`.
+- **18 / 33** active fixture files live under a directory that disagrees with their declared semantic domain.
+- **41** remaining Python test modules / **165 methods** still use milestone-style names such as `c7a`, `h4`, `r9`, `e4`, or `l2`.
+- Provider metadata still exposes two fixture authorities: `semantic` and legacy `regression`.
+- Nine non-v1 provider fixture files remain active, including old C0A and Observatory regression data.
+- The historical C0A baseline subsystem remains active through `c0a_baseline.py`, its tests, fixtures, and reports.
+- Global duplicate audit found an exact duplicate case across two suites that the current linter does not detect.
+- Several fixture names claim suggestion/realization behavior while only asserting generic recognition/response existence.
+- A structural re-scan still found **36 LOW_LEVEL direct-worker modules / 165 methods** whose detected worker calls are already supported by the fixture pipeline; these require another method-level review, not automatic deletion.
+
+Git history is the archive for milestone provenance. Active names should describe current semantic responsibility.

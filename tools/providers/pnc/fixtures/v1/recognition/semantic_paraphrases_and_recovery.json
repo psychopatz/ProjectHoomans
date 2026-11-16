@@ -1,0 +1,225 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.recognition.semantic_paraphrases_and_recovery",
+  "domain": "recognition",
+  "cases": [
+    {
+      "id": "recognition.semantic_paraphrases_and_recovery.paraphrase_wellbeing_how_are_you_doing",
+      "description": "Reviewed wellbeing paraphrase preserves offline deterministic contract.",
+      "tags": [
+        "recognition",
+        "wellbeing",
+        "paraphrase"
+      ],
+      "turns": [
+        {
+          "text": "how are you doing",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.speechAct": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "ir.provenance.pattern": "pnc.dataset.question.wellbeing.how_are_you_doing",
+            "decision.branch": "QUESTION_RECEIVED",
+            "decision.route": "deterministic",
+            "decision.response.templateID": {
+              "prefix": "question.wellbeing."
+            },
+            "llmCalls": 0,
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            },
+            "actionResult": {
+              "absent": true
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_paraphrases_and_recovery.paraphrase_holding_up_and_command_holdouts",
+      "description": "Wellbeing paraphrase succeeds and command-shaped holdouts clarify without dispatch.",
+      "tags": [
+        "recognition",
+        "wellbeing",
+        "negative"
+      ],
+      "turns": [
+        {
+          "text": "how are you holding up",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "decision.branch": "QUESTION_RECEIVED",
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            },
+            "llmCalls": 0
+          }
+        },
+        {
+          "text": "walk with me",
+          "expect": {
+            "accepted": true,
+            "decision.branch": "ASK_CLARIFICATION",
+            "actionResult": {
+              "absent": true
+            },
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            },
+            "llmCalls": 0
+          }
+        },
+        {
+          "text": "followed the trail",
+          "expect": {
+            "accepted": true,
+            "decision.branch": "ASK_CLARIFICATION",
+            "actionResult": {
+              "absent": true
+            },
+            "dispatchTransport": {
+              "count": 0
+            }
+          }
+        },
+        {
+          "text": "we are following them",
+          "expect": {
+            "accepted": true,
+            "decision.branch": "ASK_CLARIFICATION",
+            "actionResult": {
+              "absent": true
+            },
+            "dispatchTransport": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_paraphrases_and_recovery.paraphrase_unpunctuated_whats_wrong",
+      "description": "Unpunctuated wellbeing follow-up remains bounded.",
+      "tags": [
+        "recognition",
+        "wellbeing",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "text": "whats wrong",
+          "expect": {
+            "accepted": true,
+            "ir.provenance.pattern": "pnc.question.wellbeing_follow_up_whats_plain",
+            "decision.branch": "QUESTION_RECEIVED",
+            "llmCalls": 0,
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_paraphrases_and_recovery.paraphrase_contextual_fuzzy_what_happened",
+      "description": "Contextual fuzzy question recovers paraphrase and typo.",
+      "tags": [
+        "recognition",
+        "wellbeing",
+        "fuzzy",
+        "multi_turn"
+      ],
+      "scenario": {
+        "npc": {
+          "healthState": "injured",
+          "activeBehavior": "treatment",
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "text": "wat happend",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "ir.provenance.pattern": "pnc.recovery.contextual_question_wellbeing",
+            "ir.diagnostics.recoveredMatch": true,
+            "decision.branch": "QUESTION_RECEIVED",
+            "decision.route": "deterministic",
+            "decision.response.templateID": "semantic.question.wellbeing.follow_up.injured",
+            "llmCalls": 0,
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.semantic_paraphrases_and_recovery.paraphrase_contextual_fuzzy_requires_topic",
+      "description": "Contextual fuzzy question requires an active conversation topic.",
+      "tags": [
+        "recognition",
+        "negative",
+        "fuzzy"
+      ],
+      "turns": [
+        {
+          "text": "what happened",
+          "expect": {
+            "accepted": true,
+            "decision.branch": "ASK_CLARIFICATION",
+            "ir.diagnostics.noMatch": true,
+            "actionResult": {
+              "absent": true
+            },
+            "llmCalls": 0,
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "recognition"
+    }
+  ]
+}

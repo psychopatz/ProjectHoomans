@@ -1,0 +1,135 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.wellbeing_inquiries_and_reports",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_inquiry_are_you_okay",
+      "tags": [
+        "dialogue",
+        "wellbeing",
+        "question"
+      ],
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "decision.branch": "QUESTION_RECEIVED",
+            "response.sourcePoolID": "semantic.question.wellbeing",
+            "response.exists": true
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_inquiry_how_feeling",
+      "tags": [
+        "dialogue",
+        "wellbeing",
+        "question"
+      ],
+      "turns": [
+        {
+          "text": "How are you feeling?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "decision.branch": "QUESTION_RECEIVED",
+            "response.sourcePoolID": "semantic.question.wellbeing"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_inquiry_how_been",
+      "tags": [
+        "dialogue",
+        "wellbeing",
+        "question"
+      ],
+      "turns": [
+        {
+          "text": "How have you been?",
+          "expect": {
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "decision.branch": "QUESTION_RECEIVED"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_report_fine_plain",
+      "tags": [
+        "dialogue",
+        "wellbeing",
+        "self_state"
+      ],
+      "turns": [
+        {
+          "text": "im fine thank you",
+          "expect": {
+            "ir.intent": "INFORM",
+            "ir.subject": "WELLBEING",
+            "decision.branch": "SELF_STATE_RECEIVED",
+            "response.templateID": {
+              "prefix": "semantic.self_state.wellbeing"
+            }
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_report_thirst",
+      "tags": [
+        "dialogue",
+        "wellbeing",
+        "thirst",
+        "self_state"
+      ],
+      "turns": [
+        {
+          "text": "I am thirsty",
+          "expect": {
+            "ir.intent": "INFORM",
+            "ir.subject": "THIRST",
+            "decision.branch": "SELF_STATE_RECEIVED",
+            "response.templateID": {
+              "prefix": "semantic.self_state.thirst"
+            }
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.wellbeing_inquiries_and_reports.wellbeing_report_fatigue",
+      "tags": [
+        "dialogue",
+        "wellbeing",
+        "fatigue",
+        "self_state"
+      ],
+      "turns": [
+        {
+          "text": "I'm exhausted",
+          "expect": {
+            "ir.intent": "INFORM",
+            "ir.subject": "FATIGUE",
+            "decision.branch": "SELF_STATE_RECEIVED",
+            "response.templateID": {
+              "prefix": "semantic.self_state.fatigue"
+            }
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

@@ -1,0 +1,269 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.actions.companion_and_task_commands",
+  "domain": "actions",
+  "cases": [
+    {
+      "id": "actions.companion_and_task_commands.follow_direct",
+      "tags": [
+        "actions",
+        "command",
+        "follow",
+        "nlu"
+      ],
+      "turns": [
+        {
+          "text": "Follow me.",
+          "expect": {
+            "ir.intent": "REQUEST",
+            "ir.action": "FOLLOW",
+            "ir.confidence": {
+              "min": 0.9
+            }
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.follow_synonym",
+      "tags": [
+        "actions",
+        "command",
+        "follow",
+        "synonym"
+      ],
+      "turns": [
+        {
+          "text": "Come with me!",
+          "expect": {
+            "ir.action": "FOLLOW",
+            "ir.pattern": "pnc.command.follow"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.stop_following_progressive",
+      "tags": [
+        "actions",
+        "command",
+        "stop"
+      ],
+      "turns": [
+        {
+          "text": "Stop following me",
+          "expect": {
+            "ir.action": "STOP",
+            "decision.branch": "COMMAND_ACCEPTED"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.stop_following_prohibition_contracted",
+      "tags": [
+        "actions",
+        "command",
+        "stop",
+        "prohibition"
+      ],
+      "turns": [
+        {
+          "text": "Please don't follow me",
+          "expect": {
+            "ir.action": "STOP"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.stop_following_prohibition_uncontracted",
+      "tags": [
+        "actions",
+        "command",
+        "stop",
+        "prohibition"
+      ],
+      "turns": [
+        {
+          "text": "Do not follow me",
+          "expect": {
+            "ir.action": "STOP"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.stay_wait_here",
+      "tags": [
+        "actions",
+        "command",
+        "stay"
+      ],
+      "turns": [
+        {
+          "text": "Wait here.",
+          "expect": {
+            "ir.action": "STAY"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.camp_here",
+      "tags": [
+        "actions",
+        "command",
+        "camp"
+      ],
+      "turns": [
+        {
+          "text": "lets camp in here",
+          "expect": {
+            "ir.action": "CAMP",
+            "ir.target.scope": "here"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.camp_this_place",
+      "tags": [
+        "actions",
+        "command",
+        "camp"
+      ],
+      "turns": [
+        {
+          "text": "camp at this place",
+          "expect": {
+            "ir.action": "CAMP",
+            "ir.target.scope": "here"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.go_home",
+      "tags": [
+        "actions",
+        "command",
+        "go"
+      ],
+      "turns": [
+        {
+          "text": "Go home.",
+          "expect": {
+            "ir.action": "GO",
+            "ir.destination.category": "HOME"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.fetch_water",
+      "tags": [
+        "actions",
+        "command",
+        "fetch",
+        "water"
+      ],
+      "turns": [
+        {
+          "text": "Can you bring me some water?",
+          "expect": {
+            "ir.intent": "REQUEST",
+            "ir.action": "FETCH",
+            "ir.object.category": "WATER",
+            "ir.object.quantity": "SOME"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.fetch_food",
+      "tags": [
+        "actions",
+        "command",
+        "fetch",
+        "food"
+      ],
+      "turns": [
+        {
+          "text": "Get some food",
+          "expect": {
+            "ir.object.category": "FOOD"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.fetch_medicine",
+      "tags": [
+        "actions",
+        "command",
+        "fetch",
+        "medicine"
+      ],
+      "turns": [
+        {
+          "text": "Bring me meds",
+          "expect": {
+            "ir.object.category": "MEDICINE"
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.fetch_unresolved_item",
+      "tags": [
+        "actions",
+        "command",
+        "fetch",
+        "unresolved"
+      ],
+      "turns": [
+        {
+          "text": "Bring me an apple",
+          "expect": {
+            "ir.action": "FETCH",
+            "ir.object.text": "apple",
+            "ir.object.unresolved": true
+          }
+        }
+      ],
+      "domain": "actions"
+    },
+    {
+      "id": "actions.companion_and_task_commands.fetch_compound_item",
+      "tags": [
+        "actions",
+        "command",
+        "fetch",
+        "compound"
+      ],
+      "turns": [
+        {
+          "text": "Bring me some medical supplies",
+          "expect": {
+            "ir.action": "FETCH",
+            "ir.object.text": "medical supplies"
+          }
+        }
+      ],
+      "domain": "actions"
+    }
+  ]
+}

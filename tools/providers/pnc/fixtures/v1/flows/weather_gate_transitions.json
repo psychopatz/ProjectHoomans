@@ -1,0 +1,196 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.flows.weather_gate_transitions",
+  "domain": "flows",
+  "cases": [
+    {
+      "id": "flows.weather_gate_transitions.weather_gate_rain",
+      "description": "Weather gate selects raining branch when weather is rain.",
+      "tags": [
+        "flows",
+        "weather"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "rain"
+        }
+      },
+      "turns": [
+        {
+          "text": "is it raining",
+          "expect": {
+            "observation.ir.pattern": "pnc.question.weather",
+            "observation.flow.flowId": "weather_context",
+            "observation.flow.fromNodeId": "weather_gate",
+            "observation.flow.toNodeId": "raining",
+            "observation.flow.gateStatus": "PASS",
+            "observation.flow.gateReason": "weather_rain_true",
+            "observation.flow.status": "retired",
+            "observation.flow.activeAfter": {
+              "count": 0
+            },
+            "observation.sideEffects.actions": {
+              "count": 0
+            },
+            "observation.sideEffects.dispatchTransport": {
+              "count": 0
+            },
+            "observation.sideEffects.noGameplayEffects": true,
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            },
+            "observation.response.sourceFlowID": "weather_context",
+            "observation.response.text": {
+              "contains": "raining"
+            }
+          }
+        }
+      ],
+      "domain": "flows"
+    },
+    {
+      "id": "flows.weather_gate_transitions.weather_gate_clear",
+      "description": "Weather gate selects clear branch when weather is clear.",
+      "tags": [
+        "flows",
+        "weather"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "clear"
+        }
+      },
+      "turns": [
+        {
+          "text": "is it raining",
+          "expect": {
+            "observation.ir.pattern": "pnc.question.weather",
+            "observation.flow.flowId": "weather_context",
+            "observation.flow.fromNodeId": "weather_gate",
+            "observation.flow.toNodeId": "clear",
+            "observation.flow.gateStatus": "FAIL",
+            "observation.flow.gateReason": "weather_rain_false",
+            "observation.flow.status": "retired",
+            "observation.sideEffects.noGameplayEffects": true,
+            "observation.response.sourceFlowID": "weather_context",
+            "observation.response.text": {
+              "contains": "clear"
+            }
+          }
+        }
+      ],
+      "domain": "flows"
+    },
+    {
+      "id": "flows.weather_gate_transitions.weather_gate_unknown",
+      "description": "Weather gate selects unknown branch when weather is unknown.",
+      "tags": [
+        "flows",
+        "weather"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "unknown"
+        }
+      },
+      "turns": [
+        {
+          "text": "is it raining",
+          "expect": {
+            "observation.ir.pattern": "pnc.question.weather",
+            "observation.flow.flowId": "weather_context",
+            "observation.flow.fromNodeId": "weather_gate",
+            "observation.flow.toNodeId": "unknown",
+            "observation.flow.gateStatus": "UNKNOWN",
+            "observation.flow.gateReason": "weather_rain_unknown",
+            "observation.flow.status": "retired",
+            "observation.sideEffects.noGameplayEffects": true,
+            "observation.response.sourceFlowID": "weather_context",
+            "observation.response.text": {
+              "contains": "confirm"
+            }
+          }
+        }
+      ],
+      "domain": "flows"
+    },
+    {
+      "id": "flows.weather_gate_transitions.weather_gate_tl_translation",
+      "description": "Weather flow renders real TL translation.",
+      "tags": [
+        "flows",
+        "weather",
+        "localization"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "rain"
+        },
+        "runtime": {
+          "language": "TL"
+        }
+      },
+      "turns": [
+        {
+          "text": "is it raining",
+          "expect": {
+            "observation.response.translationKey": "UI_PNC_Conversation_Semantic_FlowWeatherRaining",
+            "observation.response.translated": true
+          }
+        }
+      ],
+      "domain": "flows"
+    },
+    {
+      "id": "flows.weather_gate_transitions.weather_gate_preview_pure",
+      "description": "Weather gate preview is pure and exposes gate status without mutating context.",
+      "tags": [
+        "flows",
+        "weather",
+        "preview"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "unknown"
+        }
+      },
+      "turns": [
+        {
+          "action": "preview",
+          "text": "is it raining",
+          "expect": {
+            "observation.flow.gateStatus": "UNKNOWN",
+            "observation.flow.gateReason": "weather_rain_unknown",
+            "observation.flow.toNodeId": "unknown",
+            "messages": {
+              "count": 0
+            },
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            }
+          }
+        },
+        {
+          "action": "preview",
+          "text": "is it raining",
+          "expect": {
+            "observation.flow.gateStatus": "UNKNOWN",
+            "messages": {
+              "count": 0
+            },
+            "dispatchTransport": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "domain": "flows"
+    }
+  ]
+}

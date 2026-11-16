@@ -1,0 +1,116 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.social_acts",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.social_acts.offer_apple",
+      "tags": [
+        "dialogue",
+        "social",
+        "offer"
+      ],
+      "turns": [
+        {
+          "text": "Who wants an apple?",
+          "expect": {
+            "ir.intent": "OFFER",
+            "ir.speechAct": "OFFER",
+            "ir.object.text": "apple",
+            "ir.object.unresolved": true
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_acts.agreement_standalone_okay",
+      "tags": [
+        "dialogue",
+        "social",
+        "accept"
+      ],
+      "turns": [
+        {
+          "text": "okay",
+          "expect": {
+            "ir.intent": "ACCEPT"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_acts.agreement_fine_by_me",
+      "tags": [
+        "dialogue",
+        "social",
+        "agree"
+      ],
+      "turns": [
+        {
+          "text": "fine by me",
+          "expect": {
+            "ir.intent": "AGREE"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_acts.greeting_hello_there",
+      "tags": [
+        "dialogue",
+        "social",
+        "greet"
+      ],
+      "turns": [
+        {
+          "text": "hello there",
+          "expect": {
+            "ir.intent": "GREET",
+            "ir.speechAct": "GREET",
+            "ir.pattern": "pnc.social.greet"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_acts.thank_thanks",
+      "tags": [
+        "dialogue",
+        "social",
+        "thank"
+      ],
+      "turns": [
+        {
+          "text": "thanks",
+          "expect": {
+            "ir.intent": "THANK",
+            "ir.pattern": "pnc.social.thank"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_acts.apology_sorry",
+      "tags": [
+        "dialogue",
+        "social",
+        "apology"
+      ],
+      "turns": [
+        {
+          "text": "sorry",
+          "expect": {
+            "ir.intent": "APOLOGIZE",
+            "ir.pattern": "pnc.social.apologize"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

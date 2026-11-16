@@ -1,0 +1,24 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.inventory_queries",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.inventory_queries.inventory_query_seafood",
+      "tags": [
+        "inventory",
+        "dialogue"
+      ],
+      "turns": [
+        {
+          "text": "What kind of seafood do you have?",
+          "expect": {
+            "ir.subject": "INVENTORY",
+            "ir.inventoryQuery.concept": "SEAFOOD"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

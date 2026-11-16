@@ -16,15 +16,12 @@ OUTPUT = ROOT / "docs/Jobs/TestSuiteRationalization/R4_SEMANTIC_SLOW_REVIEW.json
 SLOW_MODULES = (
     "test_response_observatory_matrix",
     "test_sweep_acceptance",
-    "test_observatory_fixture_parity",
     "test_harness",
     "test_contextual_talk_parity",
-    "test_behavior_fixture_parity",
     "test_contextual_social_reactions",
     "test_contextual_speech_behavior",
     "test_automatic_flow_generation",
-    "test_pilot_parity",
-    "test_contextual_suggestions_s4",
+    "test_suggestion_presentation_and_frames",
     "test_contextual_bonds",
 )
 

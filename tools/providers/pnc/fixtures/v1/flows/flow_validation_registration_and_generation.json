@@ -1,0 +1,126 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.flows.flow_validation_registration_and_generation",
+  "domain": "flows",
+  "cases": [
+    {
+      "id": "flows.flow_validation_registration_and_generation.authoring_catalogs_validate_register_generate",
+      "description": "Verify fact.catalog, event.catalog, flow.validate, flow.register, and flow.generate against production Lua.",
+      "tags": [
+        "flows"
+      ],
+      "turns": [
+        {
+          "action": "fact.catalog",
+          "expect": {
+            "operation.status": "ok",
+            "result.count": {
+              "min": 1
+            }
+          }
+        },
+        {
+          "action": "event.catalog",
+          "expect": {
+            "operation.status": "ok",
+            "result.count": {
+              "min": 1
+            }
+          }
+        },
+        {
+          "action": "flow.validate",
+          "payload": {
+            "definition": {
+              "id": "fixture_a6r2_flow",
+              "owner": "SemanticTest",
+              "version": 1,
+              "initial": "await_reply",
+              "triggers": [
+                {
+                  "intent": "QUESTION",
+                  "subject": "WEATHER"
+                }
+              ],
+              "nodes": {
+                "await_reply": {
+                  "id": "await_reply",
+                  "accepts": [
+                    {
+                      "intent": "ACCEPT"
+                    }
+                  ],
+                  "onMatch": "complete",
+                  "onRefuse": "cancel",
+                  "onUnrelated": "suspend",
+                  "responsePool": "semantic.question.weather",
+                  "terminal": false
+                },
+                "complete": {
+                  "id": "complete",
+                  "accepts": [],
+                  "terminal": true
+                }
+              }
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.valid": true
+          }
+        },
+        {
+          "action": "flow.register",
+          "payload": {
+            "definition": {
+              "id": "fixture_a6r2_flow",
+              "owner": "SemanticTest",
+              "version": 1,
+              "initial": "await_reply",
+              "triggers": [
+                {
+                  "intent": "QUESTION",
+                  "subject": "WEATHER"
+                }
+              ],
+              "nodes": {
+                "await_reply": {
+                  "id": "await_reply",
+                  "accepts": [
+                    {
+                      "intent": "ACCEPT"
+                    }
+                  ],
+                  "onMatch": "complete",
+                  "onRefuse": "cancel",
+                  "onUnrelated": "suspend",
+                  "responsePool": "semantic.question.weather",
+                  "terminal": false
+                },
+                "complete": {
+                  "id": "complete",
+                  "accepts": [],
+                  "terminal": true
+                }
+              }
+            }
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.registered": true
+          }
+        },
+        {
+          "action": "flow.generate",
+          "expect": {
+            "operation.status": "ok",
+            "result.generation.summary.generated": {
+              "min": 1
+            }
+          }
+        }
+      ],
+      "domain": "flows"
+    }
+  ]
+}

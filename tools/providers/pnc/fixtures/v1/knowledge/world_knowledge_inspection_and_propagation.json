@@ -1,0 +1,110 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.knowledge.world_knowledge_inspection_and_propagation",
+  "domain": "knowledge",
+  "cases": [
+    {
+      "id": "knowledge.world_knowledge_inspection_and_propagation.inspect_and_propagate",
+      "domain": "knowledge",
+      "description": "Verify world knowledge inspection and propagation through production Lua.",
+      "tags": [
+        "knowledge"
+      ],
+      "scenario": {
+        "npc": {
+          "npcID": "npc_alice",
+          "id": "npc_alice",
+          "coreActorID": "actor:alice",
+          "name": "Alice"
+        },
+        "runtime": {
+          "worldKnowledge": {
+            "actors": [
+              {
+                "id": "npc_alice",
+                "coreActorID": "actor:alice",
+                "name": "Alice",
+                "alive": true
+              },
+              {
+                "id": "npc_bob",
+                "coreActorID": "actor:bob",
+                "name": "Bob",
+                "alive": true
+              }
+            ],
+            "facts": [
+              {
+                "producer": "semantic_lab:scenario",
+                "kind": "zombie.pressure",
+                "eventID": "lab:zombie:episode:1",
+                "subject": {
+                  "id": "actor:alice",
+                  "kind": "npc"
+                },
+                "occurredAt": 50,
+                "observedAt": 50,
+                "severity": 0.8,
+                "retention": "historical",
+                "payload": {
+                  "band": "heavy",
+                  "scenarioOwned": true
+                }
+              }
+            ],
+            "acquisitions": [
+              {
+                "actorID": "actor:alice",
+                "factIndex": 1,
+                "provenance": "witnessed",
+                "confidence": 0.95,
+                "source": "scenario_authority",
+                "acquisitionPath": "scenario_authority"
+              }
+            ]
+          }
+        }
+      },
+      "turns": [
+        {
+          "action": "knowledge.inspect",
+          "payload": {
+            "actorID": "actor:alice"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.finalRealization.statements": {
+              "minCount": 1
+            }
+          }
+        },
+        {
+          "action": "knowledge.propagate",
+          "payload": {
+            "fromActorID": "actor:alice",
+            "toActorID": "actor:bob",
+            "channel": "conversation"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.transferred": {
+              "minCount": 1
+            }
+          }
+        },
+        {
+          "action": "knowledge.inspect",
+          "payload": {
+            "actorID": "actor:bob"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.finalRealization.statements": {
+              "minCount": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

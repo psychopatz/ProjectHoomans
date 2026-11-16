@@ -1,0 +1,38 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.flows.flow_coverage_and_catalog",
+  "domain": "flows",
+  "cases": [
+    {
+      "id": "flows.flow_coverage_and_catalog.flow_coverage_and_catalog",
+      "domain": "flows",
+      "description": "Verify flow coverage and catalog operations.",
+      "tags": [
+        "flows"
+      ],
+      "turns": [
+        {
+          "action": "flow.coverage",
+          "expect": {
+            "operation.status": "ok",
+            "result.count": {
+              "min": 1
+            },
+            "result.capabilityCoverage": {
+              "minCount": 1
+            }
+          }
+        },
+        {
+          "action": "flow.catalog",
+          "expect": {
+            "operation.status": "ok",
+            "result.flows": {
+              "minCount": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

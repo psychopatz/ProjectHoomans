@@ -7,7 +7,7 @@ import unittest
 from tools.semantic_harness.inspection.world_knowledge import (
     build_world_knowledge_inspector,
 )
-from tools.providers.pnc.tests.test_grounded_world_knowledge_gossip import (
+from tools.providers.pnc.tests.world_knowledge_test_support import (
     scenario_for,
 )
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker

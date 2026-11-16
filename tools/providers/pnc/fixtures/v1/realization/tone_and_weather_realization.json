@@ -1,0 +1,148 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.realization.tone_and_weather_realization",
+  "domain": "realization",
+  "cases": [
+    {
+      "id": "realization.tone_and_weather_realization.core_greeting_opening_en",
+      "tags": [
+        "realization",
+        "greeting",
+        "core"
+      ],
+      "turns": [
+        {
+          "text": "hello",
+          "language": "EN",
+          "expect": {
+            "firstSemanticKey": "flow.greeting.opening.default"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.tone_and_weather_realization.core_greeting_opening_tl",
+      "tags": [
+        "realization",
+        "greeting",
+        "core",
+        "localization"
+      ],
+      "turns": [
+        {
+          "text": "hello",
+          "language": "TL",
+          "expect": {
+            "firstSemanticKey": "flow.greeting.opening.default",
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.tone_and_weather_realization.core_rain_greeting_en",
+      "tags": [
+        "realization",
+        "greeting",
+        "weather",
+        "core"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "rain"
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "language": "EN",
+          "expect": {
+            "firstSemanticKey": "flow.greeting.opening.rain"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.tone_and_weather_realization.core_rain_greeting_tl",
+      "tags": [
+        "realization",
+        "greeting",
+        "weather",
+        "core",
+        "localization"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "rain"
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "language": "TL",
+          "expect": {
+            "firstSemanticKey": "flow.greeting.opening.rain",
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.tone_and_weather_realization.core_unknown_identity_en",
+      "tags": [
+        "realization",
+        "identity",
+        "core"
+      ],
+      "scenario": {
+        "npc": {
+          "name": ""
+        }
+      },
+      "turns": [
+        {
+          "text": "who are you",
+          "language": "EN",
+          "expect": {
+            "ir.subject": "IDENTITY",
+            "lastSemanticKey": {
+              "prefix": "question.identity"
+            }
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.tone_and_weather_realization.core_unknown_identity_tl",
+      "tags": [
+        "realization",
+        "identity",
+        "core",
+        "localization"
+      ],
+      "scenario": {
+        "npc": {
+          "name": ""
+        }
+      },
+      "turns": [
+        {
+          "text": "who are you",
+          "language": "TL",
+          "expect": {
+            "ir.subject": "IDENTITY",
+            "lastSemanticKey": {
+              "prefix": "question.identity"
+            }
+          }
+        }
+      ],
+      "domain": "realization"
+    }
+  ]
+}

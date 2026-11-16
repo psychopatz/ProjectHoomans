@@ -1,0 +1,286 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.beats.pragmatic_arbitration",
+  "domain": "beats",
+  "cases": [
+    {
+      "id": "beats.pragmatic_arbitration.suspicious_first_contact_persists_then_challenges_gossip",
+      "description": "Suspicious first contact persists across greeting and challenges gossip without hijacking grounded wellbeing.",
+      "tags": [
+        "beats",
+        "arbitration",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "decision.director.selectedBeat.id": "beat.suspicious_first_contact",
+            "decision.response.sourcePoolID": "semantic.flow.greeting.opening"
+          }
+        },
+        {
+          "text": "do you have any news",
+          "expect": {
+            "decision.director.selectedBeat.id": "beat.suspicious_first_contact",
+            "decision.director.selectedBehavior.id": "behavior.challenge",
+            "decision.response.sourcePoolID": "semantic.gossip",
+            "decision.response.plan.dialogueAct": "CHALLENGE",
+            "decision.response.fallback": {
+              "notEquals": "I'm not sure what you mean."
+            }
+          }
+        },
+        {
+          "text": "are you okay",
+          "expect": {
+            "decision.branch": "QUESTION_RECEIVED",
+            "decision.response.plan.dialogueAct": {
+              "notEquals": "CHALLENGE"
+            }
+          }
+        }
+      ],
+      "domain": "beats"
+    },
+    {
+      "id": "beats.pragmatic_arbitration.argument_contextual_behavior_warn",
+      "description": "Default personality selects boundary warning under hostile remark.",
+      "tags": [
+        "beats",
+        "behaviors",
+        "arbitration"
+      ],
+      "turns": [
+        {
+          "text": "fuck ypuuuu",
+          "expect": {
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.speechAct": "HOSTILE_REMARK",
+            "ir.provenance.pattern": "pnc.social.profanity",
+            "decision.director.selectedBeat.id": "beat.argument_escalation",
+            "decision.director.selectedBehavior.id": "behavior.warn",
+            "decision.response.sourcePoolID": "semantic.hostile_remark",
+            "decision.response.plan.sourcePoolID": "semantic.hostile_remark",
+            "decision.response.plan.dialogueAct": "BOUNDARY_WARNING",
+            "decision.interactionPlan.behaviorID": "behavior.warn",
+            "decision.interactionPlan.dialogueAct": "BOUNDARY_WARNING",
+            "decision.response.selectionSource": {
+              "notEquals": "director"
+            }
+          }
+        }
+      ],
+      "domain": "beats"
+    },
+    {
+      "id": "beats.pragmatic_arbitration.argument_contextual_behavior_retaliate",
+      "description": "High aggression/confidence selects verbal retaliation under hostile remark.",
+      "tags": [
+        "beats",
+        "behaviors",
+        "arbitration"
+      ],
+      "scenario": {
+        "npc": {
+          "personality": {
+            "aggression": 0.95,
+            "confidence": 0.85,
+            "forgiveness": 0.8
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "fuck ypuuuu",
+          "expect": {
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.speechAct": "HOSTILE_REMARK",
+            "ir.provenance.pattern": "pnc.social.profanity",
+            "decision.director.selectedBeat.id": "beat.argument_escalation",
+            "decision.director.selectedBehavior.id": "behavior.retaliate_verbally",
+            "decision.response.sourcePoolID": "semantic.hostile_remark",
+            "decision.response.plan.dialogueAct": "RETALIATE_VERBALLY",
+            "decision.interactionPlan.behaviorID": "behavior.retaliate_verbally",
+            "decision.interactionPlan.dialogueAct": "RETALIATE_VERBALLY"
+          }
+        }
+      ],
+      "domain": "beats"
+    },
+    {
+      "id": "beats.pragmatic_arbitration.argument_contextual_behavior_deescalate",
+      "description": "High panic with low aggression/confidence selects deescalation under hostile remark.",
+      "tags": [
+        "beats",
+        "behaviors",
+        "arbitration"
+      ],
+      "scenario": {
+        "npc": {
+          "personality": {
+            "aggression": 0.2,
+            "confidence": 0.2,
+            "forgiveness": 0.8
+          },
+          "conditionStats": {
+            "panic": 90,
+            "stress": 0,
+            "boredom": 0
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "fuck ypuuuu",
+          "expect": {
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.speechAct": "HOSTILE_REMARK",
+            "ir.provenance.pattern": "pnc.social.profanity",
+            "decision.director.selectedBeat.id": "beat.argument_escalation",
+            "decision.director.selectedBehavior.id": "behavior.deescalate",
+            "decision.response.sourcePoolID": "semantic.hostile_remark",
+            "decision.response.plan.dialogueAct": "DEESCALATE",
+            "decision.interactionPlan.behaviorID": "behavior.deescalate",
+            "decision.interactionPlan.dialogueAct": "DEESCALATE"
+          }
+        }
+      ],
+      "domain": "beats"
+    },
+    {
+      "id": "beats.pragmatic_arbitration.reconciliation_forgiving",
+      "description": "High forgiveness exits argument into reconciliation and keeps director context bounded.",
+      "tags": [
+        "beats",
+        "behaviors",
+        "arbitration",
+        "multi_turn"
+      ],
+      "scenario": {
+        "npc": {
+          "personality": {
+            "forgiveness": 0.9
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "decision.director.selectedBeat.id": "beat.argument_escalation",
+            "decision.director.selectedBehavior.id": "behavior.warn"
+          }
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "ir.intent": "APOLOGIZE",
+            "decision.director.exited.id": "beat.argument_escalation",
+            "decision.director.entered.id": "beat.reconciliation",
+            "decision.director.selectedBeat.id": "beat.reconciliation",
+            "decision.director.selectedBehavior.id": "behavior.reconcile",
+            "decision.response.sourcePoolID": "semantic.apology",
+            "decision.response.plan.dialogueAct": "RECONCILE",
+            "decision.interactionPlan.behaviorID": "behavior.reconcile",
+            "contextAfter.dialogue.director.active.id": "beat.reconciliation",
+            "contextAfter.dialogue.director.recent": {
+              "maxCount": 4
+            },
+            "contextAfter.dialogue.director.revision": {
+              "min": 2
+            }
+          }
+        }
+      ],
+      "domain": "beats"
+    },
+    {
+      "id": "beats.pragmatic_arbitration.reconciliation_unforgiving",
+      "description": "Low forgiveness exits argument into end_conversation.",
+      "tags": [
+        "beats",
+        "behaviors",
+        "arbitration",
+        "multi_turn"
+      ],
+      "scenario": {
+        "npc": {
+          "personality": {
+            "forgiveness": 0.1
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "decision.director.selectedBeat.id": "beat.argument_escalation"
+          }
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "decision.director.exited.id": "beat.argument_escalation",
+            "decision.director.selectedBeat.id": "beat.reconciliation",
+            "decision.director.selectedBehavior.id": "behavior.end_conversation",
+            "decision.response.sourcePoolID": "semantic.apology",
+            "decision.response.plan.dialogueAct": "END_CONVERSATION",
+            "decision.interactionPlan.behaviorID": "behavior.end_conversation"
+          }
+        }
+      ],
+      "domain": "beats"
+    },
+    {
+      "id": "beats.pragmatic_arbitration.active_argument_does_not_hijack_wellbeing",
+      "description": "Active argument beat does not hijack an unrelated grounded wellbeing question.",
+      "tags": [
+        "beats",
+        "arbitration",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "decision.director.selectedBeat.id": "beat.argument_escalation"
+          }
+        },
+        {
+          "text": "are you okay",
+          "expect": {
+            "decision.director.selectedBeat.id": "beat.argument_escalation",
+            "decision.director.selectedBehavior": {
+              "absent": true
+            },
+            "decision.branch": "QUESTION_RECEIVED",
+            "decision.response.sourcePoolID": {
+              "notEquals": "semantic.hostile_remark"
+            }
+          }
+        }
+      ],
+      "domain": "beats"
+    },
+    {
+      "id": "beats.pragmatic_arbitration.catalog_initial_beats",
+      "description": "Verify initial production beat and behavior catalog counts.",
+      "tags": [
+        "beats",
+        "behaviors"
+      ],
+      "turns": [
+        {
+          "action": "beat.catalog",
+          "expect": {
+            "operation.status": "ok",
+            "result.beatCount": 3,
+            "result.behaviorCount": 30
+          }
+        }
+      ],
+      "domain": "beats"
+    }
+  ]
+}

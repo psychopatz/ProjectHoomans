@@ -1,0 +1,43 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.knowledge.backstory_projection_and_facts",
+  "domain": "knowledge",
+  "cases": [
+    {
+      "id": "knowledge.backstory_projection_and_facts.backstory_inspect_and_fact",
+      "domain": "knowledge",
+      "description": "Verify deterministic backstory projection and fact lookup.",
+      "tags": [
+        "knowledge",
+        "backstory"
+      ],
+      "turns": [
+        {
+          "action": "backstory.inspect",
+          "payload": {
+            "identitySeed": 104729,
+            "tacticalClass": "colonist"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.profile.identitySeed": 104729
+          }
+        },
+        {
+          "action": "backstory.fact",
+          "payload": {
+            "identitySeed": 104729,
+            "kind": "former_job",
+            "tacticalClass": "colonist",
+            "language": "EN"
+          },
+          "expect": {
+            "operation.status": "ok",
+            "result.fact.kind": "former_job",
+            "result.fact.value": "farmer"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.behaviors.npc_semantic_act_interaction_preview",
+  "domain": "behaviors",
+  "cases": [
+    {
+      "id": "behaviors.npc_semantic_act_interaction_preview.interaction_preview_npc_semantic_act",
+      "description": "Verify interaction.preview evaluates NPC_SEMANTIC_ACT without mutating conversation.",
+      "tags": [
+        "behaviors",
+        "interaction"
+      ],
+      "turns": [
+        {
+          "action": "interaction.preview",
+          "payload": {
+            "stimulus": {
+              "type": "NPC_SEMANTIC_ACT",
+              "source": {
+                "kind": "npc",
+                "actorID": "npc-a",
+                "providerID": "synthetic.scene"
+              },
+              "targets": [
+                "npc_mara"
+              ],
+              "semantic": {
+                "intent": "THANK",
+                "speechAct": "THANK",
+                "topic": "social",
+                "confidence": 1.0
+              }
+            }
+          },
+          "expect": {
+            "operation.status": "ok"
+          }
+        }
+      ],
+      "domain": "behaviors"
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.realization.lifecycle_and_goodbye_wording",
+  "domain": "realization",
+  "cases": [
+    {
+      "id": "realization.lifecycle_and_goodbye_wording.lifecycle_goodbye_root_choice_en",
+      "tags": [
+        "realization",
+        "lifecycle",
+        "goodbye"
+      ],
+      "turns": [
+        {
+          "rootChoice": "goodbye",
+          "language": "EN",
+          "expect": {
+            "conversationClosed": true,
+            "lastKey": "response.goodbye"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.lifecycle_and_goodbye_wording.lifecycle_goodbye_root_choice_tl",
+      "tags": [
+        "realization",
+        "lifecycle",
+        "goodbye",
+        "localization"
+      ],
+      "turns": [
+        {
+          "rootChoice": "goodbye",
+          "language": "TL",
+          "expect": {
+            "conversationClosed": true,
+            "lastKey": "response.goodbye",
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.lifecycle_and_goodbye_wording.lifecycle_typed_goodbye_separate_route_en",
+      "tags": [
+        "realization",
+        "lifecycle",
+        "typed_goodbye"
+      ],
+      "turns": [
+        {
+          "text": "goodbye",
+          "language": "EN",
+          "expect": {
+            "conversationClosed": false,
+            "lastKey": "semantic.ask_clarification"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.lifecycle_and_goodbye_wording.lifecycle_typed_goodbye_separate_route_tl",
+      "tags": [
+        "realization",
+        "lifecycle",
+        "typed_goodbye",
+        "localization"
+      ],
+      "turns": [
+        {
+          "text": "goodbye",
+          "language": "TL",
+          "expect": {
+            "conversationClosed": false,
+            "lastKey": "semantic.ask_clarification"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.lifecycle_and_goodbye_wording.lifecycle_follow_then_wait_en",
+      "tags": [
+        "realization",
+        "lifecycle",
+        "commands",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "follow me",
+          "language": "EN",
+          "expect": {
+            "ir.action": "FOLLOW"
+          }
+        },
+        {
+          "text": "wait here",
+          "language": "EN",
+          "expect": {
+            "ir.action": "STAY",
+            "lastKey": "command.stay.queued"
+          }
+        }
+      ],
+      "domain": "realization"
+    },
+    {
+      "id": "realization.lifecycle_and_goodbye_wording.lifecycle_follow_then_wait_tl",
+      "tags": [
+        "realization",
+        "lifecycle",
+        "commands",
+        "multi_turn",
+        "localization"
+      ],
+      "turns": [
+        {
+          "text": "follow me",
+          "language": "TL",
+          "expect": {
+            "ir.action": "FOLLOW"
+          }
+        },
+        {
+          "text": "wait here",
+          "language": "TL",
+          "expect": {
+            "ir.action": "STAY",
+            "lastKey": "command.stay.queued",
+            "fallbackLookups": 0
+          }
+        }
+      ],
+      "domain": "realization"
+    }
+  ]
+}

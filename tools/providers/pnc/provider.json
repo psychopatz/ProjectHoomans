@@ -43,8 +43,7 @@
       "workerProfile": "pnc",
       "workerPriority": 100,
       "fixtureRoots": {
-        "semantic": "${repository}/tools/providers/pnc/fixtures/v1",
-        "regression": "${repository}/tools/providers/pnc/fixtures"
+        "semantic": "${repository}/tools/providers/pnc/fixtures/v1"
       }
     }
   ],

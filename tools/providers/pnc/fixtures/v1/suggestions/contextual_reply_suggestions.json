@@ -1,0 +1,70 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.suggestions.contextual_reply_suggestions",
+  "domain": "suggestions",
+  "cases": [
+    {
+      "id": "suggestions.contextual_reply_suggestions.greeting",
+      "tags": [
+        "suggestions"
+      ],
+      "turns": [
+        {
+          "text": "hello there",
+          "expect": {
+            "ir.intent": "GREET",
+            "response.exists": true,
+            "observation.suggestions.candidates": {
+              "minCount": 1
+            },
+            "observation.suggestions.activeFlow.flowID": "greeting",
+            "observation.suggestions.candidates.0.groupID": "conversation_branch"
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.contextual_reply_suggestions.time_reply",
+      "tags": [
+        "suggestions",
+        "time"
+      ],
+      "turns": [
+        {
+          "text": "what time is it",
+          "expect": {
+            "ir.subject": "TIME",
+            "response.exists": true,
+            "observation.suggestions.candidates": {
+              "minCount": 1
+            }
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.contextual_reply_suggestions.hostility_reply",
+      "tags": [
+        "suggestions",
+        "hostility"
+      ],
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "ir.intent": "INSULT",
+            "dispatchTransport": {
+              "count": 0
+            },
+            "observation.suggestions.candidates": {
+              "minCount": 1
+            }
+          }
+        }
+      ],
+      "domain": "suggestions"
+    }
+  ]
+}

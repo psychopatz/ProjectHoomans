@@ -1,0 +1,117 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.interaction.identity_pending_exchange_interruptions",
+  "domain": "interaction",
+  "cases": [
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.identity_collision_wellbeing_report_preserves_pending",
+      "tags": [
+        "interaction",
+        "identity",
+        "wellbeing",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "text": "im fine thanks",
+          "expect": {
+            "ir.subject": "WELLBEING",
+            "decision.branch": "SELF_STATE_RECEIVED",
+            "relationshipAfter.identityTrust": "unknown",
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.identity_collision_hunger_report_preserves_pending",
+      "tags": [
+        "interaction",
+        "identity",
+        "hunger",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "text": "I'm hungry",
+          "expect": {
+            "ir.subject": "HUNGER",
+            "decision.branch": "SELF_STATE_RECEIVED",
+            "relationshipAfter.identityTrust": "unknown",
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.identity_collision_question_interruption_preserves_pending",
+      "tags": [
+        "interaction",
+        "identity",
+        "question",
+        "interruption",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "ir.subject": "WELLBEING",
+            "decision.branch": "QUESTION_RECEIVED",
+            "relationshipAfter.identityTrust": "unknown",
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.identity_collision_time_interruption_preserves_pending",
+      "tags": [
+        "interaction",
+        "identity",
+        "time",
+        "interruption",
+        "multi_turn"
+      ],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "text": "what time is it",
+          "expect": {
+            "ir.subject": "TIME",
+            "decision.branch": "QUESTION_RECEIVED",
+            "relationshipAfter.identityTrust": "unknown",
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        }
+      ],
+      "domain": "interaction"
+    }
+  ]
+}

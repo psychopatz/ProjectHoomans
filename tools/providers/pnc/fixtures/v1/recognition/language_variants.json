@@ -1,0 +1,64 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.recognition.language_variants",
+  "domain": "recognition",
+  "cases": [
+    {
+      "id": "recognition.language_variants.language_greeting_matrix",
+      "tags": [
+        "recognition",
+        "greeting",
+        "matrix",
+        "localization"
+      ],
+      "matrix": {
+        "language": [
+          "EN",
+          "TL"
+        ]
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "ir.intent": "GREET",
+            "response.templateID": "flow.greeting.opening.default",
+            "response.exists": true
+          }
+        }
+      ],
+      "domain": "recognition"
+    },
+    {
+      "id": "recognition.language_variants.language_rain_greeting_matrix",
+      "tags": [
+        "recognition",
+        "greeting",
+        "weather",
+        "localization"
+      ],
+      "scenario": {
+        "world": {
+          "weather": "rain"
+        }
+      },
+      "matrix": {
+        "language": [
+          "EN",
+          "TL"
+        ]
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "ir.intent": "GREET",
+            "response.templateID": "flow.greeting.opening.rain",
+            "response.exists": true
+          }
+        }
+      ],
+      "domain": "recognition"
+    }
+  ]
+}
