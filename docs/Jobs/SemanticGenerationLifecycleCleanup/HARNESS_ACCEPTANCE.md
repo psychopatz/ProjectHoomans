@@ -1,50 +1,44 @@
-# Harness Acceptance — G8R7 Portability Closure
+# Harness Acceptance — Semantic Generation Lifecycle
 
-## Backend dispatch
+**Status:** ACCEPTED.
 
-Use the normal production compiler.
+## Package / source acceptance
 
-Require:
-- current PZ target selects `pz-lua` through descriptors;
-- a non-PZ test/reference backend selects through the same dispatcher;
-- unknown backend fails closed;
-- incompatible mixed-backend target sets fail closed;
-- adding the test backend requires no conditional in generic conversation compilation.
+- Self-contained Core, ProjectHoomans and DTCommon packages resolve through generic imports.
+- Semantic owner follows package/domain meaning.
+- `domainPath` derives from source hierarchy and preserves broad runtime `domain`.
 
-## Executed trace equivalence
+## Generated topology acceptance
 
-Use real production portable plans and execute both sides.
+Across all owners:
+- generated behavior/beat data mirrors source-package ownership;
+- director/runtime-plan surfaces use the same semantic decomposition;
+- no cross-owner false naming collision;
+- no avoidable `__????????.lua` output;
+- retired generated module references are absent.
 
-Reference side: `PortableReferenceVM`.
-PZ side: existing Lua ConvoProbe / `simulate_convo_engine_family()` infrastructure, adapted as needed to consume the generated portable-plan-derived PZ runtime plan.
+## Variant-growth acceptance
 
-Cover exact recognition, fuzzy recognition, fuzzy mutating confirmation, profanity, beat + behavior, camp result branch, and a deterministic realization case.
+Real compact-source fixtures prove:
+- adding a variant changes only its semantic group on both runtime-plan and director surfaces;
+- adding a new subdomain creates local modules without renaming unrelated groups;
+- enumeration order does not change output;
+- cross-owner identical semantic leaves coexist without hash fallback.
 
-Normalize traces before comparison. Projection/table membership is not sufficient.
+## Portability acceptance
 
-## Lineage
-
-For compact production source assert:
-- authored schema is `psychopatz.psdl.v2`;
-- canonical schema/version is separately represented;
-- source path points to authored file;
-- diagnostics remain source-lineage-aware.
+- production compile lowers through Portable Dialogue Plan;
+- backend dispatch is descriptor-driven;
+- Reference VM and Lua ConvoProbe execute equivalent semantic traces for the accepted corpus;
+- authored and canonical schema lineage remain distinct/truthful.
 
 ## Final committed-vector acceptance
 
-From an isolated final participant vector:
-- canonical check clean before apply;
-- focused G8R7 tests pass;
-- production G8R suite passes;
-- lifecycle tests pass;
-- naming/sharding determinism passes;
-- generated-output deletion/rebuild recreates all ledger-owned outputs;
+Require:
+- canonical check clean before repair;
+- G9R, G9, G8R7, G8 and lifecycle suites pass;
+- `audit-s6m8 --check-determinism` passes;
+- isolated ledger-owned generated-output deletion/rebuild succeeds;
 - second apply is a no-op;
 - final check clean;
-- ROADMAP/PROGRESS/HANDOFF all say COMPLETE.
-
-## Evidence rule
-
-Data-driven owner routing does not prove backend portability; backend implementation selection must also be descriptor-driven.
-
-Generated PZ definitions containing matching IDs do not prove runtime equivalence; execute both runtimes.
+- active documentation agrees on COMPLETE.

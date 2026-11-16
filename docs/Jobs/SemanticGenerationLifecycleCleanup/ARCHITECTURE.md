@@ -1,9 +1,9 @@
 # Architecture — Portable PSDL / ConvoEngine
 
-## Production authority
+## Authority pipeline
 
 ```text
-compact PSDL
+compact PSDL package
 → canonical Semantic Dialogue IR
 → Portable Dialogue Plan
 → descriptor-selected backend
@@ -11,54 +11,88 @@ compact PSDL
 → typed game capability adapter
 ```
 
-There is one portable semantic-plan authority and one backend-dispatch authority.
+There is one semantic-plan authority and one backend-dispatch authority.
 
-## Backend contract
-
-Generic compiler code may compile/link portable plans and resolve target descriptors, but must not hard-code a backend renderer.
-
-Backends are selected by descriptor identity:
+## Package ownership
 
 ```text
-backend ID
-→ registered backend implementation
-→ validate target context
-→ render portable plan
+PsychopatzCore
+  compiler
+  standard runtime
+  reusable semantic stdlib
+
+ProjectHoomans
+  Hoomans/domain PSDL programs
+
+DTCommon
+  Dynamic Trading/domain PSDL programs
 ```
 
-Unknown backends and incompatible mixed-backend targets fail closed.
+Adopters import shared Core packages. Core does not hard-code adopter source roots.
 
-`pz-lua` remains the production PZ backend. Future backends plug into the same dispatch contract.
+## Semantic decomposition
 
-## Trace conformance contract
-
-Reference and target runtimes are compared through a normalized semantic trace, not implementation data structures.
-
-Stable trace semantics include recognition identity/mode/confidence class, confirmation requirement, selected beat/behavior/dialogue, action/result outcome, reply branch, and realization/template identity where deterministic.
-
-Lua ConvoProbe is the preferred PZ-side developer acceptance runtime because it executes generated Lua without requiring native game launch.
-
-## Source lineage
-
-Lineage distinguishes authored representation from normalized/canonical representation.
-
-Compact records expose authored schema/path and canonical IR schema/version separately. Do not label canonical schema as authored source schema.
-
-## Logic ownership
+Organize by meaning before safety sharding:
 
 ```text
-portable declaration → PSDL source
-portable reusable algorithm → versioned standard runtime
+package
+→ kind
+→ domain
+→ domainPath
+→ variants
+→ generated module
+```
+
+Broad `domain` may preserve runtime semantics. `domainPath` is derived from source/package hierarchy and drives generated grouping and navigation.
+
+Example:
+
+```text
+behavior/social/conflict/retaliate_verbally.json
+→ domain = social
+→ domainPath = social/conflict
+```
+
+Adding a variant should normally affect only its semantic group.
+
+## Generated surfaces
+
+Generated data mirrors source-package ownership.
+
+Core-owned semantic source generates Core-owned modules. Hoomans-owned source generates PNC modules. Shared runtime/director code may consume imported packages without merging adopter data into Core payloads.
+
+Distinct generated surfaces such as portable runtime-plan modules and director/catalog modules remain projections of the same canonical semantic model. Neither is an authoring authority.
+
+Broad aggregator/index modules are allowed only as composition/discovery surfaces, not monolithic semantic payloads.
+
+## Naming and safety sharding
+
+Generated naming is deterministic and scoped by final owner/backend namespace.
+
+Readable semantic hierarchy is preferred. Compact hashes are only a true residual collision/backend-limit fallback.
+
+Safety ceilings remain downstream constraints:
+
+```text
+max generated shard bytes = 192 KiB
+max records per shard = 32
+```
+
+They do not define semantic organization.
+
+`catalog_naming.py` remains the naming authority. Generated files are never hand-renamed.
+
+## Portability boundary
+
+```text
+portable declaration → PSDL
+portable reusable algorithm → standard runtime
 game/engine implementation → typed capability adapter
 backend rendering → descriptor-selected backend
 ```
 
-## Naming/sharding invariants
+Fuzzy matching, predicates and directors are reusable runtime algorithms. Game mechanics such as PZ camp geometry/pathfinding/server mutation remain adopter capability implementations.
 
-Preserve stable semantic IDs/realization handles, named outcomes, coherent family sharding, lowercase semantic source names, deterministic source-lineage-aware generated chunking, valid desired hash shards, `catalog_naming.py` as naming authority, and no manual generated-file moves.
+## Preserved invariants
 
-Do not introduce arbitrary `PartNN`, phrase-per-file/migration-history trees, or revive `psdl.*`, `pnc.psdl.*`, or `Conversation/Text/psdl/` runtime identities.
-
-## Rebuild invariant
-
-Given only toolchain + compact packages + standard runtime + target/backend descriptors + capability adapters, a clean output directory recreates all reusable dialogue runtime artifacts deterministically.
+Keep stable semantic IDs, realization handles, named outcomes, explicit authored/canonical lineage, deterministic output, closed-set reconciliation, no arbitrary `PartNN`/phrase-per-file/migration-history authoring trees, and no revival of legacy `psdl.*` runtime identities.

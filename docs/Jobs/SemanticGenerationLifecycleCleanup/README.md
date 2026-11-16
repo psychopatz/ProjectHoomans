@@ -1,48 +1,57 @@
-# Portable PSDL / ConvoEngine Portability Closure
+# Semantic Generation Lifecycle / Portable PSDL
 
-**Status:** IN PROGRESS — G8R7 portability closure.
+**Status:** COMPLETE.
 
-## Parent objective
+## Final result
 
-Finish the remaining portability boundary so ConvoEngine selects backends from target descriptors and proves the same Portable Dialogue Plan behaves equivalently in the reference runtime and generated Project Zomboid Lua runtime.
+The Semantic CodeBuilder/ConvoEngine pipeline is now a compact, portable, package-owned dialogue toolchain with deterministic generated ownership.
+
+Production authority:
 
 ```text
-compact PSDL
+compact PSDL package
 → canonical Semantic Dialogue IR
 → Portable Dialogue Plan
 → descriptor-selected backend
-→ generated runtime
+→ owner-isolated generated runtime
 → typed game capability adapter
 ```
 
-## Accepted baseline
+Semantic source and generated output are organized by meaning before safety sharding:
 
-Already verified and no longer active work:
-- all 577 production semantic families use compact `psychopatz.psdl.v2`;
-- production package/provenance data exists;
-- production compilation lowers through `compile_portable_plan()`;
-- PZ generated output is rendered from the portable plan;
-- profanity recognition is source/generated rather than handwritten registration;
-- camp uses a typed capability boundary;
-- current PZ owner/output routing is descriptor-driven;
-- synthetic adopter routing through the normal generator works;
-- isolated committed-vector canonical check, deterministic rebuild, and naming/sharding audit pass.
+```text
+package
+→ kind
+→ broad runtime domain
+→ semantic domainPath
+→ variants
+→ generated modules
+→ byte/record safety split only if still required
+```
 
-Git history is the archive for those completed changes.
+Examples now include:
 
-## Remaining closure
+```text
+behavior/social/conflict/
+→ Behavior/Social/Conflict.lua
+→ Behaviors/Director/Social/Conflict.lua
 
-Only four concerns remain:
-1. backend selection is still hard-coded to `pz-lua` in the generic compiler path;
-2. G8R5 compares the Reference VM with PZ projection tables, not an executed Lua/PZ semantic trace;
-3. normalized lineage reports the canonical schema as if it were the authored source schema;
-4. final ROADMAP/PROGRESS/HANDOFF committed closure is inconsistent.
+behavior/scene/horde/
+→ PNC/ConvoEngine/Behavior/Scene/Horde.lua
+→ PNC/ConvoEngine/Behaviors/Director/Scene/Horde.lua
+```
 
-## Minimal read order
+## Accepted properties
 
-1. root `AGENTS.md`
-2. `PROGRESS.md`
-3. `HANDOFF.md`
-4. active `ROADMAP.md`
-5. `ARCHITECTURE.md` when modifying backend/runtime contracts
-6. `HARNESS_ACCEPTANCE.md` before closure
+- Core, ProjectHoomans and DTCommon own self-contained PSDL packages.
+- Core contains reusable compiler/runtime/semantic stdlib; adopters own domain semantics.
+- Compact source preserves explicit canonical IR and Portable Dialogue Plan semantics.
+- Project Zomboid is selected through backend descriptors; a portable reference backend exists.
+- Reference VM ↔ Lua ConvoProbe conformance is tested.
+- Generated behavior/beat surfaces mirror package ownership and semantic domainPath.
+- Adding a real source variant changes only its semantic group.
+- Adding a new real semantic subdomain creates new local runtime/director modules without renaming unrelated groups.
+- Avoidable `__<8hex>.lua` generated modules are zero across Core, ProjectHoomans and DTCommon.
+- Generated reconciliation, clean rebuild, second-pass no-op and naming determinism are enforced.
+
+Git history is the archive for G0–G9R implementation details.

@@ -1,34 +1,57 @@
-# Agent Runbook — G8R7 Portability Closure
+# Agent Runbook — Portable PSDL / ConvoEngine
 
 ## Startup
 
-For every participant repo:
+For each participant repository:
 1. read root `AGENTS.md`;
 2. inspect branch/HEAD/upstream/worktree;
 3. preserve unrelated work;
-4. read `PROGRESS.md`, `HANDOFF.md`, then active ROADMAP gate;
-5. inspect exact source/tests before editing.
+4. use compact inspection before broad source reads;
+5. inspect exact source/tests when changing semantic/compiler behavior.
 
-Primary job repo: ProjectHoomans.
-Compiler/toolchain owner: PsychopatzCore.
-Current generated adopters: ProjectHoomans and DTCommon.
+## Semantic authoring
 
-Do not create a branch.
+Classify logic as:
 
-## Reuse before invention
+```text
+portable declaration → PSDL source
+portable reusable algorithm → standard runtime
+game/engine implementation → capability adapter
+```
 
-Reuse accepted compact-PSDL, portable-plan, capability, descriptor and inspection systems. For G8R7B reuse the existing Lua ConvoProbe/studio trace infrastructure where practical; do not create a second PZ simulator.
+Put adopter-domain semantic programs in the adopter package. Keep reusable semantic stdlib in Core.
 
-## Backend discipline
+Organize variants by coherent semantic `domainPath` before generated size sharding.
 
-Generic compiler code resolves descriptors and dispatches through one backend interface. Backend-specific renderers live behind that interface. Do not add game-specific semantics to dispatch.
+## Inspection
 
-## Acceptance discipline
+Prefer progressive disclosure:
 
-Projection equivalence is weaker than runtime equivalence. Execute both Reference VM and Lua/PZ runtime and compare normalized semantic traces.
+```text
+psdl locate <id>
+psdl get <id> --summary
+psdl impact <id>
+→ targeted source
+→ canonical IR / portable plan
+→ generated backend output only when necessary
+```
 
-## Git/docs
+## Generated output
 
-Preserve unrelated work; stage exact phase-owned paths only; participant commits first; ProjectHoomans/job docs last; no push/publication without authorization.
+Never hand-edit, hand-move or hand-rename generated artifacts.
 
-ROADMAP = remaining gates. PROGRESS = current truth + one Next Chunk. HANDOFF = current baton. ARCHITECTURE = stable contracts. Git history = archive.
+Fix canonical source/package/naming authority and reconcile.
+
+A hash suffix is not evidence of staleness; reconciliation owns staleness decisions.
+
+## Validation
+
+For changes affecting semantic grouping or generation, run focused tests first, then the relevant package/portability/lifecycle suites and canonical reconciliation/determinism gates.
+
+Variant-growth changes must remain local to the affected semantic group.
+
+## Git
+
+Preserve unrelated staged/unstaged/untracked work. Stage exact phase-owned paths only. Participant commits precede primary/job-doc commits. Never push/publish/rebase/amend/force-update without explicit authorization.
+
+Git history is the archive for completed roadmap phases.

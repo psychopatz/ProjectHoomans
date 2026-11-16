@@ -1,40 +1,48 @@
-# Audit — G8R7 Portability Closure
+# Final Audit — Semantic Generation Lifecycle / G9R
 
 **Evidence:** CODE_VERIFIED, TEST_VERIFIED, GENERATED_OUTPUT_VERIFIED.
 
-## Accepted baseline
+## Final implementation findings
 
-Verified from the committed vector:
-- 577 compact `psychopatz.psdl.v2` production families and zero verbose authoring families;
-- production compiler calls `compile_portable_plan()` and PZ projection renders from it;
-- handwritten profanity registrations are removed and generated patterns are present;
-- real camp source uses the `hoomans.camp.establish` capability boundary;
-- PZ owner/output package descriptors are external data;
-- synthetic adopter uses normal compilation/ledger routing;
-- canonical check clean with `desired=384`;
-- G8R tests 5/5, lifecycle tests 3/3, naming audit zero violations;
-- independent deletion of 378 generated files rebuilt byte-identically and remained clean on second apply.
+- 577 compact production PSDL families compile through the Portable Dialogue Plan production seam.
+- Backend selection is descriptor-driven.
+- Reference VM ↔ Lua ConvoProbe semantic conformance is tested.
+- Core behavior source is decomposed into `social/{acknowledgement,conflict,context,repair,world_events}`.
+- Core beats are decomposed into `social/{conflict,first_contact,repair}`.
+- ProjectHoomans scene behavior is decomposed into `scene/{excursion,horde,news,post_combat,task_work}`.
+- Runtime-plan and director surfaces mirror the same semantic decomposition.
+- Core generated behavior payloads contain no Hoomans scene behaviors.
+- Avoidable hash-named generated Lua files are zero across PsychopatzCore, ProjectHoomans and DTCommon.
+- Retired `Social__d6475647` and `CoreKnowledgeFacts__d73c98cf` artifacts/references are absent.
+- `domainPath` is derived generically from source hierarchy rather than a hard-coded per-family partition list.
 
-## Remaining findings
+## Source-level growth regression
 
-### Backend dispatch is still PZ-specific
+A permanent regression now adds temporary real compact PSDL source files through the normal loader and proves:
 
-Generic production compilation calls `render_pz_backend_from_portable_plan()` directly. `combined_target_descriptor()` sets `backend = pz-lua` unconditionally. No backend registry/dispatcher was found.
+```text
+new social/conflict variant
+→ Behavior/Social/Conflict changes
+→ Behaviors/Director/Social/Conflict changes
+→ Repair/Acknowledgement/Context remain unchanged
 
-### Current trace equivalence is projection-only
+new social subdomain
+→ new local Behavior module
+→ new local Behaviors/Director module
+→ existing Conflict/Repair modules remain unchanged
+→ no hash fallback
+```
 
-G8R5 executes `PortableReferenceVM`, then verifies selected IDs/actions against PZ-generated plan/behavior/beat projections. It does not execute a Lua/PZ semantic trace.
+This closes the earlier model-only test weakness.
 
-Existing ConvoEngine studio support already provides `simulate_convo_engine_family()` through the live Lua ConvoProbe.
+## Final closure criteria
 
-### Lineage conflates authored and canonical schema
+The final committed-vector acceptance must keep:
+- canonical reconcile clean before apply;
+- G9R/G9/G8R7/G8/G7 regression suites green;
+- naming/sharding determinism clean;
+- isolated generated-output deletion/rebuild successful;
+- second pass a no-op;
+- final active docs consistent with COMPLETE.
 
-Representative compact records report `sourceSchema = psychopatz.convo-engine.v1` while authored files are `psychopatz.psdl.v2`.
-
-### Closure docs disagree
-
-Previous PROGRESS/HANDOFF claimed COMPLETE while ROADMAP/committed job state did not.
-
-## Conclusion
-
-Reopen only G8R7 for backend dispatch, executed runtime conformance, truthful lineage, and final committed documentation closure.
+No additional developer-side semantic-generation phase remains.
