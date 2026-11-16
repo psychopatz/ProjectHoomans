@@ -535,10 +535,12 @@ return {
         ["id"] = "command.stop_following",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "stop_following",
             ["sourceId"] = "command.stop_following",
             ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__7d8bcf74",
         ["namespace"] = "command",

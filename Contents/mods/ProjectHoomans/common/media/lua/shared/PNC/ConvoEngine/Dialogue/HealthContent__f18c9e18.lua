@@ -865,10 +865,12 @@ return {
         ["id"] = "question.medical_bite",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "medical_bite",
             ["sourceId"] = "question.medical_bite",
             ["sourcePath"] = "adopters/hoomans/dialogue/health_content/question_medical_bite.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/HealthContent__f18c9e18",
         ["namespace"] = "question",

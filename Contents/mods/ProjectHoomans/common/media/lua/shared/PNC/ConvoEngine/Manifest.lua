@@ -464,7 +464,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
         },
         {
-            ["bytes"] = 64670,
+            ["bytes"] = 65230,
             ["domain"] = "combat_banter_weapon_kill_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
@@ -485,7 +485,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
         },
         {
-            ["bytes"] = 43388,
+            ["bytes"] = 43836,
             ["domain"] = "combat_banter_weapon_kill_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
@@ -505,7 +505,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
         },
         {
-            ["bytes"] = 30682,
+            ["bytes"] = 31018,
             ["domain"] = "combat_banter_weapon_kill_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
@@ -524,7 +524,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
         },
         {
-            ["bytes"] = 69767,
+            ["bytes"] = 70439,
             ["domain"] = "combat_banter_weapon_kill_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -546,7 +546,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
         },
         {
-            ["bytes"] = 18224,
+            ["bytes"] = 18448,
             ["domain"] = "combat_banter_weapon_kill_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
@@ -564,7 +564,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
         },
         {
-            ["bytes"] = 34811,
+            ["bytes"] = 35147,
             ["domain"] = "combat_banter_weapon_kill_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillShaken",
@@ -583,7 +583,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_blade_head.json",
         },
         {
-            ["bytes"] = 22176,
+            ["bytes"] = 22400,
             ["domain"] = "combat_banter_weapon_kill_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillSupportive",
@@ -601,7 +601,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
         },
         {
-            ["bytes"] = 27113,
+            ["bytes"] = 27225,
             ["domain"] = "combat_human_banter_human_kill_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__45514287",
@@ -618,7 +618,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_aggressive/combat_human_kill_aggressive.json",
         },
         {
-            ["bytes"] = 28523,
+            ["bytes"] = 28635,
             ["domain"] = "combat_human_banter_human_kill_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillBrave",
@@ -635,7 +635,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
         },
         {
-            ["bytes"] = 27655,
+            ["bytes"] = 27767,
             ["domain"] = "combat_human_banter_human_kill_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillCold",
@@ -652,7 +652,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
         },
         {
-            ["bytes"] = 30004,
+            ["bytes"] = 30116,
             ["domain"] = "combat_human_banter_human_kill_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__67f43293",
@@ -669,7 +669,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_practical/combat_human_kill_practical.json",
         },
         {
-            ["bytes"] = 21837,
+            ["bytes"] = 21949,
             ["domain"] = "combat_human_banter_human_kill_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__9990bc04",
@@ -686,7 +686,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_reserved/combat_human_kill_reserved.json",
         },
         {
-            ["bytes"] = 28045,
+            ["bytes"] = 28157,
             ["domain"] = "combat_human_banter_human_kill_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillShaken",
@@ -703,7 +703,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
         },
         {
-            ["bytes"] = 28421,
+            ["bytes"] = 28533,
             ["domain"] = "combat_human_banter_human_kill_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__057e5fa8",
@@ -720,7 +720,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive.json",
         },
         {
-            ["bytes"] = 27189,
+            ["bytes"] = 27301,
             ["domain"] = "combat_kill_killer_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerAggressive",
@@ -737,7 +737,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
         },
         {
-            ["bytes"] = 27128,
+            ["bytes"] = 27240,
             ["domain"] = "combat_kill_killer_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerBrave",
@@ -754,7 +754,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
         },
         {
-            ["bytes"] = 25065,
+            ["bytes"] = 25177,
             ["domain"] = "combat_kill_killer_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerCold",
@@ -771,7 +771,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
         },
         {
-            ["bytes"] = 27895,
+            ["bytes"] = 28007,
             ["domain"] = "combat_kill_killer_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerPractical",
@@ -788,7 +788,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_practical/combat_reaction_kill_killer_practical.json",
         },
         {
-            ["bytes"] = 21245,
+            ["bytes"] = 21357,
             ["domain"] = "combat_kill_killer_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerReserved",
@@ -805,7 +805,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
         },
         {
-            ["bytes"] = 28974,
+            ["bytes"] = 29086,
             ["domain"] = "combat_kill_killer_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerShaken",
@@ -822,7 +822,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
         },
         {
-            ["bytes"] = 28006,
+            ["bytes"] = 28118,
             ["domain"] = "combat_kill_killer_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerSupportive",
@@ -839,7 +839,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
         },
         {
-            ["bytes"] = 27572,
+            ["bytes"] = 27684,
             ["domain"] = "combat_kill_witness_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessAggressive",
@@ -856,7 +856,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
         },
         {
-            ["bytes"] = 28481,
+            ["bytes"] = 28593,
             ["domain"] = "combat_kill_witness_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessBrave",
@@ -873,7 +873,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_brave/combat_reaction_kill_witness_brave.json",
         },
         {
-            ["bytes"] = 26980,
+            ["bytes"] = 27092,
             ["domain"] = "combat_kill_witness_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessCold",
@@ -890,7 +890,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
         },
         {
-            ["bytes"] = 28958,
+            ["bytes"] = 29070,
             ["domain"] = "combat_kill_witness_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessPractical",
@@ -907,7 +907,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
         },
         {
-            ["bytes"] = 20998,
+            ["bytes"] = 21110,
             ["domain"] = "combat_kill_witness_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
@@ -924,7 +924,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved.json",
         },
         {
-            ["bytes"] = 29889,
+            ["bytes"] = 30001,
             ["domain"] = "combat_kill_witness_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessShaken",
@@ -941,7 +941,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken.json",
         },
         {
-            ["bytes"] = 28097,
+            ["bytes"] = 28209,
             ["domain"] = "combat_kill_witness_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessSupportive",
@@ -958,7 +958,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_supportive/combat_reaction_kill_witness_supportive.json",
         },
         {
-            ["bytes"] = 53574,
+            ["bytes"] = 54134,
             ["domain"] = "combat_player_assault_reactions",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
@@ -979,7 +979,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
         },
         {
-            ["bytes"] = 27066,
+            ["bytes"] = 27402,
             ["domain"] = "companion_check_in",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCheckIn",
@@ -998,7 +998,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_check_in/question_gossip.json",
         },
         {
-            ["bytes"] = 128002,
+            ["bytes"] = 129234,
             ["domain"] = "companion_commands_combat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
@@ -1025,7 +1025,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
         },
         {
-            ["bytes"] = 159876,
+            ["bytes"] = 160100,
             ["domain"] = "companion_commands_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
@@ -1043,7 +1043,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp.json",
         },
         {
-            ["bytes"] = 132784,
+            ["bytes"] = 133008,
             ["domain"] = "companion_commands_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__3899a7d0",
@@ -1061,7 +1061,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home.json",
         },
         {
-            ["bytes"] = 67944,
+            ["bytes"] = 68056,
             ["domain"] = "companion_commands_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__7d8bcf74",
@@ -1078,7 +1078,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following.json",
         },
         {
-            ["bytes"] = 77984,
+            ["bytes"] = 79216,
             ["domain"] = "companion_commands_player",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
@@ -1105,7 +1105,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_player/command_player_attack_auto.json",
         },
         {
-            ["bytes"] = 187881,
+            ["bytes"] = 189785,
             ["domain"] = "companion_commands_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies",
@@ -1138,7 +1138,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_replies/combat_horde_ack_avoid_default.json",
         },
         {
-            ["bytes"] = 29495,
+            ["bytes"] = 29831,
             ["domain"] = "companion_commands_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__d3679c75",
@@ -1157,7 +1157,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_replies/command_reply_return_home.json",
         },
         {
-            ["bytes"] = 15293,
+            ["bytes"] = 15517,
             ["domain"] = "companion_flows",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionFlows",
@@ -1175,7 +1175,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_flows/follow.json",
         },
         {
-            ["bytes"] = 168664,
+            ["bytes"] = 171688,
             ["domain"] = "compatibility_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1218,7 +1218,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
         },
         {
-            ["bytes"] = 12721,
+            ["bytes"] = 12833,
             ["domain"] = "conversation_context",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationContext",
@@ -1235,7 +1235,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_context/conversation_context_replies.json",
         },
         {
-            ["bytes"] = 138202,
+            ["bytes"] = 139210,
             ["domain"] = "conversation_greeting",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -1260,7 +1260,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/conversation_landing_whats_up.json",
         },
         {
-            ["bytes"] = 159699,
+            ["bytes"] = 160819,
             ["domain"] = "conversation_needs",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -1286,7 +1286,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
         },
         {
-            ["bytes"] = 187905,
+            ["bytes"] = 188465,
             ["domain"] = "conversation_whats_up",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
@@ -1307,7 +1307,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
         },
         {
-            ["bytes"] = 7621,
+            ["bytes"] = 7733,
             ["domain"] = "core_knowledge_facts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CoreKnowledgeFacts",
@@ -1324,7 +1324,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
         },
         {
-            ["bytes"] = 173985,
+            ["bytes"] = 176337,
             ["domain"] = "core_semantic_responses",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
@@ -1361,7 +1361,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/accept.json",
         },
         {
-            ["bytes"] = 79113,
+            ["bytes"] = 79673,
             ["domain"] = "core_semantic_responses",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses__5fef31e4",
@@ -1382,7 +1382,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_wellbeing.json",
         },
         {
-            ["bytes"] = 34473,
+            ["bytes"] = 34809,
             ["domain"] = "event_reactions_combat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
@@ -1401,7 +1401,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
         },
         {
-            ["bytes"] = 36810,
+            ["bytes"] = 37146,
             ["domain"] = "event_reactions_companion",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
@@ -1420,7 +1420,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_abandonment.json",
         },
         {
-            ["bytes"] = 24110,
+            ["bytes"] = 24334,
             ["domain"] = "event_reactions_corpse",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
@@ -1438,7 +1438,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
         },
         {
-            ["bytes"] = 21499,
+            ["bytes"] = 21723,
             ["domain"] = "event_reactions_farewell",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsFarewell",
@@ -1456,7 +1456,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell_default.json",
         },
         {
-            ["bytes"] = 76513,
+            ["bytes"] = 77185,
             ["domain"] = "event_reactions_leader_loss",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -1478,7 +1478,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_close.json",
         },
         {
-            ["bytes"] = 21419,
+            ["bytes"] = 21643,
             ["domain"] = "event_reactions_safety",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSafety",
@@ -1496,7 +1496,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_danger.json",
         },
         {
-            ["bytes"] = 9232,
+            ["bytes"] = 9344,
             ["domain"] = "event_reactions_social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSocial",
@@ -1513,7 +1513,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
         },
         {
-            ["bytes"] = 111195,
+            ["bytes"] = 111307,
             ["domain"] = "health_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/HealthContent",
@@ -1530,7 +1530,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/health_content/question_health_state.json",
         },
         {
-            ["bytes"] = 110845,
+            ["bytes"] = 110957,
             ["domain"] = "health_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/HealthContent__f18c9e18",
@@ -1547,7 +1547,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/health_content/question_medical_bite.json",
         },
         {
-            ["bytes"] = 14423,
+            ["bytes"] = 14535,
             ["domain"] = "identity_exchange",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/IdentityExchange",
@@ -1564,7 +1564,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/identity_exchange/identity_exchange_responses.json",
         },
         {
-            ["bytes"] = 95970,
+            ["bytes"] = 96866,
             ["domain"] = "medical_event_call",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
@@ -1588,7 +1588,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bandage.json",
         },
         {
-            ["bytes"] = 35596,
+            ["bytes"] = 35932,
             ["domain"] = "medical_event_overview",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
@@ -1607,7 +1607,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_default.json",
         },
         {
-            ["bytes"] = 98110,
+            ["bytes"] = 99006,
             ["domain"] = "medical_event_repeat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -1631,7 +1631,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
         },
         {
-            ["bytes"] = 39155,
+            ["bytes"] = 39491,
             ["domain"] = "medical_event_teammate",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
@@ -1650,7 +1650,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
         },
         {
-            ["bytes"] = 23924,
+            ["bytes"] = 24148,
             ["domain"] = "medical_event_treatment",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
@@ -1668,7 +1668,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
         },
         {
-            ["bytes"] = 98942,
+            ["bytes"] = 99838,
             ["domain"] = "medical_event_update",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -1692,7 +1692,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_bandage.json",
         },
         {
-            ["bytes"] = 166874,
+            ["bytes"] = 167434,
             ["domain"] = "navigation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/Navigation",
@@ -1713,7 +1713,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
         },
         {
-            ["bytes"] = 55274,
+            ["bytes"] = 55610,
             ["domain"] = "needs_support",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
@@ -1732,7 +1732,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
         },
         {
-            ["bytes"] = 136277,
+            ["bytes"] = 136725,
             ["domain"] = "quest_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
@@ -1752,7 +1752,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept.json",
         },
         {
-            ["bytes"] = 11164,
+            ["bytes"] = 11276,
             ["domain"] = "question_relationship_status",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/QuestionRelationshipStatus",
@@ -1769,7 +1769,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/question_relationship_status/question_relationship_status.json",
         },
         {
-            ["bytes"] = 7301,
+            ["bytes"] = 7413,
             ["domain"] = "question_residence",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/QuestionResidence",
@@ -1786,7 +1786,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/question_residence/question_residence.json",
         },
         {
-            ["bytes"] = 136454,
+            ["bytes"] = 136902,
             ["domain"] = "social_apology",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
@@ -1806,7 +1806,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
         },
         {
-            ["bytes"] = 26266,
+            ["bytes"] = 26602,
             ["domain"] = "social_ask_about",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
@@ -1825,7 +1825,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_member.json",
         },
         {
-            ["bytes"] = 64722,
+            ["bytes"] = 65394,
             ["domain"] = "social_check_in",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
@@ -1847,7 +1847,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk_member.json",
         },
         {
-            ["bytes"] = 29427,
+            ["bytes"] = 29875,
             ["domain"] = "social_companion_topics",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
@@ -1867,7 +1867,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_personal_special_trust.json",
         },
         {
-            ["bytes"] = 183386,
+            ["bytes"] = 185066,
             ["domain"] = "social_emotes",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
@@ -1898,7 +1898,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
         },
         {
-            ["bytes"] = 70212,
+            ["bytes"] = 70660,
             ["domain"] = "social_emotes",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes__cb245da6",
@@ -1918,7 +1918,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
         },
         {
-            ["bytes"] = 192174,
+            ["bytes"] = 194078,
             ["domain"] = "social_greetings",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
@@ -1951,7 +1951,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_dawn.json",
         },
         {
-            ["bytes"] = 45734,
+            ["bytes"] = 46182,
             ["domain"] = "social_greetings",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings__b02b846f",
@@ -1971,7 +1971,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_dusk.json",
         },
         {
-            ["bytes"] = 70140,
+            ["bytes"] = 70364,
             ["domain"] = "social_interaction_argument",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
@@ -1989,7 +1989,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         },
         {
-            ["bytes"] = 11432,
+            ["bytes"] = 11544,
             ["domain"] = "social_interaction_context",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionContext",
@@ -2006,7 +2006,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
         },
         {
-            ["bytes"] = 34370,
+            ["bytes"] = 34482,
             ["domain"] = "social_interaction_first_contact",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
@@ -2023,7 +2023,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
         },
         {
-            ["bytes"] = 107463,
+            ["bytes"] = 107799,
             ["domain"] = "social_interaction_memory",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
@@ -2042,7 +2042,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         },
         {
-            ["bytes"] = 34825,
+            ["bytes"] = 34937,
             ["domain"] = "social_interaction_news",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
@@ -2059,7 +2059,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
         },
         {
-            ["bytes"] = 46412,
+            ["bytes"] = 46860,
             ["domain"] = "social_interaction_scene_combat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
@@ -2079,7 +2079,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
         },
         {
-            ["bytes"] = 183942,
+            ["bytes"] = 184502,
             ["domain"] = "social_interaction_scene_horde_work",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
@@ -2100,7 +2100,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
         },
         {
-            ["bytes"] = 70792,
+            ["bytes"] = 71016,
             ["domain"] = "social_interaction_scene_horde_work",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork__74d92e89",
@@ -2118,7 +2118,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
         },
         {
-            ["bytes"] = 179489,
+            ["bytes"] = 180049,
             ["domain"] = "social_interaction_scene_travel_news",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
@@ -2139,7 +2139,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
         },
         {
-            ["bytes"] = 71445,
+            ["bytes"] = 71669,
             ["domain"] = "social_interaction_scene_travel_news",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews__f95eb4d7",
@@ -2157,7 +2157,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
         },
         {
-            ["bytes"] = 169064,
+            ["bytes"] = 169512,
             ["domain"] = "social_reactions_ack_dispute",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
@@ -2177,7 +2177,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
         },
         {
-            ["bytes"] = 84904,
+            ["bytes"] = 85240,
             ["domain"] = "social_reactions_ack_dispute",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112",
@@ -2196,7 +2196,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
         },
         {
-            ["bytes"] = 174231,
+            ["bytes"] = 174791,
             ["domain"] = "social_reactions_hostile_offer_threat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
@@ -2217,7 +2217,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_short.json",
         },
         {
-            ["bytes"] = 34248,
+            ["bytes"] = 34360,
             ["domain"] = "social_reactions_hostile_offer_threat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__5b998e54",
@@ -2234,7 +2234,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
         },
         {
-            ["bytes"] = 11853,
+            ["bytes"] = 11965,
             ["domain"] = "social_settlement_admission",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialSettlementAdmission",
@@ -2251,7 +2251,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
         },
         {
-            ["bytes"] = 187364,
+            ["bytes"] = 188260,
             ["domain"] = "social_tool_replies_affirmation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
@@ -2275,7 +2275,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json",
         },
         {
-            ["bytes"] = 56447,
+            ["bytes"] = 56671,
             ["domain"] = "social_tool_replies_affirmation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation__b7b74460",
@@ -2293,7 +2293,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
         },
         {
-            ["bytes"] = 177566,
+            ["bytes"] = 178350,
             ["domain"] = "social_tool_replies_boundary_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__f0e430f3",
@@ -2316,7 +2316,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json",
         },
         {
-            ["bytes"] = 29681,
+            ["bytes"] = 29793,
             ["domain"] = "social_tool_replies_boundary_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__25339a92",
@@ -2333,7 +2333,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
         },
         {
-            ["bytes"] = 186185,
+            ["bytes"] = 188873,
             ["domain"] = "static_suggestion_text",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
@@ -2373,7 +2373,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
         },
         {
-            ["bytes"] = 76575,
+            ["bytes"] = 77695,
             ["domain"] = "static_suggestion_text",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText__aa798443",
@@ -2399,7 +2399,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
         },
         {
-            ["bytes"] = 148611,
+            ["bytes"] = 148947,
             ["domain"] = "task_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle",
@@ -2418,7 +2418,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/gift.json",
         },
         {
-            ["bytes"] = 146952,
+            ["bytes"] = 147288,
             ["domain"] = "task_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__f0e914b3",
@@ -2437,7 +2437,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_eat.json",
         },
         {
-            ["bytes"] = 101980,
+            ["bytes"] = 102204,
             ["domain"] = "task_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__f61ddfca",
@@ -2455,7 +2455,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill.json",
         },
         {
-            ["bytes"] = 191496,
+            ["bytes"] = 192504,
             ["domain"] = "task_tool_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2480,7 +2480,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_cooldown.json",
         },
         {
-            ["bytes"] = 190436,
+            ["bytes"] = 191556,
             ["domain"] = "task_tool_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies__fc2eba07",
@@ -2506,7 +2506,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_compliment.json",
         },
         {
-            ["bytes"] = 48091,
+            ["bytes"] = 48315,
             ["domain"] = "task_tool_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies__adda9390",
@@ -2524,7 +2524,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_rejected_hostile.json",
         },
         {
-            ["bytes"] = 193203,
+            ["bytes"] = 194323,
             ["domain"] = "wellbeing_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
@@ -2550,7 +2550,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
         },
         {
-            ["bytes"] = 25292,
+            ["bytes"] = 25516,
             ["domain"] = "wellbeing_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent__7c62895f",
@@ -2568,7 +2568,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
         },
         {
-            ["bytes"] = 9351,
+            ["bytes"] = 9687,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Beat/Social",
@@ -2584,7 +2584,7 @@ return {
             ["sourceShard"] = "beat/social/argument_escalation.json",
         },
         {
-            ["bytes"] = 67003,
+            ["bytes"] = 70363,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social",
@@ -2627,7 +2627,7 @@ return {
             ["sourceShard"] = "behavior/social/acknowledge_memory.json",
         },
         {
-            ["bytes"] = 53065,
+            ["bytes"] = 53737,
             ["domain"] = "core_check_in",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreCheckIn",
@@ -2646,7 +2646,7 @@ return {
             ["sourceShard"] = "dialogue/core_check_in/question_activity.json",
         },
         {
-            ["bytes"] = 35240,
+            ["bytes"] = 35688,
             ["domain"] = "core_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreIdentity",
@@ -2663,7 +2663,7 @@ return {
             ["sourceShard"] = "dialogue/core_identity/question_identity.json",
         },
         {
-            ["bytes"] = 73677,
+            ["bytes"] = 73901,
             ["domain"] = "core_knowledge_activity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeActivity",
@@ -2678,7 +2678,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_activity/question_activity_dataset_keep_moving.json",
         },
         {
-            ["bytes"] = 74070,
+            ["bytes"] = 74182,
             ["domain"] = "core_knowledge_facts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeFacts__d73c98cf",
@@ -2692,7 +2692,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_facts/question_knowledge.json",
         },
         {
-            ["bytes"] = 70177,
+            ["bytes"] = 70289,
             ["domain"] = "core_knowledge_gossip",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeGossip",
@@ -2706,7 +2706,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_gossip/gossip_unknown.json",
         },
         {
-            ["bytes"] = 74455,
+            ["bytes"] = 74567,
             ["domain"] = "core_knowledge_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeIdentity",
@@ -2720,7 +2720,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_identity/question_identity.json",
         },
         {
-            ["bytes"] = 102077,
+            ["bytes"] = 102637,
             ["domain"] = "core_text_memory_gossip_corpse_ordinary",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__d405232f",
@@ -2738,7 +2738,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_corpse_ordinary/corpse_comrade.json",
         },
         {
-            ["bytes"] = 104925,
+            ["bytes"] = 105261,
             ["domain"] = "core_text_memory_gossip_corpse_revenge",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__becaffc7",
@@ -2754,7 +2754,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_corpse_revenge/corpse_revenge_comrade.json",
         },
         {
-            ["bytes"] = 12714,
+            ["bytes"] = 12938,
             ["domain"] = "core_text_memory_gossip_death",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipDeath",
@@ -2769,7 +2769,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_death/death_report.json",
         },
         {
-            ["bytes"] = 72672,
+            ["bytes"] = 73904,
             ["domain"] = "core_text_memory_gossip_reactions",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipReactions",
@@ -2793,7 +2793,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_reactions/negative_mockery_gear.json",
         },
         {
-            ["bytes"] = 24305,
+            ["bytes"] = 24753,
             ["domain"] = "core_text_needs_gifts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextNeedsGifts",
@@ -2810,7 +2810,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_needs_gifts/gift_preference_dislike.json",
         },
         {
-            ["bytes"] = 20494,
+            ["bytes"] = 20830,
             ["domain"] = "core_text_social_departure",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialDeparture",
@@ -2826,7 +2826,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_departure/departure_confirmed.json",
         },
         {
-            ["bytes"] = 43752,
+            ["bytes"] = 43976,
             ["domain"] = "core_text_social_goodbye",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialGoodbye",
@@ -2841,7 +2841,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_goodbye/choice_goodbye.json",
         },
         {
-            ["bytes"] = 6759,
+            ["bytes"] = 6871,
             ["domain"] = "core_text_social_greetings",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialGreetings",
@@ -2855,7 +2855,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_greetings/response_ambient_visit_accepted.json",
         },
         {
-            ["bytes"] = 6060,
+            ["bytes"] = 6172,
             ["domain"] = "core_text_social_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialIdentity",
@@ -2869,7 +2869,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_identity/identity_introduction.json",
         },
         {
-            ["bytes"] = 137779,
+            ["bytes"] = 138787,
             ["domain"] = "core_text_social_recruitment",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
@@ -2891,7 +2891,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_recruitment/recruitment_admire.json",
         },
         {
-            ["bytes"] = 74266,
+            ["bytes"] = 74490,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/Social",
@@ -2906,7 +2906,7 @@ return {
             ["sourceShard"] = "dialogue/social/interaction_world_event_warning.json",
         },
         {
-            ["bytes"] = 10462,
+            ["bytes"] = 11134,
             ["domain"] = "social_affirmation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialAffirmation",
@@ -2925,7 +2925,7 @@ return {
             ["sourceShard"] = "realization/social_affirmation/social_acknowledge.json",
         },
         {
-            ["bytes"] = 15174,
+            ["bytes"] = 16182,
             ["domain"] = "social_challenge",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialChallenge",
@@ -2947,7 +2947,7 @@ return {
             ["sourceShard"] = "realization/social_challenge/social_ask_followup.json",
         },
         {
-            ["bytes"] = 11789,
+            ["bytes"] = 12461,
             ["domain"] = "social_identity_closure",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialIdentityClosure",
@@ -2966,7 +2966,7 @@ return {
             ["sourceShard"] = "realization/social_identity_closure/social_disclose_name.json",
         },
         {
-            ["bytes"] = 5420,
+            ["bytes"] = 5868,
             ["domain"] = "social_lexemes",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialLexemes",
@@ -2983,7 +2983,7 @@ return {
             ["sourceShard"] = "realization/social_lexemes/social_agreement_yes.json",
         },
         {
-            ["bytes"] = 17408,
+            ["bytes"] = 18528,
             ["domain"] = "social_warning_wellbeing",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialWarningWellbeing",
@@ -5372,5 +5372,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "e722eac2adb6d5e64c76b4266d48fd2e3f2519cc5c040867eed2bcf0cdef9de2",
+    ["wholeModelFingerprint"] = "56dca873764e172f9335e7929cf2901799769cc1e737ef494dfb13c669953986",
 }

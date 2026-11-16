@@ -286,10 +286,12 @@ return {
         ["id"] = "social.threat_boundary",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "threat_boundary",
             ["sourceId"] = "social.threat_boundary",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__5b998e54",
         ["namespace"] = "social",

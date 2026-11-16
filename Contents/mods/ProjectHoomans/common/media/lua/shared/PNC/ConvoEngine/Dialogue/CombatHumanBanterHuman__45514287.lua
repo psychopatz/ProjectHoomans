@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.human_kill.aggressive",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "aggressive",
             ["sourceId"] = "combat.human_kill.aggressive",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_aggressive/combat_human_kill_aggressive.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__45514287",
         ["namespace"] = "combat.human_kill",

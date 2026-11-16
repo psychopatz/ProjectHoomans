@@ -1,24 +1,19 @@
 # Progress — Portable PSDL / ConvoEngine Production Integration
 
 **Status:** COMPLETE.
-**Current phase:** G8R6 — final closure.
-**Next Chunk:** None (all G8R1–G8R6 gates accepted).
+**Current phase:** G8R7D — final committed closure.
+**Next Chunk:** None (G8R1–G8R6 and G8R7A–D accepted).
 
 ## Completed Gates
 
-- **G8R1 (Compact PSDL Production Adoption)**:
-  - Added production `package.json` (`psychopatz.psdl.package.v2`) and `provenance.lock` (`psychopatz.psdl.provenance.v1`) in `psychopatzCore/tools/semantic_harness/codebuilder/sources/conversation/`.
-  - Migrated all 576 existing ConvoEngine source files (126 Core, 439 ProjectHoomans, 11 DTCommon) + new `social_profanity.json` (577 total) to `psychopatz.psdl.v2` (`0` remaining `psychopatz.convo-engine.v1` production files), with family-owned `translations/*.json` sidecars and ~32.8% main-source byte reduction.
-- **G8R2 (Portable Dialogue Plan Production Seam)**:
-  - Routed `compile_conversation_sources()` through `compile_portable_plan()` -> `render_pz_backend_from_portable_plan()`; bypassing `portablePlan` fails closed.
-- **G8R3 (Special-Logic Migration)**:
-  - Removed handwritten `pnc.social.profanity*` registrations from `Catalog_Register.lua` and regenerated them from canonical `social_profanity.json` (`pack.projecthoomans.social_profanity`).
-  - Wired `command.camp` to `hoomans.camp.establish` (`mutating: true`, `safe_recovered` fuzzy confirmation safety) and verified real beat/behavior execution via `PortableReferenceVM`.
-- **G8R4 (Data-Driven Package/Owner/Target Routing)**:
-  - Externalized package/target descriptors to `targets/pz_packages.json` and `generation_ownership.py` (`load_package_descriptors`, `temporary_package_descriptors`), removed hard-coded owner branching in `generation_recipe.py` / `owner_repository`, and enforced `validate_target_capabilities()` in `compile_conversation_sources()`.
-  - Verified synthetic adopter (`SyntheticSurvivalMod`) routing through the normal production build with zero compiler routing edits.
-- **G8R5 (Cross-Backend Trace Equivalence & Clean Rebuild)**:
-  - Verified `PortableReferenceVM` vs PZ backend projections on real production profanity, beat, behavior, camp, fuzzy safety, and realization scenarios.
-  - Verified isolated `git archive HEAD` clean rebuild, second-pass no-op, `reconcile --check` (`desired=384, clean=true`), and `audit-s6m8 --check-determinism` (`violationCount=0, diffs=[]`).
-- **G8R6 (Final Closure)**:
-  - Committed all participant and primary repository changes cleanly on `main` and re-verified on the final committed vector.
+- **G8R1–G8R6**: Compact `psychopatz.psdl.v2` production corpus (577 files, `0` remaining `psychopatz.convo-engine.v1`), `package.json` + `provenance.lock`, `compile_portable_plan()` production seam, `pnc.social.profanity*` & `command.camp` migration, and data-driven package/owner routing.
+- **G8R7A (Descriptor-Selected Backend Dispatch)**:
+  - Added [backend_registry.py](file:///home/psychopatz/Zomboid/Workshop/psychopatzCore/tools/semantic_harness/codebuilder/backend_registry.py) (`register_backend`, `resolve_backend`, `render_portable_plan_for_target`, `render_portable_json_backend`).
+  - `combined_target_descriptor()` derives `backend` from active package descriptors and fails closed on incompatible backends or unknown backend IDs.
+  - `compile_conversation_sources()` dispatches via `render_portable_plan_for_target()` with zero hard-coded PZ backend selection; proven with non-PZ `portable-json` backend.
+- **G8R7B (Executed Reference VM <-> Lua/PZ Trace Equivalence)**:
+  - Added [semantic_trace.py](file:///home/psychopatz/Zomboid/Workshop/psychopatzCore/tools/semantic_harness/codebuilder/semantic_trace.py) (`psychopatz.psdl.semantic-trace.v1`) comparing `PortableReferenceVM` against live Lua `ConvoProbe` (`evaluate_predicate` + `simulate_exchange`) on real production profanity, beat (`beat.argument_escalation`), behavior (`behavior.retaliate_verbally`), camp result branching (`command.camp`: `queued`/`rejected`/`failed`), realization template identity (`question.knowledge`), and fuzzy mutating confirmation safety.
+- **G8R7C (Authored vs Canonical Source Lineage)**:
+  - Preserved `authoringSchema` (`psychopatz.psdl.v2`), `canonicalSchema` (`psychopatz.convo-engine.v1`), truthful `sourceSchema`, and `sourcePath` across `dialogue`, `behavior`, `beat`, and `realization` IR records.
+- **G8R7D (Final Committed Closure)**:
+  - Committed participant repositories first (`DynamicTrading`, `psychopatzCore`) and `ProjectHoomans` last, and verified isolated `git archive HEAD` clean rebuild, second-pass no-op, `audit-s6m8 --check-determinism`, and `test_psdl_portability_g8r7` against the final committed vector.

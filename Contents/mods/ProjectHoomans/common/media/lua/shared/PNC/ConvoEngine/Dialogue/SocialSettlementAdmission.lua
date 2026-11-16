@@ -63,10 +63,12 @@ return {
         ["id"] = "social.settlement_admission",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "settlement_admission",
             ["sourceId"] = "social.settlement_admission",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialSettlementAdmission",
         ["namespace"] = "social",

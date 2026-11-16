@@ -286,10 +286,12 @@ return {
         ["id"] = "interaction.news.acknowledge",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "acknowledge",
             ["sourceId"] = "interaction.news.acknowledge",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
         ["namespace"] = "interaction.news",

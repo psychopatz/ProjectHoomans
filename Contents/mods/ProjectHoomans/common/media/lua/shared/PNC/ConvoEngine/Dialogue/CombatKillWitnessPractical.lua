@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.reaction.kill_witness_practical",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_witness_practical",
             ["sourceId"] = "combat.reaction.kill_witness_practical",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessPractical",
         ["namespace"] = "combat.reaction",

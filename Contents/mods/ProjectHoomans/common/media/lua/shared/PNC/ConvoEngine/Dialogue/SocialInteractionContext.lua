@@ -91,10 +91,12 @@ return {
         ["id"] = "interaction.context.clarify",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "clarify",
             ["sourceId"] = "interaction.context.clarify",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionContext",
         ["namespace"] = "interaction.context",

@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.human_kill.practical",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "practical",
             ["sourceId"] = "combat.human_kill.practical",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_practical/combat_human_kill_practical.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__67f43293",
         ["namespace"] = "combat.human_kill",

@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.reaction.kill_killer_cold",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_cold",
             ["sourceId"] = "combat.reaction.kill_killer_cold",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerCold",
         ["namespace"] = "combat.reaction",

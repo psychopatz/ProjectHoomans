@@ -865,10 +865,12 @@ return {
         ["id"] = "question.health_state",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "health_state",
             ["sourceId"] = "question.health_state",
             ["sourcePath"] = "adopters/hoomans/dialogue/health_content/question_health_state.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/HealthContent",
         ["namespace"] = "question",

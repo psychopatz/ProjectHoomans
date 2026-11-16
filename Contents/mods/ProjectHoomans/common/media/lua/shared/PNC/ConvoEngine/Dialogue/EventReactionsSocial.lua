@@ -91,10 +91,12 @@ return {
         ["id"] = "social.reaction.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "social.reaction.default",
             ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSocial",
         ["namespace"] = "social.reaction",

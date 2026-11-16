@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.reaction.kill_killer_brave",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_brave",
             ["sourceId"] = "combat.reaction.kill_killer_brave",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerBrave",
         ["namespace"] = "combat.reaction",

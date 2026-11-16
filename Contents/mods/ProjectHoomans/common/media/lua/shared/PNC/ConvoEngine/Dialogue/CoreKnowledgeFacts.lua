@@ -55,10 +55,12 @@ return {
         ["id"] = "question.knowledge_and_bite.responses",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "question.knowledge_and_bite.responses",
             ["sourcePath"] = "adopters/hoomans/dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreKnowledgeFacts",
         ["namespace"] = "question.knowledge_and_bite",

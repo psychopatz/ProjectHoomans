@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.human_kill.shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "shaken",
             ["sourceId"] = "combat.human_kill.shaken",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillShaken",
         ["namespace"] = "combat.human_kill",

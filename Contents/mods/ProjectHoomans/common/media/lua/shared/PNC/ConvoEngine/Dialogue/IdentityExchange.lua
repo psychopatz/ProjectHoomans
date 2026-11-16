@@ -55,10 +55,12 @@ return {
         ["id"] = "identity.exchange.responses",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "identity.exchange.responses",
             ["sourcePath"] = "adopters/hoomans/dialogue/identity_exchange/identity_exchange_responses.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/IdentityExchange",
         ["namespace"] = "identity.exchange",

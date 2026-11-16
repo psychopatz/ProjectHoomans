@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.reaction.kill_killer_aggressive",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_aggressive",
             ["sourceId"] = "combat.reaction.kill_killer_aggressive",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerAggressive",
         ["namespace"] = "combat.reaction",

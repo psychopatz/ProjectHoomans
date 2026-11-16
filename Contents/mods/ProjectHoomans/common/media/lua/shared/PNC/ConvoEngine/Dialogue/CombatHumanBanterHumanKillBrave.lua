@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.human_kill.brave",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "brave",
             ["sourceId"] = "combat.human_kill.brave",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillBrave",
         ["namespace"] = "combat.human_kill",

@@ -55,10 +55,12 @@ return {
         ["id"] = "question.relationship_status.responses",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "question.relationship_status.responses",
             ["sourcePath"] = "adopters/hoomans/dialogue/question_relationship_status/question_relationship_status.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestionRelationshipStatus",
         ["namespace"] = "question.relationship_status",

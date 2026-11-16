@@ -286,10 +286,12 @@ return {
         ["id"] = "interaction.first_contact.challenge",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "challenge",
             ["sourceId"] = "interaction.first_contact.challenge",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
         ["namespace"] = "interaction.first_contact",

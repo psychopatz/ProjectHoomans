@@ -235,10 +235,12 @@ return {
         ["id"] = "combat.reaction.kill_witness_shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_witness_shaken",
             ["sourceId"] = "combat.reaction.kill_witness_shaken",
             ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessShaken",
         ["namespace"] = "combat.reaction",

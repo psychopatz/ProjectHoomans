@@ -235,10 +235,12 @@ return {
         ["id"] = "tool_reply.sexual",
         ["kind"] = "dialogue",
         ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "sexual",
             ["sourceId"] = "tool_reply.sexual",
             ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+            ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__25339a92",
         ["namespace"] = "tool_reply",
