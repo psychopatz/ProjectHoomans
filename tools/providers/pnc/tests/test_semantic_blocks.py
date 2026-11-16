@@ -34,7 +34,7 @@ class SemanticBlockRegistryTests(unittest.TestCase):
         block_ids = {block["id"] for block in catalog["blocks"]}
         self.assertIn("conditions.gate", block_ids)
         self.assertIn("memory.gossip", block_ids)
-        self.assertIn("response:semantic.authored.follow", block_ids)
+        self.assertIn("response:authored.follow", block_ids)
         self.assertFalse(catalog["productionCatalogLoaded"])
 
     def test_live_registry_uses_existing_lua_catalog_values(self) -> None:

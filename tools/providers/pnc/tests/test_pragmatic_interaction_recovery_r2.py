@@ -29,19 +29,19 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         behaviors = {item["id"]: item for item in model["behaviors"]}
         self.assertEqual(
             behaviors["behavior.warn"]["outputs"]["speech"]["contentTemplateID"],
-            "semantic.social.hostile_boundary",
+            "social.hostile_boundary",
         )
         self.assertEqual(
             behaviors["behavior.retaliate_verbally"]["outputs"]["speech"]["contentTemplateID"],
-            "semantic.interaction.argument.retaliate",
+            "interaction.argument.retaliate",
         )
         self.assertEqual(
             behaviors["behavior.deescalate"]["outputs"]["speech"]["contentTemplateID"],
-            "semantic.interaction.argument.deescalate",
+            "interaction.argument.deescalate",
         )
         self.assertEqual(
             behaviors["behavior.challenge"]["outputs"]["speech"]["contentTemplateID"],
-            "semantic.interaction.first_contact.challenge",
+            "interaction.first_contact.challenge",
         )
         for behavior in behaviors.values():
             self.assertNotIn("responsePool", behavior)
@@ -56,110 +56,124 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         self.assertEqual(director_pools, [])
 
         templates = {
-            item["semanticTemplateID"]
-            for item in model["content"]["phraseFamilies"]
+            item["id"]
+            for item in model["psdlRuntimePlans"]
         }
         for template in (
-            "semantic.interaction.argument.retaliate",
-            "semantic.interaction.argument.deescalate",
-            "semantic.interaction.first_contact.challenge",
+            "interaction.argument.retaliate",
+            "interaction.argument.deescalate",
+            "interaction.first_contact.challenge",
         ):
             self.assertIn(template, templates)
 
-        catalogs = conversation_translation_catalogs_by_owner(model)
-        for language in ("EN", "TL"):
-            self.assertTrue(
-                any(
-                    "conversation.content.semantic.interaction.argument.retaliate.neutral.01"
-                    in owner_catalogs.get(language, {}).get("Social", {})
-                    for owner_catalogs in catalogs.values()
-                )
+        retaliate_plan = next(
+            item
+            for item in model["psdlRuntimePlans"]
+            if item["id"] == "interaction.argument.retaliate"
+        )
+        self.assertEqual(retaliate_plan["owner"], "ProjectHoomans")
+        self.assertTrue(
+            any(
+                role.get("translations", {}).get("EN")
+                and role.get("translations", {}).get("TL")
+                for role in retaliate_plan.get("textRoles", [])
             )
+        )
 
     def test_existing_dialogue_content_authoring_edits_interaction_wording(self) -> None:
+        from tools.semantic_harness.tests.test_convo_engine_s9_regressions import (
+            _setup_three_repo_workspace,
+        )
+
         with tempfile.TemporaryDirectory() as directory:
-            repository = Path(directory)
-            shutil.copytree(
-                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
-                repository / CONVERSATION_SOURCE_RELATIVE,
-            )
+            repos = _setup_three_repo_workspace(Path(directory))
             service = SemanticLabAuthoringService(
-                repository,
-                runtime_root=repository,
-                core_repository=repository,
+                repos["core"],
+                runtime_root=repos["hoomans"],
+                core_repository=repos["core"],
+                hoomans_repository=repos["hoomans"],
+                dynamic_trading_repository=repos["dt"],
             )
-            content_id = "phrase.semantic.interaction.argument.retaliate"
-            current = service.load_dialogue_content(content_id)
-            self.assertEqual(
-                current["sourceShard"],
-                "content/social/interaction/argument/retaliate.json",
+            core_manifest_path = (
+                repos["core"]
+                / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
             )
-            edited = deepcopy(current)
-            edited["styles"]["neutral"][0]["translations"]["EN"] = (
+            core_manifest = json.loads(
+                core_manifest_path.read_text(encoding="utf-8")
+            )
+            core_manifest["externalSourceRoots"] = [
+                {
+                    "path": "adopters/hoomans/dialogue",
+                    "kind": "convo_engine",
+                    "domain": "general",
+                    "order": 3011,
+                    "owner": "ProjectHoomans",
+                    "sourcePath": "tools/providers/pnc/codebuilder/sources/conversation/dialogue",
+                    "domainFromSubdir": True,
+                }
+            ]
+            core_manifest_path.write_text(
+                json.dumps(core_manifest, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            source_rel = (
+                "tools/providers/pnc/codebuilder/sources/conversation/"
+                "dialogue/social_interaction_argument/interaction_argument_retaliate.json"
+            )
+            dest_path = repos["hoomans"] / source_rel
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(REPOSITORY / source_rel, dest_path)
+
+            got = service.dispatch_operation(
+                "convo.get", {"target": "interaction.argument.retaliate"}
+            )
+            self.assertTrue(got["found"], got)
+            doc = deepcopy(got["document"])
+            doc["say"]["variants"][0]["text"]["EN"][0] = (
                 "You are really pushing me now."
             )
-            edited["styles"]["neutral"][0]["translations"]["TL"] = (
+            doc["say"]["variants"][0]["text"]["TL"][0] = (
                 "Talagang sinusubok mo ako ngayon."
             )
-
-            preview = service.preview_dialogue_content_edit(
-                content_id,
-                edited,
-                expected_source_fingerprint=current["sourceFingerprint"],
+            preview = service.edit_convo_engine_family(
+                dest_path,
+                {"say": doc["say"]},
+                expected_source_fingerprint=got["sourceFingerprint"],
+                write=False,
             )
             self.assertTrue(preview["ok"], preview)
-            self.assertTrue(preview["structuralLocked"])
-
-            written = service.write_dialogue_content_edit(
-                content_id,
-                edited,
-                expected_source_fingerprint=current["sourceFingerprint"],
+            written = service.edit_convo_engine_family(
+                dest_path,
+                {"say": doc["say"]},
+                expected_source_fingerprint=got["sourceFingerprint"],
+                write=True,
             )
             self.assertTrue(written["ok"], written)
-            refreshed = service.load_dialogue_content(content_id)
+            refreshed = service.dispatch_operation(
+                "convo.get", {"target": "interaction.argument.retaliate"}
+            )
             self.assertEqual(
-                refreshed["styles"]["neutral"][0]["translations"]["EN"],
+                refreshed["document"]["say"]["variants"][0]["text"]["EN"][0],
                 "You are really pushing me now.",
             )
             self.assertEqual(
-                refreshed["styles"]["neutral"][0]["translations"]["TL"],
+                refreshed["document"]["say"]["variants"][0]["text"]["TL"][0],
                 "Talagang sinusubok mo ako ngayon.",
             )
-            source = json.loads(
-                (
-                    repository
-                    / CONVERSATION_SOURCE_RELATIVE
-                    / "content/social/interaction/argument/retaliate.json"
-                ).read_text(encoding="utf-8")
+            built = service.dispatch_operation("convo.build.apply", {})
+            self.assertTrue(built["ok"], built)
+            target_paths = [
+                Path(path)
+                for path in built.get("writes", [])
+                if "SocialInteractionArgument" in str(path)
+                and str(path).endswith(".lua")
+            ]
+            self.assertTrue(target_paths, built.get("writes"))
+            generated_module = "\n".join(
+                path.read_text(encoding="utf-8") for path in target_paths
             )
-            for family in source["phraseFamilies"]:
-                for phrases in family["styles"].values():
-                    for phrase in phrases:
-                        self.assertNotIn("phraseID", phrase)
-                        self.assertNotIn("translationKey", phrase)
-            self.assertEqual(
-                source["phraseFamilies"][0]["styles"]["neutral"][0]["EN"],
-                "You are really pushing me now.",
-            )
-            self.assertFalse(
-                (
-                    repository
-                    / CONVERSATION_SOURCE_RELATIVE
-                    / "translations"
-                ).exists()
-            )
-            en = (
-                repository
-                / "Contents/mods/PsychopatzCore/common/media/translation"
-                / "EN/Conversation/Social.json"
-            ).read_text(encoding="utf-8")
-            tl = (
-                repository
-                / "Contents/mods/PsychopatzCore/common/media/translation"
-                / "TL/Conversation/Social.json"
-            ).read_text(encoding="utf-8")
-            self.assertIn("You are really pushing me now.", en)
-            self.assertIn("Talagang sinusubok mo ako ngayon.", tl)
+            self.assertIn("You are really pushing me now.", generated_module)
+            self.assertIn("Talagang sinusubok mo ako ngayon.", generated_module)
 
     def test_real_worker_uses_one_response_authority_and_content_realization(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
@@ -179,7 +193,7 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         )
         self.assertEqual(
             interaction["contentTemplateID"],
-            "semantic.interaction.argument.retaliate",
+            "interaction.argument.retaliate",
         )
         self.assertEqual(
             decision["response"]["sourcePoolID"],
@@ -191,12 +205,12 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         )
         self.assertEqual(
             decision["response"]["plan"]["turns"][0]["segments"][0]["templateID"],
-            "semantic.interaction.argument.retaliate",
+            "interaction.argument.retaliate",
         )
         visible = result["observation"]["response"]
         self.assertEqual(
             visible["semanticTemplateID"],
-            "semantic.interaction.argument.retaliate",
+            "interaction.argument.retaliate",
         )
         self.assertTrue(visible["text"])
         self.assertNotEqual(visible.get("selectionSource"), "director")

@@ -1,5 +1,86 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["construction.en.social.ask_followup"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.ask_followup",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_ask_followup.json",
+    },
+    ["construction.en.social.ask_why"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.ask_why",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_ask_why.json",
+    },
+    ["construction.en.social.call_bluff"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.call_bluff",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_call_bluff.json",
+    },
+    ["construction.en.social.challenge"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.challenge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_challenge.json",
+    },
+    ["construction.en.social.claim_joke"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.claim_joke",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_claim_joke.json",
+    },
+    ["construction.en.social.dismiss"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.dismiss",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_dismiss.json",
+    },
+    ["construction.en.social.double_down"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.double_down",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_double_down.json",
+    },
+    ["construction.en.social.double_down_direct"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.double_down_direct",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_double_down_direct.json",
+    },
+    ["construction.en.social.double_down_stand"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.en.social.double_down_stand",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_double_down_stand.json",
+    },
     ["construction.social.ask_followup"] = {
         ["domain"] = "social_challenge",
         ["generated"] = {
@@ -78,6 +159,87 @@ return {
             "PsychopatzCore/ConvoEngine/Realization/SocialChallenge",
         },
         ["id"] = "construction.social.double_down_stand",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_double_down_stand.json",
+    },
+    ["construction.tl.social.ask_followup"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.ask_followup",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_ask_followup.json",
+    },
+    ["construction.tl.social.ask_why"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.ask_why",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_ask_why.json",
+    },
+    ["construction.tl.social.call_bluff"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.call_bluff",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_call_bluff.json",
+    },
+    ["construction.tl.social.challenge"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.challenge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_challenge.json",
+    },
+    ["construction.tl.social.claim_joke"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.claim_joke",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_claim_joke.json",
+    },
+    ["construction.tl.social.dismiss"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.dismiss",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_dismiss.json",
+    },
+    ["construction.tl.social.double_down"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.double_down",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_double_down.json",
+    },
+    ["construction.tl.social.double_down_direct"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.double_down_direct",
+        ["kind"] = "realization",
+        ["source"] = "realization/social_challenge/social_double_down_direct.json",
+    },
+    ["construction.tl.social.double_down_stand"] = {
+        ["domain"] = "social_challenge",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/SocialChallenge",
+        },
+        ["id"] = "construction.tl.social.double_down_stand",
         ["kind"] = "realization",
         ["source"] = "realization/social_challenge/social_double_down_stand.json",
     },

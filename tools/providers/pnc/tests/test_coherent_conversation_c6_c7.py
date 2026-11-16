@@ -219,7 +219,7 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
                 canonical = turn["result"]["decision"]["response"]
                 self.assertEqual(
                     canonical["templateID"],
-                    "semantic.interaction.argument.retaliate",
+                    "interaction.argument.retaliate",
                 )
                 self.assertEqual(canonical["fallback"], "Watch your mouth.")
 
@@ -235,7 +235,7 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
                 self.assertNotIn("uuu", payload["text"].lower())
                 self.assertEqual(
                     payload["semanticTemplateID"],
-                    "semantic.interaction.argument.retaliate",
+                    "interaction.argument.retaliate",
                 )
 
     def test_non_owned_interaction_response_falls_back_to_dialogue_content(self) -> None:
@@ -257,22 +257,22 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
         self.assertTrue(modules)
         self.assertEqual(
             index["construction.en.social.mirror_retort"]["source"],
-            "realization/social/constructions_followups.json",
+            "realization/social_identity_closure/social_mirror_retort.json",
         )
         self.assertEqual(
             index["construction.en.social.mirror_retort"]["generated"],
             [
-                "PNC/ConvoEngine/"
-                "Realization/Social/ConstructionsFollowups"
+                "PsychopatzCore/ConvoEngine/"
+                "Realization/Templates/SocialIdentityClosure"
             ],
         )
         self.assertEqual(
             index["construction.tl.social.mirror_retort"]["source"],
-            "realization/social/constructions_followups.json",
+            "realization/social_identity_closure/social_mirror_retort.json",
         )
         self.assertEqual(
             index["lexeme.social.profanity.fuck"]["source"],
-            "realization/social/lexemes.json",
+            "realization/social_lexemes/social_profanity_fuck.json",
         )
 
 

@@ -20,9 +20,9 @@ MANIFEST = (
     / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 HEALTH_IDS = (
-    "semantic.question.health_state.injured",
-    "semantic.question.health_state.healthy",
-    "semantic.question.health_state.unknown",
+    "question.health_state.injured",
+    "question.health_state.healthy",
+    "question.health_state.unknown",
 )
 STYLES = ("neutral", "warm", "terse", "guarded")
 LEGACY_KEYS = {
@@ -104,40 +104,49 @@ class HealthWordingShardTests(unittest.TestCase):
             REPOSITORY,
             manifest_path=MANIFEST,
         )
-        owned = {
-            item["semanticTemplateID"]: item
-            for item in model["content"]["phraseFamilies"]
-            if item["semanticTemplateID"] in HEALTH_IDS
+        plans = {
+            item["id"]: item
+            for item in model["psdlRuntimePlans"]
+            if item.get("domain") == "health_content"
         }
-        self.assertEqual(set(owned), set(HEALTH_IDS))
-        for item in owned.values():
-            self.assertEqual(item["conversationDomain"], "health")
+        self.assertEqual(
+            set(plans),
+            {"question.health_state", "question.medical_bite"},
+        )
+        for plan_id, item in plans.items():
             expected_source = (
-                "content/health/health_state.json"
-                if item["semanticTemplateID"].startswith(
-                    "semantic.question.health_state."
-                )
-                else "content/health/medical_bite.json"
+                "adopters/hoomans/dialogue/health_content/question_health_state.json"
+                if plan_id == "question.health_state"
+                else "adopters/hoomans/dialogue/health_content/question_medical_bite.json"
             )
             self.assertEqual(item["sourceShard"], expected_source)
-            self.assertEqual(item["group"], "facts")
-            self.assertEqual(set(item["styles"]), set(STYLES))
-            self.assertTrue(all(10 <= len(item["styles"][style]) <= 16 for style in STYLES))
+            roles = item.get("textRoles", [])
+            self.assertEqual(len(roles), 12)
+            for role in roles:
+                self.assertIn(role["variantID"], STYLES)
+                self.assertTrue(all(10 <= len(role["translations"][lang]) <= 16 for lang in ("EN", "TL")))
 
     def test_generated_health_translation_is_complete_and_legacy_keys_are_retired(
         self,
     ) -> None:
+        model = compile_conversation_sources(
+            REPOSITORY,
+            manifest_path=MANIFEST,
+        )
+        rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
+        for item in model["psdlRuntimePlans"]:
+            if item.get("domain") != "health_content":
+                continue
+            for role in item.get("textRoles", []):
+                suffix = f"{role['outcome']}.{role['variantID']}.01"
+                key = f"conversation.content.semantic.{item['id']}.{suffix}"
+                for language in ("EN", "TL"):
+                    rendered[language][key] = role["translations"][language][0]
+
         for language, expected in EXPECTED.items():
             with self.subTest(language=language):
-                generated = json.loads(
-                    (
-                        REPOSITORY
-                        / "Contents/mods/ProjectHoomans/common/media/translation/"
-                        f"{language}/Conversation/Health.json"
-                    ).read_text(encoding="utf-8")
-                )
                 for key, val in expected.items():
-                    self.assertEqual(generated.get(key), val)
+                    self.assertEqual(rendered[language].get(key), val)
                 for catalog_name in ("Responses", "Realizations"):
                     catalog = json.loads(
                         (
@@ -151,13 +160,13 @@ class HealthWordingShardTests(unittest.TestCase):
         static_map = (
             REPOSITORY
             / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-            "Semantics/PNC_SemanticDialogueInput_Presentation_Responses_"
+            "ConvoEngine/Dialogue/Input_Presentation_Responses_"
             "Translation_Keys_Question_Health_State.lua"
         ).read_text(encoding="utf-8")
         status = (
             REPOSITORY
             / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-            "Semantics/SpeechRealization/Families/Status.lua"
+            "ConvoEngine/SpeechRealization/Families/Status.lua"
         ).read_text(encoding="utf-8")
         self.assertTrue(LEGACY_KEYS.isdisjoint(static_map))
         self.assertNotIn("HealthStateInjured", status)
@@ -219,7 +228,7 @@ class HealthWordingShardTests(unittest.TestCase):
                     self.assertEqual(turn["result"]["ir"]["subject"], "NPC_HEALTH_STATE")
                     self.assertEqual(
                         response["templateID"],
-                        f"semantic.question.health_state.{health_state}",
+                        f"question.health_state.{health_state}",
                     )
                     self.assertEqual(response["sourcePoolID"], "semantic.question.health_state")
                     self.assertEqual(response["dialogueAct"], "FACT_ANSWER")

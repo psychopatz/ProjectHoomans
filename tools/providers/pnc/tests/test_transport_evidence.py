@@ -5,13 +5,14 @@ import subprocess
 import unittest
 
 from tools.semantic_harness.discovery.runtime import discover_lua
+import tools.semantic_harness
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 class TransportEvidenceTests(unittest.TestCase):
     def test_partition_keeps_facts_and_fails_closed_for_unknown_commands(self):
-        worker = Path(__file__).resolve().parents[1] / "lua"
+        worker = Path(tools.semantic_harness.__file__).resolve().parent / "lua"
         script = r'''
             package.path = WORKER_PATH .. "/?.lua;" .. package.path
             local Evidence = require "worker/TransportEvidence"

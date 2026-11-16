@@ -107,7 +107,7 @@ local function resolveHealthStateQuestion(ir, state, context)
         end
     end
     return factResponse(
-        "semantic.question.health_state.unknown",
+        "question.health_state.unknown",
         "I can't confirm my health status right now.",
         "semantic.question.health_state",
         fact,

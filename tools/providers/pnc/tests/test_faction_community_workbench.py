@@ -17,7 +17,7 @@ from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 class FactionCommunityWorkbenchTests(SemanticLabGuiTestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_saved_groups_show_persisted_context_and_load_member_target(self) -> None:
-        self.require_supported_save()
+        save_path = self.install_synthetic_save_root()
         root = tk.Tk()
         app = self.make_gui_app(root)
         root.geometry("1080x700")
@@ -36,8 +36,9 @@ class FactionCommunityWorkbenchTests(SemanticLabGuiTestCase):
             wait_until(lambda: not app.busy and app.saved_world_entries)
 
             selected_entry = next(
-                entry for entry in app.saved_world_entries
-                if (entry.get("capabilities") or {}).get("projectHoomans")
+                entry
+                for entry in app.saved_world_entries
+                if Path(str(entry["path"])).resolve() == save_path.resolve()
             )
             source_path = Path(str(selected_entry["path"]))
             before = sha256(source_path.read_bytes()).hexdigest()

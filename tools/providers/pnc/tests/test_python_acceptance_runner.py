@@ -163,10 +163,15 @@ class TestModule(unittest.TestCase):
             package,
             "failure",
             """
+import os
+import time
 import unittest
 
 class TestModule(unittest.TestCase):
     def test_failure(self):
+        deadline = time.monotonic() + 2.0
+        while not os.path.exists(os.environ['RUNNER_CHILD_PID_FILE']) and time.monotonic() < deadline:
+            time.sleep(0.01)
         self.fail('fail-fast sentinel')
 """,
         )
@@ -183,8 +188,11 @@ import unittest
 class TestModule(unittest.TestCase):
     def test_long_running(self):
         child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])
-        with open(os.environ['RUNNER_CHILD_PID_FILE'], 'w', encoding='ascii') as stream:
+        target = os.environ['RUNNER_CHILD_PID_FILE']
+        tmp = f"{target}.tmp"
+        with open(tmp, 'w', encoding='ascii') as stream:
             stream.write(str(child.pid))
+        os.replace(tmp, target)
         time.sleep(30)
 """,
         )

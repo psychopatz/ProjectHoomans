@@ -63,7 +63,7 @@ class ObservatoryScaleTests(unittest.TestCase):
     def test_repeated_inspection_is_read_only_across_actor_state_and_source(self):
         root = Path(__file__).resolve().parents[4]
         watched = [
-            root / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Selection.lua",
+            root / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/Dialogue/ResponseCatalog_Selection.lua",
             root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Command.json",
         ]
         hashes = lambda: [sha256(path.read_bytes()).hexdigest() for path in watched]

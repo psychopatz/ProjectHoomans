@@ -53,7 +53,7 @@ class ContextualConversationC3CTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     response["templateID"],
-                    "semantic.question.needs.proposal.hunger",
+                    "question.needs.proposal.hunger",
                 )
                 self.assertEqual(plan["dialogueAct"], "PROMISE_ACKNOWLEDGEMENT")
                 self.assertEqual(plan["topic"], "NEEDS")

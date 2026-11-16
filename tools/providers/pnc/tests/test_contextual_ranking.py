@@ -67,7 +67,11 @@ class ContextualRankingTests(unittest.TestCase):
             self.assertNotEqual(healthy_order, injured_order)
             self.assertLess(
                 injured_order.index("question.health"),
-                injured_order.index("question.wellbeing"),
+                healthy_order.index("question.health"),
+            )
+            self.assertLess(
+                injured_order.index("question.health"),
+                injured_order.index("question.needs"),
             )
 
             health = next(

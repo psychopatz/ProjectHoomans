@@ -18,58 +18,69 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
             self.assertTrue(report["ok"])
             self.assertGreater(report["verifiedVariantCount"], 0)
             owned = {item["variantID"]: item for item in report["sourceOwners"]}
-            entry = owned["semantic.accept.dataset.pending_started"]
+            entry = owned["semantic.accept.default"]
             self.assertTrue(entry["verifiedCanonicalSource"])
-            self.assertEqual(entry["canonicalSource"]["sourceID"],
-                             "common_dialogue")
-            self.assertEqual(entry["canonicalSource"]["generatedArtifactParity"],
-                             "unchanged")
+            self.assertEqual(
+                entry["canonicalSource"]["canonicalID"],
+                "social.acknowledged",
+            )
+            self.assertEqual(
+                entry["canonicalSource"]["generatedArtifactParity"],
+                "unchanged",
+            )
             self.assertFalse(owned["semantic.accept.request"]["verifiedCanonicalSource"])
             self.assertFalse(report["fullPoolCanonicalOwnershipVerified"])
             self.assertEqual(report["writes"], 0)
 
-    def test_semantic_definition_and_personal_dataset_have_distinct_sources(self):
+    def test_convo_engine_flow_variants_report_verified_sources(self):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
-            a = inspect_codebuilder_lineage(worker, "semantic.authored.follow")
-            b = inspect_codebuilder_lineage(
-                worker, "semantic.question.backstory.ambiguous")
-        a_row = next(row for row in a["sourceOwners"] if row["variantID"] == "accepted")
-        b_row = next(row for row in b["sourceOwners"]
-                     if row["variantID"] ==
-                     "semantic.question.backstory.ambiguous.generated")
-        self.assertEqual(a_row["canonicalSource"]["sourceID"],
-                         "semantic_flows")
-        self.assertEqual(b_row["canonicalSource"]["sourceID"],
-                         "grounded_personal")
-        self.assertEqual(a_row["canonicalSource"]["generatedArtifactParity"],
-                         "unchanged")
+            report = inspect_codebuilder_lineage(worker, "semantic.flow.greeting.opening")
+        self.assertTrue(report["ok"])
+        self.assertTrue(report["fullPoolCanonicalOwnershipVerified"])
+        row = next(
+            item for item in report["sourceOwners"]
+            if item["variantID"] == "semantic.flow.greeting.opening.default"
+        )
+        self.assertEqual(
+            row["canonicalSource"]["canonicalID"],
+            "flow.greeting.opening.default",
+        )
+        self.assertEqual(
+            row["canonicalSource"]["generatedArtifactParity"],
+            "unchanged",
+        )
 
     def test_falsified_canonical_content_never_becomes_verified_owner(self):
         from tools.semantic_harness.codebuilder.service import (
             SemanticLabAuthoringService,
         )
-        service = SemanticLabAuthoringService()
-        original = service.load_dataset_document
-        def tampered_source(source_id):
-            doc = deepcopy(original(source_id))
-            if source_id == "common_dialogue":
-                variant = next(pool for pool in doc["responsePools"]
-                               if pool["id"] == "semantic.accept")["variants"][0]
-                variant["fallback"] = "Invented sentence not in actual Lua"
-            return doc
-        service.load_dataset_document = tampered_source
+        service = SemanticLabAuthoringService(
+            repository=Path(__file__).resolve().parents[4]
+        )
+        original = service.preview_convo_engine_document
+
+        def tampered_preview(document, **kwargs):
+            result = deepcopy(original(document, **kwargs))
+            for record in (result.get("compiled") or {}).get("records") or []:
+                if record.get("id") == "social.acknowledged":
+                    for slot in (record.get("payload") or {}).get("say", {}).get("realizations", {}).values():
+                        for variant in slot.get("variants") or []:
+                            variant["text"] = {"EN": ["Invented sentence not in actual Lua"]}
+            return result
+
+        service.preview_convo_engine_document = tampered_preview
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             report = inspect_codebuilder_lineage(
                 worker, "semantic.accept", authoring_service=service)
         owned = {row["variantID"]: row for row in report["sourceOwners"]}
         self.assertFalse(
-            owned["semantic.accept.dataset.pending_started"]["verifiedCanonicalSource"])
+            owned["semantic.accept.default"]["verifiedCanonicalSource"])
         self.assertEqual(report["writes"], 0)
 
     def test_directly_authored_lua_is_not_misclassified_as_codebuilder_source(self):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             report = inspect_codebuilder_lineage(
-                worker, "semantic.flow.greeting.opening")
+                worker, "semantic.authored.follow")
         self.assertEqual(report["verifiedVariantCount"], 0)
         self.assertFalse(report["fullPoolCanonicalOwnershipVerified"])
         self.assertTrue(all(row["sourceKind"] == "UNKNOWN"
@@ -98,10 +109,13 @@ class ObservatoryLineageTkTests(unittest.TestCase):
                 pane.selected_pool = "semantic.accept"
                 pane.verify_source_lineage()
                 report = pane.views["Review"].get("1.0", "end")
-                self.assertIn("social.json", report)
+                self.assertIn("social_acknowledged.json", report)
                 self.assertIn("UNKNOWN", report)
                 self.assertIn("approval still required", report)
         finally:
+            pane = None
+            import gc
+            gc.collect()
             root.destroy()
 
 

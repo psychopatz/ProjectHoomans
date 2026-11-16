@@ -11,7 +11,9 @@ import unittest
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
-from tools.providers.pnc.tests.gui_test_support import require_supported_save
+from tools.providers.pnc.tests.gui_test_support import (
+    install_synthetic_save_root,
+)
 
 
 class SemanticLabUIOrganizationTests(unittest.TestCase):
@@ -24,7 +26,7 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
         self._assert_save_backed_layout("1280x800")
 
     def _assert_save_backed_layout(self, geometry: str) -> None:
-        require_supported_save(self)
+        save_path = install_synthetic_save_root(self)
         state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-ui-org-")
         state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
@@ -59,8 +61,9 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
             wait_until(lambda: not app.busy and bool(app.saved_world_entries))
 
             selected_entry = next(
-                entry for entry in app.saved_world_entries
-                if (entry.get("capabilities") or {}).get("projectHoomans")
+                entry
+                for entry in app.saved_world_entries
+                if Path(str(entry["path"])).resolve() == save_path.resolve()
             )
             save_label = next(
                 label for label in app.saved_world_save_box["values"]

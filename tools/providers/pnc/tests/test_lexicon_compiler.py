@@ -17,8 +17,9 @@ from tools.semantic_harness.codebuilder.lexicon_compiler import (
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
-PRODUCTION_ALLOWLIST = REPOSITORY / (
-    "tools/semantic_harness/codebuilder/sources/wordnet_concepts.json"
+PRODUCTION_ALLOWLIST = (
+    REPOSITORY.parent
+    / "psychopatzCore/tools/semantic_harness/codebuilder/sources/wordnet_concepts.json"
 )
 
 

@@ -1,10 +1,14 @@
 {
-  "schema": "pnc.semantic-test.v1",
+  "schema": "semantic.harness-test.v1",
   "suite": "pilot.wellbeing",
   "cases": [
     {
       "id": "wellbeing.inquiry.are_you_okay",
-      "tags": ["wellbeing", "question", "pilot"],
+      "tags": [
+        "wellbeing",
+        "question",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "Are you okay?",
@@ -20,7 +24,11 @@
     },
     {
       "id": "wellbeing.inquiry.how_feeling",
-      "tags": ["wellbeing", "question", "pilot"],
+      "tags": [
+        "wellbeing",
+        "question",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "How are you feeling?",
@@ -35,7 +43,11 @@
     },
     {
       "id": "wellbeing.inquiry.how_been",
-      "tags": ["wellbeing", "question", "pilot"],
+      "tags": [
+        "wellbeing",
+        "question",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "How have you been?",
@@ -49,7 +61,11 @@
     },
     {
       "id": "wellbeing.report.fine_plain",
-      "tags": ["wellbeing", "self_state", "pilot"],
+      "tags": [
+        "wellbeing",
+        "self_state",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "im fine thank you",
@@ -57,14 +73,21 @@
             "ir.intent": "INFORM",
             "ir.subject": "WELLBEING",
             "decision.branch": "SELF_STATE_RECEIVED",
-            "response.templateID": { "prefix": "semantic.self_state.wellbeing" }
+            "response.templateID": {
+              "prefix": "semantic.self_state.wellbeing"
+            }
           }
         }
       ]
     },
     {
       "id": "wellbeing.report.thirst",
-      "tags": ["wellbeing", "thirst", "self_state", "pilot"],
+      "tags": [
+        "wellbeing",
+        "thirst",
+        "self_state",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "I am thirsty",
@@ -72,14 +95,21 @@
             "ir.intent": "INFORM",
             "ir.subject": "THIRST",
             "decision.branch": "SELF_STATE_RECEIVED",
-            "response.templateID": { "prefix": "semantic.self_state.thirst" }
+            "response.templateID": {
+              "prefix": "semantic.self_state.thirst"
+            }
           }
         }
       ]
     },
     {
       "id": "wellbeing.report.fatigue",
-      "tags": ["wellbeing", "fatigue", "self_state", "pilot"],
+      "tags": [
+        "wellbeing",
+        "fatigue",
+        "self_state",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "I'm exhausted",
@@ -87,7 +117,9 @@
             "ir.intent": "INFORM",
             "ir.subject": "FATIGUE",
             "decision.branch": "SELF_STATE_RECEIVED",
-            "response.templateID": { "prefix": "semantic.self_state.fatigue" }
+            "response.templateID": {
+              "prefix": "semantic.self_state.fatigue"
+            }
           }
         }
       ]

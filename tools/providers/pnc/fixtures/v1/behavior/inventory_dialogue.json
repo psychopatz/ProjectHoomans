@@ -1,5 +1,5 @@
 {
-  "schema": "pnc.semantic-test.v1",
+  "schema": "semantic.harness-test.v1",
   "suite": "behavior.inventory_dialogue",
   "cases": [
     {

@@ -18,7 +18,7 @@ class DialogueAntiDuplicationTests(unittest.TestCase):
             rec = worker.input("hello")
             p = rec["messages"][0]["payload"]
             self.assertEqual(p.get("phraseAntiRepeatReason"), "initial_canonical")
-            self.assertEqual(p.get("phraseID"), "phrase.semantic.flow.greeting.opening.default.neutral.01")
+            self.assertEqual(p.get("phraseID"), "phrase.flow.greeting.opening.default.neutral.01")
 
     def test_seeded_initial_turn_rotates_across_pool(self) -> None:
         """Prove that passing distinct phrase salts across workers selects diverse variants."""

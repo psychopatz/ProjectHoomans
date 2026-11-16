@@ -88,7 +88,7 @@ class ContextualConversationC3DTests(unittest.TestCase):
                 self.assertEqual(resumed_pending["status"], "open")
                 self.assertEqual(
                     resumed["observation"]["response"]["templateID"],
-                    "semantic.question.needs.proposal.hunger",
+                    "question.needs.proposal.hunger",
                 )
                 self.assertEqual(resumed["translation"]["language"], language)
                 self.assertTrue(resumed["messages"][0]["payload"]["text"])

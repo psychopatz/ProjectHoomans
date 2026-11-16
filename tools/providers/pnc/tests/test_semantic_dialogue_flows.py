@@ -113,7 +113,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         )
         self.assertEqual(
             opening_observation["response"]["templateID"],
-            "semantic.flow.greeting.opening.friendly",
+            "flow.greeting.opening.friendly",
         )
         self.assertTrue(opening_observation["response"]["translated"])
         self.assertEqual(
@@ -152,7 +152,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         )
         self.assertEqual(
             followup_observation["response"]["templateID"],
-            "semantic.flow.greeting.followup.friendly",
+            "flow.greeting.followup.friendly",
         )
         self.assertTrue(followup_observation["response"]["translated"])
         self.assertGreater(followup_observation["translation"]["lookupCount"], 0)

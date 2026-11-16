@@ -40,8 +40,8 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
         self.assertTrue(report["previewOnly"])
         self.assertTrue(report["effectFree"])
         self.assertIn(
-            "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-            "ConvoEngine/Beats/Social/ArgumentEscalation.lua",
+            "Contents/mods/PsychopatzCore/common/media/lua/shared/"
+            "PsychopatzCore/ConvoEngine/Beats/Director/Social.lua",
             report["changedGeneratedPaths"],
         )
         self.assertEqual(source.read_bytes(), before)
@@ -64,6 +64,9 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
             service = SemanticLabAuthoringService(
                 repository,
                 runtime_root=REPOSITORY,
+                core_repository=repository,
+                hoomans_repository=REPOSITORY,
+                dynamic_trading_repository=CORE_REPOSITORY.parent / "DynamicTrading",
             )
             current = service.load_interaction_definition(
                 "beat.argument_escalation"
@@ -90,9 +93,13 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
             source_document = json.loads(
                 Path(refreshed["sourcePath"]).read_text(encoding="utf-8")
             )
-            canonical = next(
-                row for row in source_document["beats"]
-                if row["id"] == "beat.argument_escalation"
+            canonical = (
+                source_document
+                if source_document.get("schema") == "psychopatz.convo-engine.v1"
+                else next(
+                    row for row in source_document["beats"]
+                    if row["id"] == "beat.argument_escalation"
+                )
             )
             self.assertNotIn("labelKey", canonical)
             self.assertNotIn("descriptionKey", canonical)
@@ -101,8 +108,8 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
             self.assertTrue(
                 (
                     repository
-                    / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-                    "ConvoEngine/Beats/Social/ArgumentEscalation.lua"
+                    / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
+                    "PsychopatzCore/ConvoEngine/Beats/Director/Social.lua"
                 ).is_file()
             )
             for language in ("EN", "TL"):

@@ -39,8 +39,8 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 "semantic_generation_manifest", "semantic_generated_flows",
             }
         }
-        self.assertIn("PNC_SemanticAutomaticFlowManifest.lua", manifest_roles["semantic_generation_manifest"])
-        self.assertIn("PNC_SemanticGeneratedAutomaticFlows.lua", manifest_roles["semantic_generated_flows"])
+        self.assertIn("PNC/ConvoEngine/FlowManifest.lua", manifest_roles["semantic_generation_manifest"])
+        self.assertIn("PNC/ConvoEngine/GeneratedAutomaticFlows.lua", manifest_roles["semantic_generated_flows"])
 
         flows = {
             flow["id"]: flow
@@ -405,7 +405,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             unavailable = worker.input("any gossip?")
         self.assertEqual(
             unavailable["result"]["decision"]["response"]["templateID"],
-            "semantic.gossip.unknown",
+            "gossip.unknown",
         )
         self.assertFalse(any(
             event.get("command") == "SemanticCognitionRequest"
@@ -486,7 +486,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             unavailable = worker.input("any news about Sarah?")
         self.assertEqual(
             unavailable["result"]["decision"]["response"]["templateID"],
-            "semantic.gossip.unknown",
+            "gossip.unknown",
         )
         self.assertFalse(any(
             event.get("command") == "SemanticCognitionRequest"
@@ -511,7 +511,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             stale = worker.input("any news about Sarah?")
         self.assertEqual(
             stale["result"]["decision"]["response"]["templateID"],
-            "semantic.gossip.unknown",
+            "gossip.unknown",
         )
         stale_response = next(
             event for event in stale["dispatchTransport"]

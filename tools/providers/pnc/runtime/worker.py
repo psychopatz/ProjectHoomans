@@ -49,13 +49,22 @@ class LuaSemanticWorker(SemanticWorker):
         activity_log: ActivityLog | None = None,
         candidate_overlay_root: Path | None = None,
         candidate_overlay_module: str | None = None,
+        preset: str | None = None,
     ) -> None:
+        if (
+            config is None
+            and preset is None
+            and isinstance(scenario, dict)
+            and bool(((scenario.get("runtime") or {}).get("availableMods") or {}).get("DTHoomans"))
+        ):
+            preset = "pnc-with-dthoomans"
         self.config = config or HarnessConfig.discover(
             repository=repository or REPOSITORY,
             core_repository=core_repository or CORE_REPOSITORY,
             lua_bin=lua_bin,
             worker_script=worker_script,
             profile=profile,
+            preset=preset,
             startup_timeout=startup_timeout,
             request_timeout=request_timeout,
             shutdown_timeout=shutdown_timeout,

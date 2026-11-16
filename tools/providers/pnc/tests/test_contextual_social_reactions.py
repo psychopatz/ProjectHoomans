@@ -35,12 +35,12 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         self.assertEqual(
             response.get("templateID"),
-            "semantic.social.apology.friendly",
+            "social.apology.friendly",
         )
         payload = turn["messages"][0]["payload"]
         self.assertEqual(
             payload.get("semanticTemplateID"),
-            "semantic.social.apology.friendly",
+            "social.apology.friendly",
         )
         self.assertEqual(turn["routedSituation"]["social"]["style"], social_style)
         self.assertEqual(turn["llmCalls"], 0)
@@ -172,18 +172,18 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 self.assertLess(action["relationshipDelta"]["respect"], 0)
                 self.assertEqual(
                     result["result"]["decision"]["response"]["templateID"],
-                    "semantic.social.hostile_boundary",
+                    "social.hostile_boundary",
                 )
                 self.assertEqual(len(result["messages"]), 1)
                 payload = result["messages"][0]["payload"]
                 self.assertIn(
                     payload.get("realizationFamily"),
-                    {"utterance_plan", "semantic.social.hostile_boundary"},
+                    {"utterance_plan", "social.hostile_boundary"},
                 )
                 self.assertEqual(
                     payload.get("semanticTemplateID")
                     or payload.get("realizationFamily"),
-                    "semantic.social.hostile_boundary",
+                    "social.hostile_boundary",
                 )
                 self.assertEqual(result["llmCalls"], 0)
                 self.assertEqual(result["toolCalls"], [])
@@ -364,7 +364,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
             (
                 "friendly",
                 {"personality": {"socialStyle": "friendly"}},
-                "semantic.social.offer_friendly",
+                "social.offer_friendly",
                 None,
                 "friendly",
             ),
@@ -440,14 +440,14 @@ class ContextualSocialReactionTests(unittest.TestCase):
             (
                 "friendly",
                 {"personality": {"socialStyle": "friendly"}},
-                "semantic.social.dispute_friendly",
+                "social.dispute_friendly",
                 None,
                 "friendly",
             ),
             (
                 "withdrawn",
                 {"personality": {"socialStyle": "withdrawn"}},
-                "semantic.social.dispute_withdrawn",
+                "social.dispute_withdrawn",
                 None,
                 "withdrawn",
             ),
@@ -457,7 +457,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "conditionStats": {"stress": 95},
                     "personality": {"socialStyle": "neutral"},
                 },
-                "semantic.social.dispute_stressed",
+                "social.dispute_stressed",
                 None,
                 "neutral",
             ),

@@ -40,7 +40,7 @@ class PragmaticInteractionR6Tests(unittest.TestCase):
         )
         self.assertEqual(
             result["observation"]["response"]["semanticTemplateID"],
-            "semantic.interaction.context.clarify",
+            "interaction.context.clarify",
         )
         self.assertEqual(
             decision["response"]["plan"]["kind"],

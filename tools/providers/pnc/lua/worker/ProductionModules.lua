@@ -315,6 +315,12 @@ function ProductionModules.loadOptional(context)
     -- their live shared entrypoints. Re-run the existing catalog owner so the
     -- newly loaded Dynamic Trading action is discoverable through the normal
     -- provider lane; do not synthesize a worker-side candidate.
+    if DTHoomans
+        and DTHoomans.Conversation
+        and type(DTHoomans.Conversation.Register) == "function"
+    then
+        DTHoomans.Conversation.Register()
+    end
     local capabilityCatalog = PNC and PNC.Semantics
         and PNC.Semantics.CapabilityCatalog or nil
     if capabilityCatalog

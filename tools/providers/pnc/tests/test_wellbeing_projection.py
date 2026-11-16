@@ -50,24 +50,24 @@ class WellbeingProjectionTests(unittest.TestCase):
             ("normal", {"healthState": "normal", "needs": neutral_needs,
                          "conditionStats": neutral_conditions},
              "normal", "thirst", "normal",
-             "semantic.question.wellbeing.default"),
+             "question.wellbeing.default"),
             ("injured", {"healthState": "injured", "needs": neutral_needs,
                          "conditionStats": neutral_conditions},
              "injured", "thirst", "normal",
-             "semantic.question.wellbeing.injured"),
+             "question.wellbeing.injured"),
             ("thirst", {"healthState": "normal",
                         "needs": {"hunger": 0.05, "thirst": 0.95, "fatigue": 0.05},
                         "conditionStats": neutral_conditions},
              "normal", "thirst", None,
-             "semantic.question.wellbeing.thirst"),
+             "question.wellbeing.thirst"),
             ("panic", {"healthState": "normal", "needs": neutral_needs,
                        "conditionStats": {"stress": 0.0, "panic": 95, "boredom": 0.0}},
              "normal", "thirst", "normal",
-             "semantic.question.wellbeing.panic"),
+             "question.wellbeing.panic"),
             ("stress", {"healthState": "normal", "needs": neutral_needs,
                          "conditionStats": {"stress": 95, "panic": 0.0, "boredom": 0.0}},
              "normal", "thirst", "normal",
-             "semantic.question.wellbeing.stress"),
+             "question.wellbeing.stress"),
         )
         for label, npc, health, need, urgency, template_prefix in cases:
             with self.subTest(case=label):
@@ -103,13 +103,13 @@ class WellbeingProjectionTests(unittest.TestCase):
         self.assertIsNone(situation["emotion"].get("highest"))
         self.assertTrue(
             response["templateID"].startswith(
-                "semantic.question.wellbeing.unknown"
+                "question.wellbeing.unknown"
             ),
             response,
         )
         self.assertEqual(
-            result["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown",
+            result["messages"][0]["payload"]["semanticTemplateID"],
+            "question.wellbeing.unknown",
         )
 
     def test_unknown_health_defers_to_specific_catalog_reactions(self) -> None:
@@ -121,19 +121,19 @@ class WellbeingProjectionTests(unittest.TestCase):
                 "urgent_thirst",
                 {"healthState": None, "needs": {"thirst": 0.95},
                  "conditionStats": {}},
-                "semantic.question.wellbeing.thirst",
+                "question.wellbeing.thirst",
             ),
             (
                 "panic",
                 {"healthState": None, "needs": {},
                  "conditionStats": {"panic": 95}},
-                "semantic.question.wellbeing.panic",
+                "question.wellbeing.panic",
             ),
             (
                 "panic_precedes_thirst",
                 {"healthState": None, "needs": {"thirst": 0.95},
                  "conditionStats": {"panic": 95}},
-                "semantic.question.wellbeing.panic",
+                "question.wellbeing.panic",
             ),
         )
         for label, npc, template_prefix in cases:
@@ -179,7 +179,7 @@ class WellbeingProjectionTests(unittest.TestCase):
         self.assertEqual(situation["healthState"], "injured")
         self.assertEqual(
             response["templateID"],
-            "semantic.question.wellbeing.injured",
+            "question.wellbeing.injured",
         )
 
     def test_canonical_health_record_drives_semantic_normal_and_injury(self) -> None:
@@ -225,12 +225,12 @@ class WellbeingProjectionTests(unittest.TestCase):
         self.assertEqual(normal_situation["healthState"], "normal")
         self.assertEqual(
             normal_response["templateID"],
-            "semantic.question.wellbeing.default",
+            "question.wellbeing.default",
         )
         self.assertEqual(injured_situation["healthState"], "injured")
         self.assertEqual(
             injured_response["templateID"],
-            "semantic.question.wellbeing.injured",
+            "question.wellbeing.injured",
         )
 
     def test_canonical_health_rejects_semantic_only_state_names(self) -> None:
@@ -252,7 +252,7 @@ class WellbeingProjectionTests(unittest.TestCase):
         self.assertEqual(situation["healthState"], "injured")
         self.assertEqual(
             response["templateID"],
-            "semantic.question.wellbeing.injured",
+            "question.wellbeing.injured",
         )
 
     def test_editable_npc_state_round_trips_without_world_mutation(self) -> None:
@@ -290,7 +290,7 @@ class WellbeingProjectionTests(unittest.TestCase):
         first = result.turns[0]
         npc, response = self.assert_offline_wellbeing(first)
         self.assertEqual(npc["healthState"], "injured")
-        self.assertTrue(response["templateID"].startswith("semantic.question.wellbeing.injured"))
+        self.assertTrue(response["templateID"].startswith("question.wellbeing.injured"))
         second = result.turns[1]
         self.assertTrue(second["accepted"])
         self.assertEqual(second["llmCalls"], 0)

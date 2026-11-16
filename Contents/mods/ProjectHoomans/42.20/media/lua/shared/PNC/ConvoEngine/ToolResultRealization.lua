@@ -243,8 +243,10 @@ local function buildDetailed(result, context)
             or rendered.renderTemplateID or rendered.templateID
             or semantic.templateID
         semantic.fallback = type(renderedSegment) == "table"
-            and (renderedSegment.fallback or rendered.fallback)
-            or rendered.fallback or semantic.fallback
+            and (renderedSegment.enFallback or rendered.enFallback
+                or renderedSegment.fallback or rendered.fallback)
+            or rendered.enFallback or rendered.fallback
+            or semantic.enFallback or semantic.fallback
         semantic.responsePlan = rendered.plan or semantic.responsePlan
         semantic.args = rendered.args or args
         semantic.realizationFamily = rendered.realizationFamily

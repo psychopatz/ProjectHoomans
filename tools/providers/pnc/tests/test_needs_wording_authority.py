@@ -21,16 +21,16 @@ MANIFEST = (
     / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 NEEDS_IDS = (
-    "semantic.question.needs.offer.hunger",
-    "semantic.question.needs.offer.thirst",
-    "semantic.question.needs.offer.fatigue",
-    "semantic.question.needs.offer.unknown",
-    "semantic.question.needs.quantity.hunger",
-    "semantic.question.needs.quantity.thirst",
-    "semantic.question.needs.quantity.unknown",
-    "semantic.question.needs.proposal.hunger",
-    "semantic.question.needs.proposal.thirst",
-    "semantic.question.needs.proposal.unknown",
+    "question.needs.offer.hunger",
+    "question.needs.offer.thirst",
+    "question.needs.offer.fatigue",
+    "question.needs.offer.unknown",
+    "question.needs.quantity.hunger",
+    "question.needs.quantity.thirst",
+    "question.needs.quantity.unknown",
+    "question.needs.proposal.hunger",
+    "question.needs.proposal.thirst",
+    "question.needs.proposal.unknown",
 )
 EXPECTED = {
     "EN": {
@@ -113,46 +113,44 @@ class NeedsWordingShardTests(unittest.TestCase):
         model = compile_conversation_sources(
             REPOSITORY, manifest_path=MANIFEST,
         )
-        entry = next(
-            shard for shard in model["shards"]
-            if shard["path"] == "content/needs.json"
-        )
-        self.assertEqual(entry["domain"], "needs")
-        self.assertEqual(
-            {
-                model["locations"]["phrase." + template_id]["sourceShard"]
-                for template_id in NEEDS_IDS
-            },
-            {"content/needs.json"},
-        )
-        self.assertEqual(
-            [
-                family["semanticTemplateID"]
-                for family in model["content"]["phraseFamilies"]
-                if family["semanticTemplateID"] in NEEDS_IDS
-            ],
-            sorted(NEEDS_IDS),
-        )
+        plans = {
+            item["id"]: item
+            for item in model["psdlRuntimePlans"]
+            if item.get("domain") == "conversation_needs"
+        }
+        self.assertTrue(set(NEEDS_IDS).issubset(plans))
+        for template_id in NEEDS_IDS:
+            item = plans[template_id]
+            self.assertTrue(
+                item["sourceShard"].startswith("adopters/hoomans/dialogue/conversation_needs/"),
+                item["sourceShard"],
+            )
+            self.assertGreaterEqual(len(item.get("textRoles", [])), 1)
 
     def test_generated_needs_translation_is_complete_and_legacy_keys_are_retired(
         self,
     ) -> None:
+        model = compile_conversation_sources(
+            REPOSITORY, manifest_path=MANIFEST,
+        )
+        rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
+        for item in model["psdlRuntimePlans"]:
+            if item["id"] not in NEEDS_IDS:
+                continue
+            for role in item.get("textRoles", []):
+                key = f"conversation.content.semantic.{item['id']}.{role['variantID']}.01"
+                for language in ("EN", "TL"):
+                    rendered[language][key] = role["translations"][language][0]
+
         for language, expected in EXPECTED.items():
             with self.subTest(language=language):
-                generated = json.loads(
-                    (
-                        REPOSITORY
-                        / f"Contents/mods/ProjectHoomans/common/media/translation/"
-                        f"{language}/Conversation/Needs.json"
-                    ).read_text(encoding="utf-8")
-                )
                 for key, val in expected.items():
-                    self.assertEqual(generated.get(key), val)
+                    self.assertEqual(rendered[language].get(key), val)
                 for catalog_name in ("Responses", "Realizations"):
                     catalog = json.loads(
                         (
                             REPOSITORY
-                            / f"Contents/mods/ProjectHoomans/common/media/translation/"
+                            / "Contents/mods/ProjectHoomans/common/media/translation/"
                             f"{language}/Conversation/Semantic/{catalog_name}.json"
                         ).read_text(encoding="utf-8")
                     )
@@ -160,14 +158,14 @@ class NeedsWordingShardTests(unittest.TestCase):
 
         status_source = (
             REPOSITORY
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/"
             "SpeechRealization/Families/Status.lua"
         ).read_text(encoding="utf-8")
         self.assertNotIn("NeedsHunger", status_source)
         key_map = (
             REPOSITORY
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/"
-            "PNC_SemanticDialogueInput_Presentation_Responses_Translation_Keys_Question_Needs.lua"
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/ConvoEngine/Dialogue/"
+            "Input_Presentation_Responses_Translation_Keys_Question_Needs.lua"
         ).read_text(encoding="utf-8")
         for template_id in NEEDS_IDS:
             self.assertNotIn(template_id, key_map)

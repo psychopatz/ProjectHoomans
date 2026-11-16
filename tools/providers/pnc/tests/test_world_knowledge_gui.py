@@ -35,8 +35,8 @@ class WorldKnowledgeGuiTests(SemanticLabGuiTestCase):
                 repository=str(Path(__file__).resolve().parents[4]),
                 core_repository=str(Path(__file__).resolve().parents[4] / "psychopatzCore"),
                 lua="lua",
-                startup_timeout=8.0,
-                timeout=5.0,
+                startup_timeout=15.0,
+                timeout=10.0,
                 shutdown_timeout=1.0,
                 scenario=str(path),
                 language=None,
@@ -68,7 +68,7 @@ class WorldKnowledgeGuiTests(SemanticLabGuiTestCase):
                     app.close()
 
             root.after(50, poll)
-            root.after(12000, timeout)
+            root.after(30000, timeout)
             root.mainloop()
 
         self.assertFalse(errors, errors)

@@ -91,11 +91,11 @@ class CoherentConversationC10Tests(unittest.TestCase):
         }
         self.assertEqual(
             resolved["behavior.retaliate_verbally"]["source"],
-            "behaviors/social/retaliate_verbally.json",
+            "behavior/social/retaliate_verbally.json",
         )
         self.assertEqual(
             resolved["construction.en.social.mirror_retort"]["source"],
-            "realization/social/constructions_followups.json",
+            "realization/social_identity_closure/social_mirror_retort.json",
         )
 
         social = view["socialEffect"]

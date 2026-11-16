@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import unittest
 
-from tools.semantic_harness.c0a_baseline import capture_storage
+from tools.providers.pnc.c0a_baseline import capture_storage
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
@@ -159,16 +159,17 @@ class C0AHistoricalEvidenceTests(unittest.TestCase):
         self.assertEqual(opaque_names, {"Massive", "Sgd"})
 
     def test_storage_capture_remains_observer_only(self) -> None:
+        core_repo = REPOSITORY.parent / "psychopatzCore"
         paths = [
-            REPOSITORY
+            core_repo
             / "tools/semantic_harness/codebuilder/sources/conversation/"
             "manifest.json",
-            REPOSITORY
+            core_repo
             / "tools/semantic_harness/codebuilder/sources/conversation/"
-            "content/social/reactions.json",
+            "behavior/social/retaliate_verbally.json",
             REPOSITORY
             / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-            "PNC/ConvoEngine/Content/Social/Reactions.lua",
+            "PNC/ConvoEngine/Manifest.lua",
             REPOSITORY
             / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
             "PNC/ConvoEngine/Registry.lua",

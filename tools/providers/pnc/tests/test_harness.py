@@ -458,12 +458,12 @@ class SemanticHarnessTests(unittest.TestCase):
             reflection = worker.input("I'm an idiot")
         initial_payload = initial["messages"][0]["payload"]
         self.assertTrue(initial_payload["translationKey"].startswith(
-            "UI_PNC_Conversation_Semantic_QuestionIdentity"
+            "conversation.content.semantic.question.identity."
         ))
         self.assertNotIn("Mara", initial_payload["text"])
         self.assertTrue(any(
             word in initial_payload["text"].lower()
-            for word in ("pangalan", "tawag")
+            for word in ("pangalan", "tawag", "kaibigan", "kasama")
         ))
         wary_payload = wary["messages"][0]["payload"]
         self.assertTrue(wary_payload["translationKey"].startswith(
@@ -574,12 +574,12 @@ class SemanticHarnessTests(unittest.TestCase):
                 )
 
         for spoke in (
-            "PNC_SemanticInteractionLifecycle_Envelope.lua",
-            "PNC_SemanticInteractionLifecycle_State.lua",
+            "Lifecycle_Envelope.lua",
+            "Lifecycle_State.lua",
         ):
             with self.subTest(spoke=spoke):
                 self.assertIn(
-                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    "ProjectHoomans:shared:PNC/ConvoEngine/Interaction/" + spoke,
                     manifest_paths,
                 )
         for spoke in (
@@ -619,25 +619,25 @@ class SemanticHarnessTests(unittest.TestCase):
                 )
 
         for spoke in (
-            "PNC_SemanticDialogueSuggestions_Capabilities.lua",
-            "PNC_SemanticDialogueSuggestions_Branches.lua",
-            "PNC_SemanticDialogueSuggestions_Frames.lua",
-            "PNC_SemanticDialogueSuggestions_Projection.lua",
-            "PNC_SemanticDialogueSuggestions_Build.lua",
+            "Suggestions_Capabilities.lua",
+            "Suggestions_Branches.lua",
+            "Suggestions_Frames.lua",
+            "Suggestions_Projection.lua",
+            "Suggestions_Build.lua",
         ):
             with self.subTest(spoke=spoke):
                 self.assertIn(
-                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    "ProjectHoomans:shared:PNC/ConvoEngine/Dialogue/" + spoke,
                     manifest_paths,
                 )
         for spoke in (
-            "PNC_SemanticDialogueInput_Lifecycle_Presentation.lua",
-            "PNC_SemanticDialogueInput_Lifecycle_Navigation.lua",
-            "PNC_SemanticDialogueInput_Lifecycle_Submission.lua",
+            "Input_Lifecycle_Presentation.lua",
+            "Input_Lifecycle_Navigation.lua",
+            "Input_Lifecycle_Submission.lua",
         ):
             with self.subTest(spoke=spoke):
                 self.assertIn(
-                    "ProjectHoomans:client:PNC/Semantics/" + spoke,
+                    "ProjectHoomans:client:PNC/ConvoEngine/Dialogue/" + spoke,
                     manifest_paths,
                 )
         self.assertEqual(capabilities["translation"]["language"], "EN")

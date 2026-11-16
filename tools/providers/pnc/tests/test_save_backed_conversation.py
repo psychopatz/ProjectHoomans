@@ -187,10 +187,11 @@ class SaveBackedConversationTests(unittest.TestCase):
             None,
         )
 
-    def _worker(self) -> LuaSemanticWorker:
+    def _worker(self, *, preset: str | None = None) -> LuaSemanticWorker:
         return LuaSemanticWorker(
             merge({}, DEFAULT_SCENARIO),
             core_repository=CORE_REPOSITORY,
+            preset=preset,
         )
 
     def test_saved_pair_runs_talk_semantics_graph_replay_and_compare(self) -> None:
@@ -297,7 +298,7 @@ class SaveBackedConversationTests(unittest.TestCase):
             )
             self.assertTrue(worker.snapshot()["scenario"]["npc"]["recruited"])
 
-        with self._worker() as worker:
+        with self._worker(preset="pnc-with-dthoomans") as worker:
             worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_saved",

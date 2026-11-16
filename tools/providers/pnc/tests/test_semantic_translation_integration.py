@@ -72,7 +72,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     greeting_payloads[0]["semanticTemplateID"],
-                    "semantic.flow.greeting.opening.default",
+                    "flow.greeting.opening.default",
                 )
                 self.assertTrue(
                     greeting_payloads[1]["translationKey"].startswith(
@@ -98,7 +98,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 )
                 self.assertTrue(
                     identity_payload["semanticTemplateID"].startswith(
-                        "semantic.question.identity"
+                        "question.identity"
                     )
                 )
                 self.assertEqual(
@@ -112,12 +112,12 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 wellbeing_payload = wellbeing["messages"][0]["payload"]
                 self.assertTrue(
                     wellbeing_payload["translationKey"].startswith(
-                        "UI_PNC_Conversation_Semantic_QuestionWellbeingDataset"
+                        "conversation.content.semantic.question.wellbeing."
                     )
                 )
                 self.assertTrue(
                     wellbeing_payload["semanticTemplateID"].startswith(
-                        "semantic.question.wellbeing."
+                        "question.wellbeing."
                     )
                 )
                 if language == "TL":

@@ -18,7 +18,7 @@ PROMPT = {
     "outputs": {
         "speech": {
             "dialogueAct": "INFORM",
-            "contentTemplateID": "semantic.social.acknowledged",
+            "contentTemplateID": "social.acknowledged",
         }
     },
     "continuation": {
@@ -46,7 +46,7 @@ ACK = {
     "outputs": {
         "speech": {
             "dialogueAct": "ACKNOWLEDGE",
-            "contentTemplateID": "semantic.social.acknowledged",
+            "contentTemplateID": "social.acknowledged",
         }
     },
     "when": {
@@ -112,16 +112,16 @@ class SemanticSceneRuntimeS8Acceptance(unittest.TestCase):
         core_files = [
             root
             / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-            "Semantics/PNC_SemanticInteractionSceneRuntime.lua",
+            "ConvoEngine/Interaction/SceneRuntime.lua",
             root
             / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-            "Semantics/PNC_SemanticInteractionDirector.lua",
+            "ConvoEngine/Interaction/Director.lua",
             root
             / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-            "Semantics/PNC_SemanticInteractionScheduler.lua",
+            "ConvoEngine/Interaction/Scheduler.lua",
             root
             / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-            "Semantics/PNC_SemanticInteractionContinuation.lua",
+            "ConvoEngine/Interaction/Continuation.lua",
         ]
         for path in core_files:
             source = path.read_text(encoding="utf-8")

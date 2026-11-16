@@ -31,7 +31,7 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
     def test_canonical_realization_boundary_returns_plan_and_provenance(self) -> None:
         source = (
             LUA
-            / "shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua"
+            / "shared/PNC/ConvoEngine/Dialogue/RealizationAuthority.lua"
         ).read_text()
         self.assertIn("Catalog.Select", source)
         self.assertIn("responsePlan = plan", source)
@@ -65,7 +65,7 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
 
     def test_lifecycle_provenance_carries_realization_identity(self) -> None:
         source = (
-            LUA / "shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+            LUA / "shared/PNC/ConvoEngine/Interaction/Lifecycle.lua"
         ).read_text()
         self.assertIn("realizationFamily", source)
         self.assertIn("realizationID", source)
@@ -151,10 +151,10 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
     def test_renderer_boundary_has_no_contextual_flavor_selection(self) -> None:
         authority = (
             LUA
-            / "shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua"
+            / "shared/PNC/ConvoEngine/Dialogue/RealizationAuthority.lua"
         ).read_text()
         reactions = (
-            LUA / "shared/PNC/Semantics/PNC_SemanticSocialReaction.lua"
+            LUA / "shared/PNC/ConvoEngine/Social/Reaction.lua"
         ).read_text()
         presentation = (
             LUA / "client/PNC/Commands/PNC_CompanionCommandPresentation.lua"
@@ -168,19 +168,15 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
     def test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog(self) -> None:
         root = PROJECT / "Contents/mods/ProjectHoomans/common/media/translation"
         for language in ("EN", "TL"):
-            greeting = root / language / "Conversation/Greeting.json"
-            social = root / language / "Conversation/Social.json"
+            command = root / language / "Conversation/Command.json"
             semantic = root / language / "Conversation/Semantic/Responses.json"
-            for path in (greeting, social, semantic):
+            ui_json = root / language / "Conversation/UI.json"
+            for path in (command, semantic, ui_json):
                 self.assertTrue(path.exists(), str(path))
                 self.assertTrue(json.loads(path.read_text()), str(path))
             self.assertIn(
-                "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
-                json.loads(greeting.read_text()),
-            )
-            self.assertIn(
-                "conversation.content.semantic.emote.player.thumbsdown.neutral.01",
-                json.loads(social.read_text()),
+                "conversation.content.semantic.combat.horde.ack.avoid_default.neutral.01",
+                json.loads(command.read_text()),
             )
             self.assertIn(
                 "UI_PNC_Conversation_Semantic_FlowGreetingOpening",

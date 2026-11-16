@@ -143,6 +143,7 @@ class GiftCapabilityBindingTests(unittest.TestCase):
             tagalog["messages"][0]["payload"]["text"],
             [
                 "Hindi ko matanggap ang regalong iyan ngayon.",
+                "Hindi magaan sa loob ko na tanggapin ito sa 'yo.",
                 "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
             ],
         )

@@ -7,9 +7,15 @@ from tools.providers.pnc.tests.test_unified_evidence_e0 import saved_worker, sto
 
 ROOT = Path(__file__).resolve().parents[4]
 MOD = ROOT / "Contents/mods/ProjectHoomans"
-ALGORITHMS = [MOD / discover_newest_runtime(MOD) / "media/lua/shared/PNC/Semantics" / name
-              for name in ["PNC_SemanticInteractionEvidence.lua", "PNC_SemanticInteractionEvidenceAdapters.lua",
-                           "PNC_SemanticInteractionRelations.lua", "PNC_SemanticPragmaticResolver.lua"]]
+ALGORITHMS = [
+    MOD / discover_newest_runtime(MOD) / "media/lua/shared" / rel
+    for rel in [
+        "PNC/ConvoEngine/Interaction/Evidence.lua",
+        "PNC/ConvoEngine/Interaction/EvidenceAdapters.lua",
+        "PNC/ConvoEngine/Interaction/Relations.lua",
+        "PNC/Semantics/PNC_SemanticPragmaticResolver.lua",
+    ]
+]
 
 
 def hashes():

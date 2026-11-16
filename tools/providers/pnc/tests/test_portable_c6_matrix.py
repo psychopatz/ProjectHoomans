@@ -39,11 +39,11 @@ class PortableC6MatrixTests(unittest.TestCase):
                 # canonical greeting wording is preserved as phrase 01;
                 # the phrase layer varies only subsequent turns.
                 "hello": "Hey there. Good to see you.",
-                "im fine, how about you": "Doing okay, all things considered.",
+                "im fine, how about you": "I'm okay. How about you?",
             },
             "TL": {
                 "hello": "Uy, mabuti at nakita kita.",
-                "im fine, how about you": "Okay naman ako, sa lahat ng bagay.",
+                "im fine, how about you": "Okay naman ako. Ikaw, kumusta?",
             },
         }
         for language, phrases in expected.items():

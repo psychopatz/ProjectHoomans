@@ -21,16 +21,16 @@ MANIFEST = (
     / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 WELLBEING_IDS = (
-    "semantic.question.wellbeing.default",
-    "semantic.question.wellbeing.injured",
-    "semantic.question.wellbeing.panic",
-    "semantic.question.wellbeing.stress",
-    "semantic.question.wellbeing.thirst",
-    "semantic.question.wellbeing.thirst_alt",
-    "semantic.question.wellbeing.hunger",
-    "semantic.question.wellbeing.hunger_alt",
-    "semantic.question.wellbeing.fatigue",
-    "semantic.question.wellbeing.fatigue_alt",
+    "question.wellbeing.default",
+    "question.wellbeing.injured",
+    "question.wellbeing.panic",
+    "question.wellbeing.stress",
+    "question.wellbeing.thirst",
+    "question.wellbeing.thirst_alt",
+    "question.wellbeing.hunger",
+    "question.wellbeing.hunger_alt",
+    "question.wellbeing.fatigue",
+    "question.wellbeing.fatigue_alt",
 )
 EXPECTED = {
     "EN": {
@@ -105,55 +105,44 @@ class WellbeingWordingShardTests(unittest.TestCase):
         model = compile_conversation_sources(
             REPOSITORY, manifest_path=MANIFEST,
         )
-        wellbeing_paths = {
-            "content/wellbeing/general.json",
-            "content/wellbeing/needs.json",
-            "content/wellbeing/emotional.json",
+        plans = {
+            item["id"]: item
+            for item in model["psdlRuntimePlans"]
+            if item.get("domain") == "wellbeing_content"
         }
-        entries = [
-            shard for shard in model["shards"]
-            if shard["path"] in wellbeing_paths
-        ]
-        self.assertEqual({entry["domain"] for entry in entries}, {"wellbeing"})
-        self.assertEqual(
-            {
-                model["locations"]["phrase." + template_id]["sourceShard"]
-                for template_id in WELLBEING_IDS
-            },
-            {
-                "content/wellbeing/general.json",
-                "content/wellbeing/needs.json",
-                "content/wellbeing/emotional.json",
-            },
-        )
-        self.assertEqual(
-            [
-                family["semanticTemplateID"]
-                for family in model["content"]["phraseFamilies"]
-                if family["semanticTemplateID"] in WELLBEING_IDS
-            ],
-            sorted(WELLBEING_IDS),
-        )
+        self.assertTrue(set(WELLBEING_IDS).issubset(plans))
+        for template_id in WELLBEING_IDS:
+            item = plans[template_id]
+            self.assertTrue(
+                item["sourceShard"].startswith("adopters/hoomans/dialogue/wellbeing_content/"),
+                item["sourceShard"],
+            )
+            self.assertGreaterEqual(len(item.get("textRoles", [])), 1)
 
     def test_generated_wellbeing_translation_is_complete_and_legacy_keys_are_retired(
         self,
     ) -> None:
+        model = compile_conversation_sources(
+            REPOSITORY, manifest_path=MANIFEST,
+        )
+        rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
+        for item in model["psdlRuntimePlans"]:
+            if item.get("domain") != "wellbeing_content":
+                continue
+            for role in item.get("textRoles", []):
+                key = f"conversation.content.semantic.{item['id']}.{role['variantID']}.01"
+                for language in ("EN", "TL"):
+                    rendered[language][key] = role["translations"][language][0]
+
         for language, expected in EXPECTED.items():
             with self.subTest(language=language):
-                generated = json.loads(
-                    (
-                        REPOSITORY
-                        / f"Contents/mods/ProjectHoomans/common/media/translation/"
-                        f"{language}/Conversation/Wellbeing.json"
-                    ).read_text(encoding="utf-8")
-                )
                 for key, val in expected.items():
-                    self.assertEqual(generated.get(key), val)
+                    self.assertEqual(rendered[language].get(key), val)
                 for catalog_name in ("Responses", "Realizations"):
                     catalog = json.loads(
                         (
                             REPOSITORY
-                            / f"Contents/mods/ProjectHoomans/common/media/translation/"
+                            / "Contents/mods/ProjectHoomans/common/media/translation/"
                             f"{language}/Conversation/Semantic/{catalog_name}.json"
                         ).read_text(encoding="utf-8")
                     )
@@ -161,14 +150,14 @@ class WellbeingWordingShardTests(unittest.TestCase):
 
         wellbeing_source = (
             REPOSITORY
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/"
             "SpeechRealization/Families/Status.lua"
         ).read_text(encoding="utf-8")
         self.assertNotIn("UI_PNC_Conversation_Semantic_RealizationWellbeing", wellbeing_source)
         key_map = (
             REPOSITORY
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/"
-            "PNC_SemanticDialogueInput_Presentation_Responses_Translation_Keys_Question_Wellbeing.lua"
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/ConvoEngine/Dialogue/"
+            "Input_Presentation_Responses_Translation_Keys_Question_Wellbeing.lua"
         ).read_text(encoding="utf-8")
         for template_id in WELLBEING_IDS:
             self.assertNotIn(template_id, key_map)
@@ -178,22 +167,22 @@ class WellbeingWordingShardTests(unittest.TestCase):
     ) -> None:
         expected = {
             ("EN", "normal"): (
-                "semantic.question.wellbeing.default",
+                "question.wellbeing.default",
                 "conversation.content.semantic.question.wellbeing.default.neutral.01",
                 "I'm okay. How about you?",
             ),
             ("TL", "normal"): (
-                "semantic.question.wellbeing.default",
+                "question.wellbeing.default",
                 "conversation.content.semantic.question.wellbeing.default.neutral.01",
                 "Okay naman ako. Ikaw, kumusta?",
             ),
             ("EN", "injured"): (
-                "semantic.question.wellbeing.injured",
+                "question.wellbeing.injured",
                 "conversation.content.semantic.question.wellbeing.injured.neutral.01",
                 "A little banged up, but I'll manage.",
             ),
             ("TL", "injured"): (
-                "semantic.question.wellbeing.injured",
+                "question.wellbeing.injured",
                 "conversation.content.semantic.question.wellbeing.injured.neutral.01",
                 "Medyo may tama ako, pero kakayanin ko.",
             ),

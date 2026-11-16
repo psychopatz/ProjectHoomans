@@ -12,13 +12,15 @@ import unittest
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
-from tools.providers.pnc.tests.gui_test_support import require_supported_save
+from tools.providers.pnc.tests.gui_test_support import (
+    install_synthetic_save_root,
+)
 
 
 class OperationalWorldBrowserTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_player_hierarchy_import_and_talk_at_supported_geometries(self) -> None:
-        require_supported_save(self)
+        save_path = install_synthetic_save_root(self)
         for geometry in ("1080x700", "1280x800"):
             with self.subTest(geometry=geometry):
                 with tempfile.TemporaryDirectory() as directory:
@@ -54,8 +56,9 @@ class OperationalWorldBrowserTests(unittest.TestCase):
                         self.assertGreater(app.saved_world_tree.winfo_width(), 400)
 
                         selected_entry = next(
-                            entry for entry in app.saved_world_entries
-                            if (entry.get("capabilities") or {}).get("projectHoomans")
+                            entry
+                            for entry in app.saved_world_entries
+                            if Path(str(entry["path"])).resolve() == save_path.resolve()
                         )
                         source_path = Path(str(selected_entry["path"]))
                         before = sha256(source_path.read_bytes()).hexdigest()

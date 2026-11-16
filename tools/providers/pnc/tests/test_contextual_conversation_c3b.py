@@ -46,7 +46,7 @@ class ContextualConversationC3BTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     first_response["templateID"],
-                    "semantic.question.needs.offer.hunger",
+                    "question.needs.offer.hunger",
                 )
                 self.assertEqual(first_plan["dialogueAct"], "NEEDS_REPORT")
                 self.assertEqual(first_plan["topic"], "NEEDS")
@@ -78,7 +78,7 @@ class ContextualConversationC3BTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     second_response["templateID"],
-                    "semantic.question.needs.quantity.hunger",
+                    "question.needs.quantity.hunger",
                 )
                 self.assertEqual(second_plan["dialogueAct"], "NEEDS_QUANTITY")
                 self.assertEqual(second_plan["uncertainty"], "pending")
@@ -114,7 +114,7 @@ class ContextualConversationC3BTests(unittest.TestCase):
         response = second["result"]["decision"]["response"]
         plan = response["plan"]
         self.assertEqual(
-            response["templateID"], "semantic.question.needs.quantity.unknown"
+            response["templateID"], "question.needs.quantity.unknown"
         )
         self.assertEqual(plan["dialogueAct"], "ASK_CLARIFICATION")
         self.assertEqual(plan["uncertainty"], "ambiguous")

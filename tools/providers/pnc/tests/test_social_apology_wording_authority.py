@@ -99,7 +99,7 @@ class SocialApologyWordingShardTests(unittest.TestCase):
         self.assertEqual(turn["result"]["ir"]["intent"], "APOLOGIZE")
         self.assertEqual(
             turn["result"]["decision"]["response"]["templateID"],
-            "semantic.interaction.context.clarify",
+            "interaction.context.clarify",
         )
         self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
@@ -111,27 +111,23 @@ class SocialApologyWordingShardTests(unittest.TestCase):
             REPOSITORY,
             manifest_path=MANIFEST,
         )
-        plans = [
-            item
+        plans = {
+            item["id"]: item
             for item in model["psdlRuntimePlans"]
-            if item.get("payload", {})
-            .get("metadata", {})
-            .get("responseTemplateID") in APOLOGY_IDS
-        ]
-        self.assertEqual(len(plans), len(APOLOGY_IDS) * len(STYLES))
-        for plan in plans:
-            payload = plan["payload"]
-            metadata = payload["metadata"]
-            self.assertEqual(plan["domain"], "social_apology")
+            if item.get("domain") == "social_apology"
+            and item["id"].startswith("social.apology.")
+        }
+        self.assertEqual(len(plans), len(APOLOGY_IDS))
+        for plan in plans.values():
             self.assertTrue(
                 plan["sourceShard"].startswith("adopters/hoomans/dialogue/social_apology/"),
                 plan["sourceShard"],
             )
-            self.assertIn(metadata["responseTemplateID"], APOLOGY_IDS)
-            self.assertIn(metadata["style"], STYLES)
-            variants = payload["response"]["variants"]
-            self.assertEqual(len(variants), 10)
-            self.assertTrue(all(set(item["text"]) == {"EN", "TL"} for item in variants))
+            roles = plan.get("textRoles", [])
+            self.assertEqual({r["variantID"] for r in roles}, set(STYLES))
+            for role in roles:
+                self.assertEqual(len(role["translations"]["EN"]), 10)
+                self.assertEqual(len(role["translations"]["TL"]), 10)
 
     def test_generated_apology_psdl_source_is_complete_and_legacy_fixed_keys_retired(
         self,
@@ -140,23 +136,17 @@ class SocialApologyWordingShardTests(unittest.TestCase):
             REPOSITORY
             / "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_apology"
         )
-        files = sorted(source_dir.glob("*.json"))
-        self.assertEqual(len(files), len(APOLOGY_IDS))
-        records = [
-            record
-            for path in files
-            for record in json.loads(path.read_text(encoding="utf-8")).get("records", [])
-        ]
-        self.assertEqual(len(records), len(APOLOGY_IDS) * len(STYLES))
-        for record in records:
-            self.assertEqual(record["owner"], "ProjectHoomans")
-            self.assertEqual(record["metadata"]["sourceSurface"], "content/social_apology.json")
-            self.assertEqual(record["metadata"]["responseTemplateID"] in APOLOGY_IDS, True)
-            self.assertIn(record["metadata"]["style"], STYLES)
-            self.assertEqual(len(record["response"]["variants"]), 10)
-            for variant in record["response"]["variants"]:
-                self.assertEqual(set(variant["text"]), {"EN", "TL"})
-                self.assertTrue(all(variant["text"][language] for language in ("EN", "TL")))
+        apology_files = sorted(source_dir.glob("social_apology*.json"))
+        self.assertEqual(len(apology_files), len(APOLOGY_IDS))
+        for path in apology_files:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(doc["owner"], "ProjectHoomans")
+            variants = doc["say"]["variants"]
+            self.assertEqual({v["id"] for v in variants}, set(STYLES))
+            for variant in variants:
+                self.assertEqual(len(variant["text"]["EN"]), 10)
+                self.assertEqual(len(variant["text"]["TL"]), 10)
+                self.assertTrue(all(variant["text"][lang] for lang in ("EN", "TL")))
         for language in ("EN", "TL"):
             self.assertFalse(
                 (
@@ -182,14 +172,13 @@ class SocialApologyWordingShardTests(unittest.TestCase):
 
         static_map = (
             REPOSITORY
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-            "Semantics/PNC_SemanticDialogueInput_Presentation_Responses_"
-            "Translation_Keys_Social.lua"
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/ConvoEngine/Dialogue/"
+            "Input_Presentation_Responses_Translation_Keys_Social.lua"
         ).read_text(encoding="utf-8")
         social_families = (
             REPOSITORY
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-            "Semantics/SpeechRealization/Families/Social.lua"
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/"
+            "SpeechRealization/Families/Social.lua"
         ).read_text(encoding="utf-8")
         self.assertTrue(RETIRED_KEYS.isdisjoint(static_map))
         self.assertIn("semantic.social.apology.trusted", static_map)
@@ -255,7 +244,7 @@ class SocialApologyWordingShardTests(unittest.TestCase):
                     # The catalog still selects the personality/emotion family.
                     # The admitted reconciliation behavior owns the final speech
                     # plan; current utterance construction realizes its meaning.
-                    self.assertEqual(response["templateID"], "semantic.social.apology.friendly")
+                    self.assertEqual(response["templateID"], "social.apology.friendly")
                     self.assertEqual(payload["semanticTemplateID"], response["templateID"])
                     realization = payload["utteranceRealization"]
                     self.assertEqual(realization["locale"], language)

@@ -1,5 +1,5 @@
 {
-  "schema": "pnc.semantic-test.v1",
+  "schema": "semantic.harness-test.v1",
   "suite": "c0a.reply_realization",
   "cases": [
     {

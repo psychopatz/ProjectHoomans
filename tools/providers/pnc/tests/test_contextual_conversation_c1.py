@@ -103,7 +103,7 @@ class ContextualConversationC1Tests(unittest.TestCase):
         self.assertEqual(first_context["agenda"][0]["status"], "open")
         self.assertEqual(
             wellbeing["observation"]["response"]["templateID"],
-            "semantic.question.wellbeing.injured",
+            "question.wellbeing.injured",
         )
 
         weather_ir = weather["result"]["ir"]
@@ -152,7 +152,7 @@ class ContextualConversationC1Tests(unittest.TestCase):
         self.assertEqual(resumed_context["agenda"][0]["status"], "fulfilled")
         self.assertEqual(
             resumed["observation"]["response"]["templateID"],
-            "semantic.question.wellbeing.injured",
+            "question.wellbeing.injured",
         )
 
         for turn in (wellbeing, weather, resumed):

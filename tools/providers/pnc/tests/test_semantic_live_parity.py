@@ -21,7 +21,7 @@ LIVE_SEMANTICS = (
     REPOSITORY
     / "Contents/mods/ProjectHoomans"
     / discover_newest_runtime(REPOSITORY / "Contents/mods/ProjectHoomans")
-    / "media/lua/client/PNC/Semantics"
+    / "media/lua/client/PNC/ConvoEngine/Dialogue"
 )
 
 
@@ -54,22 +54,21 @@ class SemanticLiveParityTests(unittest.TestCase):
 
     def test_live_entrypoint_keeps_lifecycle_and_core_router_composition(self) -> None:
         entrypoint = read(
-            LIVE_SEMANTICS / "PNC_SemanticDialogueInput.lua"
+            LIVE_SEMANTICS / "Input.lua"
         )
         submission_frames = read(
-            LIVE_SEMANTICS / "PNC_SemanticDialogueInput_SubmissionFrames.lua"
+            LIVE_SEMANTICS / "Input_SubmissionFrames.lua"
         )
 
         for required_module in (
             "PsychopatzCore/ConvoEngine/DialogueRouter",
             "PNC/ConvoEngine/Dialogue/Policy",
             "PNC/ConvoEngine/Dialogue/ResponseCatalog",
-            "PNC/ConvoEngine/Dialogue/Input_Context",
-            "PNC/ConvoEngine/Dialogue/Input_ProviderFallback",
-            "PNC/ConvoEngine/Dialogue/Input_Lifecycle",
+            "PNC/ConvoEngine/Dialogue/Runtime",
+            "PNC/ConvoEngine/Interaction/Lifecycle",
         ):
             with self.subTest(module=required_module):
-                self.assertIn(f'require "{required_module}"', entrypoint)
+                self.assertIn(f'require\n        "{required_module}"' if required_module in ("PNC/ConvoEngine/Dialogue/Runtime", "PNC/ConvoEngine/Interaction/Lifecycle") else f'"{required_module}"', entrypoint)
 
         self.assertIn(
             "return Internal.SubmitSingle(view, value, part)",
@@ -97,7 +96,7 @@ class SemanticLiveParityTests(unittest.TestCase):
 
     def test_live_provider_fallback_is_the_worker_provider_boundary(self) -> None:
         provider_fallback = read(
-            LIVE_SEMANTICS / "PNC_SemanticDialogueInput_ProviderFallback.lua"
+            LIVE_SEMANTICS / "Input_ProviderFallback.lua"
         )
 
         self.assertIn(

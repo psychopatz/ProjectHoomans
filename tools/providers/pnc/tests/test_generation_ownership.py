@@ -213,18 +213,19 @@ class GenerationOwnershipTests(unittest.TestCase):
             manifest["registryOwner"] = "DTCommon"
             routed_paths = {
                 "patterns/common/greeting_whats_up.json",
-                "content/greeting.json",
-                "behaviors/social",
+                "behavior",
+                "dialogue",
             }
             for entry in [*manifest["shards"], *manifest["sourceRoots"]]:
                 if entry["path"] not in routed_paths:
                     continue
                 entry["owner"] = "DTCommon"
-                shard_paths = [source_root / entry["path"]]
-                if entry["path"] == "behaviors/social":
-                    shard_paths = sorted(
-                        (source_root / entry["path"]).glob("*.json")
-                    )
+                root_entry = source_root / entry["path"]
+                shard_paths = (
+                    [root_entry]
+                    if root_entry.is_file()
+                    else sorted(root_entry.rglob("*.json"))
+                )
                 for shard_path in shard_paths:
                     shard = json.loads(shard_path.read_text(encoding="utf-8"))
                     shard["owner"] = "DTCommon"
@@ -298,7 +299,7 @@ class GenerationOwnershipTests(unittest.TestCase):
                 dynamic_trading
                 / "Contents/mods/DTCommon/common/media/lua/shared/"
                 / "DTCommon/ConvoEngine/Packs/"
-                "Psdl/Dialogue/Trading.lua"
+                "Dialogue/Trading.lua"
             )
             manifest_lua = registry.with_name("Manifest.lua")
             self.assertTrue(registry.is_file())
@@ -306,7 +307,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             self.assertTrue(manifest_lua.is_file())
             self.assertTrue(
                 any(
-                    path.name == "Greeting.json"
+                    path.name == "UI.json"
                     and "DTCommon/common/media/translation" in str(path)
                     for path in paths
                 )

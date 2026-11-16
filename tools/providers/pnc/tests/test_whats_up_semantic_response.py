@@ -29,7 +29,7 @@ class WhatsUpSemanticResponseTests(unittest.TestCase):
         ]
         self.assertTrue(npc_messages)
         payload = npc_messages[-1]["payload"]
-        self.assertTrue(payload.get("semanticTemplateID", "").startswith("semantic.question.whats_up."))
+        self.assertTrue(payload.get("semanticTemplateID", "").startswith("question.whats_up."))
         self.assertNotEqual(payload.get("text"), "Let me think about that.")
 
     def test_whats_up_uses_grounded_semantic_realization(self) -> None:
@@ -45,10 +45,10 @@ class WhatsUpSemanticResponseTests(unittest.TestCase):
         self.assertTrue(npc_messages)
         payload = npc_messages[-1]["payload"]
         self.assertTrue(payload.get("text"))
-        self.assertNotEqual(payload.get("semanticTemplateID"), "semantic.question.received")
+        self.assertNotEqual(payload.get("semanticTemplateID"), "question.received")
         self.assertNotEqual(payload.get("text"), "Let me think about that.")
         self.assertTrue(
-            payload.get("semanticTemplateID", "").startswith("semantic.question.whats_up.")
+            payload.get("semanticTemplateID", "").startswith("question.whats_up.")
         )
 
 

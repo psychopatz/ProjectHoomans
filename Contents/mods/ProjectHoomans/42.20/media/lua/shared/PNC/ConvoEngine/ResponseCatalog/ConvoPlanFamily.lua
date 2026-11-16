@@ -75,6 +75,13 @@ local function appendLocalizedLines(phrases, installAs, styleKey, localized, bas
             local contentKey = (#localized == 1 and type(explicitKey) == "string" and explicitKey ~= "")
                 and explicitKey
                 or ("conversation.content.semantic." .. installAs .. "." .. styleToken .. "." .. seq)
+            if hasTranslations and PNC and PNC.Translation
+                and type(PNC.Translation.RegisterInlineText) == "function"
+            then
+                for langCode, text in pairs(translationsByLang) do
+                    PNC.Translation.RegisterInlineText(langCode, contentKey, text)
+                end
+            end
             phrases[#phrases + 1] = {
                 id = "phrase." .. installAs .. "." .. styleKey .. "." .. seq,
                 key = contentKey,

@@ -40,7 +40,7 @@ local function register()
                 { path = "stimulus.semantic.intent", op = "eq", value = "FIXTURE_EXPLAIN" },
                 { path = "stimulus.semantic.intent", op = "eq", value = "FIXTURE_REPAIR" },
             } } } },
-        outputs = { speech = { dialogueAct = "ACKNOWLEDGE", contentTemplateID = "semantic.social.acknowledged" } },
+        outputs = { speech = { dialogueAct = "ACKNOWLEDGE", contentTemplateID = "social.acknowledged" } },
     })
     assert(ok, reason)
 end

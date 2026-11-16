@@ -18,16 +18,10 @@ from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-SAVE = Path(
-    "/home/psychopatz/Zomboid/Saves/Apocalypse/"
-    "2026-10-14_13-57-03/global_mod_data.bin"
-)
-
-
 class InventoryGiftWorkbenchTests(SemanticLabGuiTestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_gift_uses_production_route_and_resets_working_world(self) -> None:
-        self.require_supported_save()
+        save_path = self.install_synthetic_save_root()
         root = tk.Tk()
         app = self.make_gui_app(root)
         root.geometry("1080x700")
@@ -49,7 +43,7 @@ class InventoryGiftWorkbenchTests(SemanticLabGuiTestCase):
             selected_entry = next(
                 entry
                 for entry in app.saved_world_entries
-                if Path(str(entry["path"])).resolve() == SAVE.resolve()
+                if Path(str(entry["path"])).resolve() == save_path.resolve()
             )
             source_path = Path(str(selected_entry["path"]))
             before_hash = sha256(source_path.read_bytes()).hexdigest()

@@ -15,13 +15,15 @@ from tools.providers.pnc.runtime.player_engine_state import (
     OfflinePlayerEngineStateProvider,
 )
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
-from tools.providers.pnc.tests.gui_test_support import require_supported_save
+from tools.providers.pnc.tests.gui_test_support import (
+    install_synthetic_save_root,
+)
 
 
 class ActorInspectorsTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_import_populates_shared_player_and_npc_inspectors(self) -> None:
-        require_supported_save(self)
+        save_path = install_synthetic_save_root(self)
         state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-actor-inspector-ui-")
         state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
@@ -50,7 +52,8 @@ class ActorInspectorsTests(unittest.TestCase):
             selected_entry = next(
                 entry
                 for entry in app.saved_world_entries
-                if provider.project(Path(str(entry["path"]))).get("available")
+                if Path(str(entry["path"])).resolve() == save_path.resolve()
+                and provider.project(Path(str(entry["path"]))).get("available")
             )
             source_path = Path(str(selected_entry["path"]))
             before = sha256(source_path.read_bytes()).hexdigest()

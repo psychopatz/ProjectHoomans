@@ -33,7 +33,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         self.assertEqual(turn["llmCalls"], 0)
         self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
-        expected_messages = 2 if response_prefix == "semantic.flow.greeting.opening" else 1
+        expected_messages = 2 if response_prefix == "flow.greeting.opening" else 1
         self.assertEqual(len(turn["messages"]), expected_messages)
         if expected_messages > 1:
             self.assertEqual(
@@ -46,7 +46,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         cases = (
             (
                 "greeting_default", {}, "hello there", "GREET", None,
-                "pnc.social.greet", "semantic.flow.greeting.opening",
+                "pnc.social.greet", "flow.greeting.opening",
             ),
             (
                 "wellbeing_injured", {
@@ -58,7 +58,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
                     },
                 }, "Are you okay?", "QUESTION", "WELLBEING",
                 "pnc.question.wellbeing_okay",
-                "semantic.question.wellbeing.injured",
+                "question.wellbeing.injured",
             ),
             (
                 "activity_fishing", {
@@ -68,7 +68,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
                         "conditionStats": {},
                     },
                 }, "What are you doing?", "QUESTION", "ACTIVITY",
-                "pnc.question.activity", "semantic.question.activity.fishing",
+                "pnc.question.activity", "question.activity.fishing",
             ),
             (
                 "time_default", {}, "What time is it?", "QUESTION", "TIME",
@@ -107,7 +107,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
             intent="QUESTION",
             subject="IDENTITY",
             pattern="pnc.question.identity",
-            response_prefix="semantic.question.identity",
+            response_prefix="question.identity",
         )
         self.assertTrue(second["accepted"], second.get("reason"))
         second_result = second["result"]
@@ -162,7 +162,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
             intent="QUESTION",
             subject="WELLBEING",
             pattern="pnc.question.wellbeing_okay",
-            response_prefix="semantic.question.wellbeing.injured",
+            response_prefix="question.wellbeing.injured",
         )
         self.assertTrue(second["accepted"], second.get("reason"))
         second_result = second["result"]

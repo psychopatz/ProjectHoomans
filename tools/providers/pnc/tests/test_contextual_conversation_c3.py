@@ -112,7 +112,7 @@ class ContextualConversationC3Tests(unittest.TestCase):
 
         response = turn["result"]["decision"]["response"]
         self.assertEqual(
-            response["templateID"], "semantic.question.wellbeing.unknown"
+            response["templateID"], "question.wellbeing.unknown"
         )
         self.assertEqual(response["plan"]["groundedFactRefs"], [])
         self.assertNotIn("hurt", turn["messages"][0]["payload"]["fallback"])

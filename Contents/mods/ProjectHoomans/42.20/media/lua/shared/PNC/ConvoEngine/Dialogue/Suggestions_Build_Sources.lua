@@ -203,6 +203,11 @@ function Internal.CollectSuggestionBuildSources(state)
     local typedEligible = result.accepted == true
         and subject ~= ""
         and ir.kind ~= "semantic_click_frame"
+    local staticProvider = Internal.StaticProvider
+    local staticDefinitions = staticProvider
+        and type(staticProvider.GetDefinitions) == "function"
+        and staticProvider.GetDefinitions(context)
+        or DEFINITIONS
     if typedEligible and currentTopic then
         if subject == "WELLBEING" then
             addCandidate(
@@ -210,7 +215,7 @@ function Internal.CollectSuggestionBuildSources(state)
                 "typed_input", revision, "wellbeing_follow_up"
             )
         end
-        for _, definition in ipairs(DEFINITIONS) do
+        for _, definition in ipairs(staticDefinitions) do
             if topicMatches(definition, currentTopic)
                 and definition.hubOnly ~= true
                 and not (pendingIdentity and subject == "IDENTITY")

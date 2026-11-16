@@ -112,7 +112,7 @@ class ConversationalCompetenceC7CTests(unittest.TestCase):
         self.assertEqual(question["result"]["ir"]["subject"], "NPC_HEALTH_STATE")
         self.assertEqual(
             acknowledged["result"]["decision"]["response"]["templateID"],
-            "semantic.conversation.acknowledged.default",
+            "conversation.acknowledged.default",
         )
         self.assertEqual(
             acknowledged["contextAfter"]["dialogue"]["currentTopic"],

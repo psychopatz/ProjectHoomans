@@ -33,7 +33,7 @@ class SemanticParaphraseTests(unittest.TestCase):
         self.assertEqual(decision["route"], "deterministic")
         self.assertTrue(
             decision["response"]["templateID"].startswith(
-                "semantic.question.wellbeing."
+                "question.wellbeing."
             )
         )
         self.assertEqual(turn["llmCalls"], 0)

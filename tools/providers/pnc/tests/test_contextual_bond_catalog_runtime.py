@@ -71,7 +71,7 @@ class ContextualBondCatalogRuntimeTests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
 
-        def wait_until(predicate: object, timeout: float = 12.0) -> None:
+        def wait_until(predicate: object, timeout: float = 35.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()

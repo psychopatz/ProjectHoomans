@@ -40,7 +40,7 @@ class ContextualConversationC0Tests(unittest.TestCase):
         )
         self.assertEqual(
             turns[2]["result"]["decision"]["response"]["templateID"],
-            "semantic.question.needs.offer.unknown",
+            "question.needs.offer.unknown",
         )
         self.assertEqual(
             turns[2]["contextAfter"]["dialogue"]["pendingFollowUp"][
@@ -51,7 +51,7 @@ class ContextualConversationC0Tests(unittest.TestCase):
         self.assertEqual(turns[3]["result"]["ir"]["subject"], "QUANTITY")
         self.assertEqual(
             turns[3]["result"]["decision"]["response"]["templateID"],
-            "semantic.question.needs.quantity.unknown",
+            "question.needs.quantity.unknown",
         )
         quantity_pending = turns[3]["contextAfter"]["dialogue"][
             "pendingFollowUp"
@@ -73,7 +73,7 @@ class ContextualConversationC0Tests(unittest.TestCase):
         self.assertIsNone(turns[4]["result"]["ir"].get("action"))
         self.assertEqual(
             turns[4]["result"]["decision"]["response"]["templateID"],
-            "semantic.question.needs.proposal.unknown",
+            "question.needs.proposal.unknown",
         )
         self.assertEqual(
             turns[4]["result"]["decision"]["response"]["plan"][
@@ -113,7 +113,7 @@ class ContextualConversationC0Tests(unittest.TestCase):
         )
         self.assertEqual(
             turns[6]["result"]["decision"]["response"]["templateID"],
-            "semantic.question.needs.proposal.unknown",
+            "question.needs.proposal.unknown",
         )
         self.assertEqual(
             turns[6]["observation"]["flow"]["transition"], "resume_match"

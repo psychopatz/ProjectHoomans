@@ -476,6 +476,9 @@ function Realization.Apply(response, context)
         output.semanticTemplateID = output.templateID
         output.renderTemplateID = segment.templateID or resolved.templateID
         output.fallback = segment.fallback or resolved.fallback
+        if segment.enFallback ~= nil and segment.enFallback ~= "" then
+            output.enFallback = segment.enFallback
+        end
         output.realizationFamily = resolved.family
         output.realizationVariant = resolved.variant
         output.realizationFallbackReason = resolved.fallbackReason

@@ -545,7 +545,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         self.assertTrue(queued)
         self.assertEqual(
             turn["observation"]["response"]["templateID"],
-            "semantic.question.identity.known",
+            "question.identity.known",
         )
         self.assertIn("already know each other", queued[0]["text"])
 

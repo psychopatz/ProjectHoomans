@@ -68,11 +68,11 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
         )
         self.assertEqual(
             model["locations"]["beat.argument_escalation"]["sourceShard"],
-            "beats/social/argument_escalation.json",
+            "beat/social/argument_escalation.json",
         )
         self.assertEqual(
             model["locations"]["behavior.warn"]["sourceShard"],
-            "behaviors/social/warn.json",
+            "behavior/social/warn.json",
         )
         for record in [*model["beats"], *model["behaviors"]]:
             self.assertEqual(record["domain"], "social")
@@ -114,10 +114,10 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             path = (
                 repository
                 / CONVERSATION_SOURCE_RELATIVE
-                / "beats/social/argument_escalation.json"
+                / "beat/social/argument_escalation.json"
             )
             document = json.loads(path.read_text(encoding="utf-8"))
-            document["beats"][0]["candidates"][0]["behavior"] = "behavior.missing"
+            document["candidates"][0]["behavior"] = "behavior.missing"
             path.write_text(
                 json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
                 + "\n",
@@ -134,13 +134,13 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             manifest_path = source_root / "manifest.json"
             manifest_before = manifest_path.read_bytes()
             sample = json.loads(
-                (source_root / "behaviors/social/warn.json").read_text(
+                (source_root / "behavior/social/warn.json").read_text(
                     encoding="utf-8"
                 )
             )
-            sample["behaviors"][0]["id"] = "behavior.discovery_probe"
-            sample["behaviors"][0]["act"] = "DISCOVERY_PROBE"
-            (source_root / "behaviors/social/discovery_probe.json").write_text(
+            sample["id"] = "discovery_probe"
+            sample["act"] = "DISCOVERY_PROBE"
+            (source_root / "behavior/social/discovery_probe.json").write_text(
                 json.dumps(sample, ensure_ascii=False, indent=2, sort_keys=True)
                 + "\n",
                 encoding="utf-8",
@@ -157,7 +157,7 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             self.assertEqual(manifest_path.read_bytes(), manifest_before)
             self.assertEqual(
                 model["locations"]["behavior.discovery_probe"]["sourceShard"],
-                "behaviors/social/discovery_probe.json",
+                "behavior/social/discovery_probe.json",
             )
 
     def test_dialogue_content_locale_discovery_remains_data_driven(self) -> None:
@@ -167,10 +167,10 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
             path = (
                 source_root
-                / "content/social/interaction/argument/retaliate.json"
+                / "dialogue/core_text_social_departure/departure_confirmed.json"
             )
             document = json.loads(path.read_text(encoding="utf-8"))
-            document["phraseFamilies"][0]["styles"]["neutral"][0][
+            document["metadata"]["textRows"][0]["text"][
                 "XX"
             ] = "Synthetic interaction wording."
             path.write_text(
@@ -188,14 +188,14 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             )
             self.assertTrue(
                 any(
-                    "Social" in owner_catalogs.get("XX", {})
+                    "Text/social/departure/response" in owner_catalogs.get("XX", {})
                     for owner_catalogs in catalogs.values()
                 )
             )
             self.assertTrue(
                 any(
-                    "conversation.content.semantic.interaction.argument.retaliate.neutral.01"
-                    in owner_catalogs.get("XX", {}).get("Social", {})
+                    "departure.confirmed"
+                    in owner_catalogs.get("XX", {}).get("Text/social/departure/response", {})
                     for owner_catalogs in catalogs.values()
                 )
             )

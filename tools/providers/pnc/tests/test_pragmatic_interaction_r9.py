@@ -14,6 +14,7 @@ from tools.semantic_harness.ui.interaction_inspector import interaction_summary
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class PragmaticInteractionR9Tests(unittest.TestCase):
@@ -27,11 +28,11 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
         refs = _behavior_content_refs(behavior)
         self.assertEqual(
             refs["speech"],
-            "semantic.interaction.memory.acknowledge",
+            "interaction.memory.acknowledge",
         )
         self.assertEqual(
             refs["flavor"],
-            "semantic.interaction.memory.acknowledge_flavor",
+            "interaction.memory.acknowledge_flavor",
         )
         self.assertNotIn("translations", behavior)
         self.assertNotIn("fallback", behavior)
@@ -62,7 +63,7 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
         self.assertTrue(
             any(
                 path.endswith(
-                    "Generated/Conversation/Behaviors/Social/AcknowledgeMemory.lua"
+                    "PsychopatzCore/ConvoEngine/Behaviors/Director/Social.lua"
                 )
                 for path in report["changedGeneratedPaths"]
             ),
@@ -70,11 +71,13 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
         )
 
         speech = current["outputs"]["speech"]
-        content = service.load_dialogue_content(
-            "phrase.semantic.interaction.memory.acknowledge"
+        content = service.dispatch_operation(
+            "convo.get",
+            {"target": speech["contentTemplateID"]},
         )
+        self.assertTrue(content["ok"] and content["found"], content)
         self.assertEqual(
-            content["semanticTemplateID"],
+            content["canonicalID"],
             speech["contentTemplateID"],
         )
         self.assertNotIn("styles", current)
@@ -108,12 +111,12 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
 
     def test_developer_surface_links_structure_to_dialogue_content(self) -> None:
         builder = (
-            REPOSITORY
-            / "tools/providers/pnc/ui/studio_surface_builder.py"
+            CORE_REPOSITORY
+            / "tools/semantic_harness/ui/studio_surface_builder.py"
         ).read_text(encoding="utf-8")
         content_pane = (
-            REPOSITORY
-            / "tools/providers/pnc/studio/dialogue_content_pane.py"
+            CORE_REPOSITORY
+            / "tools/semantic_harness/studio/dialogue_content_pane.py"
         ).read_text(encoding="utf-8")
         self.assertIn('text="Interaction Modules"', builder)
         self.assertNotIn('text="Beat Studio"', builder)

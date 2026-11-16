@@ -18,7 +18,7 @@ class PackageEntrypointTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("usage:", result.stdout)
         self.assertIn(
-            "Core-owned provider-neutral semantic dialogue harness",
+            "Tkinter chat UI and CLI for the real-Lua semantic dialogue harness.",
             result.stdout,
         )
 

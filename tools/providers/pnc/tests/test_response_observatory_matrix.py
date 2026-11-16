@@ -20,11 +20,11 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         result = run_quality_matrix([
             {"label": "EN greeting", "language": "EN",
              "utterance": "hello",
-             "expected": {"lastSemanticKey": "semantic.flow.greeting.opening.question.default",
+             "expected": {"lastSemanticKey": "flow.greeting.opening.question.default",
                           "maxActions": 0}},
             {"label": "TL greeting", "language": "TL",
              "utterance": "hello",
-             "expected": {"lastSemanticKey": "semantic.flow.greeting.opening.question.default",
+             "expected": {"lastSemanticKey": "flow.greeting.opening.question.default",
                           "maxActions": 0}},
             {"label": "follow request", "language": "EN",
              "utterance": "follow me",
@@ -223,8 +223,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         }
         owner = (
             "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-            "Semantics/SemanticDialogueResponseCatalog/"
-            "PNC_SemanticDialogueResponseCatalog_FlowGreeting.lua"
+            "ConvoEngine/ResponseCatalog/FlowGreeting.lua"
         )
         for language in ("EN", "TL"):
             with self.subTest(language=language), LuaSemanticWorker(
@@ -272,7 +271,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                     message
                     for message in turn["messages"]
                     if message.get("payload", {}).get("semanticTemplateID")
-                    == "semantic.flow.greeting.opening.default"
+                    == "flow.greeting.opening.default"
                 )
                 self.assertEqual(selected["payload"]["text"], expected[language])
                 self.assertNotEqual(selected["payload"]["text"], old[language])
@@ -287,7 +286,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     response["templateID"],
-                    "semantic.flow.greeting.opening.default",
+                    "flow.greeting.opening.default",
                 )
                 self.assertEqual(response["sourceFlowID"], "greeting")
                 self.assertEqual(response["flowTransition"], "start")
@@ -543,6 +542,9 @@ class ObservatoryTkTests(unittest.TestCase):
                 self.assertIn("semantic.flow.greeting.opening.rain",
                     pane.views["Catalog"].get("1.0", "end"))
         finally:
+            pane = None
+            import gc
+            gc.collect()
             root.destroy()
 
     def test_review_widget_previews_isolated_real_lua_candidate(self):
@@ -602,6 +604,9 @@ class ObservatoryTkTests(unittest.TestCase):
                     pane.approve_candidate()
                     self.assertIn("Explicit review decision: APPROVE", pane.views["Review"].get("1.0", "end"))
             finally:
+                pane = None
+                import gc
+                gc.collect()
                 root.destroy()
 
 

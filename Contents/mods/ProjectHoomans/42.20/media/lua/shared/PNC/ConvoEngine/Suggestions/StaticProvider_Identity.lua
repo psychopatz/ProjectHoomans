@@ -173,18 +173,24 @@ local function realizeIdentityChoiceText(familyID, slotValue, context, choice, c
         language = context.language or activeLanguage(),
     }
     local labelText = affordance.RenderRoleText(plan, "button_label", slotContext, options)
+    local enLabelText = options.language == "EN" and labelText
+        or affordance.RenderRoleText(plan, "button_label", slotContext, {
+            seed = options.seed,
+            index = options.index,
+            language = "EN",
+        })
     local speechText, speechErr = affordance.RenderRoleText(
         plan, "spoken_action", slotContext, options
     )
     if type(speechText) ~= "string" or trimText(speechText) == "" then
-        return nil, labelText, speechErr or "initiating_say_missing"
+        return nil, labelText, speechErr or "initiating_say_missing", enLabelText
     end
-    return speechText, labelText, nil
+    return speechText, labelText, nil, enLabelText
 end
 
 local function identityChoiceCandidate(
     Provider, id, labelKey, labelFallback, utteranceKey, utteranceFallback,
-    choice, frame
+    choice, frame, labelDisplay
 )
     return {
         id = id,
@@ -207,7 +213,7 @@ local function identityChoiceCandidate(
         display = {
             labelKey = labelKey,
             labelFallback = labelFallback,
-            label = labelFallback,
+            label = labelDisplay or labelFallback,
             utteranceKey = utteranceKey,
             utteranceFallback = utteranceFallback,
             utterance = utteranceFallback,
@@ -221,14 +227,16 @@ local function buildIdentityOption(Provider, context, spec)
         mode = spec.claimMode,
         name = spec.claimedName,
     } or nil
-    local speechText, realizedLabel = realizeIdentityChoiceText(
+    local speechText, realizedLabel, _err, enLabel = realizeIdentityChoiceText(
         spec.familyID, slotValue, context, spec.choice, spec.claimedName
     )
     if type(speechText) ~= "string" or trimText(speechText) == "" then
         return nil
     end
-    local labelFallback = (type(realizedLabel) == "string" and trimText(realizedLabel) ~= "")
-        and realizedLabel or spec.fallbackLabel
+    local labelFallback = (type(enLabel) == "string" and trimText(enLabel) ~= "")
+        and enLabel or spec.fallbackLabel
+    local labelDisplay = (type(realizedLabel) == "string" and trimText(realizedLabel) ~= "")
+        and realizedLabel or labelFallback
     local socialContext = {}
     if spec.intent == "INFORM" then socialContext.identityClaim = true end
     local frame = {
@@ -269,7 +277,8 @@ local function buildIdentityOption(Provider, context, spec)
         nil,
         speechText,
         spec.rank,
-        frame
+        frame,
+        labelDisplay
     )
 end
 

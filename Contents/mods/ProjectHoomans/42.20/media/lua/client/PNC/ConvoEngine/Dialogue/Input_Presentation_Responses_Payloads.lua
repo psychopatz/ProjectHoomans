@@ -17,49 +17,91 @@ local SpeechRealization = require
 local ResponseAdapter = Internal.ResponseAdapter or {}
 Internal.ResponseAdapter = ResponseAdapter
 
-local function localizedSegment(templateID, fallback, args)
+local function resolveTemplateArg(args, token)
+    if type(args) ~= "table" or type(token) ~= "string" or token == "" then
+        return nil
+    end
+    local direct = args[token]
+    if direct ~= nil and type(direct) ~= "table" then
+        return direct
+    end
+    local cursor = args
+    for part in string.gmatch(token, "[^%.]+") do
+        if type(cursor) ~= "table" then
+            cursor = nil
+            break
+        end
+        cursor = cursor[part]
+    end
+    if cursor ~= nil and type(cursor) ~= "table" then
+        return cursor
+    end
+    return nil
+end
+
+local function formatTemplateText(text, args)
+    text = tostring(text or "")
+    args = type(args) == "table" and args or {}
+    if text ~= "" and string.find(text, "{", 1, true) then
+        text = string.gsub(text, "{([%w_.]+)}", function(token)
+            local resolved = resolveTemplateArg(args, token)
+            if resolved ~= nil and tostring(resolved) ~= "" then
+                return tostring(resolved)
+            end
+            return "{" .. token .. "}"
+        end)
+    end
+    local firstArg = args.familyAddress or args.familyTerm or args.npcName
+        or args.target or args.object or args.location or args.topic
+        or args.content or args.value
+    if type(firstArg) == "table" then firstArg = nil end
+    if firstArg ~= nil and firstArg ~= "" then
+        text = string.gsub(text, "%%1", function() return tostring(firstArg) end)
+        text = string.gsub(text, "%%s", function() return tostring(firstArg) end)
+    elseif string.find(text, "%%s, ", 1, true) == 1 then
+        text = string.gsub(text, "^%%s, ", "")
+        local first = string.sub(text, 1, 1)
+        if first ~= "" then
+            text = string.upper(first) .. string.sub(text, 2)
+        end
+    end
+    return text
+end
+
+local function localizedSegment(templateID, fallback, args, segment)
     local response = {
         templateID = templateID,
         fallback = fallback,
         args = args,
     }
     fallback = tostring(fallback or "")
+    local enFallback = tostring(
+        (type(segment) == "table" and segment.enFallback) or fallback
+    )
     args = type(args) == "table" and args or {}
     local firstArg = args.familyAddress or args.familyTerm or args.npcName
         or args.target or args.object or args.location or args.topic
         or args.content or args.value
     if type(firstArg) == "table" then firstArg = nil end
-    local function formatFallbackText(text)
-        text = tostring(text or "")
-        if firstArg ~= nil and firstArg ~= "" then
-            text = string.gsub(text, "%%1", function() return tostring(firstArg) end)
-            text = string.gsub(text, "%%s", function() return tostring(firstArg) end)
-        elseif string.find(text, "%%s, ", 1, true) == 1 then
-            text = string.gsub(text, "^%%s, ", "")
-            local first = string.sub(text, 1, 1)
-            if first ~= "" then
-                text = string.upper(first) .. string.sub(text, 2)
-            end
-        end
-        return text
-    end
     local key = Internal.SemanticTranslationKey(response)
     local translation = PNC.Translation
     if not key or not translation
         or type(translation.TrFormat) ~= "function"
     then
-        return formatFallbackText(fallback), key
+        return formatTemplateText(fallback, args), key
     end
-    local formattedFallback = formatFallbackText(fallback)
+    local formattedFallback = formatTemplateText(enFallback, args)
     local ok, value = pcall(translation.TrFormat, key, formattedFallback, firstArg)
     if ok and value ~= nil and tostring(value) ~= "" then
-        return formatFallbackText(tostring(value)), key
+        return formatTemplateText(tostring(value), args), key
     end
-    return formattedFallback, key
+    return formatTemplateText(fallback, args), key
 end
 
-local function fallbackSegment(templateID, fallback)
-    return fallback, nil
+local function fallbackSegment(templateID, fallback, args, segment)
+    local englishFallback = (type(segment) == "table" and segment.enFallback)
+        or fallback
+    return formatTemplateText(englishFallback, args), nil
 end
 
 local function payloadForPlanTurn(response, rendered, fallbackRendered)
@@ -161,20 +203,22 @@ local function payloadsForResponse(response)
     end
 
     local fallback = tostring(response.fallback or "")
+    local enFallback = tostring(response.enFallback or fallback)
     local renderTemplateID = response.renderTemplateID or response.templateID
     local text, translationKey = localizedSegment(
         renderTemplateID,
         fallback,
-        response.args
+        response.args,
+        response
     )
     return {
         {
             key = response.templateID,
-            semanticTemplateID = response.semanticVariantID
+            semanticTemplateID = response.semanticTemplateID
                 or response.templateID,
             domain = "pnc.semantic.dialogue",
             text = text ~= "" and text or nil,
-            fallback = fallback,
+            fallback = formatTemplateText(enFallback, response.args),
             args = response.args,
             translationKey = translationKey,
             plan = response.plan,

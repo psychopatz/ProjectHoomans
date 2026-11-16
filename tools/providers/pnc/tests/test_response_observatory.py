@@ -40,14 +40,14 @@ class ResponseObservatoryTests(unittest.TestCase):
             authored = worker.response_pool_detail(
                 "semantic.flow.greeting.opening", limit=16)
             self.assertEqual(authored["sourceKind"], "AUTHORED_LUA")
-            self.assertIn("_FlowGreeting.lua", authored["sourcePath"])
+            self.assertIn("FlowGreeting.lua", authored["sourcePath"])
             self.assertTrue(all(v["sourcePath"] == authored["sourcePath"]
                                 for v in authored["variants"]))
             generated = worker.response_pool_detail(
                 "semantic.generated.simple_command.follow.queued", limit=16)
             self.assertEqual(generated["sourceKind"],
                              "GENERATED_REGISTRATION_SITE")
-            self.assertIn("AutomaticFlowGenerator_Registration.lua",
+            self.assertIn("FlowGenerator_Registration.lua",
                           generated["sourcePath"])
             self.assertNotEqual(generated["sourceKind"], "AUTHORED_LUA")
             lineage = generated["generatedActionLineage"]

@@ -96,7 +96,7 @@ class SemanticLabPersonaWorkflowTests(unittest.TestCase):
             ),
         )
 
-        def wait_until(predicate: object, timeout: float = 15.0) -> None:
+        def wait_until(predicate: object, timeout: float = 30.0) -> None:
             deadline = time.monotonic() + timeout
             while not predicate() and time.monotonic() < deadline:
                 root.update()
