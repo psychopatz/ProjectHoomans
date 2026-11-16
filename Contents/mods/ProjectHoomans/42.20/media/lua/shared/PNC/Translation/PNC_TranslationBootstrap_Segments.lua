@@ -167,6 +167,7 @@ Translation.Internal.SegmentSystems = {
     DiscoveryScan = "Debug",
     Emblem = "Factions",
     EstablishedRelationship = "Character",
+    StartingCompanion = "Character",
     Facilities = "Settlement",
     Facility = "Settlement",
     FactionArchive = "Factions",

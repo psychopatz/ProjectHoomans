@@ -3,6 +3,11 @@
 This job owns the character-creation companion customization system for
 Project Hoomans.
 
+Native user testing exposed a missing entry-point journey after the original
+P5 verification: the companion composer could be effectively unreachable in
+the real creation flow. P5R has now repaired and developer-verified that
+final-screen integration; native P6 acceptance remains user-owned.
+
 The goal is not to build a second NPC creator. The existing debug/Unique NPC
 creator, character-creation companions, presets, and future NPC authoring
 surfaces must converge on one reusable NPC blueprint/composition pipeline.

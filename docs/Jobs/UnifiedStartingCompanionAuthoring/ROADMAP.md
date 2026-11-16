@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5 developer gates complete — P6 native acceptance is user-owned
+**Status:** P5R developer gates complete — P6 native acceptance is user-owned
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -36,37 +36,46 @@ The system must:
 - preserve all current starting-companion relationship behavior, ownership,
   persistence, reconnect idempotence, faction/community assignment, knowledge,
   and relationship baselines;
-- keep the server authoritative in multiplayer.
+- keep the server authoritative in multiplayer;
+- expose companion customization explicitly from the final **Customise
+  Character** screen beside Play rather than surprise-opening it from the
+  profession/trait screen;
+- preserve the original randomized/deterministic starter behavior when the
+  player never authors companion customization.
 
 Target flow:
 
 ```text
-CharacterCreationProfession selected traits
-        |
-        +--> generic character-creation extension notification
-        |
-        v
-Starting Companion creation session
-        |
-        +--> selected trait IDs -> active companion slots
-        +--> player descriptor/social traits -> dynamic preview context
+CharacterCreationProfession
+    select Brother / Sister / Lover / Mom / Dad / Friend
         |
         v
-Reusable NPC Blueprint Composer
-        |
-        +--> sparse authored values
-        +--> relationship/player binding policy
+one creation-session state
+    selected companion trait slots + unresolved blueprints
         |
         v
-NPC Blueprint Resolver
+CharacterCreationMain — final player customization
+    name / surname / sex / skin / hair / appearance / voice
         |
-        +--> debug context: manual/no inherited bindings
-        +--> starting companion context: relationship + player bindings
+        +--> COMPANIONS (explicit optional action)
+        |       |
+        |       v
+        |   shared NPC Blueprint Composer
+        |       |
+        |       v
+        |   resolve preview from CURRENT final-player context
+        |       |
+        |       +--> close -> return to final player screen
         |
-        v
-Concrete normalized NPC definition
-        |
-        +--> debug action OR server-authoritative StartingCompanionService
+        +--> PLAY
+                |
+                +--> no authored companion customization
+                |       -> preserve original default/randomized starter path
+                |
+                +--> authored companion customization
+                        -> validate/stage canonical envelope BEFORE vanilla
+                           world transition
+                        -> server-authoritative StartingCompanionService
 ```
 
 ## Audit conclusion
@@ -164,8 +173,9 @@ SP/MP authority, and implementation order.
 one blueprint/resolver architecture and explicitly forbid a companion-only
 clone of the debug NPC model.
 
-**Current state:** documentation created; user review is still the acceptance
-boundary.
+**Current state:** accepted baseline; subsequent phases P1–P4 were implemented
+and locally committed. P5R developer gates are now implemented and verified;
+native P6 acceptance remains user-owned.
 
 ### P1 — Canonical NPC authoring schema, blueprint, and resolver contract
 
@@ -426,11 +436,85 @@ where the new reusable seam needs it. Do not introduce a second harness runner.
 **Gate:** focused tests pass, changed Lua compiles/verifies using existing
 repository tools, and no regression requires a parallel debug/gameplay model.
 
+### P5R — Final-screen entry-point and optional-customization repair
+
+Native Build 42.20 user testing after the original P5 checkpoint exposed a
+missing end-to-end UX journey. The existing adapter opens the composer only on
+`CharacterCreationProfession.screen_shown`. If no companion trait is active at
+that instant, `OpenComposer()` returns `no_active_companions`; later trait-set
+reconciliation does not reopen it. The implementation can therefore pass
+headless/session tests while the real feature remains undiscoverable.
+
+The current final Play hook also invokes vanilla `NEXT` before calling the
+starter customization submit path. Vanilla can already hide the creation
+screen, initialize the player, create the world, and transition to
+`LoadingQueueState` before Hoomans stages customization. That ordering is not
+an acceptable commit boundary.
+
+P5R must repair the flow without replacing the accepted authoring/resolver and
+server-authority foundations:
+
+- remove automatic composer navigation from profession-screen visibility;
+- add an explicit **COMPANIONS** action beside **PLAY** on
+  `CharacterCreationMain` and its local/co-op equivalent;
+- keep one creation session across profession screen, final player screen, and
+  companion composer; screen object identity must not create a second session;
+- on every Companions open, re-read the actual selected companion traits and
+  current final player descriptor, reconcile the existing session, and rebuild
+  previews from current surname/sex/appearance/orientation;
+- companion customization is opt-in: merely selecting a companion trait does
+  not create an authored customization request;
+- opening and closing the composer without changing anything still preserves
+  the original default/randomized starter path;
+- authoring a field, loading a preset/template, importing/sanitizing a Unique
+  NPC, or explicit Randomize marks the relevant customization as authored;
+- Play performs Hoomans validation/staging **before** vanilla commits the
+  character/world transition; invalid explicitly-authored customization keeps
+  the user on the final character screen with a useful error;
+- no-authored-customization must never block Play and must clear/avoid stale
+  envelopes so `StartingCompanionService` uses its established default path;
+- MP may still transmit after an `IsoPlayer` exists, but the validated intent
+  must already be staged before leaving character creation;
+- normal and `CoopCharacterCreationMain` must share the same semantic action
+  and session ownership even though co-op overrides `onOptionMouseDown`.
+
+Required developer-side UI journey coverage:
+
+1. no companion trait -> Companions unavailable/disabled -> Play succeeds;
+2. companion trait selected, composer never opened -> no authored envelope ->
+   original default/randomized starter behavior;
+3. companion trait selected -> Companions visible/enabled -> editor opens ->
+   edit -> close -> Play -> authored request staged;
+4. open/close without edits -> remains default path;
+5. edit companion -> change player surname/sex/appearance -> reopen -> same
+   blueprint resolves against the new final player context;
+6. Lover preview responds to current orientation/player sex;
+7. Back to profession -> remove/re-add/change companion traits -> return to
+   final screen -> same creation session reconciles without lost unchanged edits;
+8. Randomize marks customization authored and remains deterministic thereafter;
+9. invalid authored data prevents vanilla transition and explains the failure;
+10. local/co-op follows the same Companions action and commit semantics;
+11. SP/MP default path still reaches canonical starter generation;
+12. MP authored path still follows the P4 handshake without duplicate grants.
+
+**Gate:** accepted in the local P5R phase commit. Automated/UI-harness evidence
+proves the button is reachable and the entire profession -> final customization
+-> optional companion editor -> Play journey works for default and authored
+paths in normal + co-op creation. The submit order is pre-commit, one session
+survives the screen transition, and the existing default/randomized path is
+unchanged when customization is skipped. Native validation is deferred to P6.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
 unless the user explicitly delegates native control:
 
+- verify the final Customise Character screen visibly exposes **COMPANIONS**
+  beside Play when companion traits are selected;
+- verify selecting a companion trait and pressing Play without opening/editing
+  Companions preserves the former randomized/default starter behavior;
+- verify opening/closing Companions without changes also preserves that default
+  path;
 - new SP survivor with one and multiple companion traits;
 - change Gay/Bisexual and verify Lover preview/final sex;
 - change player surname/skin/gender after loading a preset and verify final
@@ -447,8 +531,10 @@ unless the user explicitly delegates native control:
 - MP host + remote client with different companion selections;
 - disconnect/reconnect;
 - death -> replacement survivor under the same MP account;
-- local/co-op character creation;
-- missing/invalid customization fallback;
+- local/co-op final-screen Companions button and character creation;
+- invalid explicitly-authored customization remains on the final character
+  screen instead of transitioning first;
+- missing/no customization fallback;
 - old save without new customization fields.
 
 **Gate:** native Build 42.20 proves the UI, final bindings, server authority,
@@ -484,5 +570,12 @@ companions.
 - Do not replace the existing StartingCompanionService spawn/relationship
   lifecycle with the editor.
 - Do not create a separate SP implementation and MP implementation.
+- Do not auto-open the companion composer merely because a profession/trait
+  screen became visible.
+- Do not key the logical creation session to one UI screen object.
+- Do not generate/send a customization envelope merely because a companion
+  trait is selected or the composer was opened and closed unchanged.
+- Do not call vanilla Play/NEXT before validating/staging explicitly-authored
+  companion customization.
 - Do not launch native Project Zomboid or publish Workshop content unless
   explicitly authorized.

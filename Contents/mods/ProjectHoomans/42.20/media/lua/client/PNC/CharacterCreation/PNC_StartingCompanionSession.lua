@@ -118,9 +118,7 @@ local function readPlayerContext(screen, context)
         end
         if output.playerSurname == nil then
             value = readMethod(descriptor, "getSurname")
-            if value ~= nil and tostring(value) ~= "" then
-                output.playerSurname = tostring(value)
-            end
+            if value ~= nil then output.playerSurname = tostring(value) end
         end
         if output.playerFemale == nil then
             value = readMethod(descriptor, "isFemale")
@@ -247,6 +245,25 @@ function Session:GetBlueprint(traitID)
     return slot and Blueprint.Clone(slot.blueprint) or nil
 end
 
+function Session:IsSlotAuthored(traitID)
+    local slot = self:GetSlot(traitID, true)
+    local currentFingerprint
+    local defaultFingerprint
+    if not slot or not slot.active then return false end
+    if not slot.defaultBlueprint then return true end
+    currentFingerprint = Blueprint.Fingerprint(slot.blueprint)
+    defaultFingerprint = Blueprint.Fingerprint(slot.defaultBlueprint)
+    if not currentFingerprint or not defaultFingerprint then return true end
+    return currentFingerprint ~= defaultFingerprint
+end
+
+function Session:HasAuthoredIntent()
+    for _, id in ipairs(self.selectedOrder) do
+        if self:IsSlotAuthored(id) then return true end
+    end
+    return false
+end
+
 function Session:ResolveSlot(traitID, context)
     local slot = self:GetSlot(traitID, true)
     local plan
@@ -281,6 +298,17 @@ function Session:ResolveActive()
         end
     end
     return errors
+end
+
+function Session:ValidateActive()
+    local errors = self:ResolveActive()
+    for _, id in ipairs(self.selectedOrder) do
+        if errors[id] then
+            return false, "slot:" .. tostring(id) .. ":" .. tostring(errors[id]),
+                errors
+        end
+    end
+    return true, nil, errors
 end
 
 function Session:Reconcile(selectedTraitIDs, context)

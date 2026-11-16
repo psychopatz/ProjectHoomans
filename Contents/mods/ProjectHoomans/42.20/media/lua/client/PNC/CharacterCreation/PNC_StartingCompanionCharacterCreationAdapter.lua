@@ -18,9 +18,12 @@ Adapter.MAX_CACHED_EVENTS = 8
 Adapter.MAX_SESSIONS = 4
 Adapter.Session = Adapter.Session or nil
 Adapter.Sessions = Adapter.Sessions or {}
+Adapter.SessionsByPlayerIndex = Adapter.SessionsByPlayerIndex or {}
 Adapter.SessionOrder = Adapter.SessionOrder or {}
 Adapter.EventCache = Adapter.EventCache or {}
 Adapter.PendingEnvelopes = Adapter.PendingEnvelopes or {}
+Adapter.LastPreCommit = Adapter.LastPreCommit or nil
+Adapter.LastOpen = Adapter.LastOpen or nil
 
 local function copyList(source)
     local output = {}
@@ -39,9 +42,7 @@ local function companionTraitIDs(source)
 
     for index = 1, #(source or {}) do
         selectedID = source[index]
-        id = CoreTraits.NormalizeID(
-            selectedID, StartingTraits.OWNER
-        )
+        id = CoreTraits.NormalizeID(selectedID, StartingTraits.OWNER)
         spec = id and StartingTraits.GetDefinition(id) or nil
         if spec then found[id] = true end
     end
@@ -60,112 +61,57 @@ local function cacheEvent(snapshot)
     end
 end
 
-function Adapter.AttachSession(session)
-    if session ~= nil and type(session.HandleCharacterCreationEvent) ~= "function" then
-        return false, "invalid_session"
+local function playerIndexFor(screen)
+    if screen and screen.playerIndex ~= nil then
+        return tonumber(screen.playerIndex) or 0
     end
-    Adapter.Session = session
-    return true
+    if CoopCharacterCreation and CoopCharacterCreation.instance then
+        local instance = CoopCharacterCreation.instance
+        if screen == instance.charCreationProfession
+            or screen == instance.charCreationMain
+        then
+            return tonumber(instance.playerIndex) or 0
+        end
+    end
+    return 0
 end
 
-local function rememberSession(screen, session)
-    if not screen then
-        Adapter.Session = session
-        return session
-    end
-    Adapter.Sessions[screen] = session
-    Adapter.SessionOrder[#Adapter.SessionOrder + 1] = screen
+local function rememberSession(index, session)
+    Adapter.SessionsByPlayerIndex[index] = session
+    Adapter.Session = session
+    Adapter.SessionOrder[#Adapter.SessionOrder + 1] = index
     while #Adapter.SessionOrder > Adapter.MAX_SESSIONS do
         local oldest = table.remove(Adapter.SessionOrder, 1)
-        if oldest ~= screen then Adapter.Sessions[oldest] = nil end
+        if oldest ~= index then Adapter.SessionsByPlayerIndex[oldest] = nil end
     end
     return session
 end
 
-function Adapter.GetSession(screen)
-    local session
-    if screen and Adapter.Sessions[screen] then
-        return Adapter.Sessions[screen]
-    end
-    if screen and Adapter.Session then
-        session = Adapter.Session
-        Adapter.Session = nil
-        return rememberSession(screen, session)
-    end
-    if not screen and Adapter.Session then return Adapter.Session end
-    session = PNC.StartingCompanionSession.New({ screen = screen })
-    return rememberSession(screen, session)
-end
-
-function Adapter.SetSession(screen, session)
-    if session ~= nil
-        and type(session.HandleCharacterCreationEvent) ~= "function"
-    then
-        return false, "invalid_session"
-    end
-    if screen then
-        if session then rememberSession(screen, session) end
-    else
-        Adapter.Session = session
-    end
-    return true
-end
-
-function Adapter.GetLastEvent()
-    return Adapter.EventCache[#Adapter.EventCache]
-end
-
-function Adapter.OpenComposer(screen)
-    local session = Adapter.GetSession(screen)
-    local selected = session and session.GetActiveSlots
-        and session:GetActiveSlots() or {}
-    if #selected == 0 then return nil, "no_active_companions" end
-    if not PsychopatzCore or not PsychopatzCore.UI
-        or not PsychopatzWindow
-    then
-        return nil, "ui_unavailable"
-    end
-    local UIState = require
-        "PNC/UI/StartingCompanions/PNC_StartingCompanionComposerWindow"
-    return UIState.Open(session)
-end
-
-function Adapter.HandleEvent(screen, payload)
-    local session = Adapter.GetSession(screen)
-    local snapshot = {
-        event = payload and payload.event or "",
-        reason = payload and payload.reason or "",
-        screen = screen,
-        selectedTraitIDs = copyList(payload and payload.selectedTraitIDs),
-        selectedCompanionTraitIDs = companionTraitIDs(
-            payload and payload.selectedTraitIDs
-        ),
-    }
-    cacheEvent(snapshot)
-    if snapshot.event == "screen_created"
-        and Customization.ClearLocalEnvelope
-    then
-        local index = tonumber(screen and screen.playerIndex)
-        if index == nil
-            and CoopCharacterCreation and CoopCharacterCreation.instance
-            and CoopCharacterCreation.instance.charCreationProfession == screen
-        then
-            index = tonumber(CoopCharacterCreation.instance.playerIndex) or 0
-        end
+local function clearStaged(index)
+    Adapter.PendingEnvelopes[index] = nil
+    if Customization.ClearLocalEnvelope then
         Customization.ClearLocalEnvelope()
-        Adapter.PendingEnvelopes[index or 0] = nil
     end
-    local result = session:HandleCharacterCreationEvent(snapshot)
-    if snapshot.event == "screen_shown" then
-        Adapter.OpenComposer(screen)
-    elseif snapshot.event == "screen_hidden" then
-        -- The base profession seam is also used by the co-op profession
-        -- screen.  Queue the latest selected-set snapshot here; final player
-        -- identity and server trait state are still resolved authoritatively
-        -- after OnCreatePlayer.
-        Adapter.Submit(screen, { defer = true })
+end
+
+local function professionScreen(screen)
+    if screen and screen.listboxTraitSelected then return screen end
+    if screen and screen.professionScreen then return screen.professionScreen end
+    if CoopCharacterCreation and CoopCharacterCreation.instance
+        and CoopCharacterCreation.instance.charCreationProfession
+    then
+        return CoopCharacterCreation.instance.charCreationProfession
     end
-    return result
+    if MainScreen and MainScreen.instance then
+        return MainScreen.instance.charCreationProfession
+    end
+    return nil
+end
+
+local function selectedTraitIDs(screen)
+    local profession = professionScreen(screen)
+    if not profession then return {}, nil end
+    return Extension.ReadSelectedTraitIDs(profession), profession
 end
 
 local function isRemoteClient()
@@ -176,67 +122,245 @@ local function isRemoteClient()
         and (not isServer or not isServer()) or false
 end
 
-local function playerIndexFor(screen)
-    if screen and screen.playerIndex ~= nil then
-        return tonumber(screen.playerIndex) or 0
+local function refreshSessionFromFinalScreen(screen, reason)
+    local selected
+    local profession
+    local ids
+    local session
+    local result
+
+    if screen and type(screen.initPlayer) == "function" then
+        -- Vanilla keeps name/voice text-entry state in the final-screen
+        -- widgets until initPlayer is called. Rebind before preview or
+        -- pre-commit so surname changes are not one click behind.
+        screen:initPlayer()
     end
-    if CoopCharacterCreation and CoopCharacterCreation.instance
-        and CoopCharacterCreation.instance.charCreationProfession == screen
+    selected, profession = selectedTraitIDs(screen)
+    ids = companionTraitIDs(selected)
+    session = Adapter.GetSession(screen or profession)
+    result = session:HandleCharacterCreationEvent({
+        event = "final_screen_context",
+        reason = reason or "final_screen",
+        screen = screen or profession,
+        selectedTraitIDs = selected,
+        selectedCompanionTraitIDs = ids,
+    })
+    return session, selected, ids, result, profession
+end
+
+function Adapter.GetPlayerIndex(screen)
+    return playerIndexFor(screen)
+end
+
+function Adapter.AttachSession(session)
+    if session ~= nil
+        and type(session.HandleCharacterCreationEvent) ~= "function"
     then
-        return tonumber(CoopCharacterCreation.instance.playerIndex) or 0
+        return false, "invalid_session"
     end
-    return 0
+    Adapter.Session = session
+    if session then
+        Adapter.SessionsByPlayerIndex[0] = session
+    end
+    return true
 end
 
-local function professionScreen(screen)
-    if screen and screen.listboxTraitSelected then return screen end
-    if MainScreen and MainScreen.instance then
-        return MainScreen.instance.charCreationProfession
-    end
-    return screen
+function Adapter.ResetSession(screenOrIndex)
+    local index = type(screenOrIndex) == "number"
+        and screenOrIndex or playerIndexFor(screenOrIndex)
+    Adapter.SessionsByPlayerIndex[index] = nil
+    Adapter.Session = nil
+    clearStaged(index)
+    return true
 end
 
-function Adapter.Submit(screen, options)
-    local profession = professionScreen(screen)
+function Adapter.GetSession(screen)
+    local index = playerIndexFor(screen)
+    local session = Adapter.SessionsByPlayerIndex[index]
+    if not session then
+        session = PNC.StartingCompanionSession.New({
+            playerIndex = index,
+            seedText = "starting-companion-player:" .. tostring(index),
+        })
+        rememberSession(index, session)
+    else
+        Adapter.Session = session
+    end
+    return session
+end
+
+function Adapter.SetSession(screen, session)
+    local index
+    if session ~= nil
+        and type(session.HandleCharacterCreationEvent) ~= "function"
+    then
+        return false, "invalid_session"
+    end
+    index = playerIndexFor(screen)
+    if session then
+        rememberSession(index, session)
+    else
+        Adapter.SessionsByPlayerIndex[index] = nil
+        Adapter.Session = nil
+    end
+    return true
+end
+
+function Adapter.GetLastEvent()
+    return Adapter.EventCache[#Adapter.EventCache]
+end
+
+function Adapter.CanOpenCompanions(screen)
+    local selected = selectedTraitIDs(screen)
+    return #companionTraitIDs(selected) > 0
+end
+
+function Adapter.UpdateFinalActionState(screen)
+    local enabled = Adapter.CanOpenCompanions(screen)
+    local button = screen and screen.pncStartingCompanionButton
+    if button and type(button.setEnable) == "function" then
+        button:setEnable(enabled)
+    end
+    return enabled
+end
+
+function Adapter.ReconcileFinalScreen(screen, reason)
+    return refreshSessionFromFinalScreen(screen, reason)
+end
+
+function Adapter.OpenComposer(screen)
+    local session
     local selected
     local companionIDs
+    local reconciliation
+    local UIState
+    local window
+
+    session, selected, companionIDs, reconciliation =
+        refreshSessionFromFinalScreen(screen, "companions_open")
+    if #companionIDs == 0 then return nil, "no_active_companions" end
+    if not PsychopatzCore or not PsychopatzCore.UI then
+        return nil, "ui_unavailable"
+    end
+    UIState = require
+        "PNC/UI/StartingCompanions/PNC_StartingCompanionComposerWindow"
+    if not UIState or type(UIState.Open) ~= "function" then
+        return nil, "ui_unavailable"
+    end
+    window = UIState.Open(session)
+    Adapter.LastOpen = {
+        screen = screen,
+        selectedTraitIDs = copyList(selected),
+        companionTraitIDs = copyList(companionIDs),
+        reconciliation = reconciliation,
+        session = session,
+        window = window,
+    }
+    return window
+end
+
+function Adapter.HandleEvent(screen, payload)
+    local event = payload and payload.event or ""
+    local index = playerIndexFor(screen)
     local session
-    local envelope
+    local snapshot
+    local result
+
+    if event == "screen_created" then
+        Adapter.ResetSession(index)
+        clearStaged(index)
+    end
+    session = Adapter.GetSession(screen)
+    snapshot = {
+        event = event,
+        reason = payload and payload.reason or "",
+        screen = screen,
+        selectedTraitIDs = copyList(payload and payload.selectedTraitIDs),
+        selectedCompanionTraitIDs = companionTraitIDs(
+            payload and payload.selectedTraitIDs
+        ),
+    }
+    cacheEvent(snapshot)
+    result = session:HandleCharacterCreationEvent(snapshot)
+    if event == "trait_set_changed"
+        or event == "build_loaded"
+        or event == "build_reset"
+        or event == "randomized"
+    then
+        -- A staged envelope belongs to the exact selected-set/context snapshot
+        -- that was pre-committed. Any later build mutation invalidates it.
+        clearStaged(index)
+    end
+    -- screen_shown and screen_hidden only reconcile the session. Navigation
+    -- is an explicit final-screen action, never a visibility side effect.
+    return result
+end
+
+function Adapter.PreCommit(screen)
+    local session
+    local selected
+    local companionIDs
+    local reconciliation
+    local index = playerIndexFor(screen)
+    local authored
+    local valid
     local reason
-    local index
-    local player
-    options = type(options) == "table" and options or {}
-    if not profession then return false, "profession_screen_unavailable" end
-    selected = Extension.ReadSelectedTraitIDs(profession)
-    companionIDs = companionTraitIDs(selected)
-    session = Adapter.GetSession(profession)
-    session:HandleCharacterCreationEvent({
-        event = "submission",
-        reason = "character_creation_commit",
-        screen = profession,
-        selectedTraitIDs = selected,
-        selectedCompanionTraitIDs = companionIDs,
-    })
+    local envelope
+    local decoded
+    local setResult
+
+    session, selected, companionIDs, reconciliation =
+        refreshSessionFromFinalScreen(screen, "character_creation_commit")
+    authored = session:HasAuthoredIntent()
+    clearStaged(index)
+    Adapter.LastPreCommit = {
+        screen = screen,
+        selectedTraitIDs = copyList(selected),
+        companionTraitIDs = copyList(companionIDs),
+        reconciliation = reconciliation,
+        authored = authored,
+        staged = false,
+    }
+    if #companionIDs == 0 or not authored then
+        Adapter.LastPreCommit.reason = "default"
+        return true, "default"
+    end
+
+    valid, reason = session:ValidateActive()
+    if not valid then
+        Adapter.LastPreCommit.reason = reason
+        return false, reason
+    end
     envelope, reason = Customization.BuildEnvelope(session, companionIDs)
-    if not envelope then return false, reason end
-    index = playerIndexFor(profession)
-    Adapter.PendingEnvelopes[index] = envelope
-    if not isRemoteClient() then
-        return Customization.SetLocalEnvelope(envelope)
+    if not envelope then
+        Adapter.LastPreCommit.reason = reason
+        return false, reason
     end
-    if options.defer == true then return true, "queued" end
-    player = getSpecificPlayer and getSpecificPlayer(index) or nil
-    if player and sendClientCommand then
-        sendClientCommand(
-            player,
-            PNC.Const.MODULE,
-            PNC.Const.CMD_STARTING_COMPANION_CUSTOMIZATION,
-            envelope
-        )
+    decoded, reason = Customization.DecodeEnvelope(envelope)
+    if not decoded then
+        Adapter.LastPreCommit.reason = reason
+        return false, reason
+    end
+    if isRemoteClient() then
+        Adapter.PendingEnvelopes[index] = envelope
+    else
+        setResult, reason = Customization.SetLocalEnvelope(envelope)
+        if not setResult then
+            Adapter.LastPreCommit.reason = reason
+            return false, reason
+        end
         Adapter.PendingEnvelopes[index] = nil
-        return true, "sent"
     end
-    return true, "queued"
+    Adapter.LastPreCommit.envelope = envelope
+    Adapter.LastPreCommit.staged = true
+    Adapter.LastPreCommit.reason = "staged"
+    return true, "staged"
+end
+
+-- Keep the old public name as a semantic alias for integrations that already
+-- called the adapter, but make it obey the final-screen pre-commit boundary.
+function Adapter.Submit(screen)
+    return Adapter.PreCommit(screen)
 end
 
 function Adapter.SubmitPending(playerIndex, player)

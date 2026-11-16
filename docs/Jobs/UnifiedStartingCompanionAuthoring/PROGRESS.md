@@ -1,6 +1,6 @@
 # Progress — Unified Starting Companion Authoring
 
-**Status:** P5 developer gates complete; P6 native acceptance is user-owned
+**Status:** P5R developer gates complete — P6 native acceptance is user-owned
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -80,17 +80,101 @@ millisecond-vs-world-age clock boundary are covered.
 - no native Project Zomboid SP/MP session has been run, per repository policy;
 - no Workshop publication or push was performed.
 
+## USER_VERIFIED regression — native entry-point failure
+
+The user tested a new-save character creation in Build 42.20 and reached the
+final **Customise Character** screen, but no usable starting-companion editor
+entry point was visible. The supplied native screenshot shows vanilla final
+character customization with Random and Play controls and no companion action.
+
+`CODE_VERIFIED` audit explains the failure:
+
+- `PNC_StartingCompanionCharacterCreationAdapter.HandleEvent()` calls
+  `OpenComposer()` only on profession `screen_shown`;
+- `OpenComposer()` returns `no_active_companions` when no starter trait is active
+  at that instant;
+- later trait-set events reconcile session state but do not reopen the composer;
+- therefore the feature can remain invisible even though the session/resolver
+  tests pass;
+- `PNC_SocialTraitCharacterCreationPatch` currently wraps
+  `CharacterCreationMain.onOptionMouseDown` by invoking vanilla Play/NEXT first
+  and `Adapter.Submit()` afterward;
+- vanilla NEXT hides the final screen, initializes the player/world, and enters
+  `LoadingQueueState`, so this is the wrong pre-commit ordering;
+- the adapter's current session lookup is screen-object oriented, so a naïve
+  final-screen `GetSession(CharacterCreationMain)` would risk creating a second
+  logical companion session;
+- existing focused tests did not assert the real profession -> final character
+  screen -> visible Companions action -> composer -> return -> Play journey.
+
+The prior P1/P2/P4 foundations remain useful and accepted. P3 functionality is
+implemented but its entry-point UX acceptance was incomplete. P5 verification
+is now insufficient for parent-goal completion because it missed this native
+journey regression.
+
+## P5R target
+
+Repair the character-creation lifecycle so the final screen becomes the explicit
+entry point:
+
+```text
+profession selects companion traits
+        -> one logical creation session
+        -> final Customise Character screen
+        -> optional COMPANIONS button beside Play
+              -> shared composer using CURRENT final player context
+              -> return to final screen
+        -> Play
+              -> skipped/unmodified: original default/randomized path
+              -> authored: validate/stage before vanilla transition
+```
+
+Native P6 acceptance resumes only after P5R automated/UI-harness gates pass.
+Do not launch native PZ or publish Workshop content without explicit user
+authorization.
+
+## P5R — developer acceptance complete
+
+P5R repaired the real final-screen journey without changing the accepted
+authoring, resolver, or P4 authority foundations:
+
+- profession visibility now reconciles only; it never navigates into the
+  composer;
+- normal and co-op final character screens expose an explicit **COMPANIONS**
+  action beside **PLAY**, disabled when no starting-companion trait is active;
+- session identity is keyed by creation player index, so profession, final
+  screen, composer, and back-navigation share one logical session and removed
+  slot caches;
+- every open and Play pre-commit re-reads selected traits and the current final
+  player descriptor, then rebuilds social/orientation and inherited appearance
+  context without mutating blueprint intent;
+- blueprint-vs-default fingerprints make customization opt-in. Skipped and
+  open/close-without-change flows clear/omit customization intent, while edits
+  and explicit Randomize stage canonical authored envelopes;
+- authored Play validates and stages before vanilla NEXT/world transition.
+  Invalid authored state remains on the final screen with a reason; default
+  state never blocks Play. Remote MP keeps the validated envelope pending until
+  the player exists and submits it idempotently;
+- the focused final-screen journey harness covers normal/co-op entry, session
+  continuity, dynamic player rebinding, Lover orientation, back-navigation,
+  Randomize determinism, invalid-state blocking, default paths, and MP pending
+  submission. Existing authoring, preset/import, customization, starter, and
+  authority tests remain green.
+
 ## P6 — native acceptance handoff
 
-The remaining acceptance is user-owned: run the native SP, MP host/remote,
-local/co-op, preset/import, orientation, rebinding, no-reroll, and
-Resolution-Inspector matrix described in `ROADMAP.md`. Developer-side code,
-test, compile, and static gates are complete. Do not launch native PZ or
-publish Workshop content without explicit user authorization.
+The remaining gate is user-owned native Build 42.20 validation: SP, MP
+host/remote, local/co-op, preset/import, orientation, final-player rebinding,
+deterministic preview, Reset/Randomize/Revert, final summary, Resolution
+Inspector, reconnect, replacement-survivor, and no-customization fallback.
+Do not launch native PZ or publish Workshop content without explicit user
+authorization.
 
 ## Repository safety
 
-ProjectHoomans and PsychopatzCore remain on existing `main` branches. No new
-branch, push, Workshop publication, reset, stash, broad staging, or native PZ
-validation was used. Unrelated dirty work remains preserved and is excluded
-from the exact phase commits.
+ProjectHoomans and PsychopatzCore remain on existing `main` branches. Current
+ProjectHoomans HEAD at this audit is `fb4c43ce23ee0106f52dab931f12f817ddb9f991`.
+The worktree contains unrelated active semantic/UI edits; preserve them. No new
+branch, push, Workshop publication, reset, stash, broad staging, or agent-run
+native PZ validation is authorized. The native regression above was supplied by
+the user and is acceptance evidence, not an agent-run native test.
