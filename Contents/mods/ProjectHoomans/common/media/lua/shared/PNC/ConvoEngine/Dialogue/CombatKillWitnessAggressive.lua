@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_witness_aggressive",
             ["sourceId"] = "combat.reaction.kill_witness_aggressive",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
+            ["sourcePath"] = "dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessAggressive",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
+        ["sourceShard"] = "dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "fatigue",
             ["sourceId"] = "question.needs.offer.fatigue",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_offer_fatigue.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_offer_fatigue.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -520,7 +520,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "hunger",
             ["sourceId"] = "question.needs.offer.hunger",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_offer_hunger.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -699,7 +699,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_offer_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -936,7 +936,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "thirst",
             ["sourceId"] = "question.needs.offer.thirst",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_thirst.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_offer_thirst.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -1028,7 +1028,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_thirst.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_offer_thirst.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1166,7 +1166,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "unknown",
             ["sourceId"] = "question.needs.offer.unknown",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_unknown.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_offer_unknown.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -1258,7 +1258,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_unknown.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_offer_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1396,7 +1396,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "hunger",
             ["sourceId"] = "question.needs.proposal.hunger",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_hunger.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_proposal_hunger.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -1488,7 +1488,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_hunger.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_proposal_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1626,7 +1626,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "thirst",
             ["sourceId"] = "question.needs.proposal.thirst",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_thirst.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_proposal_thirst.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -1718,7 +1718,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_thirst.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_proposal_thirst.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1856,7 +1856,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "unknown",
             ["sourceId"] = "question.needs.proposal.unknown",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_unknown.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_proposal_unknown.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -1948,7 +1948,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_unknown.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_proposal_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2086,7 +2086,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "hunger",
             ["sourceId"] = "question.needs.quantity.hunger",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_hunger.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_quantity_hunger.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -2178,7 +2178,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_hunger.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_quantity_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2316,7 +2316,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "thirst",
             ["sourceId"] = "question.needs.quantity.thirst",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_thirst.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_quantity_thirst.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -2408,7 +2408,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_thirst.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_quantity_thirst.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2546,7 +2546,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "unknown",
             ["sourceId"] = "question.needs.quantity.unknown",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_unknown.json",
+            ["sourcePath"] = "dialogue/conversation_needs/question_needs_quantity_unknown.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -2638,7 +2638,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_unknown.json",
+        ["sourceShard"] = "dialogue/conversation_needs/question_needs_quantity_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

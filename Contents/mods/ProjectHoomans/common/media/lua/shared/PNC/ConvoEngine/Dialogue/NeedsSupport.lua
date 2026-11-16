@@ -9,7 +9,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "support",
             ["sourceId"] = "needs.member.support",
-            ["sourcePath"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
+            ["sourcePath"] = "dialogue/needs_support/needs_member_support.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
@@ -380,7 +380,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
+        ["sourceShard"] = "dialogue/needs_support/needs_member_support.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -397,7 +397,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "support",
             ["sourceId"] = "needs.neutral.support",
-            ["sourcePath"] = "adopters/hoomans/dialogue/needs_support/needs_neutral_support.json",
+            ["sourcePath"] = "dialogue/needs_support/needs_neutral_support.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
@@ -768,7 +768,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_neutral_support.json",
+        ["sourceShard"] = "dialogue/needs_support/needs_neutral_support.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,7 +785,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "support",
             ["sourceId"] = "needs.special.support",
-            ["sourcePath"] = "adopters/hoomans/dialogue/needs_support/needs_special_support.json",
+            ["sourcePath"] = "dialogue/needs_support/needs_special_support.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
@@ -1156,7 +1156,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_special_support.json",
+        ["sourceShard"] = "dialogue/needs_support/needs_special_support.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

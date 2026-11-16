@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "corpse.reaction.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
+            ["sourcePath"] = "dialogue/event_reactions_corpse/corpse_reaction_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
+        ["sourceShard"] = "dialogue/event_reactions_corpse/corpse_reaction_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "revenge",
             ["sourceId"] = "corpse.reaction.revenge",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
+            ["sourcePath"] = "dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
+        ["sourceShard"] = "dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.reaction.kill_killer_aggressive",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
+        ["source"] = "dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
     },
 }

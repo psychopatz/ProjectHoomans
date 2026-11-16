@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_shaken",
             ["sourceId"] = "combat.reaction.kill_killer_shaken",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
+            ["sourcePath"] = "dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerShaken",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
+        ["sourceShard"] = "dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

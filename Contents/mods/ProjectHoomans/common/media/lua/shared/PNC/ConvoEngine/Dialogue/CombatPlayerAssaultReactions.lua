@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "aggressive",
             ["sourceId"] = "combat.player_assaulted.aggressive",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
+            ["sourcePath"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
+        ["sourceShard"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "brave",
             ["sourceId"] = "combat.player_assaulted.brave",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_brave.json",
+            ["sourcePath"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_brave.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_brave.json",
+        ["sourceShard"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "combat.player_assaulted.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_default.json",
+            ["sourcePath"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_default.json",
+        ["sourceShard"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,7 +785,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "reserved",
             ["sourceId"] = "combat.player_assaulted.reserved",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_reserved.json",
+            ["sourcePath"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_reserved.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
@@ -877,7 +877,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_reserved.json",
+        ["sourceShard"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_reserved.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1015,7 +1015,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "shaken",
             ["sourceId"] = "combat.player_assaulted.shaken",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_shaken.json",
+            ["sourcePath"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_shaken.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
@@ -1107,7 +1107,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_shaken.json",
+        ["sourceShard"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

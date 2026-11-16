@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "abandonment",
             ["sourceId"] = "companion.reaction.abandonment",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_abandonment.json",
+            ["sourcePath"] = "dialogue/event_reactions_companion/companion_reaction_abandonment.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_abandonment.json",
+        ["sourceShard"] = "dialogue/event_reactions_companion/companion_reaction_abandonment.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "camp_rejected",
             ["sourceId"] = "companion.reaction.camp_rejected",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_camp_rejected.json",
+            ["sourcePath"] = "dialogue/event_reactions_companion/companion_reaction_camp_rejected.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_camp_rejected.json",
+        ["sourceShard"] = "dialogue/event_reactions_companion/companion_reaction_camp_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "companion.reaction.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_default.json",
+            ["sourcePath"] = "dialogue/event_reactions_companion/companion_reaction_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_default.json",
+        ["sourceShard"] = "dialogue/event_reactions_companion/companion_reaction_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

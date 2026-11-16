@@ -3,7 +3,7 @@ return {
     ["corpse.revenge.comrade"] = {
         ["domain"] = "core_text_memory_gossip_corpse_revenge",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__becaffc7",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseRevenge",
         },
         ["id"] = "corpse.revenge.comrade",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["corpse.revenge.friend"] = {
         ["domain"] = "core_text_memory_gossip_corpse_revenge",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__becaffc7",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseRevenge",
         },
         ["id"] = "corpse.revenge.friend",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["corpse.revenge.relative"] = {
         ["domain"] = "core_text_memory_gossip_corpse_revenge",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__becaffc7",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseRevenge",
         },
         ["id"] = "corpse.revenge.relative",
         ["kind"] = "dialogue",

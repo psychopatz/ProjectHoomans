@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.reaction.kill_killer_supportive",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
+        ["source"] = "dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
     },
 }

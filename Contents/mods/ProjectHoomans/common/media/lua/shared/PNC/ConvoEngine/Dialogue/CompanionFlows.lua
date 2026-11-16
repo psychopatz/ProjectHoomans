@@ -59,7 +59,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "follow",
             ["sourceId"] = "pnc.dialogue.follow",
-            ["sourcePath"] = "adopters/hoomans/dialogue/companion_flows/follow.json",
+            ["sourcePath"] = "dialogue/companion_flows/follow.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionFlows",
@@ -185,7 +185,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/companion_flows/follow.json",
+        ["sourceShard"] = "dialogue/companion_flows/follow.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -269,7 +269,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "stay_with_you",
             ["sourceId"] = "pnc.lab.stay_with_you",
-            ["sourcePath"] = "adopters/hoomans/dialogue/companion_flows/lab_stay_with_you.json",
+            ["sourcePath"] = "dialogue/companion_flows/lab_stay_with_you.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionFlows",
@@ -385,7 +385,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/companion_flows/lab_stay_with_you.json",
+        ["sourceShard"] = "dialogue/companion_flows/lab_stay_with_you.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

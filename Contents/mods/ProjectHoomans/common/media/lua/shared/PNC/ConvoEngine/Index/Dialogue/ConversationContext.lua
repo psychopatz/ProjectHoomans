@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "conversation.context.replies",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/conversation_context/conversation_context_replies.json",
+        ["source"] = "dialogue/conversation_context/conversation_context_replies.json",
     },
 }

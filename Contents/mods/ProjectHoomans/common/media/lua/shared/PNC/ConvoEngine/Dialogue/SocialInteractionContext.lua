@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "clarify",
             ["sourceId"] = "interaction.context.clarify",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
+            ["sourcePath"] = "dialogue/social_interaction_context/interaction_context_clarify.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionContext",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
+        ["sourceShard"] = "dialogue/social_interaction_context/interaction_context_clarify.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

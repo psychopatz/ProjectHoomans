@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "action.trade",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/action_trade.json",
+        ["source"] = "dialogue/trading/action_trade.json",
     },
     ["question.destination"] = {
         ["domain"] = "trading",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "question.destination",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/question_destination.json",
+        ["source"] = "dialogue/trading/question_destination.json",
     },
     ["question.origin"] = {
         ["domain"] = "trading",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "question.origin",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/question_origin.json",
+        ["source"] = "dialogue/trading/question_origin.json",
     },
     ["question.rumors"] = {
         ["domain"] = "trading",
@@ -34,7 +34,7 @@ return {
         },
         ["id"] = "question.rumors",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/question_rumors.json",
+        ["source"] = "dialogue/trading/question_rumors.json",
     },
     ["question.settlement"] = {
         ["domain"] = "trading",
@@ -43,7 +43,7 @@ return {
         },
         ["id"] = "question.settlement",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/question_settlement.json",
+        ["source"] = "dialogue/trading/question_settlement.json",
     },
     ["question.story"] = {
         ["domain"] = "trading",
@@ -52,7 +52,7 @@ return {
         },
         ["id"] = "question.story",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/question_story.json",
+        ["source"] = "dialogue/trading/question_story.json",
     },
     ["question.trader"] = {
         ["domain"] = "trading",
@@ -61,7 +61,7 @@ return {
         },
         ["id"] = "question.trader",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/question_trader.json",
+        ["source"] = "dialogue/trading/question_trader.json",
     },
     ["question.whereabouts"] = {
         ["domain"] = "trading",
@@ -70,7 +70,7 @@ return {
         },
         ["id"] = "question.whereabouts",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/question_whereabouts.json",
+        ["source"] = "dialogue/trading/question_whereabouts.json",
     },
     ["trade.conversation.opening"] = {
         ["domain"] = "trading",
@@ -79,7 +79,7 @@ return {
         },
         ["id"] = "trade.conversation.opening",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_opening.json",
+        ["source"] = "dialogue/trading/trade_conversation_opening.json",
     },
     ["trade.conversation.referral"] = {
         ["domain"] = "trading",
@@ -88,7 +88,7 @@ return {
         },
         ["id"] = "trade.conversation.referral",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_referral.json",
+        ["source"] = "dialogue/trading/trade_conversation_referral.json",
     },
     ["trade.conversation.suggestions_recognition"] = {
         ["domain"] = "trading",
@@ -100,6 +100,6 @@ return {
         ["related"] = {
             "pack.DT.trader_story",
         },
-        ["source"] = "adopters/dt/dialogue/trading/suggestions_recognition.json",
+        ["source"] = "dialogue/trading/suggestions_recognition.json",
     },
 }

@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.human_kill.brave",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
+        ["source"] = "dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
     },
 }

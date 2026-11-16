@@ -275,7 +275,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "accept",
             ["sourceId"] = "quest.clinic_supplies.accept",
-            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept.json",
+            ["sourcePath"] = "dialogue/quest_content/quest_clinic_supplies_accept.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
@@ -449,7 +449,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept.json",
+        ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_accept.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -836,7 +836,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "offer",
             ["sourceId"] = "quest.clinic_supplies.offer",
-            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer.json",
+            ["sourcePath"] = "dialogue/quest_content/quest_clinic_supplies_offer.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
@@ -1010,7 +1010,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer.json",
+        ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_offer.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1397,7 +1397,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "status",
             ["sourceId"] = "quest.clinic_supplies.status",
-            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status.json",
+            ["sourcePath"] = "dialogue/quest_content/quest_clinic_supplies_status.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
@@ -1571,7 +1571,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status.json",
+        ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_status.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1958,7 +1958,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "turn_in",
             ["sourceId"] = "quest.clinic_supplies.turn_in",
-            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in.json",
+            ["sourcePath"] = "dialogue/quest_content/quest_clinic_supplies_turn_in.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
@@ -2132,7 +2132,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in.json",
+        ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_turn_in.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

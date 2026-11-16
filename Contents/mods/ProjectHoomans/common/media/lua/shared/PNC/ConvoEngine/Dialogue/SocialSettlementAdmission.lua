@@ -67,7 +67,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "settlement_admission",
             ["sourceId"] = "social.settlement_admission",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
+            ["sourcePath"] = "dialogue/social_settlement_admission/social_settlement_admission.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialSettlementAdmission",
@@ -184,7 +184,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
+        ["sourceShard"] = "dialogue/social_settlement_admission/social_settlement_admission.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

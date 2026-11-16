@@ -10,7 +10,7 @@ return {
         },
         ["id"] = "interaction.memory.acknowledge",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
+        ["source"] = "dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
     },
     ["interaction.memory.acknowledge_flavor"] = {
         ["dependents"] = {
@@ -22,7 +22,7 @@ return {
         },
         ["id"] = "interaction.memory.acknowledge_flavor",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
+        ["source"] = "dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
     },
     ["interaction.memory.followup"] = {
         ["dependents"] = {
@@ -35,6 +35,6 @@ return {
         },
         ["id"] = "interaction.memory.followup",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
+        ["source"] = "dialogue/social_interaction_memory/interaction_memory_followup.json",
     },
 }

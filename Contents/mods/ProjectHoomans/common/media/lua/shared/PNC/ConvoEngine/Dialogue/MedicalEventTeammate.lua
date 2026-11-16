@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "medical.distress.teammate.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
+            ["sourcePath"] = "dialogue/medical_event_teammate/medical_distress_teammate_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
@@ -186,7 +186,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
+        ["sourceShard"] = "dialogue/medical_event_teammate/medical_distress_teammate_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -324,7 +324,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "found",
             ["sourceId"] = "medical.distress.teammate.found",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_found.json",
+            ["sourcePath"] = "dialogue/medical_event_teammate/medical_distress_teammate_found.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
@@ -415,7 +415,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_found.json",
+        ["sourceShard"] = "dialogue/medical_event_teammate/medical_distress_teammate_found.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -553,7 +553,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "missing",
             ["sourceId"] = "medical.distress.teammate.missing",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_missing.json",
+            ["sourcePath"] = "dialogue/medical_event_teammate/medical_distress_teammate_missing.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
@@ -644,7 +644,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_missing.json",
+        ["sourceShard"] = "dialogue/medical_event_teammate/medical_distress_teammate_missing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

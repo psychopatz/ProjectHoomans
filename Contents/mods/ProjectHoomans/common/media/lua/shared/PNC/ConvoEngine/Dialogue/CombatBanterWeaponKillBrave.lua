@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "axe",
             ["sourceId"] = "combat.kill.killer.brave.axe",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "blade_head",
             ["sourceId"] = "combat.kill.killer.brave.blade_head",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "firearm_high",
             ["sourceId"] = "combat.kill.killer.brave.firearm_high",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,7 +785,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "spear",
             ["sourceId"] = "combat.kill.killer.brave.spear",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
@@ -877,7 +877,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -3,20 +3,20 @@ return {
     ["social.hostile_short"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
         },
         ["id"] = "social.hostile_short",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_short.json",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_hostile_short.json",
     },
     ["social.hostile_stressed"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
         },
         ["id"] = "social.hostile_stressed",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_stressed.json",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_hostile_stressed.json",
     },
     ["social.hostile_withdrawn"] = {
         ["dependents"] = {
@@ -24,40 +24,40 @@ return {
         },
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
         },
         ["id"] = "social.hostile_withdrawn",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_hostile_withdrawn.json",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_hostile_withdrawn.json",
     },
     ["social.offer_friendly"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
         },
         ["id"] = "social.offer_friendly",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_offer_friendly.json",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_offer_friendly.json",
     },
     ["social.profanity"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__fd5c02da",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
         },
         ["id"] = "social.profanity",
         ["kind"] = "dialogue",
         ["related"] = {
             "pack.projecthoomans.social_profanity",
         },
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
     },
     ["social.threat_boundary"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__5b998e54",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/SocialThreatBoundary",
         },
         ["id"] = "social.threat_boundary",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
     },
 }

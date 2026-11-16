@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.reaction.kill_witness_practical",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
+        ["source"] = "dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
     },
 }

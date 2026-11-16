@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "clock",
             ["sourceId"] = "combat.tactical_spatial.hostile.clock",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
+            ["sourcePath"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
+        ["sourceShard"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "coarse",
             ["sourceId"] = "combat.tactical_spatial.hostile.coarse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
+            ["sourcePath"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
+        ["sourceShard"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "clock",
             ["sourceId"] = "combat.tactical_spatial.zombie.clock",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
+            ["sourcePath"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
+        ["sourceShard"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,7 +785,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "coarse",
             ["sourceId"] = "combat.tactical_spatial.zombie.coarse",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
+            ["sourcePath"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
@@ -877,7 +877,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
+        ["sourceShard"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

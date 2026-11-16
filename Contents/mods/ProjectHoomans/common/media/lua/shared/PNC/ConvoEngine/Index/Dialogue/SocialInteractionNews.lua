@@ -10,6 +10,6 @@ return {
         },
         ["id"] = "interaction.news.acknowledge",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
+        ["source"] = "dialogue/social_interaction_news/interaction_news_acknowledge.json",
     },
 }

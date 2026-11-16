@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "social.apology.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
+        ["source"] = "dialogue/social_apology/social_apology_default.json",
     },
     ["social.apology.friendly"] = {
         ["dependents"] = {
@@ -20,7 +20,7 @@ return {
         },
         ["id"] = "social.apology.friendly",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
+        ["source"] = "dialogue/social_apology/social_apology.json",
     },
     ["social.apology.stressed"] = {
         ["domain"] = "social_apology",
@@ -29,7 +29,7 @@ return {
         },
         ["id"] = "social.apology.stressed",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
+        ["source"] = "dialogue/social_apology/social_apology_stressed.json",
     },
     ["social.apology.withdrawn"] = {
         ["domain"] = "social_apology",
@@ -38,6 +38,6 @@ return {
         },
         ["id"] = "social.apology.withdrawn",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
+        ["source"] = "dialogue/social_apology/social_apology_withdrawn.json",
     },
 }

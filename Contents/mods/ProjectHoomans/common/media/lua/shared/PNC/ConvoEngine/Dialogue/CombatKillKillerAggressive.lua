@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_aggressive",
             ["sourceId"] = "combat.reaction.kill_killer_aggressive",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
+            ["sourcePath"] = "dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerAggressive",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
+        ["sourceShard"] = "dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

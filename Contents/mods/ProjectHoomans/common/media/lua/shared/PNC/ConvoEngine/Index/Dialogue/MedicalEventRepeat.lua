@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "medical.distress.repeat.bandage",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
     },
     ["medical.distress.repeat.bleedout"] = {
         ["domain"] = "medical_event_repeat",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "medical.distress.repeat.bleedout",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bleedout.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_bleedout.json",
     },
     ["medical.distress.repeat.default"] = {
         ["domain"] = "medical_event_repeat",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "medical.distress.repeat.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_default.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_default.json",
     },
     ["medical.distress.repeat.dehydration"] = {
         ["domain"] = "medical_event_repeat",
@@ -34,7 +34,7 @@ return {
         },
         ["id"] = "medical.distress.repeat.dehydration",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_dehydration.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_dehydration.json",
     },
     ["medical.distress.repeat.exhaustion"] = {
         ["domain"] = "medical_event_repeat",
@@ -43,7 +43,7 @@ return {
         },
         ["id"] = "medical.distress.repeat.exhaustion",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_exhaustion.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_exhaustion.json",
     },
     ["medical.distress.repeat.mercy"] = {
         ["domain"] = "medical_event_repeat",
@@ -52,7 +52,7 @@ return {
         },
         ["id"] = "medical.distress.repeat.mercy",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_mercy.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_mercy.json",
     },
     ["medical.distress.repeat.rescue"] = {
         ["domain"] = "medical_event_repeat",
@@ -61,7 +61,7 @@ return {
         },
         ["id"] = "medical.distress.repeat.rescue",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_rescue.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_rescue.json",
     },
     ["medical.distress.repeat.starvation"] = {
         ["domain"] = "medical_event_repeat",
@@ -70,6 +70,6 @@ return {
         },
         ["id"] = "medical.distress.repeat.starvation",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_starvation.json",
+        ["source"] = "dialogue/medical_event_repeat/medical_distress_repeat_starvation.json",
     },
 }

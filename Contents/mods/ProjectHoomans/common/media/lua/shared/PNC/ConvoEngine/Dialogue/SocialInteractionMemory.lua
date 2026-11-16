@@ -290,7 +290,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "acknowledge",
             ["sourceId"] = "interaction.memory.acknowledge",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
+            ["sourcePath"] = "dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
@@ -469,7 +469,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
+        ["sourceShard"] = "dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -901,7 +901,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "acknowledge_flavor",
             ["sourceId"] = "interaction.memory.acknowledge_flavor",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
+            ["sourcePath"] = "dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
@@ -1080,7 +1080,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
+        ["sourceShard"] = "dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1512,7 +1512,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "followup",
             ["sourceId"] = "interaction.memory.followup",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
+            ["sourcePath"] = "dialogue/social_interaction_memory/interaction_memory_followup.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
@@ -1691,7 +1691,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
+        ["sourceShard"] = "dialogue/social_interaction_memory/interaction_memory_followup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

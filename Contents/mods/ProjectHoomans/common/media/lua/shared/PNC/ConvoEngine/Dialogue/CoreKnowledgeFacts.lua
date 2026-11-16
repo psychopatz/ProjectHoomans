@@ -59,7 +59,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "question.knowledge_and_bite.responses",
-            ["sourcePath"] = "adopters/hoomans/dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
+            ["sourcePath"] = "dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreKnowledgeFacts",
@@ -168,7 +168,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
+        ["sourceShard"] = "dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

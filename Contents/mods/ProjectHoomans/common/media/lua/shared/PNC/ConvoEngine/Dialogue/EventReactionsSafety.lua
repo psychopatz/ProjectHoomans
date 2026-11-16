@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "danger",
             ["sourceId"] = "conversation.safety.danger",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_danger.json",
+            ["sourcePath"] = "dialogue/event_reactions_safety/conversation_safety_danger.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSafety",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_danger.json",
+        ["sourceShard"] = "dialogue/event_reactions_safety/conversation_safety_danger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "conversation.safety.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_default.json",
+            ["sourcePath"] = "dialogue/event_reactions_safety/conversation_safety_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSafety",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_default.json",
+        ["sourceShard"] = "dialogue/event_reactions_safety/conversation_safety_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

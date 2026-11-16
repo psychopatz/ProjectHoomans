@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.reaction.kill_killer_shaken",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
+        ["source"] = "dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
     },
 }

@@ -10,7 +10,7 @@ return {
         },
         ["id"] = "interaction.argument.deescalate",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
+        ["source"] = "dialogue/social_interaction_argument/interaction_argument_deescalate.json",
     },
     ["interaction.argument.retaliate"] = {
         ["dependents"] = {
@@ -22,6 +22,6 @@ return {
         },
         ["id"] = "interaction.argument.retaliate",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
+        ["source"] = "dialogue/social_interaction_argument/interaction_argument_retaliate.json",
     },
 }

@@ -9,7 +9,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "whats_up",
             ["sourceId"] = "conversation.landing.whats_up",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/conversation_landing_whats_up.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/conversation_landing_whats_up.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -52,7 +52,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/conversation_landing_whats_up.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/conversation_landing_whats_up.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -155,7 +155,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "flow.greeting.followup.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup_default.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_followup_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -247,7 +247,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup_default.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_followup_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -385,7 +385,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "friendly",
             ["sourceId"] = "flow.greeting.followup.friendly",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_followup.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -477,7 +477,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_followup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -810,7 +810,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "flow.greeting.opening.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_opening_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -989,7 +989,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_opening_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1421,7 +1421,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "friendly",
             ["sourceId"] = "flow.greeting.opening.friendly",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_opening.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -1600,7 +1600,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_opening.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1837,7 +1837,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "flow.greeting.opening.question.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -1929,7 +1929,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2067,7 +2067,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "friendly",
             ["sourceId"] = "flow.greeting.opening.question.friendly",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_opening_question.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -2159,7 +2159,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_opening_question.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2297,7 +2297,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "rain",
             ["sourceId"] = "flow.greeting.opening.rain",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_rain.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_opening_rain.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -2389,7 +2389,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_rain.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_opening_rain.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2491,7 +2491,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "flow.greeting.responses",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_responses.json",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_responses.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -2691,7 +2691,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_responses.json",
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_responses.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

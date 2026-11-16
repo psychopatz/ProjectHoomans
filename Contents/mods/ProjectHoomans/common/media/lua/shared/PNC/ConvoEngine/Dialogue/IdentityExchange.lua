@@ -59,7 +59,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "identity.exchange.responses",
-            ["sourcePath"] = "adopters/hoomans/dialogue/identity_exchange/identity_exchange_responses.json",
+            ["sourcePath"] = "dialogue/identity_exchange/identity_exchange_responses.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/IdentityExchange",
@@ -287,7 +287,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/identity_exchange/identity_exchange_responses.json",
+        ["sourceShard"] = "dialogue/identity_exchange/identity_exchange_responses.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

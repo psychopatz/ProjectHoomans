@@ -8,47 +8,47 @@ return {
         },
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
         },
         ["id"] = "social.acknowledged",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
+        ["source"] = "dialogue/social_reactions_ack_dispute/social_acknowledged.json",
     },
     ["social.dispute_friendly"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
         },
         ["id"] = "social.dispute_friendly",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json",
+        ["source"] = "dialogue/social_reactions_ack_dispute/social_dispute_friendly.json",
     },
     ["social.dispute_stressed"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
         },
         ["id"] = "social.dispute_stressed",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json",
+        ["source"] = "dialogue/social_reactions_ack_dispute/social_dispute_stressed.json",
     },
     ["social.dispute_trusted"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
         },
         ["id"] = "social.dispute_trusted",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json",
+        ["source"] = "dialogue/social_reactions_ack_dispute/social_dispute_trusted.json",
     },
     ["social.dispute_withdrawn"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/DisputeWithdrawnToReactionResponses",
         },
         ["id"] = "social.dispute_withdrawn",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
+        ["source"] = "dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
     },
     ["social.hostile_boundary"] = {
         ["dependents"] = {
@@ -56,19 +56,19 @@ return {
         },
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/DisputeWithdrawnToReactionResponses",
         },
         ["id"] = "social.hostile_boundary",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json",
+        ["source"] = "dialogue/social_reactions_ack_dispute/social_hostile_boundary.json",
     },
     ["social.reaction.responses"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute__faf04112",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/DisputeWithdrawnToReactionResponses",
         },
         ["id"] = "social.reaction.responses",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_reaction_responses.json",
+        ["source"] = "dialogue/social_reactions_ack_dispute/social_reaction_responses.json",
     },
 }

@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "axe_head",
             ["sourceId"] = "combat.kill.killer.aggressive.axe_head",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "blade_head",
             ["sourceId"] = "combat.kill.killer.aggressive.blade_head",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "blunt",
             ["sourceId"] = "combat.kill.killer.aggressive.blunt",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -865,7 +865,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "firearm_high_named",
             ["sourceId"] = "combat.kill.killer.aggressive.firearm_high_named",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
@@ -999,7 +999,7 @@ return {
                 ["type"] = "entity.item",
             },
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1170,7 +1170,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "spear",
             ["sourceId"] = "combat.kill.killer.aggressive.spear",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
@@ -1262,7 +1262,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -59,7 +59,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "question.relationship_status.responses",
-            ["sourcePath"] = "adopters/hoomans/dialogue/question_relationship_status/question_relationship_status.json",
+            ["sourcePath"] = "dialogue/question_relationship_status/question_relationship_status.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestionRelationshipStatus",
@@ -210,7 +210,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/question_relationship_status/question_relationship_status.json",
+        ["sourceShard"] = "dialogue/question_relationship_status/question_relationship_status.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

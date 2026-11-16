@@ -290,7 +290,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "busy",
             ["sourceId"] = "question.whats_up.busy",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
+            ["sourcePath"] = "dialogue/conversation_whats_up/question_whats_up_busy.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
@@ -469,7 +469,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
+        ["sourceShard"] = "dialogue/conversation_whats_up/question_whats_up_busy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -901,7 +901,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "question.whats_up.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
+            ["sourcePath"] = "dialogue/conversation_whats_up/question_whats_up_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
@@ -1080,7 +1080,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
+        ["sourceShard"] = "dialogue/conversation_whats_up/question_whats_up_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1512,7 +1512,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default_alt",
             ["sourceId"] = "question.whats_up.default_alt",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
+            ["sourcePath"] = "dialogue/conversation_whats_up/question_whats_up_default_alt.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
@@ -1691,7 +1691,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
+        ["sourceShard"] = "dialogue/conversation_whats_up/question_whats_up_default_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2123,7 +2123,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "traveling",
             ["sourceId"] = "question.whats_up.traveling",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
+            ["sourcePath"] = "dialogue/conversation_whats_up/question_whats_up_traveling.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
@@ -2302,7 +2302,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
+        ["sourceShard"] = "dialogue/conversation_whats_up/question_whats_up_traveling.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2734,7 +2734,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "weather",
             ["sourceId"] = "question.whats_up.weather",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
+            ["sourcePath"] = "dialogue/conversation_whats_up/question_whats_up_weather.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
@@ -2913,7 +2913,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
+        ["sourceShard"] = "dialogue/conversation_whats_up/question_whats_up_weather.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -59,7 +59,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "colonist",
             ["sourceId"] = "integration.bandits.hooman_hurt.colonist",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -133,7 +133,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -217,7 +217,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "integration.bandits.hooman_hurt.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -291,7 +291,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -375,7 +375,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "family",
             ["sourceId"] = "integration.bandits.hooman_hurt.family",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -449,7 +449,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -533,7 +533,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "lover",
             ["sourceId"] = "integration.bandits.hooman_hurt.lover",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -607,7 +607,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -691,7 +691,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "female",
             ["sourceId"] = "integration.companion_dogs.feed.female",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -765,7 +765,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -849,7 +849,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "male",
             ["sourceId"] = "integration.companion_dogs.feed.male",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -923,7 +923,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1007,7 +1007,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "unknown",
             ["sourceId"] = "integration.companion_dogs.feed.unknown",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1081,7 +1081,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1165,7 +1165,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "female",
             ["sourceId"] = "integration.companion_dogs.greeting.female",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1239,7 +1239,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1323,7 +1323,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "male",
             ["sourceId"] = "integration.companion_dogs.greeting.male",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1397,7 +1397,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1481,7 +1481,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "unknown",
             ["sourceId"] = "integration.companion_dogs.greeting.unknown",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1555,7 +1555,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1639,7 +1639,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "colonist",
             ["sourceId"] = "integration.necroa.mask_warning.colonist",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1713,7 +1713,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1797,7 +1797,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "integration.necroa.mask_warning.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1871,7 +1871,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1955,7 +1955,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "family",
             ["sourceId"] = "integration.necroa.mask_warning.family",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -2029,7 +2029,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2113,7 +2113,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "integration.necroa.player_mask_removed.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -2187,7 +2187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2271,7 +2271,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "hostile",
             ["sourceId"] = "integration.necroa.player_mask_removed.hostile",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -2345,7 +2345,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2429,7 +2429,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "lover",
             ["sourceId"] = "integration.necroa.player_mask_removed.lover",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -2503,7 +2503,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2587,7 +2587,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "friendly",
             ["sourceId"] = "integration.projectalife.encounter.friendly",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_encounter.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -2661,7 +2661,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_encounter.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2745,7 +2745,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "hostile",
             ["sourceId"] = "integration.projectalife.encounter.hostile",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter_hostile.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_encounter_hostile.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -2819,7 +2819,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter_hostile.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_encounter_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2903,7 +2903,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "unknown",
             ["sourceId"] = "integration.projectalife.encounter.unknown",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter_unknown.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_encounter_unknown.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -2977,7 +2977,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_encounter_unknown.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_encounter_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3061,7 +3061,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "hostile",
             ["sourceId"] = "integration.projectalife.faction.hostile",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_hostile.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_faction_hostile.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -3135,7 +3135,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_hostile.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_faction_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3219,7 +3219,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "incoming",
             ["sourceId"] = "integration.projectalife.faction.incoming",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_incoming.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_faction_incoming.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -3293,7 +3293,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_incoming.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_faction_incoming.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3377,7 +3377,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "outgoing",
             ["sourceId"] = "integration.projectalife.faction.outgoing",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_outgoing.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_faction_outgoing.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -3451,7 +3451,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_faction_outgoing.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_faction_outgoing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3535,7 +3535,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "heli",
             ["sourceId"] = "integration.projectalife.meta.aircraft.heli",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_aircraft_heli.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_heli.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -3609,7 +3609,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_aircraft_heli.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_heli.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3693,7 +3693,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "military",
             ["sourceId"] = "integration.projectalife.meta.aircraft.military",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_aircraft_military.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_military.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -3767,7 +3767,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_aircraft_military.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_military.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3851,7 +3851,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "ambience",
             ["sourceId"] = "integration.projectalife.meta.ambience",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -3925,7 +3925,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4009,7 +4009,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "crash",
             ["sourceId"] = "integration.projectalife.meta.crash",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_crash.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_crash.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -4083,7 +4083,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_crash.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_crash.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4167,7 +4167,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "gunfire",
             ["sourceId"] = "integration.projectalife.meta.gunfire",
-            ["sourcePath"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
+            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -4241,7 +4241,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
+        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

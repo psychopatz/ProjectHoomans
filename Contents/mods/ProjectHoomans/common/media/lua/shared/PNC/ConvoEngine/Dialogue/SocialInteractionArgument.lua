@@ -290,7 +290,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "deescalate",
             ["sourceId"] = "interaction.argument.deescalate",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
+            ["sourcePath"] = "dialogue/social_interaction_argument/interaction_argument_deescalate.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
@@ -469,7 +469,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
+        ["sourceShard"] = "dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -901,7 +901,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "retaliate",
             ["sourceId"] = "interaction.argument.retaliate",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
+            ["sourcePath"] = "dialogue/social_interaction_argument/interaction_argument_retaliate.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
@@ -1080,7 +1080,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
+        ["sourceShard"] = "dialogue/social_interaction_argument/interaction_argument_retaliate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

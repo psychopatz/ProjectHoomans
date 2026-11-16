@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "blade_head",
             ["sourceId"] = "combat.kill.killer.cold.blade_head",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "firearm_high",
             ["sourceId"] = "combat.kill.killer.cold.firearm_high",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "heavy_melee",
             ["sourceId"] = "combat.kill.killer.cold.heavy_melee",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

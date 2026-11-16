@@ -290,7 +290,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "camp",
             ["sourceId"] = "navigation.camp",
-            ["sourcePath"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
+            ["sourcePath"] = "dialogue/navigation/navigation_camp.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/Navigation",
@@ -468,7 +468,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
+        ["sourceShard"] = "dialogue/navigation/navigation_camp.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -900,7 +900,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "camp_empty",
             ["sourceId"] = "navigation.camp_empty",
-            ["sourcePath"] = "adopters/hoomans/dialogue/navigation/navigation_camp_empty.json",
+            ["sourcePath"] = "dialogue/navigation/navigation_camp_empty.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/Navigation",
@@ -1078,7 +1078,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/navigation/navigation_camp_empty.json",
+        ["sourceShard"] = "dialogue/navigation/navigation_camp_empty.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1510,7 +1510,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "navigation.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/navigation/navigation_default.json",
+            ["sourcePath"] = "dialogue/navigation/navigation_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/Navigation",
@@ -1688,7 +1688,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/navigation/navigation_default.json",
+        ["sourceShard"] = "dialogue/navigation/navigation_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2120,7 +2120,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "orders",
             ["sourceId"] = "navigation.orders",
-            ["sourcePath"] = "adopters/hoomans/dialogue/navigation/navigation_orders.json",
+            ["sourcePath"] = "dialogue/navigation/navigation_orders.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/Navigation",
@@ -2298,7 +2298,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/navigation/navigation_orders.json",
+        ["sourceShard"] = "dialogue/navigation/navigation_orders.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2730,7 +2730,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "subject_change",
             ["sourceId"] = "navigation.subject_change",
-            ["sourcePath"] = "adopters/hoomans/dialogue/navigation/navigation_subject_change.json",
+            ["sourcePath"] = "dialogue/navigation/navigation_subject_change.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/Navigation",
@@ -2908,7 +2908,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/navigation/navigation_subject_change.json",
+        ["sourceShard"] = "dialogue/navigation/navigation_subject_change.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -290,7 +290,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "challenge",
             ["sourceId"] = "interaction.first_contact.challenge",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
+            ["sourcePath"] = "dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
@@ -469,7 +469,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
+        ["sourceShard"] = "dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

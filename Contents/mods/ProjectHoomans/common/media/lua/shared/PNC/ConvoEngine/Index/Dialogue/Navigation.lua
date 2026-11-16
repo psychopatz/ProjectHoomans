@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "navigation.camp",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
+        ["source"] = "dialogue/navigation/navigation_camp.json",
     },
     ["navigation.camp_empty"] = {
         ["domain"] = "navigation",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "navigation.camp_empty",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp_empty.json",
+        ["source"] = "dialogue/navigation/navigation_camp_empty.json",
     },
     ["navigation.default"] = {
         ["domain"] = "navigation",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "navigation.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_default.json",
+        ["source"] = "dialogue/navigation/navigation_default.json",
     },
     ["navigation.orders"] = {
         ["domain"] = "navigation",
@@ -34,7 +34,7 @@ return {
         },
         ["id"] = "navigation.orders",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_orders.json",
+        ["source"] = "dialogue/navigation/navigation_orders.json",
     },
     ["navigation.subject_change"] = {
         ["domain"] = "navigation",
@@ -43,6 +43,6 @@ return {
         },
         ["id"] = "navigation.subject_change",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_subject_change.json",
+        ["source"] = "dialogue/navigation/navigation_subject_change.json",
     },
 }

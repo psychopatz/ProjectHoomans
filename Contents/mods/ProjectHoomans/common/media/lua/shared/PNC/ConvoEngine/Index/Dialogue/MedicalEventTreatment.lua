@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "medical.distress.treatment.bandage",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
+        ["source"] = "dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
     },
     ["medical.distress.treatment.default"] = {
         ["domain"] = "medical_event_treatment",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "medical.distress.treatment.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_default.json",
+        ["source"] = "dialogue/medical_event_treatment/medical_distress_treatment_default.json",
     },
 }

@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.reaction.kill_killer_practical",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_practical/combat_reaction_kill_killer_practical.json",
+        ["source"] = "dialogue/combat_kill_killer_practical/combat_reaction_kill_killer_practical.json",
     },
 }

@@ -9,7 +9,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "member",
             ["sourceId"] = "social.ask_about.member",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_member.json",
+            ["sourcePath"] = "dialogue/social_ask_about/social_ask_about_member.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
@@ -184,7 +184,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_member.json",
+        ["sourceShard"] = "dialogue/social_ask_about/social_ask_about_member.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -201,7 +201,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "neutral",
             ["sourceId"] = "social.ask_about.neutral",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about.json",
+            ["sourcePath"] = "dialogue/social_ask_about/social_ask_about.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
@@ -376,7 +376,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about.json",
+        ["sourceShard"] = "dialogue/social_ask_about/social_ask_about.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -393,7 +393,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "special",
             ["sourceId"] = "social.ask_about.special",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_special.json",
+            ["sourcePath"] = "dialogue/social_ask_about/social_ask_about_special.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
@@ -568,7 +568,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_special.json",
+        ["sourceShard"] = "dialogue/social_ask_about/social_ask_about_special.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

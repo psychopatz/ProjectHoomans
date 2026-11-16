@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "cold",
             ["sourceId"] = "combat.human_kill.cold",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
+            ["sourcePath"] = "dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillCold",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
+        ["sourceShard"] = "dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

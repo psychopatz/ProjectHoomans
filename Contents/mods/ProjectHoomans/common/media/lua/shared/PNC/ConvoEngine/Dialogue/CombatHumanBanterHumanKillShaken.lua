@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "shaken",
             ["sourceId"] = "combat.human_kill.shaken",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
+            ["sourcePath"] = "dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillShaken",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
+        ["sourceShard"] = "dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "bandage",
             ["sourceId"] = "medical.distress.update.bandage",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_bandage.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_bandage.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -186,7 +186,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_bandage.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_bandage.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -324,7 +324,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "bleedout",
             ["sourceId"] = "medical.distress.update.bleedout",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_bleedout.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_bleedout.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -415,7 +415,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_bleedout.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_bleedout.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -553,7 +553,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "medical.distress.update.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_default.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -644,7 +644,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_default.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -782,7 +782,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "dehydration",
             ["sourceId"] = "medical.distress.update.dehydration",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_dehydration.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_dehydration.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -873,7 +873,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_dehydration.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_dehydration.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1011,7 +1011,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "exhaustion",
             ["sourceId"] = "medical.distress.update.exhaustion",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_exhaustion.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_exhaustion.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -1102,7 +1102,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_exhaustion.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_exhaustion.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1240,7 +1240,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "mercy",
             ["sourceId"] = "medical.distress.update.mercy",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_mercy.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_mercy.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -1331,7 +1331,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_mercy.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_mercy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1469,7 +1469,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "rescue",
             ["sourceId"] = "medical.distress.update.rescue",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_rescue.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_rescue.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -1560,7 +1560,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_rescue.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_rescue.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1698,7 +1698,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "starvation",
             ["sourceId"] = "medical.distress.update.starvation",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_starvation.json",
+            ["sourcePath"] = "dialogue/medical_event_update/medical_distress_update_starvation.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -1789,7 +1789,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_update/medical_distress_update_starvation.json",
+        ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_starvation.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

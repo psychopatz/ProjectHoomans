@@ -3,46 +3,46 @@ return {
     ["command.camp"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow",
         },
         ["id"] = "command.camp",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp.json",
+        ["source"] = "dialogue/companion_commands_lifecycle/command_camp.json",
     },
     ["command.follow"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow",
         },
         ["id"] = "command.follow",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow.json",
+        ["source"] = "dialogue/companion_commands_lifecycle/command_follow.json",
     },
     ["command.return_home"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__3899a7d0",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/ReturnHomeToStay",
         },
         ["id"] = "command.return_home",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home.json",
+        ["source"] = "dialogue/companion_commands_lifecycle/command_return_home.json",
     },
     ["command.stay"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__3899a7d0",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/ReturnHomeToStay",
         },
         ["id"] = "command.stay",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay.json",
+        ["source"] = "dialogue/companion_commands_lifecycle/command_stay.json",
     },
     ["command.stop_following"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__7d8bcf74",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CommandStopFollowing",
         },
         ["id"] = "command.stop_following",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following.json",
+        ["source"] = "dialogue/companion_commands_lifecycle/command_stop_following.json",
     },
 }

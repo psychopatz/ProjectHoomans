@@ -59,7 +59,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "responses",
             ["sourceId"] = "question.residence.responses",
-            ["sourcePath"] = "adopters/hoomans/dialogue/question_residence/question_residence.json",
+            ["sourcePath"] = "dialogue/question_residence/question_residence.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestionResidence",
@@ -154,7 +154,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/question_residence/question_residence.json",
+        ["sourceShard"] = "dialogue/question_residence/question_residence.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

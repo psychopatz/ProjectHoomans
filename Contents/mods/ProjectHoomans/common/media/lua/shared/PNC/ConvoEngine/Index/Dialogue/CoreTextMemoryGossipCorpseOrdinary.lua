@@ -3,7 +3,7 @@ return {
     ["corpse.comrade"] = {
         ["domain"] = "core_text_memory_gossip_corpse_ordinary",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__d405232f",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseOrdinary",
         },
         ["id"] = "corpse.comrade",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["corpse.friend"] = {
         ["domain"] = "core_text_memory_gossip_corpse_ordinary",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__d405232f",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseOrdinary",
         },
         ["id"] = "corpse.friend",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["corpse.hostile"] = {
         ["domain"] = "core_text_memory_gossip_corpse_ordinary",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__d405232f",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseOrdinary",
         },
         ["id"] = "corpse.hostile",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["corpse.neutral"] = {
         ["domain"] = "core_text_memory_gossip_corpse_ordinary",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__d405232f",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseOrdinary",
         },
         ["id"] = "corpse.neutral",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["corpse.relative"] = {
         ["domain"] = "core_text_memory_gossip_corpse_ordinary",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCo__d405232f",
+            "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseOrdinary",
         },
         ["id"] = "corpse.relative",
         ["kind"] = "dialogue",

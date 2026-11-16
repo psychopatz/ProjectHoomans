@@ -1,99 +1,136 @@
-# Roadmap — Portable PSDL / ConvoEngine Portability Closure
+# Roadmap — G9 PSDL Package Ownership & Human-Readable Generated Layout
 
 **Parent status:** COMPLETE.
-**Active phase:** G8R7D (Closed).
-**Completion boundary:** G8R7A–G8R7D accepted.
+**Active phase:** G9E (Closed).
+**Completion boundary:** G9A–G9E accepted.
 
-## G8R7A — descriptor-selected backend dispatch
+## G9A — self-contained adopter packages
 
-The portable plan is a real production seam, but generic compilation still directly calls `render_pz_backend_from_portable_plan()`, and the combined target descriptor currently forces `backend: "pz-lua"`.
+Replace the current Core-owned federation package with real package descriptors at each semantic owner.
 
-Introduce one backend-dispatch authority:
-
-```text
-target descriptor.backend
-→ backend registry / resolver
-→ backend.render(portable_plan, target/package context)
-```
+Expected ownership:
+- PsychopatzCore package: compiler/stdlib/shared semantic primitives;
+- ProjectHoomans package: Hoomans-owned semantic programs;
+- DTCommon/DynamicTrading package: trading-owned semantic programs.
 
 Requirements:
-- generic conversation compilation must not directly select the PZ renderer;
-- `combined_target_descriptor()` derives and validates backend identity from active descriptors;
-- incompatible mixed-backend owner sets fail closed;
-- unknown backend IDs fail closed;
-- current PZ generation stays behaviorally/byte stable unless a justified generated delta is required;
-- adding a non-PZ test backend must not require editing generic compiler control flow.
+- each adopter source root has its own package descriptor and provenance/lock data as appropriate;
+- Core package identity is not `ProjectHoomans`;
+- Core package does not enumerate Hoomans/DT `externalSourceRoots` as adopter-specific knowledge;
+- adopter packages import Core/shared packages through a generic package/import mechanism;
+- package discovery remains descriptor/workspace driven and supports future unknown adopters;
+- normal production compile/reconcile still produces equivalent semantic output.
 
-A minimal `portable-json` or test backend is enough to prove dispatch. Do not build Unity/Godot here.
+**Gate:** an agent can open an adopter source root and find its complete package descriptor/import boundary there, while Core contains no adopter-specific source-root federation.
 
-**Gate:** a descriptor-selected non-PZ backend is exercised through the normal compiler path with zero generic compiler routing edits.
+## G9B — semantic ownership audit and migration
 
-## G8R7B — executed Reference VM ↔ Lua/PZ trace equivalence
+Classify current non-dialogue semantic source by meaning, not historical location.
 
-Current G8R5 proves projection equivalence, not executed runtime equivalence.
-
-Reuse the existing Lua ConvoProbe / ConvoEngine studio trace infrastructure rather than inventing another simulator.
-
-For the same real production Portable Dialogue Plan semantics, compare Reference VM and Lua/PZ execution for:
-- exact recognition;
-- fuzzy recognition;
-- fuzzy-recovered mutating confirmation;
-- profanity recognition;
-- beat entry/maintain/exit;
-- behavior selection;
-- camp action/result branch;
-- deterministic realization selection where supported.
-
-Normalize both sides to a small versioned semantic-trace contract covering, when applicable:
-- recognition rule/dialogue ID;
-- recognition mode/confidence class;
-- confirmation requirement;
-- selected beat/behavior/dialogue;
-- action/result outcome;
-- reply branch;
-- realization/template identity.
-
-**Gate:** both runtimes execute the same real scenario and normalized traces agree. Table membership/projection checks alone are insufficient.
-
-## G8R7C — authored/canonical lineage clarity
-
-Compact production source is `psychopatz.psdl.v2`, but normalized lineage currently reports `sourceSchema = psychopatz.convo-engine.v1`.
-
-Preserve both concepts explicitly, preferably:
+Ownership rule:
 
 ```text
-authoringSchema = psychopatz.psdl.v2
-canonicalSchema = psychopatz.convo-engine.v1
-sourcePath = authored compact source path
+reusable across unrelated games/mods → Core stdlib/shared package
+meaningful only for one adopter/domain → adopter package
 ```
 
-Equivalent naming is acceptable if unambiguous.
+Audit at minimum:
+- all 3 beats;
+- all 30 behaviors;
+- all realizations/recognition rules used by adopters;
+- Core dialogue families;
+- Hoomans horde/excursion/task/companion semantics;
+- DynamicTrading-specific semantic logic.
 
-Requirements:
-- diagnostics still point to authored compact files;
-- canonical IR schema/version stays explicit;
-- no consumer treats canonical schema as authored schema;
-- compatibility loading remains truthful for any legacy source.
+Likely Hoomans-owned examples requiring proof/classification include:
+- `behavior.scene_horde_*`;
+- `behavior.scene_excursion_*`;
+- `behavior.scene_task_work_*`.
 
-**Gate:** representative dialogue/behavior/beat records expose truthful authored + canonical lineage with focused tests.
+Do not move generic constructs such as reusable social argument/reconciliation/deescalation merely because Hoomans currently consumes them.
 
-## G8R7D — final committed closure
+Migration must preserve semantic IDs, imports, capability contracts, generated behavior and source lineage.
 
-After G8R7A–C:
-1. run focused backend/trace/lineage tests;
-2. reconstruct the three-repository committed vector;
-3. canonical check must be clean before apply;
-4. run production G8R tests and lifecycle tests;
-5. run `audit-s6m8 --check-determinism`;
-6. perform isolated generated-output deletion/rebuild and verify second-pass no-op;
-7. reconcile ROADMAP/PROGRESS/HANDOFF to one COMPLETE state;
-8. commit participant repos first and ProjectHoomans/job docs last;
-9. rerun acceptance from the committed vector.
+**Gate:** every semantic family has an explicit justified package owner, and adopter-specific programs no longer live in Core merely for compiler convenience.
 
-**Gate:** no remaining developer-side portability gate and all active docs agree on COMPLETE.
+## G9C — readable deterministic generated shard naming
 
-## Final acceptance
+Keep generated safety budgets:
+- max generated shard bytes: currently 192 KiB;
+- max records per shard: currently 32.
 
-The goal is complete only when backend choice is descriptor-driven, Reference VM and executed Lua/PZ runtime agree on the semantic trace contract, lineage is truthful, and final committed-vector generation/rebuild/determinism gates pass.
+Do not solve readability by removing safety chunking.
 
-No native Project Zomboid launch is required unless Lua ConvoProbe cannot exercise a required semantic behavior.
+Replace normal hash-first collision naming with deterministic semantic chunk names.
+
+Current bad UX example:
+
+```text
+CompanionCommandsLifecycle.lua
+CompanionCommandsLifecycle__3899a7d0.lua
+CompanionCommandsLifecycle__7d8bcf74.lua
+```
+
+Preferred behavior:
+- base directory/module reflects semantic family/domain;
+- split chunks derive readable identity from contained semantic IDs or stable semantic ranges;
+- use subdirectories when they improve clarity;
+- long semantic names remain readable instead of being hashed solely because they exceed the current 32-character segment limit;
+- hash suffix remains available only when a true unresolved collision/length constraint remains.
+
+Naming must be deterministic from semantic content/lineage, independent of file enumeration order.
+
+Adding/removing one family must not rename unrelated generated modules unnecessarily.
+
+**Gate:** ordinary generated output contains no avoidable `__????????` names; any remaining hash suffix has an audit report explaining why a readable deterministic name was impossible.
+
+## G9D — package/source navigation and audit UX
+
+Make ownership and generation discoverable without repository archaeology.
+
+Extend existing inspection tooling so an agent can locate a semantic ID and see:
+- package/owner;
+- authored source path;
+- imported package dependencies;
+- kind: dialogue/behavior/beat/recognition/realization;
+- capability requirements;
+- generated backend module(s);
+- consumers/references when available.
+
+Preferred CLI shape may be:
+
+```text
+psdl locate <semantic-id>
+psdl get <semantic-id> --summary
+psdl impact <semantic-id>
+```
+
+Do not create a duplicate index authority; derive from the canonical compiler/package model.
+
+**Gate:** representative Hoomans/Core/DT semantic IDs are traceable source → package → portable plan → generated module with compact output.
+
+## G9E — committed-vector migration/rebuild closure
+
+After G9A–D:
+1. run package/ownership/naming/navigation tests;
+2. canonical reconcile check clean before apply;
+3. run G8R7 portability tests and G8 production tests;
+4. run lifecycle tests;
+5. run naming/sharding determinism audit;
+6. reconstruct final participant commit vector;
+7. delete ledger-owned generated artifacts and rebuild;
+8. verify second build no-op and final check clean;
+9. verify no stale old hashed module references/artifacts remain;
+10. reconcile active docs to COMPLETE;
+11. commit participant repos first, ProjectHoomans/job docs last.
+
+**Gate:** package ownership is self-explanatory, generated naming is readable/stable, and final committed vector remains fully deterministic.
+
+## Non-goals
+
+- do not remove shard size/record safety budgets;
+- do not rename stable semantic IDs for aesthetics;
+- do not move game mechanics into PSDL;
+- do not build Unity/Godot backends;
+- do not make Core know future adopters;
+- do not hand-rename generated Lua.

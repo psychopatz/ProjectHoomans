@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "social.reaction.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
+            ["sourcePath"] = "dialogue/event_reactions_social/social_reaction_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSocial",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
+        ["sourceShard"] = "dialogue/event_reactions_social/social_reaction_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

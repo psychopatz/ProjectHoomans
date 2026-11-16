@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "bandage",
             ["sourceId"] = "medical.distress.repeat.bandage",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -186,7 +186,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -324,7 +324,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "bleedout",
             ["sourceId"] = "medical.distress.repeat.bleedout",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bleedout.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_bleedout.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -415,7 +415,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_bleedout.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_bleedout.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -553,7 +553,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "medical.distress.repeat.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_default.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -644,7 +644,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_default.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -782,7 +782,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "dehydration",
             ["sourceId"] = "medical.distress.repeat.dehydration",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_dehydration.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_dehydration.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -873,7 +873,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_dehydration.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_dehydration.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1011,7 +1011,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "exhaustion",
             ["sourceId"] = "medical.distress.repeat.exhaustion",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_exhaustion.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_exhaustion.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -1102,7 +1102,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_exhaustion.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_exhaustion.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1240,7 +1240,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "mercy",
             ["sourceId"] = "medical.distress.repeat.mercy",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_mercy.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_mercy.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -1331,7 +1331,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_mercy.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_mercy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1469,7 +1469,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "rescue",
             ["sourceId"] = "medical.distress.repeat.rescue",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_rescue.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_rescue.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -1560,7 +1560,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_rescue.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_rescue.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1698,7 +1698,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "starvation",
             ["sourceId"] = "medical.distress.repeat.starvation",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_starvation.json",
+            ["sourcePath"] = "dialogue/medical_event_repeat/medical_distress_repeat_starvation.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -1789,7 +1789,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_repeat/medical_distress_repeat_starvation.json",
+        ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_starvation.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

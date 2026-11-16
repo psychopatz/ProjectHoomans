@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "bandage",
             ["sourceId"] = "medical.distress.treatment.bandage",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
+            ["sourcePath"] = "dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
@@ -186,7 +186,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
+        ["sourceShard"] = "dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -324,7 +324,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "medical.distress.treatment.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_default.json",
+            ["sourcePath"] = "dialogue/medical_event_treatment/medical_distress_treatment_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
@@ -415,7 +415,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_default.json",
+        ["sourceShard"] = "dialogue/medical_event_treatment/medical_distress_treatment_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

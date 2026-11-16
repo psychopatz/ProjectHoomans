@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "flow.farewell.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell_default.json",
+        ["source"] = "dialogue/event_reactions_farewell/flow_farewell_default.json",
     },
     ["flow.farewell.friendly"] = {
         ["domain"] = "event_reactions_farewell",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "flow.farewell.friendly",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell.json",
+        ["source"] = "dialogue/event_reactions_farewell/flow_farewell.json",
     },
 }

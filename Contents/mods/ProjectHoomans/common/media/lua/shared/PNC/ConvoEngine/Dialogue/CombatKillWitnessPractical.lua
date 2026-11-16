@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_witness_practical",
             ["sourceId"] = "combat.reaction.kill_witness_practical",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
+            ["sourcePath"] = "dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessPractical",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
+        ["sourceShard"] = "dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

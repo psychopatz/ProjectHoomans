@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "axe_spear",
             ["sourceId"] = "combat.kill.killer.practical.axe_spear",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "blade",
             ["sourceId"] = "combat.kill.killer.practical.blade",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "blunt",
             ["sourceId"] = "combat.kill.killer.practical.blunt",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,7 +785,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "firearm_high",
             ["sourceId"] = "combat.kill.killer.practical.firearm_high",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -877,7 +877,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1015,7 +1015,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "firearm_low",
             ["sourceId"] = "combat.kill.killer.practical.firearm_low",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -1107,7 +1107,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1245,7 +1245,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "unarmed",
             ["sourceId"] = "combat.kill.killer.practical.unarmed",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -1337,7 +1337,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

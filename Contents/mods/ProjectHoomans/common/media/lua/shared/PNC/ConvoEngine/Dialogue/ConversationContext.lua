@@ -59,7 +59,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "replies",
             ["sourceId"] = "conversation.context.replies",
-            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_context/conversation_context_replies.json",
+            ["sourcePath"] = "dialogue/conversation_context/conversation_context_replies.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationContext",
@@ -245,7 +245,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_context/conversation_context_replies.json",
+        ["sourceShard"] = "dialogue/conversation_context/conversation_context_replies.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

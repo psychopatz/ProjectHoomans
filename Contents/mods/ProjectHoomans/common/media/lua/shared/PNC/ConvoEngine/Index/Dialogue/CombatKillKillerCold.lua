@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.reaction.kill_killer_cold",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
+        ["source"] = "dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
     },
 }

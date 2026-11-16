@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_cold",
             ["sourceId"] = "combat.reaction.kill_killer_cold",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
+            ["sourcePath"] = "dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerCold",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
+        ["sourceShard"] = "dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

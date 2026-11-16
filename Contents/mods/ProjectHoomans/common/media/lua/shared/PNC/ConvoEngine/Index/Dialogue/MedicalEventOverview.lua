@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "medical.distress.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_default.json",
+        ["source"] = "dialogue/medical_event_overview/medical_distress_default.json",
     },
     ["medical.distress.mercy"] = {
         ["domain"] = "medical_event_overview",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "medical.distress.mercy",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_mercy.json",
+        ["source"] = "dialogue/medical_event_overview/medical_distress_mercy.json",
     },
     ["medical.distress.urgent"] = {
         ["domain"] = "medical_event_overview",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "medical.distress.urgent",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_urgent.json",
+        ["source"] = "dialogue/medical_event_overview/medical_distress_urgent.json",
     },
 }

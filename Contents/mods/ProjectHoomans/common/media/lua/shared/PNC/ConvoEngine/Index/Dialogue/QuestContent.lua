@@ -10,7 +10,7 @@ return {
         ["related"] = {
             "accept",
         },
-        ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept.json",
+        ["source"] = "dialogue/quest_content/quest_clinic_supplies_accept.json",
     },
     ["quest.clinic_supplies.offer"] = {
         ["domain"] = "quest_content",
@@ -22,7 +22,7 @@ return {
         ["related"] = {
             "offer",
         },
-        ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer.json",
+        ["source"] = "dialogue/quest_content/quest_clinic_supplies_offer.json",
     },
     ["quest.clinic_supplies.status"] = {
         ["domain"] = "quest_content",
@@ -31,7 +31,7 @@ return {
         },
         ["id"] = "quest.clinic_supplies.status",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status.json",
+        ["source"] = "dialogue/quest_content/quest_clinic_supplies_status.json",
     },
     ["quest.clinic_supplies.turn_in"] = {
         ["domain"] = "quest_content",
@@ -40,6 +40,6 @@ return {
         },
         ["id"] = "quest.clinic_supplies.turn_in",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in.json",
+        ["source"] = "dialogue/quest_content/quest_clinic_supplies_turn_in.json",
     },
 }

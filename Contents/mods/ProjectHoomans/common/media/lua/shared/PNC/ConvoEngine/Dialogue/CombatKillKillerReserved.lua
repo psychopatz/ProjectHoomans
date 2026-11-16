@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_reserved",
             ["sourceId"] = "combat.reaction.kill_killer_reserved",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
+            ["sourcePath"] = "dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerReserved",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
+        ["sourceShard"] = "dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

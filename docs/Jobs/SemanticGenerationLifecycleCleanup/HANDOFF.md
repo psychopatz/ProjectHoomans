@@ -5,8 +5,8 @@ target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 state: "COMPLETE"
 parent_status: "COMPLETE"
-phase: "G8R7D"
-chunk: "G8R7D — final committed closure"
+phase: "G9E"
+chunk: "G9E — committed-vector migration/rebuild closure"
 retrieval_tier: "auditor"
 ---
 
@@ -14,4 +14,4 @@ retrieval_tier: "auditor"
 
 **Status:** COMPLETE.
 
-All G8R1–G8R6 and G8R7A–D portability closure gates are implemented, committed on `main` across `DynamicTrading`, `psychopatzCore`, and `ProjectHoomans`, and verified on an isolated committed-vector clean rebuild and live Lua `ConvoProbe` trace-equivalence run.
+All G9A–G9E package-ownership, semantic-migration, readable-shard-naming, navigation-UX, and committed-vector rebuild gates are implemented, committed on `main` across `DynamicTrading`, `psychopatzCore`, and `ProjectHoomans`, and verified on an isolated committed-vector reconstruction.

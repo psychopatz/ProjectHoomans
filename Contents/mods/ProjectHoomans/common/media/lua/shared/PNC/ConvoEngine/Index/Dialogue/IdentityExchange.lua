@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "identity.exchange.responses",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/identity_exchange/identity_exchange_responses.json",
+        ["source"] = "dialogue/identity_exchange/identity_exchange_responses.json",
     },
 }

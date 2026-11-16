@@ -1,0 +1,82 @@
+{
+  "schema": "psychopatz.psdl.package.v2",
+  "version": 1,
+  "package": "ProjectHoomans",
+  "defaultOwner": "ProjectHoomans",
+  "registryOwner": "ProjectHoomans",
+  "imports": [
+    "PsychopatzCore"
+  ],
+  "defaults": {
+    "participants": {
+      "speaker": [
+        "participant"
+      ],
+      "addressee": [
+        "participant"
+      ]
+    }
+  },
+  "profiles": {
+    "social_beat": {
+      "kind": "beat",
+      "version": 1,
+      "stimuli": [
+        "HUMAN_UTTERANCE",
+        "NPC_SEMANTIC_ACT"
+      ]
+    },
+    "social_behavior": {
+      "kind": "behavior",
+      "version": 1,
+      "mode": "beat",
+      "stimuli": [
+        "HUMAN_UTTERANCE",
+        "NPC_SEMANTIC_ACT"
+      ],
+      "requiredCapabilities": [
+        "speech"
+      ]
+    },
+    "dialogue_participant": {
+      "kind": "dialogue",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      }
+    },
+    "lexeme_realization": {
+      "kind": "realization",
+      "type": "lexeme"
+    }
+  },
+  "requiredCapabilities": [
+    "speech",
+    "hoomans.social",
+    "hoomans.camp.establish",
+    "pnc:companion.follow",
+    "pnc:companion.stay"
+  ],
+  "sourceRoots": [
+    {
+      "path": "behavior",
+      "kind": "convo_engine",
+      "domain": "social",
+      "order": 3005,
+      "owner": "ProjectHoomans",
+      "domainFromSubdir": true
+    },
+    {
+      "path": "dialogue",
+      "kind": "convo_engine",
+      "domain": "general",
+      "order": 3011,
+      "owner": "ProjectHoomans",
+      "domainFromSubdir": true
+    }
+  ]
+}

@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "combat.kill.killer.supportive.firearm",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
     },
     ["combat.kill.killer.supportive.melee"] = {
         ["domain"] = "combat_banter_weapon_kill_supportive",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "combat.kill.killer.supportive.melee",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee.json",
     },
 }

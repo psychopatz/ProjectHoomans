@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "question.knowledge_and_bite.responses",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
+        ["source"] = "dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
     },
 }

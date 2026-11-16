@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "flow.farewell.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell_default.json",
+            ["sourcePath"] = "dialogue/event_reactions_farewell/flow_farewell_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsFarewell",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell_default.json",
+        ["sourceShard"] = "dialogue/event_reactions_farewell/flow_farewell_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "friendly",
             ["sourceId"] = "flow.farewell.friendly",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell.json",
+            ["sourcePath"] = "dialogue/event_reactions_farewell/flow_farewell.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsFarewell",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell.json",
+        ["sourceShard"] = "dialogue/event_reactions_farewell/flow_farewell.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

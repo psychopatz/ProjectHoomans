@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.human_kill.shaken",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
+        ["source"] = "dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
     },
 }

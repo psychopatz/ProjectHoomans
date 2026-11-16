@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "combat.reaction.kill_witness_brave",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_brave/combat_reaction_kill_witness_brave.json",
+        ["source"] = "dialogue/combat_kill_witness_brave/combat_reaction_kill_witness_brave.json",
     },
 }

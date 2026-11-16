@@ -3,139 +3,139 @@ return {
     ["question.wellbeing.dataset.getting_by"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.dataset.getting_by",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
     },
     ["question.wellbeing.default"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.default",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_default.json",
     },
     ["question.wellbeing.fatigue"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.fatigue",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_fatigue.json",
     },
     ["question.wellbeing.fatigue_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.fatigue_alt",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue_alt.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_fatigue_alt.json",
     },
     ["question.wellbeing.follow_up.responses"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.follow_up.responses",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_follow_up.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_follow_up.json",
     },
     ["question.wellbeing.hunger"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.hunger",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_hunger.json",
     },
     ["question.wellbeing.hunger_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.hunger_alt",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger_alt.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_hunger_alt.json",
     },
     ["question.wellbeing.injured"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.injured",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_injured.json",
     },
     ["question.wellbeing.panic"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.panic",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_panic.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_panic.json",
     },
     ["question.wellbeing.stress"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
         },
         ["id"] = "question.wellbeing.stress",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_stress.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_stress.json",
     },
     ["question.wellbeing.thirst"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent__7c62895f",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/ThirstToThirstAlt",
         },
         ["id"] = "question.wellbeing.thirst",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_thirst.json",
     },
     ["question.wellbeing.thirst_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent__7c62895f",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/ThirstToThirstAlt",
         },
         ["id"] = "question.wellbeing.thirst_alt",
         ["kind"] = "dialogue",
         ["related"] = {
             "question.wellbeing",
         },
-        ["source"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst_alt.json",
+        ["source"] = "dialogue/wellbeing_content/question_wellbeing_thirst_alt.json",
     },
 }

@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "firearm",
             ["sourceId"] = "combat.kill.killer.supportive.firearm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillSupportive",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "melee",
             ["sourceId"] = "combat.kill.killer.supportive.melee",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillSupportive",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

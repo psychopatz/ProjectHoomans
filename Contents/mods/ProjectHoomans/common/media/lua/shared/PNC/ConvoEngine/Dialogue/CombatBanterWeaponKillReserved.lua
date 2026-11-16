@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "blade",
             ["sourceId"] = "combat.kill.killer.reserved.blade",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "firearm",
             ["sourceId"] = "combat.kill.killer.reserved.firearm",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm.json",
+            ["sourcePath"] = "dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm.json",
+        ["sourceShard"] = "dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

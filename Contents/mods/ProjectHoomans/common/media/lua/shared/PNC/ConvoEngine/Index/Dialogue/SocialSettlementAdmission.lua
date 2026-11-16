@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "social.settlement_admission",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
+        ["source"] = "dialogue/social_settlement_admission/social_settlement_admission.json",
     },
 }

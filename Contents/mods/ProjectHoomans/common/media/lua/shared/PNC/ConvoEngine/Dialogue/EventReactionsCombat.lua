@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "combat.reaction.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
+            ["sourcePath"] = "dialogue/event_reactions_combat/combat_reaction_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
+        ["sourceShard"] = "dialogue/event_reactions_combat/combat_reaction_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "retreat",
             ["sourceId"] = "combat.reaction.retreat",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_retreat.json",
+            ["sourcePath"] = "dialogue/event_reactions_combat/combat_reaction_retreat.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_retreat.json",
+        ["sourceShard"] = "dialogue/event_reactions_combat/combat_reaction_retreat.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "threat",
             ["sourceId"] = "combat.reaction.threat",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_threat.json",
+            ["sourcePath"] = "dialogue/event_reactions_combat/combat_reaction_threat.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_threat.json",
+        ["sourceShard"] = "dialogue/event_reactions_combat/combat_reaction_threat.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

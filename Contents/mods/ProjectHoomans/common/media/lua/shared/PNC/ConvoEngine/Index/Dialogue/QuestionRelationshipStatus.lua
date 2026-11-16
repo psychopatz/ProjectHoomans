@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "question.relationship_status.responses",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/question_relationship_status/question_relationship_status.json",
+        ["source"] = "dialogue/question_relationship_status/question_relationship_status.json",
     },
 }

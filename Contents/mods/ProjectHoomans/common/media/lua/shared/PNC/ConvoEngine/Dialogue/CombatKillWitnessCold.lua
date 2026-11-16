@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_witness_cold",
             ["sourceId"] = "combat.reaction.kill_witness_cold",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
+            ["sourcePath"] = "dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessCold",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
+        ["sourceShard"] = "dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "question.gossip",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_check_in/question_gossip.json",
+        ["source"] = "dialogue/companion_check_in/question_gossip.json",
     },
     ["question.health"] = {
         ["domain"] = "companion_check_in",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "question.health",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_check_in/question_health.json",
+        ["source"] = "dialogue/companion_check_in/question_health.json",
     },
     ["question.needs"] = {
         ["dependents"] = {
@@ -29,6 +29,6 @@ return {
         },
         ["id"] = "question.needs",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/companion_check_in/question_needs.json",
+        ["source"] = "dialogue/companion_check_in/question_needs.json",
     },
 }

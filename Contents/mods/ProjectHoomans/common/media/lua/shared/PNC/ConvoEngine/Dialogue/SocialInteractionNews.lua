@@ -290,7 +290,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "acknowledge",
             ["sourceId"] = "interaction.news.acknowledge",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
+            ["sourcePath"] = "dialogue/social_interaction_news/interaction_news_acknowledge.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
@@ -469,7 +469,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
+        ["sourceShard"] = "dialogue/social_interaction_news/interaction_news_acknowledge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

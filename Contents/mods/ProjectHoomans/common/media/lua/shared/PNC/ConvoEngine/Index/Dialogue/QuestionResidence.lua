@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "question.residence.responses",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/question_residence/question_residence.json",
+        ["source"] = "dialogue/question_residence/question_residence.json",
     },
 }

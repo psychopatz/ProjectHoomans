@@ -6,10 +6,10 @@ return {
         },
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/ConvoEngine/Packs/Dialogue/SocialReactionsHostile__48471f22",
+            "PNC/ConvoEngine/Packs/Dialogue/SocialReactionsHostileOfferThreat",
         },
         ["id"] = "pack.projecthoomans.social_profanity",
         ["kind"] = "pack",
-        ["source"] = "adopters/hoomans/dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
     },
 }

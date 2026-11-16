@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "close",
             ["sourceId"] = "leader_loss.close",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_close.json",
+            ["sourcePath"] = "dialogue/event_reactions_leader_loss/leader_loss_close.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -187,7 +187,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_close.json",
+        ["sourceShard"] = "dialogue/event_reactions_leader_loss/leader_loss_close.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -325,7 +325,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "colonist",
             ["sourceId"] = "leader_loss.colonist",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_colonist.json",
+            ["sourcePath"] = "dialogue/event_reactions_leader_loss/leader_loss_colonist.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -417,7 +417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_colonist.json",
+        ["sourceShard"] = "dialogue/event_reactions_leader_loss/leader_loss_colonist.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -555,7 +555,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "leader_loss.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_default.json",
+            ["sourcePath"] = "dialogue/event_reactions_leader_loss/leader_loss_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -647,7 +647,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_default.json",
+        ["sourceShard"] = "dialogue/event_reactions_leader_loss/leader_loss_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,7 +785,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "devoted",
             ["sourceId"] = "leader_loss.devoted",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_devoted.json",
+            ["sourcePath"] = "dialogue/event_reactions_leader_loss/leader_loss_devoted.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -877,7 +877,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_devoted.json",
+        ["sourceShard"] = "dialogue/event_reactions_leader_loss/leader_loss_devoted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1015,7 +1015,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "dissent",
             ["sourceId"] = "leader_loss.dissent",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_dissent.json",
+            ["sourcePath"] = "dialogue/event_reactions_leader_loss/leader_loss_dissent.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -1107,7 +1107,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_dissent.json",
+        ["sourceShard"] = "dialogue/event_reactions_leader_loss/leader_loss_dissent.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1245,7 +1245,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "distant",
             ["sourceId"] = "leader_loss.distant",
-            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_distant.json",
+            ["sourcePath"] = "dialogue/event_reactions_leader_loss/leader_loss_distant.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -1337,7 +1337,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_leader_loss/leader_loss_distant.json",
+        ["sourceShard"] = "dialogue/event_reactions_leader_loss/leader_loss_distant.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

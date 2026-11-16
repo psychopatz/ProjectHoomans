@@ -290,7 +290,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "social.apology.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
+            ["sourcePath"] = "dialogue/social_apology/social_apology_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
@@ -468,7 +468,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
+        ["sourceShard"] = "dialogue/social_apology/social_apology_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -900,7 +900,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "friendly",
             ["sourceId"] = "social.apology.friendly",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
+            ["sourcePath"] = "dialogue/social_apology/social_apology.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
@@ -1078,7 +1078,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
+        ["sourceShard"] = "dialogue/social_apology/social_apology.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1510,7 +1510,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "stressed",
             ["sourceId"] = "social.apology.stressed",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
+            ["sourcePath"] = "dialogue/social_apology/social_apology_stressed.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
@@ -1688,7 +1688,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
+        ["sourceShard"] = "dialogue/social_apology/social_apology_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2120,7 +2120,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "withdrawn",
             ["sourceId"] = "social.apology.withdrawn",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
+            ["sourcePath"] = "dialogue/social_apology/social_apology_withdrawn.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
@@ -2298,7 +2298,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
+        ["sourceShard"] = "dialogue/social_apology/social_apology_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

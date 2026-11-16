@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "kill_killer_brave",
             ["sourceId"] = "combat.reaction.kill_killer_brave",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
+            ["sourcePath"] = "dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerBrave",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
+        ["sourceShard"] = "dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

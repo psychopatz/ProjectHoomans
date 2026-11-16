@@ -95,7 +95,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "default",
             ["sourceId"] = "medical.distress.default",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_default.json",
+            ["sourcePath"] = "dialogue/medical_event_overview/medical_distress_default.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
@@ -186,7 +186,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_default.json",
+        ["sourceShard"] = "dialogue/medical_event_overview/medical_distress_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -324,7 +324,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "mercy",
             ["sourceId"] = "medical.distress.mercy",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_mercy.json",
+            ["sourcePath"] = "dialogue/medical_event_overview/medical_distress_mercy.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
@@ -415,7 +415,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_mercy.json",
+        ["sourceShard"] = "dialogue/medical_event_overview/medical_distress_mercy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -553,7 +553,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "urgent",
             ["sourceId"] = "medical.distress.urgent",
-            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_urgent.json",
+            ["sourcePath"] = "dialogue/medical_event_overview/medical_distress_urgent.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
@@ -644,7 +644,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_overview/medical_distress_urgent.json",
+        ["sourceShard"] = "dialogue/medical_event_overview/medical_distress_urgent.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -3,7 +3,7 @@ return {
     ["behavior.acknowledge_memory"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.acknowledge_memory",
         ["kind"] = "behavior",
@@ -16,7 +16,7 @@ return {
     ["behavior.acknowledge_news"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.acknowledge_news",
         ["kind"] = "behavior",
@@ -28,7 +28,7 @@ return {
     ["behavior.acknowledge_repair"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.acknowledge_repair",
         ["kind"] = "behavior",
@@ -40,7 +40,7 @@ return {
     ["behavior.acknowledge_reply"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.acknowledge_reply",
         ["kind"] = "behavior",
@@ -52,7 +52,7 @@ return {
     ["behavior.acknowledge_thanks"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.acknowledge_thanks",
         ["kind"] = "behavior",
@@ -64,7 +64,7 @@ return {
     ["behavior.ask_memory_followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.ask_memory_followup",
         ["kind"] = "behavior",
@@ -79,7 +79,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.challenge",
         ["kind"] = "behavior",
@@ -91,7 +91,7 @@ return {
     ["behavior.clarify_context"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.clarify_context",
         ["kind"] = "behavior",
@@ -107,7 +107,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.deescalate",
         ["kind"] = "behavior",
@@ -123,7 +123,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.end_conversation",
         ["kind"] = "behavior",
@@ -138,7 +138,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.reconcile",
         ["kind"] = "behavior",
@@ -153,7 +153,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.retaliate_verbally",
         ["kind"] = "behavior",
@@ -165,7 +165,7 @@ return {
     ["behavior.scene_excursion_acknowledge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_excursion_acknowledge",
         ["kind"] = "behavior",
@@ -177,7 +177,7 @@ return {
     ["behavior.scene_excursion_departing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_excursion_departing",
         ["kind"] = "behavior",
@@ -189,7 +189,7 @@ return {
     ["behavior.scene_excursion_failed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_excursion_failed",
         ["kind"] = "behavior",
@@ -201,7 +201,7 @@ return {
     ["behavior.scene_excursion_home"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_excursion_home",
         ["kind"] = "behavior",
@@ -213,7 +213,7 @@ return {
     ["behavior.scene_excursion_preparing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_excursion_preparing",
         ["kind"] = "behavior",
@@ -225,7 +225,7 @@ return {
     ["behavior.scene_excursion_returning"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_excursion_returning",
         ["kind"] = "behavior",
@@ -237,7 +237,7 @@ return {
     ["behavior.scene_grounded_news_share"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_grounded_news_share",
         ["kind"] = "behavior",
@@ -249,7 +249,7 @@ return {
     ["behavior.scene_horde_prompt"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_horde_prompt",
         ["kind"] = "behavior",
@@ -261,7 +261,7 @@ return {
     ["behavior.scene_horde_reply_brave"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_horde_reply_brave",
         ["kind"] = "behavior",
@@ -273,7 +273,7 @@ return {
     ["behavior.scene_horde_reply_cautious"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_horde_reply_cautious",
         ["kind"] = "behavior",
@@ -285,7 +285,7 @@ return {
     ["behavior.scene_horde_reply_steady"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_horde_reply_steady",
         ["kind"] = "behavior",
@@ -297,7 +297,7 @@ return {
     ["behavior.scene_news_followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_news_followup",
         ["kind"] = "behavior",
@@ -309,7 +309,7 @@ return {
     ["behavior.scene_news_followup_answer"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_news_followup_answer",
         ["kind"] = "behavior",
@@ -321,7 +321,7 @@ return {
     ["behavior.scene_post_combat_clear"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_post_combat_clear",
         ["kind"] = "behavior",
@@ -333,7 +333,7 @@ return {
     ["behavior.scene_task_work_assigned"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_task_work_assigned",
         ["kind"] = "behavior",
@@ -345,7 +345,7 @@ return {
     ["behavior.scene_task_work_completed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PNC/ConvoEngine/Behavior/Social",
         },
         ["id"] = "behavior.scene_task_work_completed",
         ["kind"] = "behavior",
@@ -362,7 +362,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.warn",
         ["kind"] = "behavior",
@@ -374,7 +374,7 @@ return {
     ["behavior.world_event_warn"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/ConvoEngine/Behavior/Social",
+            "PsychopatzCore/ConvoEngine/Behavior/Social__d6475647",
         },
         ["id"] = "behavior.world_event_warn",
         ["kind"] = "behavior",

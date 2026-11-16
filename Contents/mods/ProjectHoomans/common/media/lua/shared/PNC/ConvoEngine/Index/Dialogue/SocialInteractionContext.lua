@@ -10,6 +10,6 @@ return {
         },
         ["id"] = "interaction.context.clarify",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
+        ["source"] = "dialogue/social_interaction_context/interaction_context_clarify.json",
     },
 }

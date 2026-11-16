@@ -99,7 +99,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "gossip",
             ["sourceId"] = "question.gossip",
-            ["sourcePath"] = "adopters/hoomans/dialogue/companion_check_in/question_gossip.json",
+            ["sourcePath"] = "dialogue/companion_check_in/question_gossip.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCheckIn",
@@ -212,7 +212,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/companion_check_in/question_gossip.json",
+        ["sourceShard"] = "dialogue/companion_check_in/question_gossip.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -352,7 +352,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "health",
             ["sourceId"] = "question.health",
-            ["sourcePath"] = "adopters/hoomans/dialogue/companion_check_in/question_health.json",
+            ["sourcePath"] = "dialogue/companion_check_in/question_health.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCheckIn",
@@ -471,7 +471,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/companion_check_in/question_health.json",
+        ["sourceShard"] = "dialogue/companion_check_in/question_health.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -611,7 +611,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "needs",
             ["sourceId"] = "question.needs",
-            ["sourcePath"] = "adopters/hoomans/dialogue/companion_check_in/question_needs.json",
+            ["sourcePath"] = "dialogue/companion_check_in/question_needs.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCheckIn",
@@ -724,7 +724,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/companion_check_in/question_needs.json",
+        ["sourceShard"] = "dialogue/companion_check_in/question_needs.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

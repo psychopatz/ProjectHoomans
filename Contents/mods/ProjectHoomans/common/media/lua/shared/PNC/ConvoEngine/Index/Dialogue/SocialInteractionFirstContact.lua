@@ -10,6 +10,6 @@ return {
         },
         ["id"] = "interaction.first_contact.challenge",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
+        ["source"] = "dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
     },
 }

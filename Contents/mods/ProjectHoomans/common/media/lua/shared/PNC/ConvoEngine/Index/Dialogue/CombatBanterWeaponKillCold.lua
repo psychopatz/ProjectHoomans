@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "combat.kill.killer.cold.blade_head",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
     },
     ["combat.kill.killer.cold.firearm_high"] = {
         ["domain"] = "combat_banter_weapon_kill_cold",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "combat.kill.killer.cold.firearm_high",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high.json",
     },
     ["combat.kill.killer.cold.heavy_melee"] = {
         ["domain"] = "combat_banter_weapon_kill_cold",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "combat.kill.killer.cold.heavy_melee",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee.json",
     },
 }

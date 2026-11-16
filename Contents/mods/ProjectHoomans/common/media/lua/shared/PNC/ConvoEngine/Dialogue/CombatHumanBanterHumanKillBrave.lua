@@ -239,7 +239,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "brave",
             ["sourceId"] = "combat.human_kill.brave",
-            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
+            ["sourcePath"] = "dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillBrave",
@@ -403,7 +403,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
+        ["sourceShard"] = "dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

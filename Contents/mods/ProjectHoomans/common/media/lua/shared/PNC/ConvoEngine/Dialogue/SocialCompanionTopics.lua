@@ -9,7 +9,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "trust",
             ["sourceId"] = "social.personal.special.trust",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/social_personal_special_trust.json",
+            ["sourcePath"] = "dialogue/social_companion_topics/social_personal_special_trust.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
@@ -141,7 +141,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_personal_special_trust.json",
+        ["sourceShard"] = "dialogue/social_companion_topics/social_personal_special_trust.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -162,7 +162,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "affinity",
             ["sourceId"] = "social.relationship.special.affinity",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/social_relationship_special_affinity.json",
+            ["sourcePath"] = "dialogue/social_companion_topics/social_relationship_special_affinity.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
@@ -294,7 +294,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_relationship_special_affinity.json",
+        ["sourceShard"] = "dialogue/social_companion_topics/social_relationship_special_affinity.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -315,7 +315,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "claim",
             ["sourceId"] = "social.set_territory.member.claim",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/social_set_territory_member_claim.json",
+            ["sourcePath"] = "dialogue/social_companion_topics/social_set_territory_member_claim.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
@@ -456,7 +456,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_set_territory_member_claim.json",
+        ["sourceShard"] = "dialogue/social_companion_topics/social_set_territory_member_claim.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -486,7 +486,7 @@ return {
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "status",
             ["sourceId"] = "work_orders.member.status",
-            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/work_orders_member_status.json",
+            ["sourcePath"] = "dialogue/social_companion_topics/work_orders_member_status.json",
             ["sourceSchema"] = "psychopatz.psdl.v2",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
@@ -663,7 +663,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/work_orders_member_status.json",
+        ["sourceShard"] = "dialogue/social_companion_topics/work_orders_member_status.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

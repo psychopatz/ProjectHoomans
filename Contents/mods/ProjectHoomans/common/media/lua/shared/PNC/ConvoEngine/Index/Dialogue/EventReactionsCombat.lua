@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "combat.reaction.default",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
+        ["source"] = "dialogue/event_reactions_combat/combat_reaction_default.json",
     },
     ["combat.reaction.retreat"] = {
         ["domain"] = "event_reactions_combat",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "combat.reaction.retreat",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_retreat.json",
+        ["source"] = "dialogue/event_reactions_combat/combat_reaction_retreat.json",
     },
     ["combat.reaction.threat"] = {
         ["domain"] = "event_reactions_combat",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "combat.reaction.threat",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_threat.json",
+        ["source"] = "dialogue/event_reactions_combat/combat_reaction_threat.json",
     },
 }

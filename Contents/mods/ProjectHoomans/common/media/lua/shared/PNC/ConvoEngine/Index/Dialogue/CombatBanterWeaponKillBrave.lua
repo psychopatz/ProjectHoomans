@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "combat.kill.killer.brave.axe",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
     },
     ["combat.kill.killer.brave.blade_head"] = {
         ["domain"] = "combat_banter_weapon_kill_brave",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "combat.kill.killer.brave.blade_head",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head.json",
     },
     ["combat.kill.killer.brave.firearm_high"] = {
         ["domain"] = "combat_banter_weapon_kill_brave",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "combat.kill.killer.brave.firearm_high",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high.json",
     },
     ["combat.kill.killer.brave.spear"] = {
         ["domain"] = "combat_banter_weapon_kill_brave",
@@ -34,6 +34,6 @@ return {
         },
         ["id"] = "combat.kill.killer.brave.spear",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear.json",
+        ["source"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear.json",
     },
 }
