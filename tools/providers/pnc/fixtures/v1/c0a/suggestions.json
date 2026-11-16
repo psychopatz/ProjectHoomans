@@ -4,7 +4,10 @@
   "cases": [
     {
       "id": "c0a.suggestions.greeting",
-      "tags": ["c0a", "suggestions"],
+      "tags": [
+        "c0a",
+        "suggestions"
+      ],
       "turns": [
         {
           "text": "hello there",
@@ -17,7 +20,11 @@
     },
     {
       "id": "c0a.suggestions.time_reply",
-      "tags": ["c0a", "suggestions", "time"],
+      "tags": [
+        "c0a",
+        "suggestions",
+        "time"
+      ],
       "turns": [
         {
           "text": "what time is it",
@@ -30,16 +37,23 @@
     },
     {
       "id": "c0a.suggestions.hostility_reply",
-      "tags": ["c0a", "suggestions", "hostility"],
+      "tags": [
+        "c0a",
+        "suggestions",
+        "hostility"
+      ],
       "turns": [
         {
           "text": "fuck you",
           "expect": {
             "ir.intent": "INSULT",
-            "dispatchTransport": { "count": 0 }
+            "dispatchTransport": {
+              "count": 0
+            }
           }
         }
       ]
     }
-  ]
+  ],
+  "domain": "suggestions"
 }

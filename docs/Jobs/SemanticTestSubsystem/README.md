@@ -1,35 +1,36 @@
-# Semantic Test Subsystem — Fixture Authority Repair
+# Semantic Test Subsystem — A6R Behavioral Fixture Consolidation
 
-**Status:** IN PROGRESS.
+**Status:** COMPLETE.
 
 ## Objective
 
-Restore the declarative Semantic Test subsystem as the canonical low-token behavioural acceptance surface after the PSDL/package/runtime refactors.
+Finish the All-in-One PSDL Semantic Tester by consolidating remaining behavioural acceptance into the provider-owned fixture pipeline, proving every registered fixture operation against real production authority where appropriate, and tightening domain/GUI discoverability before final closure.
 
-Target architecture:
+Accepted foundation:
 
 ```text
-Semantic Harness Core
-  schema + loader + executor + comparator + batching + fixture resolver
-
-provider package
-  provider-owned semantic fixtures
-
-active provider
-  → fixture resolver
-  → same CLI / GUI / batch executor
-  → real production Lua
+provider fixture
+→ generic loader/resolver
+→ typed operation registry
+→ compiler probe and/or real LuaSemanticWorker
+→ normalized bounded result
+→ generic comparator
+→ CLI / GUI / batch
 ```
 
-The subsystem itself is still healthy. The repair is about fixture ownership, discovery, stale expectations and acceptance coverage.
+A1–A3 infrastructure is implemented and independently verified. The first A4 migration batch is valid. A5/A6 closure was premature because many behavioural direct-worker tests were blanket-classified as low-level contracts without concrete justification.
 
-## Verified current baseline
+## Verified audit baseline
 
-- ProjectHoomans provider corpus: 17 files / 116 expanded cases.
-- Explicit current fixture execution works through both Semantic Test CLIs.
-- Lint, behaviour parity and real-Lua batch/cancel/resume tests pass.
-- Full provider corpus: 114 PASS / 2 FAIL.
-- Both default runners currently fail before execution because they discover the stale Core copy using retired `pnc.semantic-test.v1` instead of current `semantic.harness-test.v1`.
-- GUI regression fixture loading still points directly at Core-owned PNC fixture copies.
+- Exact committed vector audited: Core `1199980f00a1`, ProjectHoomans `f1dcf5c5cdac`.
+- Core fixture operation/authority tests: 15/15 PASS.
+- Provider fixture corpus: 137/137 PASS.
+- Compiler domain: 2/2 PASS.
+- Beats domain: 10/10 PASS.
+- Provider parity/lint/batch suite: 33/33 PASS.
+- Current classification ledger: 194 modules / 801 methods.
+- 91 direct-worker modules / 374 methods are labeled `LOW_LEVEL_RUNTIME_CONTRACT` with one generic justification.
+- Conservative scan found 34 small modules / 83 methods whose worker calls are already expressible by the current fixture pipeline.
+- A targeted 23-test easy-migration batch was rerun from the committed vector and passed completely.
 
-Git history is the archive for the completed original P0–P7 implementation.
+Git history remains the archive for the original Fixture Authority Repair and A1–A6 implementation.

@@ -4,7 +4,12 @@
   "cases": [
     {
       "id": "identity.collision.wellbeing_report_preserves_pending",
-      "tags": ["identity", "wellbeing", "multi_turn", "pilot"],
+      "tags": [
+        "identity",
+        "wellbeing",
+        "multi_turn",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "who are you",
@@ -25,7 +30,12 @@
     },
     {
       "id": "identity.collision.hunger_report_preserves_pending",
-      "tags": ["identity", "hunger", "multi_turn", "pilot"],
+      "tags": [
+        "identity",
+        "hunger",
+        "multi_turn",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "who are you",
@@ -46,7 +56,13 @@
     },
     {
       "id": "identity.collision.question_interruption_preserves_pending",
-      "tags": ["identity", "question", "interruption", "multi_turn", "pilot"],
+      "tags": [
+        "identity",
+        "question",
+        "interruption",
+        "multi_turn",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "who are you",
@@ -67,7 +83,13 @@
     },
     {
       "id": "identity.collision.time_interruption_preserves_pending",
-      "tags": ["identity", "time", "interruption", "multi_turn", "pilot"],
+      "tags": [
+        "identity",
+        "time",
+        "interruption",
+        "multi_turn",
+        "pilot"
+      ],
       "turns": [
         {
           "text": "who are you",
@@ -86,5 +108,6 @@
         }
       ]
     }
-  ]
+  ],
+  "domain": "interaction"
 }

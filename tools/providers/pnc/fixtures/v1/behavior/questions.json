@@ -4,7 +4,10 @@
   "cases": [
     {
       "id": "question.location.direct",
-      "tags": ["question", "location"],
+      "tags": [
+        "question",
+        "location"
+      ],
       "turns": [
         {
           "text": "Where is John?",
@@ -19,7 +22,10 @@
     },
     {
       "id": "question.location.find",
-      "tags": ["question", "location"],
+      "tags": [
+        "question",
+        "location"
+      ],
       "turns": [
         {
           "text": "Where can I find Sarah?",
@@ -33,7 +39,10 @@
     },
     {
       "id": "question.location.embedded",
-      "tags": ["question", "location"],
+      "tags": [
+        "question",
+        "location"
+      ],
       "turns": [
         {
           "text": "Do you know where Sarah is?",
@@ -46,7 +55,10 @@
     },
     {
       "id": "question.seen.present_perfect",
-      "tags": ["question", "seen"],
+      "tags": [
+        "question",
+        "seen"
+      ],
       "turns": [
         {
           "text": "Have you seen Sarah?",
@@ -59,7 +71,10 @@
     },
     {
       "id": "question.seen.polite",
-      "tags": ["question", "seen"],
+      "tags": [
+        "question",
+        "seen"
+      ],
       "turns": [
         {
           "text": "Did you happen to see Sarah?",
@@ -72,7 +87,10 @@
     },
     {
       "id": "question.activity.recent",
-      "tags": ["question", "activity"],
+      "tags": [
+        "question",
+        "activity"
+      ],
       "turns": [
         {
           "text": "What have you been doing?",
@@ -84,7 +102,10 @@
     },
     {
       "id": "question.activity.up_to",
-      "tags": ["question", "activity"],
+      "tags": [
+        "question",
+        "activity"
+      ],
       "turns": [
         {
           "text": "What have you been up to?",
@@ -96,7 +117,10 @@
     },
     {
       "id": "question.activity.now",
-      "tags": ["question", "activity"],
+      "tags": [
+        "question",
+        "activity"
+      ],
       "turns": [
         {
           "text": "What are you doing right now?",
@@ -108,7 +132,10 @@
     },
     {
       "id": "question.date.day",
-      "tags": ["question", "date"],
+      "tags": [
+        "question",
+        "date"
+      ],
       "turns": [
         {
           "text": "What day is it?",
@@ -121,7 +148,10 @@
     },
     {
       "id": "question.weather.current",
-      "tags": ["question", "weather"],
+      "tags": [
+        "question",
+        "weather"
+      ],
       "turns": [
         {
           "text": "What is the weather?",
@@ -132,5 +162,6 @@
         }
       ]
     }
-  ]
+  ],
+  "domain": "dialogue"
 }

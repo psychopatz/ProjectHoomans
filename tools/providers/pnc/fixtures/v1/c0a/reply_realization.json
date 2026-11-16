@@ -4,7 +4,11 @@
   "cases": [
     {
       "id": "c0a.realization.retaliation_mirror",
-      "tags": ["c0a", "realization", "personality"],
+      "tags": [
+        "c0a",
+        "realization",
+        "personality"
+      ],
       "scenario": {
         "npc": {
           "personalityOverride": true,
@@ -25,14 +29,19 @@
           "text": "fuck you",
           "expect": {
             "ir.intent": "INSULT",
-            "dispatchTransport": { "count": 0 }
+            "dispatchTransport": {
+              "count": 0
+            }
           }
         }
       ]
     },
     {
       "id": "c0a.realization.agreement",
-      "tags": ["c0a", "realization"],
+      "tags": [
+        "c0a",
+        "realization"
+      ],
       "turns": [
         {
           "text": "yes",
@@ -45,7 +54,10 @@
     },
     {
       "id": "c0a.realization.disagreement",
-      "tags": ["c0a", "realization"],
+      "tags": [
+        "c0a",
+        "realization"
+      ],
       "turns": [
         {
           "text": "not really",
@@ -58,7 +70,10 @@
     },
     {
       "id": "c0a.realization.acknowledgement",
-      "tags": ["c0a", "realization"],
+      "tags": [
+        "c0a",
+        "realization"
+      ],
       "turns": [
         {
           "text": "thanks",
@@ -71,7 +86,10 @@
     },
     {
       "id": "c0a.realization.apology_deescalation",
-      "tags": ["c0a", "realization"],
+      "tags": [
+        "c0a",
+        "realization"
+      ],
       "turns": [
         {
           "text": "sorry",
@@ -84,7 +102,10 @@
     },
     {
       "id": "c0a.realization.ask_back_follow_up",
-      "tags": ["c0a", "realization"],
+      "tags": [
+        "c0a",
+        "realization"
+      ],
       "turns": [
         {
           "text": "hello there",
@@ -95,5 +116,6 @@
         }
       ]
     }
-  ]
+  ],
+  "domain": "realization"
 }

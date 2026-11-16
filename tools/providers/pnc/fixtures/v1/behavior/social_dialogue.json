@@ -4,7 +4,10 @@
   "cases": [
     {
       "id": "social.offer.apple",
-      "tags": ["social", "offer"],
+      "tags": [
+        "social",
+        "offer"
+      ],
       "turns": [
         {
           "text": "Who wants an apple?",
@@ -19,7 +22,10 @@
     },
     {
       "id": "social.agreement.standalone_okay",
-      "tags": ["social", "accept"],
+      "tags": [
+        "social",
+        "accept"
+      ],
       "turns": [
         {
           "text": "okay",
@@ -31,7 +37,10 @@
     },
     {
       "id": "social.agreement.fine_by_me",
-      "tags": ["social", "agree"],
+      "tags": [
+        "social",
+        "agree"
+      ],
       "turns": [
         {
           "text": "fine by me",
@@ -43,7 +52,10 @@
     },
     {
       "id": "social.greeting.hello_there",
-      "tags": ["social", "greet"],
+      "tags": [
+        "social",
+        "greet"
+      ],
       "turns": [
         {
           "text": "hello there",
@@ -57,7 +69,10 @@
     },
     {
       "id": "social.thank.thanks",
-      "tags": ["social", "thank"],
+      "tags": [
+        "social",
+        "thank"
+      ],
       "turns": [
         {
           "text": "thanks",
@@ -70,7 +85,10 @@
     },
     {
       "id": "social.apology.sorry",
-      "tags": ["social", "apology"],
+      "tags": [
+        "social",
+        "apology"
+      ],
       "turns": [
         {
           "text": "sorry",
@@ -81,5 +99,6 @@
         }
       ]
     }
-  ]
+  ],
+  "domain": "dialogue"
 }

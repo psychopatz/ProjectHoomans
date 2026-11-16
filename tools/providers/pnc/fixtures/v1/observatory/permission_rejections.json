@@ -4,7 +4,12 @@
   "cases": [
     {
       "id": "observatory.permissions.follow_rejected.en",
-      "tags": ["observatory", "permissions", "rejected", "follow"],
+      "tags": [
+        "observatory",
+        "permissions",
+        "rejected",
+        "follow"
+      ],
       "scenario": {
         "runtime": {
           "commandResponses": {
@@ -30,7 +35,13 @@
     },
     {
       "id": "observatory.permissions.follow_rejected.tl",
-      "tags": ["observatory", "permissions", "rejected", "follow", "localization"],
+      "tags": [
+        "observatory",
+        "permissions",
+        "rejected",
+        "follow",
+        "localization"
+      ],
       "scenario": {
         "runtime": {
           "commandResponses": {
@@ -57,7 +68,12 @@
     },
     {
       "id": "observatory.permissions.stay_rejected.en",
-      "tags": ["observatory", "permissions", "rejected", "stay"],
+      "tags": [
+        "observatory",
+        "permissions",
+        "rejected",
+        "stay"
+      ],
       "scenario": {
         "runtime": {
           "commandResponses": {
@@ -83,7 +99,13 @@
     },
     {
       "id": "observatory.permissions.stay_rejected.tl",
-      "tags": ["observatory", "permissions", "rejected", "stay", "localization"],
+      "tags": [
+        "observatory",
+        "permissions",
+        "rejected",
+        "stay",
+        "localization"
+      ],
       "scenario": {
         "runtime": {
           "commandResponses": {
@@ -108,5 +130,6 @@
         }
       ]
     }
-  ]
+  ],
+  "domain": "realization"
 }

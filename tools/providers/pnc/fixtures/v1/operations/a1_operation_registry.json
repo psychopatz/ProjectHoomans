@@ -4,6 +4,7 @@
   "cases": [
     {
       "id": "ops.beat.catalog_validate_register_preview",
+      "domain": "beats",
       "description": "Verify beat.catalog, beat.validate, beat.register, and beat.preview against production Lua.",
       "tags": ["operations", "beats"],
       "turns": [
@@ -140,6 +141,7 @@
     },
     {
       "id": "ops.behavior.validate_and_register",
+      "domain": "behaviors",
       "description": "Verify behavior.validate and behavior.register in a disposable worker.",
       "tags": ["operations", "behaviors"],
       "turns": [
@@ -225,6 +227,7 @@
     },
     {
       "id": "ops.knowledge.inspect_and_propagate",
+      "domain": "knowledge",
       "description": "Verify world knowledge inspection and propagation through production Lua.",
       "tags": ["operations", "knowledge"],
       "scenario": {
@@ -313,6 +316,7 @@
     },
     {
       "id": "ops.backstory.inspect_and_fact",
+      "domain": "knowledge",
       "description": "Verify deterministic backstory projection and fact lookup.",
       "tags": ["operations", "backstory"],
       "turns": [
@@ -345,6 +349,7 @@
     },
     {
       "id": "ops.response.list_explain_sample",
+      "domain": "realization",
       "description": "Verify response pool listing, explanation, and sampling.",
       "tags": ["operations", "realization"],
       "turns": [
@@ -386,6 +391,7 @@
     },
     {
       "id": "ops.flow.coverage_and_catalog",
+      "domain": "flows",
       "description": "Verify flow coverage and catalog operations.",
       "tags": ["operations", "flows"],
       "turns": [

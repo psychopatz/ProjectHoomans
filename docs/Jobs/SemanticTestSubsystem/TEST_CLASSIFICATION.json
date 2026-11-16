@@ -1,11 +1,11 @@
 {
   "schema": "semantic.test-classification.v1",
-  "totalModules": 194,
-  "totalMethods": 801,
+  "totalModules": 181,
+  "totalMethods": 772,
   "categoryCounts": {
     "COMPILER_CONTRACT": 10,
     "GUI_CONTRACT": 38,
-    "LOW_LEVEL_RUNTIME_CONTRACT": 112,
+    "LOW_LEVEL_RUNTIME_CONTRACT": 99,
     "NATIVE_INTEGRATION": 14,
     "PERFORMANCE_RESOURCE": 7,
     "SAVE_PERSISTENCE": 8,
@@ -17,1358 +17,1267 @@
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (shared Player/NPC actor inspector acceptance.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_app.py",
       "category": "GUI_CONTRACT",
       "methods": 9,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Entry-point, CLI, and settings draft contract tests.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_automatic_flow_generation.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 11,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Authoring/capability-binding contract (G0A acceptance for metadata-driven simple-command flow generation.): verifies low-level worker authoring validation, capability ABI, or generator manifest."
     },
     {
       "module": "test_behavior_fixture_parity.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Parity and execution validation for broad behavior fixture migration .): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_c0a_baseline.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 9,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Historical C0A evidence checks.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_cli_parity.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (machine-readable CLI parity against a real offline save.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_codeblocks.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (S3 declarative codeblock round-trip contracts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_coherent_conversation_c10.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (test_coherent_conversation_c10.py): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_coherent_conversation_c1_c2.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 8,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (test_coherent_conversation_c1_c2.py): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_coherent_conversation_c3_c4.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 7,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (test_coherent_conversation_c3_c4.py): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_coherent_conversation_c6_c7.py",
       "category": "COMPILER_CONTRACT",
       "methods": 8,
       "usesDirectWorker": true,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (test_coherent_conversation_c6_c7.py): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_coherent_conversation_c8.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 6,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (test_coherent_conversation_c8.py): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_companion_orders_hub.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Production-Lua acceptance for the contextual companion Orders hub.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_acceptance_c6b.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C6-B mandatory contextual conversation and negative-language matrix.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_actor_context.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (canonical actor-context contracts through the production Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_actor_needs_runtime.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (proof for actor-owned needs and production social projections.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_contextual_baseline_matrix.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Manually reviewed Phase 0B baseline matrix on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_bond_catalog_runtime.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (proof for truthful bond catalogs and actor-centric Simulation UX.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_contextual_bonds.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 6,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (bond vocabulary and production-faithful relationship contracts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_choice_provider.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (generic provider discovery and existing authority-lane contracts.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_choice_registry.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c0.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 1,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (choice-registry contract tests through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_conversation_c1.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C1-A pending follow-up and topic interruption on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_conversation_c2.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c3.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 3,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c3b.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 3,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c3c.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 1,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c3d.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 1,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c4a.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 2,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c4b.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 2,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c4c.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 2,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_contextual_conversation_c4d.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 2,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C2-A sparse, owner-linked commitments on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_dialogue_persona_choices.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (freeze tests for the current production suggestion path.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_friend_promotion_runtime.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (proof for durable friend promotion on the existing relationship record.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_contextual_provider_parity_c6c.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C6-C optional-provider parity and non-authorizing fallback.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_ranking.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (precedence, contextual ranking, and privacy contracts.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_relationship_preview.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (live relationship preview and Compare surface tests.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_contextual_relationship_proposal_runtime.py",
       "category": "GUI_CONTRACT",
       "methods": 7,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (proposal, compatibility, and deterministic lover progression tests.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_contextual_runtime_graph.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (shared runtime graph adapters and interaction tests.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_contextual_runtime_speech.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (modular speech-realization registry and regression checks.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_scale_isolation.py",
       "category": "PERFORMANCE_RESOURCE",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+      "justification": "Performance/resource contract (C6-A bounded latency and multi-scope isolation on real Lua workers.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_contextual_semantic_hub.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 6,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Contextual What's Up hub projection through the production Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_social_reactions.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 12,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Phase 3 bounded social-reaction probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_speech_behavior.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (production-worker speech-family and bond realization coverage.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_speech_style.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (transient speech-style and realization-family contracts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_contextual_suggestions_followup.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (Corrective dynamic-topic and owned-action suggestion coverage.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_suggestions_hub_presentation.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (Daily What's Up presentation suppression through the production worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_suggestions_s1.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 6,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (S1 production semantic suggestion projections through the real Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_suggestions_s2.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (S2 constraint and privacy checks through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_suggestions_s3.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 8,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (S3 canonical suggestion clicks through the production dialogue path.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_suggestions_s4.py",
       "category": "GUI_CONTRACT",
       "methods": 7,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (S4 interaction checks for the existing Tk Semantic Lab surface.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_contextual_suggestions_whats_up.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Suggestion/choice-provider contract (What's Up activates the semantic hub through the production Lua worker.): verifies suggestion frame projection, ranking stability, or provider registry."
     },
     {
       "module": "test_contextual_talk_parity.py",
       "category": "GUI_CONTRACT",
       "methods": 22,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
-    },
-    {
-      "module": "test_contextual_weather_gate.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 3,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "GUI/inspector contract (native Talk target parity coverage.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_conversation_inspector.py",
       "category": "GUI_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Conversation State Inspector projection over the real Lua worker.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_conversation_semantic_composition.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Semantic Lab uses the Conversation-owned semantic composition root.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_conversational_competence_c7a.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C7A conversational competence probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_conversational_competence_c7b.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C7B grounded factual-question probes on the production Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_conversational_competence_c7c.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C7C conversational initiative probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_conversational_competence_c7d.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C7D discourse continuity probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_conversational_competence_c7g.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (C7G full conversational acceptance on the production Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_core_codebuilder_boundary.py",
       "category": "STATIC_ARCHITECTURE",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+      "justification": "Static architecture contract (test_core_codebuilder_boundary.py): verifies repository ownership boundaries, file layout, or source hygiene."
     },
     {
       "module": "test_dialogue_anti_duplication.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Observatory/sweep/anti-duplication contract (Verification tests for dialogue anti-duplication, seeded exploration, and phrase pool utilization.): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_dynamic_camp_destinations.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (Production-Lua acceptance for dynamic semantic CampSite destinations.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_faction_community_workbench.py",
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (saved faction/community context and member-target acceptance.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_fixture_provider.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (explicit offline engine-fixture provider tests.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_flow_editor.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 11,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Semantic Lab flow editor contracts against the production Lua registry.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_generation_ownership.py",
       "category": "STATIC_ARCHITECTURE",
       "methods": 8,
       "usesDirectWorker": false,
-      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+      "justification": "Static architecture contract (Cross-repository CodeBuilder ownership routing acceptance.): verifies repository ownership boundaries, file layout, or source hygiene."
     },
     {
       "module": "test_gift_capability_binding.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Authoring/capability-binding contract (Real-Lua Semantic Lab acceptance for the existing gift lifecycle route.): verifies low-level worker authoring validation, capability ABI, or generator manifest."
     },
     {
       "module": "test_grounded_personal_dialogue_b0.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (B0 real-worker regression for social apparel evaluations vs inventory queries.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_grounded_personal_dialogue_b2.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
-    },
-    {
-      "module": "test_grounded_personal_dialogue_b3.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 1,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (B2 real-worker coverage for authoritative offline NPC backstory facts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_grounded_personal_dialogue_h3.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (H3 real-worker regressions for grounded backstory conversations.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_grounded_personal_dialogue_h4.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (H4 sparse persistence and optional-context acceptance checks.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_gui_saved_pair_entrypoint.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (GUI entry-point proof for explicit production save-backed startup.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_gui_test_isolation.py",
       "category": "GUI_CONTRACT",
       "methods": 2,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (GUI isolation and foreground-readiness regressions.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_harness.py",
       "category": "PERFORMANCE_RESOURCE",
       "methods": 24,
       "usesDirectWorker": true,
-      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+      "justification": "Performance/resource contract (Small dependency-free regression tests for the real-Lua worker.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_health_wording_authority.py",
       "category": "COMPILER_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (Health wording-shard migration contracts.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_hub_diagnostics_graph_history.py",
       "category": "GUI_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (proof for safe hub diagnostics and presentation-only graph history.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_inventory_gift_workbench.py",
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (production gift and isolated inventory verification acceptance.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_kahlua_verifier.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Real packaged Kahlua compiler, explicitly opt-in when game jar is present.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_lexicon_compiler.py",
       "category": "COMPILER_CONTRACT",
       "methods": 9,
       "usesDirectWorker": false,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (test_lexicon_compiler.py): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_lint.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Unit tests for the fixture linter.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_live_profiler_provider.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (optional live-profiler provider tests.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_live_regression_l1.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (test_live_regression_l1.py): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_live_regression_l2.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (test_live_regression_l2.py): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_live_regression_l3.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (test_live_regression_l3.py): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_live_regression_l4.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (test_live_regression_l4.py): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_live_regression_l5.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (test_live_regression_l5.py): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_missing_state_audit.py",
       "category": "STATIC_ARCHITECTURE",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+      "justification": "Static architecture contract (audit for honest and classified missing values.): verifies repository ownership boundaries, file layout, or source hygiene."
     },
     {
       "module": "test_native_effect_acceptance.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (Cross-input production-worker acceptance for one companion capability.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_needs_wording_authority.py",
       "category": "COMPILER_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (Needs wording-shard migration contracts.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_observatory_fixture_parity.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 7,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Observatory/sweep/anti-duplication contract (Parity and execution validation for migrated Observatory and C0A fixture families .): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_open_ended_semantic_combat_awareness.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (test_open_ended_semantic_combat_awareness.py): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_operational_acceptance.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (real-save operational acceptance for GUI, worker, and CLI paths.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_operational_world_browser.py",
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (real-worker interaction acceptance for the World Browser.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_package_boundaries.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Regression checks for the Semantic Lab package ownership boundaries.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_package_entrypoint.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (Contract checks for the package-level Semantic Lab entrypoint.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_phase6_performance.py",
       "category": "PERFORMANCE_RESOURCE",
       "methods": 2,
       "usesDirectWorker": false,
-      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+      "justification": "Performance/resource contract (Pure checks for the bounded Phase 6 Semantic Lab measurement helpers.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_phase6_static_boundaries.py",
       "category": "STATIC_ARCHITECTURE",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+      "justification": "Static architecture contract (Static Phase 6 guards for semantic submission ownership.): verifies repository ownership boundaries, file layout, or source hygiene."
     },
     {
       "module": "test_pilot_parity.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Old-versus-new parity verification for the pilot semantic test fixtures.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_player_engine_state.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (native offline Player engine-state provider acceptance.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_portable_c6_matrix.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (C6 portable actor matrix over the real worker and adopter Lua harnesses.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_pragmatic_interaction_authoring.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Authoring/capability-binding contract (worker-local interaction module authoring seam acceptance.): verifies low-level worker authoring validation, capability ABI, or generator manifest."
     },
     {
       "module": "test_pragmatic_interaction_beat_inspector.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (compiler promotion and beat-inspector acceptance.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_pragmatic_interaction_compiler.py",
       "category": "COMPILER_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
-    },
-    {
-      "module": "test_pragmatic_interaction_observations.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 3,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Compiler/catalog contract (Structural compiler acceptance for the pragmatic interaction recovery.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_pragmatic_interaction_r6.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (R6 acceptance: pragmatic resolution and generic one-shot behavior arbitration.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_pragmatic_interaction_r9.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (R9 headless acceptance for the integrated interaction workbench.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_pragmatic_interaction_recovery_r2.py",
       "category": "COMPILER_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (R2 recovery acceptance: behaviors use ordinary Dialogue Content.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_production_faction_rehydration.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (production-owned faction/community rehydration coverage.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_production_inventory_rehydration.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (production-owned NPC inventory rehydration coverage.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_production_leave_group.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (production-worker Leave Group lifecycle acceptance coverage.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_production_mutations.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (production mutation-route acceptance tests.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_production_rehydration.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (production Lua rehydration boundary acceptance coverage.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_production_social_context.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (canonical social-layer and hostile speech parity coverage.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_python_acceptance_runner.py",
       "category": "PERFORMANCE_RESOURCE",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+      "justification": "Performance/resource contract (Lifecycle and resource-boundary tests for the Python acceptance runner.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_quest_flow_binding.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Authoring/capability-binding contract (G3B acceptance for the semantic Clinic Supplies quest contract.): verifies low-level worker authoring validation, capability ABI, or generator manifest."
     },
     {
       "module": "test_real_save_production_runtime.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (real-save production-runtime regression matrix.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_response_observatory.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 10,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Observatory/sweep/anti-duplication contract (Real production Lua registry inspection (no synthetic catalog).): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_response_observatory_matrix.py",
       "category": "GUI_CONTRACT",
       "methods": 20,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Grounded multi-language production-Lua Observatory checks.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_runner.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Bounded conflict-ledger contract tests.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_runtime_config.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Runtime-version discovery tests shared by the harness and Lua smoke runner.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_runtime_package.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Runtime package ownership contracts.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_s10a_label_speech_realization.py",
       "category": "GUI_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (S10A acceptance for label-versus-speech separation and identity realization.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_s10a_provider_worker_startup.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (S10A acceptance tests for real manifest-selected PNC provider worker startup.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_s10c_gui_journeys.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (S10C real Tk/Xvfb GUI end-to-end journeys through SemanticHarnessApp.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_s10r1_worker_precision_and_history.py",
       "category": "COMPILER_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (S10R1 migrated real-worker acceptance for C7F precision, patterns, backstory specs, and interaction history.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_save_backed_conversation.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (save-backed Talk and semantic workflow acceptance coverage.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_save_backed_snapshot.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (source-snapshot and isolated working-world acceptance tests.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_save_browser.py",
       "category": "GUI_CONTRACT",
       "methods": 2,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (read-only saved-world browser tests.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_save_catalog.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 7,
       "usesDirectWorker": false,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (offline save-catalog tests using the Core reader fixture format.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_save_import.py",
       "category": "SAVE_PERSISTENCE",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests save-file serialization, ModData/snapshot rehydration, or version migration."
+      "justification": "Save/persistence contract (saved Player/NPC import and relationship isolation tests.): verifies save-file serialization, ModData rehydration, or version migration."
     },
     {
       "module": "test_saved_world_relationship_lens.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (player-relative saved-world browser coverage.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_semantic_authority_boundaries.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 11,
       "usesDirectWorker": false,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (semantic-authority regression guards.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_semantic_blocks.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (S2 reusable-block registry contracts over the real production catalog.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_category_ownership.py",
       "category": "STATIC_ARCHITECTURE",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests static repository boundaries, ownership invariants, or source hygiene."
+      "justification": "Static architecture contract (Semantic Lab coverage for semantic category ownership.): verifies repository ownership boundaries, file layout, or source hygiene."
     },
     {
       "module": "test_semantic_combat_observatory.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Observatory/sweep/anti-duplication contract (test_semantic_combat_observatory.py): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_semantic_definition_compiler.py",
       "category": "COMPILER_CONTRACT",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (test_semantic_definition_compiler.py): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_semantic_dialogue_flows.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 8,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Production-worker acceptance for bounded semantic dialogue flows.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_identity_wellbeing_collision.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 13,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Production-Lua regression coverage for identity/wellbeing collisions.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_interaction_continuation_contract.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (test_semantic_interaction_continuation_contract.py): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_semantic_interaction_lifecycle.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (production-Lua semantic interaction lifecycle coverage.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_interaction_lifecycle_acceptance.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Developer-side acceptance for the production Lua lifecycle worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_lab_npc_profiles.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Semantic Lab profile presets exercise the production worker seam.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_lab_persona_surface.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (contracts for the production-backed Semantic Lab persona surface.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_lab_persona_workflow.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (contracts for the existing production-backed Semantic Lab workflow.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_semantic_live_parity.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (Contract checks that Semantic Lab exercises the live semantic Lua seam.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_semantic_observatory_codebuilder_lineage.py",
       "category": "GUI_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Canonical generated-source ownership proven with CodeBuilder and real Lua.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_semantic_observatory_scale.py",
       "category": "PERFORMANCE_RESOURCE",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+      "justification": "Performance/resource contract (Developer bounds/side-effect verification against the *real Lua worker*.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_semantic_observatory_translation_coverage.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
-    },
-    {
-      "module": "test_semantic_paraphrases.py",
-      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 5,
-      "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "GUI/inspector contract (Real registered Lua pools joined only to canonical manifest ownership.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_semantic_provider_parity.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Phase 5 optional-provider parity probes on the real Lua worker.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_scene_observatory.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Observatory/sweep/anti-duplication contract (test_semantic_scene_observatory.py): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_semantic_scene_runtime_s8_acceptance.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (test_semantic_scene_runtime_s8_acceptance.py): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_simulation_ux.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Worker catalog and real Tk coverage for typed simulation controls.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_semantic_test_subsystem.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 10,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Unit tests for the canonical Semantic Test subsystem.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_semantic_translation_integration.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Semantic Lab checks for the public Core-backed translation seam.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_semantic_tree_projection.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (coverage for the shared derived Semantic Lab tree projection.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_session_envelope_contract.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (test_session_envelope_contract.py): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_shared_actor_conversation_service.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Real-worker checks for the Core actor-service Hoomans boundary.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_simulation_workbench.py",
       "category": "GUI_CONTRACT",
       "methods": 5,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (proof that the inline workbench applies and replays through Lua.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_social_apology_wording_authority.py",
       "category": "COMPILER_CONTRACT",
       "methods": 4,
       "usesDirectWorker": true,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (Social Apology wording-shard migration contracts.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_startup_session_parity.py",
       "category": "GUI_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (real-worker Tk/Xvfb lifecycle acceptance tests.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_stateful_capability_refresh.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Authoring/capability-binding contract (Production-Lua acceptance for post-command capability reprojection.): verifies low-level worker authoring validation, capability ABI, or generator manifest."
     },
     {
       "module": "test_structured_inventory.py",
       "category": "GUI_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Worker-backed item catalog and structured inventory UI regression tests.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_suite.py",
       "category": "PERFORMANCE_RESOURCE",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+      "justification": "Performance/resource contract (Regression tests for the bounded Lua smoke-suite runner.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_surface_consolidation.py",
       "category": "GUI_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (GUI ownership contracts for the consolidated Semantic Lab surfaces.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_sweep_acceptance.py",
       "category": "PERFORMANCE_RESOURCE",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests execution latency, memory/payload size budgets, or scale limits."
+      "justification": "Performance/resource contract (integrated acceptance tests and demonstration scenarios.): verifies execution latency, population scale, or memory/payload size budgets."
     },
     {
       "module": "test_sweep_batch.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 6,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Observatory/sweep/anti-duplication contract (tests for bounded batch execution, manifest management, and resume logic.): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_sweep_foundation.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 10,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Observatory/sweep/anti-duplication contract (foundation tests for compact evidence schema and production dimension discovery.): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_sweep_planner.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 9,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Observatory/sweep/anti-duplication contract (tests for semantic bucket policies and deterministic coverage planner.): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_sweep_quality.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Observatory/sweep/anti-duplication contract (tests for dialogue quality analyzer and canonical-source clustering.): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_sweep_reachability.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 8,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Observatory/sweep/anti-duplication contract (tests for selection provenance and variant reachability frontier.): verifies quality analyzer, reachability, or pool-sampling algorithm."
     },
     {
       "module": "test_sweep_ui.py",
       "category": "GUI_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (tests for review bundles, targeted replay, CLI, and Simulation UI.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_tool_call_formatting.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 2,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Focused tests for readable production tool/action transcript entries.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_transcript.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Visible transcript retention contract tests.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_transport_evidence.py",
       "category": "NATIVE_INTEGRATION",
       "methods": 2,
       "usesDirectWorker": true,
-      "justification": "Tests process/subprocess bridge, native MP/network transport boundary, or live integration."
+      "justification": "Native/integration contract (Keep executable-dispatch evidence distinct from the complete wire log.): verifies subprocess bridge, MP/network transport, or live integration boundary."
     },
     {
       "module": "test_ui_organization.py",
       "category": "GUI_CONTRACT",
       "methods": 2,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Real-save proof for the compact Semantic Lab Simulation workspace.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_ui_state_persistence.py",
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Proof that Semantic Lab layout state persists and can be reset safely.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_unified_authority_event_followup.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (production-worker coverage for NPC event follow-up authority.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_unified_evidence_e0.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Revision baseline: production Lua semantics, detached synthetic saved record.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_unified_evidence_e1.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (The production worker loads the same provider seam used by gameplay.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_unified_evidence_e2.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (First-party semantic and compact metadata have one domain-owned source.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_unified_evidence_e3.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Bounded compact retention remains useful after detailed retention drops.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_unified_evidence_e4.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 4,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Generic contextual admission and visible repair through production Lua.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_unified_evidence_e5.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Three first-party relation families share providers, resolver and director.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_unified_evidence_e6.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (A removable future mechanic registers data without editing shared algorithms.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_unified_evidence_e7.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 5,
       "usesDirectWorker": false,
-      "justification": "Pure Python low-level runtime/helper contract without direct worker orchestration."
+      "justification": "Pure Python runtime/helper contract (Final storage, source-isolation and bounded query acceptance.): verifies helper/model logic without worker orchestration."
     },
     {
       "module": "test_wellbeing_projection.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 12,
       "usesDirectWorker": true,
-      "justification": "Tests public Python/Lua worker API contract, protocol envelope, or low-level runtime invariant."
+      "justification": "Worker runtime/protocol contract (Real-production-Lua wellbeing scenario and projection acceptance probes.): verifies Lua-Python session protocol, context/lease invariants, or multi-step worker state."
     },
     {
       "module": "test_wellbeing_wording_authority.py",
       "category": "COMPILER_CONTRACT",
       "methods": 3,
       "usesDirectWorker": true,
-      "justification": "Tests CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
+      "justification": "Compiler/catalog contract (Wellbeing wording-shard migration contracts.): verifies CodeBuilder compilation, deterministic generation, translation-key coverage, or reconciliation."
     },
     {
       "module": "test_worker_session.py",
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Hoomans-specific GUI callback behavior for the Core worker session.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_world_knowledge_gui.py",
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": false,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Headless-display smoke for the existing Semantic Lab WKG pane.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     },
     {
       "module": "test_world_knowledge_inspector.py",
       "category": "GUI_CONTRACT",
       "methods": 1,
       "usesDirectWorker": true,
-      "justification": "Tests Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
+      "justification": "GUI/inspector contract (Semantic Lab GUI projection and explainability for World Knowledge.): verifies Tkinter widget lifecycle, UI controller wiring, or inspector projection formatting."
     }
   ]
 }
