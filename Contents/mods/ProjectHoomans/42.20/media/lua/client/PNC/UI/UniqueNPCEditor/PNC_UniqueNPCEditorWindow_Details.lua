@@ -1,4 +1,4 @@
-local Window = ISPNCUniqueNPCEditorWindow
+local Window = ISPNCNPCAuthoringEditor
 local Internal = Window.Internal or {}
 local Model = Internal.Model
 local tr = Internal.tr
@@ -6,8 +6,38 @@ local text = Internal.text
 local comboData = Internal.comboData
 local collectionIDs = Internal.collectionIDs
 local removeCollection = Internal.removeCollection
+local Profile = Internal.Presentation
+
+local function inspectorRows(self)
+    local adapter = self.presentationAdapter
+    if not adapter or not adapter.InspectorRows then return {} end
+    return adapter:InspectorRows(64)
+end
 
 function Window:buildDetails()
+    if self.presentationAdapter then
+        local rows = {}
+        for _, row in ipairs(inspectorRows(self)) do
+            local label = Profile and Profile.Label(row.fieldID)
+                or tostring(row.fieldID)
+            local value = row.resolvedValue
+            if value == nil then value = row.authoredValue end
+            if type(value) == "table" then
+                value = "<table>"
+            elseif value == nil then
+                value = "[absent]"
+            end
+            rows[#rows + 1] = {
+                label = label .. " · " .. tostring(row.fieldID),
+                value = tostring(value) .. " ("
+                    .. tostring(row.sourceLabel or "Generated") .. ")",
+                kind = "field",
+                key = row.fieldID,
+                removable = false,
+            }
+        end
+        return rows
+    end
     local draft = self.draft
     local preview = self:effectiveDraft()
     local record = preview and preview.runtimeRecord or nil
@@ -42,6 +72,8 @@ function Window:buildDetails()
         }
     end
     add(tr("UI_PNC_UniqueNPCEditor_Forename", "First name"), first)
+    add(tr("UI_PNC_NPCAuthoring_Nickname", "Nickname"),
+        draft.identity and draft.identity.nickname)
     add(tr("UI_PNC_UniqueNPCEditor_Surname", "Surname"), last)
     add(tr("UI_PNC_UniqueNPCEditor_Gender", "Gender"),
         draft.isFemale and tr("UI_PNC_UniqueNPCEditor_Female", "Female")
@@ -77,6 +109,23 @@ end
 
 function Window:refreshDetails()
     if not self.details then return end
+    if self.presentationAdapter and not self.inspectorVisible then
+        self.details:clear()
+        self.detailRows = {}
+        self.details:setVisible(false)
+        if self.removeButton then self.removeButton:setVisible(false) end
+        if self.resetDetailsButton then
+            self.resetDetailsButton:setVisible(false)
+        end
+        return
+    end
+    if self.presentationAdapter then
+        self.details:setVisible(true)
+        if self.removeButton then self.removeButton:setVisible(false) end
+        if self.resetDetailsButton then
+            self.resetDetailsButton:setVisible(false)
+        end
+    end
     local previous = self.details:getItem()
     local previousKey = previous and previous.item
         and previous.item.kind .. ":" .. text(previous.item.key) or nil

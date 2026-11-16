@@ -1,4 +1,4 @@
-local Window = ISPNCUniqueNPCEditorWindow
+local Window = ISPNCNPCAuthoringEditor
 local Internal = Window.Internal or {}
 local UI = Internal.UI
 local tr = Internal.tr
@@ -13,10 +13,11 @@ local npcTraitOptions = Internal.npcTraitOptions
 local vanillaTraitOptions = Internal.vanillaTraitOptions
 local appearanceOptions = Internal.appearanceOptions
 local beardOptions = Internal.beardOptions
+local Profile = Internal.Presentation
 
 function Window:addTextRow(id, key, fallback,
-    onlyNumbers, nameField)
-    local row = { id = id, label = tr(key, fallback) }
+    onlyNumbers, nameField, fieldID)
+    local row = { id = id, fieldID = fieldID or id, label = tr(key, fallback) }
     local parent = self.formView or self
     row.labelControl = addLabel(parent, row.label)
     row.entry = UI.CreateTextEntry(parent, {
@@ -32,22 +33,23 @@ function Window:addTextRow(id, key, fallback,
     return row.entry
 end
 
-function Window:addComboRow(id, key, fallback)
-    local row = { id = id, label = tr(key, fallback) }
+function Window:addComboRow(id, key, fallback, fieldID)
+    local row = { id = id, fieldID = fieldID or id, label = tr(key, fallback) }
     local parent = self.formView or self
     row.labelControl = addLabel(parent, row.label)
     row.entry = newCombo(parent,
-        ISPNCUniqueNPCEditorWindow.onComboChanged, self)
+        ISPNCNPCAuthoringEditor.onComboChanged, self)
     row.entry.pncKind = id
     self.coreRows[#self.coreRows + 1] = row
     return row.entry
 end
 
 function Window:addRepeaterRow(id, key, fallback,
-    entries, buttonKey)
+    entries, buttonKey, fieldID)
     local parent = self.formView or self
     local row = {
         id = id,
+        fieldID = fieldID or id,
         label = tr(key, fallback),
         labelControl = addLabel(parent, tr(key, fallback)),
         entries = entries,
@@ -56,14 +58,14 @@ function Window:addRepeaterRow(id, key, fallback,
         id = "add_" .. id,
         title = tr(buttonKey, "ADD"),
         target = self,
-        onclick = ISPNCUniqueNPCEditorWindow.onAction,
+        onclick = ISPNCNPCAuthoringEditor.onAction,
         variant = "primary",
     })
     return row
 end
 
 function Window:refreshArchetypeOptions()
-    if PNC.LoadArchetypes then pcall(PNC.LoadArchetypes) end
+    if PNC.LoadArchetypes then PNC.LoadArchetypes() end
     local current = self.draft and self.draft.archetypeID or "General"
     addOptions(self.archetypeCombo, archetypeOptions())
     selectCombo(self.archetypeCombo, current)

@@ -1,6 +1,6 @@
 # Progress — Unified Starting Companion Authoring
 
-**Status:** P5R developer gates complete — P6 native acceptance is user-owned
+**Status:** P5R2 developer gate complete — native P6 acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -161,20 +161,107 @@ authoring, resolver, or P4 authority foundations:
   submission. Existing authoring, preset/import, customization, starter, and
   authority tests remain green.
 
-## P6 — native acceptance handoff
+## USER_VERIFIED regression — companion editor presentation unusable
 
-The remaining gate is user-owned native Build 42.20 validation: SP, MP
-host/remote, local/co-op, preset/import, orientation, final-player rebinding,
-deterministic preview, Reset/Randomize/Revert, final summary, Resolution
-Inspector, reconnect, replacement-survivor, and no-customization fallback.
-Do not launch native PZ or publish Workshop content without explicit user
-authorization.
+The user reran native Build 42.20 acceptance after P5R. The final-screen
+**COMPANIONS** button now works and the editor opens, confirming P5R's entry
+point/session repair. The opened editor is nevertheless borderline unusable:
+
+- the title bar exposes the normal pin/collapse control even though this
+  character-creation editor should remain fixed;
+- the main form exposes raw canonical/diagnostic rows such as
+  `appearance.beardModel`, `[absent]`, `<table>`, and source-state text;
+- the slot/summary presentation leaks untranslated keys and implementation IDs
+  such as `UI_PNC_Trait_HasBrother` and `PNC_HasBrother`;
+- there is no rendered NPC portrait/live character preview;
+- the existing starter preset store is not exposed through practical Save/Load
+  controls;
+- skills/traits/appearance are not presented through the mature controls
+  already available in the debug Unique NPC editor.
+
+`CODE_VERIFIED` audit explains the mismatch:
+
+- `PNC_StartingCompanionComposerWindow.lua` is a separate lightweight window
+  that builds generic text controls from `NPCAuthoringComposer:FieldRows()`;
+- `FieldRows()` enumerates every canonical registry field marked `authorable`,
+  so relationship policy alone cannot produce a curated human editor and
+  unrelated authoring fields may appear;
+- the debug Unique NPC editor already implements General/Appearance tabs,
+  hair/beard/options, voice controls, skills/traits, portrait rendering,
+  persistence actions, and deterministic preview refresh;
+- the canonical model already supports `identity.nickname`, but the current
+  debug presentation does not yet expose it as a normal shared control;
+- `StartingCompanionPresetStore` already implements canonical Save/Load, so the
+  missing persistence is a UI-integration gap;
+- PsychopatzCore already provides `PsychopatzFixedWindow`, whose explicit
+  purpose is to remove native pin/collapse behavior.
+
+The accepted P1-P5R data, authority, session, and final-screen lifecycle work
+remains valid. P5R2 repairs the presentation layer and completes the original
+no-split UI objective.
+
+## P5R2 target
+
+Extract/refactor one shared Project Hoomans NPC authoring editor presentation
+from the mature Unique NPC creator and make both debug and starting-companion
+surfaces consume it with different action/policy adapters.
+
+The companion adapter must add:
+
+- fixed/non-collapsible window behavior;
+- human translated slot/relationship labels;
+- real portrait/runtime preview;
+- shared General + Appearance controls;
+- canonical nickname control;
+- skills, NPC traits, vanilla traits, and dynamic traits where policy allows;
+- relationship-bound fields shown read-only with compact source explanation;
+- LOAD, SAVE selected template, and SAVE SET using the existing starter store;
+- Randomize, Reset, Revert, Close;
+- Resolution Inspector kept as diagnostics rather than the primary form.
+
+P6 native acceptance resumes after the P5R2 developer gate; it remains
+user-owned and has not been run by the agent.
+
+## P5R2 — developer acceptance complete
+
+The shared authoring presentation repair is complete in the current
+ProjectHoomans worktree:
+
+- `PNC_NPCAuthoringEditor` now owns the mature Unique NPC General,
+  Appearance, skills, traits, portrait, preview, and persistence presentation;
+- the debug creator and starting-companion editor both instantiate that same
+  component, with a canonical presentation profile and relationship-aware
+  adapter rather than a second companion primitive editor;
+- the companion host uses `PsychopatzFixedWindow`, translated relationship
+  labels, SAVE/LOAD/SAVE SET, RANDOMIZE, RESET, REVERT TO PRESET, and CLOSE;
+- `identity.nickname` is a shared canonical control; inherited/derived fields
+  remain read-only with human source explanations, while raw resolver rows are
+  available only through the Resolution Inspector;
+- preview edits and final-player rebinding preserve blueprint intent and the
+  deterministic generation seed; only explicit Randomize advances it.
+
+Developer evidence:
+
+- focused shared-editor, adapter, P5R journey, starter-authority,
+  customization, and Unique NPC model/editor suites: **9/9 passed**;
+- extended owner regression set: **18/18 passed**;
+- full harness: **1031/1035 passed**; the four failures remain the documented
+  unrelated animation-scene route, context scene-lab, population-director
+  initialization, and dirty-work translation expectation failures;
+- `luac -p`, targeted production `pz_verify --kahlua`, refactor-binding smoke,
+  translation JSON parsing, and `git diff --check` passed;
+- no native Project Zomboid session, push, or Workshop publication was run.
+
+## Next Chunk
+
+**P6 — user-owned native SP/MP/co-op acceptance of the completed P5R2
+editor and the preserved P5R/P4 creation and authority journeys.**
 
 ## Repository safety
 
 ProjectHoomans and PsychopatzCore remain on existing `main` branches. Current
-ProjectHoomans HEAD at this audit is `fb4c43ce23ee0106f52dab931f12f817ddb9f991`.
+ProjectHoomans HEAD at this checkpoint is `70bc2a2d98da91ff07f9c2602dd4ba567d721b9b`.
 The worktree contains unrelated active semantic/UI edits; preserve them. No new
 branch, push, Workshop publication, reset, stash, broad staging, or agent-run
-native PZ validation is authorized. The native regression above was supplied by
-the user and is acceptance evidence, not an agent-run native test.
+native PZ validation is authorized. Both native regressions were supplied by
+the user and are acceptance evidence, not agent-run native tests.

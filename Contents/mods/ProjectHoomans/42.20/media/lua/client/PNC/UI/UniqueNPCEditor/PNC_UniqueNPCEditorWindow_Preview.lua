@@ -1,4 +1,4 @@
-local Window = ISPNCUniqueNPCEditorWindow
+local Window = ISPNCNPCAuthoringEditor
 local Internal = Window.Internal or {}
 local Model = Internal.Model
 local UI = Internal.UI
@@ -16,6 +16,11 @@ function Window:effectiveDraft()
 end
 
 function Window:refreshPreview(force)
+    if self.presentationAdapter and not self._skipAdapterCommit
+        and not self._committingAdapter
+    then
+        self:commitAdapterDraft()
+    end
     self.previewDraft = Model.UpdatePreviewDraft(self.previewDraft, self.draft)
     local valid, reason = Model.Validate(self.draft)
     local previewRecord, previewReason = Model.EnsureRuntimeRecord(

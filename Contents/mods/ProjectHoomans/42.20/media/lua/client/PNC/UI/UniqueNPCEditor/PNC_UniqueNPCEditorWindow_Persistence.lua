@@ -1,4 +1,4 @@
-local Window = ISPNCUniqueNPCEditorWindow
+local Window = ISPNCNPCAuthoringEditor
 local Internal = Window.Internal or {}
 local Storage = Internal.Storage
 local tr = Internal.tr

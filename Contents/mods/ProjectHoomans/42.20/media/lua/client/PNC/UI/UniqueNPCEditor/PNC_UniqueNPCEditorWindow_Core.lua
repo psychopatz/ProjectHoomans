@@ -22,6 +22,12 @@ local function setField(entry, value)
     if entry and entry.setText then entry:setText(text(value)) end
 end
 
+local function setControlEnabled(control, enabled)
+    if not control then return end
+    if control.setEnabled then control:setEnabled(enabled == true)
+    elseif control.setEnable then control:setEnable(enabled == true) end
+end
+
 -- ISComboBox:getSelectedData() assumes selected is a valid option index.
 -- Newly-created combos start at 0, so every read goes through this guard.
 local function comboData(combo)
@@ -105,6 +111,7 @@ Internal.tr = tr
 Internal.text = text
 Internal.fieldText = fieldText
 Internal.setField = setField
+Internal.setControlEnabled = setControlEnabled
 Internal.comboData = comboData
 Internal.clearCombo = clearCombo
 Internal.selectCombo = selectCombo

@@ -11,6 +11,7 @@ require "PNC/Identity/PNC_UniqueNPCDraft"
 require "PNC/Identity/PNC_UniqueNPCDefinitionStore"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCAppearanceWindow"
 require "PNC/UI/Inventory/PNC_InventoryWindow"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor"
 
 PNC = PNC or {}
 PNC.UniqueNPCEditorUI = PNC.UniqueNPCEditorUI or {}
@@ -31,8 +32,6 @@ Internal.Layout = Layout
 Internal.Theme = Theme
 Internal.Archetypes = Archetypes
 EditorUI.Internal = Internal
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Core"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Options"
 local tr = Internal.tr
 
 
@@ -43,9 +42,32 @@ function ISPNCUniqueNPCEditorWindow:initialise()
     PsychopatzWindow.initialise(self)
 end
 
+function ISPNCUniqueNPCEditorWindow:createChildren()
+    PsychopatzWindow.createChildren(self)
+    self.editor = ISPNCNPCAuthoringEditor:new(0, 0, 1, 1, {
+        mode = "debug",
+        parent = self,
+    })
+    self.editor.uiScale = self.uiScale
+    self.editor:initialise()
+    self.editor:instantiate()
+    self:addChild(self.editor)
+    self:requestResponsiveLayout(true)
+end
+
+function ISPNCUniqueNPCEditorWindow:onResponsiveLayout()
+    local rect = self:getContentRect({ top = 58, bottom = 12 })
+    if self.editor then
+        Layout.SetBounds(self.editor, rect.x, rect.y, rect.width, rect.height)
+        self.editor.uiScale = self.uiScale
+        self.editor:requestResponsiveLayout(true)
+        self.layout = self.editor.layout
+    end
+end
+
 function ISPNCUniqueNPCEditorWindow:render()
     PsychopatzWindow.render(self)
-    if self.layout then
+    if self.layout and self.editor then
         UI.DrawSectionTitle(self,
             tr("UI_PNC_UniqueNPCEditor_Preview", "PREVIEW"),
             self.layout.portraitX,
@@ -69,13 +91,6 @@ end
 
 
 ISPNCUniqueNPCEditorWindow.Internal = Internal
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Lifecycle"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Actions"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Form"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Details"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Preview"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Persistence"
 
 function EditorUI.Open()
     if not PNC.Client or not PNC.Client.CanUseDebug

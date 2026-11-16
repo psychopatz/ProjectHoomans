@@ -228,14 +228,15 @@ function Model.FileName(draft)
     return filePart(forename) .. filePart(surname) .. ".txt"
 end
 
-function Model.New()
+function Model.New(options)
+    options = type(options) == "table" and options or {}
     return {
         schemaVersion = 2,
         displayName = "",
         isFemale = false,
         -- Stable slot seed.  The concrete runtime definition may omit it, but
         -- the canonical sparse blueprint persists it for deterministic edits.
-        previewSeed = nextSeed(),
+        previewSeed = tonumber(options.previewSeed) or nextSeed(),
         identity = { nickname = nil, survivor = {} },
         authoringClears = {},
         appearanceAuthored = {},

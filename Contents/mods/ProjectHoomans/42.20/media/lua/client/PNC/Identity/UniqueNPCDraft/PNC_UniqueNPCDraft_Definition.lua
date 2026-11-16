@@ -18,7 +18,12 @@ local nameParts = Internal.nameParts
 local exportItems = Internal.exportItems
 local captureAppearanceItems = Internal.captureAppearanceItems
 
-function Model.FromDefinition(definition, fileName)
+function Model.FromDefinition(definition, fileName, options)
+    if type(fileName) == "table" then
+        options = fileName
+        fileName = options.fileName
+    end
+    options = type(options) == "table" and options or {}
     local source = copy(definition or {})
     local canonical
     local reason
@@ -37,7 +42,10 @@ function Model.FromDefinition(definition, fileName)
         })
         if not source then return nil, reason end
     end
-    local output = Model.New()
+    local output = Model.New({
+        previewSeed = canonicalSeed or source.generationSeed
+            or options.previewSeed,
+    })
     for key, value in pairs(source) do output[key] = value end
     output.displayName = text(output.displayName) or ""
     output.isFemale = output.isFemale == true
@@ -77,7 +85,7 @@ function Model.FromDefinition(definition, fileName)
     output.identitySeed = nil
     output.id = output.id or output.uniqueDefinitionId
     output.identityIDLocked = true
-    output.fileName = fileName
+    output.fileName = fileName or options.fileName
     output.originalDisplayName = output.displayName
     output.startingItems = type(output.startingItems) == "table"
         and output.startingItems or {}

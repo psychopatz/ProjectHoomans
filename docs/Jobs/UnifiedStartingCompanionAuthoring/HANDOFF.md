@@ -4,69 +4,78 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P5R"
-phase_commit_message: "phase(P5R): repair final-screen companion authoring flow"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=e3eb7ddce389dd86129f3a40651f8e646b09afec;dynamic-trading=9c8cb3dead56d66e32fccb901b9abd3dd6c2f393"
-phase_residual_vector: "project-hoomans=b7ea11e33aeb870164b1045ae9e3f307c583c69c6d17c7a2d77abf0e9d6f8c23;psychopatz-core=3a5c247da430bc289d2fceecfb851932f85375c093a25b26910fe06593d46ace;dynamic-trading=3ed15f0cd080d9eb1ebcf5d1bbab66bbfdb230223af48407f02091a54ce020a5"
-residual_worktree_fingerprint: "b7ea11e33aeb870164b1045ae9e3f307c583c69c6d17c7a2d77abf0e9d6f8c23"
-updated_at: "2026-11-16T11:52:55.239469Z"
+phase_commit_phase: "P5R2"
+phase_commit_message: "phase(P5R2): unify companion authoring presentation"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=0e43a1775d75812f338cde188633a2871b6fbd1d;dynamic-trading=9c8cb3dead56d66e32fccb901b9abd3dd6c2f393"
+phase_residual_vector: "project-hoomans=f7c4b306b468c5385d3887290d5c055b26f47dcfc5994f34ab273a73a1e90fe0;psychopatz-core=98c4feb14bac393496f4679faf59200587d2260968b87ce88648bec1aff92c8e;dynamic-trading=8a0fa0da519971def56422df4843fd38d6b93027dcf3a36926891007b461ebb9"
+residual_worktree_fingerprint: "f7c4b306b468c5385d3887290d5c055b26f47dcfc5994f34ab273a73a1e90fe0"
+updated_at: "2026-11-16T13:33:19Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
-phase: "P5R"
-chunk: "Hand off native SP/MP/co-op acceptance after developer gates"
+phase: "P6"
+chunk: "User-owned native SP/MP/co-op acceptance"
 retrieval_tier: "verify"
-codebase_memory_indexed_commit: "fb4c43ce23ee0106f52dab931f12f817ddb9f991"
+codebase_memory_indexed_commit: "02c7fb18e714bf1a3adce052c0659a972313f081"
 ---
-
 
 # Session Handoff
 
 ## What became true
 
-- P1 through P4 remain accepted: the canonical NPC registry, sparse blueprint,
-  resolver/trace, preset and Unique NPC sanitization paths, versioned envelope,
-  and server-authoritative `StartingCompanionService` were preserved.
-- The P5R repair removes profession-screen auto-navigation and adds an explicit
-  **COMPANIONS** action beside **PLAY** on normal and co-op final character
-  screens.
-- The adapter owns one logical session per creation player index across the
-  profession screen, final character screen, composer, and back-navigation.
-  Removed-slot caches and unchanged blueprint intent survive reconciliation.
-- Opening Companions and pressing Play re-read selected traits and the current
-  final descriptor, so surname, sex, appearance, and Lover orientation rebind
-  previews without mutating stored blueprint intent.
-- Customization is opt-in by canonical blueprint-vs-default comparison.
-  Skipped or unchanged flows clear/omit envelopes; authored edits and explicit
-  Randomize are validated and staged before vanilla NEXT/world transition.
-  Invalid authored state remains on the final screen with a useful reason.
-- Remote MP retains the P4 pending-envelope handoff and submits once after the
-  player entity exists. PsychopatzCore was not changed for P5R.
+- P1 through P4 and P5R remain accepted. The final-screen Companions action,
+  one-session lifecycle, pre-commit validation/staging, default path, and P4
+  authority behavior were preserved.
+- P5R2 now has one Project Hoomans-owned `PNC_NPCAuthoringEditor` presentation
+  component. The debug Unique NPC creator and starting-companion editor both
+  instantiate it; the companion host adds relationship policy and workflow
+  actions through an adapter.
+- The companion surface now uses `PsychopatzFixedWindow`, human translations,
+  the mature portrait/appearance/voice/skills/traits controls, canonical
+  nickname editing, Resolution Inspector diagnostics, and the existing starter
+  preset store for SAVE, SAVE SET, and LOAD.
+- Inherited/derived values remain read-only and rebinding updates the resolved
+  preview without mutating blueprint intent or the deterministic seed.
 
-## Validation
+## Remaining
 
-- Focused P5R and existing starting-companion suite: **9/9 passed**.
-- Full Project Hoomans harness: **1029/1033 passed**; four failures remain the
-  documented unrelated animation-scene route, context scene-lab,
-  population-director initialization, and dirty-work translation expectation
-  failures.
-- `luac -p`, targeted production `pz_verify --kahlua`, refactor-binding smoke,
-  translation JSON parsing, and `git diff --check` passed.
-- Codebase Memory was re-indexed at the verification checkpoint and cited-path
-  coverage is fresh.
-- Native Project Zomboid SP/MP/co-op acceptance was not run. No push or
-  Workshop publication was performed.
+- P6 is user-owned native Build 42.20 SP/MP/co-op acceptance. No native game
+  session was launched by the agent.
 
-## Next action
+## Resume
 
-User-owned P6 native acceptance: exercise the final-screen button and the SP,
-MP host/remote, local/co-op, preset/import, orientation, final-player
-rebinding, deterministic preview, Reset/Randomize/Revert, final summary,
-Resolution Inspector, reconnect, replacement-survivor, old-save, and
-no-customization fallback matrix in `ROADMAP.md`.
+Use Codebase Memory at the recorded retrieval tier for the target repository,
+then run the native matrix in the ROADMAP only with explicit user ownership.
 
-## Acceptance boundary
+Exact next action:
 
-P5R developer work is complete only after this handoff is committed as the
-required local phase commit. The parent goal remains in progress until the
-user-owned native P6 matrix passes or the user explicitly accepts that live
-validation boundary.
+1. Verify the final-screen Companions journey and fixed companion editor in
+   native SP, local/co-op, and MP host/remote flows.
+2. Verify preset persistence, relationship rebinding/orientation, default and
+   authored paths, reconnect/replacement-survivor authority, and the remaining
+   Resolution Inspector cases.
+
+## Evidence
+
+- `TEST_VERIFIED`: focused shared-editor, adapter, P5R journey,
+  starter-authority, customization, and Unique NPC suites passed 9/9.
+- `TEST_VERIFIED`: extended owner regression set passed 18/18; full harness
+  passed 1031/1035 with the four documented unrelated failures.
+- `STATIC_ONLY`: `luac -p`, targeted production `pz_verify --kahlua`,
+  refactor-binding smoke, translation JSON parsing, and `git diff --check`
+  passed.
+- `UNVERIFIED`: native Project Zomboid SP/MP/co-op acceptance remains user
+  owned.
+
+## Expensive discoveries worth preserving
+
+- The companion editor must remain a workflow host around the shared component;
+  its raw `FieldRows()` trace is an Inspector/debug surface, not a second
+  primitive editor.
+- The adapter compares the edited resolved draft with a view snapshot and sends
+  only editable canonical changes through `StartingCompanionSession`, which is
+  what preserves no-op/open-close and inherited-field semantics.
+
+## Blockers / open decisions
+
+- None for developer-side P5R2. Native P6 acceptance is the remaining
+  user-owned responsibility.

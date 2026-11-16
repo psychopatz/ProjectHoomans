@@ -108,6 +108,80 @@ framework.
 When a new UI engine stub is needed, add it to the current harness support in
 the smallest reusable place.
 
+### P5R — final-screen entry-point repair
+
+Treat the user's native failure as authoritative acceptance evidence that the
+previous automated journey coverage was insufficient.
+
+Do not replace the accepted P1/P4 authoring and authority foundations. Repair
+the creation lifecycle around them:
+
+1. Remove profession `screen_shown -> OpenComposer` navigation. Visibility
+   events may reconcile state but must not unexpectedly open the editor.
+2. Introduce one logical creation-session identity across profession screen,
+   final `CharacterCreationMain`, composer, and local/co-op equivalents.
+3. Add an explicit **COMPANIONS** button beside Play on the final customization
+   screen. Reuse a provider-neutral Core final-action seam if a small generic
+   extension is justified; otherwise keep any Hoomans patch narrow and ensure
+   normal + co-op parity.
+4. On button activation, re-read selected companion traits and the CURRENT final
+   player descriptor, reconcile the existing session, and only then open the
+   shared composer.
+5. Track authored intent canonically. Trait selection and open/close-without-
+   change remain default. Field edits, preset/template application, sanitized
+   import, and explicit Randomize create authored intent.
+6. Rework Play into a pre-commit flow: Hoomans validates/stages authored intent
+   before invoking vanilla NEXT. Validation failure must leave the final screen
+   active. Default/no-authored intent must not block Play.
+7. Clear stale staged envelopes when the current session returns to default or
+   the selected trait set changes so an older customization cannot leak into a
+   later Play.
+8. Preserve P4 server authority and delayed MP transmission semantics.
+
+Do not key the final-screen call to `Adapter.GetSession(CharacterCreationMain)`
+if that creates a second session. Session identity is the creation flow/player
+slot, not the current UI object.
+
+### P5R2 — shared editor parity and usability repair
+
+Treat the user's second native screenshot as authoritative evidence that the
+P5R entry point works but the editor presentation gate does not.
+
+Do not rewrite the canonical registry/resolver/session/P4 authority stack.
+Repair the presentation layer around those accepted foundations:
+
+1. Audit the current Unique NPC editor and extract/refactor its reusable General,
+   Appearance, portrait, skills, traits, and preview controls into one shared
+   Project Hoomans authoring editor component.
+2. Make the debug Unique NPC creator and starting-companion editor instantiate
+   that same component with different context/action adapters. Do not merely
+   share the data model while keeping two primitive editor implementations.
+3. Introduce a reusable presentation schema/profile over canonical field IDs:
+   labels, grouping/order, control type, option provider, normal/advanced/
+   diagnostic visibility. Relationship policy then locks/derives/inherits
+   those shared controls.
+4. Add canonical `identity.nickname` to the shared General editor so both
+   surfaces expose the field consistently.
+5. Reuse the existing portrait/runtime-preview machinery. Normal edits and
+   player-context rebinding update the portrait in place; only Randomize changes
+   generation state.
+6. Replace the companion window's ordinary `PsychopatzWindow` collapse/pin
+   behavior with `PsychopatzFixedWindow` (or the exact existing equivalent).
+   Keep Close, responsive layout, and resizing.
+7. Resolve all slot/relationship labels through translations. Normal UI must
+   not expose raw `PNC_*`, `UI_*`, canonical IDs, `[absent]`, or `<table>` as
+   its primary presentation.
+8. Wire the existing starter preset store into the companion toolbar:
+   LOAD, SAVE selected template, SAVE SET, Randomize, Reset, Revert, Close.
+   Saving alone must not mutate spawn intent.
+9. Keep raw field/source detail in the Resolution Inspector/advanced diagnostics
+   rather than the normal editor.
+10. Preserve P5R opt-in/default behavior, one-session ownership, pre-commit
+    ordering, dynamic inheritance, and P4 server authority.
+
+Do not solve the registry-field leakage by adding a large companion-only hidden
+field list. The presentation profile is shared and policy-aware.
+
 ## Required focused verification
 
 At minimum during implementation, keep these existing tests passing:
@@ -157,7 +231,17 @@ Automated:
 - explicit Randomize changes only the intended generation seed/path;
 - debug Resolution Inspector consumes the shared trace;
 - unresolved starter blueprint resolves concrete surname/sex/appearance;
-- normal and co-op character screens emit the same generic extension events;
+- normal and co-op profession screens emit the same generic extension events;
+- final normal and co-op creation screens expose the same semantic Companions
+  action;
+- one logical creation session survives profession -> final -> composer -> final
+  transitions;
+- no companion trait / skipped editor / open-close-without-change produce no
+  authored customization envelope;
+- explicit field edit/preset/import/Randomize produces authored customization;
+- Play validates/stages authored customization before vanilla NEXT/world
+  transition and validation failure leaves the final screen active;
+- stale staged customization is cleared when session intent returns to default;
 - add/remove/re-add preserves unchanged slot edits;
 - Reset/Randomize/Load Build reconcile by actual selected set;
 - Gay/Bisexual changes invalidate Lover preview;
@@ -167,14 +251,43 @@ Automated:
 - whole-setup and individual-template persistence;
 - Unique NPC import sanitization/reporting strips runtime/authority fields;
 - source indicators and Resolved Preview agree with resolver trace;
+- debug Unique NPC and starting-companion surfaces instantiate the same reusable
+  authoring editor/presentation component;
+- companion window is non-collapsible/non-pinnable and exposes no pin/collapse
+  title-bar control;
+- shared portrait preview renders and updates in place for edits/rebinding;
+- General/Appearance controls use translated human labels and appropriate
+  controls instead of raw field IDs/`[absent]`/`<table>` rows;
+- canonical nickname is editable in the shared General editor;
+- skills, NPC traits, vanilla traits, and dynamic traits use the shared
+  selector/repeater controls when starter policy permits them;
+- relationship-bound fields remain human-facing but locked/read-only with
+  correct source explanation;
+- companion labels/relationships contain no raw `PNC_*`/`UI_*` keys in normal
+  presentation;
+- selected-template SAVE, whole-set SAVE SET, and LOAD use the existing
+  canonical starter preset store;
+- saving without blueprint mutation does not mark customization authored;
+- raw resolution rows remain available through diagnostics but are not the
+  primary editor;
 - Reset, Randomize, and Revert-to-Preset remain distinct;
 - final summary includes only selected active slots;
 - server strips/rejects spoofed authority;
 - delayed/missing MP payload falls back without duplicate NPCs;
 - reconnect and old saves remain idempotent.
 
-Native user-owned:
+Native user-owned after P5R2 developer gates:
 
+- final Customise Character screen exposes Companions beside Play for selected
+  companion traits;
+- companion editor has no pin/collapse control and uses the shared
+  Unique-NPC-style General/Appearance editor with a rendered portrait;
+- translated human labels replace raw canonical/trait/UI keys;
+- Save selected template, Save whole set, and Load are usable;
+- nickname, appearance, skills, NPC traits, vanilla traits, and dynamic traits
+  use appropriate shared controls where policy permits;
+- skipping the editor preserves former default/randomized starter behavior;
+- opening/closing without changes also preserves default behavior;
 - SP;
 - host/client MP;
 - local/co-op;
@@ -188,7 +301,8 @@ Native user-owned:
 - final pre-commit companion summary;
 - Resolution Inspector diagnostics;
 - final appearance/name changes;
-- invalid/missing customization.
+- invalid authored customization blocks only the vanilla transition and reports
+  the error; missing/no-authored customization remains non-blocking.
 
 ## Runtime safety
 

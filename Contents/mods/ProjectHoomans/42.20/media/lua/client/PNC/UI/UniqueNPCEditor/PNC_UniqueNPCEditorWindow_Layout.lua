@@ -1,4 +1,4 @@
-local Window = ISPNCUniqueNPCEditorWindow
+local Window = ISPNCNPCAuthoringEditor
 local Internal = Window.Internal or {}
 local Layout = Internal.Layout
 
@@ -130,8 +130,8 @@ local function layoutEditorPortrait(self, portraitX, portraitY, portraitWidth, p
     end
 end
 
-function ISPNCUniqueNPCEditorWindow:onResponsiveLayout()
-    local rect = self:getContentRect({ top = 58, bottom = 12 })
+function ISPNCNPCAuthoringEditor:onResponsiveLayout()
+    local rect = self:getContentRect({ top = 0, bottom = 0 })
     local leftWidth, viewHeight, portraitX, portraitY, portraitWidth, portraitHeight, top, stacked =
         layoutEditorFrame(self, rect)
     local addY, detailsY, twoColumns =

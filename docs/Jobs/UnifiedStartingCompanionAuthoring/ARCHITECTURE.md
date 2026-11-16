@@ -64,8 +64,6 @@ not redefine their storage semantics.
 
 Initial identity canon:
 
-| Logical field | Canonical meaning/location | Compatibility inputs |
-| --- | --- | --- |
 | Logical field | Canonical meaning/location | Cutover rule |
 | --- | --- | --- |
 | `identity.forename` | `identity.survivor.forename` | remove `firstName` authoring alias |
@@ -290,12 +288,151 @@ Therefore:
 The preview is informative. The unresolved blueprint + binding policy are
 canonical until final resolution.
 
-## Reusable composer contract
+## Final-screen entry-point and creation-session ownership
 
-The existing Unique NPC editor controls should be reorganized behind a reusable
-composer surface rather than duplicated.
+The logical starting-companion creation session spans multiple vanilla screens.
+It must not be keyed solely by the `CharacterCreationProfession` Lua object or
+by `CharacterCreationMain` object identity.
 
-A composer context supplies field capabilities such as:
+One logical creation session owns:
+
+- selected companion trait slots from the profession screen;
+- unresolved companion blueprints and removed-slot cache;
+- authored/default state for each active slot;
+- deterministic generation seeds;
+- current preview context derived from the final player descriptor;
+- staged submit intent, if and only if customization is explicitly authored.
+
+The final **Customise Character** screen is the user-facing entry point for
+companion authoring. Its bottom action row should expose an explicit
+**COMPANIONS** action beside Play when the selected trait set contains at least
+one starting-companion trait. No companion editor opens merely because a screen
+became visible.
+
+Opening Companions performs a fresh reconciliation:
+
+```text
+profession selected traits
+        +
+current CharacterCreationMain descriptor/UI state
+        +
+existing creation session
+        -> reconcile slots
+        -> rebuild current player/social context
+        -> resolve previews
+        -> open shared composer
+```
+
+Returning from the composer does not commit character creation. The user may
+continue changing the player. Reopening the composer must reuse the same
+blueprints while recomputing inherited/derived preview values from the current
+player.
+
+### Optional customization contract
+
+Starting-companion customization is opt-in.
+
+A selected Brother/Lover/etc. trait by itself means **default starter behavior**.
+The established deterministic/randomized `StartingCompanionService` generation
+remains canonical when the player never authors customization.
+
+The session therefore distinguishes at least:
+
+- **default/unmodified** — no authored companion customization should be sent;
+- **authored** — at least one meaningful authoring action exists and a validated
+  customization envelope may be staged.
+
+Merely opening and closing the composer does not change default/unmodified to
+authored. Meaningful authoring includes explicit field edits, preset/template
+application, sanitized Unique NPC import, and explicit Randomize. Reset may
+return a slot to default semantics when no authored difference remains; the
+implementation should derive authored state from canonical blueprint/baseline
+state rather than from a fragile one-way boolean where practical.
+
+No-authored-customization must also clear/avoid stale staged envelopes so a
+back/edit/re-enter flow cannot accidentally submit an earlier customization.
+
+### Play pre-commit contract
+
+The Hoomans pre-commit hook runs before vanilla Play/NEXT transitions away from
+`CharacterCreationMain`.
+
+```text
+PLAY
+  -> reconcile current selected traits + final player context
+  -> if default/unmodified: clear/omit customization intent
+  -> if authored: validate and stage canonical envelope
+       -> failure: remain on final screen and surface reason
+       -> success: continue
+  -> invoke vanilla Play/NEXT
+```
+
+For a remote MP client, network transmission may still wait until the player
+entity exists. That transport timing does not change the rule that the validated
+canonical intent is staged before character creation leaves the final screen.
+
+Normal and local/co-op creation share this semantic pre-commit action even
+though `CoopCharacterCreationMain` overrides `onOptionMouseDown`.
+
+## Reusable authoring presentation contract
+
+The canonical registry/resolver is not by itself a player-facing editor. P5R2
+requires the useful Unique NPC editor controls to be extracted behind one
+reusable **authoring presentation component** consumed by both the debug creator
+and starting-companion editor.
+
+The shared component owns primitive NPC-editing presentation:
+
+- General identity controls;
+- canonical nickname control;
+- archetype and equipment-mode controls;
+- hair/beard/style controls;
+- Appearance tab and clothing/outfit controls;
+- voice/style/pitch controls and preview actions;
+- skill controls;
+- NPC trait controls;
+- vanilla/physiological trait controls;
+- dynamic trait controls;
+- rendered portrait/runtime preview;
+- human-readable validation/status presentation.
+
+Outer surfaces own only workflow-specific chrome/actions:
+
+```text
+Shared NPCAuthoringEditor
+        |
+        +-- Debug Unique NPC adapter
+        |     New / Load / Save / Produce / Inventory / Randomize
+        |
+        +-- Starting Companion adapter
+              Companion slot / Load / Save / Save Set
+              Randomize / Reset / Revert / Close
+```
+
+The two adapters may expose different action buttons and policies, but they must
+not maintain separate primitive implementations for identity, appearance,
+traits, skills, or portrait rendering.
+
+### Presentation schema vs canonical field registry
+
+The canonical field registry defines data meaning, type, persistence/network
+capability, and normalization. A separate reusable **presentation schema/profile**
+maps registered canonical fields to player-facing presentation metadata:
+
+- translated label/description key;
+- editor group/tab;
+- ordering;
+- control type (text, combo, slider, color, repeater, custom appearance control);
+- option provider/catalog;
+- whether the field belongs in normal, advanced, or diagnostic presentation;
+- compact source/help presentation.
+
+This presentation schema is shared infrastructure, not a companion-specific deny
+list. It must reference canonical field IDs and never redefine their storage
+semantics.
+
+Relationship/context policy is a separate layer that modifies capabilities of
+those shared controls:
 
 - visible/editable;
 - required;
@@ -303,43 +440,88 @@ A composer context supplies field capabilities such as:
 - hidden;
 - allowed value set;
 - validation policy;
-- action buttons exposed.
+- server-controlled.
 
 Examples:
 
-- debug Unique NPC context: full manual identity and broader debug fields;
-- starter Brother context: forename editable, surname inherited/read-only,
-  sex fixed/read-only, family color bindings read-only, hairstyle/outfit still
-  authorable where allowed;
+- debug Unique NPC context: broad manual identity and debug-authoring fields;
+- starter Brother context: forename/nickname editable, surname inherited/read-
+  only, sex fixed/read-only, family color bindings read-only, hairstyle/outfit
+  still authorable where permitted;
 - starter Lover context: surname inherited, sex orientation-derived/read-only.
 
-The composer should render resolved preview values while retaining unresolved
-blueprint state underneath. Important fields expose their semantic source in
-normal UI, for example Custom, Generated, Inherited from Player, Relationship
-Rule, or Server Controlled.
+The policy must not replace a shared field with a raw diagnostic row. A locked
+field remains a normal human-facing control/value with a compact explanation
+such as **Inherited from Player** or **Relationship Rule**.
 
-The composer keeps two conceptual views: Blueprint/Intent is what the player
-authored and presets serialize; Resolved Preview is what that intent becomes
-for the current survivor, relationship policy, and deterministic seed.
+### Normal presentation vs diagnostics
 
-Randomize, Reset, and Revert to Preset are separate actions. Randomize changes
-generated/default values through the seed, Reset clears authored customization
-to policy defaults, and Revert restores the last loaded preset/template
-baseline. A compact final summary of active slots should be available before
-character creation commits and must use the same resolved preview path.
+`NPCAuthoringComposer:FieldRows()` and the resolver trace remain useful
+diagnostic/introspection APIs, but they are not the normal character editor.
 
-## Field validation and limits
+Normal players must not primarily see:
 
-String lengths, collection counts, numeric ranges, enum domains, and nested
-value limits belong to the registry/field codec rather than separate UI and
-server copies. Client UI may prevalidate for feedback, but server decode and
-resolution use the same canonical constraints.
+- canonical IDs such as `appearance.beardModel`;
+- implementation IDs such as `PNC_HasBrother`;
+- untranslated keys such as `UI_PNC_Trait_HasBrother`;
+- raw `[absent]` state markers;
+- `<table>` placeholders for structured values;
+- unrelated runtime/AI authoring fields merely because the registry marks them
+  authorable.
 
-Unknown fields are never executed or silently accepted over the network. A file
-whose schema version is newer than the installed reader should fail read-only/
-unsupported rather than being rewritten and losing unknown data. Future
-third-party/adopter fields should use registered namespaced stable IDs instead
-of arbitrary passthrough tables.
+Those details belong in the Resolution Inspector/advanced diagnostics.
+
+All companion/relationship labels shown in the normal editor must be resolved
+through translations and human-facing relationship names.
+
+### Portrait and deterministic preview
+
+Both debug and starter surfaces use the same portrait/runtime-preview component
+and preview-spec path. Edits refresh the current preview in place.
+
+```text
+same blueprint + same context + same generation seed
+        -> same resolved preview
+        -> same rendered portrait
+```
+
+Only explicit Randomize changes generation state. Rebinding player surname,
+sex, skin, hair, or orientation changes resolved/inherited preview values
+without rewriting authored blueprint intent.
+
+### Companion window behavior
+
+The starting-companion editor is a focused character-creation workflow and must
+not be collapsible/pinnable. Use the existing `PsychopatzFixedWindow` behavior
+(or the same Core primitive) so title-bar pin/collapse controls are absent while
+the window remains closeable, responsive, and resizable.
+
+The debug Unique NPC editor may retain its own normal window behavior unless a
+separate product decision changes it.
+
+### Starter preset actions
+
+The companion outer adapter exposes persistence through the existing canonical
+starter preset infrastructure:
+
+- **SAVE** — save the selected active companion as an individual template;
+- **SAVE SET** — save the currently selected companion setup;
+- **LOAD** — load/apply a compatible saved template/setup using the existing
+  `StartingCompanionPresetStore` and session preset semantics.
+
+Saving must not itself alter the authored spawn intent. Loading does alter the
+blueprint and therefore may make customization authored. Revert restores the
+loaded preset/template baseline already owned by the session.
+
+### Blueprint vs resolved preview
+
+The editor renders resolved preview values while retaining unresolved blueprint
+state underneath. Important fields expose semantic source compactly: Custom,
+Generated, Inherited from Player, Relationship Rule, or Server Controlled.
+
+Randomize, Reset, and Revert to Preset remain separate actions. A compact final
+summary of active slots should still be available before character creation
+commits and must use the same resolved preview path.
 
 ## Field validation and limits
 
@@ -479,11 +661,16 @@ traits.
 
 ## Character-creation extension ownership
 
-PsychopatzCore may own a provider-neutral hook/extension registry around the
-vanilla character-creation screen because it already owns reusable character
-trait integration.
+PsychopatzCore may own provider-neutral character-creation extension seams
+because it already owns reusable character trait integration. The existing
+profession/trait lifecycle seam remains useful for selected-set reconciliation,
+but it is not sufficient as the user-facing navigation boundary.
 
-If added, Core exposes only generic screen/selection events and registration.
+If P5R needs a reusable final-screen action/pre-commit seam, Core may expose a
+small provider-neutral mechanism around `CharacterCreationMain` and inherited
+co-op creation. It may expose generic final actions and/or pre-commit callbacks,
+but it must not know what a companion is.
+
 Project Hoomans owns:
 
 - companion trait IDs;
@@ -557,3 +744,10 @@ handshake for an already-resolved survivor.
   policy says it is inherited/derived.
 - A separate SP resolver and MP resolver.
 - A Core character-creation hook containing Project Hoomans semantics.
+- Automatic companion-editor navigation from generic screen visibility events.
+- Separate profession-screen and final-screen companion sessions.
+- A Play wrapper that calls vanilla NEXT/world transition before Hoomans
+  validates explicitly-authored customization.
+- Treating trait selection alone as authored customization.
+- Sending a default blueprint envelope when the player intentionally skips
+  customization; the established starter default generator owns that path.

@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R developer gates complete — P6 native acceptance is user-owned
+**Status:** P5R2 developer gate complete — native P6 acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -41,7 +41,14 @@ The system must:
   Character** screen beside Play rather than surprise-opening it from the
   profession/trait screen;
 - preserve the original randomized/deterministic starter behavior when the
-  player never authors companion customization.
+  player never authors companion customization;
+- make the starting-companion editor a policy-adapted reuse of the same
+  human-facing NPC authoring controls/portrait used by the Unique NPC creator,
+  not a raw canonical-field/diagnostic table;
+- make the character-creation companion window fixed/non-collapsible while
+  remaining closeable, responsive, and resizable;
+- expose practical preset/template Save/Load actions directly in the companion
+  editor.
 
 Target flow:
 
@@ -173,9 +180,10 @@ SP/MP authority, and implementation order.
 one blueprint/resolver architecture and explicitly forbid a companion-only
 clone of the debug NPC model.
 
-**Current state:** accepted baseline; subsequent phases P1–P4 were implemented
-and locally committed. P5R developer gates are now implemented and verified;
-native P6 acceptance remains user-owned.
+**Current state:** accepted baseline; subsequent phases P1–P4 and the P5R
+final-screen lifecycle repair were implemented and locally committed. Native
+acceptance then exposed the P5R2 shared-editor usability gap, so developer work
+is reopened before P6 resumes.
 
 ### P1 — Canonical NPC authoring schema, blueprint, and resolver contract
 
@@ -504,6 +512,116 @@ paths in normal + co-op creation. The submit order is pre-commit, one session
 survives the screen transition, and the existing default/randomized path is
 unchanged when customization is skipped. Native validation is deferred to P6.
 
+### P5R2 — Shared authoring UI parity and companion-editor usability repair
+
+Native Build 42.20 acceptance after P5R confirms the final-screen **COMPANIONS**
+entry point now opens successfully, but the actual editor is not yet acceptable.
+The tested window exposes internal canonical field IDs, `[absent]` states,
+`<table>` values, registry source labels, and unrelated authorable fields rather
+than a usable character editor. It has no rendered NPC portrait, no accessible
+Save/Load workflow, and uses the normal collapsible/pinnable window behavior.
+
+`CODE_VERIFIED` audit explains the gap:
+
+- `PNC_StartingCompanionComposerWindow.lua` builds a separate lightweight UI
+  directly from `NPCAuthoringComposer:FieldRows()` rather than reusing the
+  Unique NPC editor's General/Appearance/portrait controls;
+- `FieldRows()` enumerates every registry field marked `authorable`, while the
+  starter relationship policy mostly expresses bindings/authority rather than a
+  human-facing field presentation set, so unrelated fields such as jobs,
+  hostility, patrol/map/combat metadata can leak into the normal editor;
+- the window displays `slot.spec.uiName` and trait IDs without consistently
+  resolving translations, exposing keys such as `UI_PNC_Trait_HasBrother` and
+  IDs such as `PNC_HasBrother`;
+- the existing Unique NPC editor already owns the useful form controls, tabs,
+  appearance editor, trait/skill selectors, portrait preview, persistence
+  actions, and deterministic preview refresh behavior;
+- starter preset/template persistence already exists through
+  `StartingCompanionPresets` and `StartingCompanionPresetStore`, so Save/Load is
+  missing UI integration rather than missing storage infrastructure;
+- PsychopatzCore already provides `PsychopatzFixedWindow`, explicitly removing
+  native pin/collapse controls while retaining shared window behavior.
+
+P5R2 must finish the original no-split UI objective without discarding the
+accepted P1-P5R data/lifecycle foundations:
+
+1. extract/refactor the useful Unique NPC editor body into a reusable authoring
+   presentation component owned by Project Hoomans;
+2. make both the debug Unique NPC creator and starting-companion editor consume
+   that same reusable editor component rather than maintaining separate primitive
+   character-editing controls;
+3. preserve different outer action adapters: debug may keep New/Load/Save/
+   Produce/Inventory, while starting companions use slot selection, Load, Save
+   Template, Save Set, Randomize, Reset, Revert, Close;
+4. reuse the same portrait/preview machinery so name, appearance, outfit, voice,
+   traits, and skills visibly update the NPC without rerolling the deterministic
+   seed unless Randomize is explicitly used;
+5. expose canonical `identity.nickname` as a normal shared General-field control
+   in both authoring surfaces;
+6. add a reusable authoring presentation schema/capability layer that maps
+   canonical fields to human labels, appropriate control types, grouping/order,
+   and visibility while the relationship policy separately supplies locking,
+   inheritance, derivation, allowed values, and authority;
+7. do not hide dozens of fields through companion-specific ad hoc conditionals;
+   irrelevant advanced/runtime fields simply are not part of the normal starter
+   presentation profile, while the raw resolver trace remains available through
+   the Resolution Inspector/debug diagnostics;
+8. inherited/derived starter fields remain visible where useful but read-only,
+   with compact human-readable explanations such as `Inherited from Player` or
+   `Relationship Rule`; never show raw `[absent]`/internal IDs as the primary UX;
+9. resolve all trait/relationship labels through translations and present human
+   names rather than `PNC_*`/`UI_*` implementation keys;
+10. make the starting-companion editor use `PsychopatzFixedWindow` or the
+    equivalent existing Core primitive so pin/collapse controls cannot appear;
+11. wire the already-existing starter preset store into the companion UI:
+    **SAVE** saves the selected companion template, **SAVE SET** saves the whole
+    current setup, and **LOAD** applies compatible canonical presets/templates;
+12. preserve P5R opt-in semantics: inspecting/opening/closing the richer editor
+    still does not author customization unless the canonical blueprint actually
+    changes; save-only operations should not accidentally alter the spawn intent;
+13. keep relationship inheritance, final-player rebinding, P4 authority, and
+    default/no-customization behavior unchanged.
+
+Required developer-side P5R2 evidence:
+
+- debug and starting-companion surfaces instantiate the same reusable authoring
+  editor/presentation component;
+- companion window is fixed/non-collapsible and has no visible pin/collapse
+  control;
+- companion editor has a real rendered portrait preview using the existing
+  preview/runtime-record path;
+- General and Appearance controls are human-facing controls, not raw field IDs;
+- nickname is editable through the shared canonical field;
+- hair/beard/skin/outfit/voice controls behave like the debug editor where
+  policy permits them;
+- skill, NPC trait, vanilla trait, and dynamic trait controls are available when
+  allowed by the starter presentation/policy;
+- Brother/Sister/Mom/Dad/Lover bindings appear locked/read-only with correct
+  resolved values and source explanation rather than editable duplicates;
+- Friend/default-unbound fields remain editable according to policy;
+- translated companion/relationship labels contain no raw `PNC_*` or `UI_*`
+  keys in normal presentation;
+- selected-template Save, whole-set Save, and Load work through the existing
+  canonical preset store;
+- preview updates in place for edits/rebinding and only explicit Randomize
+  changes generation state;
+- raw resolution details remain available through the Resolution Inspector but
+  are not the default form;
+- existing P5R final-screen/default/pre-commit journeys remain green.
+
+**Gate:** P5R2 is accepted only when the debug creator and companion editor
+share the same reusable authoring presentation component, the companion editor
+is visually/practically usable with portrait + real controls + preset actions,
+relationship policy modifies that shared editor rather than replacing it, and
+all P1-P5R behavior remains verified. Native P6 resumes only afterward.
+
+**Developer gate result:** accepted in the local P5R2 phase commit. The
+shared component, fixed companion host, translated/profile-driven controls,
+portrait parity, Resolution Inspector separation, starter preset actions,
+relationship locking, deterministic preview/rebinding behavior, and focused
+plus existing regression suites are green. Native SP/MP/co-op acceptance is
+the next user-owned P6 responsibility.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
@@ -511,6 +629,13 @@ unless the user explicitly delegates native control:
 
 - verify the final Customise Character screen visibly exposes **COMPANIONS**
   beside Play when companion traits are selected;
+- verify the companion editor cannot pin/collapse and exposes the shared
+  human-facing Unique-NPC-style General/Appearance editor with a real portrait;
+- verify human trait/relationship labels are translated and no raw canonical
+  field IDs/`PNC_*`/`UI_*` keys dominate the normal editor;
+- verify Save selected template, Save whole set, and Load are usable;
+- verify nickname, appearance, skills, NPC traits, vanilla traits, and dynamic
+  traits use appropriate shared controls where policy allows them;
 - verify selecting a companion trait and pressing Play without opening/editing
   Companions preserves the former randomized/default starter behavior;
 - verify opening/closing Companions without changes also preserves that default
@@ -577,5 +702,13 @@ companions.
   trait is selected or the composer was opened and closed unchanged.
 - Do not call vanilla Play/NEXT before validating/staging explicitly-authored
   companion customization.
+- Do not treat `NPCAuthoringComposer:FieldRows()` or the raw resolver trace as
+  the normal player-facing character editor.
+- Do not maintain a second set of primitive name/appearance/trait/skill editor
+  controls solely for starting companions after P5R2.
+- Do not hide registry leakage with a growing companion-only deny list; use the
+  shared presentation schema/profile plus relationship policy.
+- Do not remove the Resolution Inspector; raw field/source diagnostics belong
+  there rather than in the default form.
 - Do not launch native Project Zomboid or publish Workshop content unless
   explicitly authorized.
