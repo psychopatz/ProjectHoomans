@@ -15,7 +15,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
+CORE_REPOSITORY = Path(__file__).resolve().parents[5] / "psychopatzCore"
 
 
 def _write_live_files(root: Path) -> tuple[Path, Path, bytes]:

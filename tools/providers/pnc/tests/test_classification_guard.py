@@ -83,6 +83,17 @@ class TestClassificationGuardTests(unittest.TestCase):
                         f"{path.name}::{row.get('name')} reason too short: {reason!r}",
                     )
 
+    def test_no_hardcoded_live_workspace_paths(self) -> None:
+        forbidden = "/home/psychopatz/" + "Zomboid/Workshop"
+        pnc_root = Path(__file__).resolve().parents[1]
+        offenders: list[str] = []
+        for path in sorted(pnc_root.rglob("*.py")):
+            if "__pycache__" in path.parts:
+                continue
+            if forbidden in path.read_text(encoding="utf-8"):
+                offenders.append(str(path.relative_to(pnc_root)))
+        self.assertEqual(offenders, [], f"Hardcoded live workspace paths: {offenders}")
+
 
 if __name__ == "__main__":
     unittest.main()

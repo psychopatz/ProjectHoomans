@@ -83,7 +83,7 @@ class SaveCatalogTests(unittest.TestCase):
     def catalog(self) -> SaveCatalog:
         return SaveCatalog(
             [self.root],
-            core_repository=Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore"),
+            core_repository=Path(__file__).resolve().parents[5] / "psychopatzCore",
         )
 
     def test_discover_reuses_core_reader_and_enumerates_required_roots(self) -> None:
@@ -156,7 +156,7 @@ class SaveCatalogTests(unittest.TestCase):
 
         result = SaveCatalog(
             [self.root],
-            core_repository=Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore"),
+            core_repository=Path(__file__).resolve().parents[5] / "psychopatzCore",
             server_root=server_root,
         ).discover()
 

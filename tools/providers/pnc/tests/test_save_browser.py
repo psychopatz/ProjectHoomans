@@ -18,7 +18,7 @@ from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
+CORE_REPOSITORY = Path(__file__).resolve().parents[5] / "psychopatzCore"
 
 
 class SaveBrowserTests(SemanticLabGuiTestCase):

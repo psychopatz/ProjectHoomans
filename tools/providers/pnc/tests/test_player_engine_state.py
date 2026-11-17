@@ -16,7 +16,7 @@ from tools.semantic_harness.runtime.save_catalog import SaveCatalog
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 
 
-CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
+CORE_REPOSITORY = Path(__file__).resolve().parents[5] / "psychopatzCore"
 
 
 def _sha256(path: Path) -> str:

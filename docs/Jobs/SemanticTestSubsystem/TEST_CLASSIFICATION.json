@@ -1,7 +1,7 @@
 {
   "schema": "semantic.test-classification.v1",
   "totalModules": 164,
-  "totalMethods": 650,
+  "totalMethods": 651,
   "categoryCounts": {
     "COMPILER_CONTRACT": 11,
     "GUI_CONTRACT": 38,
@@ -182,12 +182,17 @@
     {
       "module": "test_classification_guard.py",
       "category": "STATIC_ARCHITECTURE",
-      "methods": 1,
+      "methods": 2,
       "usesDirectWorker": false,
       "justification": "Static architecture guard: verifies TEST_CLASSIFICATION.json matches disk and enforces method-level mechanism reasons.",
       "methodDetails": [
         {
           "name": "test_classification_ledger_matches_test_tree_and_has_mechanism_reasons",
+          "category": "STATIC_ARCHITECTURE",
+          "usesDirectWorker": false
+        },
+        {
+          "name": "test_no_hardcoded_live_workspace_paths",
           "category": "STATIC_ARCHITECTURE",
           "usesDirectWorker": false
         }

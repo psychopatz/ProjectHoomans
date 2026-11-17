@@ -20,7 +20,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
+CORE_REPOSITORY = Path(__file__).resolve().parents[5] / "psychopatzCore"
 REAL_SAVE = Path(
     "/home/psychopatz/Zomboid/Saves/Apocalypse/"
     "2026-10-14_13-57-03/global_mod_data.bin"

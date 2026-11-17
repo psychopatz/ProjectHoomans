@@ -13,7 +13,7 @@ from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.save_test_support import pz_file
 
 
-CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
+CORE_REPOSITORY = Path(__file__).resolve().parents[5] / "psychopatzCore"
 
 
 class SaveImportTests(WarmWorkerTestMixin, unittest.TestCase):
