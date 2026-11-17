@@ -1,13 +1,22 @@
-# Progress — Estate-Wide Final Remediation
+# Progress — Final Evidence Closure
 
 **Status:** COMPLETE.
-**Current phase:** A6R22 (accepted).
-**Core participant commit:** `d063236d7b08` (`d063236d7b0845a2685c8a572c19ad5b4913f1a5`).
-**Primary handoff:** `committed_handoff` (`phase_commit: self` in this commit).
+**Current phase:** A6R26 (Final exact-vector and documentation closure).
+**Next Chunk:** None (all A6R23–A6R26 gates accepted).
 
-## Completed remediation summary (A6R19–A6R22)
+## Accepted commit vector
 
-- **A6R19 (broad-suite integrity & hermeticity):** Repaired all Core broad-discovery defects (`variation_auditor`, `psdl_compiler` default sidecar loader, `psdl_compact` inline text preservation, `convo_engine_authoring`, `convo_engine_fields`, `feature_registry`, `regression_controller`, `response_source_lineage`, `response_candidate`, `test_gui_startup` Tk teardown), repaired PNC `test_generation_ownership`, extracted 32 `.tests.test_*` imports into dedicated support modules (`convo_engine_test_support.py`, `save_test_support.py`, `companion_orders_test_support.py`, `grievance_evidence_test_support.py`, `faction_rehydration_test_support.py`), and added static import-boundary tests in both repos.
-- **A6R20 (identity & naming cleanup):** Removed milestone tokens from all active Core/PNC test classes and `test_*` methods, cleaned public CLI/UI/help and canonical machine IDs (`audit-s6m8`, `S6M2A`, `s8r1-psdl-inventory.v1`, `S0`, `contextual-semantic-phase6-performance`, `S10B`), renamed all 10 fixture synthetic IDs (`a1`, `a6r2`, `h4`), and extended naming guards to active test AST symbols and fixture synthetic IDs.
-- **A6R21 (behavior ownership & classification):** Migrated daily What's Up hub NPC/day suppression scenarios to `semantic_hub_and_suggestions.json` with generic `resetConversation` / `scenarioPatch` / `groupID` directives, and regenerated `TEST_CLASSIFICATION.json` with method-level `methodDetails` across all 171 modules / 702 methods.
-- **A6R22 (final vector):** Committed Core participant first (`d063236d7b08`), reconciled all job docs to `COMPLETE`, and verified exact committed Core + ProjectHoomans vector via `git archive` clean-tree reconstruction.
+- PsychopatzCore: `a583dbd246b6d8f6f4ba519462aecae92424a06f`
+- DynamicTrading read-only dependency: `e21387081776e3c8c8e2ba34d419a83441be801f`
+- ProjectHoomans: `phase_commit: self` (final committed handoff)
+
+## Verified final evidence (reconstructed three-repo workspace)
+
+- A6R23 (bounded/hermetic PNC discovery): 648 tests in 255.800s, OK (skipped=27 environment-gated DISPLAY/real-save/game-root tests); 0 new test-owned Lua workers afterward; 0 Tk cleanup errors (`xvfb-run` GUI journeys 15/15 PASS); deterministic lifecycle regressions pass in `test_worker_session.py`.
+- A6R24 (behavioral authority & method-level classification): 8 behavioral Python test suites migrated to canonical `semantic.harness-test.v1` fixtures, plus `rejected_stale_click_does_not_suppress_hub_choice` migrated to `suggestions/semantic_hub_and_suggestions.json` (`suggestionClick.fromTurn`); `TEST_CLASSIFICATION.json` regenerated (163 modules / 650 methods; 58 `LOW_LEVEL_RUNTIME_CONTRACT` direct-worker modules / 220 methods) with concrete mechanism reasons enforced by `test_classification_guard.py`.
+- A6R25 (active identity & reproducibility): remaining `S6M8`/`C7F`/`S10C`/`S10R2`/`Phase 0B` active descriptions cleaned; all Core and PNC tests made workspace-relative (0 live `/home/psychopatz/Zomboid/Workshop` dependencies) with static guards in `test_catalog_naming.py` and `test_classification_guard.py`.
+- A6R26 (exact-vector verification & closure):
+  - Core full discovery: 284/284 PASS in 47.650s.
+  - PNC full discovery: 648 tests in 255.800s, OK (skipped=27).
+  - Canonical fixture corpus: 47 files / 282 cases, 282/282 PASS in 21.13s; `test_lint.py` PASS.
+  - Held-out evaluator: PASS.

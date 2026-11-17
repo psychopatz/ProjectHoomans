@@ -1,62 +1,28 @@
-# Audit — Exhaustive Estate Findings
+# Audit — Final Evidence Closure (A6R23–A6R26)
 
-**Status:** COMPLETE (all A6R19–A6R22 findings remediated and verified).
-**Evidence:** CODE_VERIFIED, TEST_VERIFIED, RUNTIME_VERIFIED.
+**Status:** COMPLETE.
+**Evidence:** CODE_VERIFIED, TEST_VERIFIED, RUNTIME_VERIFIED in an isolated reconstructed three-repository sibling workspace.
 
-## Healthy foundation
+## Accepted commit vector
 
-Current fixture system remains healthy:
+- PsychopatzCore: `a583dbd246b6d8f6f4ba519462aecae92424a06f`
+- DynamicTrading (read-only dependency): `e21387081776e3c8c8e2ba34d419a83441be801f`
+- ProjectHoomans: `phase_commit: self`
 
-    39 files / 226 expanded cases
-    226/226 production-Lua fixture PASS
-    0 exact duplicate fixture cases
-    0 fixture naming violations
-    0 domain/path mismatches
+## Resolved A6R23–A6R26 findings
 
-## Broad-suite failures hidden by focused closure
+1. **A6R23 — Bounded and hermetic PNC broad discovery:**
+   Full PNC `unittest` discovery completed in `255.800s` (`Ran 648 tests`, `OK (skipped=27)`), well within the 900s bound, with 0 new test-owned Lua workers remaining afterward and 0 Tk cleanup errors (`xvfb-run` GUI journeys `15/15 OK` in `22.579s`). Deterministic lifecycle regressions (`WorkerLifecycleHermeticityTests`) pass in `test_worker_session.py`.
 
-Core full discovery ran 275 tests and failed with 7 failures + 1 error.
+2. **A6R24 — Behavioral authority & method-level classification:**
+   Migrated 8 behavioral Python test suites (`test_competence_command_and_clarification_bounds.py`, `test_competence_needs_and_offer_resolution.py`, `test_competence_social_and_wellbeing_gates.py`, `test_contextual_social_reactions.py`, `test_semantic_identity_wellbeing_collision.py`, `test_competence_interruption_and_context_repair.py`, `test_open_ended_semantic_combat_awareness.py`, `test_contextual_baseline_matrix.py`) and trimmed `test_personal_dialogue_knowledge_disclosure_gates.py` and `test_contextual_suggestions_hub_presentation.py` (moving `rejected_stale_click_does_not_suppress_hub_choice` into `suggestions/semantic_hub_and_suggestions.json` via `suggestionClick.fromTurn`). Regenerated `TEST_CLASSIFICATION.json` (163 modules / 650 methods; 58 `LOW_LEVEL_RUNTIME_CONTRACT` direct-worker modules / 220 methods) with concrete mechanism reasons enforced by `test_classification_guard.py`.
 
-Verified deterministic failures:
+3. **A6R25 — Active identity cleanup & three-repository reproducibility:**
+   Removed remaining `S6M8`/`C7F`/`S10C`/`S10R2`/`Phase 0B` milestone codes from active Core and PNC descriptions/errors. Replaced hardcoded `/home/psychopatz/Zomboid/Workshop` paths with workspace-relative sibling resolution and added static guards in `test_catalog_naming.py` and `test_classification_guard.py`.
 
-1. variation auditor sees 0 families because 110 current `convo_engine` manifest entries are compact `psychopatz.psdl.v2`, unsupported by its extractor;
-2. Studio camp simulation: `textSidecars requires a sidecar loader`;
-3. response-codebuilder-lineage CLI: same sidecar-loader defect;
-4. field registry misses `_authoringSchema` and `action`;
-5. feature registry omits fixture run/cancel/domains GUI controls;
-6. PSDL catalog test expects old ConvoEngine schema for current compact DynamicTrading PSDL source;
-7. provider lifecycle produced READY timeout only under broad suite; module passes 4/4 alone.
-
-Core broad run also emitted repeated Tkinter destruction errors.
-
-PNC has a deterministic stale-import failure in `test_interaction_dialogue_content_editing_contract.py` after Core test rename.
-
-PNC full discovery did not complete during audit and accumulated 25 live Lua child workers in >20 minutes, proving test-lifecycle leakage.
-
-## Structural regression risks
-
-- direct test-to-test imports: Core 12, PNC 20;
-- one missing live internal module ref found by AST scan;
-- classification covers all 171 PNC modules, but remains module-level;
-- LOW_LEVEL direct-worker: 66 modules / 278 methods;
-- generic `Implementation runtime contract`: 35 modules / 147 methods.
-
-High-overlap behavioral/mixed families include automatic flow generation, discourse/context repair, identity-wellbeing collision, semantic dialogue flows, suggestion stability, social reactions, command/clarification, needs/offer resolution, fallback safety, combat awareness, interaction arbitration, and hub presentation suppression.
-
-## Identity debt beyond filenames
-
-- 25 milestone-coded Core test methods across 9 files;
-- historical PNC class/method names remain;
-- active S10/S10B/Phase6/S8R1/S6M2A/C7F machine/help/docstring identity remains;
-- 10 fixture-owned synthetic IDs still contain A1/A6R2/H4 history;
-- `audit-s6m8` remains public CLI alias without deprecation warning/test.
-
-Historical archive documents are not cleanup targets unless operationally consumed.
-
-## Closure protocol defect
-
-The `c3acb70d` committed handoff claimed a green exact vector, but that vector fails held-out test imports. The later goal-owned `d990032e` fixes them, leaving the handoff stale.
-
-## Conclusion
-
-No new architecture is needed. A6R19–A6R22 must repair broad-suite integrity, active identity, exhaustive method-level fixture authority, and only then issue a new final handoff.
+4. **A6R26 — Isolated three-repository verification:**
+   - Core full discovery: `Ran 284 tests in 47.650s`, `OK`.
+   - PNC full discovery: `Ran 648 tests in 255.800s`, `OK (skipped=27)`.
+   - Canonical fixture corpus: 47 files / 282 cases, `PASS 282, FAIL 0, TOTAL 282 in 21.13s`.
+   - Fixture lint (`test_lint.py`): PASS.
+   - Held-out evaluation (`test_heldout_precision_and_dataset_compilation.py`): PASS.

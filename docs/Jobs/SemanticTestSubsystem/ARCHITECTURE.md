@@ -1,30 +1,40 @@
-# Architecture — Semantic Test Estate
+# Architecture — Semantic Test Authority
 
-**Status:** COMPLETE (A6R19–A6R22 accepted).
+**Status:** COMPLETE (A6R26 closed).
 
-## Behavioral authority
+## One behavioral authority
 
     semantic.harness-test.v1
     → provider resolver
-    → typed operations
+    → typed operations/session controls
     → compiler/production Lua
     → comparator
     → CLI/GUI/batch
 
-Fixtures own semantic scenario/outcome behavior. Imperative tests own mechanisms: compiler/parser, registry/ranking, protocol/payload validation, GUI mechanics, save/native/network, performance, observatory/sweep/quality algorithms, and static architecture.
+Fixtures own semantic scenario/outcome acceptance.
+
+Imperative tests own implementation mechanisms: compiler/parser/schema, registry/ranking algorithms, protocol and worker lifecycle, GUI mechanics, save/native/network boundaries, performance, observatory/sweep/quality algorithms and static architecture.
+
+A test is not low-level merely because it calls the production worker.
+
+## Method-level ownership
+
+Every direct-worker test method must state its own responsibility.
+
+For retained imperative methods, classification must contain a concrete mechanism reason. Mixed methods should be split so behavioral assertions can move to fixtures without deleting legitimate mechanism coverage.
+
+## Resource ownership
+
+Every test owns and closes the Lua/Tk/process/thread resources it creates. Broad suites must finish within the acceptance bound and return to the pre-suite worker-resource baseline.
 
 ## Test-support ownership
 
-Reusable test setup/helpers belong in dedicated support modules, never another `test_*.py`. Tests importing tests create rename-order coupling and are forbidden.
-
-## Hermeticity
-
-Every worker/Tk test owns and closes its resources. Full-suite execution must terminate with zero test-owned worker descendants and without unraisable GUI cleanup errors.
+Reusable helpers belong in descriptive support modules, never another test_*.py. Direct test-to-test imports are forbidden.
 
 ## Identity
 
-Descriptive identity applies to filenames, test classes/methods, current CLI/UI text, canonical machine IDs, and fixture-authored synthetic IDs. Historical phase labels belong in Git/history documents; compatibility aliases must be explicit, deprecated, and tested.
+Current filenames, classes, methods, CLI/UI help, canonical machine IDs, current module/API/error descriptions and fixture-authored synthetic IDs are descriptive. Historical phase names belong in Git/history-only commentary.
 
-## Classification
+## Reproducible workspace
 
-Mixed direct-worker suites require method-level responsibility. A worker call does not make behavior a low-level contract.
+Acceptance is multi-repository whenever tests consume multiple repositories. Tests that read actual repo content must use the reconstructed workspace roots, not silently read a live external checkout. Read-only dependencies still receive an exact commit fingerprint in the final handoff.

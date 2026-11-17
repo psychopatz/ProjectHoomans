@@ -1,15 +1,18 @@
-# Agent Runbook — A6R19–A6R22 (COMPLETE)
+# Agent Runbook — A6R23–A6R26
 
-1. Inspect Core + Hoomans exact Git state and root AGENTS. Preserve unrelated work. DynamicTrading is read-only unless an exact failing contract proves a required generic compatibility edit.
-2. Read PROGRESS and HANDOFF first; use ROADMAP/HARNESS_ACCEPTANCE only for the active gate.
-3. Treat the existing fixture architecture and current 226-case behavior as accepted.
-4. A6R19: reproduce/fix every broad-suite failure at root cause; extract direct test helpers into support modules; fix worker/Tk lifecycle leakage; require full Core + PNC discovery green.
-5. Never weaken a test merely to match current output. Resolve source-vs-test drift from current architecture evidence.
-6. A6R20: clean active milestone identity across test symbols, public CLI/UI/machine IDs, compatibility aliases, and fixture synthetic IDs; do not rewrite historical archives.
-7. A6R21: review every remaining direct-worker LOW_LEVEL method, not a shortlist; migrate semantic behavior with parity and retain only specific mechanism contracts.
-8. Add only generic typed fixture/session operations when repeated behavior requires them; no arbitrary worker dispatch.
-9. Regenerate method-level classification after actual migration decisions.
-10. A6R22: reconstruct exact committed Core + Hoomans vector and run broad discoveries + fixture corpus + leak/reference guards.
-11. Accepted phase commits: Core participant first; Hoomans primary/job repo last. Final handoff must be written after the final goal-owned fix.
-12. Never reset/stash/broad-stage; never push/publish/amend/rebase/tag/force-update without authorization.
-13. Continue automatically through A6R22 unless genuinely blocked.
+1. Inspect Git state in ProjectHoomans, PsychopatzCore and DynamicTrading. Read each applicable root AGENTS. Preserve unrelated work.
+2. Read PROGRESS and HANDOFF first. Then read only the active ROADMAP phase and its HARNESS_ACCEPTANCE gate.
+3. Treat the fixture engine architecture as accepted. Do not create a second tester or schema.
+4. A6R23: make full PNC discovery finish inside 900s and restore worker/Tk baseline. Diagnose lifecycle ownership; do not merely raise timeouts or use blanket kill commands.
+5. Re-run full Core discovery after lifecycle changes.
+6. A6R24: review every direct-worker LOW_LEVEL method. Use the semantic-scenario/outcome vs implementation-mechanism rule in ROADMAP. Split mixed methods.
+7. For each retained direct-worker imperative method, write a concrete method-level reason. Add a guard that rejects missing/generic reasons.
+8. Migrate stale-click no-suppression and other confirmed behavioral cases with side-by-side fixture parity before deleting Python behavior.
+9. A6R25: clean remaining current module/API/error/dataset milestone terminology. Do not rewrite historical archives.
+10. Make acceptance path-isolated: reconstruct Core/Hoomans/DynamicTrading as sibling repos; remove live absolute filesystem dependencies except pure string fixtures.
+11. DynamicTrading is read-only unless exact evidence proves a required change. Record its commit even if unchanged.
+12. A6R26: reconstruct exact commits and run full Core + PNC discovery, guards, lint, full fixtures and held-out acceptance.
+13. Reconcile every active job doc only after exact-vector success. All counts/commits must agree.
+14. Commit participant Core changes first; ProjectHoomans primary/docs/HANDOFF last. No goal-owned Hoomans commit may follow the final committed handoff.
+15. Never reset/stash/broad-stage uncertain work. Never push/publish/amend/rebase/tag/force-update without authorization.
+16. Continue automatically through A6R26 unless genuinely blocked.

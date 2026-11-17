@@ -1,114 +1,394 @@
-# Roadmap — A6R19–A6R22 Estate-Wide Final Remediation
+# Roadmap — A6R23–A6R26 Final Evidence Closure
 
 **Parent status:** COMPLETE.
-**Active phase:** A6R22 (closed).
-**Completion boundary:** A6R19–A6R22 accepted.
+**Active phase:** A6R26 (Closed).
+**Completion boundary:** A6R23–A6R26 accepted.
 
-## A6R19 — broad-suite integrity, hermeticity, and dependency repair
+## Rules for this roadmap
 
-Focused tests are insufficient. Current full Core discovery:
+This roadmap replaces the false COMPLETE state from A6R19–A6R22.
 
-    275 tests
-    7 failures
-    1 error
+Do not stop after one file or one passing focused suite. Continue through A6R26 unless blocked by a genuine external dependency.
 
-Deterministic failures/root causes already verified:
+Do not redesign the fixture engine or create another behavioral authority.
 
-- variation auditor reports 0 families because current manifest `convo_engine` entries are compact `psychopatz.psdl.v2`, while the auditor only extracts direct dialogue/realization documents;
-- ConvoEngine Studio camp simulation and `--response-codebuilder-lineage` fail with `textSidecars requires a sidecar loader`;
-- field registry is missing `_authoringSchema` and `action`;
-- feature registry misses `app.fixture_run_button`, `app.fixture_cancel_button`, `app.fixture_domains_button`;
-- PSDL studio/catalog test expects old `psychopatz.convo-engine.v1` while current DynamicTrading source is compact `psychopatz.psdl.v2`; resolve against current architecture rather than forcing the old schema;
-- provider-lifecycle suite passes 4/4 alone but produced a READY timeout in full discovery, indicating order/resource isolation debt;
-- full Core discovery emits Tkinter `Variable.__del__` / `main thread is not in main loop` cleanup errors.
+---
 
-ProjectHoomans also has a current broken test:
-`test_interaction_dialogue_content_editing_contract.py` imports removed `test_convo_engine_s9_regressions`; that module runs 2 PASS / 1 ERROR.
+## A6R23 — make full PNC discovery bounded and hermetic
 
-Structural prevention:
+### Known evidence
 
-- Core has 12 direct test-to-test imports;
-- PNC has 20 direct test-to-test imports.
+Independent audit command:
 
-Extract reusable helpers into descriptive support modules and add a static gate forbidding imports from `.tests.test_*`. This is the root fix for rename fragility.
+    PYTHONPATH=../psychopatzCore:. python3 -m unittest discover       -s tools/providers/pnc/tests -p 'test_*.py' -q
 
-The exhaustive PNC discovery audit was terminated after >20 minutes because it accumulated **25 live Lua worker children**. Full-suite worker/Tk lifecycle must be hermetic: no leaked worker descendants/orphans at completion.
+was bounded at 900 seconds and timed out:
 
-**Gate:** full Core discovery and full PNC discovery both terminate cleanly, pass, and leave zero test-owned Lua/Tk resources; live internal imports resolve; no direct test-to-test helper imports remain.
+    RC=124
 
-## A6R20 — active identity and compatibility cleanup
+During the run, roughly 10–12 Lua workers were simultaneously alive; several remained alive for many minutes. Timeout cleanup removed the audit-owned workers, so the current problem is accumulation/runtime ownership, not proven orphan persistence.
 
-Filename cleanup alone was too narrow.
+Current full Core discovery independently passes:
 
-Clean current agent/user-facing identity across Core + PNC:
+    Ran 277 tests in 124.768s
+    OK
 
-- 25 milestone-coded Core test method names across 9 files;
-- PNC historical class/method names such as R2/B2/H3/H4/R6/R9;
-- public CLI/help strings still saying S10/S10B;
-- canonical milestone IDs such as `contextual-semantic-phase6-performance`, `psychopatz.convo-engine.s8r1-psdl-inventory.v1`, and phase values `S0` / `S6M2A`;
-- C7F/S6M/S8R/G8/G9 labels in active module/API descriptions where they are current identity rather than historical commentary;
-- `audit-s6m8`: remove unless real compatibility is demonstrated, otherwise keep only as an explicitly deprecated, warning-emitting, tested alias.
+### Goal
 
-Rename the 10 fixture-owned synthetic IDs still carrying A1/A6R2/H4 history (beat/behavior/flow IDs, bootstrap request/NPC/player IDs).
+Find why a sequential PNC unittest estate retains many long-lived workers and why total runtime exceeds 15 minutes.
 
-Do **not** rewrite historical archive docs merely to erase provenance. Update current normative docs or live machine-readable inventories only when stale paths/identities are operationally consumed.
+Do not solve this by only increasing timeouts.
 
-Extend guards beyond filenames to active test symbols and canonical user/machine identities, with allowlists only for real protocol/version IDs.
+Inspect:
 
-**Gate:** active test symbols, UI/CLI help, canonical schemas/kinds/operation identities, fixture-authored synthetic IDs, and live references are descriptive; compatibility aliases are explicit and tested.
+- LuaSemanticWorker, LuaProcess, worker context-manager enter/exit, close(), QUIT/wait/terminate behavior;
+- helper functions that create workers;
+- class/module fixtures that may retain worker/process objects;
+- GUI test support and worker restart paths;
+- tests that intentionally run more than one worker concurrently;
+- subprocess pipes/reader threads that may prevent process reap;
+- expensive repeated worker startup where safe bounded reuse could exist without cross-test state leakage.
 
-## A6R21 — exhaustive behavioral-authority sweep
+Add a small lifecycle regression/harness that proves:
 
-Do not use another shortlist.
+1. a representative worker-heavy test/module returns to its starting worker-process count;
+2. repeated worker start/close cycles do not accumulate children;
+3. full PNC discovery has a bounded runtime and exits normally.
 
-Current ledger is module-level and masks mixed suites:
+Use deterministic ownership. Do not use blanket pkill as the fix.
 
-- 171 modules / 702 methods;
-- 66 LOW_LEVEL direct-worker modules / 278 methods;
-- 35 generic `Implementation runtime contract` entries / 147 methods.
+### A6R23 gate
 
-Upgrade classification to record **method responsibility** for every direct-worker LOW_LEVEL method:
+Accept only when:
 
-    behavioral semantic scenario/outcome → fixture authority
-    implementation mechanism/protocol/algorithm → imperative authority
+- full PNC discovery exits 0 inside 900 seconds;
+- worker population does not monotonically accumulate across unrelated tests;
+- after completion, new test-owned Lua worker count is zero;
+- no Tkinter unraisable cleanup errors appear;
+- full Core discovery still passes;
+- no test is weakened or skipped merely to reduce runtime.
 
-Review all 66 modules, prioritizing high-overlap families already identified:
-automatic flow generation; discourse/context repair; identity/wellbeing collision; semantic dialogue flows; suggestion ranking/stability; social reactions; command/clarification; needs/offer resolution; localization/fallback; combat awareness; interaction preview/arbitration; hub presentation suppression; companion/order/social/interaction lifecycle suites.
+Commit accepted Core participant changes first if Core owns the lifecycle fix. Then commit Hoomans phase changes and continue automatically.
 
-Mandatory remaining hub behavior:
-accepted choice hidden for NPC/day, next-day restore, NPC scoping, and rejected stale click not suppressing behavior. Keep reset/cache/stale-frame implementation mechanics in Python where appropriate.
+---
 
-Add the smallest generic typed fixture/session operations only when needed; never arbitrary worker dispatch.
+## A6R24 — finish behavioral authority and method-level classification for real
 
-Regenerate `TEST_CLASSIFICATION.json` with method-level reasons. Generic file-level prose is not sufficient for mixed suites.
+### Current classification truth
 
-**Gate:** every remaining direct-worker LOW_LEVEL method has a specific mechanism reason; all semantic behavior has fixture parity before imperative duplication is removed.
+Current ledger:
 
-## A6R22 — exhaustive exact-vector closure
+    171 modules
+    702 methods
+    66 LOW_LEVEL direct-worker modules
+    276 LOW_LEVEL direct-worker methods
 
-Closure requires broad evidence, not a hand-picked vector.
+The agent added methodDetails, but each row currently contains only:
 
-From clean reconstructed commits run:
+    name
+    category
+    usesDirectWorker
 
-- full Core unittest discovery;
-- full PNC unittest discovery;
-- Core + PNC naming/static/import guards;
-- fixture lint + overlap report;
-- full canonical fixture corpus;
-- held-out evaluator suite;
-- retained mechanism suites affected by migration;
-- worker/Tk leak check before and after suites.
+There is no method-specific reason.
 
-Require zero live broken renamed-path/module references and zero test-owned descendants after completion.
+Across all categories, the audit counted 508 direct-worker method rows without a method-specific reason.
 
-The final Hoomans handoff must be written **after** the last goal-owned fix. The previous handoff commit `c3acb70d` is invalid as a final baton because its exact vector fails the held-out import and current HEAD is the later `d990032e`.
+Conservative review candidates:
 
-Commit Core participant first, ProjectHoomans primary/job repo last. Reconstruct that exact vector and rerun acceptance. No goal-owned commit may follow the final `committed_handoff`.
+- 61 behavior-named LOW_LEVEL methods across 28 modules;
+- 68 LOW_LEVEL methods whose literal worker input already appears in canonical fixtures.
+
+These candidate counts are not automatic migration counts.
+
+### Decision rule
+
+For every direct-worker method, decide by what it proves.
+
+Fixture authority:
+
+    scenario/context
+    + user utterance / semantic choice
+    → semantic outcome
+
+Typical behavioral assertions include:
+
+- IR intent, subject, speech act or recognition pattern;
+- response branch, template or message outcome;
+- grounded known/unknown answers;
+- conversation topic/follow-up behavior;
+- suggestion availability or semantic action surface;
+- relationship, identity or wellbeing semantic outcome;
+- semantic action accepted/rejected as user-visible behavior;
+- localization preserving semantic identity.
+
+Imperative authority:
+
+- parser/compiler/schema/API validation;
+- registry/provider ordering;
+- ranking algorithm implementation;
+- frame stale/replay protocol itself;
+- serialization/save/native/network contract;
+- worker envelope/process lifecycle;
+- GUI mechanics;
+- performance/resource limits;
+- observatory/sweep/quality algorithms;
+- internal authoring/editing mechanics.
+
+A mixed method must be split when necessary.
+
+### Required representative fixes
+
+The audit directly inspected these currently LOW_LEVEL methods. Treat them as behavioral unless exact source evidence proves a mechanism contract.
+
+1. test_competence_command_and_clarification_bounds.py
+   test_continuation_paraphrases_follow_the_previous_topic
+
+   Inputs include tell me more, say more, what else, continue.
+   Assertions include QUESTION / CONVERSATION, CONVERSATION_CONTINUATION, grounded response and gossip-topic continuity.
+
+2. test_competence_needs_and_offer_resolution.py
+   test_natural_question_variants_answer_unknown_truthfully
+
+   Inputs ask residence, wounds/health and radio-tower knowledge.
+   Assertions include semantic subject, unknown fact status, uncertainty and truthful wording.
+
+3. test_competence_social_and_wellbeing_gates.py
+   test_required_five_turn_semantic_lab_sequence
+
+   Runs news → wait command → residence question → bite question → apparel compliment.
+   Asserts semantic patterns, branches, actions and grounded answers.
+
+4. test_contextual_social_reactions.py
+   test_typoed_hostility_keeps_recognized_social_route
+
+   Input fuck ypuuuu.
+   Asserts HOSTILE_REMARK, profanity pattern, hostile branch and negative relationship effect.
+
+5. test_semantic_identity_wellbeing_collision.py
+   test_wellbeing_and_need_reports_do_not_become_identity_claims
+
+   During a pending player-name exchange, wellbeing/hunger reports must remain WELLBEING/HUNGER instead of identity claims.
+
+Review the remaining candidates using the same rule. Do not simply relabel them LOW_LEVEL again.
+
+### Mandatory hub remainder
+
+This behavioral outcome is still only imperative:
+
+    rejected stale click
+    → reopen hub
+    → same semantic choice remains available
+
+Keep stale-frame rejection mechanics in Python if appropriate. Move the no-semantic-suppression outcome into fixture authority.
+
+### Classification schema requirement
+
+Regenerate TEST_CLASSIFICATION.json.
+
+Every direct-worker method must have:
+
+    name
+    category
+    usesDirectWorker
+    reason
+
+For behavioral methods temporarily retained during parity, also record the canonical fixture target/reference.
+
+For LOW_LEVEL direct-worker methods, reason must name the exact mechanism, for example:
+
+    stale suggestion-frame replay rejection protocol
+    provider registry normalization and ordering
+    Lua worker READY/QUIT process lifecycle
+
+Reject generic reasons such as:
+
+    Implementation runtime contract
+    real worker test
+    worker protocol
+
+unless the exact concrete mechanism follows.
+
+Add a static test that fails if a direct-worker LOW_LEVEL method lacks a non-generic reason.
+
+### A6R24 gate
+
+Accept only when:
+
+- all 66 current LOW_LEVEL direct-worker modules have been reviewed method-by-method;
+- every semantic behavior has fixture parity before duplicate Python behavior is removed;
+- stale-click no-suppression is fixture-owned;
+- every retained direct-worker imperative method has a specific method-level reason;
+- classification guard passes;
+- fixture lint and full semantic fixture corpus pass.
+
+Continue automatically.
+
+---
+
+## A6R25 — finish active identity cleanup and make the acceptance vector reproducible
+
+### Active naming remainder
+
+File and test-symbol naming is largely clean, but active current module/API/dataset descriptions still contain milestone archaeology.
+
+Examples found in active Core surfaces:
+
+- S6M8 three-repository ConvoEngine integrity...
+- Bounded C7F held-out scoring...
+- S10C/S10R2 Feature Acceptance Registry...
+- current errors saying C7F holdout ...
+- held-out dataset title containing C7F.
+
+PNC also still has current docstrings such as:
+
+- Manually reviewed Phase 0B baseline matrix...
+
+Rename current user/agent-facing descriptions by responsibility.
+
+Do not rewrite historical archive documents or migration comments that are only provenance.
+
+### Reproducibility problem
+
+The previous final handoff records Core + Hoomans only, but broad acceptance consumes DynamicTrading directly.
+
+Audit found:
+
+- 20 Core test files reference DynamicTrading;
+- 6 PNC test files reference DynamicTrading;
+- some tests derive the live sibling repo;
+- some tests contain absolute /home/psychopatz/Zomboid/Workshop/... paths.
+
+Therefore a Core+Hoomans git archive is not necessarily an isolated exact vector.
+
+### Required fix
+
+Make broad acceptance reproducible from an explicit sibling workspace containing:
+
+    PsychopatzCore
+    ProjectHoomans
+    DynamicTrading
+
+Record DynamicTrading's commit even if it remains read-only and unchanged.
+
+Current audited DynamicTrading dependency:
+
+    1fac47cdb1ff5ced7b2951634511859a0d276df3
+
+Tests needing real repository content must derive paths from reconstructed workspace/repository roots or an explicit test-workspace parameter/environment.
+
+Literal absolute paths may remain only when they are pure string fixtures for path-parsing tests and never read/write the filesystem; comment those exceptions.
+
+Add a static/reproducibility guard for live absolute workspace dependencies.
+
+### A6R25 gate
+
+Accept only when:
+
+- current module/API/error/dataset descriptions no longer expose irrelevant milestone codes;
+- historical archives remain untouched unless operationally consumed;
+- broad acceptance can run from a reconstructed three-repo sibling workspace;
+- DynamicTrading read-only commit is recorded as part of the dependency vector;
+- tests do not silently read/write a live external sibling outside the reconstructed workspace;
+- no unrelated DynamicTrading changes are made.
+
+Continue automatically.
+
+---
+
+## A6R26 — final exact-vector and documentation closure
+
+### Current documentation defect
+
+Previous closure docs disagree:
+
+- HANDOFF says 228 cases and COMPLETE;
+- README/AUDIT/RUNBOOK say 226 cases;
+- AUDIT says COMPLETE while still listing old 7F+1E, sidecar, registry and 25-worker failures as unresolved.
+
+Do not preserve this contradiction.
+
+### Final validation
+
+After A6R23–A6R25, reconstruct all acceptance repositories at exact recorded commits in one isolated sibling workspace.
+
+Run:
+
+1. full Core unittest discovery;
+2. full PNC unittest discovery;
+3. Core + PNC naming/static/import/classification guards;
+4. fixture lint + overlap report;
+5. full canonical semantic fixture corpus;
+6. held-out evaluator suite;
+7. focused retained mechanism suites affected by A6R24;
+8. worker/Tk lifecycle check before and after broad suites.
+
+Record exact counts and runtimes.
+
+Require:
+
+    Core broad discovery PASS
+    PNC broad discovery PASS within 900s
+    0 new test-owned Lua workers after each broad suite
+    0 Tk cleanup errors
+    0 direct test-to-test imports
+    0 unresolved active rename references
+    0 missing direct-worker method reasons
+    fixture lint errors = 0
+    exact fixture duplicates = 0
+    naming violations = 0
+    domain/path mismatches = 0
+    full fixture corpus PASS
+    held-out evaluation PASS
+
+### Final documents
+
+Only after the exact reconstructed vector is green, reconcile:
+
+- README.md
+- ROADMAP.md
+- PROGRESS.md
+- HANDOFF.md
+- ARCHITECTURE.md
+- AUDIT.md
+- HARNESS_ACCEPTANCE.md
+- AGENT_RUNBOOK.md
+- TEST_CLASSIFICATION.json
+
+All counts and commits must match current evidence.
+
+Final AUDIT must summarize resolved final evidence. It must not retain unresolved pre-fix prose under a COMPLETE heading.
+
+### Final Git order
+
+If Core changed:
+
+1. commit accepted PsychopatzCore participant work;
+2. DynamicTrading stays read-only unless an exact required fix was explicitly justified;
+3. commit ProjectHoomans implementation/provider/docs last.
+
+Final HANDOFF must be part of the final Hoomans commit.
+
+It must record the exact dependency vector, including DynamicTrading:
+
+    checkpoint_mode: committed_handoff
+    state: COMPLETE
+    parent_status: COMPLETE
+    phase: A6R26
+    phase_commit: self
+    participant_commits:
+      PsychopatzCore: "<exact commit>"
+      DynamicTrading: "<read-only dependency commit>"
+
+No goal-owned Hoomans commit may follow that handoff. If final verification requires another fix, reopen the handoff and close again afterward.
+
+---
 
 ## Non-goals
 
-- no new tester/schema;
+- no new semantic tester;
+- no parallel behavioral schema;
+- no arbitrary worker-method fixture escape hatch;
+- no migration of genuine mechanism tests merely for uniformity;
 - no mass deletion based on counts;
-- no rewriting historical archives merely for cosmetic naming;
-- no DynamicTrading edits unless an exact failing cross-repo contract requires them;
-- no push/publication.
+- no rewriting historical archives to cosmetically remove old phase names;
+- no push, PR, tag, release, amend, rebase or force update without authorization.

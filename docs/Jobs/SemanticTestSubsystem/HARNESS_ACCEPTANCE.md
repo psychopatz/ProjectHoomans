@@ -1,43 +1,41 @@
-# Harness Acceptance — Estate-Wide Final Remediation
+# Harness Acceptance — A6R23–A6R26
 
-**Status:** COMPLETE (A6R19–A6R22 accepted).
+**Status:** COMPLETE.
 
-## A6R19 broad integrity
+## A6R23 — PNC broad-suite lifecycle
 
-- full Core discovery passes, including all currently failing 275-test baseline cases;
-- full PNC discovery passes and terminates;
-- no test-owned Lua descendants remain after either suite;
-- no Tkinter unraisable cleanup errors;
-- stale renamed imports are repaired;
-- reusable helpers live in support modules;
-- static guard rejects direct imports from `.tests.test_*`.
+- Full PNC unittest discovery exits 0 within 900s (`255.800s`, 648 tests, `OK (skipped=27)`).
+- No monotonically accumulating long-lived worker population across unrelated tests.
+- Zero new test-owned Lua workers remain afterward.
+- No Tk cleanup/unraisable errors (`xvfb-run` GUI journeys 15/15 OK).
+- Full Core discovery remains green (`284/284 PASS in 47.650s`).
+- Deterministic lifecycle regressions pass in `test_worker_session.py`.
 
-## A6R20 identity
+## A6R24 — behavioral authority
 
-- active Core/PNC test methods/classes use descriptive responsibility names;
-- current CLI/UI/help and canonical schema/kind IDs do not expose roadmap milestones;
-- `audit-s6m8` is removed or explicitly deprecated + warning-tested;
-- fixture-owned A1/A6R2/H4 synthetic IDs are renamed;
-- live rename/reference audit reports zero broken operational refs.
+- All 66 prior `LOW_LEVEL_RUNTIME_CONTRACT` direct-worker modules reviewed method-by-method (now 58 modules / 220 methods).
+- Every direct-worker method has a concrete, method-specific mechanism reason in `TEST_CLASSIFICATION.json`.
+- Stale-click no-suppression semantic outcome is fixture-owned in `suggestions/semantic_hub_and_suggestions.json`.
+- `test_classification_guard.py` rejects missing or generic reasons.
+- `test_lint.py` and the full 47-file / 282-case semantic corpus pass (`282/282 PASS in 21.13s`).
 
-## A6R21 behavior ownership
+## A6R25 — identity + reproducibility
 
-- all 66 current direct-worker LOW_LEVEL modules are reviewed at method responsibility;
-- every behavioral method has fixture parity before removal;
-- every retained imperative method has a concrete mechanism justification;
-- hub NPC/day suppression behavior is fixture-owned;
-- classification ledger records method-level ownership.
+- Current module/API/error/dataset descriptions are descriptive (0 active milestone codes).
+- Historical archives remain untouched.
+- Broad tests derive live repository paths from the reconstructed workspace; 0 hardcoded live workspace paths remain (guarded by `test_catalog_naming.py` and `test_classification_guard.py`).
+- Final acceptance vector includes `DynamicTrading` read-only commit `e21387081776e3c8c8e2ba34d419a83441be801f`.
 
-## A6R22 final vector
+## A6R26 — exact closure
 
-From exact committed Core + Hoomans vector:
+In a clean reconstructed sibling workspace containing the exact recorded commits:
 
-- full Core discovery PASS;
-- full PNC discovery PASS;
-- fixture lint PASS with zero duplicate/naming/domain-path errors;
-- full semantic fixture corpus PASS;
-- held-out evaluation PASS;
-- naming/import/reference guards PASS;
-- zero test-owned worker/Tk leaks;
-- all active job docs agree on COMPLETE;
-- final `committed_handoff` is the last goal-owned primary commit.
+- Full Core discovery PASS (`284/284 in 47.650s`).
+- Full PNC discovery PASS within 900s (`648 tests in 255.800s`, `OK (skipped=27)`).
+- Worker/Tk baseline restored after each suite.
+- Naming/import/classification/reproducibility guards PASS.
+- Fixture lint PASS.
+- Full semantic fixture corpus PASS (`282/282 in 21.13s`).
+- Held-out evaluator PASS.
+- All active docs report the same commits, counts, and `COMPLETE` status.
+- Final Hoomans committed handoff is the last goal-owned primary commit (`phase_commit: self`).
