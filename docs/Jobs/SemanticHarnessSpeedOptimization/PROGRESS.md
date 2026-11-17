@@ -1,10 +1,22 @@
 # Progress — Semantic Harness Speed & Runtime Optimization
 
-**Status:** IN PROGRESS.
-**Current phase:** P5.
-**Next Chunk:** Execute `P5` — re-run full multi-repo verification gates cleanly on committed `P4` state (`228` declarative fixtures serial & `--jobs 4`, `63/283` Core unittest, `171/700` PNC unittest serial & `--jobs 4`, `run_tests.py --suite lua`, `test_semantic_harness_gui_journeys` on `DISPLAY=:0`, `pz-verify`, `0` leaked workers) and close `SemanticHarnessSpeedOptimization`.
+**Status:** COMPLETE.
+**Current phase:** P5 (COMPLETE).
+**Next Chunk:** None — `P1` through `P5` complete across `psychopatzCore` and `ProjectHoomans`.
 
 ## Completed Phases
+
+- **P5 (Final Multi-Repo Verification & Evidence Closure):**
+  - Re-ran all verification gates cleanly on committed `P4` state (`psychopatzCore` `2dec87a665aa5f26ed5287300ae42859e34852c6`, `ProjectHoomans` `dedf15bd3dd564c0c57aabeb86d6a7bfa10d6235`):
+    - Declarative fixtures: `228/228` PASS in `35.16 s` serial and `15.25 s` with `--jobs 4`, `0` leftover workers.
+    - Core `compact_unittest` serial (`DISPLAY=:0`): `63/63` modules, `283/283` PASS in `53.750 s` (`<= 60 s`), `0` leftover workers.
+    - PNC `compact_unittest` serial (`DISPLAY=:0`): `171/171` modules, `700` tests PASS (`skipped=27`) in `300.250 s` (`294.330 s` prior clean pass; `294.330–300.250 s`), `0` leftover workers.
+    - Unified Python runner (`tests/run_tests.py --suite python --jobs 4 --progress-every 10`, `DISPLAY=:0`): `171/171` modules, `700` tests PASS (`skipped=27`) in `148.846 s` (`146.141 s` in `P4`).
+    - Unified Lua smoke runner (`tests/run_tests.py --suite lua --progress-every 100`): `1033/1039` PASS in `9.90 s` (same `6` pre-existing unrelated baseline failures: `4` listed in `unrelated_baselines.json`, `2` pre-existing prior to job baseline).
+    - Direct `DISPLAY=:0` GUI journeys + static/acceptance checks (`test_semantic_harness_gui_journeys`, `test_python_acceptance_runner`, `test_semantic_harness_static_boundaries`): `15/15` PASS in `22.498 s` (`0` XIM deadlocks, `0` Tk errors).
+    - `pz-verify --kahlua --severity ERROR` on all modified mod Lua files (`PsychopatzJson.lua`, `PsychopatzJson_Parser.lua`, `PsychopatzSemanticRegistry.lua`, `PsychopatzCustomTranslationManager.lua`, `SpeechRealization.lua`, `ToolResultRealization.lua`) + `ScenarioSession_Lifecycle.lua`: `0` errors.
+    - Pre/post `ps -ef | grep '[w]orker.lua'`: `0` leaked workers before and after runs (`ZERO_WORKERS_BEFORE`, `ZERO_WORKERS_AFTER`).
+  - Re-indexed `codebase-memory-mcp` (`fast` mode) for both `psychopatz-core` (`2dec87a6`) and `project-hoomans` (`dedf15bd`).
 
 - **P4 (CodeBuilder Cache, Batch Reuse, XIM/Probe Cleanup, Compact Runners & Heavy Imperative Suite Acceleration):**
   - Added thread-safe mtime/fingerprint-keyed in-process cache in `conversation_compiler.py`, `_MODEL_CACHE_LOCK` in `compiler_probes.py`, batch/matrix worker reuse (`sweep_batch.py`, `sweep_service.py`, `response_observatory.py`, `response_candidate.py`), string-prefix path slicing in `convo_engine_psdl_inventory.py`/`convo_engine_ownership_inventory.py`, fast `copy_json` in `conversation_model.py` (`psdl_compiler.py`, `convo_engine_exchange.py`, `semantic_dialogue_ir.py`, `blocks.py`), `_lua_string`/`_lua_value` fast paths (`lexicon_compiler.py`, `dialogue_content.py`), and `reconcile_apply` Step 4 skip when clean.
@@ -39,11 +51,10 @@
   - Removed redundant `deepcopy` in `state.py` (`ImportedSourceSnapshot.from_scenario`) and `worker_conversation.py` (`mutation_response`), plus duplicate `_sync_effective_scenario` call.
   - Verified: `test_process`, `test_protocol`, `test_state`, `test_worker`, `test_core_worker` (16 tests OK), `test_worker_session` (1 test OK), Lua JSON roundtrip OK, `pz-verify` 0 errors on modified mod Lua files, `worker.input("follow me")` `56.94–84.74 ms` (`<= 90 ms`, down from `301.1 ms`).
 
-## Current Commit Baseline
+## Initial Job Commit Baseline & Completed State
 
-- `psychopatz-core`: `d063236d7b0845a2685c8a572c19ad5b4913f1a5` (`main`)
-- `project-hoomans`: `3a476aee2b9f617ab88c3df43484e73daeb78629` (`main`)
-- `dynamic-trading` (read-only): `1fac47cdb1ff5ced7b2951634511859a0d276df3` (`main`)
+- Initial baseline (`main`): `psychopatz-core` `d063236d7b0845a2685c8a572c19ad5b4913f1a5`, `project-hoomans` `3a476aee2b9f617ab88c3df43484e73daeb78629`, `dynamic-trading` `1fac47cdb1ff5ced7b2951634511859a0d276df3` (read-only).
+- Committed `P4` implementation state verified in `P5`: `psychopatz-core` `2dec87a665aa5f26ed5287300ae42859e34852c6`, `project-hoomans` `dedf15bd3dd564c0c57aabeb86d6a7bfa10d6235` (`P5` docs closure committed on top of `dedf15bd`).
 
 ## Verified Baseline Timing (Pre-Optimization)
 

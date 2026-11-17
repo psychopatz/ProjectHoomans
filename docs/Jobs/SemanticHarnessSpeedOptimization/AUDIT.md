@@ -1,6 +1,6 @@
 # Performance Audit — Semantic Harness Runtime & Test Estate
 
-**Status:** Baseline audit verified (`RUNTIME_VERIFIED` / `CODE_VERIFIED`).
+**Status:** Optimization audit & `P1`–`P5` verification complete (`COMPLETE`).
 **Baseline Commits:**
 - `psychopatz-core`: `d063236d7b0845a2685c8a572c19ad5b4913f1a5`
 - `project-hoomans`: `3a476aee2b9f617ab88c3df43484e73daeb78629`

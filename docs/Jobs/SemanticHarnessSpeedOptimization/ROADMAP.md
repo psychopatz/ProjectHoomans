@@ -1,7 +1,7 @@
 # Roadmap — Semantic Harness Speed & Runtime Optimization (`P1`–`P5`)
 
-**Parent status:** IN PROGRESS.
-**Active phase:** `P5`.
+**Parent status:** COMPLETE.
+**Active phase:** `P5` (`COMPLETE`).
 **Completion boundary:** `P1`–`P5` accepted and committed cleanly across participant (`psychopatzCore`) and primary (`ProjectHoomans`).
 
 ## Global Rules
@@ -100,18 +100,18 @@
 
 ---
 
-## P5 — Final Multi-Repo Verification & Evidence Closure
+## P5 — Final Multi-Repo Verification & Evidence Closure (`DONE`)
 
 **Goal:** Prove full-estate correctness, speed targets, and clean resource ownership across all repositories and close `SemanticHarnessSpeedOptimization`.
 
 ### Targets
-- Re-run all verification gates on clean phase commits:
-  1. Declarative fixtures (`228/228 PASS`) serial and `--jobs 4`.
-  2. Full Core unittest discovery (`277/277 PASS`).
-  3. Full PNC unittest discovery (`702/702 PASS`).
-  4. `pz-verify` on all modified mod Lua files.
-  5. Pre/post Lua worker process count check (`0` new stray processes).
-- Reconcile `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `PROGRESS.md`, and `HANDOFF.md` with exact observed runtimes, per-item latencies, and committed dependency vector (`state: "COMPLETE"`, `parent_status: "COMPLETE"`).
+- Re-run all verification gates on clean phase commits (`psychopatzCore` `2dec87a665aa5f26ed5287300ae42859e34852c6`, `ProjectHoomans` `dedf15bd3dd564c0c57aabeb86d6a7bfa10d6235`):
+  1. Declarative fixtures (`228/228 PASS`) serial (`35.16 s`) and `--jobs 4` (`15.25 s`).
+  2. Full Core unittest discovery (`63` modules / `283/283 PASS` in `53.750 s`).
+  3. Full PNC unittest discovery (`171` modules / `700` tests OK, `skipped=27`: `294.330 s` in `P4` / `300.250 s` in `P5` serial; `146.141 s` / `148.846 s` `--jobs 4`), `run_tests.py --suite lua` (`1033/1039`, `6` pre-existing unrelated baseline failures), and direct `DISPLAY=:0` GUI journeys + static boundary checks (`15/15 PASS` in `22.498 s`).
+  4. `pz-verify --kahlua --severity ERROR` on all modified mod Lua files + `ScenarioSession_Lifecycle.lua` (`0` errors).
+  5. Pre/post Lua worker process count check (`0` leaked processes: `ZERO_WORKERS_BEFORE`, `ZERO_WORKERS_AFTER`).
+- Reconcile `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `PROGRESS.md`, and `HANDOFF.md` with exact observed runtimes, per-item latencies, and committed dependency vector (`state: "CLEAN_CHECKPOINT"`, `parent_status: "COMPLETE"`).
 
 ## Non-Goals
 
