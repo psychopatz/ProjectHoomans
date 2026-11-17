@@ -102,9 +102,7 @@ LEGACY_KEYS = {
 
 class WellbeingWordingShardTests(unittest.TestCase):
     def test_compiler_owns_wellbeing_families_by_wellbeing_shard(self) -> None:
-        model = compile_conversation_sources(
-            REPOSITORY, manifest_path=MANIFEST,
-        )
+        model = compile_conversation_sources(REPOSITORY)
         plans = {
             item["id"]: item
             for item in model["psdlRuntimePlans"]
@@ -114,7 +112,7 @@ class WellbeingWordingShardTests(unittest.TestCase):
         for template_id in WELLBEING_IDS:
             item = plans[template_id]
             self.assertTrue(
-                item["sourceShard"].startswith("adopters/hoomans/dialogue/wellbeing_content/"),
+                item["sourceShard"].startswith("dialogue/wellbeing_content/"),
                 item["sourceShard"],
             )
             self.assertGreaterEqual(len(item.get("textRoles", [])), 1)
@@ -122,9 +120,7 @@ class WellbeingWordingShardTests(unittest.TestCase):
     def test_generated_wellbeing_translation_is_complete_and_legacy_keys_are_retired(
         self,
     ) -> None:
-        model = compile_conversation_sources(
-            REPOSITORY, manifest_path=MANIFEST,
-        )
+        model = compile_conversation_sources(REPOSITORY)
         rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
         for item in model["psdlRuntimePlans"]:
             if item.get("domain") != "wellbeing_content":

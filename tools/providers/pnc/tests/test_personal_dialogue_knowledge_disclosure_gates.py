@@ -9,7 +9,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class GroundedPersonalDialogueH3Tests(unittest.TestCase):
+class PersonalDialogueKnowledgeDisclosureGatesTests(unittest.TestCase):
     @staticmethod
     def scenario(
         familiarity: int = 80,

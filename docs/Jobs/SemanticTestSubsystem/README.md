@@ -1,26 +1,25 @@
-# Semantic Test Subsystem — Cross-Repo Closure
+# Semantic Test Subsystem — Estate-Wide Final Remediation
 
-**Status:** COMPLETE.
+**Status:** COMPLETE (A6R19–A6R22 accepted).
 
 ## Objective
 
-All-in-one PSDL semantic tester across ProjectHoomans and PsychopatzCore with one declarative behavioral fixture authority, descriptive domain-first naming in both repositories, contextual suggestion/hub behavioral ownership in fixtures, and cross-repo naming guards.
+Close the all-in-one PSDL semantic tester only after the **entire active Core + PNC test estate** is internally consistent, hermetic, descriptively named, behavior-authoritative, and green under broad discovery—not merely a focused closure subset.
 
-Accepted architecture:
+Accepted foundation remains:
 
     semantic.harness-test.v1
     → provider resolver
     → typed fixture operations
-    → compiler probe and/or production Lua worker
+    → compiler/production Lua
     → comparator
     → CLI / GUI / batch
 
-Final accepted baseline:
+Current source baseline:
 
 - PsychopatzCore `d1d4097ee4ce`
-- ProjectHoomans (recorded in `HANDOFF.md` / Git HEAD)
-- Core fixture/authority & naming gate: **19/19 PASS**
-- canonical fixture corpus: **226/226 PASS**
-- lint: **39 files / 226 cases / 0 errors** (0 exact duplicates, 0 naming violations, 0 domain/path mismatches)
-- classification ledger: **171 modules / 702 methods** with implementation-specific contracts
-- one GUI behavioral fixture authority; old regression/C0A surfaces removed.
+- ProjectHoomans `d990032e46f7`
+
+The canonical fixture corpus itself is healthy: **226/226 PASS**, lint **39 files / 226 expanded cases / 0 errors**.
+
+The parent goal is reopened because exhaustive audit found failures outside the previous focused vector. Only A6R19–A6R22 remain; completed history stays in Git.

@@ -14,7 +14,7 @@ import unittest
 from typing import Any, Callable, Iterable
 
 from tools.providers.pnc.runtime.player_engine_state import PLAYER_WORLD_VERSION
-from tools.providers.pnc.tests.test_save_catalog import pz_file
+from tools.providers.pnc.tests.save_test_support import pz_file
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.runtime.save_catalog import SaveCatalog
 from tools.semantic_harness.ui.shell import SemanticHarnessApp

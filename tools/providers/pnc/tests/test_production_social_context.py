@@ -12,13 +12,14 @@ from tools.semantic_harness.inspection.conversation_inspector import (
 from tools.semantic_harness.inspection.rendering import conversation_first
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-import tools.providers.pnc.tests.test_production_faction_rehydration as faction_fixture_fixture
+from tools.providers.pnc.tests.faction_rehydration_test_support import (
+    setup_faction_fixture,
+)
 
 
 class ProductionSocialContextTests(unittest.TestCase):
     def setUp(self) -> None:
-        # Reuse the bounded FactionFixture raw-save fixture without inheriting its tests.
-        faction_fixture_fixture.ProductionFactionRehydrationTests.setUp(self)
+        setup_faction_fixture(self)
 
     def test_saved_layers_share_production_context_and_hostile_talk(self) -> None:
         source_before = deepcopy(self.save_path.read_bytes())

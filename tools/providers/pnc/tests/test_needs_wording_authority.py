@@ -110,9 +110,7 @@ LEGACY_KEYS = {
 
 class NeedsWordingShardTests(unittest.TestCase):
     def test_compiler_owns_needs_families_by_needs_shard(self) -> None:
-        model = compile_conversation_sources(
-            REPOSITORY, manifest_path=MANIFEST,
-        )
+        model = compile_conversation_sources(REPOSITORY)
         plans = {
             item["id"]: item
             for item in model["psdlRuntimePlans"]
@@ -122,7 +120,7 @@ class NeedsWordingShardTests(unittest.TestCase):
         for template_id in NEEDS_IDS:
             item = plans[template_id]
             self.assertTrue(
-                item["sourceShard"].startswith("adopters/hoomans/dialogue/conversation_needs/"),
+                item["sourceShard"].startswith("dialogue/conversation_needs/"),
                 item["sourceShard"],
             )
             self.assertGreaterEqual(len(item.get("textRoles", [])), 1)
@@ -130,9 +128,7 @@ class NeedsWordingShardTests(unittest.TestCase):
     def test_generated_needs_translation_is_complete_and_legacy_keys_are_retired(
         self,
     ) -> None:
-        model = compile_conversation_sources(
-            REPOSITORY, manifest_path=MANIFEST,
-        )
+        model = compile_conversation_sources(REPOSITORY)
         rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
         for item in model["psdlRuntimePlans"]:
             if item["id"] not in NEEDS_IDS:

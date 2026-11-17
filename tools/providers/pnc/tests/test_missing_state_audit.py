@@ -7,15 +7,15 @@ import unittest
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-import tools.providers.pnc.tests.test_production_faction_rehydration as faction_fixture
-
-
-CORE_REPOSITORY = faction_fixture.CORE_REPOSITORY
+from tools.providers.pnc.tests.faction_rehydration_test_support import (
+    CORE_REPOSITORY,
+    setup_faction_fixture,
+)
 
 
 class MissingStateAuditTests(unittest.TestCase):
     def setUp(self) -> None:
-        faction_fixture.ProductionFactionRehydrationTests.setUp(self)
+        setup_faction_fixture(self)
 
     def test_missing_values_have_explicit_provenance_class(self) -> None:
         selection = SaveBackedImporter(

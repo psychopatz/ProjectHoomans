@@ -8,7 +8,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class PragmaticInteractionR6Tests(unittest.TestCase):
+class InteractionPreviewAndContextualResolutionTests(unittest.TestCase):
     def test_ungrounded_thanks_clarifies_without_entering_a_beat(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             result = worker.input("thanks")

@@ -27,7 +27,7 @@
           "action": "beat.validate",
           "payload": {
             "definition": {
-              "id": "beat.fixture_a1_argument",
+              "id": "beat.fixture_sample_argument",
               "owner": "SemanticTest",
               "version": 1,
               "domain": "social",
@@ -76,7 +76,7 @@
           "action": "beat.register",
           "payload": {
             "definition": {
-              "id": "beat.fixture_a1_argument",
+              "id": "beat.fixture_sample_argument",
               "owner": "SemanticTest",
               "version": 1,
               "domain": "social",
@@ -125,7 +125,7 @@
           "action": "beat.preview",
           "payload": {
             "definition": {
-              "id": "beat.fixture_a1_preview",
+              "id": "beat.fixture_sample_preview",
               "owner": "SemanticTest",
               "version": 1,
               "domain": "social",

@@ -1,7 +1,7 @@
 """Three first-party relation families share providers, resolver and director."""
 import unittest
-from tools.providers.pnc.tests.test_grievance_evidence_schema_and_validation import saved_worker, storage
-from tools.providers.pnc.tests.test_grievance_evidence_roundtrip_and_repair import admission
+from tools.providers.pnc.tests.grievance_evidence_test_support import saved_worker, storage
+from tools.providers.pnc.tests.grievance_evidence_test_support import admission
 
 
 class UnifiedEvidenceE5Tests(unittest.TestCase):

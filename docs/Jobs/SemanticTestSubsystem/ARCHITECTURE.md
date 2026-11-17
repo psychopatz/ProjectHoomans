@@ -1,28 +1,30 @@
-# Architecture — Semantic Test Authority
+# Architecture — Semantic Test Estate
 
-**Status:** COMPLETE.
+**Status:** COMPLETE (A6R19–A6R22 accepted).
 
-## Invariant
-
-Provider behavioral acceptance has one authority:
+## Behavioral authority
 
     semantic.harness-test.v1
-    → resolver/loader
+    → provider resolver
     → typed operations
     → compiler/production Lua
     → comparator
     → CLI/GUI/batch
 
-GUI Regression actions are fixture presets, not parallel behavioral matrices.
+Fixtures own semantic scenario/outcome behavior. Imperative tests own mechanisms: compiler/parser, registry/ranking, protocol/payload validation, GUI mechanics, save/native/network, performance, observatory/sweep/quality algorithms, and static architecture.
 
-## Ownership
+## Test-support ownership
 
-Fixtures own semantic scenario/outcome behavior (including contextual hub/suggestion availability, trust/ownership gating, click routes, and action-surface refresh).
+Reusable test setup/helpers belong in dedicated support modules, never another `test_*.py`. Tests importing tests create rename-order coupling and are forbidden.
 
-Imperative tests own implementation contracts such as compiler/parser/generation determinism, worker protocol and payload validation, GUI mechanics, save/native/network boundaries, performance/resource budgets, observatory/sweep/quality algorithms, candidate registry/ranking/privacy mechanics, stale-frame/cache replay protocol, event-window worker RPCs, and static architecture/naming guards.
+## Hermeticity
 
-Calling `LuaSemanticWorker` does not make a test low-level.
+Every worker/Tk test owns and closes its resources. Full-suite execution must terminate with zero test-owned worker descendants and without unraisable GUI cleanup errors.
 
-## Naming
+## Identity
 
-Active paths, suites, case IDs, test filenames, class names, canonical UI/CLI/API identities, and human-facing descriptions across both repositories describe current semantic/implementation responsibility. Historical phase provenance belongs in Git.
+Descriptive identity applies to filenames, test classes/methods, current CLI/UI text, canonical machine IDs, and fixture-authored synthetic IDs. Historical phase labels belong in Git/history documents; compatibility aliases must be explicit, deprecated, and tested.
+
+## Classification
+
+Mixed direct-worker suites require method-level responsibility. A worker call does not make behavior a low-level contract.

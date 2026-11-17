@@ -9,7 +9,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class GroundedPersonalDialogueB0Tests(unittest.TestCase):
+class PersonalDialogueApparelAndInventoryBoundsTests(unittest.TestCase):
     @staticmethod
     def response_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]

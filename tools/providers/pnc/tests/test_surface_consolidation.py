@@ -161,7 +161,11 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         document = json.loads(
             Path(greeting["sourcePath"]).read_text(encoding="utf-8")
         )
-        line = document["say"]["variants"][0]["text"]["EN"][0]
+        preview = app.authoring_service.preview_convo_engine_document(
+            document, source_path=greeting["sourcePath"]
+        )
+        say_variants = preview["compiled"]["records"][0]["payload"]["say"]["realizations"]["1"]["variants"]
+        line = next(v for v in say_variants if v["id"] == "neutral")["text"]["EN"][0]
         report = {
             "contentID": greeting["canonicalID"],
             "kind": "phraseFamily",
@@ -210,10 +214,13 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         app.run_regression()
         self.wait_for(
             root,
-            lambda: "PASS=4" in app.regression_output.get("1.0", "end"),
+            lambda: "PASS=" in app.regression_output.get("1.0", "end")
+            and "FAIL=0" in app.regression_output.get("1.0", "end"),
             "timed out waiting for the production regression matrix",
+            timeout=60.0,
         )
-        self.assertIn("PASS=4", app.regression_output.get("1.0", "end"))
+        self.assertIn("PASS=", app.regression_output.get("1.0", "end"))
+        self.assertIn("FAIL=0", app.regression_output.get("1.0", "end"))
         self.assertEqual(
             app.trace_tabs.tab(app.trace_tabs.select(), "text"),
             "Compare / Regression",

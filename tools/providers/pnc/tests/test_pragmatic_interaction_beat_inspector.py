@@ -27,6 +27,8 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
         service = SemanticLabAuthoringService(REPOSITORY)
         current = service.load_interaction_definition("beat.argument_escalation")
         source = Path(current["sourcePath"])
+        if not source.is_file():
+            source = CORE_REPOSITORY / source
         before = source.read_bytes()
 
         edited = deepcopy(current)
@@ -41,7 +43,7 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
         self.assertTrue(report["effectFree"])
         self.assertIn(
             "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-            "PsychopatzCore/ConvoEngine/Beats/Director/Social.lua",
+            "PsychopatzCore/ConvoEngine/Beats/Director/Social/Conflict.lua",
             report["changedGeneratedPaths"],
         )
         self.assertEqual(source.read_bytes(), before)
@@ -90,12 +92,15 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
                 "beat.argument_escalation"
             )
             self.assertEqual(refreshed["baseRelevance"], 0.74)
+            refreshed_path = Path(refreshed["sourcePath"])
+            if not refreshed_path.is_file():
+                refreshed_path = repository / refreshed_path
             source_document = json.loads(
-                Path(refreshed["sourcePath"]).read_text(encoding="utf-8")
+                refreshed_path.read_text(encoding="utf-8")
             )
             canonical = (
                 source_document
-                if source_document.get("schema") == "psychopatz.convo-engine.v1"
+                if source_document.get("schema") in {"psychopatz.convo-engine.v1", "psychopatz.psdl.v2"}
                 else next(
                     row for row in source_document["beats"]
                     if row["id"] == "beat.argument_escalation"
@@ -109,7 +114,7 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
                 (
                     repository
                     / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-                    "PsychopatzCore/ConvoEngine/Beats/Director/Social.lua"
+                    "PsychopatzCore/ConvoEngine/Beats/Director/Social/Conflict.lua"
                 ).is_file()
             )
             for language in ("EN", "TL"):

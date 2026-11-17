@@ -9,7 +9,7 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class GroundedPersonalDialogueB2Tests(unittest.TestCase):
+class PersonalDialogueImmutableBackstoryFactsTests(unittest.TestCase):
     def test_authoritative_facts_cover_immutable_personal_history(self) -> None:
         kinds = (
             "former_job",

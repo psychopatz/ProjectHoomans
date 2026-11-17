@@ -3,7 +3,7 @@ from copy import deepcopy
 import json
 import time
 import unittest
-from tools.providers.pnc.tests.test_grievance_evidence_schema_and_validation import saved_worker, storage, byte_size
+from tools.providers.pnc.tests.grievance_evidence_test_support import saved_worker, storage, byte_size
 
 FORBIDDEN = {"semanticEvidence", "contextualAdmission", "contextualRelevance", "transcript",
              "rawText", "normalizedText", "utterancePlan", "interactionPlan", "generatedChoices",
@@ -48,7 +48,7 @@ def capture_stress():
 
 class UnifiedEvidenceE7Tests(unittest.TestCase):
     def test_busy_conduct_provider_cannot_hide_durable_closing_fact(self):
-        from tools.providers.pnc.tests.test_grievance_evidence_roundtrip_and_repair import admission
+        from tools.providers.pnc.tests.grievance_evidence_test_support import admission
         with saved_worker() as worker:
             worker._request("TEST_EVIDENCE_STRESS", {"count": 128, "seedMeaningful": True})
             self.assertTrue(admission(worker.input("im sorry"))["admitted"])
@@ -60,7 +60,7 @@ class UnifiedEvidenceE7Tests(unittest.TestCase):
             self.assertFalse(frame["contextualAdmission"]["admitted"])
 
     def test_targeted_query_preserves_rare_durable_relation_under_unrelated_pressure(self):
-        from tools.providers.pnc.tests.test_grievance_evidence_roundtrip_and_repair import admission
+        from tools.providers.pnc.tests.grievance_evidence_test_support import admission
         with saved_worker() as worker:
             worker.input("fuck you")
             raw = storage(worker)["serializedRecord"]

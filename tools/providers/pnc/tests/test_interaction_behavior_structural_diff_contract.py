@@ -17,7 +17,7 @@ REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
-class PragmaticInteractionR9Tests(unittest.TestCase):
+class InteractionBehaviorStructuralDiffContractTests(unittest.TestCase):
     def test_behavior_outputs_link_to_dialogue_content_without_wording(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             catalog = worker.beat_catalog()
@@ -47,6 +47,8 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
             "behavior.acknowledge_memory"
         )
         source = Path(current["sourcePath"])
+        if not source.is_file():
+            source = REPOSITORY.parent / "psychopatzCore" / source
         before = source.read_bytes()
         edited = deepcopy(current)
         edited["baseRelevance"] = float(current["baseRelevance"]) + 0.01
@@ -63,7 +65,7 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
         self.assertTrue(
             any(
                 path.endswith(
-                    "PsychopatzCore/ConvoEngine/Behaviors/Director/Social.lua"
+                    "PsychopatzCore/ConvoEngine/Behaviors/Director/Social/Acknowledgement.lua"
                 )
                 for path in report["changedGeneratedPaths"]
             ),
@@ -82,7 +84,7 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
         )
         self.assertNotIn("styles", current)
 
-    def test_real_worker_inspector_exposes_r9_interaction_evidence(self) -> None:
+    def test_real_worker_inspector_exposes_interaction_evidence(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             result = worker.input("fuck ypuuuu")
         observation = result["observation"]

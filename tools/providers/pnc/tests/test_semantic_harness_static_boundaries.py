@@ -101,6 +101,34 @@ class SemanticHarnessStaticBoundaryTests(unittest.TestCase):
         ]
         self.assertEqual(violations, [])
 
+    def test_pnc_test_symbols_are_descriptive_not_milestone_coded(self) -> None:
+        import ast
+        from tools.semantic_harness.testing.lint import _find_history_tokens
+
+        allowed_words = {"legacy", "old"}
+        tests_dir = Path(__file__).resolve().parent
+        violations: list[tuple[str, str, list[str]]] = []
+        for path in sorted(tests_dir.glob("test_*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef) or (
+                    isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
+                ):
+                    tokens = [t for t in _find_history_tokens(node.name) if t not in allowed_words]
+                    if tokens:
+                        violations.append((path.name, node.name, tokens))
+        self.assertEqual(violations, [])
+
+    def test_pnc_tests_do_not_import_other_test_modules_directly(self) -> None:
+        tests_dir = Path(__file__).resolve().parent
+        pattern = re.compile(r"\b(?:from|import)\s+.*\btests\.test_")
+        offenders: list[str] = []
+        for path in sorted(tests_dir.glob("test_*.py")):
+            for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if pattern.search(line):
+                    offenders.append(f"{path.name}:{lineno}: {line.strip()}")
+        self.assertEqual(offenders, [])
+
 
 if __name__ == "__main__":
     unittest.main()

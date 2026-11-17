@@ -91,7 +91,7 @@ class ConversationResponsePlanAndVariationTests(unittest.TestCase):
         }
         self.assertEqual(
             resolved["behavior.retaliate_verbally"]["source"],
-            "behavior/social/retaliate_verbally.json",
+            "behavior/social/conflict/retaliate_verbally.json",
         )
         self.assertEqual(
             resolved["construction.en.social.mirror_retort"]["source"],

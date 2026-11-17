@@ -11,10 +11,10 @@
       ],
       "scenario": {
         "player": {
-          "characterUUID": "char-h4-a"
+          "characterUUID": "char-knowledge-a"
         },
         "npc": {
-          "npcID": "npc-h4-grounded",
+          "npcID": "npc-grounded-personal",
           "identitySeed": 90210,
           "identity": {
             "seed": 90210
@@ -57,7 +57,7 @@
         {
           "action": "knowledge.bootstrap",
           "payload": {
-            "requestID": "a6r2-bootstrap"
+            "requestID": "fixture-bootstrap-1"
           },
           "expect": {
             "operation.status": "ok"

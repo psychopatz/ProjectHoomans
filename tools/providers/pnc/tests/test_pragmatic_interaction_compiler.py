@@ -68,14 +68,14 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
         )
         self.assertEqual(
             model["locations"]["beat.argument_escalation"]["sourceShard"],
-            "beat/social/argument_escalation.json",
+            "beat/social/conflict/argument_escalation.json",
         )
         self.assertEqual(
             model["locations"]["behavior.warn"]["sourceShard"],
-            "behavior/social/warn.json",
+            "behavior/social/conflict/warn.json",
         )
         for record in [*model["beats"], *model["behaviors"]]:
-            self.assertEqual(record["domain"], "social")
+            self.assertIn(record["domain"], {"social", "scene"})
             self.assertNotIn("translations", record)
             self.assertNotIn("labelKey", record)
             self.assertNotIn("descriptionKey", record)
@@ -114,17 +114,28 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             path = (
                 repository
                 / CONVERSATION_SOURCE_RELATIVE
-                / "beat/social/argument_escalation.json"
+                / "beat/social/conflict/argument_escalation.json"
             )
             document = json.loads(path.read_text(encoding="utf-8"))
-            document["candidates"][0]["behavior"] = "behavior.missing"
+            if isinstance(document.get("candidates"), dict):
+                document["candidates"]["behavior.missing"] = 1
+            else:
+                document["candidates"][0]["behavior"] = "behavior.missing"
             path.write_text(
                 json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
                 + "\n",
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(Exception, "unknown behavior"):
-                compile_conversation_sources(repository, runtime_root=REPOSITORY)
+                compile_conversation_sources(
+                    repository,
+                    runtime_root=REPOSITORY,
+                    package_repositories={
+                        "PsychopatzCore": repository,
+                        "ProjectHoomans": REPOSITORY,
+                        "DTCommon": CORE_REPOSITORY.parent / "DynamicTrading",
+                    },
+                )
 
     def test_source_root_discovers_new_behavior_without_manifest_edit(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -134,13 +145,13 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             manifest_path = source_root / "manifest.json"
             manifest_before = manifest_path.read_bytes()
             sample = json.loads(
-                (source_root / "behavior/social/warn.json").read_text(
+                (source_root / "behavior/social/conflict/warn.json").read_text(
                     encoding="utf-8"
                 )
             )
-            sample["id"] = "discovery_probe"
+            sample["id"] = "behavior.discovery_probe"
             sample["act"] = "DISCOVERY_PROBE"
-            (source_root / "behavior/social/discovery_probe.json").write_text(
+            (source_root / "behavior/social/conflict/discovery_probe.json").write_text(
                 json.dumps(sample, ensure_ascii=False, indent=2, sort_keys=True)
                 + "\n",
                 encoding="utf-8",
@@ -149,6 +160,11 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             model = compile_conversation_sources(
                 repository,
                 runtime_root=REPOSITORY,
+                package_repositories={
+                    "PsychopatzCore": repository,
+                    "ProjectHoomans": REPOSITORY,
+                    "DTCommon": CORE_REPOSITORY.parent / "DynamicTrading",
+                },
             )
             self.assertIn(
                 "behavior.discovery_probe",
@@ -157,7 +173,7 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             self.assertEqual(manifest_path.read_bytes(), manifest_before)
             self.assertEqual(
                 model["locations"]["behavior.discovery_probe"]["sourceShard"],
-                "behavior/social/discovery_probe.json",
+                "behavior/social/conflict/discovery_probe.json",
             )
 
     def test_dialogue_content_locale_discovery_remains_data_driven(self) -> None:

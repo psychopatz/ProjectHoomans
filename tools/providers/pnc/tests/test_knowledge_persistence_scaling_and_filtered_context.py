@@ -8,15 +8,15 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
-class GroundedPersonalDialogueH4Tests(unittest.TestCase):
+class KnowledgePersistenceScalingAndFilteredContextTests(unittest.TestCase):
     @staticmethod
-    def scenario(character_uuid: str = "char-h4-a") -> dict:
+    def scenario(character_uuid: str = "char-knowledge-a") -> dict:
         return merge(
             DEFAULT_SCENARIO,
             {
                 "player": {"characterUUID": character_uuid},
                 "npc": {
-                    "npcID": "npc-h4-grounded",
+                    "npcID": "npc-grounded-personal",
                     "identitySeed": 90210,
                     "identity": {"seed": 90210},
                     "tacticalClass": "colonist",
@@ -86,7 +86,7 @@ class GroundedPersonalDialogueH4Tests(unittest.TestCase):
         )
 
     def test_optional_pbrainz_context_receives_only_player_filtered_facts(self) -> None:
-        with LuaSemanticWorker(self.scenario("char-h4-a")) as worker:
+        with LuaSemanticWorker(self.scenario("char-knowledge-a")) as worker:
             disclosed = worker.input("what was your old job")
             pbrainz = disclosed["contextAfter"]["pbrainz"]
             self.assertTrue(pbrainz["disclosureFiltered"])

@@ -9,9 +9,9 @@ from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 class ConversationSemanticCompositionTests(unittest.TestCase):
     def test_worker_loads_conversation_semantic_runtime(self) -> None:
-        worker = LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO))
-        worker.open_conversation()
-        snapshot = worker.snapshot()
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            worker.open_conversation()
+            snapshot = worker.snapshot()
 
         self.assertIn(
             "PNC/ConvoEngine/RuntimeFacade.lua",

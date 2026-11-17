@@ -7,7 +7,7 @@ from copy import deepcopy
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.tests.test_companion_orders_hub import open_orders
+from tools.providers.pnc.tests.companion_orders_test_support import open_orders
 
 
 def action_signature(result: dict) -> tuple[str, str, str, str]:

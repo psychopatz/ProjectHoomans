@@ -107,10 +107,7 @@ class SocialApologyWordingShardTests(unittest.TestCase):
         self.assertEqual(turn["llmCalls"], 0)
 
     def test_compiler_owns_fixed_apology_families_by_apology_shard(self) -> None:
-        model = compile_conversation_sources(
-            REPOSITORY,
-            manifest_path=MANIFEST,
-        )
+        model = compile_conversation_sources(REPOSITORY)
         plans = {
             item["id"]: item
             for item in model["psdlRuntimePlans"]
@@ -120,7 +117,7 @@ class SocialApologyWordingShardTests(unittest.TestCase):
         self.assertEqual(len(plans), len(APOLOGY_IDS))
         for plan in plans.values():
             self.assertTrue(
-                plan["sourceShard"].startswith("adopters/hoomans/dialogue/social_apology/"),
+                plan["sourceShard"].startswith("dialogue/social_apology/"),
                 plan["sourceShard"],
             )
             roles = plan.get("textRoles", [])
@@ -132,6 +129,8 @@ class SocialApologyWordingShardTests(unittest.TestCase):
     def test_generated_apology_psdl_source_is_complete_and_legacy_fixed_keys_retired(
         self,
     ) -> None:
+        from tools.semantic_harness.codebuilder.psdl_compiler import compile_convo_engine_document
+
         source_dir = (
             REPOSITORY
             / "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_apology"
@@ -140,8 +139,11 @@ class SocialApologyWordingShardTests(unittest.TestCase):
         self.assertEqual(len(apology_files), len(APOLOGY_IDS))
         for path in apology_files:
             doc = json.loads(path.read_text(encoding="utf-8"))
-            self.assertEqual(doc["owner"], "ProjectHoomans")
-            variants = doc["say"]["variants"]
+            compiled = compile_convo_engine_document(
+                doc, source_path=path, default_owner="ProjectHoomans"
+            )["records"][0]
+            self.assertEqual(compiled["owner"], "ProjectHoomans")
+            variants = compiled["payload"]["say"]["realizations"]["1"]["variants"]
             self.assertEqual({v["id"] for v in variants}, set(STYLES))
             for variant in variants:
                 self.assertEqual(len(variant["text"]["EN"]), 10)

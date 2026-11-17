@@ -100,10 +100,7 @@ EXPECTED = {
 
 class HealthWordingShardTests(unittest.TestCase):
     def test_compiler_owns_health_families_by_health_shard(self) -> None:
-        model = compile_conversation_sources(
-            REPOSITORY,
-            manifest_path=MANIFEST,
-        )
+        model = compile_conversation_sources(REPOSITORY)
         plans = {
             item["id"]: item
             for item in model["psdlRuntimePlans"]
@@ -115,9 +112,9 @@ class HealthWordingShardTests(unittest.TestCase):
         )
         for plan_id, item in plans.items():
             expected_source = (
-                "adopters/hoomans/dialogue/health_content/question_health_state.json"
+                "dialogue/health_content/question_health_state.json"
                 if plan_id == "question.health_state"
-                else "adopters/hoomans/dialogue/health_content/question_medical_bite.json"
+                else "dialogue/health_content/question_medical_bite.json"
             )
             self.assertEqual(item["sourceShard"], expected_source)
             roles = item.get("textRoles", [])
@@ -129,10 +126,7 @@ class HealthWordingShardTests(unittest.TestCase):
     def test_generated_health_translation_is_complete_and_legacy_keys_are_retired(
         self,
     ) -> None:
-        model = compile_conversation_sources(
-            REPOSITORY,
-            manifest_path=MANIFEST,
-        )
+        model = compile_conversation_sources(REPOSITORY)
         rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
         for item in model["psdlRuntimePlans"]:
             if item.get("domain") != "health_content":

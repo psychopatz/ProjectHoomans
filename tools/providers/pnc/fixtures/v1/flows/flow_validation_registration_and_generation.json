@@ -32,7 +32,7 @@
           "action": "flow.validate",
           "payload": {
             "definition": {
-              "id": "fixture_a6r2_flow",
+              "id": "fixture_sample_flow",
               "owner": "SemanticTest",
               "version": 1,
               "initial": "await_reply",
@@ -73,7 +73,7 @@
           "action": "flow.register",
           "payload": {
             "definition": {
-              "id": "fixture_a6r2_flow",
+              "id": "fixture_sample_flow",
               "owner": "SemanticTest",
               "version": 1,
               "initial": "await_reply",

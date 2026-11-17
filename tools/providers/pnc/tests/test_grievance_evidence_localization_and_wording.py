@@ -3,7 +3,7 @@ from hashlib import sha256
 from pathlib import Path
 import unittest
 from tools.semantic_harness.discovery.runtime import discover_newest_runtime
-from tools.providers.pnc.tests.test_grievance_evidence_schema_and_validation import saved_worker, storage
+from tools.providers.pnc.tests.grievance_evidence_test_support import saved_worker, storage
 
 ROOT = Path(__file__).resolve().parents[4]
 MOD = ROOT / "Contents/mods/ProjectHoomans"

@@ -15,7 +15,7 @@
           "action": "behavior.validate",
           "payload": {
             "definition": {
-              "id": "behavior.fixture_a1_ack",
+              "id": "behavior.fixture_sample_ack",
               "owner": "SemanticTest",
               "version": 1,
               "act": "ACKNOWLEDGE",
@@ -56,7 +56,7 @@
           "action": "behavior.register",
           "payload": {
             "definition": {
-              "id": "behavior.fixture_a1_ack",
+              "id": "behavior.fixture_sample_ack",
               "owner": "SemanticTest",
               "version": 1,
               "act": "ACKNOWLEDGE",

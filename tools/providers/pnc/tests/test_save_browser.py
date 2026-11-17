@@ -13,7 +13,7 @@ import unittest
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
 from tools.semantic_harness.runtime.state_providers import SemanticStateCatalog
-from tools.providers.pnc.tests.test_save_catalog import pz_file
+from tools.providers.pnc.tests.save_test_support import pz_file
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 

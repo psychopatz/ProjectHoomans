@@ -384,6 +384,85 @@
         }
       ],
       "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.accepted_hub_choice_hidden_until_next_day",
+      "tags": ["suggestions", "semantic_hub", "suppression"],
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.suggestions.groups.1.id": "semantic_hub.whats_up",
+            "observation.suggestions.groups.1.candidates": {"contains": {"id": "question.wellbeing"}}
+          }
+        },
+        {
+          "suggestionClick": {"groupID": "semantic_hub.whats_up", "candidateID": "question.wellbeing"},
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.groups.1.candidates": {
+              "notContains": {"id": "question.wellbeing"},
+              "contains": {"id": "question.activity"}
+            }
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.groups.1.candidates": {"notContains": {"id": "question.wellbeing"}}
+          }
+        },
+        {
+          "text": "How are you feeling?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "WELLBEING"
+          }
+        },
+        {
+          "scenarioPatch": {"world": {"worldAgeHours": 73.5}},
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.groups.1.candidates": {"contains": {"id": "question.wellbeing"}}
+          }
+        }
+      ],
+      "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.hub_suppression_scoped_to_npc",
+      "tags": ["suggestions", "semantic_hub", "suppression"],
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.groups.1.candidates": {"contains": {"id": "question.wellbeing"}}
+          }
+        },
+        {
+          "suggestionClick": {"groupID": "semantic_hub.whats_up", "candidateID": "question.wellbeing"},
+          "expect": {"accepted": true}
+        },
+        {
+          "scenarioPatch": {"npc": {"npcID": "npc_other"}},
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.groups.1.candidates": {"contains": {"id": "question.wellbeing"}}
+          }
+        }
+      ],
+      "domain": "suggestions"
     }
   ]
 }

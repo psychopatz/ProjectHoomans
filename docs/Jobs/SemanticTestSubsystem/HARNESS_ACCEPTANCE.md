@@ -1,26 +1,43 @@
-# Harness Acceptance — Cross-Repo Closure
+# Harness Acceptance — Estate-Wide Final Remediation
 
-**Status:** COMPLETE.
+**Status:** COMPLETE (A6R19–A6R22 accepted).
 
-## A6R16
+## A6R19 broad integrity
 
-- Core 23 milestone-coded test files and 3 implementation/data files renamed descriptively;
-- canonical UI/CLI/API/schema `S6M8` identity replaced by `ConvoEngine Integrity Audit` / `audit-integrity` / `run_convo_engine_integrity_audit`;
-- Core-side naming guard added and green.
+- full Core discovery passes, including all currently failing 275-test baseline cases;
+- full PNC discovery passes and terminates;
+- no test-owned Lua descendants remain after either suite;
+- no Tkinter unraisable cleanup errors;
+- stale renamed imports are repaired;
+- reusable helpers live in support modules;
+- static guard rejects direct imports from `.tests.test_*`.
 
-## A6R17
+## A6R20 identity
 
-- contextual semantic hub, follow-up, and "What's up?" behavioral scenarios migrated to `suggestions/semantic_hub_and_suggestions.json` with parity;
-- candidate registry, ranking, privacy, and stale-frame/cache protocol tests retained as imperative contracts;
-- `TEST_CLASSIFICATION.json` regenerated (171 modules / 702 methods) with specific implementation reasons.
+- active Core/PNC test methods/classes use descriptive responsibility names;
+- current CLI/UI/help and canonical schema/kind IDs do not expose roadmap milestones;
+- `audit-s6m8` is removed or explicitly deprecated + warning-tested;
+- fixture-owned A1/A6R2/H4 synthetic IDs are renamed;
+- live rename/reference audit reports zero broken operational refs.
 
-## A6R18
+## A6R21 behavior ownership
 
-From exact committed Core (`d1d4097ee4ce`) + Hoomans vector:
+- all 66 current direct-worker LOW_LEVEL modules are reviewed at method responsibility;
+- every behavioral method has fixture parity before removal;
+- every retained imperative method has a concrete mechanism justification;
+- hub NPC/day suppression behavior is fixture-owned;
+- classification ledger records method-level ownership.
 
-- Core fixture/authority & naming gate PASS (19/19);
-- ProjectHoomans naming/static boundary gate PASS (4/4);
-- lint PASS with zero exact duplicates, zero naming violations, zero domain/path mismatches (39 files / 226 cases);
-- focused retained suggestion/ranking/protocol/heldout suites PASS;
-- full canonical semantic fixture corpus PASS (226/226);
-- README/ROADMAP/PROGRESS/HANDOFF/ARCHITECTURE/AUDIT/HARNESS_ACCEPTANCE/RUNBOOK agree on COMPLETE.
+## A6R22 final vector
+
+From exact committed Core + Hoomans vector:
+
+- full Core discovery PASS;
+- full PNC discovery PASS;
+- fixture lint PASS with zero duplicate/naming/domain-path errors;
+- full semantic fixture corpus PASS;
+- held-out evaluation PASS;
+- naming/import/reference guards PASS;
+- zero test-owned worker/Tk leaks;
+- all active job docs agree on COMPLETE;
+- final `committed_handoff` is the last goal-owned primary commit.

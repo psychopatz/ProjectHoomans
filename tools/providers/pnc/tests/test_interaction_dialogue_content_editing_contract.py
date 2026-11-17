@@ -23,7 +23,7 @@ REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
-class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
+class InteractionDialogueContentEditingContractTests(unittest.TestCase):
     def test_behaviors_reference_dialogue_content_not_response_pools(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
         behaviors = {item["id"]: item for item in model["behaviors"]}
@@ -81,7 +81,7 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         )
 
     def test_existing_dialogue_content_authoring_edits_interaction_wording(self) -> None:
-        from tools.semantic_harness.tests.test_convo_engine_s9_regressions import (
+        from tools.semantic_harness.tests.convo_engine_test_support import (
             _setup_three_repo_workspace,
         )
 
@@ -116,19 +116,34 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
                 json.dumps(core_manifest, indent=2) + "\n",
                 encoding="utf-8",
             )
-            source_rel = (
+            source_dir_rel = (
                 "tools/providers/pnc/codebuilder/sources/conversation/"
-                "dialogue/social_interaction_argument/interaction_argument_retaliate.json"
+                "dialogue/social_interaction_argument"
             )
-            dest_path = repos["hoomans"] / source_rel
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(REPOSITORY / source_rel, dest_path)
+            shutil.copytree(
+                REPOSITORY / source_dir_rel,
+                repos["hoomans"] / source_dir_rel,
+                dirs_exist_ok=True,
+            )
+            dest_path = (
+                repos["hoomans"] / source_dir_rel / "interaction_argument_retaliate.json"
+            )
 
             got = service.dispatch_operation(
                 "convo.get", {"target": "interaction.argument.retaliate"}
             )
             self.assertTrue(got["found"], got)
+            preview_doc = service.preview_convo_engine_document(
+                got["document"], source_path=dest_path
+            )
+            compiled_variants = preview_doc["compiled"]["records"][0]["payload"]["say"]["realizations"]["1"]["variants"]
             doc = deepcopy(got["document"])
+            doc["say"] = {
+                "variants": [
+                    {"id": v["id"], "text": deepcopy(v["text"])}
+                    for v in compiled_variants
+                ]
+            }
             doc["say"]["variants"][0]["text"]["EN"][0] = (
                 "You are really pushing me now."
             )

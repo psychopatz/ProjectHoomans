@@ -236,6 +236,18 @@ class GenerationOwnershipTests(unittest.TestCase):
                         json.dumps(shard, indent=2) + "\n",
                         encoding="utf-8",
                     )
+            manifest["externalSourceRoots"] = [
+                {
+                    "path": "adopters/hoomans/dialogue",
+                    "kind": "convo_engine",
+                    "domain": "general",
+                    "order": 3011,
+                    "owner": "ProjectHoomans",
+                    "optional": True,
+                    "sourcePath": "tools/providers/pnc/codebuilder/sources/conversation/dialogue",
+                    "domainFromSubdir": True,
+                }
+            ]
             manifest_path.write_text(
                 json.dumps(manifest, indent=2) + "\n",
                 encoding="utf-8",
@@ -244,6 +256,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             model = compile_conversation_sources(
                 hoomans,
                 runtime_root=REPOSITORY,
+                manifest_path=manifest_path,
                 package_repositories={
                     "DTCommon": REPOSITORY.parent / "DynamicTrading"
                 },
@@ -295,15 +308,8 @@ class GenerationOwnershipTests(unittest.TestCase):
                 / "Contents/mods/DTCommon/common/media/lua/shared/"
                 / "DTCommon/ConvoEngine/Registry.lua"
             )
-            pack_module = (
-                dynamic_trading
-                / "Contents/mods/DTCommon/common/media/lua/shared/"
-                / "DTCommon/ConvoEngine/Packs/"
-                "Dialogue/Trading.lua"
-            )
             manifest_lua = registry.with_name("Manifest.lua")
             self.assertTrue(registry.is_file())
-            self.assertTrue(pack_module.is_file())
             self.assertTrue(manifest_lua.is_file())
             self.assertTrue(
                 any(
@@ -317,7 +323,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             registry_text = registry.read_text(encoding="utf-8")
             self.assertIn("Registry.PACKS = {}", registry_text)
             self.assertIn(
-                'DTCommon/ConvoEngine/Packs/Dialogue/Trading',
+                'DTCommon/ConvoEngine/Behaviors',
                 registry_text,
             )
             self.assertIn(
@@ -389,9 +395,9 @@ class GenerationOwnershipTests(unittest.TestCase):
                 "CompanionCommandsPlayer.lua"
             )
             registry = (
-                hoomans
-                / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-                / "PNC/ConvoEngine/Registry.lua"
+                core
+                / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
+                / "PsychopatzCore/ConvoEngine/Registry.lua"
             )
 
             self.assertTrue(core_identity.is_file())
@@ -424,10 +430,15 @@ class GenerationOwnershipTests(unittest.TestCase):
                 'Patterns/Common/Identity"',
                 registry_text,
             )
+            core_index = (
+                core
+                / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
+                / "PsychopatzCore/ConvoEngine/Index/Dialogue/"
+                "CompanionCommandsPlayer.lua"
+            )
             self.assertIn(
-                'appendConvoPlans(require "PNC/ConvoEngine/'
-                'Dialogue/CompanionCommandsPlayer")',
-                registry_text,
+                '"PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer"',
+                core_index.read_text(encoding="utf-8"),
             )
 
     def test_default_lexicon_output_is_core_owned(self) -> None:

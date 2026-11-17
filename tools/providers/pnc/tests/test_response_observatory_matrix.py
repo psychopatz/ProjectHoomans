@@ -306,12 +306,10 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                     for key in data:
                         occurrence.setdefault(key, []).append(rel)
                 keys = (
-                    "conversation.content.semantic.command.follow.queued.neutral.01",
-                    "conversation.content.semantic.command.stay.queued.neutral.01",
-                    "conversation.content.semantic.command.follow.rejected.neutral.01",
-                    "conversation.content.semantic.command.stay.rejected.neutral.01",
-                    "conversation.content.semantic.command.follow.failed.neutral.01",
-                    "conversation.content.semantic.command.stay.failed.neutral.01",
+                    "UI_PNC_Conversation_Semantic_RealizationCompanionFollowNeutral",
+                    "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
+                    "UI_PNC_Conversation_Semantic_ActionFollowUnavailable",
+                    "UI_PNC_Conversation_Semantic_ActionStayUnavailable",
                 )
                 for key in keys:
                     self.assertEqual(
