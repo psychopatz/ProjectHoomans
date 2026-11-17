@@ -12,21 +12,35 @@ participant_commits:
   DynamicTrading: "e21387081776e3c8c8e2ba34d419a83441be801f"
 ---
 
-# Session Handoff — A6R23–A6R26 Complete
+# Session Handoff — Semantic Test Subsystem Complete
 
-## Accepted three-repository commit vector
+## Accepted implementation vector
 
-- `PsychopatzCore`: `a583dbd246b6d8f6f4ba519462aecae92424a06f`
-- `DynamicTrading` (read-only dependency): `e21387081776e3c8c8e2ba34d419a83441be801f`
-- `ProjectHoomans`: `phase_commit: self`
+- PsychopatzCore: a583dbd246b6d8f6f4ba519462aecae92424a06f
+- ProjectHoomans implementation parent: ae2ec1f401dcad05d62830d442fed2addc4415c4
+- DynamicTrading read-only dependency: e21387081776e3c8c8e2ba34d419a83441be801f
 
-## Verified final evidence (isolated reconstructed sibling workspace)
+## Final isolated verification
 
-- Core full `unittest` discovery: `Ran 284 tests in 47.650s`, `OK`.
-- PNC full `unittest` discovery: `Ran 648 tests in 255.800s`, `OK (skipped=27)` (all 27 skips are environment-gated `DISPLAY`, real local save, or `PZ_KAHLUA_GAME_ROOT` checks).
-- Tk GUI journeys under `xvfb-run -a`: `Ran 15 tests in 22.579s`, `OK`, 0 Tk cleanup/unraisable errors.
-- Worker baseline before and after all broad suites: 0 lingering test-owned Lua workers.
-- Canonical semantic fixture corpus: 47 files / 282 expanded cases, `PASS 282, FAIL 0, TOTAL 282 in 21.13s`.
-- Fixture linter (`test_lint.py`): PASS (0 lint errors, 0 naming violations, 0 domain/path mismatches).
-- Classification & reproducibility guards (`test_classification_guard.py`, `test_catalog_naming.py`): PASS (163 modules / 650 methods; 58 `LOW_LEVEL_RUNTIME_CONTRACT` direct-worker modules / 220 methods, all with concrete mechanism reasons; 0 hardcoded live workspace paths).
-- Held-out conversation evaluation (`test_heldout_precision_and_dataset_compilation.py`): PASS.
+- Core discovery: 284/284 PASS in 43.956s.
+- PNC discovery: 645 tests in 249.783s, OK (skipped=27).
+- GUI journeys under Xvfb: 4/4 PASS in 19.051s.
+- Fixture lint: 48 files / 290 cases, zero lint/naming/domain-path/duplicate errors.
+- Full semantic fixture corpus: 290/290 PASS in 47.30s.
+- Classification/static/import/workspace guards: PASS.
+- Held-out evaluator: PASS.
+- Zero new test-owned Lua workers after acceptance.
+- Zero Tk cleanup errors.
+
+## Residual work outside this goal
+
+DynamicTrading live worktree contains unrelated generated fingerprint edits that are NOT part of this acceptance vector:
+
+- Contents/mods/DTCommon/common/media/lua/shared/DTCommon/ConvoEngine/Manifest.lua
+- Contents/mods/DTCommon/common/media/lua/shared/DTCommon/ConvoEngine/Registry.lua
+
+Residual diff SHA-256:
+
+    6501c2d9ec8ccf468d5e50eee7e9bc897fc0c3fbbdbe7224544f07f1d8f9160a
+
+Preserve those changes. Do not reset, stash or stage them as SemanticTestSubsystem work.

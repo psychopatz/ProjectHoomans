@@ -2,11 +2,7 @@
 
 **Status:** COMPLETE.
 
-## Objective
-
-Finish the all-in-one PSDL semantic tester with the whole active semantic-test estate behavior-authoritative, implementation-precise, bounded/hermetic, descriptively named, reproducible from an exact multi-repository commit vector, and documented consistently.
-
-Accepted architecture:
+## Accepted architecture
 
     semantic.harness-test.v1
     → provider-aware resolver
@@ -15,17 +11,22 @@ Accepted architecture:
     → comparator
     → CLI / GUI / batch
 
-## Accepted acceptance vector
+Semantic scenario/outcome acceptance belongs in fixtures. Imperative Python tests retain implementation mechanisms such as parser/compiler/schema, registry/ranking, transport/process lifecycle, replay protocol, GUI mechanics, persistence/native/network, performance and observatory/sweep algorithms.
 
-- PsychopatzCore: `a583dbd246b6d8f6f4ba519462aecae92424a06f`
-- DynamicTrading (read-only dependency): `e21387081776e3c8c8e2ba34d419a83441be801f`
-- ProjectHoomans: `phase_commit: self` (final committed handoff)
+## Final accepted vector
 
-## Verified final metrics
+- PsychopatzCore: a583dbd246b6d8f6f4ba519462aecae92424a06f
+- DynamicTrading read-only dependency: e21387081776e3c8c8e2ba34d419a83441be801f
+- ProjectHoomans implementation parent: ae2ec1f401dcad05d62830d442fed2addc4415c4
+- ProjectHoomans final handoff: phase_commit: self
 
-- Core full discovery: 284/284 PASS in 47.650s (0 lingering workers, 0 Tk cleanup errors).
-- PNC full discovery: 648 tests in 255.800s, OK (skipped=27 environment-gated DISPLAY/real-save/game-root tests; 0 lingering workers, 0 Tk cleanup errors).
-- Canonical fixture tree: 47 files / 282 expanded cases (282/282 PASS in 21.13s; 0 lint errors).
-- Method-level classification: 163 modules / 650 methods (58 `LOW_LEVEL_RUNTIME_CONTRACT` direct-worker modules / 220 methods, all with concrete mechanism reasons enforced by `test_classification_guard.py`).
-- Direct test-to-test imports: 0 Core / 0 PNC.
-- Milestone-coded test symbols and active descriptions: 0.
+## Final evidence
+
+- Core discovery: 284/284 PASS.
+- PNC discovery: 645 tests PASS, 27 environment-gated skips, under the 900s bound.
+- GUI journeys under Xvfb: 4/4 PASS.
+- Canonical fixtures: 48 files / 290 cases, 290/290 PASS.
+- Classification: 165 modules / 648 methods; 59 LOW_LEVEL_RUNTIME_CONTRACT direct-worker modules / 217 methods.
+- Classification/static/import/workspace guards: PASS.
+- Held-out evaluator: PASS.
+- Zero new test-owned Lua workers and zero Tk cleanup errors after the isolated acceptance run.

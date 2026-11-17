@@ -1,28 +1,46 @@
-# Audit — Final Evidence Closure (A6R23–A6R26)
+# Audit — Final Semantic Test Subsystem Closure
 
 **Status:** COMPLETE.
-**Evidence:** CODE_VERIFIED, TEST_VERIFIED, RUNTIME_VERIFIED in an isolated reconstructed three-repository sibling workspace.
+**Evidence:** CODE_VERIFIED, TEST_VERIFIED, RUNTIME_VERIFIED.
 
-## Accepted commit vector
+## Corrective ownership audit
 
-- PsychopatzCore: `a583dbd246b6d8f6f4ba519462aecae92424a06f`
-- DynamicTrading (read-only dependency): `e21387081776e3c8c8e2ba34d419a83441be801f`
-- ProjectHoomans: `phase_commit: self`
+The previous A6R26 closure was reopened because some LOW_LEVEL tests still contained semantic scenario→outcome acceptance and the closure docs reported stale classification totals.
 
-## Resolved A6R23–A6R26 findings
+The corrective implementation commit ae2ec1f401dcad05d62830d442fed2addc4415c4 resolved that debt:
 
-1. **A6R23 — Bounded and hermetic PNC broad discovery:**
-   Full PNC `unittest` discovery completed in `255.800s` (`Ran 648 tests`, `OK (skipped=27)`), well within the 900s bound, with 0 new test-owned Lua workers remaining afterward and 0 Tk cleanup errors (`xvfb-run` GUI journeys `15/15 OK` in `22.579s`). Deterministic lifecycle regressions (`WorkerLifecycleHermeticityTests`) pass in `test_worker_session.py`.
+1. Removed redundant "What's up?" semantic-hub activation from Python because canonical fixture authority already covered it.
+2. Split identity generated-frame mechanics from disclosure/evasion outcomes; click behavior now lives in identity fixtures.
+3. Added canonical friendly-greeting follow-up and wellbeing-refusal flow outcomes; removed duplicate Python behavior.
+4. Split semantic-cognition gossip outcomes from request/response target transport. Known/unknown, EN/TL, reconfiguration and mismatched-target fail-closed behavior are fixtures; transport targeting remains a descriptive imperative contract.
+5. Trimmed ungrounded-thanks Python coverage to one-shot arbitration mechanics; semantic response behavior remains fixture-owned.
+6. Regenerated the classification ledger from the actual test tree.
 
-2. **A6R24 — Behavioral authority & method-level classification:**
-   Migrated 8 behavioral Python test suites (`test_competence_command_and_clarification_bounds.py`, `test_competence_needs_and_offer_resolution.py`, `test_competence_social_and_wellbeing_gates.py`, `test_contextual_social_reactions.py`, `test_semantic_identity_wellbeing_collision.py`, `test_competence_interruption_and_context_repair.py`, `test_open_ended_semantic_combat_awareness.py`, `test_contextual_baseline_matrix.py`) and trimmed `test_personal_dialogue_knowledge_disclosure_gates.py` and `test_contextual_suggestions_hub_presentation.py` (moving `rejected_stale_click_does_not_suppress_hub_choice` into `suggestions/semantic_hub_and_suggestions.json` via `suggestionClick.fromTurn`). Regenerated `TEST_CLASSIFICATION.json` (163 modules / 650 methods; 58 `LOW_LEVEL_RUNTIME_CONTRACT` direct-worker modules / 220 methods) with concrete mechanism reasons enforced by `test_classification_guard.py`.
+Final classification truth:
 
-3. **A6R25 — Active identity cleanup & three-repository reproducibility:**
-   Removed remaining `S6M8`/`C7F`/`S10C`/`S10R2`/`Phase 0B` milestone codes from active Core and PNC descriptions/errors. Replaced hardcoded `/home/psychopatz/Zomboid/Workshop` paths with workspace-relative sibling resolution and added static guards in `test_catalog_naming.py` and `test_classification_guard.py`.
+    165 modules
+    648 methods
+    59 LOW_LEVEL_RUNTIME_CONTRACT direct-worker modules
+    217 LOW_LEVEL_RUNTIME_CONTRACT direct-worker methods
 
-4. **A6R26 — Isolated three-repository verification:**
-   - Core full discovery: `Ran 284 tests in 47.650s`, `OK`.
-   - PNC full discovery: `Ran 648 tests in 255.800s`, `OK (skipped=27)`.
-   - Canonical fixture corpus: 47 files / 282 cases, `PASS 282, FAIL 0, TOTAL 282 in 21.13s`.
-   - Fixture lint (`test_lint.py`): PASS.
-   - Held-out evaluation (`test_heldout_precision_and_dataset_compilation.py`): PASS.
+## Exact isolated verification
+
+Using:
+
+- Core a583dbd246b6d8f6f4ba519462aecae92424a06f
+- Hoomans ae2ec1f401dcad05d62830d442fed2addc4415c4
+- DynamicTrading e21387081776e3c8c8e2ba34d419a83441be801f
+
+the isolated sibling workspace produced:
+
+- Core: 284/284 PASS in 43.956s.
+- PNC: 645 tests PASS in 249.783s, skipped=27.
+- Guards: PASS.
+- GUI journeys: 4/4 PASS in 19.051s.
+- Fixture lint: 48 files / 290 cases clean.
+- Fixture corpus: 290/290 PASS in 47.30s.
+- Held-out evaluation: PASS.
+- New worker processes after run: 0.
+- Tk cleanup errors: 0.
+
+The SemanticTestSubsystem parent objective is accepted.

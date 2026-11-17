@@ -1,8 +1,8 @@
 # Architecture — Semantic Test Authority
 
-**Status:** COMPLETE (A6R26 closed).
+**Status:** COMPLETE.
 
-## One behavioral authority
+## Behavioral authority
 
     semantic.harness-test.v1
     → provider resolver
@@ -13,28 +13,18 @@
 
 Fixtures own semantic scenario/outcome acceptance.
 
-Imperative tests own implementation mechanisms: compiler/parser/schema, registry/ranking algorithms, protocol and worker lifecycle, GUI mechanics, save/native/network boundaries, performance, observatory/sweep/quality algorithms and static architecture.
+Imperative tests own implementation mechanisms: parser/compiler/schema, provider/registry/ranking algorithms, transport and worker lifecycle, stale/replay protocol, GUI mechanics, persistence/native/network boundaries, performance, authoring/editing internals and observatory/sweep/quality algorithms.
 
-A test is not low-level merely because it calls the production worker.
+A production-worker call alone never makes a test low-level.
 
 ## Method-level ownership
 
-Every direct-worker test method must state its own responsibility.
-
-For retained imperative methods, classification must contain a concrete mechanism reason. Mixed methods should be split so behavioral assertions can move to fixtures without deleting legitimate mechanism coverage.
+Each direct-worker method has a specific classification reason. Mixed tests are split so fixture-owned behavior is not duplicated by imperative acceptance.
 
 ## Resource ownership
 
-Every test owns and closes the Lua/Tk/process/thread resources it creates. Broad suites must finish within the acceptance bound and return to the pre-suite worker-resource baseline.
+Tests close the Lua/Tk/process/thread resources they create. Broad discovery must return to its pre-run worker baseline.
 
-## Test-support ownership
+## Repository boundaries
 
-Reusable helpers belong in descriptive support modules, never another test_*.py. Direct test-to-test imports are forbidden.
-
-## Identity
-
-Current filenames, classes, methods, CLI/UI help, canonical machine IDs, current module/API/error descriptions and fixture-authored synthetic IDs are descriptive. Historical phase names belong in Git/history-only commentary.
-
-## Reproducible workspace
-
-Acceptance is multi-repository whenever tests consume multiple repositories. Tests that read actual repo content must use the reconstructed workspace roots, not silently read a live external checkout. Read-only dependencies still receive an exact commit fingerprint in the final handoff.
+Reusable helpers live in support modules rather than test-to-test imports. Acceptance uses explicit sibling repository roots. Read-only dependencies are pinned in HANDOFF even when unchanged.
