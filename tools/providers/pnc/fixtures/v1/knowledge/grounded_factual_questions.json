@@ -1,0 +1,254 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.knowledge.grounded_factual_questions",
+  "domain": "knowledge",
+  "cases": [
+    {
+      "id": "knowledge.grounded_factual_questions.natural_question_variants_answer_unknown_truthfully",
+      "description": "Natural question variants for residence, health/wounds, and radio-tower knowledge answer unknown truthfully.",
+      "tags": ["knowledge", "unknown_fact", "truthfulness"],
+      "scenario": {
+        "npc": {
+          "residence": null,
+          "health": null,
+          "hp": null,
+          "hpMax": null
+        }
+      },
+      "turns": [
+        {
+          "text": "where do you live exactly",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_RESIDENCE",
+            "ir.extensions.facts.NPC_RESIDENCE.status": "unknown",
+            "result.decision.response.uncertainty": "unknown",
+            "messages.0.payload.text": {"contains": "don't have a confirmed home"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "where is your home",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_RESIDENCE",
+            "ir.extensions.facts.NPC_RESIDENCE.status": "unknown",
+            "result.decision.response.uncertainty": "unknown",
+            "messages.0.payload.text": {"contains": "don't have a confirmed home"}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "are you hurt",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_HEALTH_STATE",
+            "ir.extensions.facts.NPC_HEALTH_STATE.status": "unknown",
+            "result.decision.response.uncertainty": "unknown",
+            "messages.0.payload.text": {"contains": "can't confirm my health status"}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "how are your wounds",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_HEALTH_STATE",
+            "ir.extensions.facts.NPC_HEALTH_STATE.status": "unknown",
+            "result.decision.response.uncertainty": "unknown",
+            "messages.0.payload.text": {"contains": "can't confirm my health status"}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you know about the radio tower",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_KNOWLEDGE",
+            "ir.extensions.facts.NPC_KNOWLEDGE.status": "unknown",
+            "result.decision.response.uncertainty": "unknown",
+            "messages.0.payload.text": {"contains": "don't have reliable information about that"}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "have you heard of the radio tower",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_KNOWLEDGE",
+            "ir.extensions.facts.NPC_KNOWLEDGE.status": "unknown",
+            "result.decision.response.uncertainty": "unknown",
+            "messages.0.payload.text": {"contains": "don't have reliable information about that"}
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.grounded_factual_questions.known_facts_use_authoritative_projection",
+      "description": "Known residence, health, and topic knowledge use authoritative projection and groundedFactRefs.",
+      "tags": ["knowledge", "known_fact", "projection"],
+      "scenario": {
+        "npc": {
+          "residence": {"label": "Riverside Camp"},
+          "healthState": "injured",
+          "knowledge": {
+            "topics": {
+              "radio tower": {
+                "known": true,
+                "answer": "It is north of here."
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "where is your home",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.facts.NPC_RESIDENCE.status": "known",
+            "ir.extensions.facts.NPC_RESIDENCE.value.label": "Riverside Camp",
+            "ir.extensions.facts.NPC_RESIDENCE.factRef": "npc.residence",
+            "ir.extensions.facts.NPC_RESIDENCE.provenance": "PNC.NPCResidence.authoritative_projection",
+            "messages.0.payload.text": {"contains": "Riverside Camp"},
+            "result.decision.response.groundedFactRefs": ["npc.residence"]
+          }
+        },
+        {
+          "text": "are you hurt",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.facts.NPC_HEALTH_STATE.status": "known",
+            "ir.extensions.facts.NPC_HEALTH_STATE.value": "injured",
+            "ir.extensions.facts.NPC_HEALTH_STATE.factRef": "npc.healthState",
+            "messages.0.payload.text": {"contains": "hurt"},
+            "result.decision.response.groundedFactRefs": ["npc.healthState"]
+          }
+        },
+        {
+          "text": "do you know about the radio tower",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.facts.NPC_KNOWLEDGE.status": "known",
+            "ir.extensions.facts.NPC_KNOWLEDGE.value": true,
+            "ir.extensions.facts.NPC_KNOWLEDGE.factRef": "npc.knowledge.topic",
+            "ir.extensions.facts.NPC_KNOWLEDGE.provenance": "PNC.NPCKnowledge.authoritative_projection",
+            "messages.0.payload.text": {"contains": "north of here"},
+            "result.decision.response.groundedFactRefs": ["npc.knowledge.topic"]
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.grounded_factual_questions.inventory_relationship_and_command_authority",
+      "description": "Inventory query, relationship status, and stay command preserve their respective authority lanes.",
+      "tags": ["knowledge", "authority", "inventory", "command"],
+      "turns": [
+        {
+          "text": "what do you have",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "INVENTORY",
+            "result.decision.branch": "INVENTORY_QUERY_RECEIVED",
+            "result.actionResult.accepted": true,
+            "result.actionResult.status": "found",
+            "dispatchTransport": {"minCount": 1}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "are you single",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "RELATIONSHIP_STATUS",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "messages.0.payload.text": {"truthy": true}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "wait here",
+          "expect": {
+            "accepted": true,
+            "ir.action": "STAY",
+            "result.decision.branch": "COMMAND_ACCEPTED",
+            "result.actionResult.accepted": true,
+            "result.actionResult.capabilityID": "pnc:companion.stay",
+            "dispatchTransport": {"count": 1}
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.grounded_factual_questions.social_and_gossip_do_not_become_factual_actions",
+      "description": "Gossip and negative apparel inputs do not dispatch factual actions.",
+      "tags": ["knowledge", "negative_control", "gossip"],
+      "turns": [
+        {
+          "text": "did you hear that someone got bitten",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "GOSSIP",
+            "ir.subject": "GOSSIP",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "i don't like your dress",
+          "expect": {
+            "ir.diagnostics.noMatch": true,
+            "trace.0.data.classification": "unrecognized_language",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.grounded_factual_questions.tl_residence_translation_and_preview",
+      "description": "Residence preview is effect-free and TL residence response uses localized translation.",
+      "tags": ["knowledge", "residence", "preview", "tl"],
+      "scenario": {
+        "npc": {
+          "residence": {"label": "Riverside Camp"}
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {"accepted": true}
+        },
+        {
+          "action": "preview",
+          "text": "where do you live exactly",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_RESIDENCE",
+            "messages": {"count": 0},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        },
+        {
+          "language": "TL",
+          "text": "where do you live exactly",
+          "expect": {
+            "accepted": true,
+            "translation.language": "TL",
+            "messages.0.payload.translationKey": "UI_PNC_Conversation_Semantic_QuestionResidenceKnown",
+            "messages.0.payload.text": {"contains": "Nakatira ako sa Riverside Camp"}
+          }
+        }
+      ],
+      "domain": "knowledge"
+    }
+  ]
+}

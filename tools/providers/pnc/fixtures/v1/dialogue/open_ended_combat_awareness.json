@@ -1,0 +1,89 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.open_ended_combat_awareness",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.open_ended_combat_awareness.double_down_advances_frontier",
+      "description": "Clicking DOUBLE_DOWN advances the hostility frontier and does not immediately re-offer DOUBLE_DOWN.",
+      "tags": ["dialogue", "hostility", "frontier"],
+      "turns": [
+        {
+          "text": "fuckyouuuu",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.candidates": {"contains": {"strategy": "DOUBLE_DOWN"}},
+            "observation.suggestions.candidates": {"contains": {"strategy": "CLAIM_JOKE"}},
+            "observation.suggestions.candidates": {"contains": {"strategy": "DEESCALATE"}},
+            "observation.suggestions.candidates": {"contains": {"strategy": "ASK_WHY"}}
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "generated.double_down"},
+          "expect": {
+            "accepted": true,
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.speechAct": "HOSTILE_REMARK",
+            "observation.suggestions.candidates": {"notContains": {"strategy": "DOUBLE_DOWN"}}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.open_ended_combat_awareness.typed_i_mean_it_reaffirms_hostility",
+      "description": "Typed 'yeah i meant it' after hostility reaffirms HOSTILE_REMARK.",
+      "tags": ["dialogue", "hostility", "reaffirmation"],
+      "turns": [
+        {
+          "text": "fuckyouuuu",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "yeah i meant it",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.speechAct": "HOSTILE_REMARK",
+            "ir.provenance.contextualReframe": "hostile_reaffirmation"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.open_ended_combat_awareness.i_mean_it_without_hostility_is_acknowledge",
+      "description": "'i mean it' without prior hostility is not fabricated as hostile.",
+      "tags": ["dialogue", "negative_control", "acknowledge"],
+      "turns": [
+        {
+          "text": "i mean it",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "ACKNOWLEDGE",
+            "ir.speechAct": "ACKNOWLEDGE"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.open_ended_combat_awareness.double_down_realization_is_locale_owned",
+      "description": "DOUBLE_DOWN generated affordance has distinct EN and TL utterances.",
+      "tags": ["dialogue", "hostility", "tl"],
+      "scenario": {
+        "runtime": {"language": "TL"}
+      },
+      "turns": [
+        {
+          "text": "fuckyouuuu",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.candidates": {"contains": {"strategy": "DOUBLE_DOWN"}}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

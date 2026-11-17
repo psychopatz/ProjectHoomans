@@ -1,0 +1,148 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.knowledge.backstory_disclosure_gates",
+  "domain": "knowledge",
+  "cases": [
+    {
+      "id": "knowledge.backstory_disclosure_gates.familiarity_gates_disclosure_and_followup_context",
+      "description": "High familiarity discloses former_job and preserves context for 'where?' and 'do you miss it?' follow-ups.",
+      "tags": ["knowledge", "backstory", "disclosure"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc-backstory-grounded",
+          "identitySeed": 90210,
+          "identity": {"seed": 90210},
+          "tacticalClass": "colonist",
+          "relationship": {"familiarity": 80}
+        }
+      },
+      "turns": [
+        {
+          "text": "what was your old job",
+          "expect": {
+            "ir.provenance.pattern": "pnc.backstory.question.former_job.old_job",
+            "observation.authoritativeMessages.0.text": "I worked as farmer before all this.",
+            "contextAfter.knowledge.npcID": "npc-backstory-grounded"
+          }
+        },
+        {
+          "text": "where?",
+          "expect": {
+            "ir.provenance.pattern": "pnc.backstory.follow_up.where",
+            "observation.authoritativeMessages.0.text": "I remember that part of my life, but I don't have more detail about where it was.",
+            "result.decision.branch": {"notEquals": "ASK_CLARIFICATION"}
+          }
+        },
+        {
+          "text": "do you miss it?",
+          "expect": {
+            "ir.provenance.pattern": "pnc.backstory.follow_up.do_you_miss_it",
+            "observation.authoritativeMessages.0.text": "Sometimes. I still think about that part of my life."
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.backstory_disclosure_gates.private_backstory_refuses_without_disclosure",
+      "description": "Zero familiarity refuses private backstory without writing knowledge context.",
+      "tags": ["knowledge", "backstory", "refusal"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc-backstory-grounded",
+          "identitySeed": 90210,
+          "identity": {"seed": 90210},
+          "tacticalClass": "colonist",
+          "relationship": {"familiarity": 0}
+        }
+      },
+      "turns": [
+        {
+          "text": "what was your old job",
+          "expect": {
+            "result.decision.branch": "QUESTION_RECEIVED",
+            "observation.authoritativeMessages.0.text": "I'm not ready to talk about that yet.",
+            "contextAfter.knowledge": {"absent": true}
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.backstory_disclosure_gates.backstory_sentence_resolves_in_tagalog",
+      "description": "Backstory former_job question translates cleanly in TL without English fallback.",
+      "tags": ["knowledge", "backstory", "tl"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc-backstory-grounded",
+          "identitySeed": 90210,
+          "identity": {"seed": 90210},
+          "tacticalClass": "colonist",
+          "relationship": {"familiarity": 80}
+        },
+        "runtime": {"language": "TL"}
+      },
+      "turns": [
+        {
+          "text": "what was your old job",
+          "expect": {
+            "translation.language": "TL",
+            "observation.authoritativeMessages.0.text": "Nagtrabaho ako bilang magsasaka bago ang lahat ng ito."
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.backstory_disclosure_gates.friendly_personality_discloses_at_medium_familiarity",
+      "description": "Friendly socialStyle discloses former_job at familiarity 40.",
+      "tags": ["knowledge", "backstory", "personality"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc-backstory-grounded",
+          "identitySeed": 90210,
+          "identity": {"seed": 90210},
+          "tacticalClass": "colonist",
+          "relationship": {"familiarity": 40},
+          "personality": {"socialStyle": "friendly"}
+        }
+      },
+      "turns": [
+        {
+          "text": "what was your old job",
+          "expect": {
+            "observation.authoritativeMessages.0.text": "I worked as farmer before all this.",
+            "contextAfter.knowledge.npcID": "npc-backstory-grounded"
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.backstory_disclosure_gates.withdrawn_personality_refuses_at_medium_familiarity",
+      "description": "Withdrawn socialStyle refuses former_job at familiarity 40.",
+      "tags": ["knowledge", "backstory", "personality", "refusal"],
+      "scenario": {
+        "npc": {
+          "npcID": "npc-backstory-grounded",
+          "identitySeed": 90210,
+          "identity": {"seed": 90210},
+          "tacticalClass": "colonist",
+          "relationship": {"familiarity": 40},
+          "personality": {"socialStyle": "withdrawn"}
+        }
+      },
+      "turns": [
+        {
+          "text": "what was your old job",
+          "expect": {
+            "observation.authoritativeMessages.0.text": "I'm not ready to talk about that yet.",
+            "contextAfter.knowledge": {"absent": true},
+            "ir.diagnostics.factStatus": "unknown"
+          }
+        }
+      ],
+      "domain": "knowledge"
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.social_and_wellbeing_gates",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.social_and_wellbeing_gates.required_five_turn_semantic_lab_sequence",
+      "description": "Five-turn sequence: news gossip, wait command, unknown residence, known bite status, and apparel compliment.",
+      "tags": ["dialogue", "five_turn", "semantic_lab"],
+      "turns": [
+        {
+          "text": "do you have any news",
+          "expect": {
+            "accepted": true,
+            "ir.provenance.pattern": "pnc.social.news_do_you_have",
+            "result.decision.branch": "GOSSIP_RECEIVED",
+            "trace.0.data.classification": "recognized_social_interaction"
+          }
+        },
+        {
+          "text": "wait here",
+          "expect": {
+            "accepted": true,
+            "ir.provenance.pattern": "pnc.command.wait",
+            "ir.action": "STAY",
+            "result.decision.branch": "COMMAND_ACCEPTED",
+            "result.actionResult.accepted": true,
+            "trace.0.data.classification": "authorized_gameplay_action"
+          }
+        },
+        {
+          "text": "where do you live exactly",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_RESIDENCE",
+            "ir.diagnostics.factStatus": "unknown",
+            "result.decision.branch": "QUESTION_RECEIVED",
+            "trace.0.data.classification": "recognized_question_unknown_fact",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "have you been bitten",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_BITE_STATUS",
+            "ir.diagnostics.factStatus": "known",
+            "result.decision.response.uncertainty": "known",
+            "messages.0.payload.text": {"contains": "recorded bite"},
+            "trace.0.data.classification": "recognized_question",
+            "trace.0.data.responseClassification": "grounded_npc_response",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "text": "i like your dress",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "COMPLIMENT",
+            "result.decision.branch": "COMPLIMENT_RECEIVED",
+            "ir.provenance.pattern": "pnc.social.compliment_i_like_your_feature",
+            "messages.0.payload.text": {"truthy": true},
+            "trace.0.data.classification": "recognized_social_interaction",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_and_wellbeing_gates.apparel_compliment_categories_and_negative_holdout",
+      "description": "Apparel compliment variants route to COMPLIMENT_RECEIVED while negative dress remark is unrecognized and gossip is GOSSIP.",
+      "tags": ["dialogue", "compliment", "negative_control"],
+      "turns": [
+        {
+          "text": "i like your dress",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "COMPLIMENT",
+            "ir.provenance.pattern": "pnc.social.compliment_i_like_your_feature",
+            "result.decision.branch": "COMPLIMENT_RECEIVED",
+            "result.decision.response.sourcePoolID": {"truthy": true},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "i really like your jacket",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "COMPLIMENT",
+            "ir.provenance.pattern": "pnc.social.compliment_i_really_like_your_feature",
+            "result.decision.branch": "COMPLIMENT_RECEIVED",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "you have a nice outfit",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "COMPLIMENT",
+            "ir.provenance.pattern": "pnc.social.compliment_you_have_feature_a",
+            "result.decision.branch": "COMPLIMENT_RECEIVED",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "your appearance looks beautiful",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "COMPLIMENT",
+            "ir.provenance.pattern": "pnc.social.compliment_your_looks_feature",
+            "result.decision.branch": "COMPLIMENT_RECEIVED",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "i don't like your dress",
+          "expect": {
+            "ir.diagnostics.noMatch": true,
+            "result.decision.branch": "ASK_CLARIFICATION",
+            "trace.0.data.classification": "unrecognized_language",
+            "result.actionResult": {"absent": true},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "did you hear that someone got bitten",
+          "expect": {
+            "ir.intent": "GOSSIP",
+            "ir.subject": "GOSSIP",
+            "ir.provenance.pattern": "pnc.social.gossip_event",
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_and_wellbeing_gates.bite_status_authoritative_or_unknown",
+      "description": "Bite status question uses authoritative wound projection when present and stays unknown when missing.",
+      "tags": ["dialogue", "bite_status", "grounding"],
+      "scenario": {
+        "npc": {
+          "health": {
+            "body": {
+              "wounds": {
+                "Head": {"type": "bite"}
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "did a zombie bite you",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.facts.NPC_BITE_STATUS.status": "known",
+            "ir.extensions.facts.NPC_BITE_STATUS.value": true,
+            "ir.extensions.facts.NPC_BITE_STATUS.provider": "client_npc_health_projection",
+            "ir.extensions.facts.NPC_BITE_STATUS.provenance": "PNC.NPCWounds.BuildSnapshot",
+            "result.decision.response.groundedFactRefs": ["npc.health.body.wounds"],
+            "result.decision.response.uncertainty": "known",
+            "result.decision.response.templateID": "question.medical_bite.positive",
+            "messages.0.payload.text": {"contains": "bitten"},
+            "trace.0.data.responsePlan.uncertainty": "known",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "scenarioPatch": {"npc": {"health": {"body": {"wounds": {"Head": null}}}}},
+          "text": "did a zombie bite you",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.facts.NPC_BITE_STATUS.status": "known",
+            "ir.extensions.facts.NPC_BITE_STATUS.value": false,
+            "result.decision.response.templateID": "question.medical_bite.negative",
+            "messages.0.payload.text": {"contains": "bite"},
+            "trace.0.data.responsePlan.uncertainty": "known"
+          }
+        },
+        {
+          "scenarioPatch": {"npc": {"health": null}},
+          "text": "did a zombie bite you",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.facts.NPC_BITE_STATUS.status": "unknown",
+            "ir.extensions.facts.NPC_BITE_STATUS.value": {"absent": true},
+            "result.decision.response.groundedFactRefs": {"count": 0},
+            "result.decision.response.uncertainty": "unknown",
+            "result.decision.response.templateID": "question.medical_bite.unknown",
+            "messages.0.payload.text": {"contains": "confirm"},
+            "trace.0.data.responsePlan.uncertainty": "unknown"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.social_and_wellbeing_gates.preview_and_tl_response_effect_free_and_localized",
+      "description": "Bite preview is pure and TL compliment uses localized translation key.",
+      "tags": ["dialogue", "preview", "tl"],
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {"accepted": true}
+        },
+        {
+          "action": "preview",
+          "text": "have you been bitten",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_BITE_STATUS",
+            "messages": {"count": 0},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        },
+        {
+          "language": "TL",
+          "text": "i like your dress",
+          "expect": {
+            "accepted": true,
+            "translation.language": "TL",
+            "messages.0.payload.translationKey": "UI_PNC_Conversation_Semantic_ComplimentAlternate",
+            "messages.0.payload.text": {"contains": "Pinahahalagahan"},
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

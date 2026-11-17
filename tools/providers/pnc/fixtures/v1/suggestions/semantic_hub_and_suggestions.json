@@ -463,6 +463,42 @@
         }
       ],
       "domain": "suggestions"
+    },
+    {
+      "id": "suggestions.semantic_hub_and_suggestions.rejected_stale_click_does_not_suppress_hub_choice",
+      "tags": ["suggestions", "semantic_hub", "stale_click"],
+      "turns": [
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.suggestions.groups.1.candidates": {"contains": {"id": "question.wellbeing"}}
+          }
+        },
+        {
+          "text": "hello",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "suggestionClick": {"groupID": "semantic_hub.whats_up", "candidateID": "question.wellbeing", "fromTurn": 0},
+          "expect": {
+            "accepted": false,
+            "reason": "stale_suggestion"
+          }
+        },
+        {
+          "text": "What's up?",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.currentGroupID": "semantic_hub.whats_up",
+            "observation.suggestions.groups.1.candidates": {"contains": {"id": "question.wellbeing"}}
+          }
+        }
+      ],
+      "domain": "suggestions"
     }
   ]
 }

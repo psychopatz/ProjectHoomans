@@ -50,102 +50,6 @@ class PersonalDialogueKnowledgeDisclosureGatesTests(WarmWorkerTestMixin, unittes
             if lookup.get("key")
         }
 
-    def test_familiarity_gates_disclosure_and_preserves_follow_up_context(self) -> None:
-        with self.warm_worker(self.scenario()) as worker:
-            old_job = worker.input("what was your old job")
-            self.assertEqual(
-                old_job["result"]["ir"]["provenance"]["pattern"],
-                "pnc.backstory.question.former_job.old_job",
-            )
-            self.assertEqual(
-                self.final_text(old_job),
-                "I worked as farmer before all this.",
-            )
-            self.assertIn(
-                "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
-                self.translation_keys(old_job),
-            )
-            self.assertIn("knowledge", old_job["contextAfter"])
-
-            where = worker.input("where?")
-            self.assertEqual(
-                where["result"]["ir"]["provenance"]["pattern"],
-                "pnc.backstory.follow_up.where",
-            )
-            self.assertEqual(
-                self.final_text(where),
-                "I remember that part of my life, but I don't have more detail about where it was.",
-            )
-            self.assertIn(
-                "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
-                self.translation_keys(where),
-            )
-            self.assertNotEqual(
-                where["result"]["decision"]["branch"], "ASK_CLARIFICATION"
-            )
-
-            miss = worker.input("do you miss it?")
-            self.assertEqual(
-                miss["result"]["ir"]["provenance"]["pattern"],
-                "pnc.backstory.follow_up.do_you_miss_it",
-            )
-            self.assertEqual(
-                self.final_text(miss),
-                "Sometimes. I still think about that part of my life.",
-            )
-            self.assertIn(
-                "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
-                self.translation_keys(miss),
-            )
-
-    def test_private_backstory_refuses_without_authorized_disclosure(self) -> None:
-        with self.warm_worker(self.scenario(familiarity=0)) as worker:
-            turn = worker.input("what was your old job")
-
-        self.assertEqual(
-            turn["result"]["decision"]["branch"], "QUESTION_RECEIVED"
-        )
-        self.assertEqual(
-            self.final_text(turn),
-            "I'm not ready to talk about that yet.",
-        )
-        self.assertIn(
-            "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal",
-            self.translation_keys(turn),
-        )
-        self.assertNotIn("knowledge", turn["contextAfter"])
-
-    def test_authoritative_backstory_sentence_resolves_in_tagalog(self) -> None:
-        with self.warm_worker(self.scenario(language="TL")) as worker:
-            turn = worker.input("what was your old job")
-
-        self.assertEqual(
-            self.final_text(turn),
-            "Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.",
-        )
-        self.assertEqual(turn["translation"]["language"], "TL")
-        response_lookups = [
-            lookup for lookup in turn["translation"]["lookups"]
-            if lookup.get("key")
-            == "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob"
-        ]
-        self.assertTrue(response_lookups)
-        response_args = response_lookups[-1]["args"]
-        self.assertIn(
-            "magsasaka",
-            response_args,
-        )
-        self.assertNotIn(
-            "farmer",
-            response_args,
-        )
-        self.assertTrue(
-            all(
-                not lookup.get("fallbackUsed", False)
-                for lookup in turn["translation"]["lookups"]
-            )
-        )
-
     def test_player_scoped_knowledge_bootstrap_survives_reload(self) -> None:
         player_a = self.scenario()
         player_a["player"]["characterUUID"] = "char_h3_a"
@@ -174,32 +78,6 @@ class PersonalDialogueKnowledgeDisclosureGatesTests(WarmWorkerTestMixin, unittes
         self.assertEqual(reloaded["characterUUID"], "char_h3_a")
         self.assertEqual(reloaded["npcID"], "npc-h3-grounded")
         self.assertEqual(reloaded["categories"], knowledge_a["categories"])
-
-    def test_personality_changes_willingness_without_bypassing_knowledge(self) -> None:
-        with self.warm_worker(
-            self.scenario(familiarity=40, social_style="friendly")
-        ) as friendly_worker:
-            friendly = friendly_worker.input("what was your old job")
-        with self.warm_worker(
-            self.scenario(familiarity=40, social_style="withdrawn")
-        ) as guarded_worker:
-            guarded = guarded_worker.input("what was your old job")
-
-        self.assertEqual(
-            self.final_text(friendly), "I worked as farmer before all this."
-        )
-        self.assertEqual(
-            friendly["contextAfter"]["knowledge"]["npcID"], "npc-h3-grounded"
-        )
-        self.assertEqual(
-            self.final_text(guarded), "I'm not ready to talk about that yet."
-        )
-        self.assertIsNone(guarded["contextAfter"].get("knowledge"))
-        self.assertEqual(
-            guarded["result"]["ir"]["diagnostics"].get("factStatus"),
-            "unknown",
-        )
-
 
 if __name__ == "__main__":
     unittest.main()

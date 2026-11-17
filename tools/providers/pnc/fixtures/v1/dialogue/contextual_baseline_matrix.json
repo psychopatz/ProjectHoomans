@@ -1,0 +1,193 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.contextual_baseline_matrix",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.contextual_baseline_matrix.greeting_one_turn_contract",
+      "description": "Greeting produces flow.greeting.opening with two plan turns and no side effects.",
+      "tags": ["dialogue", "greeting", "baseline"],
+      "turns": [
+        {
+          "text": "hello there",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "GREET",
+            "ir.provenance.pattern": "pnc.social.greet",
+            "result.decision.route": "deterministic",
+            "result.decision.response.templateID": {"prefix": "flow.greeting.opening"},
+            "messages": {"count": 2},
+            "messages.0.payload.planTurn": 1,
+            "messages.1.payload.planTurn": 2,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_baseline_matrix.wellbeing_injured_one_turn_contract",
+      "description": "Injured NPC wellbeing question routes to question.wellbeing.injured with treatment situation.",
+      "tags": ["dialogue", "wellbeing", "baseline"],
+      "scenario": {
+        "npc": {
+          "healthState": "injured",
+          "activeBehavior": "treatment",
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "ir.provenance.pattern": "pnc.question.wellbeing_okay",
+            "result.decision.response.templateID": {"prefix": "question.wellbeing.injured"},
+            "routedSituation.npc.healthState": "injured",
+            "routedSituation.npc.activity.id": "treatment",
+            "messages": {"count": 1},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_baseline_matrix.activity_fishing_one_turn_contract",
+      "description": "Fishing NPC activity question routes to question.activity.fishing.",
+      "tags": ["dialogue", "activity", "baseline"],
+      "scenario": {
+        "npc": {
+          "activeBehavior": "fishing",
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "What are you doing?",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "ACTIVITY",
+            "ir.provenance.pattern": "pnc.question.activity",
+            "result.decision.response.templateID": {"prefix": "question.activity.fishing"},
+            "routedSituation.npc.activity.id": "fishing",
+            "messages": {"count": 1},
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_baseline_matrix.time_default_one_turn_contract",
+      "description": "Time question routes to semantic.question.time.",
+      "tags": ["dialogue", "time", "baseline"],
+      "turns": [
+        {
+          "text": "What time is it?",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "TIME",
+            "ir.provenance.pattern": "pnc.question.time",
+            "result.decision.response.templateID": {"prefix": "semantic.question.time"},
+            "messages": {"count": 1},
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_baseline_matrix.identity_exchange_records_self_name",
+      "description": "'who are you' followed by 'im psycho' records identity claim.",
+      "tags": ["dialogue", "identity", "baseline"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "IDENTITY",
+            "ir.provenance.pattern": "pnc.question.identity",
+            "result.decision.response.templateID": {"prefix": "question.identity"}
+          }
+        },
+        {
+          "text": "im psycho",
+          "expect": {
+            "accepted": true,
+            "result.sequence": 2,
+            "ir.intent": "INFORM",
+            "ir.subject": "IDENTITY",
+            "ir.provenance.pattern": "pnc.identity.self_name_im_plain"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_baseline_matrix.wellbeing_followup_reuses_bounded_context",
+      "description": "'Are you okay?' followed by 'What's wrong?' reuses wellbeing topic context and preview is pure.",
+      "tags": ["dialogue", "wellbeing", "followup", "preview"],
+      "scenario": {
+        "npc": {
+          "healthState": "injured",
+          "activeBehavior": "treatment",
+          "needs": {},
+          "conditionStats": {}
+        }
+      },
+      "turns": [
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "WELLBEING",
+            "result.decision.response.templateID": {"prefix": "question.wellbeing.injured"}
+          }
+        },
+        {
+          "action": "preview",
+          "text": "What is wrong?",
+          "expect": {
+            "accepted": true,
+            "ir.provenance.pattern": "pnc.question.wellbeing_follow_up_what_is_wrong",
+            "result.decision.response.templateID": "semantic.question.wellbeing.follow_up.injured",
+            "messages": {"count": 0},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        },
+        {
+          "text": "What's wrong?",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "WELLBEING",
+            "ir.provenance.pattern": "pnc.question.wellbeing_follow_up_whats_wrong",
+            "ir.extensions.dialogueFollowUp": "WELLBEING",
+            "result.decision.branch": "QUESTION_RECEIVED",
+            "result.decision.response.templateID": {"prefix": "semantic.question.wellbeing.follow_up.injured"},
+            "contextBefore.state.sequence": 1,
+            "contextAfter.state.sequence": 2,
+            "contextBefore.dialogue.currentTopic": "wellbeing",
+            "contextAfter.dialogue.currentTopic": "wellbeing",
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

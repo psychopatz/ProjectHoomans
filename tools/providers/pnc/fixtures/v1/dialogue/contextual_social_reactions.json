@@ -1,0 +1,507 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.dialogue.contextual_social_reactions",
+  "domain": "dialogue",
+  "cases": [
+    {
+      "id": "dialogue.contextual_social_reactions.apology_uses_relationship_emotion_and_precedence",
+      "description": "Apology uses guarded emotion, relationship, and social-style precedence without side effects.",
+      "tags": ["dialogue", "social", "apology"],
+      "scenario": {
+        "npc": {
+          "personality": {"socialStyle": "neutral"}
+        }
+      },
+      "turns": [
+        {
+          "text": "You're an idiot",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "accepted": true,
+            "result.ir.intent": "APOLOGIZE",
+            "result.decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "result.decision.route": "deterministic",
+            "result.decision.response.templateID": "social.apology.friendly",
+            "messages.0.payload.semanticTemplateID": "social.apology.friendly",
+            "routedSituation.social.style": "neutral",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "result.actionResult": {"absent": true}
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"traits": {"friendly": true}, "personality": null}},
+          "text": "You're an idiot",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "social.apology.friendly",
+            "routedSituation.social.style": "friendly"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"traits": {"friendly": false, "reserved": true}, "relationshipState": "Member", "personality": {"socialStyle": "neutral"}}},
+          "text": "You're an idiot",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "social.apology.friendly",
+            "routedSituation.social.style": "neutral"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"conditionStats": {"stress": 95}}},
+          "text": "You're an idiot",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "social.apology.friendly",
+            "routedSituation.social.style": "neutral"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"traits": {"reserved": false, "friendly": true}, "personality": {"socialStyle": "friendly"}}},
+          "text": "You're an idiot",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "sorry",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "social.apology.friendly",
+            "routedSituation.social.style": "friendly"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.existing_social_reactions_remain_local",
+      "description": "Compliment, busy threat, and stressed self-reflection remain local and contextual.",
+      "tags": ["dialogue", "social", "compliment", "self_reflection"],
+      "scenario": {
+        "npc": {
+          "traits": {"friendly": true}
+        }
+      },
+      "turns": [
+        {
+          "text": "you look cute",
+          "expect": {
+            "accepted": true,
+            "result.decision.branch": "COMPLIMENT_RECEIVED",
+            "result.decision.response.templateID": "semantic.social.compliment.friendly",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"traits": null, "activeBehavior": "combat"}},
+          "text": "I will kill you",
+          "expect": {
+            "accepted": true,
+            "result.decision.branch": "THREAT_RECEIVED",
+            "result.decision.response.templateID": "semantic.social.threat_busy",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"activeBehavior": null, "conditionStats": {"stress": 95}, "personality": {"socialStyle": "neutral"}}},
+          "text": "I'm an idiot",
+          "expect": {
+            "accepted": true,
+            "result.decision.branch": "SELF_REFLECTION_RECEIVED",
+            "result.decision.response.templateID": "semantic.social.self_reflection.stressed",
+            "llmCalls": 0,
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.insults_use_authoritative_social_boundary",
+      "description": "Insults dispatch authoritative social boundary and negative relationship delta.",
+      "tags": ["dialogue", "social", "insult"],
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "INSULT",
+            "result.decision.branch": "HOSTILE_REMARK_RECEIVED",
+            "result.actionResult.accepted": true,
+            "result.actionResult.status": "applied",
+            "result.actionResult.eventType": "player_dialogue_insult",
+            "result.actionResult.relationshipDelta.approval": {"max": -1},
+            "result.actionResult.relationshipDelta.respect": {"max": -1},
+            "result.decision.response.templateID": "social.hostile_boundary",
+            "messages": {"count": 1},
+            "llmCalls": 0,
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.insult_useless_uses_authoritative_social_boundary",
+      "description": "Variant insult 'you are useless' dispatches authoritative social boundary.",
+      "tags": ["dialogue", "social", "insult"],
+      "turns": [
+        {
+          "text": "you are useless",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "INSULT",
+            "result.decision.branch": "HOSTILE_REMARK_RECEIVED",
+            "result.actionResult.accepted": true,
+            "result.actionResult.eventType": "player_dialogue_insult",
+            "result.decision.response.templateID": "social.hostile_boundary"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.typoed_hostility_keeps_recognized_social_route",
+      "description": "Typoed hostility 'fuck ypuuuu' keeps HOSTILE_REMARK, pnc.social.profanity, HOSTILE_REMARK_RECEIVED, and negative relationship effect.",
+      "tags": ["dialogue", "social", "hostility", "typo"],
+      "turns": [
+        {
+          "text": "fuck ypuuuu",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "HOSTILE_REMARK",
+            "ir.speechAct": "HOSTILE_REMARK",
+            "ir.provenance.pattern": "pnc.social.profanity",
+            "ir.diagnostics.unresolvedEntity": true,
+            "ir.confidence": {"min": 0.85},
+            "result.decision.branch": "HOSTILE_REMARK_RECEIVED",
+            "result.decision.response.templateID": {"notEquals": "semantic.ask_clarification"},
+            "messages.0.payload.text": {"notEquals": "I'm not sure what you mean."},
+            "result.actionResult.accepted": true,
+            "result.actionResult.status": "applied",
+            "result.actionResult.speechAct": "HOSTILE_REMARK",
+            "result.actionResult.relationshipDelta.approval": {"max": -1}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.rejected_and_unavailable_insults_truthful",
+      "description": "Invalid lease rejects insult truthfully; unavailable social transport reports unavailable without relationship delta.",
+      "tags": ["dialogue", "social", "insult", "authority"],
+      "scenario": {
+        "npc": {
+          "runtime": {
+            "conversationLease": {"token": "authority-token"}
+          }
+        },
+        "conversation": {"token": "client-token"}
+      },
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "result.actionResult.accepted": false,
+            "result.actionResult.status": "rejected",
+            "result.actionResult.reason": "invalid_lease",
+            "result.actionResult.authority": "server",
+            "messages.0.payload.key": "semantic.social.interaction.rejected",
+            "messages.0.payload.text": {"notEquals": "I couldn't do that right now."}
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"runtime": null}, "conversation": {"token": null}, "runtime": {"socialTransportAvailable": false}},
+          "text": "fuck you",
+          "expect": {
+            "result.actionResult.accepted": false,
+            "result.actionResult.status": "semantic_social_dispatch_unavailable",
+            "result.actionResult.reason": "semantic_social_transport_unavailable",
+            "messages.0.payload.key": "semantic.social.interaction.unavailable",
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.self_directed_insult_no_dispatch",
+      "description": "Self-directed insult routes to SELF_REFLECTION without dispatching social authority.",
+      "tags": ["dialogue", "social", "self_reflection"],
+      "turns": [
+        {
+          "text": "I'm an idiot",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "SELF_REFLECTION",
+            "result.decision.branch": "SELF_REFLECTION_RECEIVED",
+            "result.actionResult": {"absent": true},
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.social_rejection_translation_tl",
+      "description": "Unavailable social interaction translates in TL.",
+      "tags": ["dialogue", "social", "tl"],
+      "scenario": {
+        "runtime": {
+          "language": "TL",
+          "socialTransportAvailable": false
+        }
+      },
+      "turns": [
+        {
+          "text": "fuck you",
+          "expect": {
+            "messages.0.payload.translationKey": "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable",
+            "messages.0.payload.text": {"truthy": true}
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.threat_uses_guarded_emotion_relationship_and_precedence",
+      "description": "Threats apply withdrawn and stressed precedence and record negative relationship deltas.",
+      "tags": ["dialogue", "social", "threat"],
+      "scenario": {
+        "npc": {
+          "personality": {"socialStyle": "withdrawn"}
+        }
+      },
+      "turns": [
+        {
+          "text": "I will kill you",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "THREATEN",
+            "result.decision.branch": "THREAT_RECEIVED",
+            "result.decision.route": "deterministic",
+            "result.decision.response.templateID": "semantic.social.threat_withdrawn",
+            "messages.0.payload.key": "semantic.social.threat_withdrawn",
+            "routedSituation.social.style": "withdrawn",
+            "result.actionResult.accepted": true,
+            "result.actionResult.status": "applied",
+            "result.actionResult.eventType": "player_dialogue_threat",
+            "result.actionResult.relationshipDelta.approval": {"max": -1},
+            "result.actionResult.relationshipDelta.respect": {"max": -1}
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"conditionStats": {"stress": 95}, "personality": {"socialStyle": "neutral"}}},
+          "text": "I will kill you",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "semantic.social.threat_stressed",
+            "routedSituation.social.style": "neutral"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"activeBehavior": "combat", "conditionStats": {"stress": 95}, "personality": {"socialStyle": "withdrawn"}}},
+          "text": "I will kill you",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "semantic.social.threat_stressed",
+            "routedSituation.social.style": "withdrawn"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.offer_uses_emotion_hunger_and_social_context",
+      "description": "Offers select friendly, withdrawn, hungry, and stressed templates by precedence.",
+      "tags": ["dialogue", "social", "offer"],
+      "scenario": {
+        "npc": {
+          "personality": {"socialStyle": "friendly"}
+        }
+      },
+      "turns": [
+        {
+          "text": "want some food",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "OFFER",
+            "ir.speechAct": "OFFER",
+            "result.decision.branch": "OFFER_RECEIVED",
+            "result.decision.response.templateID": "social.offer_friendly",
+            "messages.0.payload.semanticTemplateID": "social.offer_friendly",
+            "routedSituation.social.style": "friendly",
+            "dispatchTransport": {"count": 0},
+            "result.actionResult": {"absent": true}
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"personality": {"socialStyle": "withdrawn"}}},
+          "text": "want some food",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "semantic.social.offer_withdrawn",
+            "routedSituation.social.style": "withdrawn"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"needs": {"hunger": 0.9}, "personality": {"socialStyle": "neutral"}}},
+          "text": "want some food",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": {"oneOf": ["semantic.offer.hungry", "semantic.offer.dataset.hungry_share", "semantic.offer.dataset.hungry_appreciate"]},
+            "routedSituation.social.style": "neutral"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"needs": {"hunger": 0.9}, "conditionStats": {"stress": 95}, "personality": {"socialStyle": "friendly"}}},
+          "text": "want some food",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "semantic.social.offer_stressed",
+            "routedSituation.social.style": "friendly"
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.dispute_uses_guarded_context_and_preserves_pending_authority",
+      "description": "Disputes select friendly/withdrawn/stressed templates and preserve pending command refusal.",
+      "tags": ["dialogue", "social", "dispute"],
+      "scenario": {
+        "npc": {
+          "personality": {"socialStyle": "friendly"}
+        }
+      },
+      "turns": [
+        {
+          "text": "I disagree",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "DISAGREE",
+            "result.decision.branch": "SOCIAL_ACKNOWLEDGED",
+            "result.decision.response.templateID": "social.dispute_friendly",
+            "routedSituation.social.style": "friendly",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"personality": {"socialStyle": "withdrawn"}}},
+          "text": "I disagree",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "social.dispute_withdrawn",
+            "routedSituation.social.style": "withdrawn"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"conditionStats": {"stress": 95}, "personality": {"socialStyle": "neutral"}}},
+          "text": "I disagree",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "social.dispute_stressed",
+            "routedSituation.social.style": "neutral"
+          }
+        },
+        {
+          "resetConversation": true,
+          "scenarioPatch": {"npc": {"conditionStats": null, "personality": {"socialStyle": "friendly"}}},
+          "text": "follow me",
+          "expect": {
+            "accepted": true,
+            "result.actionResult.accepted": true
+          }
+        },
+        {
+          "text": "I disagree",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "semantic.social.refuse_request",
+            "messages.0.payload.translationKey": "UI_PNC_Conversation_Semantic_RefuseRequest",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        }
+      ],
+      "domain": "dialogue"
+    },
+    {
+      "id": "dialogue.contextual_social_reactions.apology_and_insult_previews_are_pure",
+      "description": "Apology and insult previews do not emit messages, dispatch transport, or mutate relationship.",
+      "tags": ["dialogue", "social", "preview"],
+      "scenario": {
+        "npc": {
+          "traits": {"friendly": true}
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {"accepted": true}
+        },
+        {
+          "action": "preview",
+          "text": "sorry",
+          "expect": {
+            "accepted": true,
+            "messages": {"count": 0},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        },
+        {
+          "action": "preview",
+          "text": "fuck you",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "INSULT",
+            "result.decision.branch": "HOSTILE_REMARK_RECEIVED",
+            "result.actionResult": {"absent": true},
+            "messages": {"count": 0},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        }
+      ],
+      "domain": "dialogue"
+    }
+  ]
+}

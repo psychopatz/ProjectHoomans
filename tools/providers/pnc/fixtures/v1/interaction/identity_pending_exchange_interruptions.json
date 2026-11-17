@@ -112,6 +112,207 @@
         }
       ],
       "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.identity_collision_fine_thank_you_preserves_pending",
+      "tags": ["interaction", "identity", "wellbeing", "multi_turn"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "text": "I'm fine, thank you",
+          "expect": {
+            "ir.provenance.pattern": "pnc.state.self_wellbeing_im_fine_thank_you",
+            "ir.intent": "INFORM",
+            "ir.subject": "WELLBEING",
+            "decision.branch": "SELF_STATE_RECEIVED",
+            "relationshipAfter.identityTrust": "unknown",
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.authoritative_true_name_claim_im_patrick",
+      "tags": ["interaction", "identity", "claim"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "text": "I'm Patrick",
+          "expect": {
+            "ir.provenance.pattern": "pnc.identity.self_name_im",
+            "ir.socialContext.identityClaim": true,
+            "decision.branch": "IDENTITY_CLAIM_RECEIVED",
+            "relationshipAfter.identityTrust": "trusted",
+            "relationshipAfter.approval": 1,
+            "relationshipAfter.respect": 2,
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.authoritative_true_name_claim_my_name_is",
+      "tags": ["interaction", "identity", "claim"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "text": "My name is Patrick",
+          "expect": {
+            "ir.provenance.pattern": "pnc.identity.my_name_is",
+            "ir.socialContext.identityClaim": true,
+            "decision.branch": "IDENTITY_CLAIM_RECEIVED",
+            "relationshipAfter.identityTrust": "trusted",
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.pending_identity_presents_three_choice_frames_and_real_name_click",
+      "tags": ["interaction", "identity", "suggestions"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "observation.suggestions.candidates": {"contains": {"id": "identity.choice.real_name"}},
+            "observation.suggestions.candidates": {"contains": {"id": "identity.choice.refuse_name"}},
+            "observation.suggestions.candidates": {"contains": {"id": "identity.choice.lie_name"}},
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "identity.choice.real_name"},
+          "expect": {
+            "accepted": true,
+            "messages.0.payload.text": {"contains": "Mara"},
+            "relationshipAfter.identityTrust": "trusted",
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.false_explicit_name_claim_rejected",
+      "tags": ["interaction", "identity", "evasion"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "I'm Patricia",
+          "expect": {
+            "ir.socialContext.identityClaim": true,
+            "decision.branch": "IDENTITY_CLAIM_RECEIVED",
+            "relationshipAfter.identityTrust": "untrustworthy",
+            "relationshipAfter.approval": -4,
+            "relationshipAfter.respect": -6,
+            "messages.0.payload.text": "I don't believe you.",
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.lie_choice_submits_alias_and_disbelief",
+      "tags": ["interaction", "identity", "evasion"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {"accepted": true}
+        },
+        {
+          "suggestionClick": {"candidateID": "identity.choice.lie_name"},
+          "expect": {
+            "decision.branch": "IDENTITY_CLAIM_RECEIVED",
+            "relationshipAfter.identityTrust": "untrustworthy",
+            "messages.0.payload.text": "I don't believe you.",
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.explicit_refusal_remains_identity_evasion",
+      "tags": ["interaction", "identity", "evasion"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {"accepted": true}
+        },
+        {
+          "text": "no",
+          "expect": {
+            "decision.branch": "IDENTITY_NAME_EVASION",
+            "relationshipAfter.identityTrust": "untrustworthy",
+            "relationshipAfter.approval": -2,
+            "relationshipAfter.respect": -3,
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.interruption_resumes_and_preview_is_pure",
+      "tags": ["interaction", "identity", "preview", "resume"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "action": "preview",
+          "text": "im fine thanks",
+          "expect": {
+            "type": "preview",
+            "ir.provenance.pattern": "pnc.state.self_wellbeing_im_plain_fine_thanks",
+            "decision.branch": "SELF_STATE_RECEIVED",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "messages": {"count": 0}
+          }
+        },
+        {
+          "text": "Are you okay?",
+          "expect": {
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME",
+            "relationshipAfter.identityTrust": "unknown"
+          }
+        },
+        {
+          "text": "I'm Patrick",
+          "expect": {
+            "decision.branch": "IDENTITY_CLAIM_RECEIVED",
+            "relationshipAfter.identityTrust": "trusted",
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
     }
   ]
 }

@@ -1,0 +1,329 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.interaction.continuation_and_clarification_bounds",
+  "domain": "interaction",
+  "cases": [
+    {
+      "id": "interaction.continuation_and_clarification_bounds.continuation_paraphrases_follow_previous_topic",
+      "description": "Continuation paraphrases follow the previous gossip topic without side effects, while 'give me more food' does not become CONVERSATION_CONTINUATION.",
+      "tags": ["interaction", "continuation", "gossip"],
+      "turns": [
+        {
+          "text": "do you have any news",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "GOSSIP"
+          }
+        },
+        {
+          "text": "tell me more",
+          "expect": {
+            "accepted": true,
+            "result.decision.route": "deterministic",
+            "result.actionResult": {"absent": true},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "ir.provenance.pattern": {"prefix": "pnc.social.continuation."},
+            "result.decision.response.selectionSource": "conversation_context",
+            "trace.0.data.classification": "recognized_question",
+            "trace.0.data.responseClassification": "grounded_npc_response",
+            "messages.0.payload.text": {"contains": "anything else"},
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "can you say more",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "say more",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "what else",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "anything else",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "go on",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "keep going",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "continue",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "do you have any news",
+          "expect": {"accepted": true, "ir.intent": "GOSSIP"}
+        },
+        {
+          "text": "can you tell me more",
+          "expect": {
+            "accepted": true,
+            "ir.intent": "QUESTION",
+            "ir.subject": "CONVERSATION",
+            "ir.extensions.dialogueFollowUp": "CONVERSATION_CONTINUATION",
+            "contextAfter.dialogue.currentTopic": "gossip"
+          }
+        },
+        {
+          "resetConversation": true,
+          "action": "preview",
+          "text": "give me more food",
+          "expect": {
+            "ir.extensions.dialogueFollowUp": {"notEquals": "CONVERSATION_CONTINUATION"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.continuation_and_clarification_bounds.acknowledgements_preserve_context_without_actions",
+      "description": "Acknowledgements preserve relationship and medical context without authorizing actions.",
+      "tags": ["interaction", "acknowledgement", "context"],
+      "turns": [
+        {
+          "text": "are you single",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "okay",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "semantic.question.relationship_status.acknowledged.alternate",
+            "contextAfter.dialogue.currentTopic": "RELATIONSHIP_STATUS",
+            "messages.0.payload.text": {"contains": "appreciate"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        },
+        {
+          "resetConversation": true,
+          "text": "are you hurt",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_HEALTH_STATE"
+          }
+        },
+        {
+          "text": "okay",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "conversation.acknowledged.default",
+            "contextAfter.dialogue.currentTopic": "medical",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "text": "tell me more",
+          "expect": {
+            "accepted": true,
+            "result.decision.response.templateID": "semantic.conversation.continuation.medical_known",
+            "messages.0.payload.text": {"contains": "anything more"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "text": "wait here",
+          "expect": {
+            "accepted": true,
+            "ir.action": "STAY",
+            "result.actionResult.accepted": true
+          }
+        },
+        {
+          "text": "okay",
+          "expect": {
+            "accepted": true,
+            "result.actionResult": {"absent": true},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.continuation_and_clarification_bounds.topic_carryover_and_truthful_unknown_continuation",
+      "description": "Topic carryover switches from known residence to unknown health and stays truthful on continuation.",
+      "tags": ["interaction", "continuation", "unknown_fact"],
+      "scenario": {
+        "npc": {
+          "residence": {"label": "Riverside Camp"},
+          "health": null
+        }
+      },
+      "turns": [
+        {
+          "text": "where is your home",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_RESIDENCE",
+            "ir.diagnostics.factStatus": "known"
+          }
+        },
+        {
+          "text": "what about your health",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "NPC_HEALTH_STATE",
+            "ir.diagnostics.factStatus": "unknown",
+            "messages.0.payload.text": {"contains": "can't confirm"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        },
+        {
+          "text": "tell me more",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "CONVERSATION",
+            "result.decision.response.templateID": "semantic.conversation.continuation.medical_unknown",
+            "messages.0.payload.text": {"contains": "can't confirm"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.continuation_and_clarification_bounds.preview_and_tl_continuation_effect_free_and_localized",
+      "description": "Preview of continuation is effect-free and TL continuation uses localized translation key.",
+      "tags": ["interaction", "continuation", "preview", "tl"],
+      "scenario": {
+        "npc": {
+          "residence": {"label": "Riverside Camp"}
+        }
+      },
+      "turns": [
+        {
+          "text": "where do you live exactly",
+          "expect": {"accepted": true}
+        },
+        {
+          "action": "preview",
+          "text": "tell me more",
+          "expect": {
+            "accepted": true,
+            "messages": {"count": 0},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0,
+            "result.decision.response.templateID": "semantic.conversation.continuation.residence"
+          }
+        },
+        {
+          "language": "TL",
+          "text": "tell me more",
+          "expect": {
+            "accepted": true,
+            "translation.language": "TL",
+            "messages.0.payload.translationKey": "UI_PNC_Conversation_Semantic_ConversationContinuationResidence",
+            "messages.0.payload.text": {"contains": "tinitirhan"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    }
+  ]
+}

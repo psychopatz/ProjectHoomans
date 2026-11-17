@@ -1,0 +1,246 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.interaction.context_repair_and_pronouns",
+  "domain": "interaction",
+  "cases": [
+    {
+      "id": "interaction.context_repair_and_pronouns.pronoun_followups_requery_grounded_topics",
+      "description": "Pronoun follow-ups re-query grounded residence and knowledge topics without side effects.",
+      "tags": ["interaction", "pronouns", "context_reference"],
+      "scenario": {
+        "npc": {
+          "residence": {"label": "Riverside Camp"},
+          "knowledge": {
+            "topics": {
+              "radio tower": {
+                "known": true,
+                "answer": "It is north of here."
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "where is your home",
+          "expect": {"accepted": true, "dispatchTransport": {"count": 0}}
+        },
+        {
+          "text": "what about it",
+          "expect": {
+            "accepted": true,
+            "ir.provenance.pattern": "pnc.question.context_reference.what_about_it",
+            "ir.target.resolvedReference": "IT",
+            "ir.target.concept": "NPC_RESIDENCE",
+            "ir.extensions.facts.CONTEXT_REFERENCE.subject": "NPC_RESIDENCE",
+            "ir.extensions.facts.CONTEXT_REFERENCE.status": "known",
+            "messages.0.payload.text": {"contains": "Riverside Camp"},
+            "result.decision.response.selectionSource": "conversation_reference",
+            "trace.0.data.classification": "recognized_question",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        },
+        {
+          "text": "is it safe there",
+          "expect": {
+            "accepted": true,
+            "ir.diagnostics.factStatus": "unknown",
+            "messages.0.payload.text": {"contains": "reliable information"},
+            "trace.0.data.classification": "recognized_question_unknown_fact",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "what about that",
+          "expect": {
+            "accepted": true,
+            "ir.extensions.facts.CONTEXT_REFERENCE.subject": "NPC_RESIDENCE",
+            "ir.extensions.facts.CONTEXT_REFERENCE.status": "known",
+            "messages.0.payload.text": {"contains": "Riverside Camp"},
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "do you know about the radio tower",
+          "expect": {
+            "accepted": true,
+            "ir.diagnostics.factStatus": "known",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "what is it like there",
+          "expect": {
+            "accepted": true,
+            "ir.target.concept": "NPC_KNOWLEDGE",
+            "ir.diagnostics.factStatus": "known",
+            "messages.0.payload.text": {"contains": "north of here"},
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "what about it",
+          "expect": {
+            "accepted": true,
+            "ir.target.resolvedReference": "IT",
+            "messages.0.payload.text": {"contains": "north of here"},
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.context_repair_and_pronouns.medical_pronouns_stay_truthful_when_unknown",
+      "description": "Medical pronoun follow-ups remain truthful when health is unknown.",
+      "tags": ["interaction", "pronouns", "unknown_fact"],
+      "scenario": {
+        "npc": {
+          "healthState": null,
+          "bodyHealth": null,
+          "hpCurrent": null,
+          "hpMax": null
+        }
+      },
+      "turns": [
+        {
+          "text": "are you hurt",
+          "expect": {
+            "accepted": true,
+            "ir.diagnostics.factStatus": "unknown",
+            "trace.0.data.classification": "recognized_question_unknown_fact",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "does it still hurt",
+          "expect": {
+            "accepted": true,
+            "ir.diagnostics.factStatus": "unknown",
+            "ir.target.resolvedReference": "IT",
+            "ir.target.concept": "NPC_HEALTH_STATE",
+            "result.decision.response.selectionSource": "conversation_reference",
+            "trace.0.data.classification": "recognized_question_unknown_fact",
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "what about that",
+          "expect": {
+            "accepted": true,
+            "ir.diagnostics.factStatus": "unknown",
+            "trace.0.data.classification": "recognized_question_unknown_fact",
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.context_repair_and_pronouns.unresolved_reference_recognized_without_inventing_fact",
+      "description": "Unresolved 'what about it' is recognized as unknown fact without inventing a fact.",
+      "tags": ["interaction", "pronouns", "unresolved"],
+      "turns": [
+        {
+          "text": "what about it",
+          "expect": {
+            "accepted": true,
+            "ir.provenance.pattern": "pnc.question.context_reference.what_about_it",
+            "ir.target.unresolved": true,
+            "trace.0.data.classification": "recognized_question_unknown_fact",
+            "result.decision.route": "deterministic",
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.context_repair_and_pronouns.needs_commitment_survives_topic_switch",
+      "description": "Pending needs proposal survives weather topic interruption and resumes on acknowledgement.",
+      "tags": ["interaction", "needs", "interruption"],
+      "turns": [
+        {
+          "text": "do you need anything",
+          "expect": {
+            "contextAfter.dialogue.pendingFollowUp.id": "flow:needs:await_player_quantity"
+          }
+        },
+        {
+          "text": "how many",
+          "expect": {
+            "ir.extensions.contextualFollowUp.status": "matched"
+          }
+        },
+        {
+          "text": "i will get some",
+          "expect": {
+            "contextAfter.dialogue.pendingFollowUp.id": "flow:needs:proposal_pending"
+          }
+        },
+        {
+          "text": "what is the weather",
+          "expect": {
+            "ir.extensions.contextualFollowUp.status": "interrupted",
+            "contextAfter.dialogue.pendingFollowUp.id": "flow:needs:proposal_pending",
+            "result.actionResult": {"absent": true},
+            "dispatchTransport": {"count": 0}
+          }
+        },
+        {
+          "text": "okay",
+          "expect": {
+            "ir.extensions.contextualFollowUp.status": "matched",
+            "contextAfter.dialogue.pendingFollowUp.status": "open",
+            "result.actionResult": {"absent": true},
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.context_repair_and_pronouns.preview_and_tl_safety_reference",
+      "description": "Context-reference preview is effect-free and TL translation uses localized key.",
+      "tags": ["interaction", "pronouns", "preview", "tl"],
+      "scenario": {
+        "npc": {
+          "residence": {"label": "Riverside Camp"}
+        }
+      },
+      "turns": [
+        {
+          "text": "where is your home",
+          "expect": {"accepted": true}
+        },
+        {
+          "action": "preview",
+          "text": "is it safe there",
+          "expect": {
+            "accepted": true,
+            "messages": {"count": 0},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0},
+            "llmCalls": 0
+          }
+        },
+        {
+          "language": "TL",
+          "text": "is it safe there",
+          "expect": {
+            "accepted": true,
+            "messages.0.payload.translationKey": "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown",
+            "messages.0.payload.text": {"contains": "ligtas"},
+            "dispatchTransport": {"count": 0},
+            "toolCalls": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    }
+  ]
+}
