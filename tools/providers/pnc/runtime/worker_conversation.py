@@ -7,7 +7,6 @@ transport and working-world synchronization.
 
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import Any, Protocol
 
 from tools.semantic_harness.core.item_catalog import search_item_catalog
@@ -82,7 +81,7 @@ class WorkerConversationOperations:
         self._host._sync_effective_scenario(snapshot)
         if not isinstance(response, dict):
             return snapshot
-        merged = deepcopy(response)
+        merged = dict(response)
         for key in (
             "scenario",
             "context",
@@ -99,8 +98,7 @@ class WorkerConversationOperations:
             "conversationPresentation",
         ):
             if key in snapshot:
-                merged[key] = deepcopy(snapshot[key])
-        self._host._sync_effective_scenario(snapshot)
+                merged[key] = snapshot[key]
         return merged
 
     def inspect_actor_state(self) -> dict[str, Any]:
