@@ -11,19 +11,19 @@ from tools.semantic_harness.inspection.conversation_inspector import (
 )
 from tools.semantic_harness.inspection.rendering import conversation_first
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.faction_rehydration_test_support import (
     setup_faction_fixture,
 )
 
 
-class ProductionSocialContextTests(unittest.TestCase):
+class ProductionSocialContextTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         setup_faction_fixture(self)
 
     def test_saved_layers_share_production_context_and_hostile_talk(self) -> None:
         source_before = deepcopy(self.save_path.read_bytes())
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_faction_fixture",
@@ -114,7 +114,7 @@ class ProductionSocialContextTests(unittest.TestCase):
         self.assertEqual(self.save_path.read_bytes(), source_before)
 
     def test_gui_and_cli_expose_the_same_canonical_layers(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_faction_fixture",

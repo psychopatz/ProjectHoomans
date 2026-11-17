@@ -8,6 +8,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def scoped_scenario(character: str, npc: str, token: str) -> dict:
@@ -41,11 +42,11 @@ def scoped_scenario(character: str, npc: str, token: str) -> dict:
     )
 
 
-class ContextualScaleIsolationTests(unittest.TestCase):
+class ContextualScaleIsolationTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_real_worker_turn_latency_stays_bounded(self) -> None:
         scenario = scoped_scenario("char_perf", "npc_perf", "perf")
         samples: list[float] = []
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.preview("Are you okay?")
             for phrase in (
                 "Are you okay?",
@@ -69,7 +70,7 @@ class ContextualScaleIsolationTests(unittest.TestCase):
 
     def test_two_player_npc_scopes_keep_context_memory_and_transport_isolated(self) -> None:
         with (
-            LuaSemanticWorker(scoped_scenario("char_alpha", "npc_alpha", "alpha")) as alpha,
+            self.warm_worker(scoped_scenario("char_alpha", "npc_alpha", "alpha")) as alpha,
             LuaSemanticWorker(scoped_scenario("char_bravo", "npc_bravo", "bravo")) as bravo,
         ):
             alpha_question = alpha.input("Are you okay?")

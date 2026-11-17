@@ -9,13 +9,14 @@ import tempfile
 import json
 import unittest
 
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.inspection.response_candidate import preview_authored_variant
 from tools.semantic_harness.inspection.response_observatory import (
     run_quality_matrix, compare_quality_reports, review_variant_proposal,
 )
 
 
-class ResponseQualityMatrixTests(unittest.TestCase):
+class ResponseQualityMatrixTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_greeting_and_companion_actions_en_tl(self):
         result = run_quality_matrix([
             {"label": "EN greeting", "language": "EN",
@@ -98,7 +99,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
     def test_safe_proposal_preflight_never_changes_loaded_pool(self):
         from tools.providers.pnc.runtime.worker import LuaSemanticWorker
         from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             original = worker.response_pool_detail(
                 "semantic.flow.greeting.opening", limit=16)
             candidate = {
@@ -134,7 +135,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         from tools.providers.pnc.runtime.worker import LuaSemanticWorker
         from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
         repository = Path(__file__).resolve().parents[4]
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             original = worker.response_pool_detail(
                 "semantic.flow.greeting.opening", limit=16)
         proposal = {
@@ -175,7 +176,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         self.assertTrue(pinned["sourceSHA256GuardMatched"])
         self.assertEqual(pinned["writesToProduction"], 0)
         proposal.pop("expectedSourceSHA256")
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             after = worker.response_pool_detail(original["poolID"], limit=16)
         self.assertEqual(original["contentFingerprint"],
                          after["contentFingerprint"])
@@ -205,7 +206,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             "ConvoEngine/ResponseCatalog/FlowGreeting.lua"
         )
         for language in ("EN", "TL"):
-            with self.subTest(language=language), LuaSemanticWorker(
+            with self.subTest(language=language), self.warm_worker(
                 DEFAULT_SCENARIO
             ) as worker:
                 detail = worker.response_pool_detail(
@@ -276,7 +277,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         from tools.providers.pnc.runtime.worker import LuaSemanticWorker
         from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
         repository = Path(__file__).resolve().parents[4]
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             original = worker.response_pool_detail(
                 "semantic.generated.simple_command.follow.queued", limit=16)
         proposal = {
@@ -327,7 +328,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                     scenario = merge(DEFAULT_SCENARIO, {
                         "runtime": {"language": language},
                     })
-                    with LuaSemanticWorker(scenario) as worker:
+                    with self.warm_worker(scenario) as worker:
                         turn = worker.input(utterance)
                     npc = [message["payload"]["text"]
                            for message in turn["messages"]
@@ -452,7 +453,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "real Tk needs X11/Xvfb")
-class ObservatoryTkTests(unittest.TestCase):
+class ObservatoryTkTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_explore_is_static_and_selection_belongs_to_simulation(self):
         import tkinter as tk
         from tkinter import ttk
@@ -466,7 +467,7 @@ class ObservatoryTkTests(unittest.TestCase):
         root = tk.Tk()
         root.withdraw()
         try:
-            with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            with self.warm_worker(DEFAULT_SCENARIO) as worker:
                 def run(operation, callback):
                     callback(operation(worker))
                     return True
@@ -517,7 +518,7 @@ class ObservatoryTkTests(unittest.TestCase):
             SemanticObservatoryPane,
         )
         repository = Path(__file__).resolve().parents[4]
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             detail = worker.response_pool_detail(
                 "semantic.flow.greeting.opening", limit=16)
         proposal = {
@@ -544,7 +545,7 @@ class ObservatoryTkTests(unittest.TestCase):
             try:
                 review_parent = ttk.Frame(root)
                 review_parent.grid(row=0, column=0, sticky="nsew")
-                with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+                with self.warm_worker(DEFAULT_SCENARIO) as worker:
                     def run(operation, callback):
                         callback(operation(worker))
                         return True

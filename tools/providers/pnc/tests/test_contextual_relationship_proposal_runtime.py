@@ -10,12 +10,12 @@ import unittest
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualRelationshipProposalRuntimeTests(SemanticLabGuiTestCase):
+class ContextualRelationshipProposalRuntimeTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def scenario(
         self,
         *,
@@ -52,7 +52,7 @@ class ContextualRelationshipProposalRuntimeTests(SemanticLabGuiTestCase):
         return scenario
 
     def proposal(self, scenario: dict) -> tuple[dict, dict]:
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             return worker.relationship_proposal(), worker.snapshot()
 
     def test_same_gender_incompatible_and_gay_compatible(self) -> None:
@@ -127,7 +127,7 @@ class ContextualRelationshipProposalRuntimeTests(SemanticLabGuiTestCase):
 
     def test_rejection_cooldown_blocks_retry_and_persistence_round_trip(self) -> None:
         scenario = self.scenario(npc_style="reserved")
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             rejected = worker.relationship_proposal()
             self.assertFalse(rejected["accepted"])
             self.assertEqual(rejected["reason"], "rejected")

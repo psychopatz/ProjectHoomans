@@ -7,13 +7,13 @@ import unittest
 
 from tools.semantic_harness.core.fixture_provider import OfflineEngineFixtureProvider
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class OfflineFixtureProviderTests(unittest.TestCase):
+class OfflineFixtureProviderTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_fixture_payload_and_provenance_survive_working_world_mutation(self) -> None:
         scenario = merge({}, DEFAULT_SCENARIO)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             initial = worker.snapshot()
             source_before = deepcopy(worker.source_snapshot.to_dict())
             payload = initial["sourceSnapshot"]["providerPayloads"][

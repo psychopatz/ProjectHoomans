@@ -9,6 +9,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def grounded_scenario(*, language: str = "EN", provider: bool = False) -> dict:
@@ -40,7 +41,7 @@ def grounded_scenario(*, language: str = "EN", provider: bool = False) -> dict:
     )
 
 
-class LocalizationAndFallbackSafetyTests(unittest.TestCase):
+class LocalizationAndFallbackSafetyTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]
@@ -76,7 +77,7 @@ class LocalizationAndFallbackSafetyTests(unittest.TestCase):
         )
         for language in ("EN", "TL"):
             with self.subTest(language=language):
-                with LuaSemanticWorker(grounded_scenario(language=language)) as worker:
+                with self.warm_worker(grounded_scenario(language=language)) as worker:
                     turns = [worker.input(text) for text in script]
                     before_preview = worker.snapshot()
                     preview = worker.preview("wait here")
@@ -162,9 +163,9 @@ class LocalizationAndFallbackSafetyTests(unittest.TestCase):
         withdrawn["npc"]["personality"] = {"socialStyle": "withdrawn"}
         withdrawn["npc"]["traits"] = ["reserved"]
 
-        with LuaSemanticWorker(friendly) as friendly_worker:
+        with self.warm_worker(friendly) as friendly_worker:
             friendly_turn = friendly_worker.input("are you okay")
-        with LuaSemanticWorker(withdrawn) as withdrawn_worker:
+        with self.warm_worker(withdrawn) as withdrawn_worker:
             withdrawn_turn = withdrawn_worker.input("are you okay")
 
         for turn in (friendly_turn, withdrawn_turn):
@@ -195,7 +196,7 @@ class LocalizationAndFallbackSafetyTests(unittest.TestCase):
         bravo["npc"]["residence"] = {"label": "Oak Cabin"}
 
         with (
-            LuaSemanticWorker(alpha) as alpha_worker,
+            self.warm_worker(alpha) as alpha_worker,
             LuaSemanticWorker(bravo) as bravo_worker,
         ):
             alpha_worker.input("where do you live exactly")
@@ -234,7 +235,7 @@ class LocalizationAndFallbackSafetyTests(unittest.TestCase):
         )
         turns: dict[str, list[dict]] = {}
         for label, enabled in (("offline", False), ("provider", True)):
-            with LuaSemanticWorker(grounded_scenario(provider=enabled)) as worker:
+            with self.warm_worker(grounded_scenario(provider=enabled)) as worker:
                 turns[label] = [worker.input(text) for text in script]
 
         for offline, provider in zip(turns["offline"], turns["provider"]):
@@ -266,7 +267,7 @@ class LocalizationAndFallbackSafetyTests(unittest.TestCase):
             "tell me more",
         )
         samples: list[float] = []
-        with LuaSemanticWorker(grounded_scenario()) as worker:
+        with self.warm_worker(grounded_scenario()) as worker:
             for phrase in script:
                 started = time.perf_counter()
                 turn = worker.input(phrase)

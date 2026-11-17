@@ -4,7 +4,7 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def generated(turn: dict, strategy: str) -> dict | None:
@@ -17,9 +17,9 @@ def generated(turn: dict, strategy: str) -> dict | None:
     return None
 
 
-class OpenEndedSemanticCombatAwarenessTests(unittest.TestCase):
+class OpenEndedSemanticCombatAwarenessTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_double_down_advances_frontier_instead_of_immediate_self_loop(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             first = worker.input("fuckyouuuu")
             double_down = generated(first, "DOUBLE_DOWN")
@@ -46,7 +46,7 @@ class OpenEndedSemanticCombatAwarenessTests(unittest.TestCase):
         )
 
     def test_hostile_frontier_prioritizes_relevant_open_ended_moves(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             turn = worker.input("fuckyouuuu")
 
@@ -63,7 +63,7 @@ class OpenEndedSemanticCombatAwarenessTests(unittest.TestCase):
         self.assertNotIn("REFUSE", strategies)
 
     def test_typed_i_mean_it_reaffirms_active_hostility(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             worker.input("fuckyouuuu")
             turn = worker.input("yeah i meant it")
@@ -77,7 +77,7 @@ class OpenEndedSemanticCombatAwarenessTests(unittest.TestCase):
         )
 
     def test_i_mean_it_without_hostility_is_not_fabricated_as_hostile(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             turn = worker.input("i mean it")
         self.assertEqual(
@@ -90,7 +90,7 @@ class OpenEndedSemanticCombatAwarenessTests(unittest.TestCase):
         for language in ("EN", "TL"):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 worker.open_conversation()
                 turn = worker.input("fuckyouuuu")
             row = generated(turn, "DOUBLE_DOWN")

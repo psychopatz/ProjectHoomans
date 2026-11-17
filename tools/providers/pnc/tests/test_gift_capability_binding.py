@@ -5,12 +5,12 @@ from __future__ import annotations
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class GiftCapabilityBindingTests(unittest.TestCase):
+class GiftCapabilityBindingTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_live_catalog_exposes_existing_gift_transfer_binding(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             gift = next(
                 row
                 for row in worker.flow_catalog()["actionCatalog"]
@@ -30,7 +30,7 @@ class GiftCapabilityBindingTests(unittest.TestCase):
         self.assertEqual(gift["workflowKind"], "multi_stage_gift")
 
     def test_gift_offer_preview_and_authoritative_result_trace(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             previews = [
                 worker.preview("I want to give you an apple") for _ in range(2)
             ]
@@ -105,10 +105,10 @@ class GiftCapabilityBindingTests(unittest.TestCase):
             DEFAULT_SCENARIO,
             {"conversation": {"semanticAuthorization": {"authorized": False}}},
         )
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
             generation = catalog["generation"]
-        with LuaSemanticWorker(gated_scenario) as worker:
+        with self.warm_worker(gated_scenario) as worker:
             result = worker.input("I want to give you an apple")
             worker.set_language("TL")
             tagalog = worker.input("I want to give you an apple")

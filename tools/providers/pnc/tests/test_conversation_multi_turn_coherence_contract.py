@@ -4,7 +4,7 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 PROVIDER = "projecthoomans.generated_affordances"
@@ -18,9 +18,9 @@ def generated(turn: dict) -> list[dict]:
     ]
 
 
-class ConversationMultiTurnCoherenceContractTests(unittest.TestCase):
+class ConversationMultiTurnCoherenceContractTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_npc_pending_question_drives_current_player_affordances(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("how are you doing?")
 
         pending = turn["contextAfter"]["dialogue"]["pendingFollowUp"]
@@ -51,7 +51,7 @@ class ConversationMultiTurnCoherenceContractTests(unittest.TestCase):
             self.assertEqual(reply_to["flowID"], "wellbeing")
 
     def test_generated_and_typed_wellbeing_answers_converge(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opening = worker.input("hello")
             positive = next(
                 row for row in generated(opening)
@@ -59,7 +59,7 @@ class ConversationMultiTurnCoherenceContractTests(unittest.TestCase):
             )
             clicked = worker.suggestion_click(positive["frame"])
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.input("hello")
             typed = worker.input("I'm good")
 
@@ -88,7 +88,7 @@ class ConversationMultiTurnCoherenceContractTests(unittest.TestCase):
         )
 
     def test_identity_question_generates_safe_disclosure_and_evasion(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("what is your name?")
             rows = {row["strategy"]: row for row in generated(turn)}
 
@@ -124,7 +124,7 @@ class ConversationMultiTurnCoherenceContractTests(unittest.TestCase):
             accepted["contextAfter"]["dialogue"].get("pendingFollowUp")
         )
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("what is your name?")
             refusal = next(
                 row for row in generated(turn)

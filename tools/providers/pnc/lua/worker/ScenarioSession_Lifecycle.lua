@@ -100,6 +100,9 @@ local function install(ScenarioSession)
     function ScenarioSession.reset(context, scenario)
         local Runtime = context.Runtime
         local Values = context.Values
+        if Runtime.replaceProductionDurableState == true then
+            Runtime.view = nil
+        end
         Runtime.scenario = Values.copy(scenario or {})
         Runtime.conversationOpened = false
         Runtime.conversationSuspended = false
@@ -122,6 +125,27 @@ local function install(ScenarioSession)
             and type(PNC.ConvoEngine.ToolResultRealization.ResetSelections) == "function"
         then
             PNC.ConvoEngine.ToolResultRealization.ResetSelections()
+        end
+        if PNC.PlayerKnowledgeCommands then
+            if type(PNC.PlayerKnowledgeCommands.Processed) == "table" then
+                Values.clearTable(PNC.PlayerKnowledgeCommands.Processed)
+            end
+            if type(PNC.PlayerKnowledgeCommands.Uncommitted) == "table" then
+                Values.clearTable(PNC.PlayerKnowledgeCommands.Uncommitted)
+            end
+        end
+        if PNC.BaseService then
+            if type(PNC.BaseService.ProcessedRequests) == "table" then
+                Values.clearTable(PNC.BaseService.ProcessedRequests)
+            end
+            if type(PNC.BaseService.ProcessedRequestOrder) == "table" then
+                Values.clearTable(PNC.BaseService.ProcessedRequestOrder)
+            end
+        end
+        if PNC.ColonyStorageService
+            and type(PNC.ColonyStorageService.ProcessedRequests) == "table"
+        then
+            Values.clearTable(PNC.ColonyStorageService.ProcessedRequests)
         end
         ScenarioSession.configureRuntime(context)
         context.WorkingWorld.captureBaseline(Runtime, Values)

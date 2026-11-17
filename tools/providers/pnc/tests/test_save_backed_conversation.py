@@ -9,13 +9,14 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.save_test_support import pz_file
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
 
 
-class SaveBackedConversationTests(unittest.TestCase):
+class SaveBackedConversationTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -187,7 +188,16 @@ class SaveBackedConversationTests(unittest.TestCase):
             None,
         )
 
-    def _worker(self, *, preset: str | None = None) -> LuaSemanticWorker:
+    def _worker(self, *, preset: str | None = None):
+        if preset == "pnc-with-dthoomans":
+            return self.warm_worker(
+                merge(
+                    DEFAULT_SCENARIO,
+                    {"runtime": {"availableMods": {"DTHoomans": True}}},
+                )
+            )
+        if preset is None:
+            return self.warm_worker(merge({}, DEFAULT_SCENARIO))
         return LuaSemanticWorker(
             merge({}, DEFAULT_SCENARIO),
             core_repository=CORE_REPOSITORY,

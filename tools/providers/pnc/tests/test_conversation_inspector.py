@@ -7,10 +7,10 @@ import unittest
 from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
 from tools.semantic_harness.inspection.rendering import conversation_first
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ConversationInspectorTests(unittest.TestCase):
+class ConversationInspectorTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def scenario(language: str = "EN") -> dict:
         return merge(
@@ -27,7 +27,7 @@ class ConversationInspectorTests(unittest.TestCase):
         )
 
     def test_projects_real_turn_context_plan_flow_response_and_trace(self) -> None:
-        with LuaSemanticWorker(self.scenario()) as worker:
+        with self.warm_worker(self.scenario()) as worker:
             worker.input("Do you need anything?")
             worker.input("How many?")
             worker.input("I'll get some")
@@ -61,7 +61,7 @@ class ConversationInspectorTests(unittest.TestCase):
         self.assertTrue(view["effects"]["sideEffects"]["noGameplayEffects"])
 
     def test_snapshot_uses_authoritative_context_and_bounds_trace(self) -> None:
-        with LuaSemanticWorker(self.scenario()) as worker:
+        with self.warm_worker(self.scenario()) as worker:
             for text in (
                 "Do you need anything?",
                 "How many?",
@@ -92,7 +92,7 @@ class ConversationInspectorTests(unittest.TestCase):
                 "conversation": {"token": "client-token"},
             },
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             turn = worker.input("fuck you")
 
         view = build_conversation_inspector(turn)
@@ -112,7 +112,7 @@ class ConversationInspectorTests(unittest.TestCase):
             DEFAULT_SCENARIO,
             {"npc": {"residence": {"label": "Riverside Camp"}}},
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("where is your home")
             reference_turn = worker.input("what about it")
             command_turn = worker.input("wait here")

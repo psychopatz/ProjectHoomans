@@ -6,15 +6,15 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.testing.sweep_quality import ALLOWED_SHORT_WORDS, QualityAnalyzer
 
 
-class DialogueAntiDuplicationTests(unittest.TestCase):
+class DialogueAntiDuplicationTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_unseeded_initial_turn_preserves_canonical_variant(self) -> None:
         """Prove that default unseeded turns select canonical variant 1 for test parity."""
         scenario = deepcopy(DEFAULT_SCENARIO)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             rec = worker.input("hello")
             p = rec["messages"][0]["payload"]
             self.assertEqual(p.get("phraseAntiRepeatReason"), "initial_canonical")
@@ -26,7 +26,7 @@ class DialogueAntiDuplicationTests(unittest.TestCase):
         for i in range(5):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario.setdefault("runtime", {})["phraseSalt"] = f"case_test_salt_{i * 7}"
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 rec = worker.input("hello")
                 p = rec["messages"][0]["payload"]
                 self.assertEqual(p.get("phraseAntiRepeatReason"), "initial_seeded")

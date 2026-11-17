@@ -6,12 +6,12 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SuggestionCandidateGenerationContractTests(unittest.TestCase):
+class SuggestionCandidateGenerationContractTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_preview_is_bounded_repeatable_and_non_executing(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             before = worker.snapshot()
             first = worker.preview("Are you okay?")
             second = worker.preview("Are you okay?")
@@ -52,7 +52,7 @@ class SuggestionCandidateGenerationContractTests(unittest.TestCase):
             self.assertNotIn("action", frame)
 
     def test_typed_and_response_plan_sources_share_stable_frames(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("Are you okay?")
 
         suggestions = result["observation"]["suggestions"]
@@ -104,7 +104,7 @@ class SuggestionCandidateGenerationContractTests(unittest.TestCase):
         self.assertTrue(result["observation"]["sideEffects"]["noGameplayEffects"])
 
     def test_greeting_response_plan_exposes_wellbeing_follow_up(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello")
 
         suggestions = result["observation"]["suggestions"]
@@ -128,7 +128,7 @@ class SuggestionCandidateGenerationContractTests(unittest.TestCase):
         )
 
     def test_current_flow_and_response_plan_branch_offers_are_projected(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello")
 
         candidates = {
@@ -159,7 +159,7 @@ class SuggestionCandidateGenerationContractTests(unittest.TestCase):
             with self.subTest(language=language):
                 scenario = deepcopy(DEFAULT_SCENARIO)
                 scenario["runtime"]["language"] = language
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     result = worker.input("Are you okay?")
 
                 labels = {
@@ -177,7 +177,7 @@ class SuggestionCandidateGenerationContractTests(unittest.TestCase):
             with self.subTest(language=language):
                 scenario = deepcopy(DEFAULT_SCENARIO)
                 scenario["runtime"]["language"] = language
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     result = worker.input("hello")
 
                 labels = {

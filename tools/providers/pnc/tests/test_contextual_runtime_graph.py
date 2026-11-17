@@ -12,14 +12,14 @@ import unittest
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.flow_editor.model import conversation_graph_model
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
-class ContextualRuntimeGraphTests(unittest.TestCase):
+class ContextualRuntimeGraphTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_greeting_uses_runtime_flow_graph_with_current_transition(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             response = worker.input("hello")
 
         graph = response["observation"]["conversationGraph"]
@@ -32,7 +32,7 @@ class ContextualRuntimeGraphTests(unittest.TestCase):
         self.assertIn("current", {node["state"] for node in model["nodes"]})
 
     def test_whats_up_uses_provider_candidate_graph_and_retains_visit_history(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             entered = worker.input("What's up?")
             graph = entered["observation"]["conversationGraph"]
             candidate = next(

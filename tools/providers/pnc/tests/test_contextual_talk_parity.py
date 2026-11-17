@@ -16,6 +16,7 @@ from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.semantic_harness.discovery.runtime import discover_newest_runtime
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.semantic_harness.ui.suggestion_projection import (
     conversation_presented_rows,
@@ -23,7 +24,7 @@ from tools.semantic_harness.ui.suggestion_projection import (
 )
 
 
-class ContextualTalkParityTests(unittest.TestCase):
+class ContextualTalkParityTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_production_native_conversation_parity_record(self) -> None:
         """Compare the complete primary surface to one production session.
 
@@ -32,7 +33,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         candidate policy from the diagnostic/global suggestion projection.
         """
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             production = opened["presentation"]
             channel = production["responseChannel"]
@@ -96,7 +97,7 @@ class ContextualTalkParityTests(unittest.TestCase):
                 [row["id"] for row in next_channel["rows"]],
             )
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             before = worker.snapshot()["conversationPresentation"]
             suspended = worker.suspend_conversation()["presentation"]
@@ -133,7 +134,7 @@ class ContextualTalkParityTests(unittest.TestCase):
             )
 
     def test_catalog_is_production_owned_and_truthful(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.talk_catalog()
 
         self.assertEqual(catalog["schema"], "semantic.talk.catalog.v1")
@@ -148,7 +149,7 @@ class ContextualTalkParityTests(unittest.TestCase):
 
     def test_matrix_uses_native_target_facts_and_restores_base_scenario(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             matrix = worker.talk_matrix(text="hello")
             restored = worker.snapshot()["scenario"]
 
@@ -163,7 +164,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         self.assertEqual(rows["hostile"]["target"]["audience"], "hostile")
         self.assertEqual(rows["hostile"]["target"]["route"], "hostile_full_conversation")
         self.assertEqual(rows["hostile"]["runtimeGraphPath"]["kind"], "semantic_flow")
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as navigation_worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as navigation_worker:
             navigation_worker.open_conversation()
             root_channel = navigation_worker.conversation_projection()["presentation"]["responseChannel"]
             orders = navigation_worker.suggestion_click(
@@ -225,7 +226,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         self.assertNotIn("palette.ResolveType", parity)
         self.assertNotIn("audience.Resolve", parity)
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.talk_start(target_id="hostile", utterance="hello")
 
         projection = result["start"]["target"]
@@ -236,7 +237,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         self.assertEqual(projection["opening"]["nodeID"], "greeting")
 
     def test_production_projection_exposes_exact_presented_session_rows(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             loaded = worker.snapshot()
             opened = worker.open_conversation()
             snapshot = worker.snapshot()
@@ -291,7 +292,7 @@ class ContextualTalkParityTests(unittest.TestCase):
     def test_open_returns_bounded_projection_for_large_saved_world(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario.setdefault("world", {})["saveBackedDiagnostic"] = "x" * 120_000
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             opened = worker.open_conversation()
 
         encoded = json.dumps(
@@ -308,7 +309,7 @@ class ContextualTalkParityTests(unittest.TestCase):
     def test_primary_renderer_adapter_preserves_production_row_order_and_frames(
         self,
     ) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             presentation = worker.snapshot()["conversationPresentation"]
 
@@ -328,7 +329,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         )
 
     def test_primary_click_uses_exact_production_frame_and_reprojects(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             before = opened["presentation"]
             row = next(
@@ -356,7 +357,7 @@ class ContextualTalkParityTests(unittest.TestCase):
     def test_production_frame_rejection_is_stale_or_replayed_without_mutation(
         self,
     ) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             frame = next(
                 row["semanticFrame"]
@@ -380,7 +381,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         )
 
     def test_unpresented_production_frame_is_rejected_without_mutation(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             frame = deepcopy(
                 next(
@@ -403,7 +404,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         )
 
     def test_close_and_explicit_reopen_follow_the_same_production_session(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             goodbye = next(
                 row for row in opened["presentation"]["responseChannel"]["rows"]
@@ -427,7 +428,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         self.assertTrue(reopened["responseChannel"]["rows"])
 
     def test_typed_emote_suspend_resume_share_the_production_semantic_state(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             typed = worker.input("What's up?")
             before = worker.snapshot()["conversationPresentation"]
@@ -497,7 +498,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         )
 
     def test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.talk_start(
                 target_id="neutral", utterance="What's up?"
             )
@@ -533,7 +534,7 @@ class ContextualTalkParityTests(unittest.TestCase):
 
     def test_owned_companion_uses_known_identity_policy(self) -> None:
         scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "companion")
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             root = worker.snapshot()["suggestions"]
             turn = worker.input("What's your name?")
 
@@ -550,7 +551,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         self.assertIn("already know each other", queued[0]["text"])
 
     def test_talk_something_else_returns_to_landing_with_navigation_reply(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             started = worker.talk_start(
                 target_id="neutral", utterance="What's up?"
             )
@@ -596,7 +597,7 @@ class ContextualTalkParityTests(unittest.TestCase):
     def test_unavailable_current_target_reports_reason_and_restores_scenario(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["alive"] = False
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             matrix = worker.talk_matrix(target_types=["current"])
             restored = worker.snapshot()["scenario"]
 
@@ -611,7 +612,7 @@ class ContextualTalkParityTests(unittest.TestCase):
 
     def test_trader_capability_is_an_overlay_on_the_talk_target(self) -> None:
         scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "trader")
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             matrix = worker.talk_matrix(target_types=["current"])
 
         row = matrix["rows"][0]
@@ -631,7 +632,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         for language in ("EN", "TL"):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 matrix = worker.talk_matrix(
                     target_types=["colonist", "neutral", "hostile"],
                     text="hello",
@@ -657,7 +658,7 @@ class ContextualTalkParityTests(unittest.TestCase):
 
     def test_recruitment_shortcut_and_typed_input_use_production_result_path(self) -> None:
         neutral = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "neutral")
-        with LuaSemanticWorker(neutral) as worker:
+        with self.warm_worker(neutral) as worker:
             candidates = []
             suggestions = worker.snapshot()["suggestions"]
             for group in suggestions.get("groups", []):
@@ -688,7 +689,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         }
         for profile, response_prefix in expected_replies.items():
             scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), profile)
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 result = worker.input("Would you like to join us?")
             npc_messages = [
                 message
@@ -710,7 +711,7 @@ class ContextualTalkParityTests(unittest.TestCase):
             revision=2,
         )
 
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.input("Would you like to join us?")
             snapshot = worker.snapshot()
 

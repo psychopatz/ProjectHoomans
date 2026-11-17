@@ -6,12 +6,12 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SemanticInteractionLifecycleTests(unittest.TestCase):
+class SemanticInteractionLifecycleTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_input_adapters_converge_in_the_production_worker(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             typed = worker.interaction_envelope(
                 {
                     "source": "typed_text",
@@ -55,7 +55,7 @@ class SemanticInteractionLifecycleTests(unittest.TestCase):
         )
 
     def test_npc_provenance_close_resume_and_200_turn_bound(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             speech = worker.interaction_npc_speech(
                 {
                     "npcID": "npc_mara",
@@ -139,7 +139,7 @@ class SemanticInteractionLifecycleTests(unittest.TestCase):
         self.assertGreaterEqual(metrics["promotions"], 1)
 
     def test_trivial_interaction_does_not_materialize_pair_state(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.interaction_apply(
                 {
                     "source": "emote",
@@ -152,7 +152,7 @@ class SemanticInteractionLifecycleTests(unittest.TestCase):
         self.assertEqual(metrics["pairRecords"], 0)
 
     def test_sparse_multiplayer_pairs_and_shared_event_references(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             for player_id in ("player-one", "player-two"):
                 worker.interaction_apply(
                     {
@@ -187,7 +187,7 @@ class SemanticInteractionLifecycleTests(unittest.TestCase):
         self.assertEqual(metrics["sharedEventRefs"], 1)
 
     def test_hundreds_of_npcs_and_thousands_of_trivial_turns_stay_sparse(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             for index in range(400):
                 worker.interaction_apply(
                     {

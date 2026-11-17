@@ -4,7 +4,7 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def scene_fixture() -> dict:
@@ -129,9 +129,9 @@ def assert_no_transcript_fields(test: unittest.TestCase, value: object) -> None:
             assert_no_transcript_fields(test, item)
 
 
-class SemanticSceneObservatoryTests(unittest.TestCase):
+class SemanticSceneObservatoryTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_worker_reads_production_scene_observatory(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.scene_observatory_fixture(scene_fixture())
             scene_id = first["scenes"][0]["id"]
             again = worker.scene_observatory_inspect(
@@ -187,7 +187,7 @@ class SemanticSceneObservatoryTests(unittest.TestCase):
 
 
     def test_worker_exposes_social_director_and_affordance_trace(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             view = worker.scene_observatory_fixture(social_scene_fixture())
 
         self.assertTrue(view["ok"])
@@ -219,7 +219,7 @@ class SemanticSceneObservatoryTests(unittest.TestCase):
         assert_no_transcript_fields(self, view)
 
     def test_worker_exposes_bounded_tactical_spatial_without_transcript(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             view = worker.scene_observatory_fixture(tactical_scene_fixture())
 
         self.assertTrue(view["ok"])
@@ -238,9 +238,9 @@ class SemanticSceneObservatoryTests(unittest.TestCase):
 
 
     def test_worker_explains_coarse_and_omitted_tactical_modes(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             coarse = worker.scene_observatory_fixture(coarse_scene_fixture())
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             omitted = worker.scene_observatory_fixture(omitted_scene_fixture())
 
         coarse_spatial = coarse["scenes"][0]["tacticalSpatial"]
@@ -260,7 +260,7 @@ class SemanticSceneObservatoryTests(unittest.TestCase):
         assert_no_transcript_fields(self, omitted)
 
     def test_worker_api_enforces_scene_observatory_bounds(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.scene_observatory_fixture(scene_fixture())
             with self.assertRaisesRegex(ValueError, "scene limit must be 1 to 8"):
                 worker.scene_observatory_inspect(scene_limit=0)

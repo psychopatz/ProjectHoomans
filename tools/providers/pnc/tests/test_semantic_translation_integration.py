@@ -7,10 +7,10 @@ import json
 from pathlib import Path
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SemanticTranslationIntegrationTests(unittest.TestCase):
+class SemanticTranslationIntegrationTests(WarmWorkerTestMixin, unittest.TestCase):
     BACKSTORY_KEYS = {
         "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
         "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
@@ -42,7 +42,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                     DEFAULT_SCENARIO,
                     {"runtime": {"language": language}},
                 )
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     greeting = worker.input("hello there")
                     identity = worker.input("what is your name")
                     wellbeing = worker.input("how are you doing?")

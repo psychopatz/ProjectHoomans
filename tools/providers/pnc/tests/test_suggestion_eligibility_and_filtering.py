@@ -7,13 +7,14 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
+class SuggestionEligibilityAndFilteringTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_typed_all_any_not_predicates_and_fail_closed_results(self) -> None:
         private_scenario = deepcopy(DEFAULT_SCENARIO)
         private_scenario["npc"]["semanticAuthorization"] = {"private": True}
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             allowed = worker.suggestion_predicate(
                 {
                     "all": [
@@ -51,7 +52,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
             unknown = worker.suggestion_predicate(
                 {"path": "not_public.value", "op": "eq", "value": "x"}
             )
-        with LuaSemanticWorker(private_scenario) as worker:
+        with self.warm_worker(private_scenario) as worker:
             private = worker.suggestion_predicate(
                 {
                     "path": "semanticAuthorization.private",
@@ -79,7 +80,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
             with self.subTest(behavior=behavior):
                 scenario = deepcopy(DEFAULT_SCENARIO)
                 scenario["npc"]["activeBehavior"] = behavior
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     result = worker.preview("Are you okay?")
 
                 capabilities = {
@@ -103,7 +104,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
 
         unknown_scenario = deepcopy(DEFAULT_SCENARIO)
         unknown_scenario["npc"].pop("activeBehavior")
-        with LuaSemanticWorker(unknown_scenario) as worker:
+        with self.warm_worker(unknown_scenario) as worker:
             unknown = worker.preview("Are you okay?")
         unknown_capabilities = {
             row["action"]: row
@@ -128,7 +129,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
             "secret": True,
             "undiscovered": "private_value",
         }
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.preview("Are you okay?")
 
         suggestions = result["observation"]["suggestions"]
@@ -146,7 +147,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["npc"]["activeBehavior"] = behavior
             with self.subTest(behavior=behavior):
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     result = worker.input("hello")
                 ids = {
                     candidate["id"]
@@ -157,7 +158,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
 
         unknown_scenario = deepcopy(DEFAULT_SCENARIO)
         unknown_scenario["npc"].pop("activeBehavior")
-        with LuaSemanticWorker(unknown_scenario) as worker:
+        with self.warm_worker(unknown_scenario) as worker:
             result = worker.input("hello")
         ids = {
             candidate["id"]
@@ -171,7 +172,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["npc"]["relationship"]["approval"] = approval
             with self.subTest(approval=approval):
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     result = worker.suggestion_predicate(
                         {
                             "path": "relationship.approval",
@@ -183,7 +184,7 @@ class SuggestionEligibilityAndFilteringTests(unittest.TestCase):
 
         trait_scenario = deepcopy(DEFAULT_SCENARIO)
         trait_scenario["npc"]["traits"] = {"friendly": True}
-        with LuaSemanticWorker(trait_scenario) as worker:
+        with self.warm_worker(trait_scenario) as worker:
             trait_true = worker.suggestion_predicate(
                 {"path": "npcState.traits.friendly", "op": "truthy"}
             )

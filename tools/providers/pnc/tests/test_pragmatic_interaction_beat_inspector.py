@@ -14,7 +14,7 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
 )
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.interaction_inspector import interaction_summary, interaction_timeline_record
 
 
@@ -22,7 +22,7 @@ REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
-class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
+class PragmaticInteractionBeatInspectorTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_promotion_preview_is_effect_free_and_source_fingerprinted(self) -> None:
         service = SemanticLabAuthoringService(REPOSITORY)
         current = service.load_interaction_definition("beat.argument_escalation")
@@ -134,7 +134,7 @@ class PragmaticInteractionBeatInspectorTests(unittest.TestCase):
             "confidence": 0.85,
             "forgiveness": 0.8,
         }
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.input("fuck ypuuuu")
         observation = result["observation"]
         summary = interaction_summary(observation)

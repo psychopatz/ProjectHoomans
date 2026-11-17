@@ -6,9 +6,10 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualSocialReactionTests(unittest.TestCase):
+class ContextualSocialReactionTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def scenario(npc: dict) -> dict:
         return merge(DEFAULT_SCENARIO, {"npc": npc})
@@ -100,7 +101,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         for label, npc, selection_id, social_style in cases:
             with self.subTest(case=label):
-                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                with self.warm_worker(self.scenario(npc)) as worker:
                     worker.input("You're an idiot")
                     result = worker.input("sorry")
                 self.assert_apology_turn(
@@ -138,7 +139,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         for label, npc, text, branch, template in cases:
             with self.subTest(case=label):
-                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                with self.warm_worker(self.scenario(npc)) as worker:
                     result = worker.input(text)
                 self.assertTrue(result["accepted"], result.get("reason"))
                 self.assertEqual(result["result"]["decision"]["branch"], branch)
@@ -156,7 +157,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
     def test_insults_use_the_authoritative_social_boundary_and_visible_response(self) -> None:
         for text in ("fuck you", "you are useless"):
             with self.subTest(text=text):
-                with LuaSemanticWorker(self.scenario({})) as worker:
+                with self.warm_worker(self.scenario({})) as worker:
                     result = worker.input(text)
                 self.assertTrue(result["accepted"], result.get("reason"))
                 self.assertEqual(result["result"]["ir"]["intent"], "INSULT")
@@ -189,7 +190,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 self.assertEqual(result["toolCalls"], [])
 
     def test_typoed_hostility_keeps_recognized_social_route(self) -> None:
-        with LuaSemanticWorker(self.scenario({})) as worker:
+        with self.warm_worker(self.scenario({})) as worker:
             result = worker.input("fuck ypuuuu")
         self.assertTrue(result["accepted"], result.get("reason"))
         ir = result["result"]["ir"]
@@ -228,7 +229,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 "conversation": {"token": "client-token"},
             },
         )
-        with LuaSemanticWorker(denied_scenario) as worker:
+        with self.warm_worker(denied_scenario) as worker:
             denied = worker.input("fuck you")
         denied_action = denied["result"]["actionResult"]
         self.assertFalse(denied_action["accepted"])
@@ -247,7 +248,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
 
         unavailable = self.scenario({})
         unavailable["runtime"]["socialTransportAvailable"] = False
-        with LuaSemanticWorker(unavailable) as worker:
+        with self.warm_worker(unavailable) as worker:
             missing_transport = worker.input("fuck you")
         unavailable_action = missing_transport["result"]["actionResult"]
         self.assertFalse(unavailable_action["accepted"])
@@ -268,7 +269,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                          missing_transport["relationshipAfter"])
 
     def test_self_directed_insult_does_not_dispatch_social_authority(self) -> None:
-        with LuaSemanticWorker(self.scenario({})) as worker:
+        with self.warm_worker(self.scenario({})) as worker:
             result = worker.input("I'm an idiot")
         self.assertEqual(result["result"]["ir"]["intent"], "SELF_REFLECTION")
         self.assertEqual(
@@ -285,7 +286,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 "runtime": {"language": "TL", "socialTransportAvailable": False},
             },
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.input("fuck you")
         self.assertEqual(
             result["messages"][0]["payload"]["translationKey"],
@@ -326,7 +327,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         for label, npc, template, social_style in cases:
             with self.subTest(case=label):
-                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                with self.warm_worker(self.scenario(npc)) as worker:
                     result = worker.input("I will kill you")
                 self.assertTrue(result["accepted"], result.get("reason"))
                 self.assertEqual(result["result"]["ir"]["intent"], "THREATEN")
@@ -403,7 +404,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         for label, npc, expected_template, translation_key, social_style in cases:
             with self.subTest(case=label):
-                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                with self.warm_worker(self.scenario(npc)) as worker:
                     result = worker.input("want some food")
                 self.assertTrue(result["accepted"], result.get("reason"))
                 self.assertEqual(result["result"]["ir"]["intent"], "OFFER")
@@ -464,7 +465,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         for label, npc, template, translation_key, social_style in cases:
             with self.subTest(case=label):
-                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                with self.warm_worker(self.scenario(npc)) as worker:
                     result = worker.input("I disagree")
                 self.assertTrue(result["accepted"], result.get("reason"))
                 self.assertEqual(result["result"]["ir"]["intent"], "DISAGREE")
@@ -494,7 +495,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["relationshipBefore"], result["relationshipAfter"]
                 )
 
-        with LuaSemanticWorker(
+        with self.warm_worker(
             self.scenario({"personality": {"socialStyle": "friendly"}})
         ) as worker:
             command = worker.input("follow me")
@@ -520,7 +521,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         scenario = self.scenario({
             "traits": {"friendly": True},
         })
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("hello")
             before = worker.snapshot()
             preview_one = worker.preview("sorry")
@@ -540,7 +541,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
 
     def test_insult_preview_is_pure_and_does_not_emit_social_effects(self) -> None:
-        with LuaSemanticWorker(self.scenario({})) as worker:
+        with self.warm_worker(self.scenario({})) as worker:
             before = worker.snapshot()
             preview = worker.preview("fuck you")
             after = worker.snapshot()

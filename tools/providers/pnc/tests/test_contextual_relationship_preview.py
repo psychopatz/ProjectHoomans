@@ -12,17 +12,17 @@ import unittest
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
-class ContextualRelationshipPreviewTests(unittest.TestCase):
+class ContextualRelationshipPreviewTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_preview_uses_production_resolver_without_persisting(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["relationship"].update(
             {"approval": 20, "respect": 20, "familiarity": 20}
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             before = deepcopy(worker.snapshot()["scenario"]["npc"]["relationship"])
             preview = worker.relationship_preview(
                 {"approval": -100, "respect": -20, "familiarity": 0}
@@ -41,7 +41,7 @@ class ContextualRelationshipPreviewTests(unittest.TestCase):
         scenario["npc"]["relationship"].update(
             {"approval": 72, "respect": 55, "familiarity": 63}
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             projection = worker.snapshot()["simulationProjection"]["relationship"]
             preview = worker.relationship_preview(
                 {"approval": 72, "respect": 55, "familiarity": 63}
@@ -55,7 +55,7 @@ class ContextualRelationshipPreviewTests(unittest.TestCase):
 
     def test_compare_exposes_runtime_parity_fields(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.context_matrix([scenario], text="hello", maximum=1)
 
         row = result["rows"][0]

@@ -6,12 +6,12 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualChoiceProviderTests(unittest.TestCase):
+class ContextualChoiceProviderTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_generic_social_provider_is_discovered_and_clickable(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("hello")
             suggestions = turn["observation"]["suggestions"]
             candidate = next(
@@ -46,7 +46,7 @@ class ContextualChoiceProviderTests(unittest.TestCase):
             self.assertEqual(clicked["dispatchTransport"], [])
 
     def test_provider_frame_is_stale_safe_and_replay_safe(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.input("hello")
             candidate = next(
                 row for row in first["observation"]["suggestions"]["candidates"]

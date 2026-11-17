@@ -6,17 +6,17 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ProductionMutationTests(unittest.TestCase):
+class ProductionMutationTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_normal_semantic_proposal_choice_calls_production_route(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["relationship"].update(
             {"approval": 100, "respect": 100, "familiarity": 100, "revision": 2}
         )
         scenario["npc"]["identitySeed"] = "production-mutation-proposal"
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             source_before = deepcopy(worker.source_snapshot.to_dict())
             suggestions = worker.snapshot()["suggestions"]
             candidates = [

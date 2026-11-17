@@ -61,3 +61,17 @@
 ### 7. Imperative Test Suite & Service Worker Churn
 - **Files:** `sweep_batch.py`, `sweep_service.py`, `response_observatory.py`, `response_candidate.py`, and 118 PNC test modules (`451` `LuaSemanticWorker` call sites across 702 test methods).
 - **Mechanism:** `DialogueQualitySweepService`/`SweepBatchExecutor` spawns 3 temporary metadata workers + 1 worker per case; `preview_authored_variant` spawns 5 separate workers per call; imperative test suites spawn workers inside `for` / `subTest` loops or per test method.
+
+## Root Causes Surfaced & Fixed During `P4`
+
+### 8. X11 `ibus-x11` (XIM) Deadlock on Repeated `tk.Tk()` Destruction/Creation
+- **Files:** `psychopatzCore/tools/semantic_harness/ui/app_initializer.py`, `ProjectHoomans/tools/providers/pnc/tests/gui_test_support.py`.
+- **Mechanism:** Mapping `ttk.Entry` on `DISPLAY=:0` and destroying `tk.Tk()`, then creating another `tk.Tk()`, deadlocked inside `ttk.Notebook.add` waiting on an `ibus-x11` XIM handshake. Setting `os.environ.setdefault("XMODIFIERS", "@im=none")` before Tk root creation eliminates the deadlock cleanly on `DISPLAY=:0` without `xvfb-run`.
+
+### 9. Leaked `ConvoProbe` `worker.lua` Processes & Unjoined Background Sweep Threads
+- **Files:** `psychopatzCore/tools/semantic_harness/codebuilder/{convo_probe.py,service.py}`, `psychopatzCore/tools/semantic_harness/ui/{lifecycle_controller.py,quality_sweep_controller.py}`, `ProjectHoomans/tools/providers/pnc/tests/{gui_test_support.py,test_semantic_harness_gui_journeys.py}`.
+- **Mechanism:** `ConvoEngineAuthoringPane` created `service.convo_probe = ConvoProbe(...)` with only `atexit.register(self.close)` and neither `close_app()` nor `close_gui_app()` closed `authoring_service`, nor were sweep background threads tracked/joined. Adding `ConvoProbe.close()` `atexit.unregister`, `SemanticLabAuthoringService.close()`, `close_app()` service close + sweep thread cancel/join, and `gui_test_support.close_gui_app` cleanup brings leaked worker processes to `0`.
+
+### 10. `Runtime.view` (`phraseSalt`) Leak Across Warm `import_source` & CodeBuilder / Startup Bottlenecks
+- **Files:** `ProjectHoomans/tools/providers/pnc/lua/worker/ScenarioSession_Lifecycle.lua`, `psychopatzCore/tools/semantic_harness/codebuilder/{conversation_model.py,psdl_compiler.py,convo_engine_exchange.py,semantic_dialogue_ir.py,blocks.py,convo_engine_psdl_inventory.py,convo_engine_ownership_inventory.py,lexicon_compiler.py,dialogue_content.py,reconcile.py}`, `psychopatzCore/tools/semantic_harness/studio/{convo_engine_authoring_pane.py,block_registry.py}`, `psychopatzCore/tools/semantic_harness/ui/{shell.py,studio_surface_builder.py}`.
+- **Mechanism:** `ScenarioSession.reset` left `Runtime.view` populated on `replaceProductionDurableState == true`, leaking `priorContext.phraseSalt` when scenarios omitted `phraseSalt`. In Python, `copy.deepcopy` on JSON ASTs (~3.6M calls per compile), `Path.relative_to()` (~15k calls), and eager Studio pane initialization (`ConvoEngineAuthoringPane.refresh()` spawning `ConvoProbe` + `SemanticBlockRegistryPane` compiling blocks before `_start_worker`) added ~35–40 s of overhead across GUI and compiler tests. Replacing JSON `deepcopy` with `copy_json`, string-prefix path slicing, clean-string `_lua_string` / exact-type `_lua_value`, deferring `ConvoEngineAuthoringPane` & `SemanticBlockRegistryPane` hydration until tab activation, and starting `app._start_worker()` ahead of Studio construction resolved these bottlenecks without altering behavior.

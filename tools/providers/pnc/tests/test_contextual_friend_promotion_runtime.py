@@ -17,9 +17,9 @@ from tools.providers.pnc.runtime.scenario import (
     load_scenario,
     save_scenario,
 )
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def relationship_scenario(approval: float, respect: float, familiarity: float) -> dict:
@@ -33,15 +33,15 @@ def relationship_scenario(approval: float, respect: float, familiarity: float) -
     return scenario
 
 
-class ContextualFriendPromotionRuntimeTests(SemanticLabGuiTestCase):
+class ContextualFriendPromotionRuntimeTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def test_friend_gate_promotes_once_and_survives_standing_deterioration(self) -> None:
         below = relationship_scenario(79, 50, 60)
-        with LuaSemanticWorker(below) as worker:
+        with self.warm_worker(below) as worker:
             first = worker.configure(deepcopy(below))
         self.assertEqual(first["simulationProjection"]["npc"].get("bond", {}).get("class", "none"), "none")
 
         crossed = relationship_scenario(80, 50, 60)
-        with LuaSemanticWorker(crossed) as worker:
+        with self.warm_worker(crossed) as worker:
             promoted = worker.configure(deepcopy(crossed))
             after = worker.input("hello")
         bond = promoted["simulationProjection"]["npc"]["bond"]
@@ -53,7 +53,7 @@ class ContextualFriendPromotionRuntimeTests(SemanticLabGuiTestCase):
         deteriorated["npc"]["relationship"].update(
             {"approval": -80, "respect": -20, "familiarity": 0}
         )
-        with LuaSemanticWorker(deteriorated) as worker:
+        with self.warm_worker(deteriorated) as worker:
             result = worker.configure(deteriorated)
         final_bond = result["simulationProjection"]["npc"]["bond"]
         self.assertEqual(final_bond["class"], "friend")
@@ -69,7 +69,7 @@ class ContextualFriendPromotionRuntimeTests(SemanticLabGuiTestCase):
         ):
             scenario = relationship_scenario(0, 0, 0)
             scenario["npc"]["startingRelationship"] = {"kind": kind}
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 result = worker.configure(scenario)
             bond = result["simulationProjection"]["npc"]["bond"]
             self.assertEqual(bond["class"], expected_class, kind)
@@ -78,7 +78,7 @@ class ContextualFriendPromotionRuntimeTests(SemanticLabGuiTestCase):
 
     def test_bond_persists_through_scenario_round_trip(self) -> None:
         scenario = relationship_scenario(80, 50, 60)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             configured = worker.configure(scenario)
         saved = configured["scenario"]
         with tempfile.TemporaryDirectory() as directory:

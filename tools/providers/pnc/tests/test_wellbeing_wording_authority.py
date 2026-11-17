@@ -11,7 +11,7 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
     compile_conversation_sources,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
@@ -100,7 +100,7 @@ LEGACY_KEYS = {
 }
 
 
-class WellbeingWordingShardTests(unittest.TestCase):
+class WellbeingWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_compiler_owns_wellbeing_families_by_wellbeing_shard(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
         plans = {
@@ -193,7 +193,7 @@ class WellbeingWordingShardTests(unittest.TestCase):
                 scenario["npc"]["conditionStats"] = {
                     "stress": 0.0, "panic": 0.0, "boredom": 0.0,
                 }
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     turn = worker.input("Are you okay?")
                 self.assertTrue(turn["accepted"], turn.get("reason"))
                 payload = turn["messages"][0]["payload"]

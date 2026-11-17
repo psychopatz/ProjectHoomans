@@ -7,9 +7,10 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class PersonalDialogueApparelAndInventoryBoundsTests(unittest.TestCase):
+class PersonalDialogueApparelAndInventoryBoundsTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def response_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]
@@ -19,7 +20,7 @@ class PersonalDialogueApparelAndInventoryBoundsTests(unittest.TestCase):
 
     def run_turn(self, text: str, language: str = "EN") -> dict:
         scenario = deepcopy(DEFAULT_SCENARIO)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             if language != "EN":
                 worker.set_language(language)
             return worker.input(text)
@@ -133,7 +134,7 @@ class PersonalDialogueApparelAndInventoryBoundsTests(unittest.TestCase):
         )
 
     def test_seed_backstory_reconstructs_across_language_and_worker_reload(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.backstory(
                 90210, "colonist", "npc-backstory-b0", save_seed="save-a"
             )

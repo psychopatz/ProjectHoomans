@@ -6,14 +6,14 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualChoiceRegistryTests(unittest.TestCase):
+class ContextualChoiceRegistryTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_all_current_sources_normalize_to_the_versioned_candidate_contract(
         self,
     ) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello")
 
         suggestions = result["observation"]["suggestions"]
@@ -35,9 +35,9 @@ class ContextualChoiceRegistryTests(unittest.TestCase):
             )
 
     def test_registry_provider_order_and_candidate_order_are_repeatable(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.input("hello")
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             second = worker.input("hello")
 
         first_suggestions = first["observation"]["suggestions"]
@@ -59,7 +59,7 @@ class ContextualChoiceRegistryTests(unittest.TestCase):
         self.assertLessEqual(len(first_suggestions["permittedCapabilities"]), 24)
 
     def test_provider_contract_does_not_create_a_second_click_or_effect_lane(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello")
             row = next(
                 candidate

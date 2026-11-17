@@ -10,10 +10,10 @@ from tools.semantic_harness.inspection.world_knowledge import (
 from tools.providers.pnc.tests.world_knowledge_test_support import (
     scenario_for,
 )
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class WorldKnowledgeInspectorTests(unittest.TestCase):
+class WorldKnowledgeInspectorTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_real_worker_projection_answers_why_actor_knows(self) -> None:
         scenario = scenario_for("alice", "EN", [
             {
@@ -25,7 +25,7 @@ class WorldKnowledgeInspectorTests(unittest.TestCase):
                 "confidence": 0.95,
             },
         ])
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("any gossip?")
             initial = worker.world_knowledge_inspect(actor_id="actor:alice")
             fact_id = initial["ledger"]["facts"][0]["factID"]

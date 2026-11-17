@@ -6,7 +6,7 @@ import unittest
 from copy import deepcopy
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.companion_orders_test_support import open_orders
 
 
@@ -21,13 +21,13 @@ def action_signature(result: dict) -> tuple[str, str, str, str]:
     )
 
 
-class NativeEffectAcceptanceTests(unittest.TestCase):
+class NativeEffectAcceptanceTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_typed_and_semantic_button_follow_share_executor_and_effect(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             typed = worker.input("Follow me.")
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             orders = open_orders(worker)
             follow = next(
                 row for row in orders["conversationPresentation"]["responseChannel"]["rows"]

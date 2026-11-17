@@ -13,13 +13,13 @@ from copy import deepcopy
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.core.item_catalog import _parse_script_text
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.dialogs.inventory_editor import StructuredInventoryEditor
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class StructuredInventoryTests(SemanticLabGuiTestCase):
+class StructuredInventoryTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def test_item_script_catalog_parses_definitions_without_tk_item_policy(self) -> None:
         parsed = _parse_script_text(
             "module Base\n{\n"
@@ -32,7 +32,7 @@ class StructuredInventoryTests(SemanticLabGuiTestCase):
         )
 
     def test_worker_item_catalog_comes_from_installed_pz_item_scripts(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.item_catalog("Bandage", limit=100)
 
         self.assertEqual(catalog.get("schema"), "semantic.item.catalog.v1")

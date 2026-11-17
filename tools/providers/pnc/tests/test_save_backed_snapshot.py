@@ -9,13 +9,13 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.core.state import (
     Provenance,
 )
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class LuaSnapshotAcceptanceTests(unittest.TestCase):
+class LuaSnapshotAcceptanceTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_worker_keeps_source_while_configuring_mutating_and_resetting(self) -> None:
         scenario = merge({}, DEFAULT_SCENARIO)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             source_before = deepcopy(worker.source_snapshot.to_dict())
             initial = worker.snapshot()
             self.assertEqual(

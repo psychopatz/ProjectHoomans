@@ -6,11 +6,11 @@ import unittest
 from copy import deepcopy
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.companion_orders_test_support import open_orders
 
 
-class StatefulCapabilityRefreshTests(unittest.TestCase):
+class StatefulCapabilityRefreshTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_go_home_state_removes_no_longer_meaningful_go_row(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["runtime"]["commandResponses"]["return_home"] = {
@@ -23,7 +23,7 @@ class StatefulCapabilityRefreshTests(unittest.TestCase):
                 },
             },
         }
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             orders = open_orders(worker)
             go_home = next(
                 row for row in orders["conversationPresentation"]["responseChannel"]["rows"]
@@ -58,7 +58,7 @@ class StatefulCapabilityRefreshTests(unittest.TestCase):
                 "z": 0,
             },
         ]
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.open_conversation()
             root = worker.conversation_projection()["presentation"]["responseChannel"]
             root_rows = {row["id"]: row for row in root["rows"]}

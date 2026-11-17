@@ -8,7 +8,7 @@ from tools.semantic_harness.inspection.conversation_inspector import (
 )
 from tools.semantic_harness.inspection.rendering import conversation_first
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.testing.conversation_fuzz import (
     DEFAULT_CASES,
     run_mutation_matrix,
@@ -18,7 +18,7 @@ from tools.semantic_harness.testing.conversation_fuzz import (
 PROVIDER = "projecthoomans.generated_affordances"
 
 
-class ConversationResponsePlanAndVariationTests(unittest.TestCase):
+class ConversationResponsePlanAndVariationTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_bounded_mutation_matrix_uses_real_worker_and_preserves_action_safety(self) -> None:
         report = run_mutation_matrix()
         self.assertEqual(report["caseCount"], len(DEFAULT_CASES))
@@ -51,7 +51,7 @@ class ConversationResponsePlanAndVariationTests(unittest.TestCase):
             "confidence": 0.85,
             "forgiveness": 0.8,
         }
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             turn = worker.input("fuckyouuuu")
 
         view = build_conversation_inspector(turn)
@@ -128,7 +128,7 @@ class ConversationResponsePlanAndVariationTests(unittest.TestCase):
             self.assertIn(heading, rendered)
 
     def test_inspector_explains_selected_generated_button_without_reparse(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opening = worker.input("hello")
             choice = next(
                 row

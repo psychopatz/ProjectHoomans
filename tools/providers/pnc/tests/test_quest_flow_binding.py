@@ -6,11 +6,12 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class QuestFlowBindingTests(unittest.TestCase):
+class QuestFlowBindingTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_quest_operations_are_generated_from_registered_metadata(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
 
         generation = catalog["generation"]
@@ -58,7 +59,7 @@ class QuestFlowBindingTests(unittest.TestCase):
             ("I want to turn in the supplies", "QUEST_TURN_IN", "rewarded",
              "UI_PNC_Conversation_Semantic_QuestRewarded"),
         )
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             for phrase, action, status, translation_key in phrases:
                 with self.subTest(phrase=phrase):
                     result = worker.input(phrase)
@@ -101,13 +102,13 @@ class QuestFlowBindingTests(unittest.TestCase):
                 },
             }}},
         )
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             preview = worker.preview("Can you help me?")
             first = worker.input("Can you help me?")
             repeated = worker.input("Can you help me?")
-        with LuaSemanticWorker(denied_scenario) as worker:
+        with self.warm_worker(denied_scenario) as worker:
             denied = worker.input("Can you help me?")
-        with LuaSemanticWorker(failed_scenario) as worker:
+        with self.warm_worker(failed_scenario) as worker:
             failed = worker.input("Can you help me?")
 
         self.assertTrue(preview["result"]["flow"]["generated"])
@@ -128,7 +129,7 @@ class QuestFlowBindingTests(unittest.TestCase):
 
     def test_quest_response_has_en_and_tl_fallbacks(self) -> None:
         scenario = merge(DEFAULT_SCENARIO, {"runtime": {"language": "TL"}})
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.input("Can you help me?")
         payload = result["messages"][0]["payload"]
         self.assertEqual(payload["translationKey"],
@@ -143,7 +144,7 @@ class QuestFlowBindingTests(unittest.TestCase):
         self,
     ) -> None:
         scenario = merge(DEFAULT_SCENARIO, {"runtime": {"mode": "multiplayer"}})
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             capabilities = worker.capabilities()
             self.assertIn("REPLAY_SEMANTIC_QUEST", capabilities["capabilities"])
 

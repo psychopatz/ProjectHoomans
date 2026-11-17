@@ -5,13 +5,13 @@ from __future__ import annotations
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SharedActorConversationServiceTests(unittest.TestCase):
+class SharedActorConversationServiceTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_real_worker_attaches_one_core_service_to_the_session(self) -> None:
         scenario = merge(DEFAULT_SCENARIO, {"npc": {"npcID": "mara"}})
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             first = worker.input("hello")
             second = worker.input("where do you live")
 
@@ -29,7 +29,7 @@ class SharedActorConversationServiceTests(unittest.TestCase):
         )
 
     def test_compound_turn_uses_the_same_actor_service_and_router(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             turn = worker.input("im fine, how about you")
 
         service = turn["actorConversation"]

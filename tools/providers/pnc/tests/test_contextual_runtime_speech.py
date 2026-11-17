@@ -6,12 +6,12 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualRuntimeSpeechTests(unittest.TestCase):
+class ContextualRuntimeSpeechTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_one_registry_exposes_domain_pack_families(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.persona_catalog()["speechRealization"]
 
         families = set(catalog["families"])
@@ -22,7 +22,7 @@ class ContextualRuntimeSpeechTests(unittest.TestCase):
             "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
             families,
         )
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             follow = worker.input("Follow me")
         self.assertEqual(
             follow["messages"][0]["payload"]["phraseFamilyID"],
@@ -42,7 +42,7 @@ class ContextualRuntimeSpeechTests(unittest.TestCase):
             "socialStyle": "friendly",
             "romanceStyle": "flirty",
         }
-        with LuaSemanticWorker(neutral) as worker:
+        with self.warm_worker(neutral) as worker:
             english = worker.input("Are you okay?")
             warm_response = worker.configure(warm)
             self.assertTrue(warm_response["ok"])
@@ -64,7 +64,7 @@ class ContextualRuntimeSpeechTests(unittest.TestCase):
         for language in ("EN", "TL"):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 responses[language] = worker.input("Are you okay?")
 
         en = responses["EN"]["observation"]["response"]

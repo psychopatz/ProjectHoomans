@@ -7,6 +7,7 @@ from copy import deepcopy
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def response_channel(response: dict) -> dict:
@@ -21,9 +22,9 @@ def open_orders(worker: LuaSemanticWorker) -> dict:
     return worker.suggestion_click(hub)
 
 
-class CompanionOrdersHubTests(unittest.TestCase):
+class CompanionOrdersHubTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_landing_has_one_orders_navigation_and_exclusive_initial_rows(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             channel = worker.conversation_projection()["presentation"]["responseChannel"]
             root_ids = {row["id"] for row in channel["rows"]}
@@ -63,7 +64,7 @@ class CompanionOrdersHubTests(unittest.TestCase):
             )
 
     def test_follow_and_wait_reproject_from_authoritative_command_state(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             orders = open_orders(worker)
             follow = next(row["frame"] for row in response_channel(orders)["rows"]
                           if row["id"] == "action.follow")
@@ -124,7 +125,7 @@ class CompanionOrdersHubTests(unittest.TestCase):
                 }
             },
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             orders = open_orders(worker)
             go_home = next(row["frame"]
                            for row in response_channel(orders)["rows"]

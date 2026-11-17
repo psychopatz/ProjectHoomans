@@ -19,9 +19,10 @@ from tools.semantic_harness.runtime.config import (
 from tools.semantic_harness.testing.runner import HarnessCase, detect_conflicts, run_case
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, load_scenario, merge, save_scenario
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SemanticHarnessTests(unittest.TestCase):
+class SemanticHarnessTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def message_text(result: dict) -> str:
         messages = result.get("messages", [])
@@ -31,7 +32,7 @@ class SemanticHarnessTests(unittest.TestCase):
         return payload.get("fallback") or payload.get("text") or ""
 
     def test_worker_loads_production_modules_and_parses_greeting(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello there")
         self.assertTrue(result["accepted"])
         self.assertEqual(result["result"]["decision"]["route"], "deterministic")
@@ -107,7 +108,7 @@ class SemanticHarnessTests(unittest.TestCase):
                 }
             },
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.input("do you have food")
 
         self.assertEqual(result["result"]["decision"]["branch"], "INVENTORY_QUERY_RECEIVED")
@@ -134,7 +135,7 @@ class SemanticHarnessTests(unittest.TestCase):
             "have you heard any rumors?",
         ):
             with self.subTest(utterance=utterance):
-                with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
                     result = worker.input(utterance)
 
                 semantic = result["result"]
@@ -163,7 +164,7 @@ class SemanticHarnessTests(unittest.TestCase):
         known_npc_scenario = merge({}, DEFAULT_SCENARIO)
         known_npc_scenario["npc"]["identityState"] = "known"
         known_npc_scenario["npc"]["forename"] = "Sarah"
-        with LuaSemanticWorker(known_npc_scenario) as worker:
+        with self.warm_worker(known_npc_scenario) as worker:
             named_news_query = worker.input("any news about Sarah?")
         named_semantic = named_news_query["result"]
         self.assertEqual(
@@ -183,7 +184,7 @@ class SemanticHarnessTests(unittest.TestCase):
             {call["label"] for call in named_news_query["toolCalls"]},
         )
 
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             new_item_query = worker.input("you got any new batteries")
         self.assertEqual(
             new_item_query["result"]["decision"]["branch"],
@@ -195,7 +196,7 @@ class SemanticHarnessTests(unittest.TestCase):
         )
 
     def test_gift_uses_editable_player_inventory_and_mutates_npc_projection(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             result = worker.input("here's an apple for you")
             snapshot = worker.snapshot()
 
@@ -222,7 +223,7 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertEqual(snapshot["scenario"]["npc"]["inventory"]["revision"], 2)
 
     def test_worker_can_restart_and_restore_the_current_scenario(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("hello")
             response = worker.restart()
             result = worker.input("hello")
@@ -234,7 +235,7 @@ class SemanticHarnessTests(unittest.TestCase):
             DEFAULT_SCENARIO,
             {"player": {"displayName": "SteamAlias"}},
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("what is your name")
             result = worker.input("I'm Patrick")
         self.assertTrue(result["accepted"])
@@ -263,7 +264,7 @@ class SemanticHarnessTests(unittest.TestCase):
             "call me Patrick",
         ):
             with self.subTest(phrase=phrase):
-                with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
                     worker.input("what is your name")
                     result = worker.input(phrase)
                 self.assertTrue(result["result"]["ir"]["socialContext"]["identityClaim"])
@@ -281,7 +282,7 @@ class SemanticHarnessTests(unittest.TestCase):
                 }
             },
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("what is your name")
             result = worker.input("im psycho")
         identity_claim = result["result"]["ir"]["slots"]["identityClaim"]
@@ -306,7 +307,7 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertEqual(identity_result["memoryType"], "identity_introduction")
 
     def test_false_name_does_not_disclose_npc_name(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("what is your name")
             result = worker.input("I'm Patricia")
         self.assertEqual(result["relationshipAfter"]["identityTrust"], "untrustworthy")
@@ -321,7 +322,7 @@ class SemanticHarnessTests(unittest.TestCase):
         ))
 
     def test_topic_change_after_name_question_preserves_pending_exchange(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("what is your name")
             result = worker.input("I'm starving")
             follow_up = worker.input("what is your name")
@@ -341,7 +342,7 @@ class SemanticHarnessTests(unittest.TestCase):
         )
 
     def test_self_reflection_is_not_an_insult_and_directed_insult_is(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             self_mockery = worker.input("I'm an idiot")
             directed = worker.input("you are an idiot")
         self.assertEqual(
@@ -353,7 +354,7 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertEqual(directed["result"]["ir"]["subject"], "RECIPIENT")
 
     def test_self_blame_stays_self_directed(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             result = worker.input("it was my fault")
         self.assertEqual(result["result"]["decision"]["branch"], "SELF_REFLECTION_RECEIVED")
         self.assertEqual(
@@ -370,9 +371,9 @@ class SemanticHarnessTests(unittest.TestCase):
             DEFAULT_SCENARIO,
             {"npc": {"traits": {"reserved": True}}},
         )
-        with LuaSemanticWorker(friendly) as worker:
+        with self.warm_worker(friendly) as worker:
             friendly_result = worker.input("I'm an idiot")
-        with LuaSemanticWorker(reserved) as worker:
+        with self.warm_worker(reserved) as worker:
             reserved_result = worker.input("I'm an idiot")
         self.assertIn("matter", self.message_text(friendly_result).lower())
         self.assertIn(
@@ -380,7 +381,7 @@ class SemanticHarnessTests(unittest.TestCase):
         )
 
     def test_first_person_state_is_not_identity_claim(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             result = worker.input("I'm starving")
         ir = result["result"]["ir"]
         self.assertFalse(ir.get("socialContext", {}).get("identityClaim", False))
@@ -388,7 +389,7 @@ class SemanticHarnessTests(unittest.TestCase):
 
     def test_real_tagalog_tool_catalog_and_live_language_switch(self) -> None:
         scenario = merge(DEFAULT_SCENARIO, {"runtime": {"language": "TL"}})
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             name_reply = worker.tool_result_speech(
                 [{"name": "ask_name", "accepted": True}],
                 {"npc_name": "Mara Vale"},
@@ -419,7 +420,7 @@ class SemanticHarnessTests(unittest.TestCase):
 
     def test_tagalog_identity_exchange_uses_canonical_npc_translation(self) -> None:
         scenario = merge(DEFAULT_SCENARIO, {"runtime": {"language": "TL"}})
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("what is your name")
             result = worker.input("I'm Patrick")
         payload = result["messages"][0]["payload"]
@@ -450,11 +451,11 @@ class SemanticHarnessTests(unittest.TestCase):
                 },
             },
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             initial = worker.input("what is your name")
             worker.input("I'm Patricia")
             wary = worker.input("what is your name")
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             reflection = worker.input("I'm an idiot")
         initial_payload = initial["messages"][0]["payload"]
         self.assertTrue(initial_payload["translationKey"].startswith(
@@ -473,7 +474,7 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertIn("sarili", reflection["messages"][0]["payload"]["text"].lower())
 
     def test_action_boundary_uses_configurable_mock_and_reports_tools(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             result = worker.input("let's camp here")
         self.assertTrue(any(
             call["name"] == "camp"
@@ -491,7 +492,7 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertNotIn("to in", text)
 
     def test_worker_reports_grounded_module_manifest_and_translation_state(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             capabilities = worker.capabilities()
         manifest_paths = [item["path"] for item in capabilities["moduleManifest"]]
         self.assertIn(

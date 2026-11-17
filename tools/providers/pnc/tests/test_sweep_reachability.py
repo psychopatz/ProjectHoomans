@@ -6,7 +6,7 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.testing.sweep_reachability import (
     REACHABILITY_SCHEMA_V1,
     ObservedVariantLedger,
@@ -19,7 +19,7 @@ from tools.semantic_harness.testing.sweep_reachability import (
 )
 
 
-class SweepReachabilityTests(unittest.TestCase):
+class SweepReachabilityTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_reachability_states_and_never_overclaiming_unreachable(self) -> None:
         rec = VariantReachabilityRecord(
             pool_id="pool_1",
@@ -64,7 +64,7 @@ class SweepReachabilityTests(unittest.TestCase):
 
     def test_real_lua_reachability_analysis(self) -> None:
         """Integration with real LuaSemanticWorker verifying production selector explain."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             analyzer = ReachabilityAnalyzer(worker)
 
             # Mock evidence row where semantic.accept.default was selected
@@ -106,7 +106,7 @@ class SweepReachabilityTests(unittest.TestCase):
 
     def test_full_response_pool_pagination(self) -> None:
         """Verify that ReachabilityAnalyzer paginates the entire production pool registry."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             analyzer = ReachabilityAnalyzer(worker)
             pools, prod_total, is_complete = analyzer.enumerate_all_response_pools(worker)
             self.assertGreaterEqual(prod_total, 200)
@@ -166,7 +166,7 @@ class SweepReachabilityTests(unittest.TestCase):
 
     def test_condition_guided_frontier_search_reaches_unobserved_variants(self) -> None:
         """Verify that condition-guided search uses failed checks to reach unobserved variants."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             analyzer = ReachabilityAnalyzer(worker)
 
             # Analyze pool semantic.flow.farewell where initially no rows exist
@@ -191,7 +191,7 @@ class SweepReachabilityTests(unittest.TestCase):
 
     def test_genuine_eligible_not_selected_variant(self) -> None:
         """Verify a genuine ELIGIBLE_NOT_SELECTED variant where candidate is eligible but another variant wins."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             # Under empty context, semantic.combat.human_kill.aggressive has 3 eligible variants, but line_02 wins tiebreak
             exp = worker.explain_response_selection("semantic.combat.human_kill.aggressive", {})
             self.assertTrue(exp.get("ok"))
@@ -221,7 +221,7 @@ class SweepReachabilityTests(unittest.TestCase):
 
     def test_find_frontier_targets(self) -> None:
         """Verify find_frontier_targets discovers unobserved variants with reachable contexts."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             ledger = ObservedVariantLedger()
             # Only record default
             ledger.entries["semantic.flow.farewell.default"] = True

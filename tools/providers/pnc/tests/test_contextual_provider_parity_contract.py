@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def provider_scenario(enabled: bool) -> dict:
@@ -27,7 +27,7 @@ def provider_scenario(enabled: bool) -> dict:
     )
 
 
-class ContextualProviderParityContractTests(unittest.TestCase):
+class ContextualProviderParityContractTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_provider_enabled_reuses_the_same_contextual_plan_and_effects(self) -> None:
         phrases = (
             "Are you okay?",
@@ -40,7 +40,7 @@ class ContextualProviderParityContractTests(unittest.TestCase):
         )
         turns: dict[str, list[dict]] = {}
         for label, enabled in (("offline", False), ("provider", True)):
-            with LuaSemanticWorker(provider_scenario(enabled)) as worker:
+            with self.warm_worker(provider_scenario(enabled)) as worker:
                 turns[label] = [worker.input(phrase) for phrase in phrases]
 
         for offline, provider in zip(turns["offline"], turns["provider"]):
@@ -57,9 +57,9 @@ class ContextualProviderParityContractTests(unittest.TestCase):
             self.assertEqual(provider["llmCalls"], 0)
 
     def test_provider_rejection_falls_back_without_authority_or_effects(self) -> None:
-        with LuaSemanticWorker(provider_scenario(False)) as offline_worker:
+        with self.warm_worker(provider_scenario(False)) as offline_worker:
             offline = offline_worker.input("this sentence is not authored")
-        with LuaSemanticWorker(provider_scenario(True)) as provider_worker:
+        with self.warm_worker(provider_scenario(True)) as provider_worker:
             provider = provider_worker.input("this sentence is not authored")
 
         self.assertEqual(offline["result"]["ir"], provider["result"]["ir"])

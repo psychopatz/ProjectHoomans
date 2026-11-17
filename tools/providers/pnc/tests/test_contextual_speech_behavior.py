@@ -6,10 +6,10 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualSpeechBehaviorTests(unittest.TestCase):
+class ContextualSpeechBehaviorTests(WarmWorkerTestMixin, unittest.TestCase):
     def _scenario(self, style: str, bond: str | None = None) -> dict:
         scenario = deepcopy(DEFAULT_SCENARIO)
         npc = scenario["npc"]
@@ -78,7 +78,7 @@ class ContextualSpeechBehaviorTests(unittest.TestCase):
         return scenario
 
     def _turn(self, scenario: dict, text: str, language: str = "EN") -> dict:
-        with LuaSemanticWorker(deepcopy(scenario)) as worker:
+        with self.warm_worker(deepcopy(scenario)) as worker:
             if language != "EN":
                 worker.set_language(language)
             if text == "sorry":
@@ -170,7 +170,7 @@ class ContextualSpeechBehaviorTests(unittest.TestCase):
         self.assertIn("Nanay", tagalog_q["text"])
 
     def test_production_catalog_exposes_machine_readable_realization_coverage(self) -> None:
-        with LuaSemanticWorker(self._scenario("neutral")) as worker:
+        with self.warm_worker(self._scenario("neutral")) as worker:
             catalog = worker.persona_catalog()
         coverage = catalog["speechRealization"]["coverage"]
         families = set(catalog["speechRealization"]["families"])
@@ -184,7 +184,7 @@ class ContextualSpeechBehaviorTests(unittest.TestCase):
             "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
             families,
         )
-        with LuaSemanticWorker(self._scenario("friendly")) as worker:
+        with self.warm_worker(self._scenario("friendly")) as worker:
             follow = worker.input("Follow me")
         payload = follow["messages"][0]["payload"]
         self.assertEqual(

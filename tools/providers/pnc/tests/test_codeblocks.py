@@ -14,15 +14,15 @@ from tools.semantic_harness.codebuilder.codeblocks import (
 )
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
 
 
-class CodeBlockRoundTripTests(unittest.TestCase):
+class CodeBlockRoundTripTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_generated_flow_round_trips_typed_result_edges_and_lua_validation(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
             follow = next(
                 flow for flow in catalog["flows"]
@@ -52,7 +52,7 @@ class CodeBlockRoundTripTests(unittest.TestCase):
         self.assertEqual(result["writes"], [])
 
     def test_authored_flow_round_trips_special_targets_and_connections(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
         greeting = next(flow for flow in catalog["flows"] if flow["id"] == "greeting")
         document = flow_to_codeblocks(greeting)
@@ -68,7 +68,7 @@ class CodeBlockRoundTripTests(unittest.TestCase):
         self.assertEqual(result["flow"]["nodes"], greeting["nodes"])
 
     def test_invalid_typed_edge_and_nested_reference_fail_without_writes(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
         greeting = next(flow for flow in catalog["flows"] if flow["id"] == "greeting")
         document = flow_to_codeblocks(greeting)
@@ -86,7 +86,7 @@ class CodeBlockRoundTripTests(unittest.TestCase):
 
     def test_headless_service_validates_saved_codeblock_source(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             greeting = next(flow for flow in worker.flow_catalog()["flows"] if flow["id"] == "greeting")
         document = flow_to_codeblocks(greeting)
         with tempfile.TemporaryDirectory() as directory:

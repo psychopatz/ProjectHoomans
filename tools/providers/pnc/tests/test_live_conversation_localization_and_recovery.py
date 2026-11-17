@@ -6,7 +6,7 @@ from pathlib import Path
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REAL_SAVE = Path(
@@ -17,11 +17,11 @@ DANA_NPC_ID = "npcDanapatz_Y5KK"
 
 
 @unittest.skipUnless(REAL_SAVE.is_file(), "local Dana save unavailable")
-class LiveRegressionL5Tests(unittest.TestCase):
+class LiveRegressionL5Tests(WarmWorkerTestMixin, unittest.TestCase):
     def test_dana_live_regression_full_visible_chain(self) -> None:
         source_hash = hashlib.sha256(REAL_SAVE.read_bytes()).digest()
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(
                 REAL_SAVE,
                 npc_id=DANA_NPC_ID,
@@ -146,7 +146,7 @@ class LiveRegressionL5Tests(unittest.TestCase):
         for language in ("EN", "TL"):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 worker.open_conversation()
                 turn = worker.input("fuckyouuuu")
 

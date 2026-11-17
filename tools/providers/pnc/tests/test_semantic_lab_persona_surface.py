@@ -8,13 +8,13 @@ import unittest
 
 from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 
 
-class SemanticLabPersonaSurfaceTests(unittest.TestCase):
+class SemanticLabPersonaSurfaceTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_catalog_reads_registered_traits_and_social_profile_dimensions(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.persona_catalog()
 
         self.assertEqual(catalog["schema"], "semantic.persona.catalog.v1")
@@ -71,7 +71,7 @@ class SemanticLabPersonaSurfaceTests(unittest.TestCase):
         }
         guarded["npc"]["activeBehavior"] = "hostile"
 
-        with LuaSemanticWorker(baseline) as worker:
+        with self.warm_worker(baseline) as worker:
             original = deepcopy(worker.scenario)
             matrix = worker.context_matrix(
                 [baseline, warm, guarded], text="hello", maximum=3
@@ -99,7 +99,7 @@ class SemanticLabPersonaSurfaceTests(unittest.TestCase):
             self.assertNotIn("jealousyStyle", personality)
 
     def test_inspector_exposes_choice_realization_and_replay_trace(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             record = worker.input("hello")
 
         view = build_conversation_inspector(record)

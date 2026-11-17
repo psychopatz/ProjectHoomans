@@ -11,7 +11,7 @@ from copy import deepcopy
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.shell import (
     SemanticHarnessApp,
     semantic_hub_diagnostic_projection,
@@ -80,9 +80,9 @@ def _conversation_graph(graph_id: str) -> dict:
     }
 
 
-class HubDiagnosticsGraphHistoryTests(SemanticLabGuiTestCase):
+class HubDiagnosticsGraphHistoryTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def test_real_worker_hub_projection_has_safe_provider_owned_diagnostics(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             response = worker.input("What's up?")
         suggestions = response["observation"]["suggestions"]
         diagnostics = semantic_hub_diagnostic_projection(suggestions)

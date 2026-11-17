@@ -16,14 +16,14 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
 )
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
-class InteractionDialogueContentEditingContractTests(unittest.TestCase):
+class InteractionDialogueContentEditingContractTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_behaviors_reference_dialogue_content_not_response_pools(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
         behaviors = {item["id"]: item for item in model["behaviors"]}
@@ -197,7 +197,7 @@ class InteractionDialogueContentEditingContractTests(unittest.TestCase):
             "confidence": 0.85,
             "forgiveness": 0.8,
         }
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             result = worker.input("fuck ypuuuu")
 
         decision = result["result"]["decision"]

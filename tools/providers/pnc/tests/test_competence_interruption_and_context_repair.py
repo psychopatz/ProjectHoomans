@@ -6,10 +6,10 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class InterruptionAndContextRepairTests(unittest.TestCase):
+class InterruptionAndContextRepairTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]
@@ -38,7 +38,7 @@ class InterruptionAndContextRepairTests(unittest.TestCase):
             }
         }
 
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             residence = worker.input("where is your home")
             residence_follow_up = worker.input("what about it")
             safety = worker.input("is it safe there")
@@ -115,7 +115,7 @@ class InterruptionAndContextRepairTests(unittest.TestCase):
         for key in ("healthState", "bodyHealth", "hpCurrent", "hpMax"):
             scenario["npc"][key] = None
 
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             direct = worker.input("are you hurt")
             follow_up = worker.input("does it still hurt")
             second_follow_up = worker.input("what about that")
@@ -157,7 +157,7 @@ class InterruptionAndContextRepairTests(unittest.TestCase):
         )
 
     def test_unresolved_reference_is_recognized_without_inventing_a_fact(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("what about it")
 
         self.assertTrue(turn["accepted"], turn.get("reason"))
@@ -175,7 +175,7 @@ class InterruptionAndContextRepairTests(unittest.TestCase):
         self.assertNotIn("npc.", self.message_text(turn).lower())
 
     def test_needs_commitment_survives_topic_switch_without_dispatch(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             needs = worker.input("do you need anything")
             quantity = worker.input("how many")
             promise = worker.input("i will get some")
@@ -226,7 +226,7 @@ class InterruptionAndContextRepairTests(unittest.TestCase):
     def test_participant_context_isolation_and_preview_are_effect_free(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["residence"] = {"label": "Riverside Camp"}
-        with LuaSemanticWorker(scenario) as first:
+        with self.warm_worker(scenario) as first:
             first.input("where is your home")
             first_reference = first.input("what about it")
             before = first.snapshot()
@@ -235,7 +235,7 @@ class InterruptionAndContextRepairTests(unittest.TestCase):
             first.set_language("TL")
             tl_turn = first.input("is it safe there")
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as second:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as second:
             second_reference = second.input("what about it")
 
         self.assertIn("Riverside Camp", self.message_text(first_reference))

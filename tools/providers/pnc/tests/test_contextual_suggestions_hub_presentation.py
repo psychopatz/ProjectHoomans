@@ -7,9 +7,10 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualSuggestionsHubPresentationTests(unittest.TestCase):
+class ContextualSuggestionsHubPresentationTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def _hub_candidates(suggestions: dict) -> dict[str, dict]:
         group = next(
@@ -31,8 +32,7 @@ class ContextualSuggestionsHubPresentationTests(unittest.TestCase):
         return self._hub_candidates(suggestions)
 
     def test_rejected_stale_click_does_not_suppress_hub_choice(self) -> None:
-        worker = LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO))
-        try:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             initial = self._whats_up(worker)
             stale_frame = deepcopy(initial["question.wellbeing"]["frame"])
 
@@ -44,8 +44,6 @@ class ContextualSuggestionsHubPresentationTests(unittest.TestCase):
 
             current = self._whats_up(worker)
             self.assertIn("question.wellbeing", current)
-        finally:
-            worker.close()
 
 
 if __name__ == "__main__":

@@ -4,12 +4,12 @@ import os
 import unittest
 from tools.semantic_harness.inspection.response_translation_coverage import translation_coverage
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class TranslationManifestTests(unittest.TestCase):
+class TranslationManifestTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_generated_key_has_one_owner_in_every_manifest_locale(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             report = translation_coverage(worker, "semantic.question.backstory.ambiguous")
         self.assertTrue(report["ok"])
         self.assertEqual(report["summary"]["ALL_MANIFESTED"], 1)
@@ -24,7 +24,7 @@ class TranslationManifestTests(unittest.TestCase):
         self.assertEqual(report["writes"], 0)
 
     def test_authored_fallback_pool_is_not_falsely_claimed_untranslated(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             report = translation_coverage(worker, "semantic.flow.greeting.opening")
             self.assertEqual(report["variantCount"], 3)
             self.assertEqual(
@@ -36,13 +36,13 @@ class TranslationManifestTests(unittest.TestCase):
 
     def test_unknown_pool_remains_error(self):
         from tools.semantic_harness.transport.process import HarnessError
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             with self.assertRaises(HarnessError):
                 translation_coverage(worker, "not.a.real.registered.pool")
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "visible Tk needs Xvfb")
-class TranslationManifestTkTests(unittest.TestCase):
+class TranslationManifestTkTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_studio_uses_same_read_only_translation_service(self):
         import tkinter as tk
         from tkinter import ttk
@@ -51,7 +51,7 @@ class TranslationManifestTkTests(unittest.TestCase):
         root = tk.Tk()
         root.withdraw()
         try:
-            with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            with self.warm_worker(DEFAULT_SCENARIO) as worker:
                 def run(operation, callback):
                     callback(operation(worker))
                     return True

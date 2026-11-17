@@ -2,13 +2,13 @@
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.transport.process import HarnessError
 
 
-class ResponseObservatoryTests(unittest.TestCase):
+class ResponseObservatoryTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_loaded_registry_detail_is_bounded_and_read_only(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             listing = worker.flow_catalog()["responsePoolCatalog"]
             self.assertTrue(listing)
             entry = next(row for row in listing if row["variantCount"] > 0)
@@ -36,7 +36,7 @@ class ResponseObservatoryTests(unittest.TestCase):
 
 
     def test_production_registration_origin_differs_from_generated_owner(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             authored = worker.response_pool_detail(
                 "semantic.flow.greeting.opening", limit=16)
             self.assertEqual(authored["sourceKind"], "AUTHORED_LUA")
@@ -66,7 +66,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             inspect_response_turn,
         )
         from tools.providers.pnc.runtime.scenario import merge
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             opening = inspect_response_turn(worker, worker.input("hello"))
             first = opening["npcMessages"][0]
             self.assertEqual(first["selectedVariantID"],
@@ -104,7 +104,7 @@ class ResponseObservatoryTests(unittest.TestCase):
                 {"label": "friendly in rain", "context": {"npcID": "obs-both", "socialStyle": "friendly", "worldContext": {"weather": {"raining": True}}}},
             ],
         }
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             before = worker.explain_response_selection(
                 "semantic.flow.greeting.opening",
                 {"npcID": "history-proof", "socialStyle": "friendly"}, "constant")
@@ -132,7 +132,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             "friendly": (2, 1),
             "rain": (2, 2),
         })
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             only_rain = selection_coverage(worker, {
                 "poolID": "semantic.flow.greeting.opening",
                 "cases": [{"context": {
@@ -151,7 +151,7 @@ class ResponseObservatoryTests(unittest.TestCase):
         from tools.semantic_harness.inspection.response_selection_coverage import (
             selection_coverage,
         )
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             with self.assertRaisesRegex(ValueError, "1 to 16"):
                 selection_coverage(worker, {
                     "poolID": "semantic.flow.greeting.opening",
@@ -164,7 +164,7 @@ class ResponseObservatoryTests(unittest.TestCase):
                 })
 
     def test_lookup_does_not_mutate_real_worker_actor_state(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             before = worker.inspect_actor_state()
             for _ in range(3):
                 worker.response_key_lookup(
@@ -176,7 +176,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             self.assertEqual(before, after)
 
     def test_pool_list_paging_and_invalid_limit(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             a = worker.response_pool_list(filter="greeting", limit=2)
             b = worker.response_pool_list(filter="greeting", offset=2, limit=2)
             self.assertTrue(a["ok"])
@@ -191,7 +191,7 @@ class ResponseObservatoryTests(unittest.TestCase):
     def test_explain_parity_and_read_only_repeat_history(self):
         pool = "semantic.question.wellbeing"
         context = {"npcID": "observatory-parity-test", "healthState": "healthy"}
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             first = worker.explain_response_selection(pool, context, "seed")
             again = worker.explain_response_selection(pool, context, "seed")
             self.assertEqual(first["selectedID"], again["selectedID"])
@@ -210,7 +210,7 @@ class ResponseObservatoryTests(unittest.TestCase):
 
     def test_weather_and_unknown_npc_facts_are_not_invented(self):
         pool = "semantic.flow.greeting.opening"
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             rain = worker.explain_response_selection(pool, {
                 "npcID": "obs-rain", "worldContext": {
                     "weather": {"raining": True}}}, "x")
@@ -226,7 +226,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             self.assertFalse(blocked["checks"][0]["actualKnown"])
 
     def test_explain_does_not_mutate_actor_fixture(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             before = worker.inspect_actor_state()
             for _ in range(4):
                 worker.explain_response_selection(

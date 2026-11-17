@@ -13,15 +13,15 @@ from copy import deepcopy
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.core.activity import ActivityLog
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualBondCatalogRuntimeTests(SemanticLabGuiTestCase):
+class ContextualBondCatalogRuntimeTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def test_normal_relationship_catalog_matches_current_producers(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             persona = worker.persona_catalog()
             controls = worker.simulation_control_catalog()
 
@@ -43,7 +43,7 @@ class ContextualBondCatalogRuntimeTests(SemanticLabGuiTestCase):
         )
 
     def test_catalog_declares_the_four_actor_centric_workbench_panels(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             controls = worker.simulation_control_catalog()["controls"]
 
         workbench = [row for row in controls if row.get("workbench") is True]

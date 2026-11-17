@@ -8,12 +8,12 @@ from tools.semantic_harness.inspection.response_source_lineage import (
     inspect_codebuilder_lineage,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
+class ObservatoryCodeBuilderLineageTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_generated_dialogue_variant_is_verified_but_pool_can_be_mixed(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             report = inspect_codebuilder_lineage(worker, "semantic.accept")
             self.assertTrue(report["ok"])
             self.assertGreater(report["verifiedVariantCount"], 0)
@@ -33,7 +33,7 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
             self.assertEqual(report["writes"], 0)
 
     def test_convo_engine_flow_variants_report_verified_sources(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             report = inspect_codebuilder_lineage(worker, "semantic.flow.greeting.opening")
         self.assertTrue(report["ok"])
         self.assertTrue(report["fullPoolCanonicalOwnershipVerified"])
@@ -69,7 +69,7 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
             return result
 
         service.preview_convo_engine_document = tampered_preview
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             report = inspect_codebuilder_lineage(
                 worker, "semantic.accept", authoring_service=service)
         owned = {row["variantID"]: row for row in report["sourceOwners"]}
@@ -78,7 +78,7 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
         self.assertEqual(report["writes"], 0)
 
     def test_directly_authored_lua_is_not_misclassified_as_codebuilder_source(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             report = inspect_codebuilder_lineage(
                 worker, "semantic.authored.follow")
         self.assertEqual(report["verifiedVariantCount"], 0)
@@ -88,7 +88,7 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "visible Tk needs X11/Xvfb")
-class ObservatoryLineageTkTests(unittest.TestCase):
+class ObservatoryLineageTkTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_gui_review_displays_verified_and_unknown_owners(self):
         import tkinter as tk
         from tkinter import ttk
@@ -99,7 +99,7 @@ class ObservatoryLineageTkTests(unittest.TestCase):
         root = tk.Tk()
         root.withdraw()
         try:
-            with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            with self.warm_worker(DEFAULT_SCENARIO) as worker:
                 def synchronous(operation, callback):
                     callback(operation(worker))
                     return True

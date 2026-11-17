@@ -6,12 +6,12 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SemanticInteractionLifecycleAcceptanceTests(unittest.TestCase):
+class SemanticInteractionLifecycleAcceptanceTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_registered_gestures_and_grounded_events_use_one_envelope(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             gestures = (
                 "wavehi",
                 "wavebye",
@@ -59,7 +59,7 @@ class SemanticInteractionLifecycleAcceptanceTests(unittest.TestCase):
         self.assertEqual(grounded["act"], "REACT")
 
     def test_worker_snapshot_exposes_bounded_window_and_source_boundary(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             source_before = deepcopy(worker.source_snapshot.to_dict())
             speech = worker.interaction_npc_speech(
                 {
@@ -106,7 +106,7 @@ class SemanticInteractionLifecycleAcceptanceTests(unittest.TestCase):
             )
 
     def test_export_import_preserves_compact_semantic_state_only(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.interaction_npc_speech(
                 {
                     "npcID": "npc_mara",
@@ -131,7 +131,7 @@ class SemanticInteractionLifecycleAcceptanceTests(unittest.TestCase):
             self.assertEqual(window["status"], "ACTIVE")
 
     def test_compaction_removes_resolved_trivial_pair_capsule(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.interaction_npc_speech(
                 {
                     "npcID": "npc_mara",
@@ -154,7 +154,7 @@ class SemanticInteractionLifecycleAcceptanceTests(unittest.TestCase):
         self.assertEqual(metrics["pairRecords"], 0)
 
     def test_residue_and_realization_history_remain_lazy_and_bounded(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             for index in range(24):
                 worker.interaction_apply(
                     {

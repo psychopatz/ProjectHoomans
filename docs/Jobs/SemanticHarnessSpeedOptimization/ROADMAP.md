@@ -1,7 +1,7 @@
 # Roadmap — Semantic Harness Speed & Runtime Optimization (`P1`–`P5`)
 
 **Parent status:** IN PROGRESS.
-**Active phase:** `P4`.
+**Active phase:** `P5`.
 **Completion boundary:** `P1`–`P5` accepted and committed cleanly across participant (`psychopatzCore`) and primary (`ProjectHoomans`).
 
 ## Global Rules
@@ -81,21 +81,21 @@
 
 ---
 
-## P4 — CodeBuilder Compilation Cache, Batch Reuse & Heavy Imperative Suite Acceleration
+## P4 — CodeBuilder Compilation Cache, Batch Reuse & Heavy Imperative Suite Acceleration (`DONE`)
 
-**Goal:** Remove repeated canonical source recompilations and per-item worker churn in CodeBuilder, Observatory, Sweep Executor, and slow imperative test modules.
+**Goal:** Remove repeated canonical source recompilations and per-item worker churn in CodeBuilder, Observatory, Sweep Executor, GUI Studio initialization, and slow imperative test modules, while adding live-flushed compact test runners and deterministic Tk/worker cleanup.
 
 ### Targets
-- `psychopatzCore/tools/semantic_harness/codebuilder/conversation_compiler.py` & `service.py`:
-  - Add a thread-safe mtime/fingerprint-keyed in-process cache for read-only `compile_conversation_sources` calls (with clean invalidation whenever underlying source roots or file mtimes change) so repeated CLI/service/test queries do not re-parse 500+ JSON files (`test_dataset_compiler_and_workflow.py` `30.65 s -> <= 6 s`).
-- `psychopatzCore/tools/semantic_harness/testing/sweep_batch.py`, `sweep_service.py`, `inspection/response_observatory.py`, `inspection/response_candidate.py`:
-  - Reuse a warm worker across cases/variants inside `SweepBatchExecutor`, `DialogueQualitySweepService`, `run_quality_matrix`, and `preview_authored_variant` instead of spawning 1–5 workers per item/metadata query.
-- Heavy imperative test suites in `psychopatzCore/tools/semantic_harness/tests/` and `ProjectHoomans/tools/providers/pnc/tests/`:
-  - Provide a clean, deterministic warm-worker reuse helper (with explicit process teardown at class/module/process exit) and adopt it in the slowest multi-case imperative loops (e.g., `test_contextual_social_reactions.py`, `test_response_observatory_matrix.py`, `test_sweep_acceptance.py`, `test_contextual_talk_parity.py`, `test_harness.py`) without altering any test assertions or weakening mechanism coverage of lifecycle/process-restart tests.
+- `psychopatzCore/tools/semantic_harness/codebuilder/{conversation_compiler.py,conversation_model.py,psdl_compiler.py,convo_engine_exchange.py,semantic_dialogue_ir.py,blocks.py,convo_engine_psdl_inventory.py,convo_engine_ownership_inventory.py,lexicon_compiler.py,dialogue_content.py,reconcile.py,convo_probe.py,service.py}`:
+  - Add thread-safe mtime/fingerprint-keyed in-process cache for `compile_conversation_sources` (`_COMPILE_CACHE_LOCK` + `_MODEL_CACHE_LOCK` in `compiler_probes.py`), replace JSON `deepcopy` hot paths with recursive `copy_json`, use string-prefix path slicing, fast `_lua_string`/`_lua_value`, skip clean `reconcile_apply` Step 4 rebuilds, and add `SemanticLabAuthoringService.close()` + `ConvoProbe.close()` `atexit.unregister`.
+- `psychopatzCore/tools/semantic_harness/testing/{sweep_batch.py,sweep_service.py,executor.py,cli.py,compact_unittest.py,acceptance.py}`, `inspection/{response_observatory.py,response_candidate.py}`, and `ProjectHoomans/tests/run_tests.py`:
+  - Reuse warm workers across cases/variants in `SweepBatchExecutor`, `DialogueQualitySweepService`, `run_quality_matrix`, and `preview_authored_variant`, add live-flushed compact progress output (`cli.py`, `compact_unittest.py` with `--jobs` GUI shard isolation + `close_all_warm_workers()` reaper, and `run_tests.py --suite {lua,python,all}`).
+- `psychopatzCore/tools/semantic_harness/{ui/{app_initializer.py,lifecycle_controller.py,quality_sweep_controller.py,shell.py,studio_surface_builder.py},studio/{convo_engine_authoring_pane.py,block_registry.py}}`, `ProjectHoomans/tools/providers/pnc/lua/worker/ScenarioSession_Lifecycle.lua`, and `ProjectHoomans/tools/providers/pnc/tests/{worker_reuse.py,gui_test_support.py,...}`:
+  - Fix `XMODIFIERS=@im=none` X11 XIM deadlock on `DISPLAY=:0`, join background sweep threads on `close_app`, clear `Runtime.view = nil` on `replaceProductionDurableState == true`, defer Studio `ConvoEngineAuthoringPane` & `SemanticBlockRegistryPane` population until tab activation, overlap `_start_worker()` with `_build_deferred_studio_editors()`, and adopt process-shared `WarmWorkerTestMixin` across multi-spawn PNC suites.
 
 ### P4 Acceptance Gate
-- Core full unittest discovery (`277` tests) passes in `<= 60 s`.
-- PNC full unittest discovery (`702` tests) passes in `<= 300 s` (and faster with `run_tests.py --jobs 4`) with `0` leaked Lua workers and `0` Tkinter cleanup errors.
+- Core full unittest discovery (`63` modules / `283` tests) passes in `<= 60 s` (observed: `49.256 s`).
+- PNC full unittest discovery (`171` modules / `700` tests) passes in `<= 300 s` serial (`294.330 s`; `146.141 s` with `run_tests.py --suite python --jobs 4`) with `0` leaked Lua workers and `0` Tkinter cleanup errors.
 - Local phase commits succeed (`psychopatzCore` first, then `ProjectHoomans`).
 
 ---

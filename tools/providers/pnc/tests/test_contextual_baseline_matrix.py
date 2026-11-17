@@ -10,10 +10,10 @@ import unittest
 
 from tools.semantic_harness.testing.runner import HarnessCase, run_case
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualBaselineMatrixTests(unittest.TestCase):
+class ContextualBaselineMatrixTests(WarmWorkerTestMixin, unittest.TestCase):
     def assert_one_turn_contract(self, turn: dict, *, intent: str,
                                  subject: str | None, pattern: str,
                                  response_prefix: str) -> dict:
@@ -77,7 +77,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         )
         for label, override, text, intent, subject, pattern, response in cases:
             with self.subTest(case=label):
-                with LuaSemanticWorker(merge(DEFAULT_SCENARIO, override)) as worker:
+                with self.warm_worker(merge(DEFAULT_SCENARIO, override)) as worker:
                     turn = worker.input(text)
                 self.assert_one_turn_contract(
                     turn,
@@ -205,7 +205,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
                 "conditionStats": {},
             },
         })
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             first = worker.input("Are you okay?")
             before = worker.snapshot()
             preview_one = worker.preview("What is wrong?")

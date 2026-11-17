@@ -6,11 +6,11 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 
 
-class ContextualBondsTests(unittest.TestCase):
+class ContextualBondsTests(WarmWorkerTestMixin, unittest.TestCase):
     def _scenario(
         self,
         kind: str,
@@ -36,7 +36,7 @@ class ContextualBondsTests(unittest.TestCase):
         return scenario
 
     def _context(self, scenario: dict) -> tuple[dict, dict]:
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             turn = worker.input("hello")
             return (
                 turn["contextAfter"]["actorConversationContext"],
@@ -52,7 +52,7 @@ class ContextualBondsTests(unittest.TestCase):
             "sister": "family",
             "brother": "family",
         }
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.persona_catalog()
         classes = {row["kind"]: row["class"] for row in catalog["relationshipKinds"]}
         for kind, bond_class in expected.items():
@@ -165,7 +165,7 @@ class ContextualBondsTests(unittest.TestCase):
     def test_relationship_terms_are_language_localized_without_changing_kind_or_keys(self) -> None:
         en_context, _ = self._context(self._scenario("mother", language="EN"))
         tl_context, _ = self._context(self._scenario("mother", language="TL"))
-        with LuaSemanticWorker(self._scenario("mother", language="EN")) as worker:
+        with self.warm_worker(self._scenario("mother", language="EN")) as worker:
             en_row = next(
                 row for row in worker.persona_catalog()["relationshipKinds"]
                 if row["kind"] == "mother"
@@ -187,24 +187,27 @@ class ContextualBondsTests(unittest.TestCase):
 
     def test_future_family_subtype_uses_registry_and_family_projection(self) -> None:
         scenario = self._scenario("grandmother", language="TL")
-        with LuaSemanticWorker(scenario) as worker:
-            catalog = worker.persona_catalog(
-                {
-                    "kind": "grandmother",
-                    "class": "family",
-                    "termKeys": {
-                        "reference": "UI_PNC_SemanticAddressing_RelationshipTerm_Grandmother_Reference",
-                        "address": "UI_PNC_SemanticAddressing_RelationshipTerm_Grandmother_Address",
-                    },
-                }
-            )
-            turn = worker.input("hello")
-            snapshot = worker.snapshot()
-            row = next(
-                row for row in catalog["relationshipKinds"]
-                if row["kind"] == "grandmother"
-            )
-            bond = turn["contextAfter"]["actorConversationContext"]["bond"]
+        try:
+            with self.warm_worker(scenario) as worker:
+                catalog = worker.persona_catalog(
+                    {
+                        "kind": "grandmother",
+                        "class": "family",
+                        "termKeys": {
+                            "reference": "UI_PNC_SemanticAddressing_RelationshipTerm_Grandmother_Reference",
+                            "address": "UI_PNC_SemanticAddressing_RelationshipTerm_Grandmother_Address",
+                        },
+                    }
+                )
+                turn = worker.input("hello")
+                snapshot = worker.snapshot()
+                row = next(
+                    row for row in catalog["relationshipKinds"]
+                    if row["kind"] == "grandmother"
+                )
+                bond = turn["contextAfter"]["actorConversationContext"]["bond"]
+        finally:
+            self.close_warm_worker()
 
         self.assertTrue(catalog["relationshipKindRegistration"]["registered"])
         self.assertEqual(row["class"], "family")

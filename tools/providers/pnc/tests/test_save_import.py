@@ -9,14 +9,14 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.save_test_support import pz_file
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
 
 
-class SaveImportTests(unittest.TestCase):
+class SaveImportTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -193,7 +193,7 @@ class SaveImportTests(unittest.TestCase):
         self.assertEqual(knowledge["revision"], 12)
 
     def test_saved_relationship_mutates_only_detached_world(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_saved",

@@ -3,7 +3,12 @@ from copy import deepcopy
 import json
 import time
 import unittest
-from tools.providers.pnc.tests.grievance_evidence_test_support import saved_worker, storage, byte_size
+from tools.providers.pnc.tests.grievance_evidence_test_support import (
+    GrievanceEvidenceWarmWorkerMixin,
+    byte_size,
+    saved_worker,
+    storage,
+)
 
 FORBIDDEN = {"semanticEvidence", "contextualAdmission", "contextualRelevance", "transcript",
              "rawText", "normalizedText", "utterancePlan", "interactionPlan", "generatedChoices",
@@ -18,8 +23,8 @@ def keys(value):
     return set()
 
 
-def capture_stress():
-    with saved_worker() as worker:
+def capture_stress(worker_factory=saved_worker):
+    with worker_factory() as worker:
         source = deepcopy(worker.source_snapshot.to_dict())
         before = worker._request("TEST_EVIDENCE_STRESS")
         first = worker._request("TEST_EVIDENCE_STRESS", {"count": 128, "seedMeaningful": True})
@@ -46,10 +51,10 @@ def capture_stress():
         return report, [before, first, second, repeated], bench, rolled
 
 
-class UnifiedEvidenceE7Tests(unittest.TestCase):
+class UnifiedEvidenceE7Tests(GrievanceEvidenceWarmWorkerMixin, unittest.TestCase):
     def test_busy_conduct_provider_cannot_hide_durable_closing_fact(self):
         from tools.providers.pnc.tests.grievance_evidence_test_support import admission
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             worker._request("TEST_EVIDENCE_STRESS", {"count": 128, "seedMeaningful": True})
             self.assertTrue(admission(worker.input("im sorry"))["admitted"])
             storage(worker, advanceDays=1, clearSession=True)
@@ -61,10 +66,10 @@ class UnifiedEvidenceE7Tests(unittest.TestCase):
 
     def test_targeted_query_preserves_rare_durable_relation_under_unrelated_pressure(self):
         from tools.providers.pnc.tests.grievance_evidence_test_support import admission
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             worker.input("fuck you")
             raw = storage(worker)["serializedRecord"]
-        with saved_worker(raw) as worker:
+        with self.saved_worker(raw) as worker:
             storage(worker, advanceDays=1)
             snapshot = storage(worker, fillUnrelated=18, presentation=True)
             rows = snapshot["presentationEvidence"]["rows"]
@@ -75,7 +80,7 @@ class UnifiedEvidenceE7Tests(unittest.TestCase):
             self.assertEqual(result["selected"]["sourceTier"], "DURABLE")
 
     def test_live_semantic_pipeline_does_not_persist_derived_or_realized_payloads(self):
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             source = deepcopy(worker.source_snapshot.to_dict())
             worker.input("fuck you")
             worker.input("im sorry")
@@ -92,7 +97,7 @@ class UnifiedEvidenceE7Tests(unittest.TestCase):
 
     def test_lab_diagnostics_expose_independent_evidence_signals(self):
         from tools.semantic_harness.ui.interaction_inspector import interaction_summary
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             worker.input("fuck you")
             result = worker.input("im sorry")
             summary = interaction_summary(result["observation"])
@@ -104,7 +109,7 @@ class UnifiedEvidenceE7Tests(unittest.TestCase):
         self.assertIn("[DURABLE]", summary)
 
     def test_storage_pressure_plateaus_and_queries_remain_read_only(self):
-        report, samples, bench, rolled = capture_stress()
+        report, samples, bench, rolled = capture_stress(self.saved_worker)
         before, first, second, repeated = samples
         relationship_limit = before["limits"]["relationship"]
         self.assertTrue(report["sourceSnapshotUnchanged"])

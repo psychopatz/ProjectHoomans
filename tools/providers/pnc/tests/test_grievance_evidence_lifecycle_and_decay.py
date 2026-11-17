@@ -1,12 +1,15 @@
 """Three first-party relation families share providers, resolver and director."""
 import unittest
-from tools.providers.pnc.tests.grievance_evidence_test_support import saved_worker, storage
-from tools.providers.pnc.tests.grievance_evidence_test_support import admission
+from tools.providers.pnc.tests.grievance_evidence_test_support import (
+    GrievanceEvidenceWarmWorkerMixin,
+    admission,
+    storage,
+)
 
 
-class UnifiedEvidenceE5Tests(unittest.TestCase):
+class UnifiedEvidenceE5Tests(GrievanceEvidenceWarmWorkerMixin, unittest.TestCase):
     def test_authoritative_npc_aid_grounds_gratitude(self):
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             before = storage(worker)
             after = storage(worker, emitHelp="gratitude")
             self.assertTrue(any(row["eventType"] == "provided_treated_wound"
@@ -20,7 +23,7 @@ class UnifiedEvidenceE5Tests(unittest.TestCase):
 
     def test_open_offer_request_question_admit_replies(self):
         for opening, text in [("OFFER", "yes"), ("REQUEST", "no"), ("QUESTION", "okay")]:
-            with self.subTest(opening=opening), saved_worker() as worker:
+            with self.subTest(opening=opening), self.saved_worker() as worker:
                 worker.input("hello")
                 storage(worker, openResponse=opening)
                 result = worker.input(text)
@@ -29,7 +32,7 @@ class UnifiedEvidenceE5Tests(unittest.TestCase):
                 self.assertEqual(result["observation"]["interactionPlan"]["behaviorID"], "behavior.acknowledge_reply")
 
     def test_generated_acknowledgement_uses_the_same_admission(self):
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             worker.input("hello")
             storage(worker, openResponse="OFFER")
             result = worker.input("what time is it?")
@@ -41,15 +44,15 @@ class UnifiedEvidenceE5Tests(unittest.TestCase):
 
     def test_missing_antecedents_and_direction_remain_unresolved(self):
         for text in ["thanks", "yes", "no"]:
-            with self.subTest(text=text), saved_worker() as worker:
+            with self.subTest(text=text), self.saved_worker() as worker:
                 result = worker.input(text)
                 self.assertFalse(admission(result)["admitted"])
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             storage(worker, project="treated_wound")  # player aided NPC, opposite direction
             self.assertFalse(admission(worker.input("thanks"))["admitted"])
 
     def test_player_scoped_presentation_exports_only_bounded_evidence(self):
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             worker.input("fuck you")
             before = storage(worker)
             result = storage(worker, presentation=True)

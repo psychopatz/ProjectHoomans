@@ -6,7 +6,7 @@ from pathlib import Path
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.codebuilder.heldout_conversation_eval import (
     HOLDOUT_PATH,
     load_heldout_conversation_eval,
@@ -20,7 +20,7 @@ CORE_ROOT = HOOMANS_ROOT.parent / "psychopatzCore"
 DT_ROOT = HOOMANS_ROOT.parent / "DynamicTrading"
 
 
-class HeldoutPrecisionAndDatasetCompilationTests(unittest.TestCase):
+class HeldoutPrecisionAndDatasetCompilationTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_common_patterns_compile_and_heldout_worker_scores_perfect(self) -> None:
         service = SemanticLabAuthoringService(
             repository=CORE_ROOT,
@@ -56,7 +56,7 @@ class HeldoutPrecisionAndDatasetCompilationTests(unittest.TestCase):
         holdout = load_heldout_conversation_eval(HOLDOUT_PATH)
         cases = holdout["cases"]
         turns = []
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             for case in cases:
                 worker.reset_working_world()
                 for setup in case.get("setup", []):

@@ -11,14 +11,14 @@ from copy import deepcopy
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualActorNeedsRuntimeTests(SemanticLabGuiTestCase):
+class ContextualActorNeedsRuntimeTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def test_catalog_owns_needs_by_actor_and_exposes_real_trait_sources(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.simulation_control_catalog()
             persona = worker.persona_catalog()
 
@@ -47,7 +47,7 @@ class ContextualActorNeedsRuntimeTests(SemanticLabGuiTestCase):
         scenario["npc"]["identitySeed"] = "actor-needs-seed"
         scenario["npc"]["archetype"] = "Doctor"
         scenario["npc"]["traits"] = ["pnc_friendly"]
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             projection = worker.configure(scenario)["simulationProjection"]
             catalog = worker.persona_catalog()
 

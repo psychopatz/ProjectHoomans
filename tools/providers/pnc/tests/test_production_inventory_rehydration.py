@@ -11,17 +11,17 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.save_catalog import SaveCatalog
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.semantic_harness.core.state import Provenance
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
 
 
-class ProductionInventoryRehydrationTests(unittest.TestCase):
+class ProductionInventoryRehydrationTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_all_production_inventory_persistence_modes_rehydrate(self) -> None:
         for mode in ("SEED_ONLY", "BASELINE_DELTA", "FULL"):
             with self.subTest(mode=mode):
-                with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
                     # The worker asks production Lua to serialize the record.
                     # Python only transports the resulting raw saved record.
                     fixture = worker._request(
@@ -153,7 +153,7 @@ class ProductionInventoryRehydrationTests(unittest.TestCase):
             selection.provenance["paths"]["npc.inventory"]["owner"],
         )
 
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(save_path, npc_id=npc_id)
             status = imported["productionRehydration"]
             self.assertEqual(status["status"], "HYDRATED")

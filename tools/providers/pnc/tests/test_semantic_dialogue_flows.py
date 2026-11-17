@@ -7,7 +7,7 @@ from pathlib import Path
 
 from tools.semantic_harness.testing.runner import load_case, run_case
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 FLOW_CASE = (
@@ -17,7 +17,7 @@ FLOW_CASE = (
 )
 
 
-class SemanticDialogueFlowTests(unittest.TestCase):
+class SemanticDialogueFlowTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_real_worker_commits_and_resumes_bounded_flows(self) -> None:
         run = run_case(load_case(FLOW_CASE))
         self.assertEqual(run.conflicts, [])
@@ -92,7 +92,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
                 "runtime": {"language": "TL"},
             },
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             opening = worker.input("hello")
             followup = worker.input("thanks")
 
@@ -165,7 +165,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
                     DEFAULT_SCENARIO,
                     {"runtime": {"language": language}},
                 )
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     opening = worker.input("hello")
 
                 payloads = [message["payload"] for message in opening["messages"]]
@@ -208,7 +208,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             DEFAULT_SCENARIO,
             {"runtime": {"language": "TL"}},
         )
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             identity = worker.input("who are you")
             wellbeing = worker.input("are you okay")
             status = worker.input("im fine thanks")
@@ -274,7 +274,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
                 DEFAULT_SCENARIO,
                 {"runtime": {"language": language}},
             )
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 turn = worker.input("who are you")
 
             response = turn["result"]["decision"]["response"]
@@ -294,7 +294,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
                 self.assertNotEqual(payload["text"], payload["fallback"])
 
     def test_real_worker_preview_is_pure_for_flow_interruptions(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")
             before = worker.snapshot()
             previews = [worker.preview("are you okay") for _ in range(2)]
@@ -318,7 +318,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertEqual(before["transport"], after["transport"])
 
     def test_wellbeing_refusal_is_a_flow_owned_safe_branch(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("are you okay")
             refusal = worker.input("no")
 

@@ -7,13 +7,13 @@ import unittest
 
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
 
 
-class SemanticBlockRegistryTests(unittest.TestCase):
+class SemanticBlockRegistryTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_static_registry_exposes_all_required_categories_and_contracts(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)
         catalog = service.list_semantic_blocks()
@@ -39,7 +39,7 @@ class SemanticBlockRegistryTests(unittest.TestCase):
 
     def test_live_registry_uses_existing_lua_catalog_values(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             production_catalog = worker.flow_catalog()
 
         catalog = service.list_semantic_blocks(production_catalog)
@@ -67,7 +67,7 @@ class SemanticBlockRegistryTests(unittest.TestCase):
 
     def test_block_selection_validation_is_effect_free_and_fails_closed(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             production_catalog = worker.flow_catalog()
 
         valid = service.validate_semantic_blocks(

@@ -6,17 +6,17 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualSpeechStyleTests(unittest.TestCase):
+class ContextualSpeechStyleTests(WarmWorkerTestMixin, unittest.TestCase):
     def _scenario(self, **npc_updates: object) -> dict:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"].update(npc_updates)
         return scenario
 
     def _turn(self, scenario: dict, language: str = "EN") -> dict:
-        with LuaSemanticWorker(deepcopy(scenario)) as worker:
+        with self.warm_worker(deepcopy(scenario)) as worker:
             if language != "EN":
                 worker.set_language(language)
             return worker.input("hello")

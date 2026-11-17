@@ -7,11 +7,12 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SuggestionRankingAndStabilityTests(unittest.TestCase):
+class SuggestionRankingAndStabilityTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_semantic_question_click_appends_one_player_turn(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             typed = worker.input("Are you okay?")
             frame = next(
                 candidate["frame"]
@@ -32,7 +33,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(new_player_rows[0]["value"], "Do you need anything?")
 
     def test_topic_group_click_reuses_core_surface_without_gameplay_effect(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             presentation = worker.conversation_projection()["presentation"]
             group = next(
@@ -67,7 +68,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(after["transport"], after_duplicate["transport"])
 
     def test_question_click_reuses_canonical_ir_without_a_second_parser(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             typed = worker.input("Are you okay?")
             frame = next(
                 candidate["frame"]
@@ -85,7 +86,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(click["toolCalls"], [])
 
     def test_dynamic_response_branch_click_uses_canonical_ir_and_replays_safely(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello")
             candidate = next(
                 item
@@ -121,7 +122,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(before_duplicate["trace"], after_duplicate["trace"])
 
     def test_dynamic_flow_branch_click_transitions_existing_flow(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello")
             candidate = next(
                 item
@@ -137,7 +138,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(click["dispatchTransport"], [])
 
     def test_stale_click_is_rejected_without_mutation(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.input("Are you okay?")
             frame = next(
                 candidate["frame"]
@@ -156,7 +157,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(before["trace"], after["trace"])
 
     def test_duplicate_click_is_deduplicated_without_a_second_turn(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("Are you okay?")
             frame = next(
                 candidate["frame"]
@@ -176,7 +177,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(before["trace"], after["trace"])
 
     def test_follow_click_uses_existing_action_dispatch_and_wait_at_fails_closed(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("Are you okay?")
             capabilities = {
                 row["action"]: row
@@ -196,7 +197,7 @@ class SuggestionRankingAndStabilityTests(unittest.TestCase):
         self.assertEqual(follow["dispatchTransport"][0]["command"], "CompanionCommand")
 
         wait_scenario = deepcopy(DEFAULT_SCENARIO)
-        with LuaSemanticWorker(wait_scenario) as worker:
+        with self.warm_worker(wait_scenario) as worker:
             result = worker.input("Are you okay?")
             wait_rows = [
                 row

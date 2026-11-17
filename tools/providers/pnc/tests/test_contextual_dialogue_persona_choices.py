@@ -11,14 +11,14 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualDialoguePersonaChoicesTests(unittest.TestCase):
+class ContextualDialoguePersonaChoicesTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_whats_up_utterance_activates_semantic_hub(
         self,
     ) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             entered = worker.input("What's up?")
 
             self.assertTrue(entered["accepted"])
@@ -41,7 +41,7 @@ class ContextualDialoguePersonaChoicesTests(unittest.TestCase):
     def test_active_flow_response_plan_and_capability_rows_keep_one_frame_contract(
         self,
     ) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("hello")
 
         suggestions = result["observation"]["suggestions"]
@@ -82,7 +82,7 @@ class ContextualDialoguePersonaChoicesTests(unittest.TestCase):
         for language in ("EN", "TL"):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 result = worker.input("Are you okay?")
             row = next(
                 candidate
@@ -110,7 +110,7 @@ class ContextualDialoguePersonaChoicesTests(unittest.TestCase):
         self.assertEqual(tl_result["translation"]["language"], "TL")
 
     def test_stale_duplicate_and_authority_rejection_are_side_effect_free(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.input("Are you okay?")
             frame = next(
                 candidate["frame"]
@@ -127,7 +127,7 @@ class ContextualDialoguePersonaChoicesTests(unittest.TestCase):
         self.assertEqual(before_stale["transcript"], after_stale["transcript"])
         self.assertEqual(before_stale["transport"], after_stale["transport"])
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             result = worker.input("Are you okay?")
             follow = next(
                 row
@@ -155,7 +155,7 @@ class ContextualDialoguePersonaChoicesTests(unittest.TestCase):
             "eligible": False,
             "status": "not_companion",
         }
-        with LuaSemanticWorker(non_companion) as worker:
+        with self.warm_worker(non_companion) as worker:
             result = worker.input("Are you okay?")
         self.assertFalse(
             any(

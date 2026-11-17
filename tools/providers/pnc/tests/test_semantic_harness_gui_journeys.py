@@ -370,6 +370,7 @@ class SemanticHarnessGuiJourneyTests(SemanticLabGuiTestCase):
             hermetic_service = SemanticLabAuthoringService(
                 temp_hoomans, core_repository=temp_core
             )
+            self.addCleanup(hermetic_service.close)
             host_frame = tk.Frame(root)
             from tkinter import ttk, scrolledtext
 

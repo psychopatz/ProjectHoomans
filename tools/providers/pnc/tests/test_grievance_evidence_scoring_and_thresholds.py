@@ -1,12 +1,12 @@
 """First-party semantic and compact metadata have one domain-owned source."""
 import unittest
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 
 
-class UnifiedEvidenceE2Tests(unittest.TestCase):
+class UnifiedEvidenceE2Tests(WarmWorkerTestMixin, unittest.TestCase):
     def test_all_social_types_derive_canonical_registration(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             audit = worker._request("TEST_EVIDENCE_METADATA")
         self.assertSetEqual(
             {row["id"] for row in audit["rows"]},

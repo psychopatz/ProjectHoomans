@@ -6,12 +6,12 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ConversationCategoryOwnershipTests(unittest.TestCase):
+class ConversationCategoryOwnershipTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_worker_loads_the_shared_ownership_manifest(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             snapshot = worker.snapshot()
 
@@ -21,7 +21,7 @@ class ConversationCategoryOwnershipTests(unittest.TestCase):
         )
 
     def test_root_projection_exposes_semantic_metadata_for_first_slice(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             landing = next(
                 row

@@ -10,7 +10,7 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
     compile_conversation_sources,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
@@ -91,9 +91,9 @@ RETIRED_KEYS.update(
 )
 
 
-class SocialApologyWordingShardTests(unittest.TestCase):
+class SocialApologyWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_apology_without_an_antecedent_requests_context_without_dispatch(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             turn = worker.input("sorry")
         self.assertTrue(turn["accepted"])
         self.assertEqual(turn["result"]["ir"]["intent"], "APOLOGIZE")
@@ -223,7 +223,7 @@ class SocialApologyWordingShardTests(unittest.TestCase):
                         DEFAULT_SCENARIO,
                         {"runtime": {"language": language}, "npc": npc},
                     )
-                    with LuaSemanticWorker(scenario) as worker:
+                    with self.warm_worker(scenario) as worker:
                         # An apology must refer to an accepted prior offense;
                         # the current relation resolver never invents one.
                         worker.input("You're an idiot")

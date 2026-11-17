@@ -6,11 +6,12 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class AutomaticFlowGenerationTests(unittest.TestCase):
+class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_live_coverage_generates_follow_and_stay_from_one_template(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
             coverage = worker.flow_coverage()
             capabilities = worker.capabilities()
@@ -65,7 +66,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             )
 
     def test_parameterized_task_template_generates_wait_at_and_fetch(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
             wait_at = worker.input("Wait at the campfire")
             fetch = worker.input("Bring me the can opener")
@@ -134,7 +135,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             "REFILL": "PNC.Client.RequestSemanticTask",
             "CONSUME": "PNC.Client.RequestSemanticTask",
         }
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
             turns = {
                 action: worker.input(phrase)
@@ -182,11 +183,11 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             DEFAULT_SCENARIO,
             {"conversation": {"semanticAuthorization": {"authorized": False}}},
         )
-        with LuaSemanticWorker(rejected_scenario) as worker:
+        with self.warm_worker(rejected_scenario) as worker:
             rejected = worker.input("Wait at the campfire")
-        with LuaSemanticWorker(failed_scenario) as worker:
+        with self.warm_worker(failed_scenario) as worker:
             failed = worker.input("Wait at the campfire")
-        with LuaSemanticWorker(gated_scenario) as worker:
+        with self.warm_worker(gated_scenario) as worker:
             gated = worker.input("Wait at the campfire")
 
         self.assertEqual(rejected["result"]["flow"]["resultNodeId"], "rejected")
@@ -207,7 +208,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         )
 
     def test_real_worker_records_result_nodes_and_one_dispatch(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             follow = worker.input("Follow me")
             stay = worker.input("Stay here")
 
@@ -252,11 +253,11 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             {"runtime": {"language": "TL"}},
         )
 
-        with LuaSemanticWorker(friendly_scenario) as worker:
+        with self.warm_worker(friendly_scenario) as worker:
             friendly = worker.input("Follow me")
-        with LuaSemanticWorker(trusted_scenario) as worker:
+        with self.warm_worker(trusted_scenario) as worker:
             trusted = worker.input("Follow me")
-        with LuaSemanticWorker(tl_scenario) as worker:
+        with self.warm_worker(tl_scenario) as worker:
             tagalog = worker.input("Follow me")
 
         self.assertEqual(
@@ -279,7 +280,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertEqual(len(result["dispatchTransport"]), 1)
 
     def test_generated_simple_command_uses_bounded_previous_action_memory(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             first = worker.input("Follow me")
             repeated = worker.input("Follow me")
 
@@ -316,11 +317,11 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             DEFAULT_SCENARIO,
             {"conversation": {"semanticAuthorization": {"authorized": False}}},
         )
-        with LuaSemanticWorker(denied_scenario) as worker:
+        with self.warm_worker(denied_scenario) as worker:
             denied = worker.input("Follow me")
-        with LuaSemanticWorker(failed_scenario) as worker:
+        with self.warm_worker(failed_scenario) as worker:
             failed = worker.input("Follow me")
-        with LuaSemanticWorker(gated_scenario) as worker:
+        with self.warm_worker(gated_scenario) as worker:
             gated = worker.input("Follow me")
 
         self.assertEqual(denied["result"]["flow"]["resultNodeId"], "rejected")
@@ -333,7 +334,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         self.assertEqual(gated["messages"][0]["payload"]["text"], "I can't follow you right now.")
 
     def test_preview_is_pure_and_generation_survives_restart(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             first = worker.preview("Follow me")
             second = worker.preview("Follow me")
             generated = worker.generate_flows()
@@ -381,7 +382,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 }},
             )
             with self.subTest(language=language):
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     result = worker.input("any gossip?")
 
                 response = result["result"]["decision"]["response"]
@@ -401,7 +402,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                     for event in result["dispatchTransport"]
                 ))
 
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             unavailable = worker.input("any gossip?")
         self.assertEqual(
             unavailable["result"]["decision"]["response"]["templateID"],
@@ -427,7 +428,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 },
             },
         )
-        with LuaSemanticWorker(first_scenario) as worker:
+        with self.warm_worker(first_scenario) as worker:
             first = worker.input("any news about Sarah?")
             second_scenario = merge(
                 first_scenario,
@@ -482,7 +483,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 },
             },
         )
-        with LuaSemanticWorker(unavailable_scenario) as worker:
+        with self.warm_worker(unavailable_scenario) as worker:
             unavailable = worker.input("any news about Sarah?")
         self.assertEqual(
             unavailable["result"]["decision"]["response"]["templateID"],
@@ -507,7 +508,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 },
             },
         )
-        with LuaSemanticWorker(stale_scenario) as worker:
+        with self.warm_worker(stale_scenario) as worker:
             stale = worker.input("any news about Sarah?")
         self.assertEqual(
             stale["result"]["decision"]["response"]["templateID"],

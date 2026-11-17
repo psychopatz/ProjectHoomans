@@ -18,13 +18,14 @@ from tools.semantic_harness.codebuilder.interaction_explorer import (
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.flow_editor.model import (
     conversation_graph_diagnostics,
     conversation_graph_model,
 )
 
 
-class FlowEditorTests(unittest.TestCase):
+class FlowEditorTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_generated_flow_labels_hide_registry_prefix_but_keep_meaning(self) -> None:
         self.assertEqual(
             flow_display_name(
@@ -42,7 +43,7 @@ class FlowEditorTests(unittest.TestCase):
             "Task / Wait / At",
         )
         self.assertEqual(flow_display_name("greeting"), "greeting")
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
         wait_at = next(
             flow for flow in catalog["flows"]
@@ -150,7 +151,7 @@ class FlowEditorTests(unittest.TestCase):
         )
 
     def test_graph_model_exposes_nodes_and_transition_edges(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
 
         greeting = next(flow for flow in catalog["flows"] if flow["id"] == "greeting")
@@ -182,7 +183,7 @@ class FlowEditorTests(unittest.TestCase):
         )
 
     def test_generated_graph_exposes_typed_action_and_result_edges(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
 
         follow = next(
@@ -219,7 +220,7 @@ class FlowEditorTests(unittest.TestCase):
         )
 
     def test_semantic_lab_coverage_view_keeps_exact_live_reasons(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
 
         coverage = catalog["generation"]["coverage"]
@@ -236,7 +237,7 @@ class FlowEditorTests(unittest.TestCase):
         self.assertTrue(any(line.startswith("HELP: generated") for line in lines))
 
     def test_catalog_exposes_engine_facts_and_commands(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
 
         fact_ids = {fact["id"] for fact in catalog["factCatalog"]}
@@ -264,7 +265,7 @@ class FlowEditorTests(unittest.TestCase):
         self.assertNotIn("target", wait_at_action["frame"])
 
     def test_interaction_explorer_searches_live_policy_flows_and_core_routes(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
 
         policy = catalog["policyCatalog"]
@@ -300,7 +301,7 @@ class FlowEditorTests(unittest.TestCase):
         self.assertTrue(any(row.get("kind") == "policy_branch" for row in needs))
 
     def test_fact_gate_is_accepted_by_production_registry(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
             weather = next(flow for flow in catalog["flows"] if flow["id"] == "weather_context")
             draft = deepcopy(weather)

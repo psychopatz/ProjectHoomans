@@ -11,10 +11,10 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SocialAndWellbeingGatesTests(unittest.TestCase):
+class SocialAndWellbeingGatesTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]
@@ -40,7 +40,7 @@ class SocialAndWellbeingGatesTests(unittest.TestCase):
             "have you been bitten",
             "i like your dress",
         )
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turns = [worker.input(value) for value in inputs]
 
         news, stay, residence, bite, compliment = turns
@@ -108,7 +108,7 @@ class SocialAndWellbeingGatesTests(unittest.TestCase):
         )
         for text, expected_pattern in positive:
             with self.subTest(text=text):
-                with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
                     turn = worker.input(text)
                 self.assertTrue(turn["accepted"], turn.get("reason"))
                 ir = turn["result"]["ir"]
@@ -119,7 +119,7 @@ class SocialAndWellbeingGatesTests(unittest.TestCase):
                 self.assertTrue(self.message_text(turn))
                 self.assert_offline_question(turn)
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             negative = worker.input("i don't like your dress")
         self.assertEqual(negative["result"]["ir"]["diagnostics"]["noMatch"], True)
         self.assertEqual(negative["result"]["decision"]["branch"], "ASK_CLARIFICATION")
@@ -128,7 +128,7 @@ class SocialAndWellbeingGatesTests(unittest.TestCase):
         self.assertEqual(negative["dispatchTransport"], [])
         self.assertEqual(negative["toolCalls"], [])
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             gossip = worker.input("did you hear that someone got bitten")
         self.assertEqual(gossip["result"]["ir"]["intent"], "GOSSIP")
         self.assertEqual(gossip["result"]["ir"]["subject"], "GOSSIP")
@@ -174,7 +174,7 @@ class SocialAndWellbeingGatesTests(unittest.TestCase):
                     scenario["npc"]["health"] = None
                 else:
                     scenario["npc"]["health"]["body"] = body_health
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     turn = worker.input("did a zombie bite you")
                 self.assert_offline_question(turn)
                 fact = turn["result"]["ir"]["extensions"]["facts"]["NPC_BITE_STATUS"]
@@ -198,7 +198,7 @@ class SocialAndWellbeingGatesTests(unittest.TestCase):
                 )
 
     def test_preview_and_tl_response_are_effect_free_and_localized(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             # Initialize the ordinary conversation lease first. Preview must
             # then leave the live semantic/gameplay state byte-for-byte
             # unchanged while still using the production router and facts.

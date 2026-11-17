@@ -16,6 +16,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.testing.sweep_batch import (
     SweepBatchExecutor,
     SweepExecutionCancelled,
@@ -34,17 +35,18 @@ from tools.semantic_harness.testing.sweep_reachability import (
 from tools.semantic_harness.testing.sweep_service import DialogueQualitySweepService
 
 
-class SweepAcceptanceTests(unittest.TestCase):
+class SweepAcceptanceTests(WarmWorkerTestMixin, unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        super().setUpClass()
         cls.service = DialogueQualitySweepService()
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with cls.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             cls.inventory = extract_dimension_inventory(worker)
 
     def test_performance_characterization(self) -> None:
         """Measure performance across discovery, pool pagination, planning, compact size, and resolution."""
         # 1. Surface and dimension discovery time
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             t0 = time.monotonic()
             inv = extract_dimension_inventory(worker)
             t_discovery = time.monotonic() - t0
@@ -118,7 +120,9 @@ class SweepAcceptanceTests(unittest.TestCase):
 
     def test_13_required_demonstration_scenarios(self) -> None:
         """Exercise all 13 required demonstration scenarios from HARNESS_ACCEPTANCE.md."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker, LuaSemanticWorker(
+            deepcopy(DEFAULT_SCENARIO)
+        ) as aux_worker:
             analyzer = QualityAnalyzer()
             aggregator = ClusterAggregator(analyzer)
 
@@ -150,20 +154,20 @@ class SweepAcceptanceTests(unittest.TestCase):
             sc_hostile = self.inventory.project_to_scenario(
                 {"relationship.approval": -75.0, "relationship.respect": -50.0}
             )
-            with LuaSemanticWorker(sc_hostile) as hostile_worker:
-                rec_hostile = hostile_worker.input("hello")
-                rows_hostile = extract_evidence_rows_from_turn(
-                    rec_hostile, turn_index=0, case_id="c3_hostile", parameters={"relationship.approval": -75.0}, worker=hostile_worker
-                )
+            aux_worker.import_source(sc_hostile)
+            rec_hostile = aux_worker.input("hello")
+            rows_hostile = extract_evidence_rows_from_turn(
+                rec_hostile, turn_index=0, case_id="c3_hostile", parameters={"relationship.approval": -75.0}, worker=aux_worker
+            )
 
             sc_friendly = self.inventory.project_to_scenario(
                 {"relationship.approval": 75.0, "relationship.respect": 50.0}
             )
-            with LuaSemanticWorker(sc_friendly) as friendly_worker:
-                rec_friendly = friendly_worker.input("hello")
-                rows_friendly = extract_evidence_rows_from_turn(
-                    rec_friendly, turn_index=0, case_id="c3_friendly", parameters={"relationship.approval": 75.0}, worker=friendly_worker
-                )
+            aux_worker.import_source(sc_friendly)
+            rec_friendly = aux_worker.input("hello")
+            rows_friendly = extract_evidence_rows_from_turn(
+                rec_friendly, turn_index=0, case_id="c3_friendly", parameters={"relationship.approval": 75.0}, worker=aux_worker
+            )
 
             self.assertGreaterEqual(len(rows_hostile), 1)
             self.assertGreaterEqual(len(rows_friendly), 1)
@@ -182,15 +186,15 @@ class SweepAcceptanceTests(unittest.TestCase):
             sc_sister = self.inventory.project_to_scenario(
                 {"persona.bondKind": "sister", "relationship.approval": 80.0}
             )
-            with LuaSemanticWorker(sc_sister) as sister_worker:
-                rec_sister = sister_worker.input("how are you?")
-                rows_sister = extract_evidence_rows_from_turn(
-                    rec_sister,
-                    turn_index=0,
-                    case_id="c4_sister_real",
-                    parameters={"persona.bondKind": "sister"},
-                    worker=sister_worker,
-                )
+            aux_worker.import_source(sc_sister)
+            rec_sister = aux_worker.input("how are you?")
+            rows_sister = extract_evidence_rows_from_turn(
+                rec_sister,
+                turn_index=0,
+                case_id="c4_sister_real",
+                parameters={"persona.bondKind": "sister"},
+                worker=aux_worker,
+            )
             self.assertGreaterEqual(len(rows_sister), 1)
             row_sister = rows_sister[0]
             self.assertEqual(row_sister["trigger"]["relationshipSummary"]["bondKind"], "sister")
@@ -202,15 +206,15 @@ class SweepAcceptanceTests(unittest.TestCase):
 
             # 2. Unsupported family: real worker turn with stranger/no bond
             sc_stranger = self.inventory.project_to_scenario({"relationship.approval": 0.0})
-            with LuaSemanticWorker(sc_stranger) as stranger_worker:
-                rec_stranger = stranger_worker.input("how are you?")
-                rows_stranger = extract_evidence_rows_from_turn(
-                    rec_stranger,
-                    turn_index=0,
-                    case_id="c4_stranger_real",
-                    parameters={},
-                    worker=stranger_worker,
-                )
+            aux_worker.import_source(sc_stranger)
+            rec_stranger = aux_worker.input("how are you?")
+            rows_stranger = extract_evidence_rows_from_turn(
+                rec_stranger,
+                turn_index=0,
+                case_id="c4_stranger_real",
+                parameters={},
+                worker=aux_worker,
+            )
             self.assertGreaterEqual(len(rows_stranger), 1)
             row_stranger = rows_stranger[0]
             self.assertEqual(row_stranger["trigger"]["relationshipSummary"].get("bondKind", "none"), "none")
@@ -268,10 +272,10 @@ class SweepAcceptanceTests(unittest.TestCase):
             # Distinct parameter vectors player.hunger=0.2 and 0.8 reaching same response
             sc_p1 = self.inventory.project_to_scenario({"player.needs.hunger": 0.2})
             sc_p2 = self.inventory.project_to_scenario({"player.needs.hunger": 0.8})
-            with LuaSemanticWorker(sc_p1) as w1:
-                r1 = extract_evidence_rows_from_turn(w1.input("hello"), case_id="p1", worker=w1)
-            with LuaSemanticWorker(sc_p2) as w2:
-                r2 = extract_evidence_rows_from_turn(w2.input("hello"), case_id="p2", worker=w2)
+            aux_worker.import_source(sc_p1)
+            r1 = extract_evidence_rows_from_turn(aux_worker.input("hello"), case_id="p1", worker=aux_worker)
+            aux_worker.import_source(sc_p2)
+            r2 = extract_evidence_rows_from_turn(aux_worker.input("hello"), case_id="p2", worker=aux_worker)
             self.assertEqual(
                 r1[0]["semanticPath"]["semanticTemplateID"],
                 r2[0]["semanticPath"]["semanticTemplateID"],
@@ -302,19 +306,19 @@ class SweepAcceptanceTests(unittest.TestCase):
             cluster_rows = []
             for i in range(4):
                 sc_c10 = self.inventory.project_to_scenario({"player.needs.hunger": i * 0.2})
-                with LuaSemanticWorker(sc_c10) as w10:
-                    rec_10 = w10.input("how are you?")
-                    r_10 = extract_evidence_rows_from_turn(
-                        rec_10,
-                        turn_index=0,
-                        case_id=f"c10_case_{i}",
-                        parameters={"player.needs.hunger": i * 0.2},
-                        worker=w10,
-                    )[0]
-                    # Simulate unreplaced family text on this source owner
-                    r_10["output"]["finalText"] = "family"
-                    r_10["selectionProvenance"]["canonicalSourceOwner"] = "dialogue_dataset.wellbeing"
-                    cluster_rows.append(r_10)
+                aux_worker.import_source(sc_c10)
+                rec_10 = aux_worker.input("how are you?")
+                r_10 = extract_evidence_rows_from_turn(
+                    rec_10,
+                    turn_index=0,
+                    case_id=f"c10_case_{i}",
+                    parameters={"player.needs.hunger": i * 0.2},
+                    worker=aux_worker,
+                )[0]
+                # Simulate unreplaced family text on this source owner
+                r_10["output"]["finalText"] = "family"
+                r_10["selectionProvenance"]["canonicalSourceOwner"] = "dialogue_dataset.wellbeing"
+                cluster_rows.append(r_10)
 
             cluster_report = aggregator.aggregate_rows(cluster_rows, sweep_id="demo_c10")
             fam_clusters = cluster_report.filter_by(flag="UNSUPPORTED_FAMILY_REFERENCE")

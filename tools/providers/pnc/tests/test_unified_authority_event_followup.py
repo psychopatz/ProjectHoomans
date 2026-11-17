@@ -6,10 +6,10 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class UnifiedAuthorityEventFollowUpTests(unittest.TestCase):
+class UnifiedAuthorityEventFollowUpTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def _event_payload(*, with_facts: bool = True) -> dict:
         payload = {
@@ -62,7 +62,7 @@ class UnifiedAuthorityEventFollowUpTests(unittest.TestCase):
         }
 
     def test_real_worker_event_window_projects_catalog_offers(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             event = worker.interaction_npc_event(self._event_payload())
 
             self.assertTrue(event["ok"])
@@ -119,7 +119,7 @@ class UnifiedAuthorityEventFollowUpTests(unittest.TestCase):
 
         # Typed input is a separate worker session, proving the offer is an
         # affordance only and not a prerequisite for the same semantic route.
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.interaction_npc_event(self._event_payload())
             typed = worker.input("Where are they?")
             self.assertTrue(typed["accepted"], typed.get("reason"))
@@ -169,7 +169,7 @@ class UnifiedAuthorityEventFollowUpTests(unittest.TestCase):
                 "Clear the nearby zombies before we relax.",
         }
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             event = worker.interaction_npc_event(payload)
             self.assertTrue(event["ok"])
             realization = event["result"]["realization"]
@@ -182,7 +182,7 @@ class UnifiedAuthorityEventFollowUpTests(unittest.TestCase):
 
         for candidate_id, content in expected.items():
             with self.subTest(candidate_id=candidate_id):
-                with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
                     event = worker.interaction_npc_event(payload)
                     rows = self._event_rows(event["result"]["suggestions"])
                     clicked = worker.suggestion_click(
@@ -201,7 +201,7 @@ class UnifiedAuthorityEventFollowUpTests(unittest.TestCase):
                     )
 
     def test_no_fact_refs_hide_followups_and_expire_the_window(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             event = worker.interaction_npc_event(
                 self._event_payload(with_facts=False)
             )

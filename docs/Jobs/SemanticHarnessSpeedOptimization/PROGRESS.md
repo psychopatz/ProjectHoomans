@@ -1,10 +1,24 @@
 # Progress — Semantic Harness Speed & Runtime Optimization
 
 **Status:** IN PROGRESS.
-**Current phase:** P4.
-**Next Chunk:** Execute `P4` — add mtime/fingerprint-keyed in-process cache for `compile_conversation_sources`, reuse warm workers in `SweepBatchExecutor`/`DialogueQualitySweepService`/`run_quality_matrix`/`preview_authored_variant`, and adopt warm-worker reuse in slow imperative test modules.
+**Current phase:** P5.
+**Next Chunk:** Execute `P5` — re-run full multi-repo verification gates cleanly on committed `P4` state (`228` declarative fixtures serial & `--jobs 4`, `63/283` Core unittest, `171/700` PNC unittest serial & `--jobs 4`, `run_tests.py --suite lua`, `test_semantic_harness_gui_journeys` on `DISPLAY=:0`, `pz-verify`, `0` leaked workers) and close `SemanticHarnessSpeedOptimization`.
 
 ## Completed Phases
+
+- **P4 (CodeBuilder Cache, Batch Reuse, XIM/Probe Cleanup, Compact Runners & Heavy Imperative Suite Acceleration):**
+  - Added thread-safe mtime/fingerprint-keyed in-process cache in `conversation_compiler.py`, `_MODEL_CACHE_LOCK` in `compiler_probes.py`, batch/matrix worker reuse (`sweep_batch.py`, `sweep_service.py`, `response_observatory.py`, `response_candidate.py`), string-prefix path slicing in `convo_engine_psdl_inventory.py`/`convo_engine_ownership_inventory.py`, fast `copy_json` in `conversation_model.py` (`psdl_compiler.py`, `convo_engine_exchange.py`, `semantic_dialogue_ir.py`, `blocks.py`), `_lua_string`/`_lua_value` fast paths (`lexicon_compiler.py`, `dialogue_content.py`), and `reconcile_apply` Step 4 skip when clean.
+  - Resolved two blockers surfaced during full PNC runs: set `XMODIFIERS=@im=none` (`app_initializer.py`, `gui_test_support.py`) preventing `ibus-x11` XIM deadlocks across repeated `tk.Tk()` windows on `DISPLAY=:0`; added `ConvoProbe.close()` `atexit.unregister`, `SemanticLabAuthoringService.close()`, `close_app()` authoring-service close + background sweep thread cancel/join (`lifecycle_controller.py`, `quality_sweep_controller.py`), `close_gui_app` cleanup, and hermetic cleanup in `test_semantic_harness_gui_journeys.py` (`23 -> 0` leaked `worker.lua` processes).
+  - Deferred `ConvoEngineAuthoringPane.refresh()` and `SemanticBlockRegistryPane` catalog hydration until Studio/Blocks tab activation and overlapped `_start_worker()` with `_build_deferred_studio_editors()` in `shell.py`.
+  - Fixed `ScenarioSession.reset` (`ScenarioSession_Lifecycle.lua`) to clear `Runtime.view = nil` when `Runtime.replaceProductionDurableState == true` (`phraseSalt` leak), implemented process-shared `WarmWorkerTestMixin` (`worker_reuse.py`) + `\bWarmWorkerTestMixin\b` regex classification in `acceptance.py`, and adopted `WarmWorkerTestMixin` across multi-spawn PNC imperative modules.
+  - Added live-flushed compact test progress across declarative fixtures (`testing/executor.py`, `testing/cli.py`), `tools.semantic_harness.testing.compact_unittest` (with `close_all_warm_workers()` reaper and `--jobs` GUI-isolated shard execution), and `ProjectHoomans/tests/run_tests.py` (`--suite {lua,python,all}`, `--progress-every`).
+  - Verified (`P4`):
+    - Core `compact_unittest` serial: `63/63` modules, `283` tests PASS in `49.256 s` (`<= 60 s`), `0` leaked workers.
+    - PNC `compact_unittest` serial (`DISPLAY=:0`): `171/171` modules, `700` tests PASS (`skipped=27`) in `294.330 s` (`<= 300 s`), `0` leaked workers.
+    - `tests/run_tests.py --suite python --jobs 4`: `171/171` modules, `700` tests PASS (`skipped=27`) in `146.141 s`, `0` leaked workers.
+    - Declarative fixtures: `228/228` PASS in `35.95 s` serial and `14.93 s` with `--jobs 4`, `0` leaked workers.
+    - `test_semantic_harness_gui_journeys` directly on `DISPLAY=:0`: `4/4` PASS in `21.209 s`.
+    - `test_python_acceptance_runner` + `test_semantic_harness_static_boundaries`: `11/11` PASS; `pz-verify --kahlua --severity ERROR` on all modified mod Lua files + `ScenarioSession_Lifecycle.lua`: `0` errors.
 
 - **P3 (Hermetic State Reset & Warm-Worker Reuse + Parallelism for Declarative Fixtures):**
   - Fixed all state-reset leaks across `import_source`/`reset`: cleared `runtime.playerConduct` and `runtime.socialEvents` in `RuntimeState.resetContainers`, added `ResetSelections()` to `SpeechRealization.lua` and `ToolResultRealization.lua` and called them alongside `ResponseCatalog.ResetSelections()` in `ScenarioSession.reset`, and cleared `PNC.Network.ClientState.semanticHubPresentation` when `replaceProductionDurableState == true`.

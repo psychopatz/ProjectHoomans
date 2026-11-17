@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REAL_SAVE = Path(
@@ -25,9 +25,9 @@ def candidate(turn: dict, strategy: str) -> dict:
     )
 
 
-class LiveRegressionL3Tests(unittest.TestCase):
+class LiveRegressionL3Tests(WarmWorkerTestMixin, unittest.TestCase):
     def test_claim_joke_is_typed_repair_not_display_text_reparse(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             hostile = worker.input("fuckyouuuu")
             joke = candidate(hostile, "CLAIM_JOKE")
@@ -57,7 +57,7 @@ class LiveRegressionL3Tests(unittest.TestCase):
         )
 
     def test_double_down_is_typed_hostility_and_keeps_argument_beat(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             hostile = worker.input("fuckyouuuu")
             double_down = candidate(hostile, "DOUBLE_DOWN")
@@ -83,10 +83,13 @@ class LiveRegressionL3Tests(unittest.TestCase):
     def test_exact_dana_surface_has_repair_escalation_and_neutral_choices(
         self,
     ) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            worker.import_saved_selection(REAL_SAVE, npc_id=DANA_NPC_ID)
-            worker.open_conversation()
-            turn = worker.input("fuckyouuuu")
+        try:
+            with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
+                worker.import_saved_selection(REAL_SAVE, npc_id=DANA_NPC_ID)
+                worker.open_conversation()
+                turn = worker.input("fuckyouuuu")
+        finally:
+            self.close_warm_worker()
 
         channel = turn["conversationPresentation"]["responseChannel"]
         self.assertEqual(channel["groupID"], "conversation_branch")
@@ -130,7 +133,7 @@ class LiveRegressionL3Tests(unittest.TestCase):
         for language, values in expected.items():
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 turn = worker.input("fuckyouuuu")
             for strategy, texts in values.items():
                 self.assertIn(

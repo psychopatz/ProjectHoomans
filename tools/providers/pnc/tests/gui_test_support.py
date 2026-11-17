@@ -9,6 +9,9 @@ import sqlite3
 import struct
 import tempfile
 import time
+
+os.environ["XMODIFIERS"] = "@im=none"
+
 import tkinter as tk
 import unittest
 from typing import Any, Callable, Iterable
@@ -290,6 +293,10 @@ def require_supported_save(test_case: unittest.TestCase) -> dict[str, Any]:
 class SemanticLabGuiTestCase(unittest.TestCase):
     """Create GUI tests with isolated, fixture-first UI state by default."""
 
+    def setUp(self) -> None:
+        super().setUp()
+        os.environ["XMODIFIERS"] = "@im=none"
+
     def new_ui_state_path(self, prefix: str = "semantic-lab-test-") -> Path:
         directory = tempfile.TemporaryDirectory(prefix=prefix)
         self.addCleanup(directory.cleanup)
@@ -325,6 +332,7 @@ class SemanticLabGuiTestCase(unittest.TestCase):
     ) -> SemanticHarnessApp:
         """Construct and clean up a fixture-first Semantic Lab application."""
 
+        os.environ["XMODIFIERS"] = "@im=none"
         app = SemanticHarnessApp(
             root,
             self.gui_arguments(
@@ -355,6 +363,12 @@ class SemanticLabGuiTestCase(unittest.TestCase):
             app.close()
         except tk.TclError:
             pass
+        authoring_service = getattr(app, "authoring_service", None)
+        if authoring_service is not None and hasattr(authoring_service, "close"):
+            try:
+                authoring_service.close()
+            except Exception:
+                pass
         try:
             root.destroy()
         except tk.TclError:

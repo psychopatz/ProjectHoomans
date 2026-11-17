@@ -5,10 +5,10 @@ from __future__ import annotations
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SemanticProviderParityTests(unittest.TestCase):
+class SemanticProviderParityTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def scenario(*, enabled: bool) -> dict:
         return merge(DEFAULT_SCENARIO, {
@@ -21,7 +21,7 @@ class SemanticProviderParityTests(unittest.TestCase):
     def test_authorized_local_command_is_provider_parity(self) -> None:
         turns = {}
         for label, enabled in (("disabled", False), ("enabled", True)):
-            with LuaSemanticWorker(self.scenario(enabled=enabled)) as worker:
+            with self.warm_worker(self.scenario(enabled=enabled)) as worker:
                 turns[label] = worker.input("follow me")
 
         for label, turn in turns.items():
@@ -55,7 +55,7 @@ class SemanticProviderParityTests(unittest.TestCase):
     def test_provider_fallback_is_safe_when_provider_is_available(self) -> None:
         turns = {}
         for label, enabled in (("disabled", False), ("enabled", True)):
-            with LuaSemanticWorker(self.scenario(enabled=enabled)) as worker:
+            with self.warm_worker(self.scenario(enabled=enabled)) as worker:
                 turns[label] = worker.input("this sentence is not authored")
 
         for label, turn in turns.items():

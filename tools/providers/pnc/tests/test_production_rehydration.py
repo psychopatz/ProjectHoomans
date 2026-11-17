@@ -10,14 +10,14 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.save_test_support import pz_file
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
 
 
-class ProductionRehydrationTests(unittest.TestCase):
+class ProductionRehydrationTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -138,7 +138,7 @@ class ProductionRehydrationTests(unittest.TestCase):
         raw = selection.provider_payloads["ProjectHoomans"]["rawRecords"]["npc"]
         self.assertEqual(raw["id"], "npcRehydrationFixture")
 
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_rehydration_fixture",
@@ -180,7 +180,7 @@ class ProductionRehydrationTests(unittest.TestCase):
         ]["npcKnowledge"]
         self.assertEqual(raw_knowledge["revision"], 7)
 
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_rehydration_fixture",
@@ -229,7 +229,7 @@ class ProductionRehydrationTests(unittest.TestCase):
         )
 
     def test_developer_fixture_mode_remains_explicit(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             snapshot = worker.snapshot()
             self.assertEqual(
                 snapshot["productionRehydration"]["status"],
@@ -241,7 +241,7 @@ class ProductionRehydrationTests(unittest.TestCase):
         selection = SaveBackedImporter(
             core_repository=CORE_REPOSITORY,
         ).load(self.save_path, player_uuid="char_rehydration_fixture", npc_id="npcRehydrationFixture")
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_rehydration_fixture",

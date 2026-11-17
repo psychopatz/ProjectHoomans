@@ -6,10 +6,10 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class PersonalDialogueKnowledgeDisclosureGatesTests(unittest.TestCase):
+class PersonalDialogueKnowledgeDisclosureGatesTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def scenario(
         familiarity: int = 80,
@@ -51,7 +51,7 @@ class PersonalDialogueKnowledgeDisclosureGatesTests(unittest.TestCase):
         }
 
     def test_familiarity_gates_disclosure_and_preserves_follow_up_context(self) -> None:
-        with LuaSemanticWorker(self.scenario()) as worker:
+        with self.warm_worker(self.scenario()) as worker:
             old_job = worker.input("what was your old job")
             self.assertEqual(
                 old_job["result"]["ir"]["provenance"]["pattern"],
@@ -99,7 +99,7 @@ class PersonalDialogueKnowledgeDisclosureGatesTests(unittest.TestCase):
             )
 
     def test_private_backstory_refuses_without_authorized_disclosure(self) -> None:
-        with LuaSemanticWorker(self.scenario(familiarity=0)) as worker:
+        with self.warm_worker(self.scenario(familiarity=0)) as worker:
             turn = worker.input("what was your old job")
 
         self.assertEqual(
@@ -116,7 +116,7 @@ class PersonalDialogueKnowledgeDisclosureGatesTests(unittest.TestCase):
         self.assertNotIn("knowledge", turn["contextAfter"])
 
     def test_authoritative_backstory_sentence_resolves_in_tagalog(self) -> None:
-        with LuaSemanticWorker(self.scenario(language="TL")) as worker:
+        with self.warm_worker(self.scenario(language="TL")) as worker:
             turn = worker.input("what was your old job")
 
         self.assertEqual(
@@ -154,7 +154,7 @@ class PersonalDialogueKnowledgeDisclosureGatesTests(unittest.TestCase):
         player_b["player"]["characterUUID"] = "char_h3_b"
         player_b["player"]["displayName"] = "Player B"
 
-        with LuaSemanticWorker(player_a) as worker:
+        with self.warm_worker(player_a) as worker:
             disclosed = worker.input("what was your old job")
             knowledge_a = disclosed["contextAfter"]["knowledge"]
             self.assertEqual(knowledge_a["npcID"], "npc-h3-grounded")
@@ -176,11 +176,11 @@ class PersonalDialogueKnowledgeDisclosureGatesTests(unittest.TestCase):
         self.assertEqual(reloaded["categories"], knowledge_a["categories"])
 
     def test_personality_changes_willingness_without_bypassing_knowledge(self) -> None:
-        with LuaSemanticWorker(
+        with self.warm_worker(
             self.scenario(familiarity=40, social_style="friendly")
         ) as friendly_worker:
             friendly = friendly_worker.input("what was your old job")
-        with LuaSemanticWorker(
+        with self.warm_worker(
             self.scenario(familiarity=40, social_style="withdrawn")
         ) as guarded_worker:
             guarded = guarded_worker.input("what was your old job")

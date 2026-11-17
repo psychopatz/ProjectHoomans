@@ -3,7 +3,10 @@ from hashlib import sha256
 from pathlib import Path
 import unittest
 from tools.semantic_harness.discovery.runtime import discover_newest_runtime
-from tools.providers.pnc.tests.grievance_evidence_test_support import saved_worker, storage
+from tools.providers.pnc.tests.grievance_evidence_test_support import (
+    GrievanceEvidenceWarmWorkerMixin,
+    storage,
+)
 
 ROOT = Path(__file__).resolve().parents[4]
 MOD = ROOT / "Contents/mods/ProjectHoomans"
@@ -22,11 +25,11 @@ def hashes():
     return {path.name: sha256(path.read_bytes()).hexdigest() for path in ALGORITHMS}
 
 
-class UnifiedEvidenceE6Tests(unittest.TestCase):
+class UnifiedEvidenceE6Tests(GrievanceEvidenceWarmWorkerMixin, unittest.TestCase):
     def test_future_commitment_uses_all_tiers_existing_owners_and_content(self):
         before_hashes = hashes()
         for tier in ["SESSION", "TODAY", "DURABLE"]:
-            with self.subTest(tier=tier), saved_worker() as worker:
+            with self.subTest(tier=tier), self.saved_worker() as worker:
                 worker.input("hello")
                 roots = storage(worker)["roots"]
                 def invoke(**payload):

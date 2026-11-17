@@ -12,13 +12,14 @@ from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.semantic_harness.runtime.save_catalog import _load_core_reader
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.save_test_support import pz_file
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
 
 
-class ProductionLeaveGroupTests(unittest.TestCase):
+class ProductionLeaveGroupTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -175,11 +176,8 @@ class ProductionLeaveGroupTests(unittest.TestCase):
             None,
         )
 
-    def _worker(self) -> LuaSemanticWorker:
-        return LuaSemanticWorker(
-            merge({}, DEFAULT_SCENARIO),
-            core_repository=CORE_REPOSITORY,
-        )
+    def _worker(self):
+        return self.warm_worker(merge({}, DEFAULT_SCENARIO))
 
     def _departure_payload(self, response: dict) -> dict:
         events = [

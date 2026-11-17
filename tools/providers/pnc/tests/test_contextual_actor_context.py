@@ -6,12 +6,12 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualActorContextTests(unittest.TestCase):
+class ContextualActorContextTests(WarmWorkerTestMixin, unittest.TestCase):
     def _turn(self, scenario: dict) -> dict:
-        with LuaSemanticWorker(deepcopy(scenario)) as worker:
+        with self.warm_worker(deepcopy(scenario)) as worker:
             return worker.input("hello")
 
     def test_context_projects_existing_identity_traits_personality_relationship_roles_and_situation(
@@ -114,7 +114,7 @@ class ContextualActorContextTests(unittest.TestCase):
 
     def test_projection_does_not_persist_persona_or_choice_state(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("hello")
             snapshot = worker.snapshot()
 

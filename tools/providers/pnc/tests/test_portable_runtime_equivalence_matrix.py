@@ -11,7 +11,7 @@ from tools.semantic_harness.inspection.conversation_inspector import (
     build_conversation_inspector,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
@@ -30,7 +30,7 @@ def _scenario(language: str, character_uuid: str = "c6-player-a") -> dict:
     )
 
 
-class PortableRuntimeEquivalenceMatrixTests(unittest.TestCase):
+class PortableRuntimeEquivalenceMatrixTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_real_worker_dialogue_inspector_restart_and_translation_matrix(self) -> None:
         expected = {
             "EN": {
@@ -48,7 +48,7 @@ class PortableRuntimeEquivalenceMatrixTests(unittest.TestCase):
         }
         for language, phrases in expected.items():
             with self.subTest(language=language):
-                with LuaSemanticWorker(_scenario(language)) as worker:
+                with self.warm_worker(_scenario(language)) as worker:
                     for phrase, visible in phrases.items():
                         turn = worker.input(phrase)
                         self.assertTrue(turn["accepted"], turn.get("reason"))

@@ -12,15 +12,15 @@ from tkinter import ttk
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class SimulationControlCatalogTests(SemanticLabGuiTestCase):
+class SimulationControlCatalogTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def test_worker_provides_bounded_typed_controls_and_registry_options(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.simulation_control_catalog()
             persona = worker.persona_catalog()
 
@@ -59,7 +59,7 @@ class SimulationControlCatalogTests(SemanticLabGuiTestCase):
         self.assertIn("trader", by_id["npc.role"]["options"])
 
     def test_catalog_collection_keeps_typed_state_and_rejects_invalid_values(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.simulation_control_catalog()
         friendly_trait = next(
             row["value"]

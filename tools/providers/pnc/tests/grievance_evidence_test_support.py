@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from copy import deepcopy
 import json
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-def saved_worker(raw=None):
-    worker = LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO))
+def _prepare_saved_worker(worker, raw=None):
     fixture = worker._request("TEST_PRODUCTION_INVENTORY_FIXTURE", {"mode": "SEED_ONLY"})
     if raw is not None:
         fixture["record"] = raw
@@ -28,6 +29,21 @@ def saved_worker(raw=None):
         },
     )
     return worker
+
+
+def saved_worker(raw=None):
+    worker = LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO))
+    return _prepare_saved_worker(worker, raw)
+
+
+class GrievanceEvidenceWarmWorkerMixin(WarmWorkerTestMixin):
+    """Reuse one class-scoped warm worker rehydrated via SAVE import_source."""
+
+    @classmethod
+    @contextmanager
+    def saved_worker(cls, raw=None):
+        with cls.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            yield _prepare_saved_worker(worker, raw)
 
 
 def storage(worker, **payload):

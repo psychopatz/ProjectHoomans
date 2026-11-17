@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REAL_SAVE = Path(
@@ -25,9 +25,9 @@ def response_channel(turn: dict) -> dict:
     return turn["conversationPresentation"]["responseChannel"]
 
 
-class LiveRegressionL1Tests(unittest.TestCase):
+class LiveRegressionL1Tests(WarmWorkerTestMixin, unittest.TestCase):
     def test_direct_responses_are_the_native_visible_surface(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             turn = worker.input("fuckyouuuu")
 
@@ -62,7 +62,7 @@ class LiveRegressionL1Tests(unittest.TestCase):
             )
 
     def test_back_navigation_restores_authored_landing_surface(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
             hostile = worker.input("fuckyouuuu")
             channel = response_channel(hostile)
@@ -81,17 +81,20 @@ class LiveRegressionL1Tests(unittest.TestCase):
 
     @unittest.skipUnless(REAL_SAVE.is_file(), "local Dana save unavailable")
     def test_exact_dana_save_exposes_direct_responses(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            imported = worker.import_saved_selection(
-                REAL_SAVE,
-                npc_id=DANA_NPC_ID,
-            )
-            self.assertEqual(
-                imported["scenario"]["npc"]["displayName"],
-                "Dana patz",
-            )
-            worker.open_conversation()
-            turn = worker.input("fuckyouuuu")
+        try:
+            with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
+                imported = worker.import_saved_selection(
+                    REAL_SAVE,
+                    npc_id=DANA_NPC_ID,
+                )
+                self.assertEqual(
+                    imported["scenario"]["npc"]["displayName"],
+                    "Dana patz",
+                )
+                worker.open_conversation()
+                turn = worker.input("fuckyouuuu")
+        finally:
+            self.close_warm_worker()
 
         self.assertEqual(
             turn["result"]["ir"]["intent"],

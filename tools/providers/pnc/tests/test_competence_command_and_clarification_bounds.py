@@ -6,10 +6,10 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class CommandAndClarificationBoundsTests(unittest.TestCase):
+class CommandAndClarificationBoundsTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]
@@ -40,7 +40,7 @@ class CommandAndClarificationBoundsTests(unittest.TestCase):
         )
         for phrase in phrases:
             with self.subTest(phrase=phrase):
-                with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
                     news = worker.input("do you have any news")
                     turn = worker.input(phrase)
                 self.assertEqual(news["result"]["ir"]["intent"], "GOSSIP")
@@ -75,7 +75,7 @@ class CommandAndClarificationBoundsTests(unittest.TestCase):
                     "gossip",
                 )
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             negative = worker.preview("give me more food")
         negative_ir = negative["result"]["ir"]
         self.assertNotEqual(
@@ -86,7 +86,7 @@ class CommandAndClarificationBoundsTests(unittest.TestCase):
         self.assertEqual(negative["toolCalls"], [])
 
     def test_acknowledgements_preserve_context_without_authorizing_actions(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             relationship = worker.input("are you single")
             acknowledged = worker.input("okay")
 
@@ -102,7 +102,7 @@ class CommandAndClarificationBoundsTests(unittest.TestCase):
         self.assert_no_effects(acknowledged)
         self.assertEqual(relationship["dispatchTransport"], [])
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             question = worker.input("are you hurt")
             acknowledged = worker.input("okay")
             continuation = worker.input("tell me more")
@@ -134,7 +134,7 @@ class CommandAndClarificationBoundsTests(unittest.TestCase):
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["residence"] = {"label": "Riverside Camp"}
         scenario["npc"]["health"] = None
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             residence = worker.input("where is your home")
             health = worker.input("what about your health")
             continuation = worker.input("tell me more")
@@ -156,7 +156,7 @@ class CommandAndClarificationBoundsTests(unittest.TestCase):
     def test_preview_and_tl_continuation_are_effect_free_and_localized(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["residence"] = {"label": "Riverside Camp"}
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("where do you live exactly")
             before = worker.snapshot()
             preview = worker.preview("tell me more")

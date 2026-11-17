@@ -7,14 +7,14 @@ import json
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class ContextualRankingTests(unittest.TestCase):
+class ContextualRankingTests(WarmWorkerTestMixin, unittest.TestCase):
     def _turn(self, updates: dict[str, object], value: str = "hello") -> dict:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"].update(updates)
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             return worker.input(value)
 
     @staticmethod
@@ -54,7 +54,7 @@ class ContextualRankingTests(unittest.TestCase):
         healthy = self._turn({}, "Are you okay?")
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["healthState"] = "injured"
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             injured = worker.input("Are you okay?")
             healthy_rows = self._rows(healthy)
             injured_rows = self._rows(injured)

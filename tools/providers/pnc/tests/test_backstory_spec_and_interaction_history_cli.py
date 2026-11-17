@@ -9,7 +9,7 @@ from pathlib import Path
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.codebuilder.interaction_spec import (
     compile_interaction_spec,
     graph_block,
@@ -24,7 +24,7 @@ HOOMANS_ROOT = Path(__file__).resolve().parents[4]
 CORE_ROOT = HOOMANS_ROOT.parent / "psychopatzCore"
 
 
-class BackstorySpecAndInteractionHistoryCliTests(unittest.TestCase):
+class BackstorySpecAndInteractionHistoryCliTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_real_worker_backstory_navigation_and_cli_inspect_interaction_history(self) -> None:
         backstory_spec = {
             "schema": "semantic.interaction_spec.v1",
@@ -107,7 +107,7 @@ class BackstorySpecAndInteractionHistoryCliTests(unittest.TestCase):
         self.assertTrue(compiled_spec["ok"], compiled_spec)
 
         scenario = merge(DEFAULT_SCENARIO, {})
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             backstory = worker.input("what did you do before all this")
             follow = worker.input("follow me")
             self.assertTrue(backstory["accepted"])

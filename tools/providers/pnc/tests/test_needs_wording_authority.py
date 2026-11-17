@@ -11,7 +11,7 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
     compile_conversation_sources,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
@@ -108,7 +108,7 @@ LEGACY_KEYS = {
 }
 
 
-class NeedsWordingShardTests(unittest.TestCase):
+class NeedsWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_compiler_owns_needs_families_by_needs_shard(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
         plans = {
@@ -200,7 +200,7 @@ class NeedsWordingShardTests(unittest.TestCase):
             with self.subTest(language=language):
                 scenario = deepcopy(scenario_base)
                 scenario["runtime"]["language"] = language
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     turns = [
                         worker.input("Do you need anything?"),
                         worker.input("How many?"),

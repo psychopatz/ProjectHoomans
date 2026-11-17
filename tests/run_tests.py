@@ -23,6 +23,7 @@ CORE_REPOSITORY = Path(
 sys.path.insert(0, str(CORE_REPOSITORY))
 
 from tools.semantic_harness.runtime.config import discover_newest_runtime
+from tools.semantic_harness.testing.compact_unittest import run_compact_unittest
 from tools.semantic_harness.testing.suite import (
     BoundedLuaTestRunner,
     install_suite_shutdown_handler,
@@ -145,6 +146,18 @@ def parse_args(arguments: list[str]) -> argparse.Namespace:
         "--domain",
         help="run one reviewed root-Lua domain from R1_ROOT_DOMAIN_REVIEW.json",
     )
+    parser.add_argument(
+        "--suite",
+        choices=("lua", "python", "all"),
+        default="lua",
+        help="suite to execute: lua smoke tests (default), python PNC suite, or all",
+    )
+    parser.add_argument(
+        "--progress-every",
+        type=int,
+        default=10,
+        help="emit flushed progress summary every N completed tests/modules (default: 10)",
+    )
     parser.add_argument("--jobs", type=int, default=min(4, os.cpu_count() or 1))
     parser.add_argument("--timeout", type=float, default=30.0, help="seconds per test")
     parser.add_argument("--max-output-lines", type=int, default=80)
@@ -170,25 +183,23 @@ def parse_args(arguments: list[str]) -> argparse.Namespace:
     return parser.parse_args(arguments)
 
 
-def main(arguments: list[str] | None = None) -> int:
-    install_suite_shutdown_handler()
-    options = parse_args(arguments or sys.argv[1:])
+def _run_lua_suite(options: argparse.Namespace) -> int:
     try:
         tests = discover(options.filters, options.domain)
     except RuntimeError as error:
-        print(f"Test selection error: {error}", file=sys.stderr)
+        print(f"Test selection error: {error}", file=sys.stderr, flush=True)
         return 2
     if options.list:
         for path in tests:
-            print(path.relative_to(ROOT))
+            print(path.relative_to(ROOT), flush=True)
         return 0
     if not tests:
-        print("No matching Lua tests.", file=sys.stderr)
+        print("No matching Lua tests.", file=sys.stderr, flush=True)
         return 2
     try:
         environment = test_environment(options.verbose)
     except (OSError, RuntimeError) as error:
-        print(f"Test environment error: {error}", file=sys.stderr)
+        print(f"Test environment error: {error}", file=sys.stderr, flush=True)
         return 2
 
     started = time.monotonic()
@@ -203,8 +214,19 @@ def main(arguments: list[str] | None = None) -> int:
                 max_output_bytes=options.max_output_bytes,
             )
         except ValueError as error:
-            print(f"Harness runner configuration error: {error}", file=sys.stderr)
+            print(f"Harness runner configuration error: {error}", file=sys.stderr, flush=True)
             return 2
+
+    print(
+        f"Running {len(tests)} Lua smoke test(s) ({workers} workers)...",
+        flush=True,
+    )
+    progress_every = max(1, int(options.progress_every))
+    width = max(1, len(str(len(tests))))
+    completed_count = 0
+    passed_count = 0
+    failed_count = 0
+
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
             executor.submit(
@@ -220,11 +242,36 @@ def main(arguments: list[str] | None = None) -> int:
         for future in as_completed(futures):
             result = future.result()
             results.append(result)
+            completed_count += 1
+            if result.returncode == 0:
+                passed_count += 1
+            else:
+                failed_count += 1
             if options.verbose:
                 state = "PASS" if result.returncode == 0 else "FAIL"
-                print(f"{state} {result.path.stem} {result.elapsed:.2f}s")
+                print(
+                    f"{state} {result.path.stem} {result.elapsed:.2f}s",
+                    flush=True,
+                )
                 if result.output.strip():
-                    print(bounded_output(result.output, options.max_output_lines))
+                    print(
+                        bounded_output(result.output, options.max_output_lines),
+                        flush=True,
+                    )
+            else:
+                if result.returncode != 0:
+                    print(
+                        f"[FAIL] {result.path.stem} ({result.elapsed:.2f}s)",
+                        flush=True,
+                    )
+                if completed_count % progress_every == 0 or completed_count == len(tests):
+                    status = "PASS" if failed_count == 0 else "FAIL"
+                    print(
+                        f"[{completed_count:>{width}}/{len(tests)}] {status} "
+                        f"{passed_count}/{completed_count} Lua tests | "
+                        f"{time.monotonic() - started:.1f}s elapsed",
+                        flush=True,
+                    )
             if options.fail_fast and result.returncode != 0:
                 for pending in futures:
                     pending.cancel()
@@ -235,17 +282,44 @@ def main(arguments: list[str] | None = None) -> int:
     elapsed = time.monotonic() - started
     if options.harness_report:
         if harness_runner is None:
-            print("--harness-report requires the bounded harness runner", file=sys.stderr)
+            print("--harness-report requires the bounded harness runner", file=sys.stderr, flush=True)
             return 2
         write_report(harness_runner.report(), Path(options.harness_report).expanduser())
     if failures:
-        print(f"FAIL {len(failures)}/{len(results)} executed in {elapsed:.2f}s")
+        print(f"FAIL {len(failures)}/{len(results)} executed in {elapsed:.2f}s", flush=True)
         for result in failures:
-            print(f"\n--- {result.path.name} ({result.elapsed:.2f}s) ---")
-            print(bounded_output(result.output, options.max_output_lines))
+            print(f"\n--- {result.path.name} ({result.elapsed:.2f}s) ---", flush=True)
+            print(bounded_output(result.output, options.max_output_lines), flush=True)
         return 1
-    print(f"PASS {len(results)}/{len(tests)} in {elapsed:.2f}s ({workers} workers)")
+    print(f"PASS {len(results)}/{len(tests)} in {elapsed:.2f}s ({workers} workers)", flush=True)
     return 0
+
+
+def _run_python_suite(options: argparse.Namespace) -> int:
+    return run_compact_unittest(
+        start_dir=ROOT / "tools/providers/pnc/tests",
+        pattern="test_*.py",
+        progress_every=options.progress_every,
+        fail_fast=options.fail_fast,
+        verbose=options.verbose,
+        list_only=options.list,
+        jobs=options.jobs,
+        filters=options.filters,
+    )
+
+
+def main(arguments: list[str] | None = None) -> int:
+    install_suite_shutdown_handler()
+    options = parse_args(arguments or sys.argv[1:])
+    if options.suite == "lua":
+        return _run_lua_suite(options)
+    if options.suite == "python":
+        return _run_python_suite(options)
+    lua_rc = _run_lua_suite(options)
+    if lua_rc != 0 and options.fail_fast:
+        return lua_rc
+    py_rc = _run_python_suite(options)
+    return 0 if (lua_rc == 0 and py_rc == 0) else (lua_rc or py_rc)
 
 
 if __name__ == "__main__":

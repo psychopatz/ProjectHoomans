@@ -6,10 +6,10 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class PersonalDialogueImmutableBackstoryFactsTests(unittest.TestCase):
+class PersonalDialogueImmutableBackstoryFactsTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_authoritative_facts_cover_immutable_personal_history(self) -> None:
         kinds = (
             "former_job",
@@ -19,7 +19,7 @@ class PersonalDialogueImmutableBackstoryFactsTests(unittest.TestCase):
             "fear",
             "tragedy",
         )
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             for kind in kinds:
                 with self.subTest(kind=kind):
                     result = worker.backstory_fact(

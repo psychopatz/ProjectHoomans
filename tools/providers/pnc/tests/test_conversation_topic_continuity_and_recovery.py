@@ -12,6 +12,7 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
@@ -26,9 +27,9 @@ def generated_rows(turn: dict) -> list[dict]:
     ]
 
 
-class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
+class ConversationTopicContinuityAndRecoveryTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_hostility_generates_semantically_diverse_affordances_and_keeps_authored(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("fuckyouuuu")
 
         rows = generated_rows(turn)
@@ -69,7 +70,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
     def test_trait_lane_uses_player_trait_only_and_exposes_bounded_provenance(self) -> None:
         player_trait = deepcopy(DEFAULT_SCENARIO)
         player_trait["player"]["traits"] = ["Brave"]
-        with LuaSemanticWorker(player_trait) as worker:
+        with self.warm_worker(player_trait) as worker:
             brave = worker.input("fuckyouuuu")
 
         call_bluff = next(
@@ -84,7 +85,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
 
         npc_trait_only = deepcopy(DEFAULT_SCENARIO)
         npc_trait_only["npc"]["traits"] = ["Brave"]
-        with LuaSemanticWorker(npc_trait_only) as worker:
+        with self.warm_worker(npc_trait_only) as worker:
             npc_only = worker.input("fuckyouuuu")
         self.assertNotIn(
             "CALL_BLUFF",
@@ -92,7 +93,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
         )
 
     def test_generated_affordance_follows_current_pending_question(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             greeting = worker.input("hello")
 
         rows = generated_rows(greeting)
@@ -113,7 +114,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
             self.assertEqual(reply_to["flowID"], "greeting")
 
     def test_generated_click_and_typed_apology_converge_downstream(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             hostile = worker.input("fuckyouuuu")
             apology = next(
                 row for row in generated_rows(hostile)
@@ -121,7 +122,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
             )
             clicked = worker.suggestion_click(apology["frame"])
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.input("fuckyouuuu")
             typed = worker.input("sorry")
 
@@ -157,7 +158,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
         for language in ("EN", "TL"):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 turn = worker.input("fuckyouuuu")
             surfaces[language] = {
                 row["strategy"]: row["display"]["utterance"]
@@ -209,7 +210,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
                     "confidence": 0.85,
                     "forgiveness": 0.8,
                 }
-                with LuaSemanticWorker(scenario) as worker:
+                with self.warm_worker(scenario) as worker:
                     turn = worker.input("fuckyouuuu")
 
                 self.assertEqual(
@@ -239,7 +240,7 @@ class ConversationTopicContinuityAndRecoveryTests(unittest.TestCase):
                 )
 
     def test_non_owned_interaction_response_falls_back_to_dialogue_content(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("hello")
         payload = turn["messages"][0]["payload"]
         self.assertNotEqual(payload.get("realizationFamily"), "utterance_plan")

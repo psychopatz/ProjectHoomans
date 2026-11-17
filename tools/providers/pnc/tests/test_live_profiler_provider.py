@@ -12,7 +12,7 @@ from tools.providers.pnc.runtime.live_profiler_provider import (
     LiveProfilerProvider,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
@@ -46,7 +46,7 @@ def _write_live_files(root: Path) -> tuple[Path, Path, bytes]:
     return snapshot_path, config_path, snapshot_path.read_bytes()
 
 
-class LiveProfilerProviderTests(unittest.TestCase):
+class LiveProfilerProviderTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_provider_is_disabled_by_default_and_has_no_write_surface(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             snapshot_path, config_path, _ = _write_live_files(Path(temporary))
@@ -86,7 +86,7 @@ class LiveProfilerProviderTests(unittest.TestCase):
                 len(projection["values"]["world"]["ignoredLargeList"]), 33
             )
 
-            with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
                 response = worker.enrich_from_live_profiler(
                     enabled=True,
                     snapshot_path=snapshot_path,

@@ -6,14 +6,14 @@ import unittest
 
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.faction_rehydration_test_support import (
     CORE_REPOSITORY,
     setup_faction_fixture,
 )
 
 
-class MissingStateAuditTests(unittest.TestCase):
+class MissingStateAuditTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         setup_faction_fixture(self)
 
@@ -54,7 +54,7 @@ class MissingStateAuditTests(unittest.TestCase):
         self.assertEqual(missing["worn"]["missingClass"], "ENGINE_ONLY")
 
     def test_fixture_mode_marks_fixture_and_absence_without_save_claims(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             social = worker.snapshot()["context"]["socialContext"]
 
         self.assertEqual(

@@ -7,10 +7,10 @@ import unittest
 
 from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class SemanticLabNpcProfileTests(unittest.TestCase):
+class SemanticLabNpcProfileTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_presets_replace_capability_specific_state_without_losing_inventory(self) -> None:
         trader = apply_npc_profile(DEFAULT_SCENARIO, "trader")
         self.assertEqual(trader["runtime"]["availableMods"], {"DTHoomans": True})
@@ -25,10 +25,9 @@ class SemanticLabNpcProfileTests(unittest.TestCase):
 
     def test_profiles_change_real_suggestions_and_trade_preflight(self) -> None:
         for profile in ("companion", "neutral", "enemy", "trader"):
-            worker = LuaSemanticWorker(
+            with self.warm_worker(
                 apply_npc_profile(deepcopy(DEFAULT_SCENARIO), profile)
-            )
-            try:
+            ) as worker:
                 response = worker.input("whats up")
                 suggestions = response["observation"]["suggestions"]
                 ids = {item["id"] for item in suggestions.get("candidates", [])}
@@ -60,8 +59,6 @@ class SemanticLabNpcProfileTests(unittest.TestCase):
                     "dthoomans:caravan_referral" in category_ids,
                     profile == "trader",
                 )
-            finally:
-                worker.close()
 
 
 if __name__ == "__main__":

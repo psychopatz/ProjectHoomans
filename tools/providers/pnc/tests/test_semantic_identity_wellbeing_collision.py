@@ -8,6 +8,7 @@ from pathlib import Path
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.testing.runner import load_case, run_case
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.shell import semantic_suggestion_rows
 
 
@@ -23,7 +24,7 @@ CANDIDATE_ELIGIBILITY_CASE = (
 )
 
 
-class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
+class SemanticIdentityWellbeingCollisionTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         messages = turn.get("messages", [])
@@ -73,7 +74,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
                 "HUNGER",
             ),
         )
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")
             for text, pattern, subject in cases:
                 with self.subTest(text=text):
@@ -99,7 +100,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
             ("what time is it", "pnc.question.time", "TIME"),
         ):
             with self.subTest(text=text):
-                with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
                     worker.input("who are you")
                     turn = worker.input(text)
                 ir = turn["result"]["ir"]
@@ -123,7 +124,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
             ("My name is Patrick", "pnc.identity.my_name_is"),
         ):
             with self.subTest(text=text):
-                with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+                with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
                     worker.input("who are you")
                     turn = worker.input(text)
                 ir = turn["result"]["ir"]
@@ -140,7 +141,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
                 self.assertIsNone(self.pending_exchange(turn))
 
     def test_pending_identity_presents_three_deterministic_choice_frames(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             turn = worker.input("who are you")
 
         suggestions = turn["observation"]["suggestions"]
@@ -192,7 +193,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         )
 
     def test_real_name_choice_submits_canonical_name_for_authoritative_check(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")
             suggestions = worker.snapshot()["suggestions"]
             group = next(
@@ -224,7 +225,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertIn("Mara", self.message_text(result))
 
     def test_native_conversation_identity_choice_submits_canonical_name(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             root_row = next(
                 row
@@ -257,7 +258,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertIn("Mara", self.message_text(result))
 
     def test_false_explicit_name_claim_remains_authoritatively_rejected(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")
             turn = worker.input("I'm Patricia")
         ir = turn["result"]["ir"]
@@ -274,7 +275,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertIsNone(self.pending_exchange(turn))
 
     def test_lie_choice_submits_generated_alias_and_uses_disbelief_response(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             turn = worker.input("who are you")
             lie = next(
                 candidate
@@ -296,7 +297,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertIsNone(self.pending_exchange(turn))
 
     def test_explicit_refusal_remains_identity_evasion(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")
             turn = worker.input("no")
         self.assertEqual(
@@ -310,7 +311,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertIsNone(self.pending_exchange(turn))
 
     def test_identity_interruption_can_resume_without_penalty(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             first = worker.input("who are you")
             interruption = worker.input("Are you okay?")
             resumed = worker.input("I'm Patrick")
@@ -332,7 +333,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertIsNone(self.pending_exchange(resumed))
 
     def test_repeated_preview_has_no_effects(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")
             before = worker.snapshot()
             previews = [worker.preview("im fine thanks") for _ in range(2)]

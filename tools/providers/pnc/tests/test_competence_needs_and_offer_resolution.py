@@ -7,9 +7,10 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class NeedsAndOfferResolutionTests(unittest.TestCase):
+class NeedsAndOfferResolutionTests(WarmWorkerTestMixin, unittest.TestCase):
     @staticmethod
     def message_text(turn: dict) -> str:
         payload = turn["messages"][-1]["payload"]
@@ -79,7 +80,7 @@ class NeedsAndOfferResolutionTests(unittest.TestCase):
         )
         for text, subject, expected_text in cases:
             with self.subTest(text=text):
-                with LuaSemanticWorker(self.unknown_health_scenario()) as worker:
+                with self.warm_worker(self.unknown_health_scenario()) as worker:
                     turn = worker.input(text)
                 fact = self.assert_fact_question(turn, subject)
                 self.assertEqual(fact["status"], "unknown")
@@ -102,7 +103,7 @@ class NeedsAndOfferResolutionTests(unittest.TestCase):
                 }
             }
         }
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             residence = worker.input("where is your home")
             health = worker.input("are you hurt")
             knowledge = worker.input("do you know about the radio tower")
@@ -153,7 +154,7 @@ class NeedsAndOfferResolutionTests(unittest.TestCase):
         )
 
     def test_inventory_relationship_and_command_authority_are_preserved(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             inventory = worker.input("what do you have")
         self.assertEqual(inventory["result"]["ir"]["subject"], "INVENTORY")
         self.assertEqual(
@@ -164,7 +165,7 @@ class NeedsAndOfferResolutionTests(unittest.TestCase):
         self.assertEqual(inventory["result"]["actionResult"]["status"], "found")
         self.assertGreaterEqual(len(inventory["dispatchTransport"]), 1)
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             relationship = worker.input("are you single")
         self.assertEqual(
             relationship["result"]["ir"]["subject"],
@@ -174,7 +175,7 @@ class NeedsAndOfferResolutionTests(unittest.TestCase):
         self.assertEqual(relationship["toolCalls"], [])
         self.assertTrue(self.message_text(relationship))
 
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             stay = worker.input("wait here")
         self.assertEqual(stay["result"]["ir"]["action"], "STAY")
         self.assertEqual(stay["result"]["decision"]["branch"], "COMMAND_ACCEPTED")
@@ -183,7 +184,7 @@ class NeedsAndOfferResolutionTests(unittest.TestCase):
         self.assertEqual(stay["result"]["actionResult"]["capabilityID"], "pnc:companion.stay")
 
     def test_social_and_gossip_inputs_do_not_become_factual_actions(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             gossip = worker.input("did you hear that someone got bitten")
             negative = worker.input("i don't like your dress")
 
@@ -198,7 +199,7 @@ class NeedsAndOfferResolutionTests(unittest.TestCase):
     def test_tl_residence_translation_and_preview_are_effect_free(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["residence"] = {"label": "Riverside Camp"}
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             worker.input("hello")
             before = worker.snapshot()
             preview = worker.preview("where do you live exactly")

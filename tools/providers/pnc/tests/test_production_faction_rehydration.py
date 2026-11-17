@@ -11,7 +11,7 @@ import unittest
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.save_catalog import SaveCatalog
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.providers.pnc.tests.save_test_support import pz_file
 
 
@@ -46,7 +46,7 @@ def relation(source: str, target: str, *, standing: int, state: str) -> dict:
     }
 
 
-class ProductionFactionRehydrationTests(unittest.TestCase):
+class ProductionFactionRehydrationTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -195,7 +195,7 @@ class ProductionFactionRehydrationTests(unittest.TestCase):
         self.assertIn("factions", raw_registries)
         self.assertIn("communities", raw_registries)
 
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(
                 self.save_path,
                 player_uuid="char_faction_fixture",
@@ -261,7 +261,7 @@ class ProductionFactionRehydrationTests(unittest.TestCase):
             self.assertEqual(worker.source_snapshot.to_dict(), source_before)
 
     def test_fixture_mode_does_not_use_saved_faction_state(self) -> None:
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             snapshot = worker.snapshot()
             self.assertEqual(
                 snapshot["productionFactionRehydration"]["status"],
@@ -288,7 +288,7 @@ class ProductionFactionRehydrationTests(unittest.TestCase):
         )
         npc_id = next(iter(factions[target_id]["memberIDs"]))
         before = hashlib.sha256(REAL_SAVE.read_bytes()).digest()
-        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
             imported = worker.import_saved_selection(REAL_SAVE, npc_id=npc_id)
             context = imported["productionFactionContext"]
             self.assertEqual(

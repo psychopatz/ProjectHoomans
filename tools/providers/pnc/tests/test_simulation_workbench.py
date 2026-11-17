@@ -13,16 +13,16 @@ from tkinter import ttk
 
 from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class SimulationWorkbenchTests(SemanticLabGuiTestCase):
+class SimulationWorkbenchTests(WarmWorkerTestMixin, SemanticLabGuiTestCase):
     def test_semantic_dialogue_toggle_uses_worker_gate_and_saved_runtime(self) -> None:
         disabled = deepcopy(DEFAULT_SCENARIO)
         disabled["runtime"]["semanticDialogueEnabled"] = False
-        with LuaSemanticWorker(disabled) as worker:
+        with self.warm_worker(disabled) as worker:
             snapshot = worker.snapshot()
             self.assertFalse(
                 snapshot["scenario"]["runtime"]["semanticDialogueEnabled"]
@@ -44,7 +44,7 @@ class SimulationWorkbenchTests(SemanticLabGuiTestCase):
         self.assertTrue(refreshed["suggestions"]["candidates"])
 
     def test_worker_marks_quick_controls_in_the_shared_catalog(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.simulation_control_catalog()
         rows = {row["id"]: row for row in catalog.get("controls", [])}
         for control_id in (

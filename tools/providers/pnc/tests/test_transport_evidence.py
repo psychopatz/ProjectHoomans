@@ -7,10 +7,10 @@ import unittest
 from tools.semantic_harness.discovery.runtime import discover_lua
 import tools.semantic_harness
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class TransportEvidenceTests(unittest.TestCase):
+class TransportEvidenceTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_partition_keeps_facts_and_fails_closed_for_unknown_commands(self):
         worker = Path(tools.semantic_harness.__file__).resolve().parent / "lua"
         script = r'''
@@ -40,7 +40,7 @@ class TransportEvidenceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_real_turn_retains_lifecycle_payload_and_one_gameplay_dispatch(self):
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             follow = worker.input("Follow me")
             vague = worker.input("yeah rigt")
         self.assertEqual(len(follow["dispatchTransport"]), 1)

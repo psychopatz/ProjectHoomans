@@ -4,7 +4,7 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def tactical_fixture() -> dict:
@@ -193,11 +193,11 @@ def silence_fixture() -> dict:
     }
 
 
-class SemanticCombatObservatoryTests(unittest.TestCase):
+class SemanticCombatObservatoryTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_worker_explains_tactical_prompt_from_production_lua(self) -> None:
         fixture = tactical_fixture()
         event_ref = fixture["inspect"]["eventRef"]
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.combat_observatory_fixture(fixture)
             again = worker.combat_observatory_inspect(
                 npc_id="npc-observatory",
@@ -256,7 +256,7 @@ class SemanticCombatObservatoryTests(unittest.TestCase):
         )
 
     def test_worker_explains_silence_and_weapon_predicates(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             view = worker.combat_observatory_fixture(silence_fixture())
 
         self.assertTrue(view["ok"])
@@ -273,7 +273,7 @@ class SemanticCombatObservatoryTests(unittest.TestCase):
         self.assertLessEqual(len(view["arbiter"]["decisions"]), 4)
 
     def test_worker_api_enforces_bounded_inspection(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.combat_observatory_fixture(tactical_fixture())
             with self.assertRaisesRegex(ValueError, "1 to 8"):
                 worker.combat_observatory_inspect(limit=0)

@@ -7,6 +7,7 @@ from copy import deepcopy
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def camp_scenario(response: dict) -> dict:
@@ -57,7 +58,7 @@ def camp_surface(worker: LuaSemanticWorker) -> dict:
     return camp
 
 
-class DynamicCampDestinationsTests(unittest.TestCase):
+class DynamicCampDestinationsTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_only_valid_discovered_destinations_project_and_transport(self) -> None:
         response = {
             "accepted": True,
@@ -72,7 +73,7 @@ class DynamicCampDestinationsTests(unittest.TestCase):
                 },
             },
         }
-        with LuaSemanticWorker(camp_scenario(response)) as worker:
+        with self.warm_worker(camp_scenario(response)) as worker:
             camp = camp_surface(worker)
             self.assertTrue(camp["accepted"])
             self.assertEqual(len(camp["messages"]), 1)
@@ -118,7 +119,7 @@ class DynamicCampDestinationsTests(unittest.TestCase):
             "reason": "camp_site_hint_stale",
             "details": {"siteReason": "camp_site_hint_stale"},
         }
-        with LuaSemanticWorker(camp_scenario(response)) as worker:
+        with self.warm_worker(camp_scenario(response)) as worker:
             camp = camp_surface(worker)
             channel = camp["conversationPresentation"]["responseChannel"]
             selected = next(
@@ -140,7 +141,7 @@ class DynamicCampDestinationsTests(unittest.TestCase):
             self.assertEqual(result["scenario"]["npc"]["activeBehavior"], "idle")
 
     def test_empty_camp_projection_is_truthful_and_conversational(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             root = opened["presentation"]["responseChannel"]
             orders = worker.suggestion_click(

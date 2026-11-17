@@ -70,17 +70,12 @@ function ProductionModules.load(context)
             return nil
         end
         local moduleName = string.gsub(relative, "%.lua$", "")
-        local value
-        if moduleName ~= relative and package.loaded[moduleName] ~= nil then
-            value = package.loaded[moduleName]
-        else
-            value = Test.load(mod, layer, relative)
-            if moduleName ~= relative and package.loaded[moduleName] == nil then
-                if value ~= nil then
-                    package.loaded[moduleName] = value
-                else
-                    package.loaded[moduleName] = true
-                end
+        local value = Test.load(mod, layer, relative)
+        if moduleName ~= relative and layer ~= "client" and package.loaded[moduleName] == nil then
+            if value ~= nil then
+                package.loaded[moduleName] = value
+            else
+                package.loaded[moduleName] = true
             end
         end
         Runtime.loadedModulePaths[key] = true

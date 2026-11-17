@@ -7,7 +7,7 @@ import json
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.testing.sweep_dimensions import (
     EXPLICIT_SCENARIO_ADAPTERS,
     DiscoveredSurface,
@@ -27,7 +27,7 @@ from tools.semantic_harness.testing.sweep_evidence import (
 )
 
 
-class SweepFoundationTests(unittest.TestCase):
+class SweepFoundationTests(WarmWorkerTestMixin, unittest.TestCase):
     def setUp(self) -> None:
         self.mock_control_catalog = {
             "controls": [
@@ -280,7 +280,7 @@ class SweepFoundationTests(unittest.TestCase):
 
     def test_real_lua_worker_dimension_and_evidence_projection(self) -> None:
         """Integration with real LuaSemanticWorker."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             inventory = extract_dimension_inventory(worker)
             self.assertIn("player.hunger", inventory)
             self.assertIn("npc.hunger", inventory)
@@ -304,7 +304,7 @@ class SweepFoundationTests(unittest.TestCase):
             )
 
         # Run modified scenario through real LuaSemanticWorker
-        with LuaSemanticWorker(modified_scenario) as worker:
+        with self.warm_worker(modified_scenario) as worker:
             record = worker.input("how are you?")
             rows = extract_evidence_rows_from_turn(
                 record,
@@ -370,7 +370,7 @@ class SweepFoundationTests(unittest.TestCase):
 
     def test_trait_option_normalization(self) -> None:
         """Verify structured trait options normalize to canonical IDs and carry labels."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             inventory = extract_dimension_inventory(worker)
             trait_dim = inventory.get("persona.traits")
             self.assertIsNotNone(trait_dim)
@@ -384,7 +384,7 @@ class SweepFoundationTests(unittest.TestCase):
 
     def test_surface_discovery_from_worker(self) -> None:
         """Verify interaction surfaces are discovered from production worker."""
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             surfaces = discover_interaction_surfaces(worker)
             surface_ids = [s.surface_id for s in surfaces]
             # Must contain production root choices

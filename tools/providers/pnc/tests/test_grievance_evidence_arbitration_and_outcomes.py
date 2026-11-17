@@ -1,11 +1,16 @@
 """Bounded compact retention remains useful after detailed retention drops."""
 import unittest
-from tools.providers.pnc.tests.grievance_evidence_test_support import saved_worker, storage, turn, byte_size
+from tools.providers.pnc.tests.grievance_evidence_test_support import (
+    GrievanceEvidenceWarmWorkerMixin,
+    byte_size,
+    storage,
+    turn,
+)
 
 
-class UnifiedEvidenceE3Tests(unittest.TestCase):
+class UnifiedEvidenceE3Tests(GrievanceEvidenceWarmWorkerMixin, unittest.TestCase):
     def test_durable_owner_survives_day_without_compact_today(self):
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             storage(worker, addMemory="abandoned_in_combat")
             after = storage(worker, advanceDays=1)
             rows = after["evidence"]["rows"]
@@ -16,7 +21,7 @@ class UnifiedEvidenceE3Tests(unittest.TestCase):
             self.assertFalse((after.get("memory") or {}).get("s"))
 
     def test_production_turn_exposes_all_tiers_and_cross_session_recall(self):
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             worker.input("fuck you")
             serialized = storage(worker)["serializedRecord"]
             result = worker.input("im sorry")
@@ -24,7 +29,7 @@ class UnifiedEvidenceE3Tests(unittest.TestCase):
             tiers = {row["sourceTier"] for row in evidence["rows"]}
             self.assertEqual(tiers, {"SESSION", "TODAY", "DURABLE"})
             self.assertTrue(all(row["status"] == "queried" for row in evidence["providers"]))
-        with saved_worker(serialized) as replay:
+        with self.saved_worker(serialized) as replay:
             evidence = storage(replay)["evidence"]
             self.assertEqual({row["sourceTier"] for row in evidence["rows"]}, {"TODAY", "DURABLE"})
             rows = evidence["rows"]
@@ -33,7 +38,7 @@ class UnifiedEvidenceE3Tests(unittest.TestCase):
             self.assertFalse(any("contextualRelevance" in row for row in rows))
 
     def test_today_survives_relationship_saturation(self):
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             before = storage(worker, saturate=True)
             result = turn(worker, "fuck you")
             after = storage(worker)
@@ -48,7 +53,7 @@ class UnifiedEvidenceE3Tests(unittest.TestCase):
         churn = ["player_greeted", "npc_greeted_player", "player_farewelled",
                  "player_thanked", "player_praised", "player_saluted",
                  "player_disapproved", "witnessed_player_hurt"]
-        with saved_worker() as worker:
+        with self.saved_worker() as worker:
             storage(worker, project="saved_from_incapacitation")
             for _ in range(5):
                 for event in churn:

@@ -8,7 +8,7 @@ import unittest
 
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 from tools.semantic_harness.ui.interaction_modules.model import _behavior_content_refs
 from tools.semantic_harness.ui.interaction_inspector import interaction_summary
 
@@ -17,9 +17,9 @@ REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
-class InteractionBehaviorStructuralDiffContractTests(unittest.TestCase):
+class InteractionBehaviorStructuralDiffContractTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_behavior_outputs_link_to_dialogue_content_without_wording(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.beat_catalog()
         behavior = next(
             row for row in catalog["behaviors"]
@@ -85,7 +85,7 @@ class InteractionBehaviorStructuralDiffContractTests(unittest.TestCase):
         self.assertNotIn("styles", current)
 
     def test_real_worker_inspector_exposes_interaction_evidence(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             result = worker.input("fuck ypuuuu")
         observation = result["observation"]
         summary = interaction_summary(observation)

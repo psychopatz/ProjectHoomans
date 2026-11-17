@@ -6,6 +6,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 REAL_SAVE = Path(
@@ -29,9 +30,14 @@ def generated(turn: dict, strategy: str) -> dict:
     )
 
 
-def warning_sequence(scenario: dict, count: int = 4) -> list[tuple[str, str]]:
+def warning_sequence(
+    scenario: dict,
+    count: int = 4,
+    *,
+    worker_factory=LuaSemanticWorker,
+) -> list[tuple[str, str]]:
     rows: list[tuple[str, str]] = []
-    with LuaSemanticWorker(deepcopy(scenario)) as worker:
+    with worker_factory(deepcopy(scenario)) as worker:
         worker.open_conversation()
         turn = worker.input("fuckyouuuu")
         for _ in range(count):
@@ -51,9 +57,9 @@ def warning_sequence(scenario: dict, count: int = 4) -> list[tuple[str, str]]:
     return rows
 
 
-class LiveRegressionL4Tests(unittest.TestCase):
+class LiveRegressionL4Tests(WarmWorkerTestMixin, unittest.TestCase):
     def test_warn_uses_compositional_realization(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("fuckyouuuu")
 
         self.assertEqual(
@@ -78,8 +84,8 @@ class LiveRegressionL4Tests(unittest.TestCase):
         self.assertNotIn("uuu", current["text"].lower())
 
     def test_warn_variation_is_bounded_deterministic_and_stateless(self) -> None:
-        first = warning_sequence(DEFAULT_SCENARIO)
-        second = warning_sequence(DEFAULT_SCENARIO)
+        first = warning_sequence(DEFAULT_SCENARIO, worker_factory=self.warm_worker)
+        second = warning_sequence(DEFAULT_SCENARIO, worker_factory=self.warm_worker)
         self.assertEqual(first, second)
         self.assertEqual(len(first), 4)
         self.assertEqual(len(set(first)), 4)
@@ -94,7 +100,7 @@ class LiveRegressionL4Tests(unittest.TestCase):
         for language in ("EN", "TL"):
             scenario = deepcopy(DEFAULT_SCENARIO)
             scenario["runtime"]["language"] = language
-            with LuaSemanticWorker(scenario) as worker:
+            with self.warm_worker(scenario) as worker:
                 turn = worker.input("fuckyouuuu")
             current = payload(turn)
             surfaces[language] = (
@@ -119,7 +125,7 @@ class LiveRegressionL4Tests(unittest.TestCase):
             "confidence": 0.85,
             "forgiveness": 0.8,
         }
-        with LuaSemanticWorker(scenario) as worker:
+        with self.warm_worker(scenario) as worker:
             turn = worker.input("fuckyouuuu")
 
         self.assertEqual(
@@ -137,7 +143,7 @@ class LiveRegressionL4Tests(unittest.TestCase):
 
     @unittest.skipUnless(REAL_SAVE.is_file(), "local Dana save unavailable")
     def test_exact_dana_warn_is_compositional_and_memory_safe(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.import_saved_selection(REAL_SAVE, npc_id=DANA_NPC_ID)
             worker.open_conversation()
             turn = worker.input("fuckyouuuu")

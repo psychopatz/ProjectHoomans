@@ -5,12 +5,12 @@ from __future__ import annotations
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
-class InteractionPreviewAndContextualResolutionTests(unittest.TestCase):
+class InteractionPreviewAndContextualResolutionTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_ungrounded_thanks_clarifies_without_entering_a_beat(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             result = worker.input("thanks")
 
         decision = result["result"]["decision"]
@@ -63,7 +63,7 @@ class InteractionPreviewAndContextualResolutionTests(unittest.TestCase):
                 "confidence": 1.0,
             },
         }
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             before = worker.snapshot()
             result = worker.preview_interaction(stimulus)
             after = worker.snapshot()
@@ -97,7 +97,7 @@ class InteractionPreviewAndContextualResolutionTests(unittest.TestCase):
         )
 
     def test_contextual_yes_resolves_against_pending_flow_semantics(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             worker.input("hello")
             result = worker.input("yes")
 
@@ -125,7 +125,7 @@ class InteractionPreviewAndContextualResolutionTests(unittest.TestCase):
             self.assertNotIn("rawText", row)
 
     def test_behavior_schema_is_output_agnostic_at_top_level(self) -> None:
-        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+        with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.beat_catalog()
         behavior = next(
             row for row in catalog["behaviors"]

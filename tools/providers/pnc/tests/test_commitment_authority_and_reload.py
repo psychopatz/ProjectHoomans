@@ -6,7 +6,7 @@ import unittest
 
 from tools.semantic_harness.transport.process import HarnessError
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 def acknowledged_scenario() -> dict:
@@ -37,9 +37,9 @@ def acknowledged_scenario() -> dict:
     )
 
 
-class CommitmentAuthorityAndReloadTests(unittest.TestCase):
+class CommitmentAuthorityAndReloadTests(WarmWorkerTestMixin, unittest.TestCase):
     def test_acknowledged_commitment_survives_knowledge_reload(self) -> None:
-        with LuaSemanticWorker(acknowledged_scenario()) as worker:
+        with self.warm_worker(acknowledged_scenario()) as worker:
             accepted = worker.commitment(
                 {
                     "operation": "record",
@@ -89,7 +89,7 @@ class CommitmentAuthorityAndReloadTests(unittest.TestCase):
     def test_unknown_unacknowledged_and_wrong_owner_are_not_authoritative(
         self,
     ) -> None:
-        with LuaSemanticWorker(acknowledged_scenario()) as worker:
+        with self.warm_worker(acknowledged_scenario()) as worker:
             with self.assertRaisesRegex(
                 HarnessError, "commitment_evidence_unknown"
             ):
