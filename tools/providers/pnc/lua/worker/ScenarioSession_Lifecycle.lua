@@ -105,6 +105,24 @@ local function install(ScenarioSession)
         Runtime.conversationSuspended = false
         context.WorkingWorld.beginReset(Runtime)
         context.RuntimeState.resetContainers(Runtime)
+        if PNC.ConvoEngine
+            and PNC.ConvoEngine.ResponseCatalog
+            and type(PNC.ConvoEngine.ResponseCatalog.ResetSelections) == "function"
+        then
+            PNC.ConvoEngine.ResponseCatalog.ResetSelections()
+        end
+        if PNC.ConvoEngine
+            and PNC.ConvoEngine.SpeechRealization
+            and type(PNC.ConvoEngine.SpeechRealization.ResetSelections) == "function"
+        then
+            PNC.ConvoEngine.SpeechRealization.ResetSelections()
+        end
+        if PNC.ConvoEngine
+            and PNC.ConvoEngine.ToolResultRealization
+            and type(PNC.ConvoEngine.ToolResultRealization.ResetSelections) == "function"
+        then
+            PNC.ConvoEngine.ToolResultRealization.ResetSelections()
+        end
         ScenarioSession.configureRuntime(context)
         context.WorkingWorld.captureBaseline(Runtime, Values)
         local runtime = Runtime.scenario.runtime or {}

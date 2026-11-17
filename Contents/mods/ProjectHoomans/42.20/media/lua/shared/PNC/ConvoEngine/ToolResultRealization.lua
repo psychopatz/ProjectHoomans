@@ -36,6 +36,16 @@ Realization.lastVariant = lastVariant
 local lastVariantOrder = Realization.lastVariantOrder or {}
 Realization.lastVariantOrder = lastVariantOrder
 
+function Realization.ResetSelections()
+    for key in pairs(lastVariant) do
+        lastVariant[key] = nil
+    end
+    for index = #lastVariantOrder, 1, -1 do
+        lastVariantOrder[index] = nil
+    end
+    return true
+end
+
 local function normalized(value)
     value = string.lower(tostring(value or ""))
     value = string.gsub(value, "[%s%-]", "_")

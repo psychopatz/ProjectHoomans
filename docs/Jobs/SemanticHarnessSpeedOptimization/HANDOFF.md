@@ -7,19 +7,20 @@ workspace_scope: "multi"
 workspace_primary: "project-hoomans"
 workspace_repositories: "project-hoomans;psychopatz-core;dynamic-trading"
 codebase_memory_indexed_commit: "24965c9c6cef4f9b0dbadc949c9db7867a94f2a9"
-updated_at: "2026-11-17T15:06:06.639015Z"
+updated_at: "2026-11-17T15:13:02.137367Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
-phase: "P3"
-chunk: "P3 hermetic state reset, warm-worker reuse, and --jobs N parallelism for declarative fixtures"
+phase: "P4"
+chunk: "P4 CodeBuilder compilation cache, batch reuse, and heavy imperative suite acceleration"
 retrieval_tier: "verify"
 phase_commit: "self"
-phase_commit_phase: "P2"
-phase_commit_message: "phase(P2): semantic_harness(P2): deduplicate ProductionModules require and skip redundant startup import/hello"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=fe8093833c74441e69ffceca262e2595a3a50202;dynamic-trading=1fac47cdb1ff5ced7b2951634511859a0d276df3"
+phase_commit_phase: "P3"
+phase_commit_message: "phase(P3): semantic_harness(P3): hermetic anti-repeat/hub reset and warm-worker reuse tests"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=6245bfe07a6c3db68e7c21e61735cffff30e7445;dynamic-trading=1fac47cdb1ff5ced7b2951634511859a0d276df3"
 phase_residual_vector: "project-hoomans=791e2a8abd94c5481933eec993f5d9a48076e39fe99be33e0575d34ffcfe5920;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "791e2a8abd94c5481933eec993f5d9a48076e39fe99be33e0575d34ffcfe5920"
 ---
+
 
 
 

@@ -1,10 +1,16 @@
 # Progress — Semantic Harness Speed & Runtime Optimization
 
 **Status:** IN PROGRESS.
-**Current phase:** P3.
-**Next Chunk:** Execute `P3` — fix the 3 hermetic state-reset leaks (`RuntimeState.resetContainers`, `ScenarioSession.reset`, `semanticHubPresentation` on `replaceProductionDurableState == true`), add warm-worker reuse to `execute_case`/`execute_cases`/`execute_cases_batch`, and add `--jobs N` parallelism to `tools.semantic_harness.testing.cli`.
+**Current phase:** P4.
+**Next Chunk:** Execute `P4` — add mtime/fingerprint-keyed in-process cache for `compile_conversation_sources`, reuse warm workers in `SweepBatchExecutor`/`DialogueQualitySweepService`/`run_quality_matrix`/`preview_authored_variant`, and adopt warm-worker reuse in slow imperative test modules.
 
 ## Completed Phases
+
+- **P3 (Hermetic State Reset & Warm-Worker Reuse + Parallelism for Declarative Fixtures):**
+  - Fixed all state-reset leaks across `import_source`/`reset`: cleared `runtime.playerConduct` and `runtime.socialEvents` in `RuntimeState.resetContainers`, added `ResetSelections()` to `SpeechRealization.lua` and `ToolResultRealization.lua` and called them alongside `ResponseCatalog.ResetSelections()` in `ScenarioSession.reset`, and cleared `PNC.Network.ClientState.semanticHubPresentation` when `replaceProductionDurableState == true`.
+  - Added warm-worker reuse (`execute_case(..., worker=...)`, `execute_cases`, `execute_cases_batch`) with `warm_worker_imported` ordering guard, `DTHoomans` preset keying, and catalog-mutation/error recycling, plus `--jobs N` (`execute_cases_parallel`) in `cli.py`.
+  - Added `HermeticWarmWorkerReuseTests` in `test_worker_session.py`.
+  - Verified: 228/228 declarative semantic fixtures PASS in `39.77 s` serial and `18.31 s` with `--jobs 4` (remaining compiler-case time `~11 s` to be cached in `P4`), `test_fixture_operations` + `test_acceptance_runner` (`17 tests OK`), `test_worker_session` (`2 tests OK`), `pz-verify` 0 errors, `0` leftover Lua workers.
 
 - **P2 (Lua Worker Startup Deduplication, Lazy Registry Sort & Translation Shard Cache):**
   - Replaced per-call `table.sort` in `PsychopatzSemanticRegistry.RegisterPattern` with O(1) duplicate lookup + `_patternsDirty` lazy sorting in `Registry.GetPatterns()`.

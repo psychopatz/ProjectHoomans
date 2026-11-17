@@ -87,8 +87,10 @@ local function configureContext(state)
     PNC.Const.CMD_SEMANTIC_IDENTITY_RESULT = "SemanticIdentityResult"
     PNC.Network = PNC.Network or {}
     PNC.Network.ClientState = PNC.Network.ClientState or {}
-    local semanticHubPresentation =
-        PNC.Network.ClientState.semanticHubPresentation
+    local preserveHubPresentation = Runtime.replaceProductionDurableState == false
+    local semanticHubPresentation = preserveHubPresentation
+        and PNC.Network.ClientState.semanticHubPresentation
+        or nil
     Values.clearTable(PNC.Network.ClientState)
     PNC.Network.ClientState.semanticHubPresentation =
         semanticHubPresentation or {}

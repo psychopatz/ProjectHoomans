@@ -66,6 +66,16 @@ Realization.phraseHistory = phraseHistory
 local phraseHistoryOrder = Realization.phraseHistoryOrder or {}
 Realization.phraseHistoryOrder = phraseHistoryOrder
 
+function Realization.ResetSelections()
+    for key in pairs(phraseHistory) do
+        phraseHistory[key] = nil
+    end
+    for index = #phraseHistoryOrder, 1, -1 do
+        phraseHistoryOrder[index] = nil
+    end
+    return true
+end
+
 local function hash(value)
     local output = 0
     value = tostring(value or "")

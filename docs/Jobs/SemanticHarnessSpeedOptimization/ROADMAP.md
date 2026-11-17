@@ -1,7 +1,7 @@
 # Roadmap — Semantic Harness Speed & Runtime Optimization (`P1`–`P5`)
 
 **Parent status:** IN PROGRESS.
-**Active phase:** `P3`.
+**Active phase:** `P4`.
 **Completion boundary:** `P1`–`P5` accepted and committed cleanly across participant (`psychopatzCore`) and primary (`ProjectHoomans`).
 
 ## Global Rules
@@ -57,7 +57,7 @@
 
 ---
 
-## P3 — Hermetic State Reset & Warm-Worker Reuse + Parallelism for Declarative Fixtures
+## P3 — Hermetic State Reset & Warm-Worker Reuse + Parallelism for Declarative Fixtures (`DONE`)
 
 **Goal:** Eliminate per-case cold worker spawns across all 228 declarative semantic fixtures via hermetic `worker.import_source(scenario)` reuse and `--jobs N` parallel sharding.
 
