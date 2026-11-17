@@ -69,7 +69,20 @@ function ProductionModules.load(context)
         if Runtime.loadedModulePaths[key] then
             return nil
         end
-        local value = Test.load(mod, layer, relative)
+        local moduleName = string.gsub(relative, "%.lua$", "")
+        local value
+        if moduleName ~= relative and package.loaded[moduleName] ~= nil then
+            value = package.loaded[moduleName]
+        else
+            value = Test.load(mod, layer, relative)
+            if moduleName ~= relative and package.loaded[moduleName] == nil then
+                if value ~= nil then
+                    package.loaded[moduleName] = value
+                else
+                    package.loaded[moduleName] = true
+                end
+            end
+        end
         Runtime.loadedModulePaths[key] = true
         Runtime.moduleManifest[#Runtime.moduleManifest + 1] = {
             path = key,

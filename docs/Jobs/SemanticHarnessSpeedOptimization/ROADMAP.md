@@ -1,7 +1,7 @@
 # Roadmap — Semantic Harness Speed & Runtime Optimization (`P1`–`P5`)
 
 **Parent status:** IN PROGRESS.
-**Active phase:** `P2`.
+**Active phase:** `P3`.
 **Completion boundary:** `P1`–`P5` accepted and committed cleanly across participant (`psychopatzCore`) and primary (`ProjectHoomans`).
 
 ## Global Rules
@@ -32,7 +32,7 @@
 
 ---
 
-## P2 — Lua Worker Startup Deduplication, Lazy Registry Sort & Translation Shard Cache
+## P2 — Lua Worker Startup Deduplication, Lazy Registry Sort & Translation Shard Cache (`DONE`)
 
 **Goal:** Cut cold `LuaSemanticWorker` startup from `~1,125 ms` to `<= 400 ms` and remove redundant translation shard decoding and duplicate suggestion builds on every reset/turn.
 

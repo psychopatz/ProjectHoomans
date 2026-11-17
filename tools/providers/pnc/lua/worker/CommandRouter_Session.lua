@@ -43,6 +43,18 @@ local capabilities = {
 
 function Session.hello(context)
     local Runtime = context.Runtime
+    local deferred = os.getenv("SEMANTIC_HARNESS_DEFER_INITIAL_IMPORT") == "1"
+    if deferred then
+        return {
+            ok = true,
+            type = "hello",
+            worker = "project_hoomans_semantic_harness",
+            profile = Runtime.launchProfile,
+            providers = Runtime.launchProviders,
+            materializationMode = Runtime.launchMaterializationMode,
+            capabilities = capabilities,
+        }
+    end
     return {
         ok = true,
         type = "hello",

@@ -1,10 +1,17 @@
 # Progress — Semantic Harness Speed & Runtime Optimization
 
 **Status:** IN PROGRESS.
-**Current phase:** P2.
-**Next Chunk:** Execute `P2` — lazy pattern sorting in `PsychopatzSemanticRegistry.lua`, `package.loaded` registration in `ProductionModules.lua` / `test.lua`, eliminating double `importSource` on worker startup, and caching decoded translation shards in `PsychopatzCustomTranslationManager.lua`.
+**Current phase:** P3.
+**Next Chunk:** Execute `P3` — fix the 3 hermetic state-reset leaks (`RuntimeState.resetContainers`, `ScenarioSession.reset`, `semanticHubPresentation` on `replaceProductionDurableState == true`), add warm-worker reuse to `execute_case`/`execute_cases`/`execute_cases_batch`, and add `--jobs N` parallelism to `tools.semantic_harness.testing.cli`.
 
 ## Completed Phases
+
+- **P2 (Lua Worker Startup Deduplication, Lazy Registry Sort & Translation Shard Cache):**
+  - Replaced per-call `table.sort` in `PsychopatzSemanticRegistry.RegisterPattern` with O(1) duplicate lookup + `_patternsDirty` lazy sorting in `Registry.GetPatterns()`.
+  - Registered loaded relative module names in `package.loaded` inside `ProductionModules.lua` to prevent duplicate `require` passes.
+  - Added `SEMANTIC_HARNESS_DEFER_INITIAL_IMPORT=1` when `import_source_on_start=True` in `core/worker.py`, skipping redundant `ScenarioSession.importSource` in `worker.lua` and heavy `hello` projection assembly in `CommandRouter_Session.lua`.
+  - Added `previousLanguage ~= currentLanguage` guard in `PsychopatzCustomTranslationManager.setLanguageOverride` and in-memory decoded shard caching in `readCatalog`.
+  - Verified: cold `LuaSemanticWorker` `__init__` `346.21–365.56 ms` (`<= 400 ms`, down from `~1,125 ms`), `pz-verify` 0 errors on modified mod Lua files, Core + PNC verification suites (`21 tests OK`) and `test_startup_session_parity` (`4 tests OK, 2 skipped`) passing.
 
 - **P1 (Buffered Transport, Pure-Lua JSON Fast-Path & Redundant Copy Removal):**
   - Switched `LuaProcess` pipe transport (`psychopatzCore/tools/semantic_harness/transport/process.py`) from `bufsize=0` to `bufsize=-1`.

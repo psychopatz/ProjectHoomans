@@ -206,15 +206,17 @@ Runtime.productionPlayerCharactersService = {
     ApplyConductRecord = PNC.PlayerCharacters
         and PNC.PlayerCharacters.ApplyConductRecord,
 }
-ScenarioSession.importSource(
-    Context,
-    ScenarioSession.initialScenario,
-    {
-        sourceKind = "FIXTURE",
-        sourceID = "fixture:worker-bootstrap",
-        mode = "developer_test",
-    }
-)
+if os.getenv("SEMANTIC_HARNESS_DEFER_INITIAL_IMPORT") ~= "1" then
+    ScenarioSession.importSource(
+        Context,
+        ScenarioSession.initialScenario,
+        {
+            sourceKind = "FIXTURE",
+            sourceID = "fixture:worker-bootstrap",
+            mode = "developer_test",
+        }
+    )
+end
 
 WorkerLoop.run(
     Protocol,
