@@ -1,0 +1,235 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.interaction.state_aware_outcome_closure",
+  "domain": "interaction",
+  "cases": [
+    {
+      "id": "interaction.state_aware_outcome_closure.known_identity_question_no_player_name_obligation",
+      "description": "Known NPC asked 'What's your name?' answers with reminder and does not create a first-contact PLAYER_NAME obligation.",
+      "tags": ["interaction", "identity", "state_outcome", "p0_regression"],
+      "scenario": {
+        "npc": {
+          "identityState": "known"
+        }
+      },
+      "turns": [
+        {
+          "text": "What's your name?",
+          "expect": {
+            "accepted": true,
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.repeat_truthful_identity_no_reward_farming",
+      "description": "Repeated truthful identity claim after first introduction does not reapply first-introduction relationship reward.",
+      "tags": ["interaction", "identity", "idempotence", "p0_regression"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "accepted": true,
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "identity.choice.real_name"},
+          "expect": {
+            "accepted": true,
+            "relationshipAfter.identityTrust": "trusted",
+            "relationshipAfter.approval": 1,
+            "relationshipAfter.respect": 2,
+            "relationshipAfter.familiarity": 6,
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        },
+        {
+          "text": "My name is Patrick",
+          "expect": {
+            "accepted": true,
+            "relationshipAfter.approval": 1,
+            "relationshipAfter.respect": 2,
+            "relationshipAfter.familiarity": 6,
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.resolved_identity_choices_do_not_resurrect",
+      "description": "Resolved identity choices remain retired across subsequent turns and refreshes.",
+      "tags": ["interaction", "identity", "projection", "p0_regression"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {
+            "accepted": true,
+            "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "identity.choice.real_name"},
+          "expect": {
+            "accepted": true,
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        },
+        {
+          "text": "hello",
+          "expect": {
+            "accepted": true,
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true},
+            "observation.suggestions.candidates": {
+              "notContains": {"id": "identity.choice.real_name"}
+            }
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.already_following_typed_command_zero_dispatch",
+      "description": "Typed FOLLOW when NPC is already following dispatches zero gameplay commands and gives an already-satisfied reply.",
+      "tags": ["interaction", "actions", "follow", "state_outcome", "p0_regression"],
+      "turns": [
+        {
+          "text": "Follow me",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 1}
+          }
+        },
+        {
+          "text": "Follow me",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.busy_blocked_typed_command_zero_dispatch",
+      "description": "Typed companion command while NPC is hostile/blocked dispatches zero gameplay commands.",
+      "tags": ["interaction", "actions", "blocked", "state_outcome", "p0_regression"],
+      "scenario": {
+        "npc": {
+          "activeBehavior": "hostile",
+          "actorAuthority": {"companion": false, "owned": false, "eligible": false, "status": "hostile"}
+        }
+      },
+      "turns": [
+        {
+          "text": "Follow me",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.needs_proposal_acceptance_closes_or_progresses",
+      "description": "Accepting a Needs proposal must close or progress pendingFollowUp instead of looping in proposal_pending.",
+      "tags": ["interaction", "needs", "bounded_progress", "p0_regression"],
+      "turns": [
+        {
+          "text": "do you need anything",
+          "expect": {
+            "contextAfter.dialogue.pendingFollowUp.id": "flow:needs:await_player_quantity"
+          }
+        },
+        {
+          "text": "how many",
+          "expect": {
+            "ir.extensions.contextualFollowUp.status": "matched"
+          }
+        },
+        {
+          "text": "i will get some",
+          "expect": {
+            "contextAfter.dialogue.pendingFollowUp.id": "flow:needs:proposal_pending"
+          }
+        },
+        {
+          "text": "okay",
+          "expect": {
+            "accepted": true,
+            "contextAfter.dialogue.pendingFollowUp": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.hostile_greeting_no_friendly_continuation",
+      "description": "Hostile NPC greeted by player responds with hostile boundary and does not open friendly greeting continuation.",
+      "tags": ["interaction", "greeting", "hostile", "state_outcome", "p0_regression"],
+      "scenario": {
+        "npc": {
+          "activeBehavior": "hostile",
+          "actorAuthority": {"companion": false, "owned": false, "eligible": false, "status": "hostile"}
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "accepted": true,
+            "contextAfter.dialogue.pendingFollowUp": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.already_member_recruitment_not_actionable",
+      "description": "Already-recruited companion asked to join group dispatches zero recruitment commands.",
+      "tags": ["interaction", "recruitment", "state_outcome", "p0_regression"],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "actorAuthority": {"companion": true, "owned": true, "eligible": true, "status": "eligible"}
+        }
+      },
+      "turns": [
+        {
+          "text": "join my group",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.accepted_relationship_proposal_not_actionable",
+      "description": "NPC already in romantic/lover relationship does not redispatch relationship proposal.",
+      "tags": ["interaction", "relationship", "state_outcome", "p0_regression"],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "actorAuthority": {"companion": true, "owned": true, "eligible": true, "status": "eligible"},
+          "startingRelationship": {"kind": "lover", "source": "starting_companion_trait"}
+        }
+      },
+      "turns": [
+        {
+          "text": "be my partner",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 0}
+          }
+        }
+      ],
+      "domain": "interaction"
+    }
+  ]
+}

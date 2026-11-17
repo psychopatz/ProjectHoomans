@@ -278,7 +278,7 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
             self.assertEqual(result["result"]["flow"]["dispatchCount"], 1)
             self.assertEqual(len(result["dispatchTransport"]), 1)
 
-    def test_generated_simple_command_uses_bounded_previous_action_memory(self) -> None:
+    def test_generated_simple_command_does_not_redispatch_when_already_following(self) -> None:
         with self.warm_worker(DEFAULT_SCENARIO) as worker:
             first = worker.input("Follow me")
             repeated = worker.input("Follow me")
@@ -287,13 +287,9 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
             first["messages"][0]["payload"]["translationKey"],
             "conversation.content.semantic.command.follow.queued.neutral.01",
         )
-        self.assertEqual(
-            repeated["messages"][0]["payload"]["translationKey"],
-            "conversation.content.semantic.command.follow.queued.repeated.neutral.01",
-        )
-        self.assertEqual(repeated["result"]["flow"]["resultOutcome"], "queued")
-        self.assertEqual(repeated["result"]["flow"]["dispatchCount"], 1)
-        self.assertEqual(len(repeated["dispatchTransport"]), 1)
+        self.assertEqual(len(first["dispatchTransport"]), 1)
+        self.assertEqual(len(repeated["dispatchTransport"]), 0)
+        self.assertEqual(repeated["result"]["flow"].get("dispatchCount", 0), 0)
 
     def test_denied_failed_and_context_gate_are_truthful(self) -> None:
         denied_scenario = merge(

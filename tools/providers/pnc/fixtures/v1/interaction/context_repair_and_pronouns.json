@@ -195,7 +195,7 @@
           "text": "okay",
           "expect": {
             "ir.extensions.contextualFollowUp.status": "matched",
-            "contextAfter.dialogue.pendingFollowUp.status": "open",
+            "contextAfter.dialogue.pendingFollowUp": {"absent": true},
             "result.actionResult": {"absent": true},
             "dispatchTransport": {"count": 0}
           }
