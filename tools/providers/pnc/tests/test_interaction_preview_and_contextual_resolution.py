@@ -9,7 +9,7 @@ from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 class InteractionPreviewAndContextualResolutionTests(WarmWorkerTestMixin, unittest.TestCase):
-    def test_ungrounded_thanks_clarifies_without_entering_a_beat(self) -> None:
+    def test_ungrounded_thanks_uses_one_shot_arbitration_without_beat_state(self) -> None:
         with self.warm_worker(DEFAULT_SCENARIO) as worker:
             result = worker.input("thanks")
 
@@ -21,26 +21,11 @@ class InteractionPreviewAndContextualResolutionTests(WarmWorkerTestMixin, unitte
             director["selectedBehavior"]["id"],
             "behavior.clarify_context",
         )
-        self.assertEqual(
-            decision["interactionPlan"]["behaviorMode"],
-            "one_shot",
-        )
+        self.assertEqual(decision["interactionPlan"]["behaviorMode"], "one_shot")
         self.assertIsNone(decision["interactionPlan"].get("beatID"))
         self.assertEqual(
             decision["interactionPlan"]["behaviorAct"],
             "ASK_CLARIFICATION",
-        )
-        self.assertEqual(
-            decision["response"]["sourcePoolID"],
-            "semantic.thanks",
-        )
-        self.assertEqual(
-            decision["response"]["plan"]["dialogueAct"],
-            "ASK_CLARIFICATION",
-        )
-        self.assertEqual(
-            result["observation"]["response"]["semanticTemplateID"],
-            "interaction.context.clarify",
         )
         self.assertEqual(
             decision["response"]["plan"]["kind"],

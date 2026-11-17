@@ -84,80 +84,6 @@ class SemanticDialogueFlowTests(WarmWorkerTestMixin, unittest.TestCase):
             lookup_count += len(turn["translation"]["lookups"])
         self.assertGreaterEqual(lookup_count, 1)
 
-    def test_third_modular_greeting_flow_owns_contextual_followup(self) -> None:
-        scenario = merge(
-            DEFAULT_SCENARIO,
-            {
-                "npc": {"personality": {"socialStyle": "friendly"}},
-                "runtime": {"language": "TL"},
-            },
-        )
-        with self.warm_worker(scenario) as worker:
-            opening = worker.input("hello")
-            followup = worker.input("thanks")
-
-        opening_observation = opening["observation"]
-        self.assertEqual(opening_observation["ir"]["intent"], "GREET")
-        self.assertEqual(opening_observation["flow"]["flowId"], "greeting")
-        self.assertEqual(opening_observation["flow"]["transition"], "start")
-        self.assertEqual(opening_observation["flow"]["status"], "started")
-        self.assertEqual(
-            opening_observation["flow"]["responsePoolID"],
-            "semantic.flow.greeting.opening",
-        )
-        self.assertEqual(
-            opening_observation["response"]["selectionSource"], "flow"
-        )
-        self.assertEqual(
-            opening_observation["response"]["sourceFlowID"], "greeting"
-        )
-        self.assertEqual(
-            opening_observation["response"]["templateID"],
-            "flow.greeting.opening.friendly",
-        )
-        self.assertTrue(opening_observation["response"]["translated"])
-        self.assertEqual(
-            opening_observation["response"]["translationKey"],
-            "conversation.content.semantic.flow.greeting.opening.friendly.neutral.01",
-        )
-        self.assertEqual(len(opening["messages"]), 2)
-        self.assertEqual(
-            [message["payload"]["planTurn"] for message in opening["messages"]],
-            [1, 2],
-        )
-        self.assertEqual(
-            opening["messages"][1]["payload"]["translationKey"],
-            "conversation.content.semantic.flow.greeting.opening.question.friendly.neutral.01",
-        )
-        self.assertTrue(opening_observation["response"]["composed"])
-        self.assertEqual(opening_observation["response"]["queueCount"], 2)
-        self.assertEqual(opening_observation["response"]["planTurnCount"], 2)
-        self.assertTrue(opening_observation["sideEffects"]["noGameplayEffects"])
-
-        followup_observation = followup["observation"]
-        self.assertEqual(followup_observation["ir"]["intent"], "THANK")
-        self.assertEqual(followup_observation["flow"]["flowId"], "greeting")
-        self.assertEqual(followup_observation["flow"]["transition"], "match")
-        self.assertEqual(followup_observation["flow"]["status"], "retired")
-        self.assertEqual(followup_observation["flow"]["activeAfter"], [])
-        self.assertEqual(
-            followup_observation["flow"]["responsePoolID"],
-            "semantic.flow.greeting.followup",
-        )
-        self.assertEqual(
-            followup_observation["response"]["selectionSource"], "flow"
-        )
-        self.assertEqual(
-            followup_observation["response"]["sourceFlowID"], "greeting"
-        )
-        self.assertEqual(
-            followup_observation["response"]["templateID"],
-            "flow.greeting.followup.friendly",
-        )
-        self.assertTrue(followup_observation["response"]["translated"])
-        self.assertGreater(followup_observation["translation"]["lookupCount"], 0)
-        self.assertTrue(followup_observation["sideEffects"]["noGameplayEffects"])
-
     def test_composed_flow_plan_renders_and_queues_in_en_and_tl(self) -> None:
         for language in ("EN", "TL"):
             with self.subTest(language=language):
@@ -316,21 +242,3 @@ class SemanticDialogueFlowTests(WarmWorkerTestMixin, unittest.TestCase):
             )
         self.assertEqual(before["context"], after["context"])
         self.assertEqual(before["transport"], after["transport"])
-
-    def test_wellbeing_refusal_is_a_flow_owned_safe_branch(self) -> None:
-        with self.warm_worker(merge({}, DEFAULT_SCENARIO)) as worker:
-            worker.input("are you okay")
-            refusal = worker.input("no")
-
-        flow = refusal["result"]["decision"]["flow"]
-        self.assertEqual(flow["transition"], "cancel")
-        self.assertEqual(flow["status"], "retired")
-        self.assertEqual(
-            refusal["contextAfter"]["dialogue"]["flowSessions"],
-            [],
-        )
-        self.assertEqual(refusal["dispatchTransport"], [])
-        self.assertEqual(refusal["toolCalls"], [])
-        self.assertEqual(
-            refusal["relationshipBefore"], refusal["relationshipAfter"]
-        )

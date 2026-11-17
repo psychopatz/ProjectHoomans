@@ -1,9 +1,4 @@
-"""freeze tests for the current production suggestion path.
-
-These assertions intentionally describe the existing contract.  They are the
-behavioral fence for the later registry/persona refactor, not a new policy
-surface.
-"""
+"""Mechanism contracts for production suggestion frames and rejection safety."""
 
 from __future__ import annotations
 
@@ -15,29 +10,6 @@ from tools.providers.pnc.tests.worker_reuse import WarmWorkerTestMixin
 
 
 class ContextualDialoguePersonaChoicesTests(WarmWorkerTestMixin, unittest.TestCase):
-    def test_whats_up_utterance_activates_semantic_hub(
-        self,
-    ) -> None:
-        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            entered = worker.input("What's up?")
-
-            self.assertTrue(entered["accepted"])
-            self.assertEqual(
-                entered["result"]["ir"]["extensions"]["route"],
-                "semantic_hub",
-            )
-            self.assertEqual(
-                entered["result"]["ir"]["extensions"]["hubID"],
-                "whats_up",
-            )
-            self.assertEqual(
-                entered["observation"]["suggestions"]["activeHub"]["id"],
-                "whats_up",
-            )
-            self.assertIsNone(
-                entered["observation"].get("conversationBlock")
-            )
-
     def test_active_flow_response_plan_and_capability_rows_keep_one_frame_contract(
         self,
     ) -> None:

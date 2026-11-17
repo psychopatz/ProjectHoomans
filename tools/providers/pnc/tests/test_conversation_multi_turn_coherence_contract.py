@@ -87,60 +87,26 @@ class ConversationMultiTurnCoherenceContractTests(WarmWorkerTestMixin, unittest.
             "deterministic",
         )
 
-    def test_identity_question_generates_safe_disclosure_and_evasion(self) -> None:
+    def test_identity_choice_frames_carry_safe_claim_metadata(self) -> None:
         with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             turn = worker.input("what is your name?")
-            rows = {row["strategy"]: row for row in generated(turn)}
 
-            self.assertEqual(
-                set(rows),
-                {"DISCLOSE_NAME", "REFUSE_IDENTITY"},
-            )
-            disclose = rows["DISCLOSE_NAME"]
-            self.assertEqual(disclose["display"]["utterance"], "I'm Patrick Patz.")
-            self.assertEqual(
-                disclose["frame"]["slots"]["identityClaim"]["name"],
-                "Patrick Patz",
-            )
-            self.assertTrue(
-                disclose["frame"]["socialContext"]["identityClaim"]
-            )
-            self.assertNotIn(
-                "npc",
-                str(disclose["frame"]["slots"]).lower(),
-            )
+        rows = {row["strategy"]: row for row in generated(turn)}
+        self.assertEqual(set(rows), {"DISCLOSE_NAME", "REFUSE_IDENTITY"})
 
-            accepted = worker.suggestion_click(disclose["frame"])
-
+        disclose = rows["DISCLOSE_NAME"]
+        self.assertEqual(disclose["display"]["utterance"], "I'm Patrick Patz.")
         self.assertEqual(
-            accepted["result"]["decision"]["branch"],
-            "IDENTITY_CLAIM_RECEIVED",
+            disclose["frame"]["slots"]["identityClaim"]["name"],
+            "Patrick Patz",
         )
-        self.assertEqual(
-            accepted["observation"]["flow"]["transition"],
-            "match",
-        )
-        self.assertIsNone(
-            accepted["contextAfter"]["dialogue"].get("pendingFollowUp")
-        )
+        self.assertTrue(disclose["frame"]["socialContext"]["identityClaim"])
+        self.assertNotIn("npc", str(disclose["frame"]["slots"]).lower())
 
-        with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            turn = worker.input("what is your name?")
-            refusal = next(
-                row for row in generated(turn)
-                if row["strategy"] == "REFUSE_IDENTITY"
-            )
-            declined = worker.suggestion_click(refusal["frame"])
-
-        self.assertEqual(
-            declined["result"]["decision"]["branch"],
-            "IDENTITY_NAME_EVASION",
-        )
-        self.assertEqual(declined["observation"]["flow"]["transition"], "cancel")
-        self.assertIsNone(
-            declined["contextAfter"]["dialogue"].get("pendingFollowUp")
-        )
-
+        refusal = rows["REFUSE_IDENTITY"]
+        self.assertEqual(refusal["frame"]["kind"], "semantic_click_frame")
+        self.assertEqual(refusal["frame"]["intent"], "REFUSE")
+        self.assertEqual(refusal["frame"]["subject"], "IDENTITY")
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,107 @@
+{
+  "schema": "semantic.harness-test.v1",
+  "suite": "pnc.flows.dialogue_flow_outcomes",
+  "domain": "flows",
+  "cases": [
+    {
+      "id": "flows.dialogue_flow_outcomes.friendly_tl_greeting_followup_retires_flow",
+      "description": "Friendly TL greeting starts the greeting flow and thanks retires it through the authored follow-up.",
+      "tags": [
+        "flows",
+        "greeting",
+        "multi_turn",
+        "localization"
+      ],
+      "scenario": {
+        "npc": {
+          "personality": {
+            "socialStyle": "friendly"
+          }
+        },
+        "runtime": {
+          "language": "TL"
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "ir.intent": "GREET",
+            "observation.flow.flowId": "greeting",
+            "observation.flow.transition": "start",
+            "observation.flow.status": "started",
+            "observation.flow.responsePoolID": "semantic.flow.greeting.opening",
+            "observation.response.selectionSource": "flow",
+            "observation.response.sourceFlowID": "greeting",
+            "observation.response.templateID": "flow.greeting.opening.friendly",
+            "observation.response.translated": true,
+            "messages": {
+              "count": 2
+            },
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        },
+        {
+          "text": "thanks",
+          "expect": {
+            "ir.intent": "THANK",
+            "observation.flow.flowId": "greeting",
+            "observation.flow.transition": "match",
+            "observation.flow.status": "retired",
+            "observation.flow.activeAfter": {
+              "count": 0
+            },
+            "observation.flow.responsePoolID": "semantic.flow.greeting.followup",
+            "observation.response.selectionSource": "flow",
+            "observation.response.sourceFlowID": "greeting",
+            "observation.response.templateID": "flow.greeting.followup.friendly",
+            "observation.response.translated": true,
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        }
+      ],
+      "domain": "flows"
+    },
+    {
+      "id": "flows.dialogue_flow_outcomes.wellbeing_refusal_retires_without_effects",
+      "description": "Refusing a wellbeing exchange safely retires the flow without gameplay or relationship effects.",
+      "tags": [
+        "flows",
+        "wellbeing",
+        "refusal",
+        "safety"
+      ],
+      "turns": [
+        {
+          "text": "are you okay",
+          "expect": {
+            "accepted": true,
+            "ir.subject": "WELLBEING"
+          }
+        },
+        {
+          "text": "no",
+          "expect": {
+            "accepted": true,
+            "observation.flow.transition": "cancel",
+            "observation.flow.status": "retired",
+            "observation.flow.activeAfter": {
+              "count": 0
+            },
+            "contextAfter.dialogue.flowSessions": {
+              "count": 0
+            },
+            "dispatchTransport": {
+              "count": 0
+            },
+            "toolCalls": {
+              "count": 0
+            },
+            "observation.sideEffects.noGameplayEffects": true
+          }
+        }
+      ],
+      "domain": "flows"
+    }
+  ]
+}

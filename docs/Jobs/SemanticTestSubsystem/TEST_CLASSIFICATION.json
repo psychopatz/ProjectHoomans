@@ -1,11 +1,11 @@
 {
   "schema": "semantic.test-classification.v1",
-  "totalModules": 164,
-  "totalMethods": 651,
+  "totalModules": 165,
+  "totalMethods": 648,
   "categoryCounts": {
     "COMPILER_CONTRACT": 11,
     "GUI_CONTRACT": 38,
-    "LOW_LEVEL_RUNTIME_CONTRACT": 75,
+    "LOW_LEVEL_RUNTIME_CONTRACT": 76,
     "NATIVE_INTEGRATION": 13,
     "PERFORMANCE_RESOURCE": 7,
     "SAVE_PERSISTENCE": 11,
@@ -92,7 +92,7 @@
     {
       "module": "test_automatic_flow_generation.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 11,
+      "methods": 9,
       "usesDirectWorker": true,
       "justification": "Authoring/capability/grievance contract (Acceptance for metadata-driven simple-command flow generation.): verifies worker authoring validation, capability ABI, or grievance evidence invariants.",
       "methodDetails": [
@@ -149,18 +149,6 @@
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
           "reason": "metadata-driven simple-command flow generation and handler binding: preview is pure and generation survives restart"
-        },
-        {
-          "name": "test_authoritative_gossip_memory_reaches_response_selection_in_en_and_tl",
-          "category": "COMPILER_CONTRACT",
-          "usesDirectWorker": true,
-          "reason": "metadata-driven simple-command flow generation and handler binding: authoritative gossip memory reaches response selection in en and tl"
-        },
-        {
-          "name": "test_authoritative_gossip_is_target_scoped_across_repeated_renamed_and_unavailable_targets",
-          "category": "COMPILER_CONTRACT",
-          "usesDirectWorker": true,
-          "reason": "metadata-driven simple-command flow generation and handler binding: authoritative gossip is target scoped across repeated renamed and unavailable targets"
         }
       ]
     },
@@ -525,16 +513,10 @@
     {
       "module": "test_contextual_dialogue_persona_choices.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 4,
+      "methods": 3,
       "usesDirectWorker": true,
       "justification": "Contextual choice projection structure contract: verifies persona-choice projection structure and frame wiring.",
       "methodDetails": [
-        {
-          "name": "test_whats_up_utterance_activates_semantic_hub",
-          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-          "usesDirectWorker": true,
-          "reason": "persona choice frame contract, label/utterance key separation, and stale rejection: whats up utterance activates semantic hub"
-        },
         {
           "name": "test_active_flow_response_plan_and_capability_rows_keep_one_frame_contract",
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
@@ -1076,10 +1058,10 @@
           "reason": "generated-affordance discourseFrame replyTo and click/typed IR convergence: generated and typed wellbeing answers converge"
         },
         {
-          "name": "test_identity_question_generates_safe_disclosure_and_evasion",
+          "name": "test_identity_choice_frames_carry_safe_claim_metadata",
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "generated-affordance discourseFrame replyTo and click/typed IR convergence: identity question generates safe disclosure and evasion"
+          "reason": "generated identity-affordance frame metadata and safe identity-claim slot projection"
         }
       ]
     },
@@ -2007,10 +1989,10 @@
       "justification": "Implementation runtime contract: Acceptance: pragmatic resolution and generic one-shot behavior arbitration.",
       "methodDetails": [
         {
-          "name": "test_ungrounded_thanks_clarifies_without_entering_a_beat",
+          "name": "test_ungrounded_thanks_uses_one_shot_arbitration_without_beat_state",
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "pragmatic beat arbitration, behavior schema, and interaction.preview: ungrounded thanks clarifies without entering a beat"
+          "reason": "one-shot behavior arbitration without beat-state materialization or semantic response ownership"
         },
         {
           "name": "test_generic_npc_semantic_act_preview_bypasses_nlu",
@@ -3472,6 +3454,27 @@
       ]
     },
     {
+      "module": "test_semantic_cognition_transport.py",
+      "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+      "methods": 2,
+      "usesDirectWorker": true,
+      "justification": "Semantic-cognition request/response transport target preservation and mismatch visibility.",
+      "methodDetails": [
+        {
+          "name": "test_request_and_response_transport_preserve_authoritative_target",
+          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+          "usesDirectWorker": true,
+          "reason": "SemanticCognitionRequest and OnServerCommand transport payloads preserve the authoritative target ID"
+        },
+        {
+          "name": "test_mismatched_response_target_is_visible_at_transport_boundary",
+          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+          "usesDirectWorker": true,
+          "reason": "semantic-cognition transport exposes request/response target mismatch for fail-closed resolution"
+        }
+      ]
+    },
+    {
       "module": "test_semantic_combat_observatory.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
       "methods": 3,
@@ -3525,7 +3528,7 @@
     {
       "module": "test_semantic_dialogue_flows.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 8,
+      "methods": 6,
       "usesDirectWorker": true,
       "justification": "Implementation runtime contract: Production-worker acceptance for bounded semantic dialogue flows.",
       "methodDetails": [
@@ -3540,12 +3543,6 @@
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
           "reason": "bounded semantic dialogue flow commit/resume, preview purity, and observation: worker exposes shared candidate flow and translation facts"
-        },
-        {
-          "name": "test_third_modular_greeting_flow_owns_contextual_followup",
-          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-          "usesDirectWorker": true,
-          "reason": "bounded semantic dialogue flow commit/resume, preview purity, and observation: third modular greeting flow owns contextual followup"
         },
         {
           "name": "test_composed_flow_plan_renders_and_queues_in_en_and_tl",
@@ -3570,12 +3567,6 @@
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
           "reason": "bounded semantic dialogue flow commit/resume, preview purity, and observation: real worker preview is pure for flow interruptions"
-        },
-        {
-          "name": "test_wellbeing_refusal_is_a_flow_owned_safe_branch",
-          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-          "usesDirectWorker": true,
-          "reason": "bounded semantic dialogue flow commit/resume, preview purity, and observation: wellbeing refusal is a flow owned safe branch"
         }
       ]
     },

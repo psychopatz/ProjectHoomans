@@ -192,9 +192,10 @@
         {
           "text": "who are you",
           "expect": {
-            "observation.suggestions.candidates": {"contains": {"id": "identity.choice.real_name"}},
-            "observation.suggestions.candidates": {"contains": {"id": "identity.choice.refuse_name"}},
-            "observation.suggestions.candidates": {"contains": {"id": "identity.choice.lie_name"}},
+            "observation.suggestions.candidates": {"minCount": 5},
+            "observation.suggestions.candidates.2.id": "identity.choice.real_name",
+            "observation.suggestions.candidates.3.id": "identity.choice.refuse_name",
+            "observation.suggestions.candidates.4.id": "identity.choice.lie_name",
             "contextAfter.dialogue.pendingIdentityExchange.kind": "PLAYER_NAME"
           }
         },
@@ -204,6 +205,30 @@
             "accepted": true,
             "messages.0.payload.text": {"contains": "Mara"},
             "relationshipAfter.identityTrust": "trusted",
+            "decision.branch": "IDENTITY_CLAIM_RECEIVED",
+            "observation.flow.transition": "match",
+            "contextAfter.dialogue.pendingFollowUp": {"absent": true},
+            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.identity_pending_exchange_interruptions.refusal_choice_cancels_pending_exchange",
+      "tags": ["interaction", "identity", "suggestions", "evasion"],
+      "turns": [
+        {
+          "text": "who are you",
+          "expect": {"accepted": true}
+        },
+        {
+          "suggestionClick": {"candidateID": "identity.choice.refuse_name"},
+          "expect": {
+            "accepted": true,
+            "decision.branch": "IDENTITY_NAME_EVASION",
+            "observation.flow.transition": "cancel",
+            "contextAfter.dialogue.pendingFollowUp": {"absent": true},
             "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
           }
         }

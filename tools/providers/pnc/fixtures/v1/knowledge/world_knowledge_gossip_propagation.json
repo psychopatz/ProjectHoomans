@@ -267,6 +267,223 @@
         }
       ],
       "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.world_knowledge_gossip_propagation.semantic_cognition_memory_en",
+      "description": "Authoritative semantic-cognition gossip selects the memory response in EN.",
+      "tags": [
+        "knowledge",
+        "gossip",
+        "semantic_cognition",
+        "localization"
+      ],
+      "scenario": {
+        "runtime": {
+          "language": "EN",
+          "semanticCognitionResponses": {
+            "GOSSIP": {
+              "targetID": "self",
+              "gossip": {
+                "subject": "Mara",
+                "codes": [
+                  1001
+                ]
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any gossip?",
+          "expect": {
+            "decision.response.templateID": "semantic.gossip.memory",
+            "messages.0.payload.text": "Mara has been looking out for people."
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.world_knowledge_gossip_propagation.semantic_cognition_memory_tl",
+      "description": "Authoritative semantic-cognition gossip selects the localized memory response in TL.",
+      "tags": [
+        "knowledge",
+        "gossip",
+        "semantic_cognition",
+        "localization"
+      ],
+      "scenario": {
+        "runtime": {
+          "language": "TL",
+          "semanticCognitionResponses": {
+            "GOSSIP": {
+              "targetID": "self",
+              "gossip": {
+                "subject": "Mara",
+                "codes": [
+                  1001
+                ]
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any gossip?",
+          "expect": {
+            "decision.response.templateID": "semantic.gossip.memory",
+            "messages.0.payload.text": "Inaalalayan ni Mara ang mga tao."
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.world_knowledge_gossip_propagation.semantic_cognition_unavailable_target_fails_closed",
+      "description": "Unavailable semantic-cognition gossip target fails closed to unknown gossip.",
+      "tags": [
+        "knowledge",
+        "gossip",
+        "semantic_cognition",
+        "safety"
+      ],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "forename": "Sarah"
+        },
+        "runtime": {
+          "semanticCognitionResponses": {
+            "GOSSIP": {
+              "targetID": "npc_unavailable",
+              "gossip": {
+                "subject": "Sarah",
+                "codes": [
+                  1001
+                ]
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any news about Sarah?",
+          "expect": {
+            "decision.response.templateID": "gossip.unknown",
+            "messages.0.payload.text": {
+              "contains": "haven't heard"
+            }
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.world_knowledge_gossip_propagation.semantic_cognition_target_reconfigure_updates_subject",
+      "description": "Reconfiguring the target subject updates authoritative gossip realization without stale text.",
+      "tags": [
+        "knowledge",
+        "gossip",
+        "semantic_cognition",
+        "reconfigure"
+      ],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "forename": "Sarah"
+        },
+        "runtime": {
+          "semanticCognitionResponses": {
+            "GOSSIP": {
+              "targetID": "npc_mara",
+              "gossip": {
+                "subject": "Sarah",
+                "codes": [
+                  1001
+                ]
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any news about Sarah?",
+          "expect": {
+            "decision.response.fallback": "Sarah has been looking out for people."
+          }
+        },
+        {
+          "scenarioPatch": {
+            "npc": {
+              "forename": "Morgan"
+            },
+            "runtime": {
+              "semanticCognitionResponses": {
+                "GOSSIP": {
+                  "targetID": "npc_mara",
+                  "gossip": {
+                    "subject": "Morgan",
+                    "codes": [
+                      1001
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "text": "any news about Morgan?",
+          "expect": {
+            "decision.response.fallback": "Morgan has been looking out for people."
+          }
+        }
+      ],
+      "domain": "knowledge"
+    },
+    {
+      "id": "knowledge.world_knowledge_gossip_propagation.semantic_cognition_mismatched_response_target_fails_closed",
+      "description": "A mismatched semantic-cognition response target cannot surface another target gossip.",
+      "tags": [
+        "knowledge",
+        "gossip",
+        "semantic_cognition",
+        "safety"
+      ],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "forename": "Sarah"
+        },
+        "runtime": {
+          "semanticCognitionResponses": {
+            "GOSSIP": {
+              "targetID": "npc_mara",
+              "responseTargetID": "npc_unavailable",
+              "gossip": {
+                "subject": "Sarah",
+                "codes": [
+                  1001
+                ]
+              }
+            }
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "any news about Sarah?",
+          "expect": {
+            "decision.response.templateID": "gossip.unknown",
+            "messages.0.payload.text": {
+              "notEquals": "Sarah has been looking out for people."
+            }
+          }
+        }
+      ],
+      "domain": "knowledge"
     }
   ]
 }
