@@ -16,6 +16,14 @@ env/
 # Generated architecture audit cache and reports
 .architecture-refactor/
 
+# Local decompiled Java scratch dumps and logs
+output/
+logs/
+*.log
+
+# Local database scratch directories
+data/
+
 # SQLite databases and temp files
 *.db
 *.db-shm

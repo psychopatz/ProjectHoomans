@@ -10,3 +10,6 @@ docs/Jobs/DomainContextArchitectureRefactor/P*_BOOTSTRAP*.json
 
 # Source/hash proof snapshots are generated evidence, not code definitions.
 docs/Jobs/DomainContextArchitectureRefactor/P*_PROOF.json
+
+# Local decompiled Java scratch dumps
+output/
