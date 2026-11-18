@@ -573,6 +573,9 @@ class LuaSemanticWorker(SemanticWorker):
     def replay_quest_request(self, request: dict[str, Any]) -> dict[str, Any]:
         return self._knowledge.replay_quest_request(request)
 
+    def deliver_quest_objective(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self._knowledge.deliver_quest_objective(payload)
+
     def commitment(self, payload: dict[str, Any]) -> dict[str, Any]:
         return self._knowledge.commitment(payload)
 

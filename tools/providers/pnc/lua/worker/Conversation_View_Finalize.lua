@@ -15,6 +15,26 @@ function Finalize.apply(workerContext, Conversation, view, session, spec)
     view.spec.context.conversationBlock = Conversation.blockProjection(view)
     view.spec.context.conversationGraph = Conversation.graphProjection(view)
     local composer = PNC.Conversation and PNC.Conversation.Composer
+    local scenarioNpc = Runtime.scenario and Runtime.scenario.npc or nil
+    if type(scenarioNpc) == "table"
+        and type(scenarioNpc.ambientVisitPreview) == "table"
+        and type(view.spec.context.conversationBlockContext) == "table"
+    then
+        view.spec.context.conversationBlockContext.ambientVisitPreview =
+            workerContext.Values.copy(scenarioNpc.ambientVisitPreview)
+        if composer and type(composer.BuildRootNode) == "function" then
+            local ok, root = pcall(
+                composer.BuildRootNode,
+                view.spec.context.conversationBlockContext,
+                view.spec.context.conversationMenuOptions
+                    or view.spec.context.conversationBlockContext.conversationMenuOptions
+                    or {}
+            )
+            if ok and type(root) == "table" then
+                view.spec.nodes.menu = { choices = root.choices or {} }
+            end
+        end
+    end
     if composer and type(composer.BuildSemanticRootProjection) == "function" then
         view.spec.context.conversationRoot =
             composer.BuildSemanticRootProjection(view)

@@ -74,6 +74,31 @@ function Authoring.handle(context, command, payload)
                 payload
             ) or false
         return { ok = true, type = "semantic_quest_replay", handled = handled }
+    elseif command == "DELIVER_QUEST_OBJECTIVE" then
+        local service = PNC and PNC.QuestService or nil
+        if not service or type(service.ApplyObjectiveEvent) ~= "function" then
+            return nil, "quest_service_unavailable"
+        end
+        local req = type(payload) == "table" and payload or {}
+        local playerData = context.Runtime and context.Runtime.scenario
+            and context.Runtime.scenario.player or {}
+        local npcData = context.Runtime and context.Runtime.scenario
+            and context.Runtime.scenario.npc or {}
+        local reqID = tostring(req.requestID or ("transfer-" .. tostring((context.Runtime and context.Runtime.turn or 0) + 1)))
+        local summary, reason = service.ApplyObjectiveEvent({
+            type = service.INVENTORY_EVENT or "PNC_INVENTORY_ITEM_TRANSFERRED",
+            id = reqID,
+            payload = {
+                committed = true,
+                direction = "player_to_npc",
+                playerCharacterUUID = tostring(req.playerCharacterUUID or playerData.characterUUID or playerData.playerUUID or "char_patrick"),
+                targetNPCID = tostring(req.npcID or npcData.npcID or "npc_mara"),
+                itemTypes = { tostring(req.itemFullType or "Base.Bandage") },
+                expectedItemFullType = tostring(req.itemFullType or "Base.Bandage"),
+                requestID = reqID,
+            },
+        })
+        return { ok = true, delivered = summary ~= nil, type = "quest_objective_delivered", summary = summary, reason = reason }
     elseif command == "COMMITMENT" then
         if type(payload) ~= "table" then
             return nil, "commitment_request_must_be_object"

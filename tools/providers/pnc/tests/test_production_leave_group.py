@@ -558,6 +558,27 @@ class ProductionLeaveGroupTests(WarmWorkerTestMixin, unittest.TestCase):
             self.assertEqual(replay["dispatchTransport"], [])
             self.assertFalse(worker.snapshot()["scenario"]["npc"]["recruited"])
 
+    def test_ambient_visit_root_choice_refreshes_and_retires_after_start(self) -> None:
+        """auditClaims: ["settlement_ambient_admission_boundary"]"""
+        from copy import deepcopy
+        from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
+
+        scen = deepcopy(DEFAULT_SCENARIO)
+        scen["npc"]["ambientVisitPreview"] = {"eligible": True}
+        with self.warm_worker(scen) as worker:
+            worker.open_conversation()
+            ambient = self._candidate(worker.snapshot(), "conversation.root:menu:ambient_visit")
+            self.assertIsNotNone(ambient, worker.snapshot())
+
+            clicked = worker.suggestion_click(ambient["frame"])
+            self.assertTrue(clicked["accepted"], clicked)
+            self.assertFalse(worker.snapshot()["scenario"]["npc"]["ambientVisitPreview"]["eligible"])
+            self.assertIsNone(self._candidate(worker.snapshot(), "conversation.root:menu:ambient_visit"))
+
+            replay = worker.suggestion_click(ambient["frame"])
+            self.assertEqual(replay["dispatchTransport"], [])
+            self.assertIsNone(self._candidate(worker.snapshot(), "conversation.root:menu:ambient_visit"))
+
 
 if __name__ == "__main__":
     unittest.main()

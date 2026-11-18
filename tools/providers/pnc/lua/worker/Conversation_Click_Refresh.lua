@@ -42,6 +42,13 @@ function Refresh.apply(context, state)
     then
         composer.PumpLocalRequests()
     end
+    if accepted == true and type(frame) == "table"
+        and tostring(frame.candidateID or "") == "conversation.root:menu:ambient_visit"
+        and Runtime.scenario and Runtime.scenario.npc
+        and type(Runtime.scenario.npc.ambientVisitPreview) == "table"
+    then
+        Runtime.scenario.npc.ambientVisitPreview.eligible = false
+    end
     state.Conversation.refreshViewContext(context)
     if classification.isGroup and view.semanticSuggestions then
         local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil

@@ -248,6 +248,33 @@ class QuestFlowBindingTests(WarmWorkerTestMixin, unittest.TestCase):
             premature = worker.input("I want to turn in the supplies")
             self.assertEqual(premature["result"]["actionResult"]["status"], "rejected")
 
+            # 6. Deliver objective via QuestService authority -> READY_TO_TURN_IN
+            delivered = worker.deliver_quest_objective({"itemFullType": "Base.Bandage"})
+            self.assertTrue(delivered["ok"], delivered)
+            self.assertEqual(delivered["summary"]["status"], "READY_TO_TURN_IN")
+
+            # 7. Conversation status -> ready
+            status_ready = worker.input("Is the clinic supplies quest done")
+            self.assertEqual(status_ready["result"]["actionResult"]["status"], "ready")
+
+            # 8. Turn in -> REWARDED
+            turn_in = worker.input("I want to turn in the supplies")
+            self.assertEqual(turn_in["result"]["actionResult"]["status"], "rewarded")
+            self.assertEqual(turn_in["result"]["actionResult"]["reason"], "rewarded")
+
+            # 9. Repeat turn-in -> idempotent (already_rewarded), no second reward
+            repeat_turn_in = worker.input("I want to turn in the supplies")
+            self.assertEqual(repeat_turn_in["result"]["actionResult"]["status"], "rewarded")
+            self.assertEqual(repeat_turn_in["result"]["actionResult"]["reason"], "already_rewarded")
+
+            # 10. Repeat offer and status after reward -> terminal rewarded, never available again
+            offer_after = worker.input("Can you help me?")
+            self.assertEqual(offer_after["result"]["actionResult"]["status"], "rewarded")
+            self.assertEqual(offer_after["result"]["actionResult"]["reason"], "already_allocated")
+
+            status_after = worker.input("Is the clinic supplies quest done")
+            self.assertEqual(status_after["result"]["actionResult"]["status"], "rewarded")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -217,10 +217,19 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
         scen.get("runtime", {}).pop("taskResponses", None)
         # 1. Available -> admitted/active (1 dispatch) -> duplicate while active (0 dispatch)
         with self.warm_worker(scen) as worker:
+            before_ids = {
+                c["id"] for g in worker.snapshot()["suggestions"].get("groups", [])
+                for c in g.get("candidates", [])
+            }
+            self.assertNotIn("task.wait_at.active", before_ids)
             admitted = worker.input("Wait at the campfire")
             self.assertEqual(admitted["result"]["flow"]["resultNodeId"], "admitted")
             self.assertEqual(len(admitted["dispatchTransport"]), 1)
             self.assertEqual(admitted["dispatchTransport"][0]["command"], "SemanticTaskRequest")
+            after_admit_ids = {
+                c["id"] for c in admitted["observation"]["suggestions"].get("candidates", [])
+            }
+            self.assertNotIn("pnc:task.wait_at", after_admit_ids)
 
             duplicate_active = worker.input("Wait at the campfire")
             self.assertEqual(duplicate_active["dispatchTransport"], [])
@@ -241,6 +250,11 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
                         repeat_terminal["result"]["actionResult"]["reason"],
                         f"task_already_{terminal_status}",
                     )
+                    self.assertEqual(repeat_terminal["result"]["flow"]["resultNodeId"], terminal_status)
+                    after_term_ids = {
+                        c["id"] for c in repeat_terminal["observation"]["suggestions"].get("candidates", [])
+                    }
+                    self.assertNotIn("pnc:task.wait_at", after_term_ids)
 
     def test_real_worker_records_result_nodes_and_one_dispatch(self) -> None:
         with self.warm_worker(DEFAULT_SCENARIO) as worker:

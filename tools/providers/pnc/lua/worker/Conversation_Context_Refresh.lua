@@ -52,6 +52,12 @@ function Refresh.apply(context, Conversation)
                     refreshedBlockContext.entry.snapshot.recruited = isRecruited
                 end
             end
+            if type(scenarioNpc) == "table"
+                and type(scenarioNpc.ambientVisitPreview) == "table"
+            then
+                refreshedBlockContext.ambientVisitPreview =
+                    context.Values.copy(scenarioNpc.ambientVisitPreview)
+            end
         end
         Runtime.view.spec.context = refreshedContext
         local block = Conversation.blockProjection(Runtime.view)

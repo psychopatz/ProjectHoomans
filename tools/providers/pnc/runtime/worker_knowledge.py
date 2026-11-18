@@ -99,6 +99,11 @@ class WorkerKnowledgeOperations:
 
         return self._host._request("REPLAY_SEMANTIC_QUEST", request)
 
+    def deliver_quest_objective(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Deliver a quest objective item through PNC.QuestService.ApplyObjectiveEvent."""
+
+        return self._host._request("DELIVER_QUEST_OBJECTIVE", payload or {})
+
     def commitment(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Exercise the production NPC Knowledge commitment boundary."""
 
