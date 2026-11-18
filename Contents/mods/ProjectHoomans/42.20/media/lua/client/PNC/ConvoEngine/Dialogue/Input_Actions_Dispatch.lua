@@ -85,6 +85,42 @@ return function(Input, Internal, Support)
         }
     end
 
+    local function evaluateCanonicalPolicyBlock(view, context, actionName, result, generatedFlow)
+        local actionPlan = findActionPolicyPlan(tostring(actionName or ""))
+        if not actionPlan then
+            return nil
+        end
+        local evalRes = S11PolicyEvaluator.EvaluateStatePolicy(
+            actionPlan,
+            buildPolicyEvalContext(view, context)
+        )
+        if type(evalRes) == "table"
+            and (evalRes.admission == "no_op" or evalRes.admission == "reject")
+        then
+            if type(generatedFlow) == "table" then
+                generatedFlow.dispatchCount = 0
+            end
+            local projectedReply = evalRes.replyOutcome
+                and S11PolicyEvaluator.ProjectReply
+                and S11PolicyEvaluator.ProjectReply(actionPlan, evalRes.replyOutcome)
+                or nil
+            if type(result) == "table" and type(projectedReply) == "table" then
+                result.response = {
+                    templateID = projectedReply.templateID,
+                    fallback = projectedReply.fallback,
+                }
+            end
+            local blocked = Support.blockedDispatch(evalRes.reason or "state_policy_blocked")
+            if type(projectedReply) == "table" then
+                blocked.templateID = projectedReply.templateID
+                blocked.fallback = projectedReply.fallback
+                blocked.replyOutcome = projectedReply.replyOutcome
+            end
+            return blocked
+        end
+        return nil
+    end
+
     function Internal.DispatchAction(view, result, value)
         local decision = result and result.decision or {}
         local generatedFlow = result and result.flow or nil
@@ -144,35 +180,14 @@ return function(Input, Internal, Support)
             or decision.actionIntent.action == "RECRUIT"
         then
             local policyContext = Support.actionContext(view, result, value)
-            local actionPlan = findActionPolicyPlan(tostring(decision.actionIntent.action or ""))
-            if actionPlan then
-                local evalRes = S11PolicyEvaluator.EvaluateStatePolicy(
-                    actionPlan,
-                    buildPolicyEvalContext(view, policyContext)
-                )
-                if type(evalRes) == "table"
-                    and (evalRes.admission == "no_op" or evalRes.admission == "reject")
-                then
-                    if type(generatedFlow) == "table" then
-                        generatedFlow.dispatchCount = 0
-                    end
-                    if decision.actionIntent.action == "RECRUIT" and type(result) == "table" then
-                        local reason = tostring(evalRes.reason or "")
-                        if reason == "already_member" then
-                            result.response = {
-                                templateID = "recruitment.reject.member.1",
-                                fallback = "I'm already with your group.",
-                            }
-                        elseif reason == "actor_blocked_or_hostile" then
-                            result.response = {
-                                templateID = "recruitment.reject.hostile.1",
-                                fallback = "You want me to join you? Keep your distance.",
-                            }
-                        end
-                    end
-                    return Support.blockedDispatch(evalRes.reason or "state_policy_blocked")
-                end
-            end
+            local blocked = evaluateCanonicalPolicyBlock(
+                view,
+                policyContext,
+                decision.actionIntent.action,
+                result,
+                generatedFlow
+            )
+            if blocked then return blocked end
         end
         if decision.actionIntent.action == "RELATIONSHIP_PROPOSAL" then
             return Internal.DispatchRelationshipProposal(view, result, value)
@@ -208,21 +223,14 @@ return function(Input, Internal, Support)
         end
         actionIntent = ActionTargetHints.AttachWorldTargetHint(
             actionIntent, context, WorldTargetHints, Support.audit)
-        local actionPlan = actionIntent and findActionPolicyPlan(tostring(actionIntent.action or "")) or nil
-        if actionPlan then
-            local evalRes = S11PolicyEvaluator.EvaluateStatePolicy(
-                actionPlan,
-                buildPolicyEvalContext(view, context)
-            )
-            if type(evalRes) == "table"
-                and (evalRes.admission == "no_op" or evalRes.admission == "reject")
-            then
-                if type(generatedFlow) == "table" then
-                    generatedFlow.dispatchCount = 0
-                end
-                return Support.blockedDispatch(evalRes.reason or "state_policy_blocked")
-            end
-        end
+        local blocked = actionIntent and evaluateCanonicalPolicyBlock(
+            view,
+            context,
+            actionIntent.action,
+            result,
+            generatedFlow
+        )
+        if blocked then return blocked end
         if QuestResponses
             and type(QuestResponses.IsQuestAction) == "function"
             and QuestResponses.IsQuestAction(nil, actionIntent.action)

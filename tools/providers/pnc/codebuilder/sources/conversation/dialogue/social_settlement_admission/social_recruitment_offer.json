@@ -55,12 +55,18 @@
   },
   "reply": {
     "already_member": {
+      "metadata": {
+        "templateID": "recruitment.reject.member.1"
+      },
       "say": {
         "EN": "I'm already with your group.",
         "TL": "Kasama na ako sa grupo mo."
       }
     },
     "rejected": {
+      "metadata": {
+        "templateID": "recruitment.reject.hostile.1"
+      },
       "say": {
         "EN": "Not a chance.",
         "TL": "Hindi maaari."

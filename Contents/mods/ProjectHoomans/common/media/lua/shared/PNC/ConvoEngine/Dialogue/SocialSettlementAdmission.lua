@@ -272,6 +272,9 @@ return {
                     ["textRole"] = "response",
                 },
                 ["already_member"] = {
+                    ["metadata"] = {
+                        ["templateID"] = "recruitment.reject.member.1",
+                    },
                     ["outcome"] = "already_member",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -302,6 +305,9 @@ return {
                     ["textRole"] = "response",
                 },
                 ["rejected"] = {
+                    ["metadata"] = {
+                        ["templateID"] = "recruitment.reject.hostile.1",
+                    },
                     ["outcome"] = "rejected",
                     ["say"] = {
                         ["keyOrder"] = {

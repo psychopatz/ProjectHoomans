@@ -2290,7 +2290,7 @@ return {
             ["sourceShard"] = "dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
         },
         {
-            ["bytes"] = 48130,
+            ["bytes"] = 48395,
             ["domain"] = "social_settlement_admission",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialSettlementAdmission",
@@ -5565,5 +5565,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "e98cad878e9200c33fc757971616b0c74b452f0192456afc6781e9dd9ff6cf3d",
+    ["wholeModelFingerprint"] = "c30d7149c46b0349c93f8cb43f45e819c2cc8563f78b42bfbf1768e6d34cf450",
 }
