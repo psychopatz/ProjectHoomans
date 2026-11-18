@@ -106,7 +106,7 @@ class NeedsWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
         model = compile_conversation_sources(REPOSITORY)
         plans = {
             item["id"]: item
-            for item in model["psdlRuntimePlans"]
+            for item in model["convoRuntimePlans"]
             if item.get("domain") == "conversation_needs"
         }
         self.assertTrue(set(NEEDS_IDS).issubset(plans))
@@ -123,7 +123,7 @@ class NeedsWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
     ) -> None:
         model = compile_conversation_sources(REPOSITORY)
         rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
-        for item in model["psdlRuntimePlans"]:
+        for item in model["convoRuntimePlans"]:
             if item["id"] not in NEEDS_IDS:
                 continue
             for role in item.get("textRoles", []):

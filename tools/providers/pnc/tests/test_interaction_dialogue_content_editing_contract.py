@@ -57,7 +57,7 @@ class InteractionDialogueContentEditingContractTests(WarmWorkerTestMixin, unitte
 
         templates = {
             item["id"]
-            for item in model["psdlRuntimePlans"]
+            for item in model["convoRuntimePlans"]
         }
         for template in (
             "interaction.argument.retaliate",
@@ -68,7 +68,7 @@ class InteractionDialogueContentEditingContractTests(WarmWorkerTestMixin, unitte
 
         retaliate_plan = next(
             item
-            for item in model["psdlRuntimePlans"]
+            for item in model["convoRuntimePlans"]
             if item["id"] == "interaction.argument.retaliate"
         )
         self.assertEqual(retaliate_plan["owner"], "ProjectHoomans")

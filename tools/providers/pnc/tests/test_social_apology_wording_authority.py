@@ -110,7 +110,7 @@ class SocialApologyWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
         model = compile_conversation_sources(REPOSITORY)
         plans = {
             item["id"]: item
-            for item in model["psdlRuntimePlans"]
+            for item in model["convoRuntimePlans"]
             if item.get("domain") == "social_apology"
             and item["id"].startswith("social.apology.")
         }

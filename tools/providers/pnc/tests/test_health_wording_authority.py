@@ -103,7 +103,7 @@ class HealthWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
         model = compile_conversation_sources(REPOSITORY)
         plans = {
             item["id"]: item
-            for item in model["psdlRuntimePlans"]
+            for item in model["convoRuntimePlans"]
             if item.get("domain") == "health_content"
         }
         self.assertEqual(
@@ -128,7 +128,7 @@ class HealthWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
     ) -> None:
         model = compile_conversation_sources(REPOSITORY)
         rendered: dict[str, dict[str, str]] = {"EN": {}, "TL": {}}
-        for item in model["psdlRuntimePlans"]:
+        for item in model["convoRuntimePlans"]:
             if item.get("domain") != "health_content":
                 continue
             for role in item.get("textRoles", []):
