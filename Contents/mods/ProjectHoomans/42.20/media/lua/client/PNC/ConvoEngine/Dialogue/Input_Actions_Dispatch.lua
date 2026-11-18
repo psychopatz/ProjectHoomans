@@ -176,25 +176,6 @@ return function(Input, Internal, Support)
         if not actionAllowed then
             return Support.blockedDispatch(actionBlockReason)
         end
-        if decision.actionIntent.action == "RELATIONSHIP_PROPOSAL"
-            or decision.actionIntent.action == "RECRUIT"
-        then
-            local policyContext = Support.actionContext(view, result, value)
-            local blocked = evaluateCanonicalPolicyBlock(
-                view,
-                policyContext,
-                decision.actionIntent.action,
-                result,
-                generatedFlow
-            )
-            if blocked then return blocked end
-        end
-        if decision.actionIntent.action == "RELATIONSHIP_PROPOSAL" then
-            return Internal.DispatchRelationshipProposal(view, result, value)
-        end
-        if decision.actionIntent.action == "RECRUIT" then
-            return Internal.DispatchRecruitment(view, result, value)
-        end
         local context = Support.actionContext(view, result, value)
         context.generatedFlow = generatedFlow
         local actionIntent = ActionTargetHints.AttachCampSiteHint(
@@ -223,14 +204,22 @@ return function(Input, Internal, Support)
         end
         actionIntent = ActionTargetHints.AttachWorldTargetHint(
             actionIntent, context, WorldTargetHints, Support.audit)
-        local blocked = actionIntent and evaluateCanonicalPolicyBlock(
+        local policyAction = (actionIntent and actionIntent.action)
+            or decision.actionIntent.action
+        local blocked = policyAction and evaluateCanonicalPolicyBlock(
             view,
             context,
-            actionIntent.action,
+            policyAction,
             result,
             generatedFlow
         )
         if blocked then return blocked end
+        if decision.actionIntent.action == "RELATIONSHIP_PROPOSAL" then
+            return Internal.DispatchRelationshipProposal(view, result, value)
+        end
+        if decision.actionIntent.action == "RECRUIT" then
+            return Internal.DispatchRecruitment(view, result, value)
+        end
         if QuestResponses
             and type(QuestResponses.IsQuestAction) == "function"
             and QuestResponses.IsQuestAction(nil, actionIntent.action)
