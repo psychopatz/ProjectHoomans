@@ -58,7 +58,10 @@ class PragmaticInteractionBeatInspectorTests(WarmWorkerTestMixin, unittest.TestC
 
     def test_promotion_writes_only_canonical_source_then_regenerates(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            repository = Path(directory)
+            temp_root = Path(directory)
+            repository = temp_root / "psychopatzCore"
+            hoomans_repository = temp_root / "ProjectHoomans"
+            dynamic_trading_repository = temp_root / "DynamicTrading"
             shutil.copytree(
                 CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
@@ -67,8 +70,8 @@ class PragmaticInteractionBeatInspectorTests(WarmWorkerTestMixin, unittest.TestC
                 repository,
                 runtime_root=REPOSITORY,
                 core_repository=repository,
-                hoomans_repository=REPOSITORY,
-                dynamic_trading_repository=CORE_REPOSITORY.parent / "DynamicTrading",
+                hoomans_repository=hoomans_repository,
+                dynamic_trading_repository=dynamic_trading_repository,
             )
             current = service.load_interaction_definition(
                 "beat.argument_escalation"
