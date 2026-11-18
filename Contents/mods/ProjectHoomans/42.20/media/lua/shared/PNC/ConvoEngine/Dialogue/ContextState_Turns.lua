@@ -86,11 +86,15 @@ function Context:RecordTurn(ir, options)
     -- turns are interruptions, not evasion; a self-name claim or explicit
     -- refusal/disagreement resolves the obligation.
     if not responseOnly then
-        if ir.intent == "QUESTION" and ir.subject == "IDENTITY" then
+        local identityKnown = options.identityState == "known"
+            or (type(options.context) == "table" and options.context.identityState == "known")
+        if ir.intent == "QUESTION" and ir.subject == "IDENTITY" and not identityKnown then
             self.pendingIdentityExchange = {
                 kind = "PLAYER_NAME",
                 requestedAt = sequence,
             }
+        elseif identityKnown and self.pendingIdentityExchange then
+            self.pendingIdentityExchange = nil
         elseif self.pendingIdentityExchange
             and (ir.socialContext and ir.socialContext.identityClaim == true
                 or ir.intent == "REFUSE" or ir.intent == "DISAGREE")

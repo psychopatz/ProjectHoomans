@@ -2695,7 +2695,7 @@ return {
             ["sourceShard"] = "dialogue/core_check_in/question_activity.json",
         },
         {
-            ["bytes"] = 35900,
+            ["bytes"] = 36982,
             ["domain"] = "core_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreIdentity",
@@ -5501,5 +5501,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "a5fdc0f04bb555fe5bb6bef3eeed4068fded99f5666d40ec40ea999ea5f34520",
+    ["wholeModelFingerprint"] = "c8443fdb139d204eddb0e086c864185e88d218f4a7fb89cf6d91acf062d956ba",
 }

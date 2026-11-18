@@ -63,6 +63,30 @@ function Commands.HandleSemanticIdentity(player, args)
 
     local at = worldAgeHours()
     local before = Relationships.Get(npcID, targetKey)
+    local alreadyTruthfullyIntroduced = false
+    if type(before) == "table" then
+        if before.identityTrust == "trusted" then
+            alreadyTruthfullyIntroduced = true
+        end
+        local journal = before.interactionJournal
+        if type(journal) == "table" then
+            for index = 1, #journal do
+                local item = journal[index]
+                if type(item) == "table" and item.interactionType == "identity_introduction" then
+                    alreadyTruthfullyIntroduced = true
+                    break
+                end
+            end
+        end
+        if not alreadyTruthfullyIntroduced and type(before.memories) == "table" then
+            for _, mem in pairs(before.memories) do
+                if type(mem) == "table" and mem.type == "identity_introduction" then
+                    alreadyTruthfullyIntroduced = true
+                    break
+                end
+            end
+        end
+    end
     local truthful = nil
     local trustLabel = nil
     local effect
@@ -123,17 +147,24 @@ function Commands.HandleSemanticIdentity(player, args)
     end
 
     local eventID = "semantic_identity:" .. requestID
-    local applied, applyReason, details = IdentityMutation.Apply({
-        npcID = npcID,
-        targetKey = targetKey,
-        kind = kind,
-        requestID = requestID,
-        claimedName = claimedName,
-        truthful = truthful,
-        effect = effect,
-        eventID = eventID,
-        worldAgeHours = at,
-    })
+    local applied, applyReason, details
+    if kind == Identity.EVENT_CLAIM and truthful == true and alreadyTruthfullyIntroduced then
+        applied = true
+        details = { idempotent = true, reason = "identity_already_introduced" }
+        trustLabel = Identity.TRUST_TRUSTED or "trusted"
+    else
+        applied, applyReason, details = IdentityMutation.Apply({
+            npcID = npcID,
+            targetKey = targetKey,
+            kind = kind,
+            requestID = requestID,
+            claimedName = claimedName,
+            truthful = truthful,
+            effect = effect,
+            eventID = eventID,
+            worldAgeHours = at,
+        })
+    end
     if applied ~= true then
         return IdentityResult.SendRejected(
             player,

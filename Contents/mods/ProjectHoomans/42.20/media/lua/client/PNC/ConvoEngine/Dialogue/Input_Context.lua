@@ -253,12 +253,18 @@ function Internal.RecordContextTurn(view, ir, options)
     then
         preserveCurrentTopic = context.pendingFollowUp == nil
     end
+    local viewContext = options.context
+    if type(viewContext) ~= "table" and type(Internal.ShallowContext) == "function" then
+        viewContext = Internal.ShallowContext(view)
+    end
     local recordOptions = {
         timestamp = options.timestamp,
         speaker = options.speaker or "player",
         source = options.source or "player_input",
         mentions = options.mentions,
         preserveCurrentTopic = preserveCurrentTopic,
+        identityState = options.identityState or (type(viewContext) == "table" and viewContext.identityState or nil),
+        context = viewContext,
     }
     return context:RecordTurn(ir, recordOptions)
 end
