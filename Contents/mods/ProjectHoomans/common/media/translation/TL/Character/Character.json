@@ -487,5 +487,7 @@
   "UI_PNC_Authoring_GeneratedWeaponsHelp": "Para sa mga awtomatikong NPC na walang tiyak na napiling armas. Pumili ng armas sa shortcut na Mga armas.",
   "UI_PNC_Authoring_PreviousMember": "Nakaraang NPC sa listahang ito",
   "UI_PNC_Authoring_NextMember": "Susunod na NPC sa listahang ito",
-  "UI_PNC_Authoring_PreviewUnavailable": "Hindi available ang preview"
+  "UI_PNC_Authoring_PreviewUnavailable": "Hindi available ang preview",
+  "UI_PNC_Authoring_NoEquippedItems": "Walang suot na gamit",
+  "UI_PNC_Authoring_MoreItems": "pang gamit"
 }

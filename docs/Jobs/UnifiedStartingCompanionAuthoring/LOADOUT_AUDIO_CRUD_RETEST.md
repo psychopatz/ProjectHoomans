@@ -164,3 +164,33 @@ Native rendering/input/combat is unverified; test in a fresh game session.
    disabled and verify ranged combat behavior; test a melee choice and clearing.
    Generated NPC pool/chance behavior and configured mixed firearm policy should
    remain intact. Continue MP admin/library and world-death acceptance separately.
+
+
+## P5R14 hoodie, tooltip, double-click and regional camera retest
+
+Developer checks: 74/74 focused, full 1064/1068 (same four known failures), two Core
+portrait checks; native rendering/input/camera calibration remains unverified.
+Restart with both updated Hoomans and Core runtime files before testing.
+
+1. Generate/reopen the beanie-and-hoodie starter look. HoodDown must render with
+   the beanie. For hood-up garments, obey native hat exclusivity: do not display
+   two mutually exclusive items as simultaneously worn. Check other modded layers
+   and confirm the slot overview matches the visible model.
+2. Hover body regions: verify the actual part name and equipped item icons/names,
+   or the empty state. Check long names/many items, large fonts and screen edges.
+   Leaving, clicking, changing NPC/tab, opening a picker and closing the editor
+   must remove stale tooltips.
+3. Single-click an item in the chooser to inspect it on the selected NPC. Verify
+   the correct region is framed, reselecting does not change tint, Cancel leaves
+   the NPC untouched and confirmation equips exactly the reviewed visual.
+4. Double-click clothing, weapons and carried items. It must match Equip/Add/
+   Update, including quantity/destination and compatibility restrictions. Invalid
+   input stays open; the trailing native mouse-up must not apply a second item.
+   Check centered Equip and centered Load/Delete button groups.
+5. Select head, neck, torso, each arm, hands, waist, legs, feet and bags/back.
+   Inspect camera zoom/offsets and back direction. Head framing in Loadout retains
+   hats; Appearance keeps its separate unobscured face view. Leaving Loadout or
+   Appearance restores the body camera; manual region zooms remain remembered.
+6. Check other Core portrait consumers: existing default views and conversation
+   animations must remain unchanged. Exercise Core's documented region API and
+   clear/reset behavior. Continue the remaining audio/save/library/SP/MP matrix.

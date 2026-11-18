@@ -19,6 +19,14 @@ function Base:removeChild(c) self.children[c] = nil; c.parent = nil end
 function Base:noBackground() end
 function Base:setVisible(v) self.visible = v end
 function Base:getIsVisible() return self.visible end
+function Base:isReallyVisible() return self.visible and (not self.parent or self.parent:isReallyVisible()) end
+function Base:setX(v) self.x = v end
+function Base:setY(v) self.y = v end
+function Base:setWidth(v) self.width = v end
+function Base:setHeight(v) self.height = v end
+function Base:addToUIManager() self.inUIManager = true end
+function Base:removeFromUIManager() self.inUIManager = false end
+function Base:setAlwaysOnTop(v) self.alwaysOnTop = v end
 function Base:bringToTop() end
 function Base:setEditable(v) self.editable = v end
 function Base:focus() self.focused = true end
@@ -49,6 +57,14 @@ function Base:selectData(data) for i, option in ipairs(self.options) do if optio
 function Base:setOnMouseDownFunction(target, callback) self.target, self.onmousedown = target, callback end
 ISPanel, ISLabel, ISComboBox = Base, Base, Base
 package.loaded["ISUI/ISPanel"] = true
+ISToolTip = Base:derive()
+function ISToolTip:new() return Base.new(self, 0, 0, 0, 0) end
+function ISToolTip:setOwner(owner) self.owner = owner end
+function ISToolTip:prerender()
+    if self.owner and not self.owner:isReallyVisible() then self:setVisible(false); self:removeFromUIManager(); return end
+    self:doLayout()
+end
+package.loaded['ISUI/ISToolTip'] = ISToolTip
 ISPNCUniqueNPCAppearanceScrollPanel = Base
 ISTabPanel = Base:derive()
 function ISTabPanel:createChildren() self.viewList = {}; self.tabHeight = 24 end
@@ -93,6 +109,10 @@ end
 UI.AddKeyValue = function(list, label, value) list:addItem(label, { label = label, value = value }) end
 UI.SetLabelText = function(c, value) c:setName(value) end
 PsychopatzCore = { UI = UI }
+PsychopatzPortraitPanel = UI.PortraitPanel
+function UI.PortraitPanel:applyViewState() end
+function UI.PortraitPanel:applyCameraState() end
+T.load('PsychopatzCore', 'client', 'PsychopatzCore/UI/Components/PsychopatzPortraitPanel_Framing.lua')
 local Model = { New = function() return { identity = { survivor = {} }, appearance = {} } end }
 local Storage = { List = function() return {} end }
 PNC = { UniqueNPCEditorModel = Model, UniqueNPCEditorStorage = Storage,

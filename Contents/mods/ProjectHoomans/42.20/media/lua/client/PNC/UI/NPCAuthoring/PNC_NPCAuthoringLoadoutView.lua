@@ -3,15 +3,17 @@ local Window, UI = ISPNCNPCAuthoringEditor, PsychopatzCore.UI
 local I, L = Window.Internal, UI.Layout
 local Slots, Catalog, Fields = PNC.NPCAuthoringSlots, PNC.NPCAuthoringCatalog, PNC.NPCAuthoringFields
 local BodyMap = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringBodyMap'
-function Window:selectLoadoutPart(id)
+function Window:selectLoadoutPart(id, region)
     self.loadoutPart = id
+    self.loadoutViewRegion = region or id
     self.slotContent:setYScroll(0); self.pages.loadout:setYScroll(0)
     self:refreshLoadoutPage(); self:requestResponsiveLayout()
+    if self.syncPortraitView then self:syncPortraitView() end
 end
 function Window:buildLoadoutNavigation()
     self.loadoutPart = 'torso'
     self.loadoutParts = {}
-    self.bodyMap = BodyMap:new(0, 0, 123, 302, function(id) self:selectLoadoutPart(id) end)
+    self.bodyMap = BodyMap:new(0, 0, 123, 302, function(id, region) self:selectLoadoutPart(id, region) end)
     self.bodyMap:initialise(); self.bodyMap:instantiate(); self.pages.loadout:addChild(self.bodyMap)
     self.loadoutSelectionLabel = I.addLabel(self.pages.loadout, '')
     self.loadoutLegend = I.addLabel(self.pages.loadout, I.tr('UI_PNC_Authoring_BodyMapLegend', 'Green: equipped. Click a body part.'))
@@ -44,7 +46,7 @@ function Window:refreshLoadoutNavigation()
         if row.type then counts[row.group].equipped = counts[row.group].equipped + 1 end
     end
     if not counts[self.loadoutPart] then self.loadoutPart = 'carry' end
-    self.bodyMap:SetState(self.draft and self.draft.isFemale == true, counts, self.loadoutPart)
+    self.bodyMap:SetState(self.draft and self.draft.isFemale == true, counts, self.loadoutPart, self.slotRows)
     local selected
     for _, group in ipairs(Slots.Groups()) do if group.id == self.loadoutPart then selected = group end end
     self.loadoutSelectionLabel:setName(selected and I.tr('UI_PNC_Authoring_Group_' .. selected.key, selected.label) or '')

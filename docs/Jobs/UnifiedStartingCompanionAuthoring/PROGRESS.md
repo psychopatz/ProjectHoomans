@@ -1,6 +1,57 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-19 P5R13
+## Current state — 2026-11-19 P5R14
+
+The user confirms the body-map UI renders and reports a missing hoodie. Installed
+native clothing/BodyLocations data proves HoodUp uses SweaterHat, exclusive with
+Hat. The General male starter variant incorrectly combined it with a beanie.
+It now uses HoodDown. Generated wardrobe preparation also resolves native worn
+locations/exclusivity before constructing inventory, so incompatible generated
+garments cannot both be listed as equipped while the native model evicts one.
+Later profile entries win deterministically; unaffected visual state/source
+indices survive. Provider-owned canonical inventory policy remains unchanged.
+
+Body-map hover now owns a native-lifecycle tooltip with the actual part name and
+icons/names for equipped items in that region's clothing group, including empty
+state and bounded overflow. It stays on screen and is removed on leave/click,
+owner/tab hide or source refresh. Picker double-click goes through the same
+compatibility/quantity/destination confirmation as the primary action; trailing
+mouse events cannot equip twice. Single and paired actions are centered below
+the item grid.
+
+Item selection has a read-only candidate portrait, framed for the chosen region.
+A bounded cache captures only visited native choices; confirmation uses that
+same item visual state, so it cannot roll another tint. Cancel preserves the
+accepted draft; refresh invalidates cached native captures. Appearance keeps its
+separate headgear-free projection; Loadout head framing retains equipped gear.
+
+PsychopatzCore owns reusable setViewRegion/getViewRegion/clearViewRegion and
+applyCameraState APIs, with body/head/neck/torso/arms/left_arm/right_arm/hands/
+waist/legs/feet/back views. They remember each region's manual camera separately,
+restore the prior unframed view and do not mutate/rebuild identity/clothing or
+reset animation variables. Hoomans supplies the selected region; it does not own
+another camera preset table. Public usage is documented in Core's
+Docs/UI/PortraitViewRegions.md.
+
+`TEST_VERIFIED`: **74/74** focused; full **1064/1068**, same four known scene-route/
+context/population/translation failures. Two Core portrait checks pass. Coverage
+includes generated native exclusivity, tooltip icons/bounds/cleanup, item-preview
+nonmutation/exact tint, double-click validation/one-shot behavior, centered
+geometry, region transitions and real Core model camera/animation/cache contracts.
+The old DynamicTrading canonical-slot test matched an unrelated generated-clothes
+source line; it now exercises actual canonical native-slot/payload projection.
+`STATIC_ONLY`: **22** owned Lua syntax and **14** production Kahlua checks, two
+new EN/TL Character keys, JSON/key/placeholder parity and scoped whitespace pass.
+Coverage checked 28 Hoomans, seven Core, eight current Java and six installed
+native data/UI paths; old/new/unindexed evidence was read directly. No schema
+change, new bitmap, native launch/control or publication.
+
+Next: user-owned fresh-session P5R14 visual/input matrix in
+LOADOUT_AUDIO_CRUD_RETEST.md, especially camera offsets and tooltip readability,
+then the remaining audio/save/library/SP/MP gates. Preserve concurrent semantic
+work and commit only the exact phase-owned Core/primary paths.
+
+## P5R13 preset/body-map/weapons — native acceptance pending
 
 Developer implementation is complete for read-only preset portraits, native body
 navigation and explicit weapon selection in the shared creator. Native visual/
@@ -550,9 +601,9 @@ SP/MP/co-op acceptance.
 
 ## Next Chunk
 
-**P6 — user-owned fresh-session preset portraits, body-map clicks and explicit
-weapon/combat retest after P5R13, then the remaining save/backpack/audio/skin/
-library/SP/MP/co-op matrices. Developer gates pass; native acceptance stays open.**
+**P6 — user-owned fresh-session hoodie/tooltip/double-click/region-camera retest
+after P5R14, then the remaining weapon/save/audio/library/SP/MP/co-op matrices.
+Developer gates pass; native acceptance stays open.**
 
 ## Repository safety
 

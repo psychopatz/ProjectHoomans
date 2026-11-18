@@ -60,6 +60,7 @@ function Explorer:createChildren()
         Catalog.Invalidate(); target.source, target.category, target.offset = nil, nil, 0
         target.selectedID = nil
         if target.options.reloadAllowed then target.allowed = target.options.reloadAllowed() end
+        if target.options.onRefresh then target.options.onRefresh(target.allowed) end
         target:refreshFilters(); target:refreshResults()
     end)
     self.grid = ISPNCUniqueNPCAppearanceScrollPanel:new(0, 0, 1, 1)
@@ -67,8 +68,15 @@ function Explorer:createChildren()
     self.tiles = {}
     for index = 1, self.pageSize do
         local tile = UI.CreateButton(self.grid, { title = '', target = self, onclick = function(target, clicked)
+            if not target:getIsVisible() or not clicked.item then return end
             target.selectedID = clicked.item.id; target:refreshDetails(); target:refreshSelection()
         end, variant = 'quiet' })
+        tile.onMouseDoubleClick = function(control)
+            if not self:getIsVisible() or not control.item then return true end
+            self.selectedID = control.item.id; self:refreshDetails(); self:refreshSelection()
+            self:confirmSelection()
+            return true
+        end
         tile.render = function(control)
             ISButton.render(control)
             local item = control.item
@@ -94,18 +102,7 @@ function Explorer:createChildren()
     self.destination = PNC.NPCAuthoringFields.Choice(self, self)
     self.destination:addOptionWithData(tr('UI_PNC_Authoring_Pockets', 'Pockets'), 'root')
     self.destination:addOptionWithData(tr('UI_PNC_Authoring_Bag', 'Bag (when available)'), 'bag'); self.destination:selectData('root')
-    self.confirm = button(self, '', function(target)
-        local item = target:currentSelection()
-        if not item or not target.onChoose then return end
-        if target.allowed and not target.allowed[item.id] then return end
-        local quantity = target.mode == 'carry' and tonumber(target.quantity:getText()) or 1
-        if not quantity or quantity < 1 or quantity > 99 or quantity ~= math.floor(quantity) then
-            target:setHint(tr('UI_PNC_Authoring_QuantityInvalid', 'Enter a quantity from 1 to 99')); return
-        end
-        local option = target.destination.options[target.destination.selected]
-        local ok, reason = target.onChoose(item, quantity, target.mode == 'carry' and option and option.data or nil)
-        if ok ~= false then target:Hide() else target:setHint(reason or tr('UI_PNC_Authoring_UnavailableItem', 'This item is unavailable')) end
-    end)
+    self.confirm = button(self, '', function(target) target:confirmSelection() end)
     self.deleteButton = button(self, tr('UI_PNC_Authoring_Delete', 'Delete saved record'), function(target)
         local item = target:currentSelection()
         if not item or not target.options.onDelete then return end
@@ -142,6 +139,7 @@ function Explorer:Show(options)
     self.source, self.category, self.offset, self.selectedID, self.selectedItem = nil, nil, 0, options.initialID, nil
     self.compatibleOnly = true
     self.deleteArmedID = nil
+    self.confirming = false
     self.previewItemID, self.previewIndex = nil, 1
     self.quantity:setText(tostring(options.initialQuantity or 1)); self.destination:selectData(options.initialDestination or 'root')
     self.confirm:setTitle(options.applyLabel or tr(self.mode == 'outfit' and 'UI_PNC_Authoring_ApplyOutfit' or 'UI_PNC_Authoring_Equip', self.mode == 'outfit' and 'Apply outfit' or 'Equip / Add'))
@@ -153,6 +151,22 @@ function Explorer:Show(options)
     self.search:setText(options.initialQuery or ''); self:refreshFilters(); self:refreshResults()
     self:setVisible(true); self:bringToTop(); self:onResize(); self.search:focus()
     if self.onShown then self.onShown() end
+end
+function Explorer:confirmSelection()
+    if not self:getIsVisible() or self.confirming then return false end
+    local item = self:currentSelection()
+    if not item or not self.onChoose or self.allowed and not self.allowed[item.id] then return false end
+    local quantity = self.mode == 'carry' and tonumber(self.quantity:getText()) or 1
+    if not quantity or quantity < 1 or quantity > 99 or quantity ~= math.floor(quantity) then
+        self:setHint(tr('UI_PNC_Authoring_QuantityInvalid', 'Enter a quantity from 1 to 99')); return false
+    end
+    local option = self.destination.options[self.destination.selected]
+    self.confirming = true
+    local ok, reason = self.onChoose(item, quantity, self.mode == 'carry' and option and option.data or nil)
+    self.confirming = false
+    if ok ~= false then self:Hide(); return true end
+    self:setHint(reason or tr('UI_PNC_Authoring_UnavailableItem', 'This item is unavailable'))
+    return false
 end
 function Explorer:Hide()
     self.search:unfocus(); self:setVisible(false)
@@ -269,9 +283,11 @@ function Explorer:onResize()
         L.SetBounds(self.quantity, x, y, math.max(1, contentWidth * .15 - g), h)
         L.SetBounds(self.destination, x + contentWidth * .15, y, contentWidth * .85, h); self.destination:onResize(); y = y + h + g
     end
-    local actionWidth = math.min(self.options.onDelete and (contentWidth - g) / 2 or contentWidth, 340)
-    L.SetBounds(self.confirm, x, y, actionWidth, h)
-    L.SetBounds(self.deleteButton, x + actionWidth + g, y, actionWidth, h)
+    local actionWidth = math.max(1, math.min(self.options.onDelete and (contentWidth - g) / 2 or contentWidth, 340))
+    local totalActionWidth = self.options.onDelete and actionWidth * 2 + g or actionWidth
+    local actionX = x + math.max(0, (contentWidth - totalActionWidth) / 2)
+    L.SetBounds(self.confirm, actionX, y, actionWidth, h)
+    L.SetBounds(self.deleteButton, actionX + actionWidth + g, y, actionWidth, h)
     PNC.NPCAuthoringFields.NativeMetrics(self)
 end
 require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringExplorerPortrait'

@@ -13,6 +13,7 @@ local Archetypes = PNC.Archetypes
 local Identity = PNC.Identity
 local Unique = PNC.UniqueNPCs
 local SupplyBuilder = require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_TemplateSupplies"
+local AppearanceItems = require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_AppearanceItems"
 
 local function choose(list, seed, salt)
     if type(list) ~= "table" or #list <= 0 then
@@ -54,21 +55,15 @@ local function buildIdentityTemplate(record)
 end
 
 local function addAppearanceItems(record, base, template)
-    local appearanceItems = template.appearance and template.appearance.outfitItems or {}
-    local appearanceSpecs = template.appearance
-        and template.appearance.outfitItemSpecs or nil
+    local appearanceItems = AppearanceItems.Build(template)
     local lookCounts = {}
     local templateKey
     local i
     local item
 
-    for i = 1, math.max(#appearanceItems, #(appearanceSpecs or {})) do
-        local appearanceSpec = appearanceSpecs and appearanceSpecs[i] or nil
-        local appearanceType = type(appearanceSpec) == "table"
-            and appearanceSpec.type or appearanceItems[i]
-        if not appearanceType then
-            break
-        end
+    for i = 1, #appearanceItems do
+        local appearanceSpec = appearanceItems[i]
+        local appearanceType = appearanceSpec.type
         lookCounts[tostring(appearanceType)] = (lookCounts[tostring(appearanceType)] or 0) + 1
         templateKey = "tmpl:look:" .. tostring(appearanceType) .. ":"
             .. tostring(lookCounts[tostring(appearanceType)])
@@ -76,22 +71,13 @@ local function addAppearanceItems(record, base, template)
             type = appearanceType,
             container = "root",
             templateKey = templateKey,
-            legacyTemplateKey = "tmpl:look:" .. tostring(i),
+            legacyTemplateKey = "tmpl:look:" .. tostring(appearanceSpec.legacyIndex),
             itemState = type(appearanceSpec) == "table"
                 and appearanceSpec.itemState or nil,
             wornSlot = type(appearanceSpec) == "table"
                 and appearanceSpec.wornSlot or nil,
         })
-        if item and PNC.Equipment and PNC.Equipment.CreateItem then
-            local created = PNC.Equipment.CreateItem(appearanceType)
-            created = type(created) == "table" and created[1] or created
-            if created and created.getBodyLocation then
-                item.wornSlot = Internal.normalizeString(created:getBodyLocation())
-                if item.wornSlot then
-                    base.worn[item.wornSlot] = item.id
-                end
-            end
-        end
+        if item and item.wornSlot then base.worn[item.wornSlot] = item.id end
     end
 end
 

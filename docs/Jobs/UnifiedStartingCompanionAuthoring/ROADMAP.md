@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R13 preset portraits, body map and explicit weapons verified — P6 native acceptance pending
+**Status:** P5R14 wardrobe consistency, tooltip/picker interaction and reusable Core framing verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -1014,6 +1014,29 @@ syntax, twelve production Kahlua, EN/TL parity and owned whitespace checks pass;
 eleven new/three updated Character keys. Coverage checked 34 Hoomans, one Core,
 four Java and five native Lua evidence paths with direct fallback. Exact local
 phase commit required; native input/rendering/combat remains P6 user acceptance.
+
+### P5R14 — Hoodie visibility, body tooltips and reusable regional framing
+
+Correct the native-exclusive beanie/HoodUp starter variant and resolve generated
+wardrobe conflicts before inventory creation, maintaining stored/displayed worn
+truth. Add native-lifecycle body-part tooltips with item icons, validated one-shot
+double-click confirmation, centered picker actions and read-only exact item
+previews. Retain native visual snapshots between inspection and confirmation.
+
+Move named body-region camera ownership into Core's reusable portrait component;
+Hoomans selects views for body-map/slot context and separately owns appearance
+clothing projection. Preserve manual per-region camera values, descriptor/spec
+identity and ongoing animation variables. Document the public Core API.
+
+**Gate:** **74/74** focused; **1064/1068** full, same four known failures; two Core
+portrait checks pass. Native exclusivity/data projection, tooltip content/bounds/
+cleanup, exact item tint/Cancel, double-click validation/one-shot behavior,
+centered layout and actual Core camera/model/cache contracts are covered.
+Twenty-two owned Lua syntax/fourteen production Kahlua, EN/TL parity and scoped
+whitespace pass; two new Character keys. Coverage checked 28 Hoomans/seven Core/
+eight Java/six native evidence paths with current-source fallback. Exact Core
+participant commit first, primary commit with handoff last. Native rendering,
+input and camera calibration remain P6 user-owned acceptance.
 
 ### P6 — Native acceptance
 

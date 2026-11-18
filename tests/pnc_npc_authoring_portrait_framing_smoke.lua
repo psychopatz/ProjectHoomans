@@ -5,6 +5,7 @@ PNC.NPCAuthoring = { Registry = { Copy = copy } }
 T.load('ProjectHoomans', 'client', 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringPortraitView.lua')
 local e = F.Class:new(0, 0, 1060, 700, { mode = 'debug', uiScale = 1 })
 e:initialise(); e:instantiate()
+function e:refreshLoadoutPage() end -- this test isolates framing; slot navigation has its own fixture
 local targets = {}
 function e.portraitPanel:setTarget(_, spec) targets[#targets + 1] = spec; return true end
 e.portraitSourceSpec = { key = 'stable-look', appearance = { hairModel = 'Long', outfitItems = { 'Base.Hat' } }, equipment = { primaryFullType = 'Base.Axe' } }
@@ -23,6 +24,17 @@ e.tabPanel:activateView(e.generalTabName); e:syncPageVisibility()
 T.equal(e.portraitMode, 'body', 'leaving Appearance restores full body')
 T.equal(e.portraitPanel.zoom, 1, 'body zoom preference survives the face view')
 T.equal(targets[#targets].equipment.primaryFullType, 'Base.Axe', 'body equipment reappears')
+e.tabPanel:activateView(PNC.Translation.GetKey('UI_PNC_Authoring_Loadout', 'Loadout')); e:syncPageVisibility()
+e:selectLoadoutPart('head')
+T.equal(e.portraitPanel:getViewRegion(), 'head', 'head selection uses the reusable Core camera API')
+T.equal(targets[#targets].faceOnly, false, 'loadout head framing keeps the equipped headgear visible')
+e:selectLoadoutPart('torso', 'left_arm')
+T.equal(e.portraitPanel:getViewRegion(), 'left_arm', 'clicked arm frames the arm while retaining torso slot navigation')
+e:selectLoadoutPart('legs')
+T.equal(e.portraitPanel:getViewRegion(), 'legs', 'leg selection activates lower-body framing')
+e.tabPanel:activateView(e.generalTabName); e:syncPageVisibility()
+T.equal(e.portraitPanel:getViewRegion(), 'body', 'leaving loadout restores the default body view')
+T.equal(e.portraitPanel.zoom, 1, 'region views preserve the existing body camera preference')
 local updated = 0
 e.appearanceTab.voicePreview = { Update = function() updated = updated + 1 end }
 e:update(); T.equal(updated, 1, 'editor update releases completed menu audio')

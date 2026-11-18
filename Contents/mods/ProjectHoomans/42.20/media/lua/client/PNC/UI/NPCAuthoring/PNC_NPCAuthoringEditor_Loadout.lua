@@ -92,7 +92,11 @@ function Window:openSlot(slot)
         allowed = Catalog.Weapons()
     end
     local carried = slot.group == 'carry' and slot.kind == 'item'
+    local preview, choose, refresh = self:loadoutPickerCallbacks(slot, allowed)
     self.itemExplorer:Show({ mode = carried and 'carry' or slot.kind, title = slot.label, allowed = allowed,
+        viewRegion = slot.group == self.loadoutPart and (self.loadoutViewRegion or slot.group) or slot.group,
+        preview = (slot.kind == 'worn' or slot.kind == 'held' or slot.kind == 'attach') and preview or nil,
+        onRefresh = refresh,
         applyLabel = tr(carried and 'UI_PNC_Authoring_UpdateCarried' or slot.kind == 'carry' and 'UI_PNC_Authoring_AddCarried' or 'UI_PNC_Authoring_EquipItem',
             carried and 'Update carried item' or slot.kind == 'carry' and 'Add carried item' or 'Equip item'),
         applyTooltip = tr('UI_PNC_Authoring_LoadoutEditHelp', 'Changes update this NPC in the editor immediately. Save NPC preset keeps a reusable copy of all tabs, including this loadout.'),
@@ -101,19 +105,20 @@ function Window:openSlot(slot)
         reloadAllowed = slot.weapon and function() return Catalog.Weapons() end or slot.kind == 'worn' and function()
             local refreshed = {}; for _, item in ipairs(Catalog.Clothing(slot.id)) do refreshed[item.id] = true end; return refreshed
         end or nil,
-        onChoose = function(item, quantity, destination) return self:applyLoadout(slot, item.id, quantity, destination) end })
+        onChoose = choose })
     self:requestResponsiveLayout()
 end
-function Window:applyLoadout(slot, fullType, quantity, destination)
+function Window:buildLoadoutCandidate(slot, fullType, quantity, destination, selection)
     if not self.draft then return false end
     local capability = self:fieldCapability(slot.kind == 'worn' and 'appearance' or 'startingItems')
     if capability.editable == false then return false, capability.sourceLabel end
     local spec, native, reason
     local targetSlot = slot
     if fullType then
-        native, reason = Catalog.Create(fullType)
+        if selection then native = selection.native else native, reason = Catalog.Create(fullType) end
         if not native then return false, tr('UI_PNC_Authoring_UnavailableItem', 'This item is unavailable') end
-        spec, reason = PNC.Inventory.CaptureNativeItem(native)
+        if selection then spec = PNC.NPCAuthoring.Registry.Copy(selection.spec)
+        else spec, reason = PNC.Inventory.CaptureNativeItem(native) end
         if not spec then return false, tostring(reason) end
         spec.stack = (slot.kind == 'carry' or slot.group == 'carry') and quantity or 1
         if spec.maxWeight then spec.stack = 1 end
@@ -144,6 +149,11 @@ function Window:applyLoadout(slot, fullType, quantity, destination)
     local valid
     valid, reason = I.Model.BuildBlueprint(candidate)
     if not valid then return false, tostring(reason) end
+    return candidate
+end
+function Window:applyLoadout(slot, fullType, quantity, destination, selection)
+    local candidate, reason = self:buildLoadoutCandidate(slot, fullType, quantity, destination, selection)
+    if not candidate then return false, reason end
     self.draft = candidate
     self:syncControls(); self:refreshPreview(false)
     return true
@@ -196,4 +206,5 @@ function Window:refreshLoadoutPage()
 end
 require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringCarriedInventory'
 require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringLoadoutView'
+require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringLoadoutPreview'
 return Window

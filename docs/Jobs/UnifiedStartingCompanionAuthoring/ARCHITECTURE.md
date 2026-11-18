@@ -871,3 +871,32 @@ weapon modes are debug fallback policy; an authored primary weapon determines
 the resulting generated-inventory combat mode. No new persistence schema or
 parallel loadout authority is introduced; canonical foreign inventory providers
 keep their existing combat policy ownership.
+
+
+## Region framing, hover equipment and exact picker transactions
+
+Core owns named portrait camera presets and their per-panel remembered values.
+setViewRegion/getViewRegion/clearViewRegion select or restore a camera;
+applyCameraState changes only camera properties, preserving animation variables.
+Adopters supply region intent and optional clothing projection separately. Camera
+changes must not rebuild descriptors, change saved specs, register actors or
+reroll visuals. Core's Docs/UI/PortraitViewRegions.md is the consumer contract.
+
+The body-map tooltip owns native tooltip registration/removal and a bounded
+icon/name list sourced from current slot rows. It names the actual native part
+and lists that part's authoring clothing group. No native InventoryItem is
+constructed to display an icon. Owner visibility and source refresh invalidate
+the popup; screen-edge/large-font layout stays bounded.
+
+The shared picker has one confirmation transaction for click and double-click.
+Compatibility, quantity/destination and current field constraints precede commit;
+a successful transaction cannot be repeated by trailing native mouse events.
+Item inspection builds a detached candidate. A bounded per-picker native capture
+cache supplies both its portrait and confirmation, preserving exact tint and
+payload; source/catalog refresh clears that cache. Cancel cannot edit the draft.
+
+Generated outfit preparation resolves native body locations and exclusive slots
+before item construction. Later profile entries supersede earlier conflicts,
+matching native WornItems semantics while keeping inventory and UI truthful.
+This projection does not rewrite source profiles or canonical foreign inventory;
+authored conflict validation remains a separate canonical acceptance boundary.

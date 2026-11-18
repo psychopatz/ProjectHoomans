@@ -57,6 +57,7 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
         end
         for _, tile in ipairs(explorer.tiles) do inside(tile, explorer.grid.width, explorer.grid.contentHeight, 'item tile stays in scroll content') end
         T.equal(explorer.total, 260, 'all modded definitions remain browseable')
+        T.near(explorer.confirm.x + explorer.confirm.width / 2, explorer.grid.x + explorer.grid.width / 2, 1, 'single picker action is centered under the item grid')
         explorer.nextButton.onclick(explorer)
         T.equal(explorer.offset, 48, 'Next advances the page')
         explorer:Hide()
@@ -100,4 +101,23 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
         end
     end
 end
+local applied = 0
+explorer:Show({ mode = 'carry', items = { { id = 'supply', label = 'Supply', search = 'supply' } },
+    onChoose = function(_, quantity, destination)
+        T.equal(quantity, 3, 'double-click uses the current quantity')
+        T.equal(destination, 'bag', 'double-click uses the current destination')
+        applied = applied + 1; return true
+    end })
+explorer.quantity:setText('0'); explorer.tiles[1]:onMouseDoubleClick()
+T.equal(applied, 0, 'double-click cannot bypass quantity validation')
+explorer.quantity:setText('3'); explorer.destination:selectData('bag'); explorer.tiles[1]:onMouseDoubleClick()
+T.equal(applied, 1, 'double-click performs the same action as Equip/Add')
+T.falsy(explorer.visible, 'successful double-click dismisses the browser')
+explorer.tiles[1].onclick(explorer, explorer.tiles[1])
+explorer.tiles[1]:onMouseDoubleClick()
+T.equal(applied, 1, 'the trailing native mouse-up/double-click cannot apply twice')
+explorer:Show({ mode = 'worn', items = { { id = 'bad', label = 'Incompatible', search = 'bad' } }, allowed = {},
+    onChoose = function() error('incompatible item applied') end })
+explorer.compatibleOnly = false; explorer:refreshResults(); explorer.tiles[1]:onMouseDoubleClick()
+T.truthy(explorer.visible, 'double-click cannot bypass slot compatibility')
 T.finish('pnc_npc_authoring_explorer_layout_smoke')

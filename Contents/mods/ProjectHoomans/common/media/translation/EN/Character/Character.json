@@ -487,5 +487,7 @@
   "UI_PNC_Authoring_GeneratedWeaponsHelp": "Used for generated NPCs without an explicit weapon. Choose exact weapons from the Weapons shortcut.",
   "UI_PNC_Authoring_PreviousMember": "Previous NPC in this roster",
   "UI_PNC_Authoring_NextMember": "Next NPC in this roster",
-  "UI_PNC_Authoring_PreviewUnavailable": "Preview unavailable"
+  "UI_PNC_Authoring_PreviewUnavailable": "Preview unavailable",
+  "UI_PNC_Authoring_NoEquippedItems": "No equipped items",
+  "UI_PNC_Authoring_MoreItems": "more items"
 }

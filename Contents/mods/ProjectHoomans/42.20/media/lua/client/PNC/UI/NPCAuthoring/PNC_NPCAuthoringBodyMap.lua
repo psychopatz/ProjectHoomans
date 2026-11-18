@@ -1,6 +1,7 @@
 -- Draft-safe navigation using the native protection/temperature silhouettes.
 -- No live actor, BodyDamage or health/temperature mutation is involved.
 require 'ISUI/ISPanel'
+local BodyTooltip = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringBodyTooltip'
 ISPNCNPCAuthoringBodyMap = ISPanel:derive('ISPNCNPCAuthoringBodyMap')
 local Map = ISPNCNPCAuthoringBodyMap
 local regions = {
@@ -20,24 +21,36 @@ function Map:new(x, y, w, h, onSelect)
     o.background = false
     return o
 end
-function Map:SetState(female, counts, selected)
+function Map:SetState(female, counts, selected, slots)
     self.counts, self.selected = counts or {}, selected
+    self.slots = slots or {}
+    self:hideTooltip()
     local sex = female and 'female' or 'male'
     if self.sex == sex and #self.regions > 0 then return end
     self.sex, self.regions = sex, {}
     self.baseTexture = getTexture and getTexture('media/ui/BodyParts/' .. sex .. '_base_white')
     self.outline = getTexture and getTexture('media/ui/BodyParts/bps_' .. sex .. '_outlines')
-    for _, region in ipairs(regions) do
+    for index, region in ipairs(regions) do
         local texture = getTexture and getTexture('media/ui/BodyParts/bps_' .. sex .. '_' .. region[1])
-        if texture then self.regions[#self.regions + 1] = { texture = texture, group = region[2], z = region[3] or 0,
-            x = texture:getOffsetX(), y = texture:getOffsetY(), w = texture:getWidth(), h = texture:getHeight() } end
+        if texture then
+            local title = BodyPartType and BodyPartType.getDisplayName(BodyPartType.FromIndex(index - 1))
+            if not title then
+                for _, group in ipairs(PNC.NPCAuthoringSlots.Groups()) do
+                    if group.id == region[2] then title = PNC.Translation.GetKey('UI_PNC_Authoring_Group_' .. group.key, group.label) end
+                end
+            end
+            local focus = region[2]
+            if string.find(region[1], 'arm', 1, true) then focus = string.find(region[1], 'left', 1, true) and 'left_arm' or 'right_arm' end
+            self.regions[#self.regions + 1] = { texture = texture, group = region[2], title = title, viewRegion = focus, z = region[3] or 0,
+                x = texture:getOffsetX(), y = texture:getOffsetY(), w = texture:getWidth(), h = texture:getHeight() }
+        end
     end
 end
 function Map:Projection()
     local scale = math.max(.01, math.min(self.width / 123, self.height / 302))
     return (self.width - 123 * scale) / 2, (self.height - 302 * scale) / 2, scale
 end
-function Map:Hit(x, y)
+function Map:HitRegion(x, y)
     local ox, oy, scale = self:Projection()
     x, y = (x - ox) / scale, (y - oy) / scale
     local hit, z = nil, -1
@@ -46,20 +59,37 @@ function Map:Hit(x, y)
         if self.counts[region.group] and x >= region.x and x <= region.x + region.w
             and y >= region.y and y <= region.y + region.h and region.z > z then hit, z = region, region.z end
     end
+    return hit
+end
+function Map:Hit(x, y)
+    local hit = self:HitRegion(x, y)
     return hit and hit.group
 end
 function Map:onMouseDown(x, y)
-    local group = self:Hit(x, y)
-    if group and self.onSelect then self.onSelect(group) end
+    local region = self:HitRegion(x, y)
+    self:hideTooltip()
+    if region and self.onSelect then self.onSelect(region.group, region.viewRegion) end
     return true
 end
 function Map:onMouseMove()
-    self.hovered = self:Hit(self:getMouseX(), self:getMouseY())
-    local group
-    for _, candidate in ipairs(PNC.NPCAuthoringSlots.Groups()) do if candidate.id == self.hovered then group = candidate end end
-    self.tooltip = group and PNC.Translation.GetKey('UI_PNC_Authoring_Group_' .. group.key, group.label) or nil
+    local region = self:HitRegion(self:getMouseX(), self:getMouseY())
+    self.hovered = region and region.group
+    if not region then self:hideTooltip(); return end
+    if not self.tooltipUI then
+        self.tooltipUI = BodyTooltip:new(); self.tooltipUI:initialise()
+        self.tooltipUI:setAlwaysOnTop(true); self.tooltipUI:setVisible(false)
+    end
+    if self.tooltipRegion ~= region or self.tooltipSlots ~= self.slots then
+        self.tooltipUI:SetRegion(self, region, self.slots)
+        self.tooltipRegion, self.tooltipSlots = region, self.slots
+    end
+    if not self.tooltipUI:getIsVisible() then self.tooltipUI:addToUIManager(); self.tooltipUI:setVisible(true) end
 end
-function Map:onMouseMoveOutside() self.hovered, self.tooltip = nil, nil end
+function Map:hideTooltip()
+    self.tooltipRegion, self.tooltipSlots = nil, nil
+    if self.tooltipUI then self.tooltipUI:setVisible(false); self.tooltipUI:removeFromUIManager() end
+end
+function Map:onMouseMoveOutside() self.hovered = nil; self:hideTooltip() end
 function Map:render()
     local x, y, scale = self:Projection()
     if self.baseTexture then self:drawTextureScaledUniform(self.baseTexture, x, y, scale, .25, 1, 1, 1) end

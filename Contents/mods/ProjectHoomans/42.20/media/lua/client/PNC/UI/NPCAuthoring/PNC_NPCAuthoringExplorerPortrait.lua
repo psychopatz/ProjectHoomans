@@ -25,7 +25,9 @@ function Explorer:refreshExplorerPortrait(item)
     self.previewLabel = label or item and item.label or ''
     self.previewReason = reason
     if self.preview then
-        if spec then self.preview:setTarget(nil, spec, false)
+        if spec then
+            self.preview:setViewRegion(self.options.viewRegion or 'body')
+            self.preview:setTarget(nil, spec, false)
         else self.preview:setVisible(false); self.preview.targetKey = nil end
     end
     if item and self.options.preview and not spec then

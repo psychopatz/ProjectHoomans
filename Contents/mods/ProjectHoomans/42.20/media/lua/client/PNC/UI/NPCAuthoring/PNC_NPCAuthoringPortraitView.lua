@@ -5,10 +5,9 @@ function Window:syncPortraitView(force)
     if not panel or not source then return false end
     local face = self.tabPanel and self.tabPanel:getActiveView() == self.appearanceTab
     local mode = face and 'face' or 'body'
-    self.portraitZooms = self.portraitZooms or { face = 14, body = -3 }
-    if self.portraitMode and self.portraitMode ~= mode then self.portraitZooms[self.portraitMode] = panel.zoom end
-    if self.portraitMode ~= mode then panel.zoom = self.portraitZooms[mode] end
-    self.portraitMode, panel.yOffset = mode, face and -.85 or 0
+    local loadout = self.tabPanel and self.pages and self.tabPanel:getActiveView() == self.pages.loadout
+    panel:setViewRegion(face and 'head' or loadout and (self.loadoutViewRegion or self.loadoutPart) or 'body')
+    self.portraitMode = mode
     local spec = PNC.NPCAuthoring.Registry.Copy(source)
     spec.faceOnly, spec.includeCurrentClothing = face == true, false
     spec.key = tostring(source.key or source.id) .. ':' .. mode

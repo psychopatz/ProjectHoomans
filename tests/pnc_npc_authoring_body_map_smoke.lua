@@ -39,4 +39,33 @@ local x, y, scale = map:Projection()
 T.near(scale, 80 / 123, .0001, 'compact width preserves native aspect ratio')
 map:onMouseDown(x + 60 * scale, y + 15 * scale)
 T.equal(selected, 'head', 'letterboxed/scaled silhouette retains correct hit coordinates')
+BodyPartType = { FromIndex = function(index) return index end, getDisplayName = function(index) return 'Part ' .. index end }
+getCore = function() return { getScreenWidth = function() return 640 end, getScreenHeight = function() return 480 end } end
+getMouseX, getMouseY = function() return 630 end, function() return 470 end
+getTextManager = function() return { getFontHeight = function() return 18 end, MeasureStringX = function(_, _, value) return #value * 8 end } end
+PNC.NPCAuthoringCatalog.Find = function(id) return { label = 'Item ' .. id, script = { getNormalTexture = function() return { icon = id } end } } end
+map.width, map.height, map.sex = 246, 604, nil
+map:SetState(false, map.counts, 'torso', {
+    { group = 'torso', type = 'Hoodie' }, { group = 'torso', type = 'Vest' }, { group = 'head', type = 'Hat' },
+})
+function map:getMouseX() return 120 end
+function map:getMouseY() return 120 end
+map:onMouseMove()
+local tip = map.tooltipUI
+T.truthy(tip.visible and tip.inUIManager, 'hover registers a visible native-lifecycle tooltip')
+T.equal(tip.heading, 'Part 6', 'tooltip names the actual body part rather than only its clothing group')
+T.equal(#tip.rows, 2, 'tooltip lists only equipped items in the hovered region group')
+T.equal(tip.rows[1].texture.icon, 'Hoodie', 'tooltip carries the actual equipped item icon')
+tip:prerender()
+local icons = 0
+function tip:drawRectBorder() end
+function tip:drawText() end
+function tip:drawTextureScaledAspect() icons = icons + 1 end
+tip:render()
+T.equal(icons, 2, 'tooltip renders both equipped item icons')
+T.truthy(tip.x >= 0 and tip.x + tip.width <= 640 and tip.y >= 0 and tip.y + tip.height <= 480, 'tooltip stays inside the screen near its lower-right edge')
+map:setVisible(false); tip:prerender()
+T.falsy(tip.inUIManager, 'hiding the owner removes a tooltip even without another mouse move')
+map:onMouseMoveOutside()
+T.falsy(tip.visible, 'leaving the silhouette clears the tooltip')
 T.finish('pnc_npc_authoring_body_map_smoke')
