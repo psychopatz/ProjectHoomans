@@ -155,4 +155,36 @@ local second = adapter:BuildDraft()
 T.equal(second.previewSeed, rebound.previewSeed,
     "ordinary refresh keeps deterministic generation state")
 
+local Loadout = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringLoadout"
+local loadoutDraft = adapter:BuildDraft()
+local stableSeed = loadoutDraft.previewSeed
+T.truthy(Loadout.SetSlot(loadoutDraft, { kind = "held", id = "primary" },
+    { type = "Base.Axe", stack = 1 }), "held item edits canonical startingItems")
+T.truthy(adapter:CommitDraft(loadoutDraft), "held item persists through companion adapter")
+local _, held = Blueprint.Get(session:GetBlueprint(TID.BROTHER), "startingItems")
+T.equal(held[1].type, "Base.Axe", "held type is stored in blueprint")
+T.equal(held[1].equipSlot, "primary", "held slot is stored in blueprint")
+local roundTrip = adapter:BuildDraft()
+T.equal(roundTrip.startingItems[1].type, "Base.Axe", "held item survives resolved refresh")
+T.equal(roundTrip.previewSeed, stableSeed, "loadout changes preserve seed")
+T.falsy(adapter:CommitDraft(roundTrip), "loadout refresh is not another authored edit")
+T.truthy(Loadout.SetSlot(roundTrip, { kind = "carry", id = "new" },
+    { type = "Base.WaterBottle", stack = 3, preferredContainer = "bag" }), "carried item authoring")
+T.truthy(adapter:CommitDraft(roundTrip), "carried item commits")
+local serialized = Blueprint.Serialize(session:GetBlueprint(TID.BROTHER))
+local restored = Blueprint.Deserialize(serialized)
+local _, inventory = Blueprint.Get(restored, "startingItems")
+T.equal(#inventory, 2, "loadout survives serialized preset payload")
+T.equal(inventory[2].stack, 3, "quantity survives preset payload")
+T.equal(inventory[2].preferredContainer, "bag", "container intent survives preset payload")
+local cleared = adapter:BuildDraft()
+T.truthy(Loadout.SetSlot(cleared, { kind = "held", id = "primary" }), "held clear is explicit")
+T.truthy(adapter:CommitDraft(cleared), "held clear commits")
+local afterClear = adapter:BuildDraft()
+T.equal(#afterClear.startingItems, 1, "clearing a hand preserves carried items")
+T.truthy(Loadout.SetSlot(afterClear, { kind = "item", id = afterClear.startingItems[1].key }), "remove final carried item")
+T.truthy(adapter:CommitDraft(afterClear), "empty inventory intent commits")
+local emptyState = Blueprint.Get(session:GetBlueprint(TID.BROTHER), "startingItems")
+T.equal(emptyState, "clear", "empty loadout cannot resurrect previous authored items")
+
 T.finish("pnc_starting_companion_shared_adapter_smoke")

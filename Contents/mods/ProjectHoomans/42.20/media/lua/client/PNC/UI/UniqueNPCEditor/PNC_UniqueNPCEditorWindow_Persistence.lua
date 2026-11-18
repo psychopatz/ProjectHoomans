@@ -10,11 +10,13 @@ function Window:refreshFiles()
     if not self.fileCombo then return end
     local previous = comboData(self.fileCombo)
     clearCombo(self.fileCombo)
-    for _, entry in ipairs(Storage.List()) do
+    self.savedDraftEntries = Storage.List()
+    for _, entry in ipairs(self.savedDraftEntries) do
         self.fileCombo:addOptionWithData(
             tostring(entry.label or entry.fileName), entry.fileName)
     end
     selectCombo(self.fileCombo, previous)
+    if self.refreshDebugRoster then self:refreshDebugRoster() end
 end
 
 function Window:loadSelected()

@@ -115,7 +115,25 @@ local function sortedItemIDs(items)
     return output
 end
 
-local function exportItems(draft)
+local function exportItems(draft, fromRuntime)
+    -- Slot authoring is newer than the retained preview inventory. Do not
+    -- serialize that old inventory over a pending canonical loadout edit.
+    if not fromRuntime and draft.authoredFields
+        and draft.authoredFields.startingItems == true
+    then
+        local authored = copy(draft.startingItems or {})
+        local order = {}
+        for index, item in ipairs(authored) do order[item] = index end
+        -- Template construction resolves a bag destination as bags appear.
+        -- Emit containers before contents even if the author added the bag last.
+        table.sort(authored, function(left, right)
+            local leftBag = (tonumber(left.maxWeight) or 0) > 0
+            local rightBag = (tonumber(right.maxWeight) or 0) > 0
+            if leftBag ~= rightBag then return leftBag end
+            return order[left] < order[right]
+        end)
+        return authored
+    end
     local record = draft.runtimeRecord
     local inv = record and record.inventory or nil
     local output = {}

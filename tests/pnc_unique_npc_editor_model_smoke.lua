@@ -292,4 +292,37 @@ local rejected, reason = Storage.LoadFile("../bad.txt")
 T.falsy(rejected)
 T.equal(reason, "invalid_file_name")
 T.falsy(PNC.UniqueNPCEditorWindow)
+local Model = PNC.UniqueNPCEditorModel
+local slotDraft = Model.New()
+slotDraft.displayName = "Robin Tester"
+slotDraft.identity.survivor = { forename = "Robin", surname = "Tester" }
+slotDraft.startingItems = { { key = "authoring:held:primary", type = "Base.Axe", equipSlot = "primary" } }
+slotDraft.authoredFields.startingItems = true
+local retained = { identitySeed = 999, identity = { survivor = {} },
+    startingItems = { { key = "old", type = "Base.Money" } }, equipmentSpawnMode = "none",
+    runtime = { appearanceCache = { hairModel = "Stable" } },
+    inventory = { items = { old = { type = "Base.Money", templateKey = "editor:old" } } } }
+local slotPreview = Model.UpdatePreviewDraft({ runtimeRecord = retained }, slotDraft)
+local previewDefinition = Model.BuildDefinition(slotPreview)
+T.equal(previewDefinition.startingItems[1].type, "Base.Axe", "old retained inventory cannot overwrite the slot edit")
+local rebuilds = 0
+PNC.Inventory.CreateFromTemplate = function(record)
+    rebuilds = rebuilds + 1
+    record.inventory = { items = { edited = deepCopy(record.startingItems[1]) } }
+end
+Model.EnsureRuntimeRecord(slotPreview, false)
+T.equal(rebuilds, 1, "changed startingItems rebuild the retained preview inventory")
+T.equal(slotPreview.runtimeRecord.inventory.items.edited.type, "Base.Axe", "preview materializes the new held item")
+T.equal(slotPreview.runtimeRecord.identitySeed, 999, "inventory edit preserves runtime identity seed")
+Model.EnsureRuntimeRecord(slotPreview, false)
+T.equal(rebuilds, 1, "unchanged preview does not rebuild inventory again")
+T.truthy(Model.SyncFromRuntime(slotPreview), "legacy inventory changes can still synchronize back")
+slotDraft.startingItems = {
+    { key = "water", type = "Base.WaterBottle", preferredContainer = "bag" },
+    { key = "pack", type = "Base.Bag", maxWeight = 20, wornSlot = "Back" },
+}
+local packed = Model.BuildDefinition(slotDraft)
+T.equal(packed.startingItems[1].type, "Base.Bag", "bags materialize before their contents even when authored last")
+T.equal(packed.startingItems[2].preferredContainer, "bag", "bag destination remains canonical")
+
 T.finish("pnc_unique_npc_editor_model_smoke")

@@ -67,13 +67,7 @@ end
 
 function ISPNCUniqueNPCEditorWindow:render()
     PsychopatzWindow.render(self)
-    if self.layout and self.editor then
-        UI.DrawSectionTitle(self,
-            tr("UI_PNC_UniqueNPCEditor_Preview", "PREVIEW"),
-            self.layout.portraitX,
-            self.layout.y - Layout.Pixels(18, self.uiScale),
-            self.layout.portraitWidth)
-    end
+
 end
 
 function ISPNCUniqueNPCEditorWindow:close()

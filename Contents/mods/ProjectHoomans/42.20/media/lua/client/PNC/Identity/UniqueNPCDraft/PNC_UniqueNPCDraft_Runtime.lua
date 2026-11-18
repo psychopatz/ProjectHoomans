@@ -182,8 +182,12 @@ function Model.ApplyDraftToRuntime(draft)
     local previousAppearanceSignature
     local nextAppearanceSignature
     local appearanceChanged
+    local inventoryChanged
     if not record then return nil, "preview_missing" end
     def = Model.BuildDefinition(draft)
+    inventoryChanged = PNC.NPCAuthoring.Registry.Hash(record.startingItems or {})
+        ~= PNC.NPCAuthoring.Registry.Hash(def.startingItems or {})
+        or record.equipmentSpawnMode ~= def.equipmentSpawnMode
     inventory = record.inventory
     identitySeed = record.identitySeed
     previousAppearanceSignature = Appearance and Appearance.Signature
@@ -223,10 +227,12 @@ function Model.ApplyDraftToRuntime(draft)
     local clearedAppearance = applyExplicitIdentity(record, def, draft)
     record.name = def.displayName
     applyPreviewAppearance(record, clearedAppearance)
-    if appearanceChanged and Inventory and Inventory.CreateFromTemplate then
+    if (appearanceChanged or inventoryChanged) and Inventory and Inventory.CreateFromTemplate then
         record.runtime = record.runtime or {}
-        record.runtime.appearanceCache = nil
-        record.runtime.appearanceCacheKey = nil
+        if appearanceChanged then
+            record.runtime.appearanceCache = nil
+            record.runtime.appearanceCacheKey = nil
+        end
         Inventory.CreateFromTemplate(record)
     else
         if inventory then record.inventory = inventory end
@@ -284,7 +290,9 @@ function Model.SyncFromRuntime(draft)
     end
     capturePreviewEquipmentVisuals(record)
     refreshPreviewVisualSnapshot(record)
-    draft.startingItems = exportItems(draft)
+    draft.startingItems = exportItems(draft, true)
+    draft.authoredFields = draft.authoredFields or {}
+    draft.authoredFields.startingItems = true
     draft._dirty = true
     return true
 end

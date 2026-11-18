@@ -117,7 +117,8 @@ function ISPNCUniqueNPCAppearanceWindow:onHairChanged(combo)
     local survivor = self.draft.identity and self.draft.identity.survivor or {}
     local value = comboData(combo)
     self.draft.identity.survivor = survivor
-    survivor.hairModel = value == "__random" and nil or value
+    if value == "__random" then value = nil end
+    survivor.hairModel = value
     self.draft.appearanceAuthored = self.draft.appearanceAuthored or {}
     self.draft.appearanceAuthored.hairModel = true
     self.draft.authoringClears = self.draft.authoringClears or {}
@@ -130,7 +131,8 @@ function ISPNCUniqueNPCAppearanceWindow:onBeardChanged(combo)
     local survivor = self.draft.identity and self.draft.identity.survivor or {}
     local value = comboData(combo)
     self.draft.identity.survivor = survivor
-    survivor.beardModel = value == "__random" and nil or value
+    if value == "__random" then value = nil end
+    survivor.beardModel = value
     self.draft.appearanceAuthored = self.draft.appearanceAuthored or {}
     self.draft.appearanceAuthored.beardModel = true
     self.draft.authoringClears = self.draft.authoringClears or {}
@@ -231,3 +233,20 @@ function ISPNCUniqueNPCAppearanceWindow:onSkinModeChanged(combo)
     self:markChanged()
 end
 
+
+function Window:onHairColorChanged(combo)
+    if self.syncing or not self.draft then return end
+    local id = comboData(combo)
+    if id == "custom" then return end
+    local color
+    for _, candidate in ipairs(self.hairPalette) do
+        if candidate.id == id and candidate.r then
+            color = { r = candidate.r, g = candidate.g, b = candidate.b }
+        end
+    end
+    self.draft.identity.survivor.hairColor = color
+    self.draft.appearanceAuthored.hairColor = true
+    self.draft.authoringClears = self.draft.authoringClears or {}
+    self.draft.authoringClears["appearance.hairColor"] = color == nil or nil
+    self:markChanged()
+end

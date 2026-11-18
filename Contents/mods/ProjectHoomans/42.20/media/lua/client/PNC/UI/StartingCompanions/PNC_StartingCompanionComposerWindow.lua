@@ -71,10 +71,6 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
     -- ISComboBox invokes onChange as (target, combo, arg1, arg2).  Keep the
     -- callback boundary faithful to the vanilla widget and route all state
     -- changes through the bounded selection transactions below.
-    self.slotCombo = addCombo(self, self, function(target, combo)
-        local option = combo.options and combo.options[combo.selected]
-        target:SelectCompanion(option and option.data or nil)
-    end)
     self.presetCombo = addCombo(self, self, function(target, combo)
         local option = combo.options and combo.options[combo.selected]
         target:SelectPreset(option and option.data or nil)
@@ -120,11 +116,6 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
         target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
         variant = "quiet",
     })
-    self.summary = UI.CreateKeyValueList(self, {
-        itemHeight = Layout.Pixels(25, self.uiScale),
-        labelWidthRatio = 0.42,
-        valueXRatio = 0.44,
-    })
     self.statusLabel = ISLabel:new(0, 0, 24, "", 0.75, 0.8, 0.85, 1,
         UIFont.Small, true)
     self.statusLabel:initialise()
@@ -137,6 +128,7 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
     self.editor:initialise()
     self.editor:instantiate()
     self:addChild(self.editor)
+    self.editor.refreshRosterSummary = function() self:refreshSummary() end
 end
 
 function ISPNCStartingCompanionComposerWindow:setStatus(value)
@@ -161,7 +153,6 @@ function ISPNCStartingCompanionComposerWindow:SelectCompanion(traitID)
         self.selectedTraitID = nil
         self.currentSelection = nil
         self.adapter = nil
-        if self.slotCombo then self.slotCombo.selected = 0 end
         if self.editor then self.editor:setAdapter(nil) end
         self:refreshSummary()
         self:setStatus(tr("UI_PNC_StartingCompanion_NoSelection",
@@ -170,9 +161,6 @@ function ISPNCStartingCompanionComposerWindow:SelectCompanion(traitID)
     end
 
     self.selectedTraitID = selectedID
-    if self.slotCombo and self.slotCombo.selectData then
-        self.slotCombo:selectData(selectedID)
-    end
     self.adapter = Adapter.New(self.session, selectedID)
     self.currentSelection = {
         traitID = selectedID,
@@ -202,12 +190,12 @@ function ISPNCStartingCompanionComposerWindow:refreshSlots()
         and self.session:GetActiveSlots() or {}
     local selected = self.selectedTraitID
     local selectedIsActive = false
-    self.slotCombo:clear()
+
     for _, slot in ipairs(active) do
         local spec = slot.spec or StartingTraits.GetDefinition(slot.traitID)
         local label = spec and tr(spec.uiName, spec.relationshipKind)
             or tr("UI_PNC_StartingCompanion_Companion", "Companion")
-        self.slotCombo:addOptionWithData(label, slot.traitID)
+
         if selected == slot.traitID then selectedIsActive = true end
         if not selected then selected = slot.traitID end
     end
@@ -217,11 +205,7 @@ function ISPNCStartingCompanionComposerWindow:refreshSlots()
         selected = active[1].traitID
     end
     self.selectedTraitID = selected
-    if selected then
-        self.slotCombo:selectData(selected)
-    else
-        self.slotCombo.selected = 0
-    end
+
 end
 
 function ISPNCStartingCompanionComposerWindow:refreshPresets()
@@ -244,20 +228,15 @@ function ISPNCStartingCompanionComposerWindow:refreshSelected()
 end
 
 function ISPNCStartingCompanionComposerWindow:refreshSummary()
-    self.summary:clear()
-    self.summary.currentTraitID = self.selectedTraitID
-    if not self.session then return end
-    for _, item in ipairs(self.session:FinalSummary()) do
-        local label = relationshipLabel(item.relationshipKind)
-        if item.traitID == self.selectedTraitID then
-            label = "• " .. label
-        end
-        addListItem(self.summary,
-            label,
-            item.displayName or tr("UI_PNC_StartingCompanion_PreviewUnavailable",
-                "Preview unavailable"),
-            item.error ~= nil)
+    local rows = {}
+    for _, item in ipairs(self.session and self.session:FinalSummary() or {}) do
+        rows[#rows + 1] = { id = item.traitID,
+            label = item.displayName or relationshipLabel(item.relationshipKind),
+            subtitle = relationshipLabel(item.relationshipKind), error = item.error }
     end
+    self.editor:setRoster(rows, self.selectedTraitID, function(id)
+        self:SelectCompanion(id)
+    end)
 end
 
 function ISPNCStartingCompanionComposerWindow:refresh()
@@ -272,36 +251,18 @@ function ISPNCStartingCompanionComposerWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 0, bottom = 10 })
     local gap = Layout.Pixels(8, self.uiScale)
     local rowHeight = Layout.Pixels(28, self.uiScale)
-    local slotWidth = math.floor((rect.width - gap) * 0.48)
-    local presetWidth = rect.width - slotWidth - gap
-    local y = rect.y
-    local actions = {
+    Layout.SetBounds(self.presetCombo, rect.x, rect.y, rect.width, rowHeight)
+    local toolbar = Layout.Flow({
         self.loadButton, self.saveButton, self.saveSetButton,
-        self.randomizeButton, self.resetButton, self.revertButton,
-        self.closeButton,
-    }
-    Layout.SetBounds(self.slotCombo, rect.x, y, slotWidth, rowHeight)
-    Layout.SetBounds(self.presetCombo, rect.x + slotWidth + gap, y,
-        presetWidth, rowHeight)
-    y = y + rowHeight + gap
-    local actionWidth = math.max(Layout.Pixels(78, self.uiScale),
-        math.floor((rect.width - gap * (#actions - 1)) / #actions))
-    local actionX = rect.x
-    for _, control in ipairs(actions) do
-        Layout.SetBounds(control, actionX, y, actionWidth, rowHeight)
-        actionX = actionX + actionWidth + gap
-    end
-    y = y + rowHeight + gap
-    local statusHeight = Layout.Pixels(18, self.uiScale)
-    local summaryHeight = Layout.Pixels(82, self.uiScale)
-    local summaryY = rect.y + rect.height - summaryHeight
-        - statusHeight - gap
-    Layout.SetBounds(self.summary, rect.x, summaryY, rect.width, summaryHeight)
-    local editorHeight = math.max(Layout.Pixels(220, self.uiScale),
-        summaryY - gap - y)
-    Layout.SetBounds(self.editor, rect.x, y, rect.width, editorHeight)
+        self.randomizeButton, self.resetButton, self.revertButton, self.closeButton,
+    }, { x = rect.x, y = rect.y + rowHeight + gap, width = rect.width },
+        { scale = self.uiScale, minWidth = 78, gap = 6 })
+    local y = toolbar.bottom + gap
+    local statusHeight = Layout.Pixels(22, self.uiScale)
+    Layout.SetBounds(self.editor, rect.x, y, rect.width,
+        math.max(1, rect.y + rect.height - y - statusHeight - gap))
     self.editor.uiScale = self.uiScale
-    self.editor:requestResponsiveLayout(true)
+    self.editor:requestResponsiveLayout()
     Layout.SetBounds(self.statusLabel, rect.x,
         rect.y + rect.height - statusHeight, rect.width, statusHeight)
 end
@@ -349,6 +310,7 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
     local id = button and button.internal
     local ok
     local reason
+    if self.editor.draft then self.editor:pullForm() end
     if id == "close" then
         self:close()
         return

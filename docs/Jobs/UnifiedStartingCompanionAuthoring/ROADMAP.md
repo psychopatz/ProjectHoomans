@@ -755,6 +755,35 @@ Required interaction coverage includes:
 layout, preview, policy, persistence, and regression gates pass. The roadmap
 now returns to the user-owned P6 native acceptance matrix.
 
+### P5R3 — Shared roster, compact pages and embedded loadout
+
+User-approved implementation of [the UI redesign](UI_REDESIGN_AUDIT_AND_PLAN.md).
+Developer-side implementation is complete; native acceptance is unverified.
+
+- Both entry points use the same roster, Bio/Appearance/Attributes/Loadout pages,
+  preview controls and canonical authoring model. Companion Relationships and
+  debug Details use the same page shell with their existing policy differences.
+- Exactly one tab page is visible after selection, refresh and empty-selection
+  recovery. Roster selection flushes the focused form, keeps its save target
+  aligned, and retains per-NPC preview state.
+- Loadout edits use canonical appearance/startingItems, icon slot rows, a
+  searchable script catalog, quantity/destination controls, attachment resolution,
+  explicit clearing and conflict checks. Bags serialize before their contents.
+- Pending slot edits take precedence over retained preview inventory; unchanged
+  previews do not rebuild inventory. Companion snapshots include startingItems.
+- Layout wraps actions, reserves bounded scrolling and native model-view bounds,
+  and provides an expanded preview at compact widths. Hair color presets and
+  inherited color locks remain part of shared Appearance.
+- Production lifecycle/composition, scale geometry, model materialization,
+  transaction rejection, bag and preset round-trip regressions pass. Full Lua
+  suite: 1038/1042; the four recorded unrelated failures remain.
+- Forty new Character catalog keys have English/Tagalog parity. Changed Lua
+  syntax, targeted Kahlua checks, JSON parsing and whitespace checks pass.
+
+**P5R3 gate:** developer-side implementation accepted at its local phase commit.
+P6 must verify actual native rendering, interactions and SP/MP/co-op outcomes;
+no native visual or multiplayer result is claimed by the harness.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix

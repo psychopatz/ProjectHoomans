@@ -39,7 +39,8 @@ ISPNCNPCAuthoringEditor = ISPanel:derive("ISPNCNPCAuthoringEditor")
 
 function ISPNCNPCAuthoringEditor:initialise()
     ISPanel.initialise(self)
-    self:noBackground()
+    self.backgroundColor = { r = 0.055, g = 0.065, b = 0.075, a = 0.98 }
+    self.borderColor = { r = 0.22, g = 0.28, b = 0.30, a = 1 }
 end
 
 function ISPNCNPCAuthoringEditor:new(x, y, width, height, options)
@@ -78,24 +79,49 @@ function ISPNCNPCAuthoringEditor:createChildren()
     self:buildAuthoringEditorBody()
 end
 
+-- ISTabPanel owns the active page. A host selection/refresh must never reveal
+-- inactive siblings, including when recovering from an empty roster.
+function ISPNCNPCAuthoringEditor:syncPageVisibility()
+    local tabs = self.tabPanel
+    if not tabs then return end
+    local active = tabs:getActiveView()
+    for _, entry in ipairs(tabs.viewList or {}) do
+        entry.view:setVisible(self.draft ~= nil and entry.view == active)
+    end
+end
+
 function ISPNCNPCAuthoringEditor:setAdapter(adapter)
     if not adapter then
         self:clearPresentation()
         return
     end
+    self.previewCache = self.previewCache or {}
+    local cache = self.previewCache
+    for key, value in pairs(cache) do
+        if value.traitID == (self.presentationAdapter and self.presentationAdapter.traitID) then cache[key] = nil end
+    end
+    if self.previewGenerationIdentity and self.previewDraft then
+        self.previewCache[self.previewGenerationIdentity] = {
+            preview = self.previewDraft, identity = self.previewIdentity, traitID = self.presentationAdapter and self.presentationAdapter.traitID,
+        }
+    end
     self.presentationAdapter = adapter
     if adapter.Attach then adapter:Attach(self) end
     self.inspectorVisible = false
-    if self.formView and self.formView.setVisible then
-        self.formView:setVisible(true)
-    end
-    if self.appearanceTab and self.appearanceTab.setVisible then
-        self.appearanceTab:setVisible(true)
-    end
     if self.configuredDetails and self.configuredDetails.setVisible then
         self.configuredDetails:setVisible(self.presentationMode == "companion")
     end
-    self:refreshFromAdapter(true)
+    local generation = adapter.PreviewGenerationIdentity and adapter:PreviewGenerationIdentity()
+    local identity = adapter.PreviewIdentity and adapter:PreviewIdentity()
+    local cached = generation and self.previewCache[generation]
+    if cached and cached.identity == identity then
+        self.previewDraft = cached.preview
+        self.previewGenerationIdentity = generation
+    else
+        self.previewDraft = nil
+    end
+    self:refreshFromAdapter(not (cached and cached.identity == identity))
+    self:syncPageVisibility()
 end
 
 -- Clear every visible preview surface when the host has no valid current
@@ -109,6 +135,7 @@ function ISPNCNPCAuthoringEditor:clearPresentation()
     self.previewGenerationIdentity = nil
     self.previewSpecKey = nil
     self.inspectorVisible = false
+    self:syncPageVisibility()
     if self.formView and self.formView.setVisible then
         self.formView:setVisible(false)
     end
@@ -184,6 +211,7 @@ function ISPNCNPCAuthoringEditor:refreshFromAdapter(force)
     end
     if self.syncControls then self:syncControls() end
     if self.refreshPreview then self:refreshPreview(force == true) end
+    self:syncPageVisibility()
     return true
 end
 
@@ -220,6 +248,8 @@ ISPNCNPCAuthoringEditor.Internal = Internal
 -- editor. They are loaded once here and are shared by every host surface.
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Core"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Options"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Roster"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Loadout"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Lifecycle"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Actions"

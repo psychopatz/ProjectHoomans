@@ -1,190 +1,93 @@
 local T = require "tests/support/test"
-
 T.addPackagePaths()
-
-local function control(title)
-    local value = { title = title or "", visible = true }
-    function value:getTitle() return self.title end
-    function value:setVisible(nextVisible) self.visible = nextVisible end
-    function value:setTitle(nextTitle) self.title = nextTitle end
-    function value:setEnabled(enabled) self.enabled = enabled end
-    function value:setEnable(enabled) self.enabled = enabled end
-    return value
+UIFont = { Small = 1 }
+getTextManager = function() return { getFontHeight = function() return 18 end } end
+local function control()
+    local c = { visible = true, height = 1, width = 1 }
+    function c:setVisible(v) self.visible = v end
+    function c:setEnabled(v) self.enabled = v end
+    function c:setEnable(v) self.enabled = v end
+    function c:setScrollHeight(v) self.scrollHeight = v end
+    function c:getYScroll() return self.yScroll or 0 end
+    function c:setYScroll(v) self.yScroll = v end
+    function c:onResize() end
+    return c
 end
-
 local Layout = {}
-function Layout.Pixels(value) return value end
-function Layout.SetBounds(target, x, y, width, height)
-    target.x, target.y, target.width, target.height = x, y, width, height
+function Layout.Pixels(value, scale) return math.floor(value * (scale or 1)) end
+function Layout.SetBounds(c, x, y, w, h)
+    c.x, c.y, c.width, c.height = x, y, w, h
 end
-function Layout.Flow(controls, rect)
-    local x = rect.x
-    for _, target in ipairs(controls or {}) do
-        local width = target.preferredWidth or 80
-        Layout.SetBounds(target, x, rect.y, width, 28)
-        x = x + width + 6
+function Layout.Flow(controls, rect, options)
+    local size, gap = Layout.Pixels(100, options.scale), Layout.Pixels(6, options.scale)
+    local x, y, h = rect.x, rect.y, Layout.Pixels(30, options.scale)
+    for _, c in ipairs(controls) do
+        if x > rect.x and x + size > rect.x + rect.width then x, y = rect.x, y + h + gap end
+        Layout.SetBounds(c, x, y, size, h)
+        x = x + size + gap
     end
-    return { bottom = rect.y + 28 }
+    return { bottom = y + h }
 end
-
-local function makeList()
-    local list = control()
-    function list:clear() self.items = {} end
-    list.items = {}
-    function list:addItem(label, item)
-        self.items[#self.items + 1] = { label = label, item = item }
-    end
-    return list
+ISPNCNPCAuthoringEditor = { Internal = { Layout = Layout } }
+T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout.lua")
+local Class = ISPNCNPCAuthoringEditor
+local e = setmetatable({ toolbar = { control(), control(), control(), control() },
+    coreRows = {}, addRows = {}, sectionLabels = {}, draft = {},
+    pages = {}, roster = control(), rosterLabel = control(), tabPanel = control(),
+    fileLabel = control(), fileCombo = control(), configuredDetails = control(),
+    removeConfiguredButton = control(), details = control(), resetDetailsButton = control(),
+    removeButton = control(), statusLabel = control(), portraitPanel = control(),
+}, { __index = Class })
+for _, id in ipairs({ "bio", "appearance", "attributes", "loadout", "relations" }) do e.pages[id] = control() end
+ e.formView, e.appearanceTab = e.pages.bio, e.pages.appearance
+ e.tabPanel.tabHeight = 24
+function e.appearanceTab:onResponsiveLayout() end
+function e:layoutLoadoutPage() end
+function e.portraitPanel:setPortraitBounds(x, y, w, h)
+    self.nativeWidth, self.nativeHeight = w, h
 end
-
-local editorWindow = {
-    Internal = { Layout = Layout, Presentation = {} },
-}
-editorWindow.presentationMode = "companion"
-editorWindow.uiScale = 1
-editorWindow.width = 1000
-editorWindow.height = 620
-editorWindow.toolbar = { control("INSPECTOR") }
-editorWindow.tabPanel = { tabHeight = 20 }
-editorWindow.formView = control()
-editorWindow.formView.height = 500
-function editorWindow.formView:setScrollHeight(value) self.scrollHeight = value end
-editorWindow.appearanceTab = control()
-function editorWindow.appearanceTab:onResponsiveLayout() self.responsive = true end
-editorWindow.portraitPanel = control()
-function editorWindow.portraitPanel:setPortraitBounds(x, y, width, height)
-    self.portraitBounds = { x = x, y = y, width = width, height = height }
+function e:getContentRect() return { x = 0, y = 0, width = self.width, height = self.height } end
+function e:fieldCapability(id) return { visible = id ~= "faction", editable = id ~= "surname" } end
+for _, id in ipairs({ "forename", "surname", "nickname", "gender", "archetype", "faction", "hair", "beard", "equipmentMode" }) do
+    e.coreRows[#e.coreRows + 1] = { id = id, fieldID = id, labelControl = control(), entry = control(), readOnlyValue = control() }
 end
-editorWindow.sectionLabels = {
-    identity = control(), background = control(), skills = control(), traits = control(),
-}
-editorWindow.details = makeList()
-editorWindow.configuredDetails = makeList()
-editorWindow.removeConfiguredButton = control()
-editorWindow.removeButton = control()
-editorWindow.resetDetailsButton = control()
-editorWindow.statusLabel = control()
-editorWindow.draft = {}
-editorWindow.inspectorVisible = false
-editorWindow.coreRows = {}
-for _, id in ipairs({ "forename", "nickname", "surname", "gender",
-    "archetype", "faction", "hair", "beard", "equipmentMode" }) do
-    local row = {
-        id = id, fieldID = id, labelControl = control(), entry = control(),
-    }
-    if id == "surname" or id == "gender" then
-        row.readOnlyValue = control()
-    end
-    editorWindow.coreRows[#editorWindow.coreRows + 1] = row
+for index = 1, 4 do
+    e.addRows[index] = { fieldID = "skill", labelControl = control(), button = control(), entries = index == 1 and { control(), control() } or { control() } }
 end
-editorWindow.addRows = {}
-for _, id in ipairs({ "skill", "npcTrait", "vanillaTrait", "dynamicTrait" }) do
-    editorWindow.addRows[#editorWindow.addRows + 1] = {
-        id = id, fieldID = id, labelControl = control(), button = control(),
-        entries = { control() },
-    }
+local function inside(c, w, h, message)
+    T.truthy(c.x >= 0 and c.y >= 0 and c.x + c.width <= w + 1 and c.y + c.height <= h + 1, message)
 end
-function editorWindow:getContentRect()
-    return { x = 0, y = 0, width = self.width, height = self.height }
-end
-function editorWindow:fieldCapability(fieldID)
-    if fieldID == "factionID" or fieldID == "faction" then
-        return { visible = false, editable = false }
-    end
-    if fieldID == "identity.surname" or fieldID == "surname" then
-        return { visible = true, editable = false, sourceLabel = "Inherited from Player" }
-    end
-    if fieldID == "identity.isFemale" or fieldID == "gender" then
-        return { visible = true, editable = false, sourceLabel = "Relationship Rule" }
-    end
-    return { visible = true, editable = true }
-end
-
-ISPNCNPCAuthoringEditor = editorWindow
-T.load("ProjectHoomans", "client",
-    "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout.lua")
-
-editorWindow:onResponsiveLayout()
-T.truthy(editorWindow.layout, "shared editor exposes layout evidence")
-T.truthy(editorWindow.layout.companion.scrollBounded,
-    "companion General uses a bounded scroll surface")
-T.truthy(editorWindow.layout.portraitX + editorWindow.layout.portraitWidth
-    <= editorWindow.width, "portrait remains inside the editor")
-T.truthy(editorWindow.layout.leftWidth <= editorWindow.width,
-    "General tab remains inside the editor")
-T.truthy(editorWindow.layout.companion.statusY
-    + editorWindow.layout.companion.statusHeight
-    <= editorWindow.layout.companion.contentHeight,
-    "status remains inside the General content")
-for _, row in ipairs(editorWindow.coreRows) do
-    if row.labelControl.width then
-        T.truthy(row.labelControl.x + row.labelControl.width
-            <= editorWindow.layout.leftWidth,
-            "General labels stay inside the tab")
+for _, mode in ipairs({ "companion", "debug" }) do
+    e.presentationMode = mode
+    for _, scale in ipairs({ 1, 1.25, 1.5 }) do
+        for _, size in ipairs({ { 780, 420 }, { 1060, 620 }, { 1540, 900 }, { 2480, 1300 } }) do
+            e.width, e.height, e.uiScale = size[1], size[2], scale
+            e:onResponsiveLayout()
+            inside(e.roster, e.width, e.height, "roster bounded")
+            inside(e.tabPanel, e.width, e.height, "tab viewport bounded")
+            inside(e.statusLabel, e.width, e.height, "status bounded")
+            if e.portraitPanel.visible then inside(e.portraitPanel, e.width, e.height, "portrait bounded") end
+            T.equal(e.portraitPanel.nativeWidth, e.portraitPanel.width, "native model viewport follows panel width")
+            T.equal(e.portraitPanel.nativeHeight, e.portraitPanel.height, "native model viewport follows panel height")
+            for _, row in ipairs(e.coreRows) do
+                if row.labelControl.visible then
+                    inside(row.labelControl, e.formView.width, e.formView.contentHeight, "Bio label bounded")
+                    inside(row.readOnlyValue.visible and row.readOnlyValue or row.entry, e.formView.width, e.formView.contentHeight, "Bio value bounded")
+                end
+            end
+            for _, row in ipairs(e.addRows) do
+                inside(row.button, e.pages.attributes.width, e.pages.attributes.contentHeight, "attribute action bounded")
+                for _, c in ipairs(row.entries) do inside(c, e.pages.attributes.width, e.pages.attributes.contentHeight, "attribute input bounded") end
+            end
+            if e.layout.compact then
+                e.previewExpanded = true
+                e:onResponsiveLayout()
+                T.falsy(e.tabPanel.visible, "compact preview replaces form instead of overlapping it")
+                T.truthy(e.portraitPanel.visible, "compact preview is accessible")
+                inside(e.portraitPanel, e.width, e.height, "expanded preview bounded")
+                e.previewExpanded = false
+            end
+        end
     end
 end
-
-editorWindow.width = 640
-editorWindow.height = 460
-editorWindow:onResponsiveLayout()
-T.truthy(editorWindow.layout.stacked, "small layout stacks the portrait")
-T.truthy(editorWindow.layout.portraitY + editorWindow.layout.portraitHeight
-    <= editorWindow.height, "stacked portrait remains bounded")
-
-local appearance = {
-    Internal = { Layout = Layout, tr = function(_, fallback) return fallback end },
-    parentEditor = { presentationMode = "companion" },
-    uiScale = 1, width = 560, height = 330,
-    topControls = { control("RANDOMIZE"), control("PLAY VOICE"), control("ADVANCED") },
-    content = {
-        width = 520, height = 270, contentHeight = 0,
-        vscroll = {
-            width = 16,
-            setX = function(self, value) self.x = value end,
-            setHeight = function(self, value) self.height = value end,
-        },
-    },
-    rows = {}, advancedVisible = false,
-    outfitLabel = control(), outfitCombo = control(),
-    voiceLabel = control(), voiceCombo = control(),
-    voiceSampleLabel = control(), voiceSampleCombo = control(),
-    voicePitchLabel = control(), voicePitch = control(), voicePitchValue = control(),
-    skinLabel = control(), skinModeCombo = control(), skinSwatch = control(),
-    skinValue = control(), hairLabel = control(), hairCombo = control(),
-    beardLabel = control(), beardCombo = control(), advancedLabel = control(),
-    advancedClothingButton = control("ADVANCED"),
-}
-function appearance.content:setScrollHeight(value) self.scrollHeight = value end
-function appearance.content:setYScroll(value) self.yScroll = value end
-function appearance.content:getYScroll() return self.yScroll or 0 end
-function appearance.content:onResize() self.resized = true end
-for _ = 1, 8 do
-    appearance.rows[#appearance.rows + 1] = {
-        labelControl = control(), policy = control(), item = control(),
-    }
-end
-ISPNCUniqueNPCAppearanceWindow = appearance
-T.load("ProjectHoomans", "client",
-    "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCAppearanceWindow_Layout.lua")
-
-appearance:onResponsiveLayout()
-T.falsy(appearance.layout.advancedVisible,
-    "normal Appearance keeps advanced clothing collapsed")
-for _, row in ipairs(appearance.rows) do
-    T.falsy(row.item.width > 0, "normal Appearance hides raw clothing rows")
-end
-T.truthy(appearance.content.height <= appearance.height,
-    "normal Appearance scroll region is bounded")
-
-appearance.advancedVisible = true
-appearance:onResponsiveLayout()
-T.truthy(appearance.layout.advancedVisible,
-    "Advanced Clothing Overrides can be opened")
-T.truthy(appearance.layout.scrollBounded,
-    "advanced clothing owns a bounded scroll surface")
-for _, row in ipairs(appearance.rows) do
-    T.truthy(row.item.x + row.item.width <= appearance.content.width,
-        "advanced clothing rows stay inside the scroll region")
-end
-
 T.finish("pnc_starting_companion_ui_layout_smoke")

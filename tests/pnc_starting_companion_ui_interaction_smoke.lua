@@ -74,6 +74,9 @@ local UI = {
     NewWindow = function() return nil end,
 }
 function UI.Layout.Pixels(value) return value end
+function UI.Layout.Flow(controls, rect)
+    return { bottom = rect.y + 32 }
+end
 function UI.Layout.SetBounds(control, x, y, width, height)
     if not control then return end
     control.x, control.y = x, y
@@ -206,7 +209,11 @@ function editorClass:invokeWorkflow(action)
     self:setAdapter(self.adapter)
     return ok
 end
+function editorClass:pullForm() self.flushed = true end
 function editorClass:requestResponsiveLayout() end
+function editorClass:setRoster(rows, selected, callback)
+    self.rosterRows, self.rosterSelection, self.onSelectRoster = rows, selected, callback
+end
 
 local appliedPreset
 local Presets = {
@@ -277,8 +284,7 @@ T.equal(window.selectedTraitID, brother,
     "native callback harness starts on the first active companion")
 T.equal(window.adapter.traitID, brother, "initial adapter matches selector")
 
-window.slotCombo:selectData(sister)
-window.slotCombo:invokeChange()
+window.editor.onSelectRoster(sister)
 T.equal(window.selectedTraitID, sister,
     "vanilla onChange(target, combo) updates selected companion")
 T.equal(window.adapter.traitID, sister, "adapter follows selected companion")
@@ -314,8 +320,7 @@ T.equal(appliedPreset.companionTraitID, sister,
 T.equal(window.selectedTraitID, sister,
     "template load rebinds the same selected companion transaction")
 
-window.slotCombo.selected = 0
-window.slotCombo:invokeChange()
+window.editor.onSelectRoster(nil)
 T.falsy(window.selectedTraitID, "invalid selection clears selected trait")
 T.falsy(window.adapter, "invalid selection detaches the adapter")
 T.falsy(window.editor.form, "invalid selection clears the form")
@@ -323,8 +328,7 @@ T.falsy(window.editor.portraitTarget, "invalid selection clears the portrait")
 T.equal(window.statusText, "No starting companion trait selected",
     "invalid selection explains the cleared state")
 
-window.slotCombo:selectData(brother)
-window.slotCombo:invokeChange()
+window.editor.onSelectRoster(brother)
 T.equal(window.selectedTraitID, brother,
     "a later valid selection restores the cleared companion transaction")
 T.equal(window.editor.form.gender, "Male",

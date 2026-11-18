@@ -65,10 +65,15 @@ function Window:refreshPreview(force)
         self:setStatus(tostring(previewReason or reason
             or "preview unavailable"):gsub("_", " "))
     end
+    if self.refreshLoadoutPage then self:refreshLoadoutPage() end
+    if self.refreshRosterSummary then self:refreshRosterSummary() end
+    if self.refreshDebugRoster then self:refreshDebugRoster() end
+    if self.pages then self:requestResponsiveLayout() end
     return rendered == true
 end
 
 function Window:onFormChanged(force)
+    if self.syncing or not self.draft then return end
     self:pullForm()
     self:refreshPreview(force == true)
 end

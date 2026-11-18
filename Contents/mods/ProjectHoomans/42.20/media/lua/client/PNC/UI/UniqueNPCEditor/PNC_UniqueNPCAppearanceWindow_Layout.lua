@@ -7,7 +7,7 @@ function ISPNCUniqueNPCAppearanceWindow:syncAdvancedVisibility()
     local companion = self.parentEditor
         and self.parentEditor.presentationMode == "companion"
     local visible = not companion or self.advancedVisible == true
-    local showIdentityAppearance = companion == true
+    local showIdentityAppearance = companion == true or self.integrated == true
     if self.hairLabel then self.hairLabel:setVisible(showIdentityAppearance) end
     if self.hairCombo then self.hairCombo:setVisible(showIdentityAppearance) end
     if self.beardLabel then self.beardLabel:setVisible(showIdentityAppearance) end
@@ -30,6 +30,7 @@ function ISPNCUniqueNPCAppearanceWindow:syncAdvancedVisibility()
 end
 
 function Window:onResponsiveLayout()
+    if self.integrated then return self:layoutIntegratedAppearance() end
     local scale = self.uiScale or 1
     local margin = Layout.Pixels(8, scale)
     local rect = {
@@ -152,3 +153,46 @@ function Window:onResponsiveLayout()
     }
 end
 
+
+-- Labels stack above fields so inherited-value explanations and large fonts
+-- never compete for a fixed horizontal label width.
+function Window:layoutIntegratedAppearance()
+    local Layout = Internal.Layout
+    local gap = Layout.Pixels(8, self.uiScale)
+    local h = math.max(Layout.Pixels(28, self.uiScale),
+        (getTextManager and getTextManager():getFontHeight(UIFont.Small) or 16) + 10)
+    local top = Layout.Flow(self.topControls, { x = gap, y = gap,
+        width = math.max(1, self.width - gap * 2) },
+        { scale = self.uiScale, minWidth = 80, gap = 6 })
+    Layout.SetBounds(self.content, gap, top.bottom + gap,
+        math.max(1, self.width - gap * 2), math.max(1, self.height - top.bottom - gap * 2))
+    local w = math.max(1, self.content.width - 20)
+    local y = gap
+    local function row(label, control)
+        label:setVisible(true)
+        Layout.SetBounds(label, 0, y, w, h)
+        y = y + h
+        Layout.SetBounds(control, 0, y, w, h)
+        y = y + h + gap
+    end
+    row(self.skinLabel, self.skinModeCombo)
+    Layout.SetBounds(self.skinSwatch, 0, y, h, h)
+    Layout.SetBounds(self.skinValue, h + gap, y, math.max(1, w - h - gap), h)
+    y = y + h + gap
+    row(self.hairLabel, self.hairCombo)
+    row(self.beardLabel, self.beardCombo)
+    if self.hairColorCombo then row(self.hairColorLabel, self.hairColorCombo) end
+    row(self.voiceLabel, self.voiceCombo)
+    row(self.voiceSampleLabel, self.voiceSampleCombo)
+    row(self.voicePitchLabel, self.voicePitch)
+    Layout.SetBounds(self.voicePitchValue, 0, y, w, h)
+    y = y + h + gap
+    self.advancedLabel:setVisible(false)
+    self.content.contentHeight = y
+    self.content.maxScroll = math.max(0, y - self.content.height)
+    self.content:setScrollHeight(y)
+    self.content:setYScroll(math.max(-self.content.maxScroll,
+        math.min(0, self.content:getYScroll())))
+    self.content:onResize()
+    self.layout = { contentHeight = y, scrollBounded = true, advancedVisible = false }
+end

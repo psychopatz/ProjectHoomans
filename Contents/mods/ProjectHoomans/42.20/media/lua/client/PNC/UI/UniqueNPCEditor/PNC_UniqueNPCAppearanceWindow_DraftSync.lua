@@ -123,6 +123,21 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
     if self.beardCombo and self.beardCombo.setEnabled then
         self.beardCombo:setEnabled(self.draft and self.draft.isFemale ~= true)
     end
+    if self.hairColorCombo then
+        local color = survivor.hairColor
+        local id = color and "custom" or "random"
+        for _, option in ipairs(self.hairPalette) do
+            if color and option.r and math.abs(color.r - option.r) < 0.001
+                and math.abs(color.g - option.g) < 0.001 and math.abs(color.b - option.b) < 0.001
+            then id = option.id end
+        end
+        Internal.addOptions(self.hairColorCombo, self.hairPalette)
+        if id == "custom" then self.hairColorCombo:addOptionWithData(
+            tr("UI_PNC_Authoring_CustomColor", "Custom color"), "custom") end
+        selectData(self.hairColorCombo, id)
+        local capability = self.parentEditor:fieldCapability("appearance.hairColor")
+        setControlEnabled(self.hairColorCombo, capability.editable ~= false)
+    end
     for _, row in ipairs(self.rows) do
         local policy = appearance.slots and appearance.slots[row.location]
             or { mode = "none" }

@@ -18,7 +18,7 @@ local Profile = Internal.Presentation
 function Window:addTextRow(id, key, fallback,
     onlyNumbers, nameField, fieldID)
     local row = { id = id, fieldID = fieldID or id, label = tr(key, fallback) }
-    local parent = self.formView or self
+    local parent = self.controlParent or self.formView or self
     row.labelControl = addLabel(parent, row.label)
     row.entry = UI.CreateTextEntry(parent, {
         onlyNumbers = onlyNumbers == true,
@@ -35,7 +35,7 @@ end
 
 function Window:addComboRow(id, key, fallback, fieldID)
     local row = { id = id, fieldID = fieldID or id, label = tr(key, fallback) }
-    local parent = self.formView or self
+    local parent = self.controlParent or self.formView or self
     row.labelControl = addLabel(parent, row.label)
     row.entry = newCombo(parent,
         ISPNCNPCAuthoringEditor.onComboChanged, self)
@@ -46,7 +46,7 @@ end
 
 function Window:addRepeaterRow(id, key, fallback,
     entries, buttonKey, fieldID)
-    local parent = self.formView or self
+    local parent = self.controlParent or self.formView or self
     local row = {
         id = id,
         fieldID = fieldID or id,

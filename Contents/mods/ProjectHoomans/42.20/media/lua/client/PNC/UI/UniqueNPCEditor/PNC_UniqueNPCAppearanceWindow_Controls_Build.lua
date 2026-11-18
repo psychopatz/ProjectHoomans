@@ -36,7 +36,7 @@ local function buildAppearanceTopControls(self)
     self.topControls = {
         self.randomizeButton, self.playVoiceButton, self.stopVoiceButton,
     }
-    if self.parentEditor and self.parentEditor.presentationMode == "companion" then
+    if not self.integrated and self.parentEditor and self.parentEditor.presentationMode == "companion" then
         self.advancedClothingButton = UI.CreateButton(self, {
             id = "advancedClothing",
             title = tr("UI_PNC_NPCAuthoring_AdvancedClothing",
@@ -122,6 +122,26 @@ local function buildAppearanceSkinControls(self)
         0.72, 0.78, 0.84, 1, UIFont.Small, true)
     self.skinValue:initialise()
     self.content:addChild(self.skinValue)
+    if self.integrated then
+        self.hairColorLabel = ISLabel:new(0, 0, 24,
+            tr("UI_PNC_NPCAuthoring_HairColor", "Hair color"), 0.72, 0.78, 0.84, 1, UIFont.Small, true)
+        self.hairColorLabel:initialise()
+        self.content:addChild(self.hairColorLabel)
+        self.hairColorCombo = ISComboBox:new(0, 0, 1, 24, self,
+            ISPNCUniqueNPCAppearanceWindow.onHairColorChanged)
+        self.hairColorCombo:initialise()
+        self.content:addChild(self.hairColorCombo)
+        self.hairPalette = {
+            { id = "random", label = tr("UI_PNC_UniqueNPCEditor_Random", "Random") },
+            { id = "black", label = tr("UI_PNC_Authoring_Black", "Black"), r = 0.08, g = 0.06, b = 0.05 },
+            { id = "brown", label = tr("UI_PNC_Authoring_Brown", "Brown"), r = 0.30, g = 0.19, b = 0.10 },
+            { id = "blond", label = tr("UI_PNC_Authoring_Blond", "Blond"), r = 0.78, g = 0.65, b = 0.35 },
+            { id = "red", label = tr("UI_PNC_Authoring_Red", "Red"), r = 0.55, g = 0.16, b = 0.08 },
+            { id = "gray", label = tr("UI_PNC_Authoring_Gray", "Gray"), r = 0.55, g = 0.55, b = 0.55 },
+            { id = "white", label = tr("UI_PNC_Authoring_White", "White"), r = 0.90, g = 0.90, b = 0.85 },
+        }
+        addOptions(self.hairColorCombo, self.hairPalette)
+    end
 end
 
 local function buildAppearanceIdentityControls(self)
@@ -159,7 +179,9 @@ local function finishAppearanceControls(self)
     self:buildOutfitOptions()
     self:buildVoiceOptions()
     self:refreshHairBeardOptions()
-    for _, location in ipairs(locations()) do self:addLocationRow(location) end
+    if not self.integrated then
+        for _, location in ipairs(locations()) do self:addLocationRow(location) end
+    end
     if self.syncAdvancedVisibility then self:syncAdvancedVisibility() end
     self:syncFromDraft()
 end

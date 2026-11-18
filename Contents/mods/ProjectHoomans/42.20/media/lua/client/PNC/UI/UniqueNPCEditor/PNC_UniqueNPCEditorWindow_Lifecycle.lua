@@ -27,12 +27,12 @@ local function buildEditorToolbar(self)
         { "inspector", "UI_PNC_NPCAuthoring_Inspector", "INSPECTOR", "quiet" },
     } or {
         { "new", "UI_PNC_UniqueNPCEditor_New", "NEW", "quiet" },
-        { "load", "UI_PNC_UniqueNPCEditor_Load", "LOAD", "quiet" },
         { "save", "UI_PNC_UniqueNPCEditor_Save", "SAVE", "quiet" },
         { "produce", "UI_PNC_UniqueNPCEditor_Produce", "PRODUCE", "primary" },
         { "randomize", "UI_PNC_UniqueNPCEditor_Randomize", "RANDOMIZE", "selected" },
         { "inventory", "UI_PNC_UniqueNPCEditor_Inventory", "INVENTORY", "selected" },
     }
+    buttons[#buttons + 1] = { "preview", "UI_PNC_Authoring_Preview", "Preview", "quiet" }
     for _, button in ipairs(buttons) do
         local control = UI.CreateButton(self, {
             id = button[1],
@@ -57,17 +57,17 @@ local function buildEditorTabs(self)
     self.tabPanel.allowTornOffTabs = false
     self:addChild(self.tabPanel)
 
-    local formClass = self.presentationMode == "companion"
-        and ISPNCUniqueNPCAppearanceScrollPanel or ISPanel
+    local formClass = ISPNCUniqueNPCAppearanceScrollPanel
     self.formView = formClass:new(0, 0, 1, 1)
     self.formView:initialise()
     self.formView:instantiate()
     self.formView:noBackground()
-    self.generalTabName = tr("UI_PNC_UniqueNPCEditor_GeneralTab", "GENERAL")
+    self.generalTabName = tr("UI_PNC_Authoring_Bio", "Bio")
     self.tabPanel:addView(self.generalTabName, self.formView)
 
     self.appearanceTab = ISPNCUniqueNPCAppearanceWindow:new(0, 0, 1, 1)
     self.appearanceTab.parentEditor = self
+    self.appearanceTab.integrated = true
     self.appearanceTab.draft = self.draft
     self.appearanceTab.uiScale = self.uiScale
     self.appearanceTab:initialise()
@@ -75,6 +75,25 @@ local function buildEditorTabs(self)
     self.appearanceTabName = tr(
         "UI_PNC_UniqueNPCEditor_AppearanceTab", "APPEARANCE")
     self.tabPanel:addView(self.appearanceTabName, self.appearanceTab)
+    self.pages = { bio = self.formView, appearance = self.appearanceTab }
+    for _, spec in ipairs({
+        { "attributes", "UI_PNC_Authoring_Attributes", "Attributes" },
+        { "loadout", "UI_PNC_Authoring_Loadout", "Loadout" },
+        { "relations", "UI_PNC_Authoring_Details", "Details" },
+    }) do
+        local page = formClass:new(0, 0, 1, 1)
+        page:initialise()
+        page:instantiate()
+        page:noBackground()
+        self.pages[spec[1]] = page
+        local name = spec[1] == "relations" and self.presentationMode == "companion"
+            and tr("UI_PNC_Authoring_Relationships", "Relationships") or tr(spec[2], spec[3])
+        self.tabPanel:addView(name, page)
+    end
+    self.tabPanel.target = self
+    self.tabPanel.onActivateView = function(target)
+        target:syncPageVisibility()
+    end
 end
 
 local function buildEditorForm(self)
@@ -106,28 +125,30 @@ local function buildEditorForm(self)
         "UI_PNC_UniqueNPCEditor_EquipmentMode", "Equipment",
         "equipmentSpawnMode")
 
-    self.skillCombo = newCombo(self.formView, nil)
-    self.skillLevelCombo = newCombo(self.formView, nil)
+    self.controlParent = self.pages.attributes
+    self.skillCombo = newCombo(self.controlParent, nil)
+    self.skillLevelCombo = newCombo(self.controlParent, nil)
     self.addRows[#self.addRows + 1] = self:addRepeaterRow("skill",
         "UI_PNC_UniqueNPCEditor_AddSkill", "Skill", {
             self.skillCombo, self.skillLevelCombo,
         }, "UI_PNC_UniqueNPCEditor_Add", "skills.baseLevels")
-    self.npcTraitCombo = newCombo(self.formView, nil)
+    self.npcTraitCombo = newCombo(self.controlParent, nil)
     self.addRows[#self.addRows + 1] = self:addRepeaterRow("npcTrait",
         "UI_PNC_UniqueNPCEditor_AddNPCTrait", "NPC trait",
         { self.npcTraitCombo }, "UI_PNC_UniqueNPCEditor_Add",
         "traits.npc")
-    self.vanillaTraitCombo = newCombo(self.formView, nil)
+    self.vanillaTraitCombo = newCombo(self.controlParent, nil)
     self.addRows[#self.addRows + 1] = self:addRepeaterRow("vanillaTrait",
         "UI_PNC_UniqueNPCEditor_AddVanillaTrait", "Vanilla trait",
         { self.vanillaTraitCombo }, "UI_PNC_UniqueNPCEditor_Add",
         "traits.physiological")
-    self.dynamicTraitCombo = newCombo(self.formView, nil)
+    self.dynamicTraitCombo = newCombo(self.controlParent, nil)
     self.addRows[#self.addRows + 1] = self:addRepeaterRow("dynamicTrait",
         "UI_PNC_UniqueNPCEditor_AddDynamicTrait", "Dynamic trait",
         { self.dynamicTraitCombo }, "UI_PNC_UniqueNPCEditor_Add",
         "traits.dynamic")
 
+    self.controlParent = nil
     self.sectionLabels = {
         identity = addLabel(self.formView,
             tr("UI_PNC_NPCAuthoring_IdentitySection", "IDENTITY")),
@@ -142,18 +163,18 @@ local function buildEditorForm(self)
         label:setVisible(self.presentationMode == "companion")
     end
 
-    if self.presentationMode == "companion" then
+    do
         for _, row in ipairs(self.coreRows) do
             if row.id == "surname" or row.id == "gender" then
                 row.readOnlyValue = addLabel(self.formView, "")
                 row.readOnlyValue:setVisible(false)
             end
         end
-        self.configuredDetails = UI.CreateList(self.formView, {
+        self.configuredDetails = UI.CreateList(self.pages.attributes, {
             itemHeight = Layout.Pixels(25, self.uiScale),
             doDrawItem = drawDetail,
         })
-        self.removeConfiguredButton = UI.CreateButton(self.formView, {
+        self.removeConfiguredButton = UI.CreateButton(self.pages.attributes, {
             id = "remove_configured",
             title = tr("UI_PNC_UniqueNPCEditor_Remove", "REMOVE"),
             target = self,
@@ -164,25 +185,28 @@ local function buildEditorForm(self)
         self.removeConfiguredButton:setVisible(false)
     end
 
-    self.details = UI.CreateList(self.formView, {
+    self.relationshipDetails = UI.CreateList(self.pages.relations, {
+        itemHeight = Layout.Pixels(32, self.uiScale), doDrawItem = drawDetail,
+    })
+    self.details = UI.CreateList(self.pages.relations, {
         itemHeight = Layout.Pixels(25, self.uiScale),
         doDrawItem = drawDetail,
     })
-    self.removeButton = UI.CreateButton(self.formView, {
+    self.removeButton = UI.CreateButton(self.pages.relations, {
         id = "remove_detail",
         title = tr("UI_PNC_UniqueNPCEditor_Remove", "REMOVE"),
         target = self,
         onclick = ISPNCNPCAuthoringEditor.onAction,
         variant = "quiet",
     })
-    self.resetDetailsButton = UI.CreateButton(self.formView, {
+    self.resetDetailsButton = UI.CreateButton(self.pages.relations, {
         id = "reset_details",
         title = tr("UI_PNC_UniqueNPCEditor_ResetDetails", "RESET DETAILS"),
         target = self,
         onclick = ISPNCNPCAuthoringEditor.onAction,
         variant = "quiet",
     })
-    self.statusLabel = addLabel(self.formView, "")
+    self.statusLabel = addLabel(self, "")
 end
 
 local function buildEditorPortrait(self)
@@ -197,6 +221,18 @@ local function buildEditorPortrait(self)
     self.portraitPanel:initialise()
     self.portraitPanel:instantiate()
     self:addChild(self.portraitPanel)
+    self.portraitControls = {}
+    for _, spec in ipairs({
+        { "rotate_left", "<", "UI_PNC_Authoring_RotateLeft", "Rotate left" },
+        { "rotate_right", ">", "UI_PNC_Authoring_RotateRight", "Rotate right" },
+        { "zoom_out", "-", "UI_PNC_Authoring_ZoomOut", "Zoom out" },
+        { "zoom_in", "+", "UI_PNC_Authoring_ZoomIn", "Zoom in" },
+    }) do
+        local button = UI.CreateButton(self, { id = spec[1], title = spec[2],
+            target = self, onclick = ISPNCNPCAuthoringEditor.onAction, variant = "quiet" })
+        button.tooltip = tr(spec[3], spec[4])
+        self.portraitControls[#self.portraitControls + 1] = button
+    end
 end
 
 local function refreshEditorOptions(self)
@@ -216,8 +252,10 @@ function ISPNCNPCAuthoringEditor:buildAuthoringEditorBody()
     initializeEditorState(self)
     buildEditorToolbar(self)
     buildEditorTabs(self)
+    self:buildRoster()
     buildEditorForm(self)
     buildEditorPortrait(self)
+    self:buildLoadoutPage()
     refreshEditorOptions(self)
     if self.presentationMode == "companion" then
         self.fileLabel:setVisible(false)
@@ -226,6 +264,7 @@ function ISPNCNPCAuthoringEditor:buildAuthoringEditorBody()
         self.removeButton:setVisible(false)
         self.resetDetailsButton:setVisible(false)
         self.inspectorVisible = false
+        self:refreshDetails()
     end
 end
 

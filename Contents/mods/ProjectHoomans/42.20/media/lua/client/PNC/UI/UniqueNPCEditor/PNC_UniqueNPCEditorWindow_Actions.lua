@@ -128,6 +128,7 @@ local function updatePresentation(self)
 end
 
 function Window:pullForm()
+    if not self.draft then return end
     if self.presentationAdapter then
         local survivor = self.draft.identity.survivor
         local previousNickname = self.draft.identity.nickname
@@ -199,6 +200,8 @@ function Window:pullForm()
 end
 
 function Window:syncControls()
+    if not self.draft then return end
+    self.syncing = true
     local survivor = self.draft.identity and self.draft.identity.survivor or {}
     local first, last = Model.NameParts(self.draft)
     setField(self.forenameEntry, first)
@@ -217,6 +220,9 @@ function Window:syncControls()
         self.draft.equipmentSpawnMode or "none")
     updatePresentation(self)
     self:refreshConfiguredDetails()
+    if self.refreshLoadoutPage then self:refreshLoadoutPage() end
+    self.syncing = false
+    if self.pages then self:requestResponsiveLayout() end
 end
 
 function Window:showTab(tabID)
@@ -230,7 +236,25 @@ end
 
 function ISPNCNPCAuthoringEditor:onAction(button)
     local action = button and button.internal or ""
-    if action == "new" then
+    if not self.draft and action ~= "new" then return end
+    if action == "rotate_left" or action == "rotate_right" then
+        local directions = { IsoDirections.S, IsoDirections.SW, IsoDirections.W, IsoDirections.NW,
+            IsoDirections.N, IsoDirections.NE, IsoDirections.E, IsoDirections.SE }
+        self.portraitDirectionIndex = ((self.portraitDirectionIndex or 1) - 1
+            + (action == "rotate_left" and -1 or 1)) % #directions + 1
+        self.portraitPanel.direction = directions[self.portraitDirectionIndex]
+        if self.portraitPanel.modelView then
+            self.portraitPanel.modelView:setDirection(self.portraitPanel.direction)
+        end
+    elseif action == "zoom_in" or action == "zoom_out" then
+        self.portraitPanel.zoom = math.max(-10, math.min(15,
+            (self.portraitPanel.zoom or -3) + (action == "zoom_in" and 1 or -1)))
+        if self.portraitPanel.modelView then self.portraitPanel.modelView:setZoom(self.portraitPanel.zoom) end
+    elseif action == "preview" then
+        self.previewExpanded = not self.previewExpanded
+        self:requestResponsiveLayout()
+    elseif action == "new" then
+        self.debugRosterID = "current"
         self.draft = Model.New()
         self.previewDraft = nil
         if self.appearanceTab then self.appearanceTab.draft = self.draft end
@@ -291,6 +315,11 @@ function ISPNCNPCAuthoringEditor:onAction(button)
     elseif action == "add_dynamicTrait" then
         self:addTrait("dynamicTrait", self.dynamicTraitCombo)
     elseif action == "inspector" then
+        if self.pages then
+            for _, view in ipairs(self.tabPanel.viewList) do
+                if view.view == self.pages.relations then self.tabPanel:activateView(view.name) end
+            end
+        end
         self.inspectorVisible = not (self.inspectorVisible == true)
         if self.details then self.details:setVisible(self.inspectorVisible) end
         self:requestResponsiveLayout(true)

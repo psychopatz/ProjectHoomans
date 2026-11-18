@@ -99,6 +99,7 @@ local function configuredRows(self)
 end
 
 function Window:buildDetails()
+    if not self.draft then return {} end
     if self.presentationAdapter then
         local rows = {}
         for _, row in ipairs(inspectorRows(self)) do
@@ -193,6 +194,25 @@ end
 
 function Window:refreshDetails()
     if not self.details then return end
+    if self.relationshipDetails then
+        self.relationshipDetails:clear()
+        self.relationshipDetails:setVisible(self.presentationMode == "companion" and not self.inspectorVisible)
+        if self.presentationAdapter then
+            local slot = self.presentationAdapter:Slot()
+            local kind = slot and slot.spec and slot.spec.relationshipKind or ""
+            self.relationshipDetails:addItem("", {
+                label = tr("UI_PNC_Authoring_Relationship", "Relationship"),
+                value = tr("UI_PNC_Relationship_" .. string.upper(string.sub(kind, 1, 1)) .. string.sub(kind, 2), kind),
+            })
+            for _, row in ipairs(inspectorRows(self)) do
+                if row.inherited or row.derived then
+                    self.relationshipDetails:addItem("", {
+                        label = Profile.Label(row.fieldID), value = row.sourceLabel,
+                    })
+                end
+            end
+        end
+    end
     if self.presentationMode == "companion" and not self.inspectorVisible then
         self.details:clear()
         self.detailRows = {}
@@ -268,13 +288,9 @@ function Window:refreshConfiguredDetails()
         elseif self.removeConfiguredButton.setEnabled then
             self.removeConfiguredButton:setEnabled(selected ~= nil)
         end
-        self.removeConfiguredButton:setVisible(
-            self.presentationMode == "companion"
-                and self.inspectorVisible ~= true
-                and self.draft ~= nil)
+        self.removeConfiguredButton:setVisible(self.draft ~= nil)
     end
-    list:setVisible(self.presentationMode == "companion"
-        and self.inspectorVisible ~= true and self.draft ~= nil)
+    list:setVisible(self.draft ~= nil)
 end
 
 function Window:addSkill()
@@ -283,6 +299,15 @@ function Window:addSkill()
     if not skill or level == nil then
         self:setStatus(tr("UI_PNC_UniqueNPCEditor_SelectSkill",
             "Choose a skill and level"))
+        return
+    end
+    if self.draft.skillLevels and self.draft.skillLevels[skill] ~= nil then
+        self.draft.skillLevels[skill] = tonumber(level)
+        self.draft.authoredFields = self.draft.authoredFields or {}
+        self.draft.authoredFields.skillLevels = true
+        self.draft._dirty = true
+        self:refreshPreview(false)
+        self:refreshConfiguredDetails()
         return
     end
     local ok, reason, id = Model.TryAddSkill(

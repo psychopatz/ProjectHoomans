@@ -1,5 +1,28 @@
 # Progress — Unified Starting Companion Authoring
 
+## Current state — 2026-11-18 P5R3
+
+The requested shared NPC creator redesign is implemented. Both callers use the
+same left roster, compact pages and embedded slot/catalog loadout authoring.
+General/Appearance overlap, preview-inventory overwrite, explicit clearing,
+keyless imported-item removal and bag-before-contents ordering have regression
+coverage. Rotation/zoom and compact expanded preview are available.
+
+`TEST_VERIFIED`: 45 focused authoring/inventory tests passed. Full Lua suite
+passed 1038/1042; the four prior scene-route/context-debug, population-director
+initialization and Debug Hub translation-expectation failures remain unrelated.
+`STATIC_ONLY`: changed Lua syntax, Kahlua compatibility, 40 new EN/TL Character
+keys, JSON parsing and whitespace checks passed. Graph freshness/coverage was
+checked; dirty/new files were verified directly against current source.
+
+Current Next Chunk: **P6 user-owned native acceptance of P5R3**. Open both
+creators in a fresh Build 42.20 session. Verify left roster selection, every tab,
+compact preview and font scaling, slot equip/replace/clear, bags and contents,
+Save/Load/Produce, companion finalization and SP/MP/co-op lifecycle. Native PZ
+was not launched, driven or required for developer acceptance. This is the
+current responsibility; the earlier P5R2 handoff below is historical evidence.
+
+
 **Status:** P5R2 developer repair accepted — P6 native SP/MP/co-op acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
