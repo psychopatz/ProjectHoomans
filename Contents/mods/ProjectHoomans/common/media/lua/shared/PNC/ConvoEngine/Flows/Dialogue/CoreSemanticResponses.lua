@@ -73,6 +73,28 @@ return {
                 },
                 ["branchOffers"] = {
                     {
+                        ["constraints"] = {
+                            ["all"] = {
+                                {
+                                    ["op"] = "not_in",
+                                    ["path"] = "npcState.activeBehavior",
+                                    ["values"] = {
+                                        "hostile",
+                                        "combat",
+                                        "busy",
+                                        "dead",
+                                    },
+                                },
+                                {
+                                    ["op"] = "not_in",
+                                    ["path"] = "npcState.healthState",
+                                    ["values"] = {
+                                        "dead",
+                                        "incapacitated",
+                                    },
+                                },
+                            },
+                        },
                         ["frame"] = {
                             ["intent"] = "THANK",
                             ["speechAct"] = "THANK",

@@ -157,6 +157,12 @@ function ResponseAdapter.ActionRejected(result, actionResult)
         or tostring(actionResult.commandID) == "stay"
     then
         templateID = "semantic.action.stop.unavailable"
+    elseif tostring(actionResult.reason or "") == "already_member" then
+        templateID = "recruitment.reject.member.1"
+        fallback = "I'm already with your group."
+    elseif tostring(actionResult.reason or "") == "actor_blocked_or_hostile" then
+        templateID = "recruitment.reject.hostile.1"
+        fallback = "You want me to join you? Keep your distance."
     end
     return ResponseAdapter.Payload({
         response = {

@@ -39,7 +39,7 @@ local ActionContract = require "PsychopatzCore/ConvoEngine/ActionContract"
 
 require "PNC/ConvoEngine/Registry"
 require "PNC/ConvoEngine/Manifest"
-require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle"
+require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow"
 T.load("ProjectHoomans", "client", "PNC/Networking/PNC_ClientRequests.lua")
 
 local CampAction = T.load("ProjectHoomans", "shared",

@@ -148,6 +148,12 @@
               "frame": {
                 "intent": "THANK",
                 "speechAct": "THANK"
+              },
+              "constraints": {
+                "all": [
+                  { "path": "npcState.activeBehavior", "op": "not_in", "values": ["hostile", "combat", "busy", "dead"] },
+                  { "path": "npcState.healthState", "op": "not_in", "values": ["dead", "incapacitated"] }
+                ]
               }
             }
           ],

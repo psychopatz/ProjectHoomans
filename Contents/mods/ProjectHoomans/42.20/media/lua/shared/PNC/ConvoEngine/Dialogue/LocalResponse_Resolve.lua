@@ -99,6 +99,38 @@ end
 function Response.Resolve(ir, state, context, branch)
     if type(ir) ~= "table" then return nil end
     if branch == "GREET_ACKNOWLEDGED" then
+        local situation = type(context) == "table" and context.dialogueSituation or nil
+        local actorCtx = type(context) == "table" and context.actorConversationContext or nil
+        local actorRoles = type(actorCtx) == "table" and actorCtx.roles or nil
+        local npc = type(situation) == "table" and situation.npc or nil
+        local hostility = type(npc) == "table" and npc.hostility
+            or (type(context) == "table" and context.hostility or nil)
+        local roles = type(situation) == "table" and situation.roles or nil
+        local ctxRoles = type(context) == "table" and context.roles or nil
+        local style = type(context) == "table" and context.speechStyle or nil
+        local activeBehavior = type(situation) == "table" and tostring(situation.activeBehavior or "") or ""
+        local social = type(context) == "table" and context.socialContext or nil
+        local tactical = type(social) == "table" and social.tacticalHostility or nil
+        local audience = type(social) == "table" and social.conversationAudience or nil
+        local isHostile = (type(actorRoles) == "table" and actorRoles.hostile == true)
+            or (type(ctxRoles) == "table" and ctxRoles.hostile == true)
+            or (type(roles) == "table" and roles.hostile == true)
+            or (type(hostility) == "table" and (tostring(hostility.mode or "") == "hostile" or hostility.attackPlayers == true))
+            or (type(style) == "table" and tostring(style.variant or "") == "guarded")
+            or activeBehavior == "hostile"
+            or activeBehavior == "combat"
+            or (type(tactical) == "table" and tostring(tactical.mode or "") == "hostile")
+            or (type(audience) == "table" and tostring(audience.audience or "") == "hostile")
+        if isHostile then
+            return {
+                dialogueAct = "GREET_ACKNOWLEDGED",
+                selectionSource = "flow_pool",
+                responsePool = "semantic.flow.greeting.opening",
+                templateID = "flow.greeting.opening.default",
+                fallback = "State your business. Keep your distance.",
+                args = {},
+            }
+        end
         return catalogResponse("semantic.greeting", ir, state, context, {
             topic = state and state.currentTopic,
         })

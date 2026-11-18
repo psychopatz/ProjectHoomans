@@ -163,7 +163,8 @@ class ContextualTalkParityTests(WarmWorkerTestMixin, unittest.TestCase):
         self.assertEqual(rows["neutral"]["target"]["audience"], "neutral")
         self.assertEqual(rows["hostile"]["target"]["audience"], "hostile")
         self.assertEqual(rows["hostile"]["target"]["route"], "hostile_full_conversation")
-        self.assertEqual(rows["hostile"]["runtimeGraphPath"]["kind"], "semantic_flow")
+        # S11: hostile greeting must not open the friendly greeting continuation flow.
+        self.assertIn(rows["hostile"]["runtimeGraphPath"]["kind"], {"none", "semantic_hub"})
         with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as navigation_worker:
             navigation_worker.open_conversation()
             root_channel = navigation_worker.conversation_projection()["presentation"]["responseChannel"]

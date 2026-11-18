@@ -156,6 +156,20 @@ return function(Input, Internal, Support)
                     if type(generatedFlow) == "table" then
                         generatedFlow.dispatchCount = 0
                     end
+                    if decision.actionIntent.action == "RECRUIT" and type(result) == "table" then
+                        local reason = tostring(evalRes.reason or "")
+                        if reason == "already_member" then
+                            result.response = {
+                                templateID = "recruitment.reject.member.1",
+                                fallback = "I'm already with your group.",
+                            }
+                        elseif reason == "actor_blocked_or_hostile" then
+                            result.response = {
+                                templateID = "recruitment.reject.hostile.1",
+                                fallback = "You want me to join you? Keep your distance.",
+                            }
+                        end
+                    end
                     return Support.blockedDispatch(evalRes.reason or "state_policy_blocked")
                 end
             end

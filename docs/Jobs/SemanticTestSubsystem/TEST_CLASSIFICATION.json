@@ -133,10 +133,10 @@
           "reason": "metadata-driven simple-command flow generation and handler binding: generated simple command uses relationship and personality context"
         },
         {
-          "name": "test_generated_simple_command_uses_bounded_previous_action_memory",
+          "name": "test_generated_simple_command_does_not_redispatch_when_already_following",
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "metadata-driven simple-command flow generation and handler binding: generated simple command uses bounded previous action memory"
+          "reason": "metadata-driven simple-command flow generation and S11 state-policy admission: already-following NPC does not redispatch follow command"
         },
         {
           "name": "test_denied_failed_and_context_gate_are_truthful",

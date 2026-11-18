@@ -322,11 +322,11 @@ class FlowEditorTests(WarmWorkerTestMixin, unittest.TestCase):
             self.assertEqual(
                 [flow["id"] for flow in catalog["flows"]],
             [
-                "identity",
                 "wellbeing",
-                "needs",
                 "weather_context",
                 "greeting",
+                "identity",
+                "needs",
                 "pnc.dialogue.follow.flow",
                 "pnc.lab.stay_with_you.flow",
                 "pnc.generated.parameterized_task.pnc.task.consume",

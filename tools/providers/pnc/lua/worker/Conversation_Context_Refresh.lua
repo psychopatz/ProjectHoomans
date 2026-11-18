@@ -36,11 +36,13 @@ function Refresh.apply(context, Conversation)
                 or (refreshedBlockContext.npcRecord and refreshedBlockContext.npcRecord.id)
             local liveRecord = npcID and PNC.Registry and PNC.Registry.Get
                 and PNC.Registry.Get(npcID) or nil
+            local isRecruited
             if type(liveRecord) == "table" then
                 refreshedBlockContext.npcRecord = liveRecord
+                isRecruited = liveRecord.recruited == true
+            else
+                isRecruited = type(scenarioNpc) == "table" and scenarioNpc.recruited == true
             end
-            local isRecruited = (type(liveRecord) == "table" and liveRecord.recruited == true)
-                or (type(scenarioNpc) == "table" and scenarioNpc.recruited == true)
             if type(refreshedBlockContext.npcRecord) == "table" then
                 refreshedBlockContext.npcRecord.recruited = isRecruited
             end
