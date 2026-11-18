@@ -4,6 +4,263 @@ return {
         ["domain"] = "static_suggestion_text",
         ["domainPath"] = "static_suggestion_text",
         ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["labelFallback"] = "Wait here.",
+                ["labelKey"] = "convo.ui.suggestion.stay.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.stay",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Wait here.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Wait here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka maghintay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Wait here.",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Wait here.",
+                        },
+                        ["TL"] = {
+                            "Dito ka maghintay.",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "Wait here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Wait here.",
+                        },
+                        ["TL"] = {
+                            "Dito ka maghintay.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.stay",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "stay",
+            ["sourceId"] = "ui.suggestion.stay",
+            ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_stay.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel",
+        ["namespace"] = "ui.suggestion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.stay.label",
+                        ["text"] = {
+                            ["EN"] = "Wait here.",
+                            ["TL"] = "Dito ka maghintay.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.stay.utterance",
+                        ["text"] = {
+                            ["EN"] = "Wait here.",
+                            ["TL"] = "Dito ka maghintay.",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Wait here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka maghintay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.stay",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Wait here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.ui.suggestion.stay.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/static_suggestion_text/ui_suggestion_stay.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Wait here.",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "Wait here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
             ["familyID"] = "ui.suggestion.talk_again_about.label",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -63,7 +320,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_talk_again_about_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.talk_again_about",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -258,7 +515,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_talk_something_else_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.talk_something_else",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -490,7 +747,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_trade.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -724,7 +981,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_unavailable_tooltip.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.unavailable",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -948,7 +1205,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_wait_at.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1176,7 +1433,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_whats_up_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.whats_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {

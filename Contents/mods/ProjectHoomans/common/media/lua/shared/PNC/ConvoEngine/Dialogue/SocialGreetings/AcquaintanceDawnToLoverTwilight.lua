@@ -102,7 +102,8 @@ return {
                 ["category"] = "projecthoomans:greetings",
                 ["modernizationRetention"] = {
                     ["evidenceCode"] = "NON_PARAMETERIZABLE_PREDICATES",
-                    ["reason"] = "Each greeting block owns a distinct relationship-state x time-of-day when predicate and runtimeBlockID in Conversation.Registry (38 built-in blocks).",
+                    ["nonParameterizableBy"] = "runtimeBlockID",
+                    ["reason"] = "Each greeting block projects to a distinct runtimeBlockID, textTarget, and block.gates entry in Conversation.Registry (plus hostile.parley response/offers/effects), which Conversation.Selector.SelectBlock dispatches at block granularity.",
                 },
                 ["portraitAnimation"] = "greeting.wavehi",
                 ["priority"] = 10,

@@ -63,7 +63,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.semantic_suggestions",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -258,7 +258,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_availability_tooltips.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion.availability",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -522,7 +522,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_back_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion.back",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -746,7 +746,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_check_in.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1075,7 +1075,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_companion_camp.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1383,7 +1383,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_companion_orders_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion.companion_orders",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1607,7 +1607,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_follow.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1864,7 +1864,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2121,7 +2121,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_greeting_thank.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2697,7 +2697,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3298,6 +3298,7 @@ return {
             },
             ["invoke"] = {
                 ["intent"] = "INFORM",
+                ["speechAct"] = "DECEIVE_IDENTITY",
                 ["subject"] = "IDENTITY",
             },
             ["namespace"] = "ui.suggestion.identity",
@@ -3372,7 +3373,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_identity_lie.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3406,6 +3407,7 @@ return {
             },
             ["invoke"] = {
                 ["intent"] = "INFORM",
+                ["speechAct"] = "DECEIVE_IDENTITY",
                 ["subject"] = "IDENTITY",
             },
             ["metadata"] = {
@@ -3658,6 +3660,7 @@ return {
             },
             ["invoke"] = {
                 ["intent"] = "INFORM",
+                ["speechAct"] = "DISCLOSE_IDENTITY",
                 ["subject"] = "IDENTITY",
             },
             ["namespace"] = "ui.suggestion.identity",
@@ -3732,7 +3735,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3766,12 +3769,13 @@ return {
             },
             ["invoke"] = {
                 ["intent"] = "INFORM",
+                ["speechAct"] = "DISCLOSE_IDENTITY",
                 ["subject"] = "IDENTITY",
             },
             ["metadata"] = {
                 ["modernizationRetention"] = {
                     ["evidenceCode"] = "DISTINCT_SEMANTIC_ACT_OR_INTENT",
-                    ["reason"] = "real (truthful INFORM), rude (REFUSE), and lie (deceptive INFORM) have distinct invoke intents, affordance labels, and identity-claim semantics.",
+                    ["reason"] = "real (DISCLOSE_IDENTITY / INFORM), lie (DECEIVE_IDENTITY / INFORM), and rude (REFUSE_IDENTITY / REFUSE) own distinct canonical speechAct, intent, and identity-claim semantics.",
                 },
                 ["textRows"] = {
                     {
@@ -4014,6 +4018,7 @@ return {
             },
             ["invoke"] = {
                 ["intent"] = "REFUSE",
+                ["speechAct"] = "REFUSE_IDENTITY",
                 ["subject"] = "IDENTITY",
             },
             ["namespace"] = "ui.suggestion.identity",
@@ -4072,7 +4077,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -4106,6 +4111,7 @@ return {
             },
             ["invoke"] = {
                 ["intent"] = "REFUSE",
+                ["speechAct"] = "REFUSE_IDENTITY",
                 ["subject"] = "IDENTITY",
             },
             ["metadata"] = {
@@ -4332,7 +4338,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_needs_destination_tooltip.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion.needs_destination",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -4556,7 +4562,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -4714,263 +4720,6 @@ return {
                     },
                     ["TL"] = {
                         "May bumabagabag ba sa'yo?",
-                    },
-                },
-                ["variantID"] = "default",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["domainPath"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["labelFallback"] = "Wait here.",
-                ["labelKey"] = "convo.ui.suggestion.stay.affordance.label",
-                ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
-                    },
-                },
-            },
-            ["familyID"] = "ui.suggestion.stay",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Wait here.",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Wait here.",
-                                    },
-                                    ["TL"] = {
-                                        "Dito ka maghintay.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Wait here.",
-                    ["role"] = "button_label",
-                    ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Wait here.",
-                        },
-                        ["TL"] = {
-                            "Dito ka maghintay.",
-                        },
-                    },
-                },
-                {
-                    ["fallback"] = "Wait here.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Wait here.",
-                        },
-                        ["TL"] = {
-                            "Dito ka maghintay.",
-                        },
-                    },
-                    ["variantID"] = "default",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.stay",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "stay",
-            ["sourceId"] = "ui.suggestion.stay",
-            ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_stay.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
-        ["namespace"] = "ui.suggestion",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["label"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
-                    },
-                },
-                ["textRole"] = "button_label",
-            },
-            ["domains"] = {
-                {
-                    ["domain"] = "ui",
-                    ["owner"] = "ProjectHoomans",
-                },
-            },
-            ["metadata"] = {
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.stay.label",
-                        ["text"] = {
-                            ["EN"] = "Wait here.",
-                            ["TL"] = "Dito ka maghintay.",
-                        },
-                    },
-                    {
-                        ["key"] = "suggestion.stay.utterance",
-                        ["text"] = {
-                            ["EN"] = "Wait here.",
-                            ["TL"] = "Dito ka maghintay.",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Wait here.",
-                                    },
-                                    ["TL"] = {
-                                        "Dito ka maghintay.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["topics"] = {
-                {
-                    ["domain"] = "ui",
-                    ["id"] = "ui_suggestion",
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.stay",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Wait here.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.ui.suggestion.stay.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["roles"] = {
-            ["addressee"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "addressee",
-            },
-            ["speaker"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "speaker",
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/static_suggestion_text/ui_suggestion_stay.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Wait here.",
-                ["role"] = "button_label",
-                ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
-                    },
-                },
-            },
-            {
-                ["fallback"] = "Wait here.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Wait here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka maghintay.",
                     },
                 },
                 ["variantID"] = "default",

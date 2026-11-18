@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "bfcc2d3b251785f9ef35f347cf93754103b33c119fd45de0090b64a53a280fb7"
+Registry.WHOLE_MODEL_FINGERPRINT = "b989f64511baedd83aa44357b7668d20c1ac435200cbf79a297b9a6b5642f23d"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -216,8 +216,8 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/ToolReplySexual")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionPersonalCheckIn")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText/StayToWhatsUpLabel")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle/GiftToTaskDrink")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle/EatToGive")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle/RefillToWaitAt")
