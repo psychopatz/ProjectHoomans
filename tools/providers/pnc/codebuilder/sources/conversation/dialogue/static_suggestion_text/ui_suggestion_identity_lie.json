@@ -93,6 +93,7 @@
   "owner": "ProjectHoomans",
   "invoke": {
     "intent": "INFORM",
+    "speechAct": "DECEIVE_IDENTITY",
     "subject": "IDENTITY"
   }
 }

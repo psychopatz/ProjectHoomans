@@ -17,7 +17,7 @@
     ],
     "modernizationRetention": {
       "evidenceCode": "DISTINCT_SEMANTIC_ACT_OR_INTENT",
-      "reason": "real (truthful INFORM), rude (REFUSE), and lie (deceptive INFORM) have distinct invoke intents, affordance labels, and identity-claim semantics."
+      "reason": "real (DISCLOSE_IDENTITY / INFORM), lie (DECEIVE_IDENTITY / INFORM), and rude (REFUSE_IDENTITY / REFUSE) own distinct canonical speechAct, intent, and identity-claim semantics."
     }
   },
   "affordance": {
@@ -97,6 +97,7 @@
   "owner": "ProjectHoomans",
   "invoke": {
     "intent": "INFORM",
+    "speechAct": "DISCLOSE_IDENTITY",
     "subject": "IDENTITY"
   }
 }

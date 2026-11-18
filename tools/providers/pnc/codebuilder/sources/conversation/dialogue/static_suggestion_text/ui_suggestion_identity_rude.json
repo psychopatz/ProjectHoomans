@@ -89,6 +89,7 @@
   "owner": "ProjectHoomans",
   "invoke": {
     "intent": "REFUSE",
+    "speechAct": "REFUSE_IDENTITY",
     "subject": "IDENTITY"
   }
 }
