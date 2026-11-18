@@ -68,5 +68,11 @@
       "role": "target"
     }
   ],
-  "owner": "ProjectHoomans"
+  "owner": "ProjectHoomans",
+  "slots": {
+    "location": {
+      "type": "entity.location",
+      "required": false
+    }
+  }
 }

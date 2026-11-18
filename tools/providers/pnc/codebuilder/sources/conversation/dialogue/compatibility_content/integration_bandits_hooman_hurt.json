@@ -1,0 +1,97 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "integration.bandits.hooman_hurt",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "colonist",
+        "text": {
+          "EN": [
+            "Bandit fire! Pull back and cover the wounded colonist."
+          ],
+          "TL": [
+            "Bandit fire! Pull back and cover the wounded colonist."
+          ]
+        }
+      },
+      {
+        "id": "default",
+        "text": {
+          "EN": [
+            "Bandit fire! Stay with the wounded survivor and watch the flank."
+          ],
+          "TL": [
+            "Bandit fire! Stay with the wounded survivor and watch the flank."
+          ]
+        }
+      },
+      {
+        "id": "family",
+        "text": {
+          "EN": [
+            "Bandit fire! Stay together and cover the wounded family member."
+          ],
+          "TL": [
+            "Bandit fire! Stay together and cover the wounded family member."
+          ]
+        }
+      },
+      {
+        "id": "lover",
+        "text": {
+          "EN": [
+            "Bandit fire. Stay close; I have got you."
+          ],
+          "TL": [
+            "Bandit fire. Stay close; I have got you."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "subject": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "slots": {
+    "threat": {
+      "type": "entity.threat",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "integration",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "bandits",
+      "domain": "integration"
+    }
+  ]
+}

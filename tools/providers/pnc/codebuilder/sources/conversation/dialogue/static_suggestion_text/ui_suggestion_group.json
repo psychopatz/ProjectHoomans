@@ -1,0 +1,222 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "ui.suggestion.group",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "textTarget": "UI_PNC_Conversation",
+    "textRows": [
+      {
+        "key": "suggestion.group.actions.label",
+        "text": {
+          "EN": "Conversation actions",
+          "TL": "Mga aksyon sa usapan"
+        }
+      },
+      {
+        "key": "suggestion.group.flow.label",
+        "text": {
+          "EN": "Current conversation branch",
+          "TL": "Kasalukuyang sangay ng usapan"
+        }
+      },
+      {
+        "key": "suggestion.group.identity.label",
+        "text": {
+          "EN": "Identity",
+          "TL": "Pagkakakilanlan"
+        }
+      },
+      {
+        "key": "suggestion.group.landing.label",
+        "text": {
+          "EN": "Talk",
+          "TL": "Usapan"
+        }
+      },
+      {
+        "key": "suggestion.group.medical.label",
+        "text": {
+          "EN": "Medical",
+          "TL": "Medikal"
+        }
+      },
+      {
+        "key": "suggestion.group.movement.label",
+        "text": {
+          "EN": "Owned companion actions",
+          "TL": "Mga utos sa kasamang pag-aari"
+        }
+      },
+      {
+        "key": "suggestion.group.needs.label",
+        "text": {
+          "EN": "Needs",
+          "TL": "Pangangailangan"
+        }
+      },
+      {
+        "key": "suggestion.group.response.label",
+        "text": {
+          "EN": "NPC reply",
+          "TL": "Sagot ng NPC"
+        }
+      },
+      {
+        "key": "suggestion.group.time.label",
+        "text": {
+          "EN": "Time and date",
+          "TL": "Oras at petsa"
+        }
+      },
+      {
+        "key": "suggestion.group.utilities.label",
+        "text": {
+          "EN": "Conversation utilities",
+          "TL": "Mga gamit sa usapan"
+        }
+      },
+      {
+        "key": "suggestion.group.weather.label",
+        "text": {
+          "EN": "Weather",
+          "TL": "Panahon"
+        }
+      },
+      {
+        "key": "suggestion.group.wellbeing.label",
+        "text": {
+          "EN": "Wellbeing",
+          "TL": "Kalagayan"
+        }
+      },
+      {
+        "key": "suggestion.group.whats_up.label",
+        "text": {
+          "EN": "What's up",
+          "TL": "Ano ang balita"
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "actions.label",
+        "text": {
+          "EN": "Conversation actions",
+          "TL": "Mga aksyon sa usapan"
+        }
+      },
+      {
+        "id": "flow.label",
+        "text": {
+          "EN": "Current conversation branch",
+          "TL": "Kasalukuyang sangay ng usapan"
+        }
+      },
+      {
+        "id": "identity.label",
+        "text": {
+          "EN": "Identity",
+          "TL": "Pagkakakilanlan"
+        }
+      },
+      {
+        "id": "landing.label",
+        "text": {
+          "EN": "Talk",
+          "TL": "Usapan"
+        }
+      },
+      {
+        "id": "medical.label",
+        "text": {
+          "EN": "Medical",
+          "TL": "Medikal"
+        }
+      },
+      {
+        "id": "movement.label",
+        "text": {
+          "EN": "Owned companion actions",
+          "TL": "Mga utos sa kasamang pag-aari"
+        }
+      },
+      {
+        "id": "needs.label",
+        "text": {
+          "EN": "Needs",
+          "TL": "Pangangailangan"
+        }
+      },
+      {
+        "id": "response.label",
+        "text": {
+          "EN": "NPC reply",
+          "TL": "Sagot ng NPC"
+        }
+      },
+      {
+        "id": "time.label",
+        "text": {
+          "EN": "Time and date",
+          "TL": "Oras at petsa"
+        }
+      },
+      {
+        "id": "utilities.label",
+        "text": {
+          "EN": "Conversation utilities",
+          "TL": "Mga gamit sa usapan"
+        }
+      },
+      {
+        "id": "weather.label",
+        "text": {
+          "EN": "Weather",
+          "TL": "Panahon"
+        }
+      },
+      {
+        "id": "wellbeing.label",
+        "text": {
+          "EN": "Wellbeing",
+          "TL": "Kalagayan"
+        }
+      },
+      {
+        "id": "whats_up.label",
+        "text": {
+          "EN": "What's up",
+          "TL": "Ano ang balita"
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "ui",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "ui_suggestion",
+      "domain": "ui"
+    }
+  ]
+}

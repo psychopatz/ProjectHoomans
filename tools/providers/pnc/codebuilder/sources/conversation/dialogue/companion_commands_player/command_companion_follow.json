@@ -137,5 +137,11 @@
       "id": "companion_order",
       "role": "target"
     }
-  ]
+  ],
+  "metadata": {
+    "modernizationRetention": {
+      "evidenceCode": "DISTINCT_GAMEPLAY_STATE_CONTRACT",
+      "reason": "Follow, stay, and return_home own distinct companion statePolicy, postconditions, and invoke.action contracts."
+    }
+  }
 }

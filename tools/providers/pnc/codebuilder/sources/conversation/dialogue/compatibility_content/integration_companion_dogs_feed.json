@@ -1,0 +1,86 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "integration.companion_dogs.feed",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "female",
+        "text": {
+          "EN": [
+            "Here you go, good girl."
+          ],
+          "TL": [
+            "Here you go, good girl."
+          ]
+        }
+      },
+      {
+        "id": "male",
+        "text": {
+          "EN": [
+            "Here you go, good boy."
+          ],
+          "TL": [
+            "Here you go, good boy."
+          ]
+        }
+      },
+      {
+        "id": "unknown",
+        "text": {
+          "EN": [
+            "Here you go, good dog."
+          ],
+          "TL": [
+            "Here you go, good dog."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "subject": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "slots": {
+    "subject": {
+      "type": "entity.any",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "integration",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "companion_dogs",
+      "domain": "integration"
+    }
+  ]
+}

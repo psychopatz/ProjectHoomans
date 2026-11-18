@@ -1,6 +1,7 @@
 {
   "schema": "psychopatz.convo-engine.v1",
-  "id": "flow.greeting.followup.friendly",
+  "id": "flow.greeting.followup",
+  "owner": "ProjectHoomans",
   "metadata": {
     "category": "projecthoomans:conversation_content",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
@@ -9,7 +10,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
+        "id": "friendly",
         "text": {
           "EN": [
             "You're welcome. It's good to see you too.",
@@ -34,6 +35,35 @@
             "Oo naman. Mag-ingat ka sa labas, ha?",
             "Mag-iingat ka. Mag-usap tayo ulit mamaya.",
             "Palagi. Masaya akong maayos ang lagay mo."
+          ]
+        }
+      },
+      {
+        "id": "default",
+        "text": {
+          "EN": [
+            "You're welcome. Take care.",
+            "No trouble. Stay safe.",
+            "Anytime. Watch your back out there.",
+            "Don't mention it. See you around.",
+            "Glad to help. Take it easy.",
+            "All right. Stay alert today.",
+            "No problem at all. Be careful.",
+            "Sure thing. Keep your eyes open.",
+            "Take care of yourself out there.",
+            "Until next time. Stay safe."
+          ],
+          "TL": [
+            "Walang anuman. Mag-iingat ka.",
+            "Walang problema. Manatiling ligtas.",
+            "Kahit kailan. Mag-ingat ka sa labas.",
+            "Wala 'yon. Magkikita pa tayo.",
+            "Masayang nakatulong. Dahan-dahan lang.",
+            "Sige. Maging alerto ka ngayon.",
+            "Walang anuman talaga. Mag-ingat ka.",
+            "Oo naman. Buksan mo ang mga mata mo.",
+            "Alagaan mo ang sarili mo sa labas.",
+            "Hanggang sa muli. Manatiling ligtas."
           ]
         }
       }
@@ -64,6 +94,5 @@
       "id": "greeting",
       "domain": "social"
     }
-  ],
-  "owner": "ProjectHoomans"
+  ]
 }

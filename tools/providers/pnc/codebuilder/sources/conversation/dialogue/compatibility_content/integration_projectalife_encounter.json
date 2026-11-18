@@ -1,6 +1,7 @@
 {
   "schema": "psychopatz.convo-engine.v1",
-  "id": "integration.projectalife.encounter.friendly",
+  "id": "integration.projectalife.encounter",
+  "owner": "ProjectHoomans",
   "metadata": {
     "category": "projecthoomans:compatibility_content",
     "contentOwner": "projecthoomans.dialogue_content.compatibility",
@@ -9,13 +10,35 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
+        "id": "friendly",
         "text": {
           "EN": [
             "Those survivors seem friendly. Keep your hands visible."
           ],
           "TL": [
             "Those survivors seem friendly. Keep your hands visible."
+          ]
+        }
+      },
+      {
+        "id": "hostile",
+        "text": {
+          "EN": [
+            "That group looks hostile. Keep cover between us and them."
+          ],
+          "TL": [
+            "That group looks hostile. Keep cover between us and them."
+          ]
+        }
+      },
+      {
+        "id": "unknown",
+        "text": {
+          "EN": [
+            "Someone is out there. Let us watch before we approach."
+          ],
+          "TL": [
+            "Someone is out there. Let us watch before we approach."
           ]
         }
       }
@@ -46,6 +69,5 @@
       "id": "projectalife",
       "domain": "integration"
     }
-  ],
-  "owner": "ProjectHoomans"
+  ]
 }

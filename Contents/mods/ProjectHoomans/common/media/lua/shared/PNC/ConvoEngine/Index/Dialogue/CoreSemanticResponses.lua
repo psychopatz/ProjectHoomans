@@ -6,7 +6,7 @@ return {
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "accept",
         ["kind"] = "dialogue",
@@ -18,7 +18,7 @@ return {
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "compliment",
         ["kind"] = "dialogue",
@@ -27,7 +27,7 @@ return {
     ["flow.weather.raining"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "flow.weather.raining",
         ["kind"] = "dialogue",
@@ -39,17 +39,17 @@ return {
     ["greeting"] = {
         ["dependents"] = {
             "flow.greeting.exchange",
-            "flow.greeting.followup.default",
-            "flow.greeting.followup.friendly",
-            "flow.greeting.opening.default",
-            "flow.greeting.opening.friendly",
-            "flow.greeting.opening.question.default",
-            "flow.greeting.opening.question.friendly",
+            "flow.greeting.followup",
+            "flow.greeting.opening",
             "flow.greeting.opening.rain",
+            "flow.greeting.responses",
+            "integration.companion_dogs.greeting",
+            "social.greetings.contextual",
+            "social.greetings.hostile.parley",
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "greeting",
         ["kind"] = "dialogue",
@@ -60,11 +60,12 @@ return {
             "flow.needs.exchange",
             "needs",
             "quest.clinic_supplies.offer",
+            "question.needs.offer",
             "social.recruitment.offer",
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "offer",
         ["kind"] = "dialogue",
@@ -86,7 +87,7 @@ return {
     ["question.backstory.ambiguous"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "question.backstory.ambiguous",
         ["kind"] = "dialogue",
@@ -95,7 +96,7 @@ return {
     ["question.backstory.follow_up.location"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "question.backstory.follow_up.location",
         ["kind"] = "dialogue",
@@ -104,118 +105,16 @@ return {
     ["question.backstory.follow_up.miss"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "question.backstory.follow_up.miss",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_semantic_responses/question_backstory_follow_up_miss.json",
     },
-    ["question.backstory.known"] = {
-        ["dependents"] = {
-            "question.backstory.known.education",
-            "question.backstory.known.family_background",
-            "question.backstory.known.fear",
-            "question.backstory.known.former_job",
-            "question.backstory.known.hobby",
-            "question.backstory.known.hometown",
-            "question.backstory.known.tragedy",
-        },
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known.json",
-    },
-    ["question.backstory.known.education"] = {
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known.education",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.backstory.known",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known_education.json",
-    },
-    ["question.backstory.known.family_background"] = {
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known.family_background",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.backstory.known",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known_family_background.json",
-    },
-    ["question.backstory.known.fear"] = {
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known.fear",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.backstory.known",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known_fear.json",
-    },
-    ["question.backstory.known.former_job"] = {
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known.former_job",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.backstory.known",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known_former_job.json",
-    },
-    ["question.backstory.known.hobby"] = {
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known.hobby",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.backstory.known",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known_hobby.json",
-    },
-    ["question.backstory.known.hometown"] = {
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known.hometown",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.backstory.known",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known_hometown.json",
-    },
-    ["question.backstory.known.tragedy"] = {
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.backstory.known.tragedy",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.backstory.known",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_backstory_known_tragedy.json",
-    },
     ["question.backstory.refusal"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "question.backstory.refusal",
         ["kind"] = "dialogue",
@@ -224,45 +123,11 @@ return {
     ["question.backstory.suspected"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "question.backstory.suspected",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/core_semantic_responses/question_backstory_suspected.json",
-    },
-    ["question.needs.proposal"] = {
-        ["dependents"] = {
-            "question.needs.proposal.hunger",
-            "question.needs.proposal.thirst",
-            "question.needs.proposal.unknown",
-        },
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
-        },
-        ["id"] = "question.needs.proposal",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.needs",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_needs_proposal.json",
-    },
-    ["question.needs.quantity"] = {
-        ["dependents"] = {
-            "question.needs.quantity.hunger",
-            "question.needs.quantity.thirst",
-            "question.needs.quantity.unknown",
-        },
-        ["domain"] = "core_semantic_responses",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
-        },
-        ["id"] = "question.needs.quantity",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "question.needs",
-        },
-        ["source"] = "dialogue/core_semantic_responses/question_needs_quantity.json",
     },
     ["question.wellbeing"] = {
         ["dependents"] = {
@@ -286,7 +151,7 @@ return {
     ["question.wellbeing.unknown"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "question.wellbeing.unknown",
         ["kind"] = "dialogue",
@@ -298,7 +163,7 @@ return {
     ["refuse"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "refuse",
         ["kind"] = "dialogue",
@@ -307,7 +172,7 @@ return {
     ["response_pool.question.identity"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "response_pool.question.identity",
         ["kind"] = "dialogue",
@@ -319,7 +184,7 @@ return {
     ["thanks"] = {
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
+            "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
         },
         ["id"] = "thanks",
         ["kind"] = "dialogue",

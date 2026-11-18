@@ -59,5 +59,11 @@
       "domain": "ui"
     }
   ],
-  "owner": "ProjectHoomans"
+  "owner": "ProjectHoomans",
+  "slots": {
+    "item": {
+      "type": "entity.item",
+      "required": false
+    }
+  }
 }

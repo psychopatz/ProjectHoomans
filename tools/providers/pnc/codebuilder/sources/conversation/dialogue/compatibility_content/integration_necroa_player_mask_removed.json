@@ -1,0 +1,79 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "integration.necroa.player_mask_removed",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "default",
+        "text": {
+          "EN": [
+            "Put your mask back on. The air is not safe."
+          ],
+          "TL": [
+            "Put your mask back on. The air is not safe."
+          ]
+        }
+      },
+      {
+        "id": "hostile",
+        "text": {
+          "EN": [
+            "Put your mask back on before you become a problem."
+          ],
+          "TL": [
+            "Put your mask back on before you become a problem."
+          ]
+        }
+      },
+      {
+        "id": "lover",
+        "text": {
+          "EN": [
+            "Please put your mask back on, love. This air is not safe."
+          ],
+          "TL": [
+            "Please put your mask back on, love. This air is not safe."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "slots": {
+    "threat": {
+      "type": "entity.threat",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "integration",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "necroa",
+      "domain": "integration"
+    }
+  ]
+}

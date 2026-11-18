@@ -20,6 +20,7 @@ return {
     },
     ["question.needs"] = {
         ["dependents"] = {
+            "question.needs.offer",
             "question.needs.proposal",
             "question.needs.quantity",
         },

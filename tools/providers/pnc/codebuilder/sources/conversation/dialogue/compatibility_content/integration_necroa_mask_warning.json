@@ -1,0 +1,79 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "integration.necroa.mask_warning",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "colonist",
+        "text": {
+          "EN": [
+            "Mask up. We keep the camp safe together."
+          ],
+          "TL": [
+            "Mask up. We keep the camp safe together."
+          ]
+        }
+      },
+      {
+        "id": "default",
+        "text": {
+          "EN": [
+            "Put your mask back on. Knox is airborne."
+          ],
+          "TL": [
+            "Put your mask back on. Knox is airborne."
+          ]
+        }
+      },
+      {
+        "id": "family",
+        "text": {
+          "EN": [
+            "Put your mask on, family. I am not losing you to the air."
+          ],
+          "TL": [
+            "Put your mask on, family. I am not losing you to the air."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "slots": {
+    "threat": {
+      "type": "entity.threat",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "integration",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "necroa",
+      "domain": "integration"
+    }
+  ]
+}

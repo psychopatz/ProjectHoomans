@@ -599,6 +599,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.reaction",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "That threat is down. Stay alert.",
@@ -775,6 +783,12 @@ return {
             },
         },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/event_reactions_combat/combat_reaction_threat.json",
         ["target"] = {

@@ -19,45 +19,9 @@ return {
         ["recordCount"] = 14,
     },
     {
-        ["domain"] = "combat_banter_weapon_kill_aggressive",
+        ["domain"] = "combat_horde",
         ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatBanterWeaponKillAggressive",
-        ["recordCount"] = 5,
-    },
-    {
-        ["domain"] = "combat_banter_weapon_kill_brave",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatBanterWeaponKillBrave",
-        ["recordCount"] = 4,
-    },
-    {
-        ["domain"] = "combat_banter_weapon_kill_cold",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatBanterWeaponKillCold",
-        ["recordCount"] = 3,
-    },
-    {
-        ["domain"] = "combat_banter_weapon_kill_practical",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatBanterWeaponKillPractical",
-        ["recordCount"] = 6,
-    },
-    {
-        ["domain"] = "combat_banter_weapon_kill_reserved",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatBanterWeaponKillReserved",
-        ["recordCount"] = 2,
-    },
-    {
-        ["domain"] = "combat_banter_weapon_kill_shaken",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatBanterWeaponKillShaken",
-        ["recordCount"] = 3,
-    },
-    {
-        ["domain"] = "combat_banter_weapon_kill_supportive",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatBanterWeaponKillSupportive",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatHorde",
         ["recordCount"] = 2,
     },
     {
@@ -100,6 +64,12 @@ return {
         ["domain"] = "combat_human_banter_human_kill_supportive",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatHumanBanterHumanKillSupportive",
+        ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "combat_kill",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatKill",
         ["recordCount"] = 1,
     },
     {
@@ -193,6 +163,12 @@ return {
         ["recordCount"] = 5,
     },
     {
+        ["domain"] = "combat_tactical_spatial",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatTacticalSpatial",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "companion_check_in",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCheckIn",
@@ -202,7 +178,7 @@ return {
         ["domain"] = "companion_commands_combat",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCommandsCombat",
-        ["recordCount"] = 11,
+        ["recordCount"] = 5,
     },
     {
         ["domain"] = "companion_commands_lifecycle",
@@ -220,7 +196,7 @@ return {
         ["domain"] = "companion_commands_replies",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCommandsReplies",
-        ["recordCount"] = 20,
+        ["recordCount"] = 11,
     },
     {
         ["domain"] = "companion_flows",
@@ -229,10 +205,16 @@ return {
         ["recordCount"] = 2,
     },
     {
+        ["domain"] = "companion_reaction",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionReaction",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "compatibility_content",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompatibilityContent",
-        ["recordCount"] = 27,
+        ["recordCount"] = 8,
     },
     {
         ["domain"] = "conversation_context",
@@ -244,13 +226,13 @@ return {
         ["domain"] = "conversation_greeting",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/ConversationGreeting",
-        ["recordCount"] = 10,
+        ["recordCount"] = 6,
     },
     {
         ["domain"] = "conversation_needs",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/ConversationNeeds",
-        ["recordCount"] = 11,
+        ["recordCount"] = 4,
     },
     {
         ["domain"] = "conversation_whats_up",
@@ -298,7 +280,7 @@ return {
         ["domain"] = "core_semantic_responses",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CoreSemanticResponses",
-        ["recordCount"] = 26,
+        ["recordCount"] = 16,
     },
     {
         ["domain"] = "core_text_memory_gossip_corpse_ordinary",
@@ -367,12 +349,6 @@ return {
         ["recordCount"] = 3,
     },
     {
-        ["domain"] = "event_reactions_companion",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/EventReactionsCompanion",
-        ["recordCount"] = 3,
-    },
-    {
         ["domain"] = "event_reactions_corpse",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/EventReactionsCorpse",
@@ -415,40 +391,16 @@ return {
         ["recordCount"] = 1,
     },
     {
-        ["domain"] = "medical_event_call",
+        ["domain"] = "medical_distress",
         ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalEventCall",
-        ["recordCount"] = 8,
-    },
-    {
-        ["domain"] = "medical_event_overview",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalEventOverview",
-        ["recordCount"] = 3,
-    },
-    {
-        ["domain"] = "medical_event_repeat",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalEventRepeat",
-        ["recordCount"] = 8,
-    },
-    {
-        ["domain"] = "medical_event_teammate",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalEventTeammate",
-        ["recordCount"] = 3,
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalDistress",
+        ["recordCount"] = 5,
     },
     {
         ["domain"] = "medical_event_treatment",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalEventTreatment",
-        ["recordCount"] = 2,
-    },
-    {
-        ["domain"] = "medical_event_update",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/MedicalEventUpdate",
-        ["recordCount"] = 8,
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "navigation",
@@ -467,6 +419,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/QuestContent",
         ["recordCount"] = 4,
+    },
+    {
+        ["domain"] = "question_backstory",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/QuestionBackstory",
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "question_relationship_status",
@@ -520,7 +478,7 @@ return {
         ["domain"] = "social_greetings",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialGreetings",
-        ["recordCount"] = 21,
+        ["recordCount"] = 2,
     },
     {
         ["domain"] = "social_interaction_argument",
@@ -556,7 +514,7 @@ return {
         ["domain"] = "social_interaction_scene_combat",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialInteractionSceneCombat",
-        ["recordCount"] = 4,
+        ["recordCount"] = 2,
     },
     {
         ["domain"] = "social_interaction_scene_horde_work",
@@ -604,7 +562,7 @@ return {
         ["domain"] = "static_suggestion_text",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/StaticSuggestionText",
-        ["recordCount"] = 34,
+        ["recordCount"] = 19,
     },
     {
         ["domain"] = "task_lifecycle",
@@ -623,6 +581,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/Trading",
         ["recordCount"] = 11,
+    },
+    {
+        ["domain"] = "ui_suggestion",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/UiSuggestion",
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "wellbeing_content",

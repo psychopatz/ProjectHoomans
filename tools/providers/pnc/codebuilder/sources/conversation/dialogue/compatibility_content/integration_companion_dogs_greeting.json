@@ -1,0 +1,86 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "integration.companion_dogs.greeting",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "female",
+        "text": {
+          "EN": [
+            "Who is a good girl?"
+          ],
+          "TL": [
+            "Who is a good girl?"
+          ]
+        }
+      },
+      {
+        "id": "male",
+        "text": {
+          "EN": [
+            "Who is a good boy?"
+          ],
+          "TL": [
+            "Who is a good boy?"
+          ]
+        }
+      },
+      {
+        "id": "unknown",
+        "text": {
+          "EN": [
+            "Who is a good dog?"
+          ],
+          "TL": [
+            "Who is a good dog?"
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "subject": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "slots": {
+    "subject": {
+      "type": "entity.any",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "integration",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "companion_dogs",
+      "domain": "integration"
+    }
+  ]
+}

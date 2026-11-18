@@ -21,16 +21,9 @@ MANIFEST = (
     / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 NEEDS_IDS = (
-    "question.needs.offer.hunger",
-    "question.needs.offer.thirst",
-    "question.needs.offer.fatigue",
-    "question.needs.offer.unknown",
-    "question.needs.quantity.hunger",
-    "question.needs.quantity.thirst",
-    "question.needs.quantity.unknown",
-    "question.needs.proposal.hunger",
-    "question.needs.proposal.thirst",
-    "question.needs.proposal.unknown",
+    "question.needs.offer",
+    "question.needs.quantity",
+    "question.needs.proposal",
 )
 EXPECTED = {
     "EN": {
@@ -134,7 +127,10 @@ class NeedsWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
             if item["id"] not in NEEDS_IDS:
                 continue
             for role in item.get("textRoles", []):
-                key = f"conversation.content.semantic.{item['id']}.{role['variantID']}.01"
+                vid = role["variantID"]
+                if "." not in vid:
+                    vid = f"{vid}.neutral"
+                key = f"conversation.content.semantic.{item['id']}.{vid}.01"
                 for language in ("EN", "TL"):
                     rendered[language][key] = role["translations"][language][0]
 
@@ -210,10 +206,10 @@ class NeedsWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
                     self.assertTrue(turn["accepted"], turn.get("reason"))
                     payload = turn["messages"][0]["payload"]
                     self.assertEqual(payload["semanticTemplateID"], (
-                        NEEDS_IDS[index * 3]
-                        if index == 0 else
-                        NEEDS_IDS[4] if index == 1 else NEEDS_IDS[7]
-                    ))
+                        "question.needs.offer.hunger",
+                        "question.needs.quantity.hunger",
+                        "question.needs.proposal.hunger",
+                    )[index])
                     self.assertEqual(payload["translationKey"], contract[index * 2])
                     self.assertEqual(payload["text"], contract[index * 2 + 1])
                     self.assertEqual(turn["dispatchTransport"], [])

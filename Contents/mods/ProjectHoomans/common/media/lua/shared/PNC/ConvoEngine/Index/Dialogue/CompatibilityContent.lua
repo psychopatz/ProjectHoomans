@@ -1,246 +1,78 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["integration.bandits.hooman_hurt.colonist"] = {
+    ["integration.bandits.hooman_hurt"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.bandits.hooman_hurt.colonist",
+        ["id"] = "integration.bandits.hooman_hurt",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
+        ["source"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt.json",
     },
-    ["integration.bandits.hooman_hurt.default"] = {
+    ["integration.companion_dogs.feed"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.bandits.hooman_hurt.default",
+        ["id"] = "integration.companion_dogs.feed",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
+        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_feed.json",
     },
-    ["integration.bandits.hooman_hurt.family"] = {
+    ["integration.companion_dogs.greeting"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.bandits.hooman_hurt.family",
+        ["id"] = "integration.companion_dogs.greeting",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
+        ["related"] = {
+            "greeting",
+        },
+        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_greeting.json",
     },
-    ["integration.bandits.hooman_hurt.lover"] = {
+    ["integration.necroa.mask_warning"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.bandits.hooman_hurt.lover",
+        ["id"] = "integration.necroa.mask_warning",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
+        ["source"] = "dialogue/compatibility_content/integration_necroa_mask_warning.json",
     },
-    ["integration.companion_dogs.feed.female"] = {
+    ["integration.necroa.player_mask_removed"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.companion_dogs.feed.female",
+        ["id"] = "integration.necroa.player_mask_removed",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
+        ["source"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed.json",
     },
-    ["integration.companion_dogs.feed.male"] = {
+    ["integration.projectalife.encounter"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.companion_dogs.feed.male",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
-    },
-    ["integration.companion_dogs.feed.unknown"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.companion_dogs.feed.unknown",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
-    },
-    ["integration.companion_dogs.greeting.female"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.companion_dogs.greeting.female",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
-    },
-    ["integration.companion_dogs.greeting.male"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.companion_dogs.greeting.male",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
-    },
-    ["integration.companion_dogs.greeting.unknown"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.companion_dogs.greeting.unknown",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
-    },
-    ["integration.necroa.mask_warning.colonist"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.necroa.mask_warning.colonist",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
-    },
-    ["integration.necroa.mask_warning.default"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.necroa.mask_warning.default",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
-    },
-    ["integration.necroa.mask_warning.family"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.necroa.mask_warning.family",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
-    },
-    ["integration.necroa.player_mask_removed.default"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.necroa.player_mask_removed.default",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
-    },
-    ["integration.necroa.player_mask_removed.hostile"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.necroa.player_mask_removed.hostile",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
-    },
-    ["integration.necroa.player_mask_removed.lover"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.necroa.player_mask_removed.lover",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
-    },
-    ["integration.projectalife.encounter.friendly"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.projectalife.encounter.friendly",
+        ["id"] = "integration.projectalife.encounter",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/compatibility_content/integration_projectalife_encounter.json",
     },
-    ["integration.projectalife.encounter.hostile"] = {
+    ["integration.projectalife.faction"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.projectalife.encounter.hostile",
+        ["id"] = "integration.projectalife.faction",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_encounter_hostile.json",
+        ["source"] = "dialogue/compatibility_content/integration_projectalife_faction.json",
     },
-    ["integration.projectalife.encounter.unknown"] = {
+    ["integration.projectalife.meta"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
         },
-        ["id"] = "integration.projectalife.encounter.unknown",
+        ["id"] = "integration.projectalife.meta",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_encounter_unknown.json",
-    },
-    ["integration.projectalife.faction.hostile"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.projectalife.faction.hostile",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_faction_hostile.json",
-    },
-    ["integration.projectalife.faction.incoming"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.projectalife.faction.incoming",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_faction_incoming.json",
-    },
-    ["integration.projectalife.faction.outgoing"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.projectalife.faction.outgoing",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_faction_outgoing.json",
-    },
-    ["integration.projectalife.meta.aircraft.heli"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.projectalife.meta.aircraft.heli",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_heli.json",
-    },
-    ["integration.projectalife.meta.aircraft.military"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.projectalife.meta.aircraft.military",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_military.json",
-    },
-    ["integration.projectalife.meta.ambience"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
-        },
-        ["id"] = "integration.projectalife.meta.ambience",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
-    },
-    ["integration.projectalife.meta.crash"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/CrashToGunfire",
-        },
-        ["id"] = "integration.projectalife.meta.crash",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_meta_crash.json",
-    },
-    ["integration.projectalife.meta.gunfire"] = {
-        ["domain"] = "compatibility_content",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent/CrashToGunfire",
-        },
-        ["id"] = "integration.projectalife.meta.gunfire",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
+        ["source"] = "dialogue/compatibility_content/integration_projectalife_meta.json",
     },
 }

@@ -1,0 +1,164 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "question.backstory.known",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "responsePoolID": "question.backstory.known",
+    "responseAct": "KNOWN"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "default",
+        "text": {
+          "EN": "Before all this, I was %1.",
+          "TL": "Bago ang lahat ng ito, ako ay %1."
+        },
+        "metadata": {
+          "fallback": "Before all this, I was %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      },
+      {
+        "id": "education",
+        "text": {
+          "EN": "I studied %1.",
+          "TL": "Nag-aral ako ng %1."
+        },
+        "metadata": {
+          "fallback": "I studied %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      },
+      {
+        "id": "family_background",
+        "text": {
+          "EN": "My family was %1.",
+          "TL": "Ang pamilya ko ay %1."
+        },
+        "metadata": {
+          "fallback": "My family was %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      },
+      {
+        "id": "fear",
+        "text": {
+          "EN": "I have always been afraid of %1.",
+          "TL": "Palagi akong natatakot sa %1."
+        },
+        "metadata": {
+          "fallback": "I have always been afraid of %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      },
+      {
+        "id": "former_job",
+        "text": {
+          "EN": "I worked as %1 before all this.",
+          "TL": "Nagtrabaho ako bilang %1 bago ang lahat ng ito."
+        },
+        "metadata": {
+          "fallback": "I worked as %1 before all this.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      },
+      {
+        "id": "hobby",
+        "text": {
+          "EN": "I used to enjoy %1.",
+          "TL": "Mahilig ako noon sa %1."
+        },
+        "metadata": {
+          "fallback": "I used to enjoy %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      },
+      {
+        "id": "hometown",
+        "text": {
+          "EN": "I grew up in %1.",
+          "TL": "Lumaki ako sa %1."
+        },
+        "metadata": {
+          "fallback": "I grew up in %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      },
+      {
+        "id": "tragedy",
+        "text": {
+          "EN": "Something happened: %1.",
+          "TL": "May nangyari: %1."
+        },
+        "metadata": {
+          "fallback": "Something happened: %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "subject": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "backstory",
+      "domain": "social"
+    }
+  ],
+  "memories": [
+    {
+      "id": "backstory_memory",
+      "scope": "durable"
+    }
+  ]
+}

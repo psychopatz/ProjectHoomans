@@ -94,6 +94,34 @@ local function appendLocalizedLines(phrases, installAs, styleKey, localized, bas
     end
 end
 
+local function hasSayVariant(plan, variantId)
+    if type(plan) ~= "table" or type(variantId) ~= "string" or variantId == "" then
+        return false
+    end
+    local fam = type(plan.exchangeFamily) == "table" and plan.exchangeFamily or nil
+    local say = type(fam) == "table" and fam.initiatingSay or nil
+    if type(say) ~= "table" then
+        local payload = type(plan.payload) == "table" and plan.payload or nil
+        say = type(payload) == "table" and payload.say or nil
+    end
+    if type(say) ~= "table" or type(say.realizations) ~= "table" then
+        return false
+    end
+    local keys = type(say.keyOrder) == "table" and say.keyOrder or { "1" }
+    for _, rkey in ipairs(keys) do
+        local realization = say.realizations[tostring(rkey)]
+        local variants = type(realization) == "table" and realization.variants or nil
+        if type(variants) == "table" then
+            for _, variant in ipairs(variants) do
+                if type(variant) == "table" and tostring(variant.id or "") == variantId then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
 local function resolvePlanTarget(registry, planID, options)
     local plan = type(registry.ConvoPlan) == "function" and registry.ConvoPlan(planID) or nil
     if type(plan) == "table" then
@@ -112,6 +140,9 @@ local function resolvePlanTarget(registry, planID, options)
         if type(fam) == "table" and type(fam.replies) == "table" and type(fam.replies[suffix]) == "table" then
             return directPlan, options.outcome and tostring(options.outcome) or suffix, options.style and tostring(options.style) or nil
         end
+        if hasSayVariant(directPlan, suffix) then
+            return directPlan, options.outcome and tostring(options.outcome) or nil, options.style and tostring(options.style) or suffix
+        end
         if type(registry.ConvoOutcome) == "function" then
             local ref = registry.ConvoOutcome(baseID)
             if type(ref) == "table" and type(ref.plan) == "table" then
@@ -124,6 +155,10 @@ local function resolvePlanTarget(registry, planID, options)
             local rootFam = type(rootPlan) == "table" and rootPlan.exchangeFamily or nil
             if type(rootFam) == "table" and type(rootFam.replies) == "table" and type(rootFam.replies[outcomeName]) == "table" then
                 return rootPlan, options.outcome and tostring(options.outcome) or outcomeName, options.style and tostring(options.style) or suffix
+            end
+            local combinedVariant = outcomeName .. "." .. suffix
+            if hasSayVariant(rootPlan, combinedVariant) then
+                return rootPlan, options.outcome and tostring(options.outcome) or nil, options.style and tostring(options.style) or combinedVariant
             end
         end
     end

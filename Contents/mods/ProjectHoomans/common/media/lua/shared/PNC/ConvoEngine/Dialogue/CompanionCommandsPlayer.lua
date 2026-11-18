@@ -99,6 +99,12 @@ return {
                 ["action"] = "FOLLOW",
                 ["intent"] = "COMMAND",
             },
+            ["metadata"] = {
+                ["modernizationRetention"] = {
+                    ["evidenceCode"] = "DISTINCT_GAMEPLAY_STATE_CONTRACT",
+                    ["reason"] = "Follow, stay, and return_home own distinct companion statePolicy, postconditions, and invoke.action contracts.",
+                },
+            },
             ["postconditions"] = {
                 "companion.following",
             },
@@ -1750,6 +1756,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "command.player",
+            ["slots"] = {
+                ["location"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.location",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Make camp here, {addressee.name}.",
@@ -1906,6 +1920,12 @@ return {
             },
         },
         ["slots"] = {
+            ["location"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.location",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_player/command_player_camp.json",
         ["target"] = {

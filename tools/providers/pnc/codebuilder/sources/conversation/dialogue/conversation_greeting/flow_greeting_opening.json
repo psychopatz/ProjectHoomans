@@ -1,6 +1,7 @@
 {
   "schema": "psychopatz.convo-engine.v1",
-  "id": "flow.greeting.opening.friendly",
+  "id": "flow.greeting.opening",
+  "owner": "ProjectHoomans",
   "metadata": {
     "category": "projecthoomans:conversation_content",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
@@ -9,22 +10,296 @@
   "say": {
     "variants": [
       {
-        "id": "neutral"
+        "id": "default",
+        "text": {
+          "EN": [
+            "Hey there. Good to see you.",
+            "Hello there. How are things?",
+            "Good to see you.",
+            "Morning. Hope the day treats you well.",
+            "Hey again. What's going on?",
+            "There you are. Everything quiet?",
+            "Afternoon. Staying out of trouble?",
+            "Hello. Good to run into another living person.",
+            "Hey. How's the perimeter looking?",
+            "Evening. Still on your feet, I see."
+          ],
+          "TL": [
+            "Uy, mabuti at nakita kita.",
+            "Kumusta. Kumusta ang lagay?",
+            "Mabuti at nakita kita.",
+            "Magandang umaga. Sana maayos ang araw mo.",
+            "Uy ulit. Anong nangyayari?",
+            "Nandiyan ka pala. Tahimik ba ang lahat?",
+            "Magandang hapon. Ligtas ka ba sa gulo?",
+            "Kumusta. Mabuti at may nakasalubong akong buhay pa.",
+            "Uy. Kumusta ang paligid?",
+            "Magandang gabi. Nakatayo ka pa rin pala."
+          ]
+        }
       },
       {
-        "id": "guarded"
+        "id": "default.guarded",
+        "text": {
+          "EN": [
+            "State your business. Keep your distance.",
+            "Hold it right there. What do you want?",
+            "Hands where I can see them. Who are you?",
+            "Don't come any closer until I know your business.",
+            "Keep your hands clear. Talk from there.",
+            "I'm watching you. What brings you here?",
+            "Easy now. Step back and speak your piece.",
+            "Keep your distance. Times are too dangerous for strangers.",
+            "That's close enough. What are you looking for?",
+            "Stay where you are. I don't know you yet."
+          ],
+          "TL": [
+            "Sabihin mo ang pakay mo. Lumayo ka.",
+            "Diyan ka lang. Anong gusto mo?",
+            "Itaas ang mga kamay. Sino ka?",
+            "Huwag kang lalapit hangga't hindi ko alam ang pakay mo.",
+            "Ilayo mo ang mga kamay mo. Magsalita ka riyan.",
+            "Binabantayan kita. Anong nagdala sa 'yo rito?",
+            "Dahan-dahan lang. Umatras ka at sabihin mo ang sasabihin mo.",
+            "Lumayo ka. Masyadong mapanganib ang panahon para sa mga estranghero.",
+            "Tama na ang lapit na 'yan. Anong hinahanap mo?",
+            "Diyan ka lang. Hindi pa kita kilala."
+          ]
+        }
       },
       {
-        "id": "terse"
+        "id": "default.terse",
+        "text": {
+          "EN": [
+            "Hello.",
+            "Hi.",
+            "Hey.",
+            "Morning.",
+            "There you are.",
+            "Still here.",
+            "Afternoon.",
+            "Quiet day.",
+            "You good?",
+            "Evening."
+          ],
+          "TL": [
+            "Kumusta.",
+            "Hi.",
+            "Uy.",
+            "Magandang umaga.",
+            "Nandiyan ka pala.",
+            "Nandito pa rin.",
+            "Magandang hapon.",
+            "Tahimik na araw.",
+            "Maayos ka ba?",
+            "Magandang gabi."
+          ]
+        }
       },
       {
-        "id": "warm"
+        "id": "default.warm",
+        "text": {
+          "EN": [
+            "Hey! It is good to see you.",
+            "Hey, good to see you in one piece.",
+            "Glad to see you. How are you holding up?",
+            "Hey. Really glad you made it back safe.",
+            "Back already? Good to have you around.",
+            "It's always a relief seeing you walk through.",
+            "Good to see you on your feet today.",
+            "Hey there! How's your day been treating you?",
+            "Always good seeing a friendly face out here.",
+            "Welcome back. Hope things were quiet out there."
+          ],
+          "TL": [
+            "Uy! Mabuti at nakita kita.",
+            "Uy, mabuti at buo ka pa.",
+            "Masaya akong nakita kita. Kumusta ang lagay mo?",
+            "Uy. Masaya talaga akong nakabalik ka nang ligtas.",
+            "Bumalik ka na agad? Mabuti at nandito ka.",
+            "Laging nakakagaan ng loob makita kang dumarating.",
+            "Mabuti at nakatayo ka pa rin ngayon.",
+            "Uy! Kumusta ang araw mo?",
+            "Laging magandang makakita ng pamilyar na mukha rito.",
+            "Maligayang pagbabalik. Sana tahimik lang sa labas."
+          ]
+        }
+      },
+      {
+        "id": "friendly",
+        "text": {
+          "EN": [
+            "Good to see you.",
+            "I was hoping we'd cross paths today.",
+            "Good to see you. How's the camp holding?",
+            "There you are. Ready for another day?",
+            "Back again. How's the scavenging going?",
+            "Good to see you again. Need a hand with anything?",
+            "Hey there. Glad we ran into each other.",
+            "Morning! How are things on your end?",
+            "Hey! What's the plan for today?",
+            "Good to catch up. How are you doing?"
+          ],
+          "TL": [
+            "Mabuti at nakita kita.",
+            "Inaasahan kong magkikita tayo ngayon.",
+            "Mabuti at nakita kita. Kumusta ang kampo?",
+            "Nandiyan ka pala. Handa na ba para sa isa pang araw?",
+            "Bumalik ka ulit. Kumusta ang paghahanap?",
+            "Mabuti at nakita kita ulit. Kailangan mo ba ng tulong?",
+            "Kumusta. Masaya akong nagkasalubong tayo.",
+            "Magandang umaga! Kumusta ang lagay sa parte mo?",
+            "Uy! Anong plano para sa araw na ito?",
+            "Mabuti at nagkausap tayo. Kumusta ka?"
+          ]
+        }
+      },
+      {
+        "id": "friendly.guarded",
+        "text": {
+          "EN": [
+            "Hey. Everything holding together?",
+            "Good timing. We could use your help.",
+            "Hey again. Everything quiet around here?",
+            "Back again? Keep your weapon close.",
+            "Hey. You notice anything strange out there?",
+            "Good to see you. Stay watchful though.",
+            "You made it back. Keep low and stay alert.",
+            "Glad you're safe. We've got to watch the treeline.",
+            "Hey. Hope nobody followed you in.",
+            "There you are. Let's keep our eyes sharp."
+          ],
+          "TL": [
+            "Uy. Maayos pa ba ang lahat?",
+            "Tamang-tama ang dating mo. Kailangan namin ng tulong mo.",
+            "Uy ulit. Tahimik ba ang paligid dito?",
+            "Bumalik ka? Ilapit mo ang armas mo.",
+            "Uy. May napansin ka bang kakaiba sa labas?",
+            "Mabuti at nakita kita. Magmatyag ka pa rin.",
+            "Nakabalik ka. Yumuko ka at maging alerto.",
+            "Mabuti at ligtas ka. Kailangan nating bantayan ang kagubatan.",
+            "Uy. Sana walang sumunod sa 'yo papasok.",
+            "Nandiyan ka pala. Maging matalas ang mga mata natin."
+          ]
+        }
+      },
+      {
+        "id": "friendly.terse",
+        "text": {
+          "EN": [
+            "Back again? You holding up?",
+            "Good to see you again.",
+            "Hey. How have you been?",
+            "Didn't expect to see you so soon.",
+            "Hey again. How's it going?",
+            "There you are again.",
+            "Holding steady?",
+            "Good. You're here.",
+            "All clear?",
+            "Hey. Need something?"
+          ],
+          "TL": [
+            "Bumalik ka? Ayos ka pa ba?",
+            "Mabuti at nakita kita ulit.",
+            "Uy. Kumusta ka na?",
+            "Hindi ko inasahang makikita kita agad.",
+            "Uy ulit. Kumusta?",
+            "Nandiyan ka na naman.",
+            "Matatag pa ba?",
+            "Mabuti. Nandito ka.",
+            "Ligtas ba?",
+            "Uy. May kailangan ka?"
+          ]
+        }
+      },
+      {
+        "id": "friendly.warm",
+        "text": {
+          "EN": [
+            "There you are! Good to see you.",
+            "I was hoping I'd run into you today.",
+            "Back so soon? Glad you're safe.",
+            "I was hoping you'd come back in one piece.",
+            "There you are. You doing alright today?",
+            "Good to see you. Pull up a chair.",
+            "Always makes my day better seeing you back safe.",
+            "Hey there! Really glad you're around today.",
+            "It's good to see your face. How're you feeling?",
+            "Welcome back, my friend. Good to see you."
+          ],
+          "TL": [
+            "Nandiyan ka pala! Mabuti at nakita kita.",
+            "Umasa akong makakasalubong kita ngayon.",
+            "Bumalik ka agad? Mabuti at ligtas ka.",
+            "Umasa akong babalik ka nang buo.",
+            "Nandiyan ka pala. Maayos ka ba ngayon?",
+            "Mabuti at nakita kita. Umupo ka muna.",
+            "Palaging gumaganda ang araw ko kapag nakikita kitang ligtas.",
+            "Uy! Masaya talaga akong nandito ka ngayon.",
+            "Mabuting makita ang mukha mo. Kumusta ang pakiramdam mo?",
+            "Maligayang pagbabalik, kaibigan. Mabuti at nakita kita."
+          ]
+        }
+      },
+      {
+        "id": "question.default",
+        "text": {
+          "EN": [
+            "How have you been?",
+            "How are you holding up?",
+            "Everything all right with you?",
+            "How's your day going so far?",
+            "Staying safe out there?",
+            "How are things treating you today?",
+            "Feeling alright today?",
+            "Any trouble on the road?",
+            "How are you managing out here?",
+            "Everything quiet on your end?"
+          ],
+          "TL": [
+            "Kumusta ka na?",
+            "Paano mo nakakayanan ang sitwasyon?",
+            "Maayos ba ang lahat sa iyo?",
+            "Kumusta ang araw mo hanggang ngayon?",
+            "Ligtas ka ba sa labas?",
+            "Kumusta ang takbo ng mga bagay ngayon?",
+            "Maayos ba ang pakiramdam mo ngayon?",
+            "May gulo ba sa daan?",
+            "Paano ka nakakaraos dito sa labas?",
+            "Tahimik ba ang lahat sa parte mo?"
+          ]
+        }
+      },
+      {
+        "id": "question.friendly",
+        "text": {
+          "EN": [
+            "How have you been holding up lately?",
+            "How's the camp holding together?",
+            "Need anything while we're talking?",
+            "How's your supply situation looking?",
+            "Getting enough rest between runs?",
+            "How are you feeling about things around here?",
+            "You managing to stay warm and dry?",
+            "How are the others treating you?",
+            "Everything staying solid with you?",
+            "Good to see you. How have things been going?"
+          ],
+          "TL": [
+            "Kumusta ka naman nitong mga nakaraang araw?",
+            "Kumusta ang lagay ng kampo natin?",
+            "May kailangan ka ba habang nag-uusap tayo?",
+            "Kumusta ang lagay ng mga gamit mo?",
+            "Nakakapagpahinga ka ba nang maayos?",
+            "Anong nararamdaman mo tungkol sa mga nangyayari rito?",
+            "Napananatili mo bang tuyo at maayos ang sarili mo?",
+            "Kumusta ang pakikitungo ng iba sa iyo?",
+            "Maayos at matatag pa ba ang lahat sa iyo?",
+            "Mabuti at nakita kita. Kumusta ang mga lakad mo?"
+          ]
+        }
       }
     ]
-  },
-  "textSidecars": {
-    "EN": "translations/flow_greeting_opening.en.json",
-    "TL": "translations/flow_greeting_opening.tl.json"
   },
   "roles": {
     "speaker": {
@@ -51,6 +326,5 @@
       "id": "greeting",
       "domain": "social"
     }
-  ],
-  "owner": "ProjectHoomans"
+  ]
 }

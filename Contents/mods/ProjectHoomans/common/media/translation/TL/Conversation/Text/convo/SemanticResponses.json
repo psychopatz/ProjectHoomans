@@ -29,8 +29,6 @@
   "UI_PNC_Conversation_Semantic_ConversationContinuationMedicalKnown": "Wala na akong ibang maidaragdag tungkol sa kalusugan ko sa ngayon.",
   "UI_PNC_Conversation_Semantic_ConversationContinuationMedicalUnknown": "Hindi ko makumpirma ang iba pa tungkol sa kalusugan ko ngayon.",
   "UI_PNC_Conversation_Semantic_ConversationContinuationResidence": "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon.",
-  "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst": "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
-  "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst": "Maaari ko iyong ituring na panukala, pero kailangan ko pa ang item at dami bago ako magtala ng pangako.",
   "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
   "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
   "UI_PNC_Conversation_Semantic_DisputeFriendly": "Iba ang tingin ko rito, pero ayos lang tayo.",

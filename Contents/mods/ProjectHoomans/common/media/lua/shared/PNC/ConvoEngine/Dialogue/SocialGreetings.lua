@@ -1,0 +1,2111 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
+        ["exchangeFamily"] = {
+            ["familyID"] = "social.greetings.contextual",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You're awake early too. Everything all right?",
+                                ["id"] = "acquaintance.dawn",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.dawn",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're awake early too. Everything all right?",
+                                        "Morning. I didn't expect to see you before sunrise.",
+                                        "Couldn't sleep? Neither could I.",
+                                        "Good, it's you. What brings you over this early?",
+                                        "Dawn patrol, or did you need something?",
+                                    },
+                                    ["TL"] = {
+                                        "Gising ka rin nang maaga. Ayos ba ang lahat?",
+                                        "Umaga. Hindi ko inaasahan na makikita kita bago sumikat ang araw.",
+                                        "hindi makatulog? Hindi ko rin kaya.",
+                                        "Buti, ikaw pala. Ano ang nagdudulot sa iyo ng ganito kaaga?",
+                                        "Dawn patrol, o may kailangan ka?",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Evening. Need something before we turn in?",
+                                ["id"] = "acquaintance.dusk",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.dusk",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Evening. Need something before we turn in?",
+                                        "Good, it's only you. You startled me.",
+                                        "Not much daylight left. Talk to me.",
+                                        "Hey. Keeping watch, or just passing by?",
+                                        "We should keep this quiet, but I'm listening.",
+                                    },
+                                    ["TL"] = {
+                                        "Gabi. Kailangan mo ng isang bagay bago tayo lumiko?",
+                                        "Buti, ikaw lang. Ginulat mo ako.",
+                                        "Wala na masyadong liwanag ng araw. kausapin mo ako.",
+                                        "Hey. Nagmamasid, o dumadaan lang?",
+                                        "Dapat tahimik lang tayo rito, pero nakikinig ako.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Morning. Good to see a familiar face.",
+                                ["id"] = "acquaintance.sunrise",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.sunrise",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Morning. Good to see a familiar face.",
+                                        "Hey. How's the day treating you?",
+                                        "There you are. Need a minute?",
+                                        "Morning. You look like you have something on your mind.",
+                                        "Nice to see you made it through another night.",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga. Ang sarap makakita ng pamilyar na mukha.",
+                                        "Hey. Kumusta ang pagtrato sa iyo ng araw?",
+                                        "Narito ka pala. Kailangan mo ba ng sandali?",
+                                        "Umaga. Parang may iniisip ka.",
+                                        "Natutuwa akong makita kang nagtagumpay sa isa pang gabi.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Hey. Been a long day?",
+                                ["id"] = "acquaintance.sunset",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.sunset",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hey. Been a long day?",
+                                        "Good timing. I was about to settle in.",
+                                        "There you are. Find anything useful today?",
+                                        "The day's winding down. What's up?",
+                                        "You look tired. Everything okay?",
+                                    },
+                                    ["TL"] = {
+                                        "Hey. Isang mahabang araw?",
+                                        "Magandang timing. Malapit na akong tumira.",
+                                        "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?",
+                                        "Palubog na ang araw. Anong meron?",
+                                        "Mukha kang pagod. Ayos ka lang ba?",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Late night. What has you awake?",
+                                ["id"] = "acquaintance.twilight",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.twilight",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Late night. What has you awake?",
+                                        "It's good to see someone I recognize out here.",
+                                        "Keep it down. Sound carries at night.",
+                                        "You all right? It's late to be wandering.",
+                                        "Hey. Make it quick before we draw attention.",
+                                    },
+                                    ["TL"] = {
+                                        "Gabi na. Anong gising mo?",
+                                        "Nakakatuwang makita ang isang taong kilala ko dito.",
+                                        "Panatilihin ito pababa. Ang tunog ay nagdadala sa gabi.",
+                                        "Ayos ka lang ba? Gabi na para magpagala-gala.",
+                                        "Hey. Bilisan mo bago tayo makatawag ng pansin.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Hold there. I don't know you, and dawn is a strange time for introductions.",
+                                ["id"] = "firstmeet.dawn",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.dawn",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hold there. I don't know you, and dawn is a strange time for introductions.",
+                                        "You're up before the dead settle down. Who are you?",
+                                        "Easy. The light is barely up, and I wasn't expecting company.",
+                                        "Morning, I suppose. Keep your hands where I can see them.",
+                                        "First light and a new face. Tell me what you need.",
+                                    },
+                                    ["TL"] = {
+                                        "Humawak ka dyan. Hindi kita kilala, at ang bukang-liwayway ay isang kakaibang oras para sa pagpapakilala.",
+                                        "Gising ka bago pa manahimik ang mga patay. Sino ka?",
+                                        "Madali. Bahagyang nakapatay ang ilaw, at hindi ko inaasahan ang makakasama ko.",
+                                        "Umaga, kumbaga. Itago ang iyong mga kamay kung saan ko sila makikita.",
+                                        "Unang liwanag at bagong mukha. Sabihin mo sa akin kung ano ang kailangan mo.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Stop there. Dusk makes strangers hard to read.",
+                                ["id"] = "firstmeet.dusk",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.dusk",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Stop there. Dusk makes strangers hard to read.",
+                                        "Not much light left. Introduce yourself.",
+                                        "You surprised me. What do you want?",
+                                        "Keep your voice down and tell me why you're here.",
+                                        "I can't make out your face. Come no closer.",
+                                    },
+                                    ["TL"] = {
+                                        "Tumigil ka dyan. Dahil sa takipsilim, mahirap basahin ang mga estranghero.",
+                                        "Wala nang gaanong ilaw. Magpakilala ka.",
+                                        "Nagulat mo ako. Ano ang kailangan mo?",
+                                        "Hinaan mo ang boses mo at sabihin sa akin kung bakit ka nandito.",
+                                        "Hindi ko maaninag ang mukha mo. Huwag kang lalapit.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Morning. I haven't seen you around before.",
+                                ["id"] = "firstmeet.sunrise",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.sunrise",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Morning. I haven't seen you around before.",
+                                        "That's close enough. Start with your name.",
+                                        "New face. Are you passing through or looking for something?",
+                                        "Daylight makes this easier. Who are you?",
+                                        "I don't recognize you. Talk, and keep it calm.",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga. Hindi pa kita nakikita kanina.",
+                                        "Malapit na yun. Magsimula sa iyong pangalan.",
+                                        "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
+                                        "Pinapadali ito ng liwanag ng araw. sino ka ba",
+                                        "hindi kita kilala. Mag-usap, at panatilihin itong kalmado.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "You picked a late hour to approach a stranger.",
+                                ["id"] = "firstmeet.sunset",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.sunset",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You picked a late hour to approach a stranger.",
+                                        "The light is going. Say what you came to say.",
+                                        "I don't know you, but I'm listening.",
+                                        "Before it gets dark, tell me who you are.",
+                                        "Another survivor. Friendly, I hope?",
+                                    },
+                                    ["TL"] = {
+                                        "Huli na para lumapit sa isang estranghero.",
+                                        "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
+                                        "Hindi kita kilala, pero nakikinig ako.",
+                                        "Bago dumilim, sabihin mo sa akin kung sino ka.",
+                                        "Isa pang nakaligtas. Friendly, sana?",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "It's dark out. Stay where I can see you.",
+                                ["id"] = "firstmeet.twilight",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.twilight",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "It's dark out. Stay where I can see you.",
+                                        "A stranger walking up at night usually means trouble.",
+                                        "Keep your voice low. Who are you?",
+                                        "You chose a bad time to sneak up on someone.",
+                                        "Don't move any closer. We can talk from there.",
+                                    },
+                                    ["TL"] = {
+                                        "Madilim sa labas. Manatili ka kung saan kita makikita.",
+                                        "Ang isang estranghero na naglalakad sa gabi ay karaniwang nangangahulugan ng problema.",
+                                        "Panatilihing mahina ang iyong boses. sino ka ba",
+                                        "You chose a bad time to sneak up buhay someone.",
+                                        "Huwag kang lalapit. Maaari tayong mag-usap mula doon.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "You're awake already. I was hoping you'd sleep a little longer.",
+                                ["id"] = "lover.dawn",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.dawn",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're awake already. I was hoping you'd sleep a little longer.",
+                                        "Morning, love. Come here before the day starts.",
+                                        "I missed you, and you were only asleep.",
+                                        "First light looks better with you here.",
+                                        "Couldn't sleep without checking on everyone, could you?",
+                                    },
+                                    ["TL"] = {
+                                        "You're awake already. I was hoping you'd tulog a little longer.",
+                                        "Umaga, mahal. Halika dito bago magsimula ang araw.",
+                                        "Namiss kita, tulog ka lang.",
+                                        "Mas maganda ang unang liwanag kapag kasama ka rito.",
+                                        "Hindi makatulog nang hindi sinusuri ang lahat, hindi ba?",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Stay with me a minute before night watch.",
+                                ["id"] = "lover.dusk",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.dusk",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Stay with me a minute before night watch.",
+                                        "Evening, love. You look exhausted.",
+                                        "You're safe. I can breathe again.",
+                                        "Come closer. We don't get many quiet moments.",
+                                        "I saved you a place by me.",
+                                    },
+                                    ["TL"] = {
+                                        "Manatili sa akin ng isang minuto bago manood ng gabi.",
+                                        "Gabi, mahal. Mukha kang pagod.",
+                                        "Ligtas ka. Muli na akong makahihinga.",
+                                        "Lumapit ka. Hindi kami nakakakuha ng maraming tahimik na sandali.",
+                                        "Iniligtas kita ng isang lugar sa tabi ko.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Morning, love. You sleep all right?",
+                                ["id"] = "lover.sunrise",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.sunrise",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Morning, love. You sleep all right?",
+                                        "There you are. I was starting to miss you.",
+                                        "Good morning. Stay close today, okay?",
+                                        "Seeing you first thing still makes this place feel almost normal.",
+                                        "Morning. Whatever happens today, we handle it together.",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga, mahal. Matulog ka na okay?",
+                                        "Narito ka pala. Nagsisimula na kitang ma-miss.",
+                                        "Magandang umaga po. Manatiling malapit ngayon, okay?",
+                                        "Ang una mong makita ay halos normal pa rin ang pakiramdam ng lugar na ito.",
+                                        "Umaga. Kung ano man ang mangyari ngayon, sabay nating haharapin.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "There you are. I worried when you were gone so long.",
+                                ["id"] = "lover.sunset",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.sunset",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "There you are. I worried when you were gone so long.",
+                                        "Come sit with me before the light goes.",
+                                        "Long day. I'm glad you're here at the end of it.",
+                                        "You made it back. That's all I needed to see.",
+                                        "The sunset almost makes this place look peaceful.",
+                                    },
+                                    ["TL"] = {
+                                        "Narito ka pala. Nag-alala ako nang matagal kang wala.",
+                                        "Halika maupo ka sa akin bago mamatay ang ilaw.",
+                                        "Mahabang araw. Natutuwa akong narito ka sa dulo nito.",
+                                        "Nakabalik ka. Iyon lang ang kailangan kong makita.",
+                                        "Halos nagmumukhang payapa ang lugar na ito sa dapit-hapon.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Can't sleep? Neither can I.",
+                                ["id"] = "lover.twilight",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.twilight",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Can't sleep? Neither can I.",
+                                        "It's all right. I'm here.",
+                                        "Come sit with me. We can keep watch together.",
+                                        "You scared me walking around this late.",
+                                        "Stay close tonight. I mean it.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi makatulog? Hindi ko rin kaya.",
+                                        "ayos lang. nandito ako.",
+                                        "Halika upo sa akin. Maaari tayong magbantay nang magkasama.",
+                                        "Tinakot mo ako sa paglalakad nang ganito kagabi.",
+                                        "Manatili kang malapit ngayong gabi. Seryoso ako.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "You're up. Good—we have plenty to do.",
+                                ["id"] = "member.dawn",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.member.dawn",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're up. Good—we have plenty to do.",
+                                        "Morning. I already checked the perimeter.",
+                                        "Couldn't sleep either? We may as well get started.",
+                                        "First light. What's the plan today?",
+                                        "Morning. Everyone else is still asleep, so it's just us.",
+                                    },
+                                    ["TL"] = {
+                                        "Gising ka na. Mabuti—marami tayong gagawin.",
+                                        "Umaga. Sinuri ko na ang perimeter.",
+                                        "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                                        "Unang liwanag. Ano ang plano ngayon?",
+                                        "Umaga. Tulog pa ang iba kaya kami na lang.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Evening. Perimeter looks clear.",
+                                ["id"] = "member.dusk",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.member.dusk",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Evening. Perimeter looks clear.",
+                                        "Need me for something before night watch?",
+                                        "We're all still here. I'll call that a good day.",
+                                        "Keep it quiet. The others are settling down.",
+                                        "I can take first watch if you need the rest.",
+                                    },
+                                    ["TL"] = {
+                                        "Gabi. Mukhang malinaw ang perimeter.",
+                                        "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+                                        "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+                                        "Manahimik ka. Umayos na yung iba.",
+                                        "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "Morning. Ready when you are.",
+                                ["id"] = "member.sunrise",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.member.sunrise",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Morning. Ready when you are.",
+                                        "Good, you're here. What are we doing today?",
+                                        "Another day with the crew. Could be worse.",
+                                        "Morning. Supplies are holding for now.",
+                                        "I was about to look for you. What's up?",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga. Handa kung kailan ka na.",
+                                        "Buti nandito ka. Ano ang ginagawa natin ngayon?",
+                                        "Panibagong araw kasama ang crew. Maaaring mas masahol pa.",
+                                        "Umaga. Ang mga suplay ay hawak sa ngayon.",
+                                        "Hinahanap na sana kita. Anong meron?",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "We made it through the day. That's something.",
+                                ["id"] = "member.sunset",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.member.sunset",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "We made it through the day. That's something.",
+                                        "Hey. Need a hand before we wrap up?",
+                                        "Long day, but I'm still ready if you need me.",
+                                        "Everyone accounted for?",
+                                        "The light's fading. We should finish up soon.",
+                                    },
+                                    ["TL"] = {
+                                        "Nalampasan natin ang araw. May halaga iyon.",
+                                        "Hey. Kailangan ng kamay bago tayo magtapos?",
+                                        "Mahabang araw, pero handa pa rin ako kung kailangan mo ako.",
+                                        "Lahat ng tao accounted para sa?",
+                                        "Kumukupas na ang liwanag. Dapat na tayong magtapos.",
+                                    },
+                                },
+                            },
+                            {
+                                ["fallback"] = "You're supposed to be resting. What's wrong?",
+                                ["id"] = "member.twilight",
+                                ["templateID"] = "convo.social.greetings.contextual.say.1.member.twilight",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're supposed to be resting. What's wrong?",
+                                        "Quiet night so far. Let's keep it that way.",
+                                        "I'm on watch. Did you need something?",
+                                        "Good, it's you. I heard footsteps.",
+                                        "Can't sleep? Pull up a chair, but keep your voice low.",
+                                    },
+                                    ["TL"] = {
+                                        "Dapat nagpapahinga ka. Ano ang problema?",
+                                        "Tahimik na gabi hanggang ngayon. Panatilihin natin itong paraan.",
+                                        "Nakabantay ako. may kailangan ka ba?",
+                                        "Buti, ikaw pala. Nakarinig ako ng mga yabag.",
+                                        "Hindi makatulog? Hilahin ang isang upuan, ngunit panatilihing mahina ang iyong boses.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "social.greetings",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "You're awake early too. Everything all right?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.dawn",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're awake early too. Everything all right?",
+                            "Morning. I didn't expect to see you before sunrise.",
+                            "Couldn't sleep? Neither could I.",
+                            "Good, it's you. What brings you over this early?",
+                            "Dawn patrol, or did you need something?",
+                        },
+                        ["TL"] = {
+                            "Gising ka rin nang maaga. Ayos ba ang lahat?",
+                            "Umaga. Hindi ko inaasahan na makikita kita bago sumikat ang araw.",
+                            "hindi makatulog? Hindi ko rin kaya.",
+                            "Buti, ikaw pala. Ano ang nagdudulot sa iyo ng ganito kaaga?",
+                            "Dawn patrol, o may kailangan ka?",
+                        },
+                    },
+                    ["variantID"] = "acquaintance.dawn",
+                },
+                {
+                    ["fallback"] = "Evening. Need something before we turn in?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.dusk",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Evening. Need something before we turn in?",
+                            "Good, it's only you. You startled me.",
+                            "Not much daylight left. Talk to me.",
+                            "Hey. Keeping watch, or just passing by?",
+                            "We should keep this quiet, but I'm listening.",
+                        },
+                        ["TL"] = {
+                            "Gabi. Kailangan mo ng isang bagay bago tayo lumiko?",
+                            "Buti, ikaw lang. Ginulat mo ako.",
+                            "Wala na masyadong liwanag ng araw. kausapin mo ako.",
+                            "Hey. Nagmamasid, o dumadaan lang?",
+                            "Dapat tahimik lang tayo rito, pero nakikinig ako.",
+                        },
+                    },
+                    ["variantID"] = "acquaintance.dusk",
+                },
+                {
+                    ["fallback"] = "Morning. Good to see a familiar face.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.sunrise",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Morning. Good to see a familiar face.",
+                            "Hey. How's the day treating you?",
+                            "There you are. Need a minute?",
+                            "Morning. You look like you have something on your mind.",
+                            "Nice to see you made it through another night.",
+                        },
+                        ["TL"] = {
+                            "Umaga. Ang sarap makakita ng pamilyar na mukha.",
+                            "Hey. Kumusta ang pagtrato sa iyo ng araw?",
+                            "Narito ka pala. Kailangan mo ba ng sandali?",
+                            "Umaga. Parang may iniisip ka.",
+                            "Natutuwa akong makita kang nagtagumpay sa isa pang gabi.",
+                        },
+                    },
+                    ["variantID"] = "acquaintance.sunrise",
+                },
+                {
+                    ["fallback"] = "Hey. Been a long day?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.sunset",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hey. Been a long day?",
+                            "Good timing. I was about to settle in.",
+                            "There you are. Find anything useful today?",
+                            "The day's winding down. What's up?",
+                            "You look tired. Everything okay?",
+                        },
+                        ["TL"] = {
+                            "Hey. Isang mahabang araw?",
+                            "Magandang timing. Malapit na akong tumira.",
+                            "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?",
+                            "Palubog na ang araw. Anong meron?",
+                            "Mukha kang pagod. Ayos ka lang ba?",
+                        },
+                    },
+                    ["variantID"] = "acquaintance.sunset",
+                },
+                {
+                    ["fallback"] = "Late night. What has you awake?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.twilight",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Late night. What has you awake?",
+                            "It's good to see someone I recognize out here.",
+                            "Keep it down. Sound carries at night.",
+                            "You all right? It's late to be wandering.",
+                            "Hey. Make it quick before we draw attention.",
+                        },
+                        ["TL"] = {
+                            "Gabi na. Anong gising mo?",
+                            "Nakakatuwang makita ang isang taong kilala ko dito.",
+                            "Panatilihin ito pababa. Ang tunog ay nagdadala sa gabi.",
+                            "Ayos ka lang ba? Gabi na para magpagala-gala.",
+                            "Hey. Bilisan mo bago tayo makatawag ng pansin.",
+                        },
+                    },
+                    ["variantID"] = "acquaintance.twilight",
+                },
+                {
+                    ["fallback"] = "Hold there. I don't know you, and dawn is a strange time for introductions.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.dawn",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hold there. I don't know you, and dawn is a strange time for introductions.",
+                            "You're up before the dead settle down. Who are you?",
+                            "Easy. The light is barely up, and I wasn't expecting company.",
+                            "Morning, I suppose. Keep your hands where I can see them.",
+                            "First light and a new face. Tell me what you need.",
+                        },
+                        ["TL"] = {
+                            "Humawak ka dyan. Hindi kita kilala, at ang bukang-liwayway ay isang kakaibang oras para sa pagpapakilala.",
+                            "Gising ka bago pa manahimik ang mga patay. Sino ka?",
+                            "Madali. Bahagyang nakapatay ang ilaw, at hindi ko inaasahan ang makakasama ko.",
+                            "Umaga, kumbaga. Itago ang iyong mga kamay kung saan ko sila makikita.",
+                            "Unang liwanag at bagong mukha. Sabihin mo sa akin kung ano ang kailangan mo.",
+                        },
+                    },
+                    ["variantID"] = "firstmeet.dawn",
+                },
+                {
+                    ["fallback"] = "Stop there. Dusk makes strangers hard to read.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.dusk",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Stop there. Dusk makes strangers hard to read.",
+                            "Not much light left. Introduce yourself.",
+                            "You surprised me. What do you want?",
+                            "Keep your voice down and tell me why you're here.",
+                            "I can't make out your face. Come no closer.",
+                        },
+                        ["TL"] = {
+                            "Tumigil ka dyan. Dahil sa takipsilim, mahirap basahin ang mga estranghero.",
+                            "Wala nang gaanong ilaw. Magpakilala ka.",
+                            "Nagulat mo ako. Ano ang kailangan mo?",
+                            "Hinaan mo ang boses mo at sabihin sa akin kung bakit ka nandito.",
+                            "Hindi ko maaninag ang mukha mo. Huwag kang lalapit.",
+                        },
+                    },
+                    ["variantID"] = "firstmeet.dusk",
+                },
+                {
+                    ["fallback"] = "Morning. I haven't seen you around before.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.sunrise",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Morning. I haven't seen you around before.",
+                            "That's close enough. Start with your name.",
+                            "New face. Are you passing through or looking for something?",
+                            "Daylight makes this easier. Who are you?",
+                            "I don't recognize you. Talk, and keep it calm.",
+                        },
+                        ["TL"] = {
+                            "Umaga. Hindi pa kita nakikita kanina.",
+                            "Malapit na yun. Magsimula sa iyong pangalan.",
+                            "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
+                            "Pinapadali ito ng liwanag ng araw. sino ka ba",
+                            "hindi kita kilala. Mag-usap, at panatilihin itong kalmado.",
+                        },
+                    },
+                    ["variantID"] = "firstmeet.sunrise",
+                },
+                {
+                    ["fallback"] = "You picked a late hour to approach a stranger.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.sunset",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You picked a late hour to approach a stranger.",
+                            "The light is going. Say what you came to say.",
+                            "I don't know you, but I'm listening.",
+                            "Before it gets dark, tell me who you are.",
+                            "Another survivor. Friendly, I hope?",
+                        },
+                        ["TL"] = {
+                            "Huli na para lumapit sa isang estranghero.",
+                            "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
+                            "Hindi kita kilala, pero nakikinig ako.",
+                            "Bago dumilim, sabihin mo sa akin kung sino ka.",
+                            "Isa pang nakaligtas. Friendly, sana?",
+                        },
+                    },
+                    ["variantID"] = "firstmeet.sunset",
+                },
+                {
+                    ["fallback"] = "It's dark out. Stay where I can see you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.twilight",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "It's dark out. Stay where I can see you.",
+                            "A stranger walking up at night usually means trouble.",
+                            "Keep your voice low. Who are you?",
+                            "You chose a bad time to sneak up on someone.",
+                            "Don't move any closer. We can talk from there.",
+                        },
+                        ["TL"] = {
+                            "Madilim sa labas. Manatili ka kung saan kita makikita.",
+                            "Ang isang estranghero na naglalakad sa gabi ay karaniwang nangangahulugan ng problema.",
+                            "Panatilihing mahina ang iyong boses. sino ka ba",
+                            "You chose a bad time to sneak up buhay someone.",
+                            "Huwag kang lalapit. Maaari tayong mag-usap mula doon.",
+                        },
+                    },
+                    ["variantID"] = "firstmeet.twilight",
+                },
+                {
+                    ["fallback"] = "You're awake already. I was hoping you'd sleep a little longer.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.lover.dawn",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're awake already. I was hoping you'd sleep a little longer.",
+                            "Morning, love. Come here before the day starts.",
+                            "I missed you, and you were only asleep.",
+                            "First light looks better with you here.",
+                            "Couldn't sleep without checking on everyone, could you?",
+                        },
+                        ["TL"] = {
+                            "You're awake already. I was hoping you'd tulog a little longer.",
+                            "Umaga, mahal. Halika dito bago magsimula ang araw.",
+                            "Namiss kita, tulog ka lang.",
+                            "Mas maganda ang unang liwanag kapag kasama ka rito.",
+                            "Hindi makatulog nang hindi sinusuri ang lahat, hindi ba?",
+                        },
+                    },
+                    ["variantID"] = "lover.dawn",
+                },
+                {
+                    ["fallback"] = "Stay with me a minute before night watch.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.lover.dusk",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Stay with me a minute before night watch.",
+                            "Evening, love. You look exhausted.",
+                            "You're safe. I can breathe again.",
+                            "Come closer. We don't get many quiet moments.",
+                            "I saved you a place by me.",
+                        },
+                        ["TL"] = {
+                            "Manatili sa akin ng isang minuto bago manood ng gabi.",
+                            "Gabi, mahal. Mukha kang pagod.",
+                            "Ligtas ka. Muli na akong makahihinga.",
+                            "Lumapit ka. Hindi kami nakakakuha ng maraming tahimik na sandali.",
+                            "Iniligtas kita ng isang lugar sa tabi ko.",
+                        },
+                    },
+                    ["variantID"] = "lover.dusk",
+                },
+                {
+                    ["fallback"] = "Morning, love. You sleep all right?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.lover.sunrise",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Morning, love. You sleep all right?",
+                            "There you are. I was starting to miss you.",
+                            "Good morning. Stay close today, okay?",
+                            "Seeing you first thing still makes this place feel almost normal.",
+                            "Morning. Whatever happens today, we handle it together.",
+                        },
+                        ["TL"] = {
+                            "Umaga, mahal. Matulog ka na okay?",
+                            "Narito ka pala. Nagsisimula na kitang ma-miss.",
+                            "Magandang umaga po. Manatiling malapit ngayon, okay?",
+                            "Ang una mong makita ay halos normal pa rin ang pakiramdam ng lugar na ito.",
+                            "Umaga. Kung ano man ang mangyari ngayon, sabay nating haharapin.",
+                        },
+                    },
+                    ["variantID"] = "lover.sunrise",
+                },
+                {
+                    ["fallback"] = "There you are. I worried when you were gone so long.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.lover.sunset",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "There you are. I worried when you were gone so long.",
+                            "Come sit with me before the light goes.",
+                            "Long day. I'm glad you're here at the end of it.",
+                            "You made it back. That's all I needed to see.",
+                            "The sunset almost makes this place look peaceful.",
+                        },
+                        ["TL"] = {
+                            "Narito ka pala. Nag-alala ako nang matagal kang wala.",
+                            "Halika maupo ka sa akin bago mamatay ang ilaw.",
+                            "Mahabang araw. Natutuwa akong narito ka sa dulo nito.",
+                            "Nakabalik ka. Iyon lang ang kailangan kong makita.",
+                            "Halos nagmumukhang payapa ang lugar na ito sa dapit-hapon.",
+                        },
+                    },
+                    ["variantID"] = "lover.sunset",
+                },
+                {
+                    ["fallback"] = "Can't sleep? Neither can I.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.lover.twilight",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Can't sleep? Neither can I.",
+                            "It's all right. I'm here.",
+                            "Come sit with me. We can keep watch together.",
+                            "You scared me walking around this late.",
+                            "Stay close tonight. I mean it.",
+                        },
+                        ["TL"] = {
+                            "Hindi makatulog? Hindi ko rin kaya.",
+                            "ayos lang. nandito ako.",
+                            "Halika upo sa akin. Maaari tayong magbantay nang magkasama.",
+                            "Tinakot mo ako sa paglalakad nang ganito kagabi.",
+                            "Manatili kang malapit ngayong gabi. Seryoso ako.",
+                        },
+                    },
+                    ["variantID"] = "lover.twilight",
+                },
+                {
+                    ["fallback"] = "You're up. Good—we have plenty to do.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.member.dawn",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're up. Good—we have plenty to do.",
+                            "Morning. I already checked the perimeter.",
+                            "Couldn't sleep either? We may as well get started.",
+                            "First light. What's the plan today?",
+                            "Morning. Everyone else is still asleep, so it's just us.",
+                        },
+                        ["TL"] = {
+                            "Gising ka na. Mabuti—marami tayong gagawin.",
+                            "Umaga. Sinuri ko na ang perimeter.",
+                            "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                            "Unang liwanag. Ano ang plano ngayon?",
+                            "Umaga. Tulog pa ang iba kaya kami na lang.",
+                        },
+                    },
+                    ["variantID"] = "member.dawn",
+                },
+                {
+                    ["fallback"] = "Evening. Perimeter looks clear.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.member.dusk",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Evening. Perimeter looks clear.",
+                            "Need me for something before night watch?",
+                            "We're all still here. I'll call that a good day.",
+                            "Keep it quiet. The others are settling down.",
+                            "I can take first watch if you need the rest.",
+                        },
+                        ["TL"] = {
+                            "Gabi. Mukhang malinaw ang perimeter.",
+                            "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+                            "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+                            "Manahimik ka. Umayos na yung iba.",
+                            "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa.",
+                        },
+                    },
+                    ["variantID"] = "member.dusk",
+                },
+                {
+                    ["fallback"] = "Morning. Ready when you are.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.member.sunrise",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Morning. Ready when you are.",
+                            "Good, you're here. What are we doing today?",
+                            "Another day with the crew. Could be worse.",
+                            "Morning. Supplies are holding for now.",
+                            "I was about to look for you. What's up?",
+                        },
+                        ["TL"] = {
+                            "Umaga. Handa kung kailan ka na.",
+                            "Buti nandito ka. Ano ang ginagawa natin ngayon?",
+                            "Panibagong araw kasama ang crew. Maaaring mas masahol pa.",
+                            "Umaga. Ang mga suplay ay hawak sa ngayon.",
+                            "Hinahanap na sana kita. Anong meron?",
+                        },
+                    },
+                    ["variantID"] = "member.sunrise",
+                },
+                {
+                    ["fallback"] = "We made it through the day. That's something.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.member.sunset",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "We made it through the day. That's something.",
+                            "Hey. Need a hand before we wrap up?",
+                            "Long day, but I'm still ready if you need me.",
+                            "Everyone accounted for?",
+                            "The light's fading. We should finish up soon.",
+                        },
+                        ["TL"] = {
+                            "Nalampasan natin ang araw. May halaga iyon.",
+                            "Hey. Kailangan ng kamay bago tayo magtapos?",
+                            "Mahabang araw, pero handa pa rin ako kung kailangan mo ako.",
+                            "Lahat ng tao accounted para sa?",
+                            "Kumukupas na ang liwanag. Dapat na tayong magtapos.",
+                        },
+                    },
+                    ["variantID"] = "member.sunset",
+                },
+                {
+                    ["fallback"] = "You're supposed to be resting. What's wrong?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.contextual.say.1.member.twilight",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're supposed to be resting. What's wrong?",
+                            "Quiet night so far. Let's keep it that way.",
+                            "I'm on watch. Did you need something?",
+                            "Good, it's you. I heard footsteps.",
+                            "Can't sleep? Pull up a chair, but keep your voice low.",
+                        },
+                        ["TL"] = {
+                            "Dapat nagpapahinga ka. Ano ang problema?",
+                            "Tahimik na gabi hanggang ngayon. Panatilihin natin itong paraan.",
+                            "Nakabantay ako. may kailangan ka ba?",
+                            "Buti, ikaw pala. Nakarinig ako ng mga yabag.",
+                            "Hindi makatulog? Hilahin ang isang upuan, ngunit panatilihing mahina ang iyong boses.",
+                        },
+                    },
+                    ["variantID"] = "member.twilight",
+                },
+            },
+        },
+        ["id"] = "social.greetings.contextual",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "contextual",
+            ["sourceId"] = "social.greetings.contextual",
+            ["sourcePath"] = "dialogue/social_greetings/social_greetings_contextual.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["audience"] = "neutral",
+                ["category"] = "projecthoomans:greetings",
+                ["portraitAnimation"] = "greeting.wavehi",
+                ["priority"] = 10,
+                ["responseAct"] = "GREETING",
+                ["runtimeBlockID"] = "projecthoomans:greeting_acquaintance_dawn",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.acquaintance.dawn",
+                ["textRows"] = {
+                    {
+                        ["key"] = "greeting.001",
+                        ["text"] = {
+                            ["EN"] = "You're awake early too. Everything all right?",
+                            ["TL"] = "Gising ka rin nang maaga. Ayos ba ang lahat?",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.002",
+                        ["text"] = {
+                            ["EN"] = "Morning. I didn't expect to see you before sunrise.",
+                            ["TL"] = "Umaga. Hindi ko inaasahan na makikita kita bago sumikat ang araw.",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.003",
+                        ["text"] = {
+                            ["EN"] = "Couldn't sleep? Neither could I.",
+                            ["TL"] = "hindi makatulog? Hindi ko rin kaya.",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.004",
+                        ["text"] = {
+                            ["EN"] = "Good, it's you. What brings you over this early?",
+                            ["TL"] = "Buti, ikaw pala. Ano ang nagdudulot sa iyo ng ganito kaaga?",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.005",
+                        ["text"] = {
+                            ["EN"] = "Dawn patrol, or did you need something?",
+                            ["TL"] = "Dawn patrol, o may kailangan ka?",
+                        },
+                    },
+                },
+                ["textTarget"] = "convo/social/greetings/neutral/acquaintance/dawn",
+                ["weight"] = 100,
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "acquaintance.dawn",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're awake early too. Everything all right?",
+                                        "Morning. I didn't expect to see you before sunrise.",
+                                        "Couldn't sleep? Neither could I.",
+                                        "Good, it's you. What brings you over this early?",
+                                        "Dawn patrol, or did you need something?",
+                                    },
+                                    ["TL"] = {
+                                        "Gising ka rin nang maaga. Ayos ba ang lahat?",
+                                        "Umaga. Hindi ko inaasahan na makikita kita bago sumikat ang araw.",
+                                        "hindi makatulog? Hindi ko rin kaya.",
+                                        "Buti, ikaw pala. Ano ang nagdudulot sa iyo ng ganito kaaga?",
+                                        "Dawn patrol, o may kailangan ka?",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "acquaintance.dusk",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Evening. Need something before we turn in?",
+                                        "Good, it's only you. You startled me.",
+                                        "Not much daylight left. Talk to me.",
+                                        "Hey. Keeping watch, or just passing by?",
+                                        "We should keep this quiet, but I'm listening.",
+                                    },
+                                    ["TL"] = {
+                                        "Gabi. Kailangan mo ng isang bagay bago tayo lumiko?",
+                                        "Buti, ikaw lang. Ginulat mo ako.",
+                                        "Wala na masyadong liwanag ng araw. kausapin mo ako.",
+                                        "Hey. Nagmamasid, o dumadaan lang?",
+                                        "Dapat tahimik lang tayo rito, pero nakikinig ako.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "acquaintance.sunrise",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Morning. Good to see a familiar face.",
+                                        "Hey. How's the day treating you?",
+                                        "There you are. Need a minute?",
+                                        "Morning. You look like you have something on your mind.",
+                                        "Nice to see you made it through another night.",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga. Ang sarap makakita ng pamilyar na mukha.",
+                                        "Hey. Kumusta ang pagtrato sa iyo ng araw?",
+                                        "Narito ka pala. Kailangan mo ba ng sandali?",
+                                        "Umaga. Parang may iniisip ka.",
+                                        "Natutuwa akong makita kang nagtagumpay sa isa pang gabi.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "acquaintance.sunset",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hey. Been a long day?",
+                                        "Good timing. I was about to settle in.",
+                                        "There you are. Find anything useful today?",
+                                        "The day's winding down. What's up?",
+                                        "You look tired. Everything okay?",
+                                    },
+                                    ["TL"] = {
+                                        "Hey. Isang mahabang araw?",
+                                        "Magandang timing. Malapit na akong tumira.",
+                                        "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?",
+                                        "Palubog na ang araw. Anong meron?",
+                                        "Mukha kang pagod. Ayos ka lang ba?",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "acquaintance.twilight",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Late night. What has you awake?",
+                                        "It's good to see someone I recognize out here.",
+                                        "Keep it down. Sound carries at night.",
+                                        "You all right? It's late to be wandering.",
+                                        "Hey. Make it quick before we draw attention.",
+                                    },
+                                    ["TL"] = {
+                                        "Gabi na. Anong gising mo?",
+                                        "Nakakatuwang makita ang isang taong kilala ko dito.",
+                                        "Panatilihin ito pababa. Ang tunog ay nagdadala sa gabi.",
+                                        "Ayos ka lang ba? Gabi na para magpagala-gala.",
+                                        "Hey. Bilisan mo bago tayo makatawag ng pansin.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "firstmeet.dawn",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hold there. I don't know you, and dawn is a strange time for introductions.",
+                                        "You're up before the dead settle down. Who are you?",
+                                        "Easy. The light is barely up, and I wasn't expecting company.",
+                                        "Morning, I suppose. Keep your hands where I can see them.",
+                                        "First light and a new face. Tell me what you need.",
+                                    },
+                                    ["TL"] = {
+                                        "Humawak ka dyan. Hindi kita kilala, at ang bukang-liwayway ay isang kakaibang oras para sa pagpapakilala.",
+                                        "Gising ka bago pa manahimik ang mga patay. Sino ka?",
+                                        "Madali. Bahagyang nakapatay ang ilaw, at hindi ko inaasahan ang makakasama ko.",
+                                        "Umaga, kumbaga. Itago ang iyong mga kamay kung saan ko sila makikita.",
+                                        "Unang liwanag at bagong mukha. Sabihin mo sa akin kung ano ang kailangan mo.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "firstmeet.dusk",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Stop there. Dusk makes strangers hard to read.",
+                                        "Not much light left. Introduce yourself.",
+                                        "You surprised me. What do you want?",
+                                        "Keep your voice down and tell me why you're here.",
+                                        "I can't make out your face. Come no closer.",
+                                    },
+                                    ["TL"] = {
+                                        "Tumigil ka dyan. Dahil sa takipsilim, mahirap basahin ang mga estranghero.",
+                                        "Wala nang gaanong ilaw. Magpakilala ka.",
+                                        "Nagulat mo ako. Ano ang kailangan mo?",
+                                        "Hinaan mo ang boses mo at sabihin sa akin kung bakit ka nandito.",
+                                        "Hindi ko maaninag ang mukha mo. Huwag kang lalapit.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "firstmeet.sunrise",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Morning. I haven't seen you around before.",
+                                        "That's close enough. Start with your name.",
+                                        "New face. Are you passing through or looking for something?",
+                                        "Daylight makes this easier. Who are you?",
+                                        "I don't recognize you. Talk, and keep it calm.",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga. Hindi pa kita nakikita kanina.",
+                                        "Malapit na yun. Magsimula sa iyong pangalan.",
+                                        "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
+                                        "Pinapadali ito ng liwanag ng araw. sino ka ba",
+                                        "hindi kita kilala. Mag-usap, at panatilihin itong kalmado.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "firstmeet.sunset",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You picked a late hour to approach a stranger.",
+                                        "The light is going. Say what you came to say.",
+                                        "I don't know you, but I'm listening.",
+                                        "Before it gets dark, tell me who you are.",
+                                        "Another survivor. Friendly, I hope?",
+                                    },
+                                    ["TL"] = {
+                                        "Huli na para lumapit sa isang estranghero.",
+                                        "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
+                                        "Hindi kita kilala, pero nakikinig ako.",
+                                        "Bago dumilim, sabihin mo sa akin kung sino ka.",
+                                        "Isa pang nakaligtas. Friendly, sana?",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "firstmeet.twilight",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "It's dark out. Stay where I can see you.",
+                                        "A stranger walking up at night usually means trouble.",
+                                        "Keep your voice low. Who are you?",
+                                        "You chose a bad time to sneak up on someone.",
+                                        "Don't move any closer. We can talk from there.",
+                                    },
+                                    ["TL"] = {
+                                        "Madilim sa labas. Manatili ka kung saan kita makikita.",
+                                        "Ang isang estranghero na naglalakad sa gabi ay karaniwang nangangahulugan ng problema.",
+                                        "Panatilihing mahina ang iyong boses. sino ka ba",
+                                        "You chose a bad time to sneak up buhay someone.",
+                                        "Huwag kang lalapit. Maaari tayong mag-usap mula doon.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "lover.dawn",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're awake already. I was hoping you'd sleep a little longer.",
+                                        "Morning, love. Come here before the day starts.",
+                                        "I missed you, and you were only asleep.",
+                                        "First light looks better with you here.",
+                                        "Couldn't sleep without checking on everyone, could you?",
+                                    },
+                                    ["TL"] = {
+                                        "You're awake already. I was hoping you'd tulog a little longer.",
+                                        "Umaga, mahal. Halika dito bago magsimula ang araw.",
+                                        "Namiss kita, tulog ka lang.",
+                                        "Mas maganda ang unang liwanag kapag kasama ka rito.",
+                                        "Hindi makatulog nang hindi sinusuri ang lahat, hindi ba?",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "lover.dusk",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Stay with me a minute before night watch.",
+                                        "Evening, love. You look exhausted.",
+                                        "You're safe. I can breathe again.",
+                                        "Come closer. We don't get many quiet moments.",
+                                        "I saved you a place by me.",
+                                    },
+                                    ["TL"] = {
+                                        "Manatili sa akin ng isang minuto bago manood ng gabi.",
+                                        "Gabi, mahal. Mukha kang pagod.",
+                                        "Ligtas ka. Muli na akong makahihinga.",
+                                        "Lumapit ka. Hindi kami nakakakuha ng maraming tahimik na sandali.",
+                                        "Iniligtas kita ng isang lugar sa tabi ko.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "lover.sunrise",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Morning, love. You sleep all right?",
+                                        "There you are. I was starting to miss you.",
+                                        "Good morning. Stay close today, okay?",
+                                        "Seeing you first thing still makes this place feel almost normal.",
+                                        "Morning. Whatever happens today, we handle it together.",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga, mahal. Matulog ka na okay?",
+                                        "Narito ka pala. Nagsisimula na kitang ma-miss.",
+                                        "Magandang umaga po. Manatiling malapit ngayon, okay?",
+                                        "Ang una mong makita ay halos normal pa rin ang pakiramdam ng lugar na ito.",
+                                        "Umaga. Kung ano man ang mangyari ngayon, sabay nating haharapin.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "lover.sunset",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "There you are. I worried when you were gone so long.",
+                                        "Come sit with me before the light goes.",
+                                        "Long day. I'm glad you're here at the end of it.",
+                                        "You made it back. That's all I needed to see.",
+                                        "The sunset almost makes this place look peaceful.",
+                                    },
+                                    ["TL"] = {
+                                        "Narito ka pala. Nag-alala ako nang matagal kang wala.",
+                                        "Halika maupo ka sa akin bago mamatay ang ilaw.",
+                                        "Mahabang araw. Natutuwa akong narito ka sa dulo nito.",
+                                        "Nakabalik ka. Iyon lang ang kailangan kong makita.",
+                                        "Halos nagmumukhang payapa ang lugar na ito sa dapit-hapon.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "lover.twilight",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Can't sleep? Neither can I.",
+                                        "It's all right. I'm here.",
+                                        "Come sit with me. We can keep watch together.",
+                                        "You scared me walking around this late.",
+                                        "Stay close tonight. I mean it.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi makatulog? Hindi ko rin kaya.",
+                                        "ayos lang. nandito ako.",
+                                        "Halika upo sa akin. Maaari tayong magbantay nang magkasama.",
+                                        "Tinakot mo ako sa paglalakad nang ganito kagabi.",
+                                        "Manatili kang malapit ngayong gabi. Seryoso ako.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "member.dawn",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're up. Good—we have plenty to do.",
+                                        "Morning. I already checked the perimeter.",
+                                        "Couldn't sleep either? We may as well get started.",
+                                        "First light. What's the plan today?",
+                                        "Morning. Everyone else is still asleep, so it's just us.",
+                                    },
+                                    ["TL"] = {
+                                        "Gising ka na. Mabuti—marami tayong gagawin.",
+                                        "Umaga. Sinuri ko na ang perimeter.",
+                                        "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                                        "Unang liwanag. Ano ang plano ngayon?",
+                                        "Umaga. Tulog pa ang iba kaya kami na lang.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "member.dusk",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Evening. Perimeter looks clear.",
+                                        "Need me for something before night watch?",
+                                        "We're all still here. I'll call that a good day.",
+                                        "Keep it quiet. The others are settling down.",
+                                        "I can take first watch if you need the rest.",
+                                    },
+                                    ["TL"] = {
+                                        "Gabi. Mukhang malinaw ang perimeter.",
+                                        "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+                                        "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+                                        "Manahimik ka. Umayos na yung iba.",
+                                        "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "member.sunrise",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Morning. Ready when you are.",
+                                        "Good, you're here. What are we doing today?",
+                                        "Another day with the crew. Could be worse.",
+                                        "Morning. Supplies are holding for now.",
+                                        "I was about to look for you. What's up?",
+                                    },
+                                    ["TL"] = {
+                                        "Umaga. Handa kung kailan ka na.",
+                                        "Buti nandito ka. Ano ang ginagawa natin ngayon?",
+                                        "Panibagong araw kasama ang crew. Maaaring mas masahol pa.",
+                                        "Umaga. Ang mga suplay ay hawak sa ngayon.",
+                                        "Hinahanap na sana kita. Anong meron?",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "member.sunset",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "We made it through the day. That's something.",
+                                        "Hey. Need a hand before we wrap up?",
+                                        "Long day, but I'm still ready if you need me.",
+                                        "Everyone accounted for?",
+                                        "The light's fading. We should finish up soon.",
+                                    },
+                                    ["TL"] = {
+                                        "Nalampasan natin ang araw. May halaga iyon.",
+                                        "Hey. Kailangan ng kamay bago tayo magtapos?",
+                                        "Mahabang araw, pero handa pa rin ako kung kailangan mo ako.",
+                                        "Lahat ng tao accounted para sa?",
+                                        "Kumukupas na ang liwanag. Dapat na tayong magtapos.",
+                                    },
+                                },
+                            },
+                            {
+                                ["id"] = "member.twilight",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're supposed to be resting. What's wrong?",
+                                        "Quiet night so far. Let's keep it that way.",
+                                        "I'm on watch. Did you need something?",
+                                        "Good, it's you. I heard footsteps.",
+                                        "Can't sleep? Pull up a chair, but keep your voice low.",
+                                    },
+                                    ["TL"] = {
+                                        "Dapat nagpapahinga ka. Ano ang problema?",
+                                        "Tahimik na gabi hanggang ngayon. Panatilihin natin itong paraan.",
+                                        "Nakabantay ako. may kailangan ka ba?",
+                                        "Buti, ikaw pala. Nakarinig ako ng mga yabag.",
+                                        "Hindi makatulog? Hilahin ang isang upuan, ngunit panatilihing mahina ang iyong boses.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "greeting",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "GREETING",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "social.greetings.contextual",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "You're awake early too. Everything all right?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.social.greetings.contextual.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/social_greetings/social_greetings_contextual.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "You're awake early too. Everything all right?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.dawn",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're awake early too. Everything all right?",
+                        "Morning. I didn't expect to see you before sunrise.",
+                        "Couldn't sleep? Neither could I.",
+                        "Good, it's you. What brings you over this early?",
+                        "Dawn patrol, or did you need something?",
+                    },
+                    ["TL"] = {
+                        "Gising ka rin nang maaga. Ayos ba ang lahat?",
+                        "Umaga. Hindi ko inaasahan na makikita kita bago sumikat ang araw.",
+                        "hindi makatulog? Hindi ko rin kaya.",
+                        "Buti, ikaw pala. Ano ang nagdudulot sa iyo ng ganito kaaga?",
+                        "Dawn patrol, o may kailangan ka?",
+                    },
+                },
+                ["variantID"] = "acquaintance.dawn",
+            },
+            {
+                ["fallback"] = "Evening. Need something before we turn in?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.dusk",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Evening. Need something before we turn in?",
+                        "Good, it's only you. You startled me.",
+                        "Not much daylight left. Talk to me.",
+                        "Hey. Keeping watch, or just passing by?",
+                        "We should keep this quiet, but I'm listening.",
+                    },
+                    ["TL"] = {
+                        "Gabi. Kailangan mo ng isang bagay bago tayo lumiko?",
+                        "Buti, ikaw lang. Ginulat mo ako.",
+                        "Wala na masyadong liwanag ng araw. kausapin mo ako.",
+                        "Hey. Nagmamasid, o dumadaan lang?",
+                        "Dapat tahimik lang tayo rito, pero nakikinig ako.",
+                    },
+                },
+                ["variantID"] = "acquaintance.dusk",
+            },
+            {
+                ["fallback"] = "Morning. Good to see a familiar face.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.sunrise",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Morning. Good to see a familiar face.",
+                        "Hey. How's the day treating you?",
+                        "There you are. Need a minute?",
+                        "Morning. You look like you have something on your mind.",
+                        "Nice to see you made it through another night.",
+                    },
+                    ["TL"] = {
+                        "Umaga. Ang sarap makakita ng pamilyar na mukha.",
+                        "Hey. Kumusta ang pagtrato sa iyo ng araw?",
+                        "Narito ka pala. Kailangan mo ba ng sandali?",
+                        "Umaga. Parang may iniisip ka.",
+                        "Natutuwa akong makita kang nagtagumpay sa isa pang gabi.",
+                    },
+                },
+                ["variantID"] = "acquaintance.sunrise",
+            },
+            {
+                ["fallback"] = "Hey. Been a long day?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.sunset",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hey. Been a long day?",
+                        "Good timing. I was about to settle in.",
+                        "There you are. Find anything useful today?",
+                        "The day's winding down. What's up?",
+                        "You look tired. Everything okay?",
+                    },
+                    ["TL"] = {
+                        "Hey. Isang mahabang araw?",
+                        "Magandang timing. Malapit na akong tumira.",
+                        "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?",
+                        "Palubog na ang araw. Anong meron?",
+                        "Mukha kang pagod. Ayos ka lang ba?",
+                    },
+                },
+                ["variantID"] = "acquaintance.sunset",
+            },
+            {
+                ["fallback"] = "Late night. What has you awake?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.acquaintance.twilight",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Late night. What has you awake?",
+                        "It's good to see someone I recognize out here.",
+                        "Keep it down. Sound carries at night.",
+                        "You all right? It's late to be wandering.",
+                        "Hey. Make it quick before we draw attention.",
+                    },
+                    ["TL"] = {
+                        "Gabi na. Anong gising mo?",
+                        "Nakakatuwang makita ang isang taong kilala ko dito.",
+                        "Panatilihin ito pababa. Ang tunog ay nagdadala sa gabi.",
+                        "Ayos ka lang ba? Gabi na para magpagala-gala.",
+                        "Hey. Bilisan mo bago tayo makatawag ng pansin.",
+                    },
+                },
+                ["variantID"] = "acquaintance.twilight",
+            },
+            {
+                ["fallback"] = "Hold there. I don't know you, and dawn is a strange time for introductions.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.dawn",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hold there. I don't know you, and dawn is a strange time for introductions.",
+                        "You're up before the dead settle down. Who are you?",
+                        "Easy. The light is barely up, and I wasn't expecting company.",
+                        "Morning, I suppose. Keep your hands where I can see them.",
+                        "First light and a new face. Tell me what you need.",
+                    },
+                    ["TL"] = {
+                        "Humawak ka dyan. Hindi kita kilala, at ang bukang-liwayway ay isang kakaibang oras para sa pagpapakilala.",
+                        "Gising ka bago pa manahimik ang mga patay. Sino ka?",
+                        "Madali. Bahagyang nakapatay ang ilaw, at hindi ko inaasahan ang makakasama ko.",
+                        "Umaga, kumbaga. Itago ang iyong mga kamay kung saan ko sila makikita.",
+                        "Unang liwanag at bagong mukha. Sabihin mo sa akin kung ano ang kailangan mo.",
+                    },
+                },
+                ["variantID"] = "firstmeet.dawn",
+            },
+            {
+                ["fallback"] = "Stop there. Dusk makes strangers hard to read.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.dusk",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Stop there. Dusk makes strangers hard to read.",
+                        "Not much light left. Introduce yourself.",
+                        "You surprised me. What do you want?",
+                        "Keep your voice down and tell me why you're here.",
+                        "I can't make out your face. Come no closer.",
+                    },
+                    ["TL"] = {
+                        "Tumigil ka dyan. Dahil sa takipsilim, mahirap basahin ang mga estranghero.",
+                        "Wala nang gaanong ilaw. Magpakilala ka.",
+                        "Nagulat mo ako. Ano ang kailangan mo?",
+                        "Hinaan mo ang boses mo at sabihin sa akin kung bakit ka nandito.",
+                        "Hindi ko maaninag ang mukha mo. Huwag kang lalapit.",
+                    },
+                },
+                ["variantID"] = "firstmeet.dusk",
+            },
+            {
+                ["fallback"] = "Morning. I haven't seen you around before.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.sunrise",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Morning. I haven't seen you around before.",
+                        "That's close enough. Start with your name.",
+                        "New face. Are you passing through or looking for something?",
+                        "Daylight makes this easier. Who are you?",
+                        "I don't recognize you. Talk, and keep it calm.",
+                    },
+                    ["TL"] = {
+                        "Umaga. Hindi pa kita nakikita kanina.",
+                        "Malapit na yun. Magsimula sa iyong pangalan.",
+                        "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
+                        "Pinapadali ito ng liwanag ng araw. sino ka ba",
+                        "hindi kita kilala. Mag-usap, at panatilihin itong kalmado.",
+                    },
+                },
+                ["variantID"] = "firstmeet.sunrise",
+            },
+            {
+                ["fallback"] = "You picked a late hour to approach a stranger.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.sunset",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You picked a late hour to approach a stranger.",
+                        "The light is going. Say what you came to say.",
+                        "I don't know you, but I'm listening.",
+                        "Before it gets dark, tell me who you are.",
+                        "Another survivor. Friendly, I hope?",
+                    },
+                    ["TL"] = {
+                        "Huli na para lumapit sa isang estranghero.",
+                        "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
+                        "Hindi kita kilala, pero nakikinig ako.",
+                        "Bago dumilim, sabihin mo sa akin kung sino ka.",
+                        "Isa pang nakaligtas. Friendly, sana?",
+                    },
+                },
+                ["variantID"] = "firstmeet.sunset",
+            },
+            {
+                ["fallback"] = "It's dark out. Stay where I can see you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.firstmeet.twilight",
+                ["translations"] = {
+                    ["EN"] = {
+                        "It's dark out. Stay where I can see you.",
+                        "A stranger walking up at night usually means trouble.",
+                        "Keep your voice low. Who are you?",
+                        "You chose a bad time to sneak up on someone.",
+                        "Don't move any closer. We can talk from there.",
+                    },
+                    ["TL"] = {
+                        "Madilim sa labas. Manatili ka kung saan kita makikita.",
+                        "Ang isang estranghero na naglalakad sa gabi ay karaniwang nangangahulugan ng problema.",
+                        "Panatilihing mahina ang iyong boses. sino ka ba",
+                        "You chose a bad time to sneak up buhay someone.",
+                        "Huwag kang lalapit. Maaari tayong mag-usap mula doon.",
+                    },
+                },
+                ["variantID"] = "firstmeet.twilight",
+            },
+            {
+                ["fallback"] = "You're awake already. I was hoping you'd sleep a little longer.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.dawn",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're awake already. I was hoping you'd sleep a little longer.",
+                        "Morning, love. Come here before the day starts.",
+                        "I missed you, and you were only asleep.",
+                        "First light looks better with you here.",
+                        "Couldn't sleep without checking on everyone, could you?",
+                    },
+                    ["TL"] = {
+                        "You're awake already. I was hoping you'd tulog a little longer.",
+                        "Umaga, mahal. Halika dito bago magsimula ang araw.",
+                        "Namiss kita, tulog ka lang.",
+                        "Mas maganda ang unang liwanag kapag kasama ka rito.",
+                        "Hindi makatulog nang hindi sinusuri ang lahat, hindi ba?",
+                    },
+                },
+                ["variantID"] = "lover.dawn",
+            },
+            {
+                ["fallback"] = "Stay with me a minute before night watch.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.dusk",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Stay with me a minute before night watch.",
+                        "Evening, love. You look exhausted.",
+                        "You're safe. I can breathe again.",
+                        "Come closer. We don't get many quiet moments.",
+                        "I saved you a place by me.",
+                    },
+                    ["TL"] = {
+                        "Manatili sa akin ng isang minuto bago manood ng gabi.",
+                        "Gabi, mahal. Mukha kang pagod.",
+                        "Ligtas ka. Muli na akong makahihinga.",
+                        "Lumapit ka. Hindi kami nakakakuha ng maraming tahimik na sandali.",
+                        "Iniligtas kita ng isang lugar sa tabi ko.",
+                    },
+                },
+                ["variantID"] = "lover.dusk",
+            },
+            {
+                ["fallback"] = "Morning, love. You sleep all right?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.sunrise",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Morning, love. You sleep all right?",
+                        "There you are. I was starting to miss you.",
+                        "Good morning. Stay close today, okay?",
+                        "Seeing you first thing still makes this place feel almost normal.",
+                        "Morning. Whatever happens today, we handle it together.",
+                    },
+                    ["TL"] = {
+                        "Umaga, mahal. Matulog ka na okay?",
+                        "Narito ka pala. Nagsisimula na kitang ma-miss.",
+                        "Magandang umaga po. Manatiling malapit ngayon, okay?",
+                        "Ang una mong makita ay halos normal pa rin ang pakiramdam ng lugar na ito.",
+                        "Umaga. Kung ano man ang mangyari ngayon, sabay nating haharapin.",
+                    },
+                },
+                ["variantID"] = "lover.sunrise",
+            },
+            {
+                ["fallback"] = "There you are. I worried when you were gone so long.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.sunset",
+                ["translations"] = {
+                    ["EN"] = {
+                        "There you are. I worried when you were gone so long.",
+                        "Come sit with me before the light goes.",
+                        "Long day. I'm glad you're here at the end of it.",
+                        "You made it back. That's all I needed to see.",
+                        "The sunset almost makes this place look peaceful.",
+                    },
+                    ["TL"] = {
+                        "Narito ka pala. Nag-alala ako nang matagal kang wala.",
+                        "Halika maupo ka sa akin bago mamatay ang ilaw.",
+                        "Mahabang araw. Natutuwa akong narito ka sa dulo nito.",
+                        "Nakabalik ka. Iyon lang ang kailangan kong makita.",
+                        "Halos nagmumukhang payapa ang lugar na ito sa dapit-hapon.",
+                    },
+                },
+                ["variantID"] = "lover.sunset",
+            },
+            {
+                ["fallback"] = "Can't sleep? Neither can I.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.lover.twilight",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Can't sleep? Neither can I.",
+                        "It's all right. I'm here.",
+                        "Come sit with me. We can keep watch together.",
+                        "You scared me walking around this late.",
+                        "Stay close tonight. I mean it.",
+                    },
+                    ["TL"] = {
+                        "Hindi makatulog? Hindi ko rin kaya.",
+                        "ayos lang. nandito ako.",
+                        "Halika upo sa akin. Maaari tayong magbantay nang magkasama.",
+                        "Tinakot mo ako sa paglalakad nang ganito kagabi.",
+                        "Manatili kang malapit ngayong gabi. Seryoso ako.",
+                    },
+                },
+                ["variantID"] = "lover.twilight",
+            },
+            {
+                ["fallback"] = "You're up. Good—we have plenty to do.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.member.dawn",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're up. Good—we have plenty to do.",
+                        "Morning. I already checked the perimeter.",
+                        "Couldn't sleep either? We may as well get started.",
+                        "First light. What's the plan today?",
+                        "Morning. Everyone else is still asleep, so it's just us.",
+                    },
+                    ["TL"] = {
+                        "Gising ka na. Mabuti—marami tayong gagawin.",
+                        "Umaga. Sinuri ko na ang perimeter.",
+                        "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                        "Unang liwanag. Ano ang plano ngayon?",
+                        "Umaga. Tulog pa ang iba kaya kami na lang.",
+                    },
+                },
+                ["variantID"] = "member.dawn",
+            },
+            {
+                ["fallback"] = "Evening. Perimeter looks clear.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.member.dusk",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Evening. Perimeter looks clear.",
+                        "Need me for something before night watch?",
+                        "We're all still here. I'll call that a good day.",
+                        "Keep it quiet. The others are settling down.",
+                        "I can take first watch if you need the rest.",
+                    },
+                    ["TL"] = {
+                        "Gabi. Mukhang malinaw ang perimeter.",
+                        "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+                        "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+                        "Manahimik ka. Umayos na yung iba.",
+                        "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa.",
+                    },
+                },
+                ["variantID"] = "member.dusk",
+            },
+            {
+                ["fallback"] = "Morning. Ready when you are.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.member.sunrise",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Morning. Ready when you are.",
+                        "Good, you're here. What are we doing today?",
+                        "Another day with the crew. Could be worse.",
+                        "Morning. Supplies are holding for now.",
+                        "I was about to look for you. What's up?",
+                    },
+                    ["TL"] = {
+                        "Umaga. Handa kung kailan ka na.",
+                        "Buti nandito ka. Ano ang ginagawa natin ngayon?",
+                        "Panibagong araw kasama ang crew. Maaaring mas masahol pa.",
+                        "Umaga. Ang mga suplay ay hawak sa ngayon.",
+                        "Hinahanap na sana kita. Anong meron?",
+                    },
+                },
+                ["variantID"] = "member.sunrise",
+            },
+            {
+                ["fallback"] = "We made it through the day. That's something.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.member.sunset",
+                ["translations"] = {
+                    ["EN"] = {
+                        "We made it through the day. That's something.",
+                        "Hey. Need a hand before we wrap up?",
+                        "Long day, but I'm still ready if you need me.",
+                        "Everyone accounted for?",
+                        "The light's fading. We should finish up soon.",
+                    },
+                    ["TL"] = {
+                        "Nalampasan natin ang araw. May halaga iyon.",
+                        "Hey. Kailangan ng kamay bago tayo magtapos?",
+                        "Mahabang araw, pero handa pa rin ako kung kailangan mo ako.",
+                        "Lahat ng tao accounted para sa?",
+                        "Kumukupas na ang liwanag. Dapat na tayong magtapos.",
+                    },
+                },
+                ["variantID"] = "member.sunset",
+            },
+            {
+                ["fallback"] = "You're supposed to be resting. What's wrong?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.contextual.say.1.member.twilight",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're supposed to be resting. What's wrong?",
+                        "Quiet night so far. Let's keep it that way.",
+                        "I'm on watch. Did you need something?",
+                        "Good, it's you. I heard footsteps.",
+                        "Can't sleep? Pull up a chair, but keep your voice low.",
+                    },
+                    ["TL"] = {
+                        "Dapat nagpapahinga ka. Ano ang problema?",
+                        "Tahimik na gabi hanggang ngayon. Panatilihin natin itong paraan.",
+                        "Nakabantay ako. may kailangan ka ba?",
+                        "Buti, ikaw pala. Nakarinig ako ng mga yabag.",
+                        "Hindi makatulog? Hilahin ang isang upuan, ngunit panatilihing mahina ang iyong boses.",
+                    },
+                },
+                ["variantID"] = "member.twilight",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
+        ["id"] = "social.greetings.hostile.parley",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "parley",
+            ["sourceId"] = "social.greetings.hostile.parley",
+            ["sourcePath"] = "dialogue/social_greetings/social_greetings_hostile_parley.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.hostile",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["audience"] = "hostile",
+                ["category"] = "projecthoomans:greetings",
+                ["priority"] = 100,
+                ["runtimeBlockID"] = "projecthoomans:hostile_parley",
+                ["textDomain"] = "pnc.convo.social.greetings.hostile.parley",
+                ["textRows"] = {
+                    {
+                        ["key"] = "result.accepted",
+                        ["text"] = {
+                            ["EN"] = "Ceasefire accepted for one hour.",
+                            ["TL"] = "Tinanggap ang tigil-putukan sa loob ng isang oras.",
+                        },
+                    },
+                    {
+                        ["key"] = "result.rejected",
+                        ["text"] = {
+                            ["EN"] = "Ceasefire refused.",
+                            ["TL"] = "Tumanggi ang tigil-putukan.",
+                        },
+                    },
+                },
+                ["textTarget"] = "convo/social/greetings/hostile/parley",
+                ["weight"] = 100,
+            },
+            ["response"] = {
+                ["act"] = "PARLEY",
+                ["turns"] = {
+                    {
+                        ["id"] = "opening",
+                        ["metadata"] = {
+                            ["textKey"] = "opening",
+                        },
+                        ["offers"] = {
+                            {
+                                ["consumers"] = {
+                                    "participant",
+                                },
+                                ["frame"] = {
+                                    ["intent"] = "REQUEST",
+                                    ["speechAct"] = "REQUEST",
+                                    ["subject"] = "CEASEFIRE",
+                                    ["topic"] = "parley",
+                                },
+                                ["id"] = "ceasefire",
+                                ["label"] = {
+                                    ["EN"] = {
+                                        "Ceasefire. Stand down for now.",
+                                    },
+                                    ["TL"] = {
+                                        "Ceasefire. Tumayo sa ngayon.",
+                                    },
+                                },
+                                ["metadata"] = {
+                                    ["choiceKey"] = "choice.ceasefire",
+                                    ["close"] = true,
+                                    ["effects"] = {
+                                        {
+                                            ["type"] = "pnc:ceasefire",
+                                        },
+                                    },
+                                    ["responseKey"] = "response.ceasefire",
+                                    ["responseText"] = {
+                                        ["EN"] = "You ask for a short ceasefire.",
+                                        ["TL"] = "Humihingi ka ng maikling tigil-putukan.",
+                                    },
+                                },
+                                ["utterance"] = {
+                                    ["EN"] = {
+                                        "Ceasefire. Stand down for now.",
+                                    },
+                                    ["TL"] = {
+                                        "Ceasefire. Tumayo sa ngayon.",
+                                    },
+                                },
+                            },
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "The survivor watches you carefully, ready to fight.",
+                            },
+                            ["TL"] = {
+                                "Maingat kang pinagmamasdan ng survivor, handang lumaban.",
+                            },
+                        },
+                    },
+                },
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "greeting",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "PARLEY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "social.greetings.hostile.parley",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "opening",
+                    ["offers"] = {
+                        {
+                            ["consumers"] = {
+                                "participant",
+                            },
+                            ["frame"] = {
+                                ["intent"] = "REQUEST",
+                                ["speechAct"] = "REQUEST",
+                                ["subject"] = "CEASEFIRE",
+                                ["topic"] = "parley",
+                            },
+                            ["id"] = "ceasefire",
+                            ["labelFallback"] = "Ceasefire. Stand down for now.",
+                            ["labelKey"] = "convo.social.greetings.hostile.parley.offer.ceasefire.label",
+                            ["utteranceFallback"] = "Ceasefire. Stand down for now.",
+                            ["utteranceKey"] = "convo.social.greetings.hostile.parley.offer.ceasefire.utterance",
+                        },
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "The survivor watches you carefully, ready to fight.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.social.greetings.hostile.parley.opening",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/social_greetings/social_greetings_hostile_parley.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

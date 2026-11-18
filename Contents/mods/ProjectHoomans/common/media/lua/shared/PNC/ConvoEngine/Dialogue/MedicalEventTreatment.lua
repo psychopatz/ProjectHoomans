@@ -4,7 +4,7 @@ return {
         ["domain"] = "medical_event_treatment",
         ["domainPath"] = "medical_event_treatment",
         ["exchangeFamily"] = {
-            ["familyID"] = "medical.distress.treatment.bandage",
+            ["familyID"] = "medical.distress.treatment",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
@@ -17,8 +17,8 @@ return {
                         ["variants"] = {
                             {
                                 ["fallback"] = "The wound is treated. I can move when you are ready.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.medical.distress.treatment.bandage.say.1.neutral",
+                                ["id"] = "bandage",
+                                ["templateID"] = "convo.medical.distress.treatment.say.1.bandage",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -47,18 +47,50 @@ return {
                                     },
                                 },
                             },
+                            {
+                                ["fallback"] = "Thank you. That treatment helped.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.medical.distress.treatment.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Thank you. That treatment helped.",
+                                        "Feeling much better. I appreciate the aid.",
+                                        "Much better now. Thank you for patching me up.",
+                                        "Pain is subsiding. Thanks for taking care of it.",
+                                        "Good work on that treatment. I'm indebted to you.",
+                                        "That took the edge off. Thank you.",
+                                        "I can function again. Thanks for the quick aid.",
+                                        "Appreciate the medical help. I owe you one.",
+                                        "Thanks, that helped a lot. Ready to move.",
+                                        "You saved my skin with that aid. Thank you.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat. Malaking tulong ang panggagamot na 'yon.",
+                                        "Medyo maayos na pakiramdam ko. Salamat sa tulong.",
+                                        "Mas maayos na ngayon. Salamat sa paggamot sa akin.",
+                                        "Humuhupa na ang sakit. Salamat sa pag-asikaso no'n.",
+                                        "Magaling ang panggagamot mo. May utang na loob ako sa'yo.",
+                                        "Nabawasan ang kirot. Salamat sa'yo.",
+                                        "Makakagalaw na ulit ako. Salamat sa mabilis na lunas.",
+                                        "Salamat sa tulong medikal. May utang ako sa'yo.",
+                                        "Salamat, malaking tulong 'yon. Handa nang kumilos.",
+                                        "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat.",
+                                    },
+                                },
+                            },
                         },
                     },
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "medical.distress.treatment",
+            ["namespace"] = "medical.distress",
             ["textRoles"] = {
                 {
                     ["fallback"] = "The wound is treated. I can move when you are ready.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.medical.distress.treatment.bandage.say.1.neutral",
+                    ["templateID"] = "convo.medical.distress.treatment.say.1.bandage",
                     ["translations"] = {
                         ["EN"] = {
                             "The wound is treated. I can move when you are ready.",
@@ -85,22 +117,55 @@ return {
                             "Maayos na ang lahat. Tara na sa daan.",
                         },
                     },
-                    ["variantID"] = "neutral",
+                    ["variantID"] = "bandage",
+                },
+                {
+                    ["fallback"] = "Thank you. That treatment helped.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.distress.treatment.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thank you. That treatment helped.",
+                            "Feeling much better. I appreciate the aid.",
+                            "Much better now. Thank you for patching me up.",
+                            "Pain is subsiding. Thanks for taking care of it.",
+                            "Good work on that treatment. I'm indebted to you.",
+                            "That took the edge off. Thank you.",
+                            "I can function again. Thanks for the quick aid.",
+                            "Appreciate the medical help. I owe you one.",
+                            "Thanks, that helped a lot. Ready to move.",
+                            "You saved my skin with that aid. Thank you.",
+                        },
+                        ["TL"] = {
+                            "Salamat. Malaking tulong ang panggagamot na 'yon.",
+                            "Medyo maayos na pakiramdam ko. Salamat sa tulong.",
+                            "Mas maayos na ngayon. Salamat sa paggamot sa akin.",
+                            "Humuhupa na ang sakit. Salamat sa pag-asikaso no'n.",
+                            "Magaling ang panggagamot mo. May utang na loob ako sa'yo.",
+                            "Nabawasan ang kirot. Salamat sa'yo.",
+                            "Makakagalaw na ulit ako. Salamat sa mabilis na lunas.",
+                            "Salamat sa tulong medikal. May utang ako sa'yo.",
+                            "Salamat, malaking tulong 'yon. Handa nang kumilos.",
+                            "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat.",
+                        },
+                    },
+                    ["variantID"] = "default",
                 },
             },
         },
-        ["id"] = "medical.distress.treatment.bandage",
+        ["id"] = "medical.distress.treatment",
         ["kind"] = "dialogue",
         ["lineage"] = {
             ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "bandage",
-            ["sourceId"] = "medical.distress.treatment.bandage",
-            ["sourcePath"] = "dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
+            ["localId"] = "treatment",
+            ["sourceId"] = "medical.distress.treatment",
+            ["sourcePath"] = "dialogue/medical_event_treatment/medical_distress_treatment.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
-        ["namespace"] = "medical.distress.treatment",
+        ["namespace"] = "medical.distress",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -138,7 +203,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["id"] = "neutral",
+                                ["id"] = "bandage",
                                 ["text"] = {
                                     ["EN"] = {
                                         "The wound is treated. I can move when you are ready.",
@@ -166,243 +231,8 @@ return {
                                     },
                                 },
                             },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["topics"] = {
-                {
-                    ["domain"] = "medical",
-                    ["id"] = "medical_distress",
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "MEDICAL_RESPONSE",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "medical.distress.treatment.bandage",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "The wound is treated. I can move when you are ready.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.medical.distress.treatment.bandage.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["roles"] = {
-            ["addressee"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "addressee",
-            },
-            ["speaker"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "speaker",
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "The wound is treated. I can move when you are ready.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.medical.distress.treatment.bandage.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "The wound is treated. I can move when you are ready.",
-                        "Bandaged up tight. Good to go when you are.",
-                        "Bleeding has stopped. Ready to step out.",
-                        "Dressings are secure. I can walk now.",
-                        "That did the trick. I'm back on my feet.",
-                        "Wrapped up properly. Lead on.",
-                        "Wound is stabilized. Ready for your call.",
-                        "Bandage is holding. Let's get moving.",
-                        "Cleanly wrapped. I'm ready to follow.",
-                        "All patched up. Let's hit the road.",
-                    },
-                    ["TL"] = {
-                        "Nagamot na ang sugat. Makakakilos na ako kapag handa ka na.",
-                        "Nabendahan nang mahigpit. Handa nang umalis kapag handa ka na.",
-                        "Tumigil na ang dugo. Handa nang lumabas.",
-                        "Ligtas na ang benda. Makakalakad na ako ngayon.",
-                        "Bumisa 'yon. Nakatayo na ulit ako.",
-                        "Nabalot na nang maayos. Manguna ka na.",
-                        "Maayos na ang sugat. Handa sa utos mo.",
-                        "Kumakapit ang benda. Kilos na tayo.",
-                        "Malinis na nabalutan. Handa na akong sumunod.",
-                        "Maayos na ang lahat. Tara na sa daan.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "medical_event_treatment",
-        ["domainPath"] = "medical_event_treatment",
-        ["exchangeFamily"] = {
-            ["familyID"] = "medical.distress.treatment.default",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
                             {
-                                ["fallback"] = "Thank you. That treatment helped.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.medical.distress.treatment.default.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Thank you. That treatment helped.",
-                                        "Feeling much better. I appreciate the aid.",
-                                        "Much better now. Thank you for patching me up.",
-                                        "Pain is subsiding. Thanks for taking care of it.",
-                                        "Good work on that treatment. I'm indebted to you.",
-                                        "That took the edge off. Thank you.",
-                                        "I can function again. Thanks for the quick aid.",
-                                        "Appreciate the medical help. I owe you one.",
-                                        "Thanks, that helped a lot. Ready to move.",
-                                        "You saved my skin with that aid. Thank you.",
-                                    },
-                                    ["TL"] = {
-                                        "Salamat. Malaking tulong ang panggagamot na 'yon.",
-                                        "Medyo maayos na pakiramdam ko. Salamat sa tulong.",
-                                        "Mas maayos na ngayon. Salamat sa paggamot sa akin.",
-                                        "Humuhupa na ang sakit. Salamat sa pag-asikaso no'n.",
-                                        "Magaling ang panggagamot mo. May utang na loob ako sa'yo.",
-                                        "Nabawasan ang kirot. Salamat sa'yo.",
-                                        "Makakagalaw na ulit ako. Salamat sa mabilis na lunas.",
-                                        "Salamat sa tulong medikal. May utang ako sa'yo.",
-                                        "Salamat, malaking tulong 'yon. Handa nang kumilos.",
-                                        "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "medical.distress.treatment",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Thank you. That treatment helped.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.medical.distress.treatment.default.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Thank you. That treatment helped.",
-                            "Feeling much better. I appreciate the aid.",
-                            "Much better now. Thank you for patching me up.",
-                            "Pain is subsiding. Thanks for taking care of it.",
-                            "Good work on that treatment. I'm indebted to you.",
-                            "That took the edge off. Thank you.",
-                            "I can function again. Thanks for the quick aid.",
-                            "Appreciate the medical help. I owe you one.",
-                            "Thanks, that helped a lot. Ready to move.",
-                            "You saved my skin with that aid. Thank you.",
-                        },
-                        ["TL"] = {
-                            "Salamat. Malaking tulong ang panggagamot na 'yon.",
-                            "Medyo maayos na pakiramdam ko. Salamat sa tulong.",
-                            "Mas maayos na ngayon. Salamat sa paggamot sa akin.",
-                            "Humuhupa na ang sakit. Salamat sa pag-asikaso no'n.",
-                            "Magaling ang panggagamot mo. May utang na loob ako sa'yo.",
-                            "Nabawasan ang kirot. Salamat sa'yo.",
-                            "Makakagalaw na ulit ako. Salamat sa mabilis na lunas.",
-                            "Salamat sa tulong medikal. May utang ako sa'yo.",
-                            "Salamat, malaking tulong 'yon. Handa nang kumilos.",
-                            "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "medical.distress.treatment.default",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "default",
-            ["sourceId"] = "medical.distress.treatment.default",
-            ["sourcePath"] = "dialogue/medical_event_treatment/medical_distress_treatment_default.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
-        ["namespace"] = "medical.distress.treatment",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["domains"] = {
-                {
-                    ["domain"] = "medical",
-                    ["owner"] = "ProjectHoomans",
-                },
-            },
-            ["events"] = {
-                {
-                    ["id"] = "medical_emergency",
-                    ["kind"] = "health_event",
-                },
-            },
-            ["metadata"] = {
-                ["category"] = "projecthoomans:medical_event",
-                ["responseAct"] = "MEDICAL_RESPONSE",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
+                                ["id"] = "default",
                                 ["text"] = {
                                     ["EN"] = {
                                         "Thank you. That treatment helped.",
@@ -447,7 +277,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = "MEDICAL_RESPONSE",
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "medical.distress.treatment.default",
+            ["responsePlanID"] = "medical.distress.treatment",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -459,9 +289,9 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Thank you. That treatment helped.",
+                            ["fallback"] = "The wound is treated. I can move when you are ready.",
                             ["kind"] = "translation",
-                            ["templateID"] = "convo.medical.distress.treatment.default.say_1",
+                            ["templateID"] = "convo.medical.distress.treatment.say_1",
                         },
                     },
                 },
@@ -485,7 +315,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "dialogue/medical_event_treatment/medical_distress_treatment_default.json",
+        ["sourceShard"] = "dialogue/medical_event_treatment/medical_distress_treatment.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -493,10 +323,43 @@ return {
         },
         ["textRoles"] = {
             {
+                ["fallback"] = "The wound is treated. I can move when you are ready.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.distress.treatment.say.1.bandage",
+                ["translations"] = {
+                    ["EN"] = {
+                        "The wound is treated. I can move when you are ready.",
+                        "Bandaged up tight. Good to go when you are.",
+                        "Bleeding has stopped. Ready to step out.",
+                        "Dressings are secure. I can walk now.",
+                        "That did the trick. I'm back on my feet.",
+                        "Wrapped up properly. Lead on.",
+                        "Wound is stabilized. Ready for your call.",
+                        "Bandage is holding. Let's get moving.",
+                        "Cleanly wrapped. I'm ready to follow.",
+                        "All patched up. Let's hit the road.",
+                    },
+                    ["TL"] = {
+                        "Nagamot na ang sugat. Makakakilos na ako kapag handa ka na.",
+                        "Nabendahan nang mahigpit. Handa nang umalis kapag handa ka na.",
+                        "Tumigil na ang dugo. Handa nang lumabas.",
+                        "Ligtas na ang benda. Makakalakad na ako ngayon.",
+                        "Bumisa 'yon. Nakatayo na ulit ako.",
+                        "Nabalot na nang maayos. Manguna ka na.",
+                        "Maayos na ang sugat. Handa sa utos mo.",
+                        "Kumakapit ang benda. Kilos na tayo.",
+                        "Malinis na nabalutan. Handa na akong sumunod.",
+                        "Maayos na ang lahat. Tara na sa daan.",
+                    },
+                },
+                ["variantID"] = "bandage",
+            },
+            {
                 ["fallback"] = "Thank you. That treatment helped.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.medical.distress.treatment.default.say.1.neutral",
+                ["templateID"] = "convo.medical.distress.treatment.say.1.default",
                 ["translations"] = {
                     ["EN"] = {
                         "Thank you. That treatment helped.",
@@ -523,7 +386,7 @@ return {
                         "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat.",
                     },
                 },
-                ["variantID"] = "neutral",
+                ["variantID"] = "default",
             },
         },
         ["when"] = nil,

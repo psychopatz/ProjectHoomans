@@ -21,77 +21,32 @@ return {
         },
         ["source"] = "dialogue/conversation_greeting/flow_greeting_exchange.json",
     },
-    ["flow.greeting.followup.default"] = {
+    ["flow.greeting.followup"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "flow.greeting.followup.default",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "greeting",
-        },
-        ["source"] = "dialogue/conversation_greeting/flow_greeting_followup_default.json",
-    },
-    ["flow.greeting.followup.friendly"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "flow.greeting.followup.friendly",
+        ["id"] = "flow.greeting.followup",
         ["kind"] = "dialogue",
         ["related"] = {
             "greeting",
         },
         ["source"] = "dialogue/conversation_greeting/flow_greeting_followup.json",
     },
-    ["flow.greeting.opening.default"] = {
+    ["flow.greeting.opening"] = {
+        ["dependents"] = {
+            "flow.greeting.opening.rain",
+        },
         ["domain"] = "conversation_greeting",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/ConversationGreeting",
         },
-        ["id"] = "flow.greeting.opening.default",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "greeting",
-        },
-        ["source"] = "dialogue/conversation_greeting/flow_greeting_opening_default.json",
-    },
-    ["flow.greeting.opening.friendly"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "flow.greeting.opening.friendly",
+        ["id"] = "flow.greeting.opening",
         ["kind"] = "dialogue",
         ["related"] = {
             "greeting",
         },
         ["source"] = "dialogue/conversation_greeting/flow_greeting_opening.json",
-    },
-    ["flow.greeting.opening.question.default"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "flow.greeting.opening.question.default",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "greeting",
-        },
-        ["source"] = "dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
-    },
-    ["flow.greeting.opening.question.friendly"] = {
-        ["domain"] = "conversation_greeting",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
-        },
-        ["id"] = "flow.greeting.opening.question.friendly",
-        ["kind"] = "dialogue",
-        ["related"] = {
-            "greeting",
-        },
-        ["source"] = "dialogue/conversation_greeting/flow_greeting_opening_question.json",
     },
     ["flow.greeting.opening.rain"] = {
         ["domain"] = "conversation_greeting",
@@ -101,6 +56,7 @@ return {
         ["id"] = "flow.greeting.opening.rain",
         ["kind"] = "dialogue",
         ["related"] = {
+            "flow.greeting.opening",
             "greeting",
         },
         ["source"] = "dialogue/conversation_greeting/flow_greeting_opening_rain.json",

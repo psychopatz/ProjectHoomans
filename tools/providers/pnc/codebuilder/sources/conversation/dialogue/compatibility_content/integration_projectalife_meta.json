@@ -1,0 +1,95 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "integration.projectalife.meta",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "aircraft.heli",
+        "text": {
+          "EN": [
+            "Something is flying over us. Keep listening."
+          ],
+          "TL": [
+            "Something is flying over us. Keep listening."
+          ]
+        }
+      },
+      {
+        "id": "aircraft.military",
+        "text": {
+          "EN": [
+            "That aircraft sounds close. Stay sharp."
+          ],
+          "TL": [
+            "That aircraft sounds close. Stay sharp."
+          ]
+        }
+      },
+      {
+        "id": "ambience",
+        "text": {
+          "EN": [
+            "I do not like that sound. Stay close."
+          ],
+          "TL": [
+            "I do not like that sound. Stay close."
+          ]
+        }
+      },
+      {
+        "id": "crash",
+        "text": {
+          "EN": [
+            "That crash sounded close. Keep your eyes open."
+          ],
+          "TL": [
+            "That crash sounded close. Keep your eyes open."
+          ]
+        }
+      },
+      {
+        "id": "gunfire",
+        "text": {
+          "EN": [
+            "Someone is shooting nearby. Keep your head down."
+          ],
+          "TL": [
+            "Someone is shooting nearby. Keep your head down."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "integration",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "projectalife",
+      "domain": "integration"
+    }
+  ]
+}
