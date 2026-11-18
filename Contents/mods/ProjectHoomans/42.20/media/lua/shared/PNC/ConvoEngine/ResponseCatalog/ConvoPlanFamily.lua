@@ -170,11 +170,25 @@ local function collectVariants(stylesMap, variants, installAs, language, options
     local added = false
     for _, variant in ipairs(variants) do
         if type(variant) == "table" then
-            local variantStyle = tostring(variant.id or "neutral")
-            if variantStyle == "default" then
+            local rawId = tostring(variant.id or "neutral")
+            local variantStyle = rawId
+            local matched = false
+            if not onlyStyle then
+                matched = true
+                if variantStyle == "default" then
+                    variantStyle = "neutral"
+                end
+            elseif rawId == onlyStyle or variantStyle == onlyStyle then
+                matched = true
                 variantStyle = "neutral"
+            elseif string.sub(rawId, 1, #onlyStyle + 1) == (onlyStyle .. ".") then
+                matched = true
+                variantStyle = string.sub(rawId, #onlyStyle + 2)
+                if variantStyle == "default" then
+                    variantStyle = "neutral"
+                end
             end
-            if not onlyStyle or variantStyle == onlyStyle then
+            if matched then
                 local destStyle = targetStyleOverride or variantStyle
                 local textMap = type(variant.translations) == "table"
                     and variant.translations

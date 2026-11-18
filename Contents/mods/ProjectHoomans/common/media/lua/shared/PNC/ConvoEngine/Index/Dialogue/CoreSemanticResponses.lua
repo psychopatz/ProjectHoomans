@@ -44,8 +44,8 @@ return {
             "flow.greeting.opening.rain",
             "flow.greeting.responses",
             "integration.companion_dogs.greeting",
-            "social.greetings.contextual",
-            "social.greetings.hostile.parley",
+            "social.greetings.acquaintance.dawn",
+            "social.greetings.acquaintance.dusk",
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {

@@ -478,7 +478,7 @@ return {
         ["domain"] = "social_greetings",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialGreetings",
-        ["recordCount"] = 2,
+        ["recordCount"] = 21,
     },
     {
         ["domain"] = "social_interaction_argument",
@@ -562,7 +562,7 @@ return {
         ["domain"] = "static_suggestion_text",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/StaticSuggestionText",
-        ["recordCount"] = 19,
+        ["recordCount"] = 22,
     },
     {
         ["domain"] = "task_lifecycle",
@@ -581,12 +581,6 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/Trading",
         ["recordCount"] = 11,
-    },
-    {
-        ["domain"] = "ui_suggestion",
-        ["kind"] = "dialogue",
-        ["module"] = "PNC/ConvoEngine/Index/Dialogue/UiSuggestion",
-        ["recordCount"] = 1,
     },
     {
         ["domain"] = "wellbeing_content",

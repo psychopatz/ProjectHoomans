@@ -1,0 +1,125 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "social.greetings.member.dusk",
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Member"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 18
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 21
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_member_dusk",
+    "category": "projecthoomans:greetings",
+    "audience": "member",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "convo/social/greetings/member/dusk",
+    "textDomain": "pnc.convo.social.greetings.member.dusk",
+    "responseAct": "GREETING",
+    "textRows": [
+      {
+        "key": "greeting.001",
+        "text": {
+          "EN": "Evening. Perimeter looks clear.",
+          "TL": "Gabi. Mukhang malinaw ang perimeter."
+        }
+      },
+      {
+        "key": "greeting.002",
+        "text": {
+          "EN": "Need me for something before night watch?",
+          "TL": "Kailangan mo ba ako bago ang pagbabantay sa gabi?"
+        }
+      },
+      {
+        "key": "greeting.003",
+        "text": {
+          "EN": "We're all still here. I'll call that a good day.",
+          "TL": "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw."
+        }
+      },
+      {
+        "key": "greeting.004",
+        "text": {
+          "EN": "Keep it quiet. The others are settling down.",
+          "TL": "Manahimik ka. Umayos na yung iba."
+        }
+      },
+      {
+        "key": "greeting.005",
+        "text": {
+          "EN": "I can take first watch if you need the rest.",
+          "TL": "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Evening. Perimeter looks clear.",
+            "Need me for something before night watch?",
+            "We're all still here. I'll call that a good day.",
+            "Keep it quiet. The others are settling down.",
+            "I can take first watch if you need the rest."
+          ],
+          "TL": [
+            "Gabi. Mukhang malinaw ang perimeter.",
+            "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+            "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+            "Manahimik ka. Umayos na yung iba.",
+            "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
+}

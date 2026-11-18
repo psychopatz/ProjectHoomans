@@ -1,0 +1,125 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "social.greetings.member.dawn",
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Member"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 5
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 6.5
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_member_dawn",
+    "category": "projecthoomans:greetings",
+    "audience": "member",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "convo/social/greetings/member/dawn",
+    "textDomain": "pnc.convo.social.greetings.member.dawn",
+    "responseAct": "GREETING",
+    "textRows": [
+      {
+        "key": "greeting.001",
+        "text": {
+          "EN": "You're up. Good—we have plenty to do.",
+          "TL": "Gising ka na. Mabuti—marami tayong gagawin."
+        }
+      },
+      {
+        "key": "greeting.002",
+        "text": {
+          "EN": "Morning. I already checked the perimeter.",
+          "TL": "Umaga. Sinuri ko na ang perimeter."
+        }
+      },
+      {
+        "key": "greeting.003",
+        "text": {
+          "EN": "Couldn't sleep either? We may as well get started.",
+          "TL": "Hindi rin makatulog? Maaari rin tayong magsimula."
+        }
+      },
+      {
+        "key": "greeting.004",
+        "text": {
+          "EN": "First light. What's the plan today?",
+          "TL": "Unang liwanag. Ano ang plano ngayon?"
+        }
+      },
+      {
+        "key": "greeting.005",
+        "text": {
+          "EN": "Morning. Everyone else is still asleep, so it's just us.",
+          "TL": "Umaga. Tulog pa ang iba kaya kami na lang."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "You're up. Good—we have plenty to do.",
+            "Morning. I already checked the perimeter.",
+            "Couldn't sleep either? We may as well get started.",
+            "First light. What's the plan today?",
+            "Morning. Everyone else is still asleep, so it's just us."
+          ],
+          "TL": [
+            "Gising ka na. Mabuti—marami tayong gagawin.",
+            "Umaga. Sinuri ko na ang perimeter.",
+            "Hindi rin makatulog? Maaari rin tayong magsimula.",
+            "Unang liwanag. Ano ang plano ngayon?",
+            "Umaga. Tulog pa ang iba kaya kami na lang."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
+}

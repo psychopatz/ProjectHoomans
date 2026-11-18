@@ -3,7 +3,7 @@ return {
     ["ui.semantic_suggestions.title"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.semantic_suggestions.title",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["ui.suggestion.availability.tooltips"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.availability.tooltips",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["ui.suggestion.back.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.back.label",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["ui.suggestion.check_in"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.check_in",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["ui.suggestion.companion_camp"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.companion_camp",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["ui.suggestion.companion_orders.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.companion_orders.label",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["ui.suggestion.follow"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.follow",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["ui.suggestion.greeting_report_fine"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.greeting_report_fine",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["ui.suggestion.greeting_thank"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.greeting_thank",
         ["kind"] = "dialogue",
@@ -84,16 +84,43 @@ return {
     ["ui.suggestion.group"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.group",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/static_suggestion_text/ui_suggestion_group.json",
     },
+    ["ui.suggestion.identity.lie"] = {
+        ["domain"] = "static_suggestion_text",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        },
+        ["id"] = "ui.suggestion.identity.lie",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/static_suggestion_text/ui_suggestion_identity_lie.json",
+    },
+    ["ui.suggestion.identity.real"] = {
+        ["domain"] = "static_suggestion_text",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        },
+        ["id"] = "ui.suggestion.identity.real",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
+    },
+    ["ui.suggestion.identity.rude"] = {
+        ["domain"] = "static_suggestion_text",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
+        },
+        ["id"] = "ui.suggestion.identity.rude",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
+    },
     ["ui.suggestion.needs_destination.tooltip"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.needs_destination.tooltip",
         ["kind"] = "dialogue",
@@ -102,7 +129,7 @@ return {
     ["ui.suggestion.personal_check_in"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.personal_check_in",
         ["kind"] = "dialogue",
@@ -111,7 +138,7 @@ return {
     ["ui.suggestion.stay"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay",
         },
         ["id"] = "ui.suggestion.stay",
         ["kind"] = "dialogue",
@@ -120,7 +147,7 @@ return {
     ["ui.suggestion.talk_again_about.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
         },
         ["id"] = "ui.suggestion.talk_again_about.label",
         ["kind"] = "dialogue",
@@ -129,7 +156,7 @@ return {
     ["ui.suggestion.talk_something_else.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
         },
         ["id"] = "ui.suggestion.talk_something_else.label",
         ["kind"] = "dialogue",
@@ -138,7 +165,7 @@ return {
     ["ui.suggestion.trade"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
         },
         ["id"] = "ui.suggestion.trade",
         ["kind"] = "dialogue",
@@ -147,7 +174,7 @@ return {
     ["ui.suggestion.unavailable.tooltip"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
         },
         ["id"] = "ui.suggestion.unavailable.tooltip",
         ["kind"] = "dialogue",
@@ -156,7 +183,7 @@ return {
     ["ui.suggestion.wait_at"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
         },
         ["id"] = "ui.suggestion.wait_at",
         ["kind"] = "dialogue",
@@ -165,7 +192,7 @@ return {
     ["ui.suggestion.whats_up.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel",
         },
         ["id"] = "ui.suggestion.whats_up.label",
         ["kind"] = "dialogue",

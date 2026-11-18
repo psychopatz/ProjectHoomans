@@ -1,0 +1,125 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "social.greetings.member.sunset",
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Member"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 12
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 18
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_member_sunset",
+    "category": "projecthoomans:greetings",
+    "audience": "member",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "convo/social/greetings/member/sunset",
+    "textDomain": "pnc.convo.social.greetings.member.sunset",
+    "responseAct": "GREETING",
+    "textRows": [
+      {
+        "key": "greeting.001",
+        "text": {
+          "EN": "We made it through the day. That's something.",
+          "TL": "Nalampasan natin ang araw. May halaga iyon."
+        }
+      },
+      {
+        "key": "greeting.002",
+        "text": {
+          "EN": "Hey. Need a hand before we wrap up?",
+          "TL": "Hey. Kailangan ng kamay bago tayo magtapos?"
+        }
+      },
+      {
+        "key": "greeting.003",
+        "text": {
+          "EN": "Long day, but I'm still ready if you need me.",
+          "TL": "Mahabang araw, pero handa pa rin ako kung kailangan mo ako."
+        }
+      },
+      {
+        "key": "greeting.004",
+        "text": {
+          "EN": "Everyone accounted for?",
+          "TL": "Lahat ng tao accounted para sa?"
+        }
+      },
+      {
+        "key": "greeting.005",
+        "text": {
+          "EN": "The light's fading. We should finish up soon.",
+          "TL": "Kumukupas na ang liwanag. Dapat na tayong magtapos."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "We made it through the day. That's something.",
+            "Hey. Need a hand before we wrap up?",
+            "Long day, but I'm still ready if you need me.",
+            "Everyone accounted for?",
+            "The light's fading. We should finish up soon."
+          ],
+          "TL": [
+            "Nalampasan natin ang araw. May halaga iyon.",
+            "Hey. Kailangan ng kamay bago tayo magtapos?",
+            "Mahabang araw, pero handa pa rin ako kung kailangan mo ako.",
+            "Lahat ng tao accounted para sa?",
+            "Kumukupas na ang liwanag. Dapat na tayong magtapos."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
+}

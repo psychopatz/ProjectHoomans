@@ -1,0 +1,125 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "social.greetings.lover.dusk",
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Lover"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 18
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 21
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_lover_dusk",
+    "category": "projecthoomans:greetings",
+    "audience": "special",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "convo/social/greetings/special/lover/dusk",
+    "textDomain": "pnc.convo.social.greetings.special.lover.dusk",
+    "responseAct": "GREETING",
+    "textRows": [
+      {
+        "key": "greeting.001",
+        "text": {
+          "EN": "Stay with me a minute before night watch.",
+          "TL": "Manatili sa akin ng isang minuto bago manood ng gabi."
+        }
+      },
+      {
+        "key": "greeting.002",
+        "text": {
+          "EN": "Evening, love. You look exhausted.",
+          "TL": "Gabi, mahal. Mukha kang pagod."
+        }
+      },
+      {
+        "key": "greeting.003",
+        "text": {
+          "EN": "You're safe. I can breathe again.",
+          "TL": "Ligtas ka. Muli na akong makahihinga."
+        }
+      },
+      {
+        "key": "greeting.004",
+        "text": {
+          "EN": "Come closer. We don't get many quiet moments.",
+          "TL": "Lumapit ka. Hindi kami nakakakuha ng maraming tahimik na sandali."
+        }
+      },
+      {
+        "key": "greeting.005",
+        "text": {
+          "EN": "I saved you a place by me.",
+          "TL": "Iniligtas kita ng isang lugar sa tabi ko."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Stay with me a minute before night watch.",
+            "Evening, love. You look exhausted.",
+            "You're safe. I can breathe again.",
+            "Come closer. We don't get many quiet moments.",
+            "I saved you a place by me."
+          ],
+          "TL": [
+            "Manatili sa akin ng isang minuto bago manood ng gabi.",
+            "Gabi, mahal. Mukha kang pagod.",
+            "Ligtas ka. Muli na akong makahihinga.",
+            "Lumapit ka. Hindi kami nakakakuha ng maraming tahimik na sandali.",
+            "Iniligtas kita ng isang lugar sa tabi ko."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
+}

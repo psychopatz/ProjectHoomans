@@ -1,0 +1,125 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "social.greetings.lover.dawn",
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Lover"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 5
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 6.5
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_lover_dawn",
+    "category": "projecthoomans:greetings",
+    "audience": "special",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "convo/social/greetings/special/lover/dawn",
+    "textDomain": "pnc.convo.social.greetings.special.lover.dawn",
+    "responseAct": "GREETING",
+    "textRows": [
+      {
+        "key": "greeting.001",
+        "text": {
+          "EN": "You're awake already. I was hoping you'd sleep a little longer.",
+          "TL": "You're awake already. I was hoping you'd tulog a little longer."
+        }
+      },
+      {
+        "key": "greeting.002",
+        "text": {
+          "EN": "Morning, love. Come here before the day starts.",
+          "TL": "Umaga, mahal. Halika dito bago magsimula ang araw."
+        }
+      },
+      {
+        "key": "greeting.003",
+        "text": {
+          "EN": "I missed you, and you were only asleep.",
+          "TL": "Namiss kita, tulog ka lang."
+        }
+      },
+      {
+        "key": "greeting.004",
+        "text": {
+          "EN": "First light looks better with you here.",
+          "TL": "Mas maganda ang unang liwanag kapag kasama ka rito."
+        }
+      },
+      {
+        "key": "greeting.005",
+        "text": {
+          "EN": "Couldn't sleep without checking on everyone, could you?",
+          "TL": "Hindi makatulog nang hindi sinusuri ang lahat, hindi ba?"
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "You're awake already. I was hoping you'd sleep a little longer.",
+            "Morning, love. Come here before the day starts.",
+            "I missed you, and you were only asleep.",
+            "First light looks better with you here.",
+            "Couldn't sleep without checking on everyone, could you?"
+          ],
+          "TL": [
+            "You're awake already. I was hoping you'd tulog a little longer.",
+            "Umaga, mahal. Halika dito bago magsimula ang araw.",
+            "Namiss kita, tulog ka lang.",
+            "Mas maganda ang unang liwanag kapag kasama ka rito.",
+            "Hindi makatulog nang hindi sinusuri ang lahat, hindi ba?"
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
+}

@@ -1,0 +1,125 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "social.greetings.firstmeet.sunrise",
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "FirstMeet"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 6.5
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 12
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_firstmeet_sunrise",
+    "category": "projecthoomans:greetings",
+    "audience": "neutral",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "convo/social/greetings/neutral/first_meet/sunrise",
+    "textDomain": "pnc.convo.social.greetings.neutral.first_meet.sunrise",
+    "responseAct": "GREETING",
+    "textRows": [
+      {
+        "key": "greeting.001",
+        "text": {
+          "EN": "Morning. I haven't seen you around before.",
+          "TL": "Umaga. Hindi pa kita nakikita kanina."
+        }
+      },
+      {
+        "key": "greeting.002",
+        "text": {
+          "EN": "That's close enough. Start with your name.",
+          "TL": "Malapit na yun. Magsimula sa iyong pangalan."
+        }
+      },
+      {
+        "key": "greeting.003",
+        "text": {
+          "EN": "New face. Are you passing through or looking for something?",
+          "TL": "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?"
+        }
+      },
+      {
+        "key": "greeting.004",
+        "text": {
+          "EN": "Daylight makes this easier. Who are you?",
+          "TL": "Pinapadali ito ng liwanag ng araw. sino ka ba"
+        }
+      },
+      {
+        "key": "greeting.005",
+        "text": {
+          "EN": "I don't recognize you. Talk, and keep it calm.",
+          "TL": "hindi kita kilala. Mag-usap, at panatilihin itong kalmado."
+        }
+      }
+    ]
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "neutral",
+        "text": {
+          "EN": [
+            "Morning. I haven't seen you around before.",
+            "That's close enough. Start with your name.",
+            "New face. Are you passing through or looking for something?",
+            "Daylight makes this easier. Who are you?",
+            "I don't recognize you. Talk, and keep it calm."
+          ],
+          "TL": [
+            "Umaga. Hindi pa kita nakikita kanina.",
+            "Malapit na yun. Magsimula sa iyong pangalan.",
+            "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
+            "Pinapadali ito ng liwanag ng araw. sino ka ba",
+            "hindi kita kilala. Mag-usap, at panatilihin itong kalmado."
+          ]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
+}

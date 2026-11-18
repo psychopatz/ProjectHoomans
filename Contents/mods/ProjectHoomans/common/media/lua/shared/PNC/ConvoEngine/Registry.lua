@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "5170f7c72eb96ec99942c175f3f4cd1776c816fcd492ee86940d7bc46d90e4be"
+Registry.WHOLE_MODEL_FINGERPRINT = "bfcc2d3b251785f9ef35f347cf93754103b33c119fd45de0090b64a53a280fb7"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -195,7 +195,8 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialCheckIn")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialCompanionTopics")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialGreetings")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialGreetings/AcquaintanceDawnToLoverTwilight")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialGreetings/DawnToTwilight")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialInteractionArgument")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialInteractionContext")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact")
@@ -215,14 +216,14 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/ToolReplySexual")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionStay")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText/TalkAgainAboutLabelToWhatsUpLabel")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle/GiftToTaskDrink")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle/EatToGive")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle/RefillToWaitAt")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/UiSuggestion")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WellbeingContent/StressToThirstAlt")
 appendConvoPlans(require "PsychopatzCore/ConvoEngine/Beat/Social/Conflict")

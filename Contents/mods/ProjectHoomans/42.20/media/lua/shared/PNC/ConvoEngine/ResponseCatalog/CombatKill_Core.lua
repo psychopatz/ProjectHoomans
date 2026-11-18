@@ -55,7 +55,12 @@ for _, templateID in ipairs(SINGLE_TEMPLATES) do
 end
 
 local MULTI_SAY_FAMILIES = {
-    { id = "combat.kill.killer.aggressive.firearm_high_named", count = 2 },
+    {
+        id = "combat.kill.killer.aggressive.firearm_high_named",
+        planID = "combat.kill.killer",
+        stylePrefix = "aggressive.firearm_high_named.say.",
+        count = 2,
+    },
     { id = "combat.human_kill.aggressive", count = 3 },
     { id = "combat.human_kill.brave", count = 3 },
     { id = "combat.human_kill.cold", count = 3 },
@@ -80,14 +85,26 @@ local MULTI_SAY_FAMILIES = {
 }
 
 for _, entry in ipairs(MULTI_SAY_FAMILIES) do
-    installFamily(entry.id)
-    for index = 1, entry.count do
-        local key = tostring(index)
-        installFamily(entry.id, {
-            planID = entry.id,
-            realizationKey = key,
-            installAs = entry.id .. ".say." .. key,
-        })
+    if entry.planID and entry.stylePrefix then
+        for index = 1, entry.count do
+            local key = tostring(index)
+            installFamily(entry.id .. ".say." .. key, {
+                planID = entry.planID,
+                style = entry.stylePrefix .. key,
+                targetStyle = "neutral",
+                installAs = entry.id .. ".say." .. key,
+            })
+        end
+    else
+        installFamily(entry.id)
+        for index = 1, entry.count do
+            local key = tostring(index)
+            installFamily(entry.id, {
+                planID = entry.id,
+                realizationKey = key,
+                installAs = entry.id .. ".say." .. key,
+            })
+        end
     end
 end
 

@@ -1270,7 +1270,7 @@ option.callback()
 T.equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
 local GeneratedConvo = require "PNC/ConvoEngine/Registry"
-local greetingPlan = GeneratedConvo.ConvoPlan("flow.greeting.opening.default")
+local greetingPlan = GeneratedConvo.ConvoPlan("flow.greeting.opening")
 T.truthy(
     greetingPlan and greetingPlan.payload and (greetingPlan.payload.say
         or greetingPlan.payload.response),
@@ -1278,7 +1278,7 @@ T.truthy(
 )
 T.equal(
     greetingPlan.sourceShard,
-    "dialogue/conversation_greeting/flow_greeting_opening_default.json",
+    "dialogue/conversation_greeting/flow_greeting_opening.json",
     "greeting keeps canonical ConvoEngine source lineage"
 )
 T.finish("pnc_conversation_smoke")
