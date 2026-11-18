@@ -106,3 +106,31 @@ voice pitch, carried contents and gender where allowed. Switch pages between
 edits. The same backpack must retain its exact tint and texture. Deliberately
 replace it, select a captured custom visual, and reroll Loadout: these actions
 must still apply the requested/new visual. Save/reload and continue prior tests.
+
+
+## P5R12 save-dialog and scope regression
+
+Console session 65ae9e31/EDF66F8 confirmed SaveDialog.Open line 29 calls the absent
+ISTickBox.setEnable. Native disableOption now governs the encounter checkbox;
+submit independently rechecks current authority. Filename validation keeps bad
+names correctable and Cancel dismissible. Focused 68/68 including catalogs;
+full 1060/1064, same four known failures. Native interaction remains unverified.
+
+1. Select a companion and choose Save NPC preset. The filename starts with its
+   name; all tabs/loadout belong to the same preset. Rename, save, load and delete
+   it. Try an invalid name, correct it, and separately Cancel without a write.
+2. Finish editing through primary Done. Reopen and verify current companion
+   edits remain even without saving a reusable preset. Invalid pending input
+   must keep the editor open for correction.
+3. Open Presets, then Save roster preset. This action must be absent from the
+   editing toolbar and present even when there are no saved presets. Save with
+   a custom filename, confirm the refreshed browser lists it, then load/delete.
+4. Loadout uses Equip item / Add carried item / Update carried item, with hints
+   explaining that these edit the current NPC. Save NPC preset saves the whole
+   character, including its loadout, for reuse.
+5. In SP the encounter checkbox is available; non-admin MP cannot select it.
+   Admin MP may select it, with publication still enforced by the authority.
+   Verify both local preset-only and authorized encounter export paths.
+6. Repeat Presets at compact resolution/large fonts; the roster-save row must
+   not overlap search/results or leak into item/outfit browsers. Debug Save NPC
+   preset and Save encounter NPC use the same repaired filename dialog.

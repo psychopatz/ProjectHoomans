@@ -20,6 +20,7 @@ function Window:buildLoadoutPage()
         end
     end
     self.outfitBrowse = button(page, self, tr('UI_PNC_Authoring_BrowseOutfits', 'Browse outfits'), function(target) target:browseOutfits() end)
+    self.outfitBrowse.tooltip = tr('UI_PNC_Authoring_LoadoutEditHelp', 'Changes update this NPC in the editor immediately. Save NPC preset keeps a reusable copy of all tabs, including this loadout.')
     self.outfitValue = I.addLabel(page, '')
     self.slotContent = ISPNCUniqueNPCAppearanceScrollPanel:new(0, 0, 1, 1)
     self.slotContent:initialise(); self.slotContent:instantiate(); page:addChild(self.slotContent)
@@ -64,7 +65,7 @@ function Window:browseOutfits()
         return spec
     end
     self.itemExplorer:Show({ mode = "outfit", title = tr('UI_PNC_Authoring_BrowseOutfits', 'Browse outfits'), items = items,
-        preview = inspect, onChoose = function(item)
+        preview = inspect, applyTooltip = self.outfitBrowse.tooltip, onChoose = function(item)
             if not previews[item.id] then inspect(item) end
             local choice = previews[item.id]
             if not choice then return false, tr('UI_PNC_Authoring_UnavailableOutfit', 'This outfit is unavailable') end
@@ -90,6 +91,9 @@ function Window:openSlot(slot)
     end
     local carried = slot.group == 'carry' and slot.kind == 'item'
     self.itemExplorer:Show({ mode = carried and 'carry' or slot.kind, title = slot.label, allowed = allowed,
+        applyLabel = tr(carried and 'UI_PNC_Authoring_UpdateCarried' or slot.kind == 'carry' and 'UI_PNC_Authoring_AddCarried' or 'UI_PNC_Authoring_EquipItem',
+            carried and 'Update carried item' or slot.kind == 'carry' and 'Add carried item' or 'Equip item'),
+        applyTooltip = tr('UI_PNC_Authoring_LoadoutEditHelp', 'Changes update this NPC in the editor immediately. Save NPC preset keeps a reusable copy of all tabs, including this loadout.'),
         initialID = carried and slot.type or nil, initialQuery = carried and slot.type or nil,
         initialQuantity = carried and slot.quantity or nil, initialDestination = carried and slot.destination or nil,
         reloadAllowed = slot.kind == 'worn' and function()

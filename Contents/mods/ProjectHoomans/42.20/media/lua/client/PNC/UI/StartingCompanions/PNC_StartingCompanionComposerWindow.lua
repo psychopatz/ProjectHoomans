@@ -82,15 +82,9 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
         variant = "quiet",
     })
     self.saveButton = UI.CreateButton(self, {
-        id = "save", title = tr("UI_PNC_StartingCompanion_Save", "SAVE"),
+        id = "save", title = tr("UI_PNC_StartingCompanion_Save", "Save NPC preset..."),
         target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
         variant = "quiet",
-    })
-    self.saveSetButton = UI.CreateButton(self, {
-        id = "save_set",
-        title = tr("UI_PNC_StartingCompanion_SaveSet", "SAVE SET"),
-        target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
-        variant = "primary",
     })
     self.resetButton = UI.CreateButton(self, {
         id = "reset",
@@ -106,10 +100,12 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
     })
     self.closeButton = UI.CreateButton(self, {
         id = "close",
-        title = tr("UI_PNC_StartingCompanion_Close", "CLOSE"),
+        title = tr("UI_PNC_StartingCompanion_Done", "Done"),
         target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
-        variant = "quiet",
+        variant = "primary",
     })
+    self.saveButton.tooltip = tr("UI_PNC_Authoring_SaveNPCHelp", "Save the selected NPC, including every tab and its loadout, as a reusable preset.")
+    self.closeButton.tooltip = tr("UI_PNC_StartingCompanion_DoneHelp", "Keep your companion changes and return to character creation. Saving a reusable preset is optional.")
     self.statusLabel = ISLabel:new(0, 0, 24, "", 0.75, 0.8, 0.85, 1,
         UIFont.Small, true)
     self.statusLabel:initialise()
@@ -247,12 +243,12 @@ function ISPNCStartingCompanionComposerWindow:onResponsiveLayout()
     local rowHeight = Layout.Pixels(28, self.uiScale)
     self.presetCombo:setVisible(false)
     local toolbar = Layout.Flow({
-        self.loadButton, self.saveButton, self.saveSetButton,
+        self.loadButton, self.saveButton,
         self.resetButton, self.revertButton, self.closeButton,
     }, { x = rect.x, y = rect.y, width = rect.width },
         { scale = self.uiScale, minWidth = 78, gap = 6 })
     local exploring = self.editor and self.editor.itemExplorer and self.editor.itemExplorer:getIsVisible()
-    for _, control in ipairs({ self.loadButton, self.saveButton, self.saveSetButton, self.resetButton, self.revertButton, self.closeButton }) do PNC.NPCAuthoringFields.EnableButton(control, not exploring) end
+    for _, control in ipairs({ self.loadButton, self.saveButton, self.resetButton, self.revertButton, self.closeButton }) do PNC.NPCAuthoringFields.EnableButton(control, not exploring) end
     local y = toolbar.bottom + gap
     local statusHeight = Layout.Pixels(22, self.uiScale)
     Layout.SetBounds(self.editor, rect.x, y, rect.width,
@@ -295,6 +291,23 @@ function ISPNCStartingCompanionComposerWindow:saveSet(label, fileName, prepared)
     return Store.Save(payload, payload.label, fileName)
 end
 
+function ISPNCStartingCompanionComposerWindow:promptSaveSet()
+    if not self.session then return false end
+    if self.editor.draft and self.editor:pullForm() == false then return false end
+    local preset, reason = Presets.FromSession(self.session)
+    if not preset then self:setStatus(tostring(reason)); return false end
+    local dialog = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringSaveDialog"
+    dialog.Open(self, tr("UI_PNC_StartingCompanion_Title", "Starting companions"), nil, function(label, fileName)
+        local saved, why = self:saveSet(label, fileName, preset)
+        self:setStatus(saved and tr("UI_PNC_StartingCompanion_SetSaved", "Roster preset saved") or tostring(why))
+        self:refreshPresets()
+        local explorer = self.editor.itemExplorer
+        if saved and explorer:getIsVisible() and explorer.options.mode == "preset" then self:browsePresets() end
+    end, { title = tr("UI_PNC_StartingCompanion_SaveSet", "Save roster preset..."),
+        help = tr("UI_PNC_Authoring_SaveRosterHelp", "Save all companions together as one reusable roster preset.") })
+    return true
+end
+
 function ISPNCStartingCompanionComposerWindow:loadSelected()
     if not self.selectedPresetFile then
         return false, "preset_not_selected"
@@ -327,6 +340,11 @@ function ISPNCStartingCompanionComposerWindow:browsePresets()
     self.editor.itemExplorer:Show({ mode = "preset", items = items,
         title = tr("UI_PNC_Authoring_Presets", "Presets..."),
         applyLabel = tr("UI_PNC_StartingCompanion_Load", "Load"),
+        contextAction = {
+            title = tr("UI_PNC_StartingCompanion_SaveSet", "Save roster preset..."),
+            tooltip = tr("UI_PNC_Authoring_SaveRosterHelp", "Save all companions together as one reusable roster preset."),
+            onClick = function() self:promptSaveSet() end,
+        },
         reloadItems = entries,
         onDelete = function(item)
             local ok, reason = Store.Delete(item.id)
@@ -383,16 +401,9 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
             local saved, why = self:saveTemplate(label, fileName, library, prepared)
             self:setStatus(saved and tr("UI_PNC_StartingCompanion_Saved", "Companion saved") or tostring(why))
             self:refreshPresets()
-        end)
+        end, { title = tr("UI_PNC_StartingCompanion_Save", "Save NPC preset..."), help = self.saveButton.tooltip })
     elseif id == "save_set" then
-        local dialog = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringSaveDialog"
-        local preset, why = Presets.FromSession(self.session)
-        if not preset then self:setStatus(tostring(why)); return end
-        dialog.Open(self, tr("UI_PNC_StartingCompanion_Title", "Starting companions"), nil, function(label, fileName)
-            local saved, why = self:saveSet(label, fileName, preset)
-            self:setStatus(saved and tr("UI_PNC_StartingCompanion_SetSaved", "Companion set saved") or tostring(why))
-            self:refreshPresets()
-        end)
+        self:promptSaveSet()
     elseif id == "load" then
         self:browsePresets()
     elseif id == "reset" or id == "revert" then
@@ -409,7 +420,7 @@ end
 
 function ISPNCStartingCompanionComposerWindow:close()
     if self.editor then
-        self.editor:pullForm()
+        if self.editor:pullForm() == false then return false end
         self.editor.appearanceTab:onStopVoice()
     end
     self:setVisible(false)

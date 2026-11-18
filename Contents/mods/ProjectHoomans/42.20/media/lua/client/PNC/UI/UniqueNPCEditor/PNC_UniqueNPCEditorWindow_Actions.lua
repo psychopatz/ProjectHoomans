@@ -252,7 +252,9 @@ function ISPNCNPCAuthoringEditor:onAction(button)
             else ok, reason = Storage.Save(source, false, fileName) end
             self:refreshFiles(); self:refreshPreview(false)
             self:setStatus(ok and tr("UI_PNC_UniqueNPCEditor_Saved", "Saved ") .. fileName or tostring(reason))
-        end)
+        end, { title = tr(action == "produce" and "UI_PNC_UniqueNPCEditor_Produce" or "UI_PNC_UniqueNPCEditor_Save",
+            action == "produce" and "Save encounter NPC..." or "Save NPC preset..."),
+            help = tr("UI_PNC_Authoring_SaveNPCHelp", "Save the selected NPC, including every tab and its loadout, as a reusable preset.") })
     elseif action == "inventory" then
         if self:pullForm() == false then return end
         self:adoptPreview()

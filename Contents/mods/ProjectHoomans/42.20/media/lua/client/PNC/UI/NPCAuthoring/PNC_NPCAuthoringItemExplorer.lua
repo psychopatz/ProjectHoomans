@@ -123,6 +123,11 @@ function Explorer:createChildren()
         target:setHint(tr('UI_PNC_Authoring_Deleted', 'Saved record deleted'))
     end)
     self.closeButton = button(self, tr('UI_PNC_StartingCompanion_Close', 'Close'), function(target) target:Hide() end)
+    self.contextActionButton = button(self, '', function(target)
+        local action = target.options and target.options.contextAction
+        if action and action.onClick then action.onClick() end
+    end)
+    self.contextActionButton:setVisible(false)
     self.previous = button(self, '<', function(target) target.offset = math.max(0, target.offset - target.pageSize); target:refreshResults() end)
     self.nextButton = button(self, '>', function(target) if target.offset + target.pageSize < target.total then target.offset = target.offset + target.pageSize; target:refreshResults() end end)
     self.counter = ISLabel:new(0, 0, 24, '', .8, .85, .85, 1, UIFont.Small, true)
@@ -138,6 +143,11 @@ function Explorer:Show(options)
     self.deleteArmedID = nil
     self.quantity:setText(tostring(options.initialQuantity or 1)); self.destination:selectData(options.initialDestination or 'root')
     self.confirm:setTitle(options.applyLabel or tr(self.mode == 'outfit' and 'UI_PNC_Authoring_ApplyOutfit' or 'UI_PNC_Authoring_Equip', self.mode == 'outfit' and 'Apply outfit' or 'Equip / Add'))
+    self.confirm.tooltip = options.applyTooltip
+    local action = options.contextAction
+    self.contextActionButton:setTitle(action and action.title or '')
+    self.contextActionButton.tooltip = action and action.tooltip or nil
+    self.contextActionButton:setVisible(action ~= nil)
     self.search:setText(options.initialQuery or ''); self:refreshFilters(); self:refreshResults()
     self:setVisible(true); self:bringToTop(); self:onResize(); self.search:focus()
     if self.onShown then self.onShown() end
@@ -224,14 +234,16 @@ function Explorer:onResize()
     local contentWidth = math.max(1, width - (filters and filterWidth + g or 0) - (side > 0 and side + g or 0))
     self.heading:setName(L.Ellipsize(self.titleText or '', UIFont.Small, math.max(1, width - 110))); self.heading.tooltip = self.titleText
     L.SetBounds(self.heading, g, g, width - 110, h); L.SetBounds(self.closeButton, self.width - 100 - g, g, 100, h)
+    local contextHeight = self.options.contextAction and h + g or 0
+    L.SetBounds(self.contextActionButton, g, h + g * 2, width, h)
     local filterActions = filters and (self.allowed and 260 or 128) or 0
-    L.SetBounds(self.search, g, h + g * 2, width - filterActions, h)
+    L.SetBounds(self.search, g, h + g * 2 + contextHeight, width - filterActions, h)
     self.compatible:setVisible(filters and self.allowed ~= nil); self.refreshButton:setVisible(filters)
-    L.SetBounds(self.compatible, self.width - 252 - g, h + g * 2, 124, h)
-    L.SetBounds(self.refreshButton, self.width - 120 - g, h + g * 2, 120, h)
+    L.SetBounds(self.compatible, self.width - 252 - g, h + g * 2 + contextHeight, 124, h)
+    L.SetBounds(self.refreshButton, self.width - 120 - g, h + g * 2 + contextHeight, 120, h)
     local carry = self.mode == 'carry'
     self.quantityLabel:setVisible(carry); self.quantity:setVisible(carry); self.destination:setVisible(carry)
-    local top = h * 2 + g * 3
+    local top = h * 2 + g * 3 + contextHeight
     local bottom = carry and h * 5 + g * 7 or h * 3 + g * 5
     local gridHeight = math.max(h * 2, self.height - top - bottom)
     self.sources:setVisible(filters); self.categories:setVisible(filters)

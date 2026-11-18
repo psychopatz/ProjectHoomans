@@ -26,8 +26,10 @@ local function buildEditorToolbar(self)
     local buttons = self.presentationMode == "companion" and {} or {
         { "new", "UI_PNC_UniqueNPCEditor_New", "NEW", "quiet" },
         { "presets", "UI_PNC_Authoring_Presets", "Presets...", "quiet" },
-        { "save", "UI_PNC_UniqueNPCEditor_Save", "SAVE", "quiet" },
-        { "produce", "UI_PNC_UniqueNPCEditor_Produce", "PRODUCE", "primary" },
+        { "save", "UI_PNC_UniqueNPCEditor_Save", "Save NPC preset...", "quiet",
+            "UI_PNC_Authoring_SaveNPCHelp", "Save the selected NPC, including every tab and its loadout, as a reusable preset." },
+        { "produce", "UI_PNC_UniqueNPCEditor_Produce", "Save encounter NPC...", "primary",
+            "UI_PNC_Authoring_SaveEncounterHelp", "Save this NPC as a reusable preset and offer it for world encounters. Multiplayer publication requires an administrator." },
     }
     buttons[#buttons + 1] = { "preview", "UI_PNC_Authoring_Preview", "Preview", "quiet" }
     for _, button in ipairs(buttons) do
@@ -38,6 +40,7 @@ local function buildEditorToolbar(self)
             onclick = ISPNCNPCAuthoringEditor.onAction,
             variant = button[4],
         })
+        if button[5] then control.tooltip = tr(button[5], button[6]) end
         self.toolbar[#self.toolbar + 1] = control
         self[button[1] .. "Button"] = control
     end

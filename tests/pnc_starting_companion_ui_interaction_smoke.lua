@@ -290,6 +290,7 @@ window:createChildren()
 window:refresh()
 T.truthy(window.loadButton.y >= 30, "toolbar reserves the native title bar")
 T.truthy(window.editor.y >= window.loadButton.y + 32, "editor starts below the toolbar")
+T.falsy(window.saveSetButton, 'roster saving is absent from the editing toolbar')
 
 T.equal(window.selectedTraitID, brother,
     "native callback harness starts on the first active companion")
@@ -354,4 +355,48 @@ T.equal(window.editor.portraitTarget.traitID, brother,
 T.truthy(UIState, "starting companion UI state remains loadable")
 window.editor.draft = { displayName = 'Lemuel Colbert' }
 T.equal(window:currentLabel(), 'Lemuel Colbert', 'the real host defaults single-character saves to the NPC name rather than the relationship trait')
+-- Saving a reusable copy has an explicit single-NPC/whole-roster scope.
+local prompt, persisted
+package.loaded['PNC/UI/NPCAuthoring/PNC_NPCAuthoringSaveDialog'] = {
+    Open = function(_, name, library, callback, options)
+        prompt = { name = name, library = library, callback = callback, title = options.title }
+    end,
+}
+PNC.NPCAuthoring = { Registry = { Copy = function(value)
+    return { displayName = value.displayName }
+end } }
+function window.editor:effectiveDraft() return self.draft end
+function window:saveTemplate(label, filename, library, prepared)
+    persisted = { label = label, filename = filename, library = library, prepared = prepared }
+    return true
+end
+function window:saveSet(label, filename, preset)
+    persisted = { label = label, filename = filename, preset = preset }
+    return true
+end
+window:onAction({ internal = 'save' })
+T.equal(prompt.title, 'Save NPC preset...', 'single-character action names its reusable scope')
+T.equal(prompt.name, 'Lemuel Colbert', 'single-character prompt defaults to selected NPC')
+window.editor.draft.displayName = 'Changed after prompt'
+prompt.callback('Lemuel', 'Lemuel.txt', false)
+T.equal(persisted.prepared.draft.displayName, 'Lemuel Colbert', 'save retains the reviewed NPC snapshot')
+T.equal(persisted.library, false, 'preset-only save remains available')
+window:onAction({ internal = 'load' })
+T.truthy(window.editor.itemExplorer.options.contextAction, 'Presets owns the roster-save action')
+window.editor.itemExplorer.options.contextAction.onClick()
+T.equal(prompt.title, 'Save roster preset...', 'roster action names its whole-roster scope')
+T.equal(prompt.library, nil, 'roster does not offer single-NPC encounter publication')
+prompt.callback('My roster', 'My_roster.txt')
+T.equal(persisted.preset.kind, 'whole', 'roster save serializes the whole set')
+T.truthy(window.editor.itemExplorer.visible, 'saving a roster returns to its preset browser')
+
+window.editor.pullForm = function() return false end
+window:close()
+T.falsy(window.removed, 'Done leaves an invalid pending edit visible for correction')
+window.editor.pullForm = function() return true end
+local stopped = false
+window.editor.appearanceTab = { onStopVoice = function() stopped = true end }
+window:close()
+T.truthy(window.removed, 'Done returns to character creation after committing valid edits')
+T.truthy(stopped, 'Done releases voice preview')
 T.finish("pnc_starting_companion_ui_interaction_smoke")

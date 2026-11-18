@@ -45,6 +45,7 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
             inside(tile.clear, e.slotContent.width, e.slotContent.contentHeight, 'clear action stays inside slot content')
         end
         explorer:Show({ title = 'Choose item', onChoose = function() return true end })
+        T.falsy(explorer.contextActionButton.visible, 'item browsers never inherit preset-saving controls')
         e:onResponsiveLayout()
         T.falsy(e.tabPanel.visible, 'explorer hides underlying page hit targets')
         T.falsy(e.pageDice.bio.visible, 'tab action cannot change the NPC behind a modal')
@@ -61,12 +62,23 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
         explorer:Hide()
         T.truthy(e.tabPanel.visible, 'dismissal restores editor controls')
         for _, mode in ipairs({ 'carry', 'outfit', 'preset' }) do
+            local saves = 0
             explorer:Show({ mode = mode, items = mode ~= 'carry' and { { id = 'one', label = 'Long catalog entry', search = 'long catalog entry' } } or nil,
+                contextAction = mode == 'preset' and { title = 'Save roster preset...', onClick = function() saves = saves + 1 end } or nil,
                 onChoose = function() return true end })
             for _, control in ipairs({ explorer.heading, explorer.hint, explorer.sources, explorer.categories,
                 explorer.grid, explorer.details, explorer.quantity, explorer.quantityLabel, explorer.destination,
-                explorer.confirm, explorer.previous, explorer.counter, explorer.nextButton }) do
+                explorer.confirm, explorer.previous, explorer.counter, explorer.nextButton, explorer.contextActionButton }) do
                 inside(control, explorer.width, explorer.height, 'contextual browser control fits its viewport')
+            end
+            if mode == 'preset' then
+                T.truthy(explorer.search.y >= explorer.contextActionButton.y + explorer.contextActionButton.height,
+                    'preset saving reserves its own row above search')
+                explorer.contextActionButton.onclick(explorer)
+                T.equal(saves, 1, 'preset action routes only to its configured callback')
+                explorer:Show({ mode = 'preset', items = {}, contextAction = { title = 'Save roster preset...', onClick = function() saves = saves + 1 end } })
+                explorer.contextActionButton.onclick(explorer)
+                T.equal(saves, 2, 'the first roster can be saved from an empty preset browser')
             end
             explorer:Hide()
         end

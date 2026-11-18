@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R11 backpack visual continuity verified — P6 native acceptance pending
+**Status:** P5R12 save repair and workflow clarity verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -968,6 +968,28 @@ passes for ordinary edits, reconstruction and deliberate replacement/reroll
 boundaries. Three Lua syntax, two production Kahlua, whitespace and twelve-path
 coverage/current-source checks pass. Exact owned local phase commit required;
 native backpack-color confirmation remains user-owned P6 acceptance.
+
+### P5R12 — Native save-dialog repair and clear preset scopes
+
+Repair console-confirmed SaveDialog.Open line 29: ISTickBox has disableOption,
+not setEnable. Follow installed native filename validation and retain SP/MP admin
+publication boundaries, including rechecking authority on submission.
+
+The user explicitly places Save roster preset inside Presets, not the editing
+toolbar. Make it available in empty browsers too, preserve reviewed snapshots,
+refresh the browser after success and reserve layout space for the action.
+Use primary Done for applying companion edits, optional Save NPC preset for a
+reusable full NPC, and explicit Equip/Add/Update wording for Loadout. Keep invalid
+pending edits open and distinguish debug encounter export from local presets.
+
+**Gate:** **68/68** focused including translation catalogs; full **1060/1064**,
+same four known failures. Native-shaped checkbox test reproduces old line 29;
+save scope/snapshots, permission changes, filename validation, empty presets,
+context-action isolation, geometry and Done validation/audio cleanup pass.
+Nine Lua syntax, six production Kahlua, EN/TL parity and whitespace checks pass;
+ten new/six updated Character keys. Sixteen repo plus two installed native Lua
+evidence paths checked with direct source fallback. Exact local commit required;
+native interaction/rendering/audio remains user-owned P6 acceptance.
 
 ### P6 — Native acceptance
 

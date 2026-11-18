@@ -1,6 +1,40 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-19 P5R11
+## Current state — 2026-11-19 P5R12
+
+The save-dialog crash is repaired on the developer side. Console session
+`65ae9e31`, issue `EDF66F8`, identifies SaveDialog.Open line 29 calling the absent
+native ISTickBox.setEnable method. The dialog now uses disableOption by its
+translated label, which also blocks native joypad toggling. Submission rechecks
+encounter-publication authority; SP/local presets and MP administrator gating
+remain intact. Invalid filenames use native validation, correction and Cancel.
+
+Following the user's clarification, **Save roster preset...** lives inside the
+Presets browser, including an empty browser, and is removed from the editing
+toolbar. **Done** is the primary editing-completion action; it validates/commits
+pending edits and keeps invalid input open. Saving a reusable preset is optional.
+**Save NPC preset...** means the selected NPC with every tab and its loadout.
+Loadout actions explicitly Equip/Add/Update; tooltips distinguish editing from
+persisting a reusable copy. Both creator save dialogs identify their scope;
+the debug encounter-publication action has an explicit label too.
+
+`TEST_VERIFIED`: **68/68** focused including translation catalogs; full
+**1060/1064**, the same four known animation-scene/context/population/translation
+failures. Strict native-shaped checkbox regression fails against the original
+line 29 and passes with the repair. Regressions cover SP/admin/non-admin/revoked
+publication rights, invalid-name/Cancel behavior, reviewed NPC/roster snapshots,
+roster saving from Presets and empty browsers, modal-control isolation, compact/
+large-font geometry and Done validation/audio cleanup. `STATIC_ONLY`: nine Lua
+syntax and six production Kahlua checks, EN/TL JSON/key/placeholder parity and
+whitespace pass. Ten new and six updated Character keys in EN/TL. Coverage checked
+for sixteen repo evidence paths plus two unindexed installed native Lua files;
+changed/unindexed source was read directly. No Core edits or native launch/control.
+
+Next: user-owned fresh-session save-dialog, Presets roster-save and Done retest,
+then the remaining backpack/loadout/audio/CRUD/skin/library/SP/MP matrices. Native
+rendering, file-save interactions and audible acceptance remain unverified.
+
+## P5R11 backpack-color continuity — native acceptance pending
 
 The creator preview now retains the exact tint, texture and decal of an existing
 backpack across inventory and body reconstruction. Previously a fresh generated
@@ -471,15 +505,16 @@ SP/MP/co-op acceptance.
 
 ## Next Chunk
 
-**P6 — user-owned fresh-session backpack-color retest after P5R11, then the
-loadout/audio/CRUD, skin/save/library and SP/MP/co-op matrices. Developer-side
-P5R11 gates pass; native rendering/audio/lifecycle acceptance remains open.**
+**P6 — user-owned fresh-session save-dialog and Presets roster-save retest after
+P5R12, then the backpack/loadout/audio/CRUD, skin/library and SP/MP/co-op matrices.
+Developer-side gates pass; native rendering/audio/lifecycle acceptance stays open.**
 
 ## Repository safety
 
 ProjectHoomans and PsychopatzCore remain on existing `main` branches. Current
-ProjectHoomans pre-P5R11 HEAD observed is
-`5ced43e44d957ff1fe090cb16cc224d3d4aeabbd`.
+Concurrent semantic-tooling work committed independently as
+`c39beeef` while P5R12 was underway. P5R12 owns only its exact creator/test/docs
+paths and preserves those independent commits.
 The worktree contains unrelated active semantic/UI edits; preserve them. No new
 branch, push, Workshop publication, reset, stash, broad staging, or agent-run
 native PZ validation is authorized. All native regressions were supplied by
