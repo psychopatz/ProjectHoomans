@@ -2,7 +2,7 @@
 handoff_schema: 2
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-updated_at: "2026-11-18T09:16:28.557729Z"
+updated_at: "2026-11-18T09:17:41.634987Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P5R4"
@@ -12,16 +12,17 @@ codebase_memory_indexed_commit: "86000e26cc26561a99894a2abb978b6946da3c94"
 checkpoint_mode: "committed_handoff"
 phase_commit: "self"
 phase_commit_phase: "P5R4"
-phase_commit_message: "phase(P5R4): repair native creator editing and equipment explorer"
+phase_commit_message: "phase(P5R4): use Kahlua-compatible shared outfit import"
 phase_commit_vector: "project-hoomans=self;psychopatz-core=8a5ba7aec2e5fecad449c3b5abf28648d0e6a148;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 ---
 
 
+
 # Session Handoff
 
-P5R4 developer repair is complete. Both creator entry points retain one shared
+P5R4 developer repair is complete, including the final Kahlua import correction. Both creator entry points retain one shared
 editor/model. Buffered text commits, validated rollback, isolated audio/visual
 invalidation, actorless owned voice preview, compact fields/locks/gender icons,
 grouped equipment tiles and the mod-aware paged Item Explorer are implemented.

@@ -1,5 +1,6 @@
 -- Canonical draft edits. No live player, world inventory, or second save format.
 require "PNC/Core/Identity/PNC_Identity_Appearance"
+require "PNC/Identity/PNC_UniqueNPCOutfitCapture"
 PNC.NPCAuthoringLoadout = PNC.NPCAuthoringLoadout or {}
 local Model = PNC.NPCAuthoringLoadout
 local Appearance = PNC.Identity.Appearance
@@ -111,6 +112,6 @@ function Model.SetSlot(draft, slot, spec, baseline)
     return true
 end
 
-Model.CaptureOutfit = require("PNC/Identity/PNC_UniqueNPCOutfitCapture").Capture
+Model.CaptureOutfit = PNC.UniqueNPCOutfitCapture.Capture
 
 return Model
