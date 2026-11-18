@@ -83,7 +83,7 @@ local function addLabel(parent, value)
 end
 
 local function newCombo(parent, callback, target)
-    local combo = ISComboBox:new(0, 0, 1, 1, target or parent, callback)
+    local combo = ISComboBox:new(0, 0, 1, 28, target or parent, callback)
     combo:initialise()
     combo:instantiate()
     parent:addChild(combo)

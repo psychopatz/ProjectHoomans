@@ -239,6 +239,7 @@ function ISPNCNPCAuthoringEditor:commitAdapterDraft()
 end
 
 function ISPNCNPCAuthoringEditor:invokeWorkflow(action)
+    if action == "randomize" and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     local adapter = self.presentationAdapter
     if not adapter then return false end
     local method = action == "randomize" and "Randomize"
@@ -264,6 +265,7 @@ require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Actions"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Form"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Details"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringAttributes"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Preview"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Persistence"
 

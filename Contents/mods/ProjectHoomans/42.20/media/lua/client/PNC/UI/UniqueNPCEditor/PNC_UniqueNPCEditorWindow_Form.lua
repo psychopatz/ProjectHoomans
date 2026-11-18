@@ -89,10 +89,8 @@ function Window:refreshStyleOptions()
     local female = self.draft and self.draft.isFemale == true
     local survivor = self.draft and self.draft.identity
         and self.draft.identity.survivor or {}
-    addOptions(self.hairCombo, appearanceOptions(female))
-    addOptions(self.beardCombo, beardOptions(female))
-    selectCombo(self.hairCombo, survivor.hairModel)
-    selectCombo(self.beardCombo, survivor.beardModel)
+    PNC.NPCAuthoringFields.Options(self, self.hairCombo, appearanceOptions(female), survivor.hairModel)
+    PNC.NPCAuthoringFields.Options(self, self.beardCombo, beardOptions(female), survivor.beardModel)
     self.beardCombo:setEnabled(not female)
     if self.appearanceTab and self.appearanceTab.refreshHairBeardOptions then
         self.appearanceTab:refreshHairBeardOptions()

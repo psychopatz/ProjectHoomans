@@ -112,6 +112,21 @@ function Model.SetSlot(draft, slot, spec, baseline)
     return true
 end
 
+function Model.SetOutfit(draft, appearance)
+    local items = {}
+    for _, item in ipairs(draft.startingItems or {}) do
+        if not item.wornSlot or item.equipSlot or item.maxWeight or item.bagContainer then items[#items + 1] = copy(item) end
+    end
+    draft.appearance = copy(appearance)
+    draft.startingItems = items
+    draft.authoredFields = draft.authoredFields or {}
+    draft.authoredFields.startingItems = true
+    draft.authoringClears = draft.authoringClears or {}
+    draft.authoringClears.startingItems = #items == 0 or nil
+    draft.runtimeRecord = nil
+    draft._dirty = true
+end
+
 Model.CaptureOutfit = PNC.UniqueNPCOutfitCapture.Capture
 
 return Model

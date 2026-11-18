@@ -28,6 +28,8 @@ function Base:forceImageSize(w,h) self.imageWidth, self.imageHeight = w,h end
 function Base:setEnabled(v) self.enabled = v end
 Base.setEnable = Base.setEnabled
 function Base:setName(v) self.name = v end
+function Base:setTitle(v) self.title = v end
+function Base:setFont(font, pad) self.font, self.itemPadY = font, pad end
 function Base:setScrollHeight(v) self.scrollHeight = v end
 function Base:getYScroll() return self.yScroll or 0 end
 function Base:setYScroll(v) self.yScroll = v end
@@ -40,7 +42,7 @@ function Base:getText() return self.text or "" end
 function Base:getWidth() return self.width end
 function Base:getHeight() return self.height end
 function Base:clear() self.items = {}; self.options = {}; self.selected = 0 end
-function Base:addItem(label, row) self.items[#self.items + 1] = { item = row, index = #self.items + 1 } end
+function Base:addItem(label, row) self.items[#self.items + 1] = { item = row, text = label, index = #self.items + 1 } end
 function Base:getItem() return self.items[self.selected] end
 function Base:addOptionWithData(label, data) self.options[#self.options + 1] = { text = label, data = data }; if self.selected == 0 then self.selected = 1 end end
 function Base:selectData(data) for i, option in ipairs(self.options) do if option.data == data then self.selected = i end end end
@@ -110,6 +112,7 @@ for _, path in ipairs({ "PNC_NPCAuthoringLoadout", "PNC_NPCAuthoringCatalog" }) 
     package.loaded["PNC/UI/NPCAuthoring/" .. path] = true
 end
 T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Loadout.lua")
+T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringAttributes.lua")
 T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Lifecycle.lua")
 T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout.lua")
 ISPNCUniqueNPCAppearanceWindow = Base:derive()

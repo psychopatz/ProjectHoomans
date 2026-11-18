@@ -40,6 +40,7 @@ local Profile = {
 }
 
 ISPNCNPCAuthoringEditor = {
+    fieldCapability = function() return { editable = true } end,
     Internal = {
         Model = Model,
         Presentation = Profile,

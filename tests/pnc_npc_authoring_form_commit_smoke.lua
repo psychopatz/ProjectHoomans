@@ -46,4 +46,17 @@ e.forenameEntry:setText('Recovered')
 e.forenameEntry:onCommandEntered()
 T.equal(e.draft.identity.survivor.forename, 'Recovered', 'correcting invalid text recovers normally')
 T.equal(previews, 2, 'recovery performs one accepted preview update')
+e.presentationMode = 'companion'
+e.presentationAdapter = {}
+e.commitAdapterDraft = function() return false end
+e.draft.identity.survivor.hairModel = nil
+e.draft.identity.survivor.beardModel = nil
+e.draft.authoringClears = {}
+local synced = 0
+function e.appearanceTab:refreshGenderOptions() synced = synced + 1 end
+e:syncControls()
+T.truthy(synced > 0, 'production synchronization also refreshes the visible appearance controls')
+e:pullForm()
+T.falsy(e.draft.authoringClears['appearance.hairModel'], 'unrelated companion commit cannot clear generated hair')
+T.falsy(e.draft.authoringClears['appearance.beardModel'], 'unrelated companion commit cannot clear generated beard')
 T.finish('pnc_npc_authoring_form_commit_smoke')

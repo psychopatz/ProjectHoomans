@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R4 developer repair complete — P6 native acceptance pending
+**Status:** P5R5 developer repair verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -808,6 +808,34 @@ commit. Native input/rendering/audio and P6 lifecycle results remain unverified.
 Use the revised native matrix in the linked audit; the installed game is PZ
 42.22.2 while the packaged runtime directory remains 42.20.
 
+### P5R5 — Randomization policy and browser usability repair
+
+User-authorized repair from
+[RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md](RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md).
+Developer-side implementation is complete; native acceptance remains unverified.
+
+- One shared capability excludes companion Random actions/choices and rejects
+  stale handler/adapter routes, preserving automatic/default/no-op generation.
+- Debug Randomize look releases explicit visual overrides, materializes exact
+  new clothing once and updates controls/portrait/slots while retaining unrelated
+  biography, attributes, voice and carried/held gear.
+- Combo baseHeight, explicit list fonts/row metrics and label-position contracts
+  are corrected. Disabled buttons have neutral styling.
+- One shared contextual browser presents outfit rows/focused preview, item icon
+  tiles, compact presets/scope and searchable attribute choices. Apply/Cancel,
+  invalid/filtered selection, contextual quantity/destination and empty states
+  have production-boundary coverage.
+- Skills/trait groups use bounded controls and local removal; font/viewport
+  matrices exercise stacking, scrolling and browser modes.
+- Focused suite **55/55**; full suite **1048/1052**, with the same four known
+  failures. All 33 Lua syntax/22 production Kahlua checks, JSON, 15 new EN/TL keys,
+  static references, parity and whitespace checks pass.
+
+**P5R5 gate:** closed only by the exact local phase commit after these developer
+checks. P6 must establish actual native rendering/input/audio and SP/MP/co-op
+outcomes. Registered native outfit names remain available; no guessed test-name
+blacklist or fabricated outfit-visibility API was introduced.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
@@ -835,7 +863,11 @@ unless the user explicitly delegates native control:
 - verify source indicators and Resolved Preview update without mutating saved
   blueprint intent;
 - reopen the editor repeatedly and confirm no reroll until Randomize is used;
-- verify Reset, Randomize, and Revert to Preset are distinct;
+- verify companion Reset/Revert and debug Randomize look have distinct behavior;
+- verify companion customization exposes no Random choices/actions, including
+  after loading older randomized presets;
+- verify browser selection, focused outfit preview, Apply/Cancel, grouped
+  attributes and compact preset scope using the P5R5 native matrix;
 - verify the final active-companion summary before world entry;
 - use the Resolution Inspector to confirm shared field-source traces when
   diagnosing a mismatch;

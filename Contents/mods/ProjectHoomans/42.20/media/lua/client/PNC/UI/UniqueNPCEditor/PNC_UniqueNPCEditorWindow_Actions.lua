@@ -11,6 +11,13 @@ local beardOptions = Internal.beardOptions
 local Storage = Internal.Storage
 local Profile = Internal.Presentation
 
+local function readStyle(combo, survivor, key, clears)
+    local value = comboData(combo)
+    if value == "__current" then return end
+    survivor[key] = value ~= "__random" and value or nil
+    clears["appearance." .. key] = value == "__random" and true or nil
+end
+
 local function setControlEnabled(control, enabled)
     if not control then return end
     if control.setEnabled then control:setEnabled(enabled == true)
@@ -92,21 +99,9 @@ function Window:pullForm()
         self.draft.displayName = first ~= "" and last ~= ""
             and first .. " " .. last or first .. last
         self.draft.archetypeID = comboData(self.archetypeCombo) or "General"
-        survivor.hairModel = comboData(self.hairCombo)
-        survivor.beardModel = comboData(self.beardCombo)
         self.draft.authoringClears = self.draft.authoringClears or {}
-        if survivor.hairModel == "__random" then survivor.hairModel = nil end
-        if survivor.beardModel == "__random" then survivor.beardModel = nil end
-        if survivor.hairModel == nil then
-            self.draft.authoringClears["appearance.hairModel"] = true
-        else
-            self.draft.authoringClears["appearance.hairModel"] = nil
-        end
-        if survivor.beardModel == nil then
-            self.draft.authoringClears["appearance.beardModel"] = true
-        else
-            self.draft.authoringClears["appearance.beardModel"] = nil
-        end
+        readStyle(self.hairCombo, survivor, "hairModel", self.draft.authoringClears)
+        readStyle(self.beardCombo, survivor, "beardModel", self.draft.authoringClears)
         self.draft.equipmentSpawnMode = comboData(self.equipmentModeCombo)
             or "none"
         local valid, reason = Model.BuildBlueprint(self.draft)
@@ -138,21 +133,9 @@ function Window:pullForm()
     self.draft.archetypeID = comboData(self.archetypeCombo) or "General"
     self.draft.factionID = fieldText(self.factionEntry):trim()
     self.draft.factionID = self.draft.factionID ~= "" and self.draft.factionID or nil
-    survivor.hairModel = comboData(self.hairCombo)
-    survivor.beardModel = comboData(self.beardCombo)
     self.draft.authoringClears = self.draft.authoringClears or {}
-    if survivor.hairModel == "__random" then survivor.hairModel = nil end
-    if survivor.beardModel == "__random" then survivor.beardModel = nil end
-    if survivor.hairModel == nil then
-        self.draft.authoringClears["appearance.hairModel"] = true
-    else
-        self.draft.authoringClears["appearance.hairModel"] = nil
-    end
-    if survivor.beardModel == nil then
-        self.draft.authoringClears["appearance.beardModel"] = true
-    else
-        self.draft.authoringClears["appearance.beardModel"] = nil
-    end
+    readStyle(self.hairCombo, survivor, "hairModel", self.draft.authoringClears)
+    readStyle(self.beardCombo, survivor, "beardModel", self.draft.authoringClears)
     self.draft.equipmentSpawnMode = comboData(self.equipmentModeCombo) or "none"
     local valid, reason = Model.BuildBlueprint(self.draft)
     if not valid then
@@ -175,14 +158,16 @@ function Window:syncControls()
     selectCombo(self.genderCombo, self.draft.isFemale == true)
     selectCombo(self.archetypeCombo, self.draft.archetypeID or "General")
     PNC.NPCAuthoringFields.SyncText(self, self.factionEntry, self.draft.factionID)
-    addOptions(self.hairCombo, appearanceOptions(self.draft.isFemale == true))
-    addOptions(self.beardCombo, beardOptions(self.draft.isFemale == true))
-    selectCombo(self.hairCombo, survivor.hairModel)
-    selectCombo(self.beardCombo, survivor.beardModel)
+    PNC.NPCAuthoringFields.Options(self, self.hairCombo, appearanceOptions(self.draft.isFemale == true), survivor.hairModel)
+    PNC.NPCAuthoringFields.Options(self, self.beardCombo, beardOptions(self.draft.isFemale == true), survivor.beardModel)
     self.beardCombo:setEnabled(self.draft.isFemale ~= true)
     selectCombo(self.equipmentModeCombo,
         self.draft.equipmentSpawnMode or "none")
     updatePresentation(self)
+    if self.appearanceTab then
+        self.appearanceTab.draft = self.draft
+        if self.appearanceTab.refreshGenderOptions then self.appearanceTab:refreshGenderOptions() end
+    end
     self:refreshConfiguredDetails()
     if self.refreshLoadoutPage then self:refreshLoadoutPage() end
     self.syncing = false
@@ -232,6 +217,7 @@ function ISPNCNPCAuthoringEditor:onAction(button)
     elseif action == "load" then
         self:loadSelected()
     elseif action == "randomize" then
+        if not PNC.NPCAuthoringFields.CanRandomize(self) then return end
         if self:pullForm() == false then return end
         self:adoptPreview()
         Model.Randomize(self.draft)

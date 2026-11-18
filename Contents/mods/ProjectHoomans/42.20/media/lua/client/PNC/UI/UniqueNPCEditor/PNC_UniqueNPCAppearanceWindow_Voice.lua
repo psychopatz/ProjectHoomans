@@ -48,17 +48,10 @@ end
 function ISPNCUniqueNPCAppearanceWindow:onAction(button)
     local action = button and button.internal or ""
     if action == "randomize" then
-        if self.parentEditor and self.parentEditor.presentationAdapter
-            and self.parentEditor.invokeWorkflow
-        then
-            -- Companion Randomize is a session operation.  Do not mutate a
-            -- local resolved draft and accidentally leave the canonical seed
-            -- unchanged.
-            if self.parentEditor:pullForm() == false then return end
-            self.parentEditor:invokeWorkflow("randomize")
-            return
+        if not PNC.NPCAuthoringFields.CanRandomize(self) then return end
+        if self.parentEditor and self.parentEditor.onAction then
+            return self.parentEditor:onAction({ internal = "randomize" })
         end
-        self.draft.previewSeed = nil
         Model.Randomize(self.draft)
         self:markChanged()
     elseif action == "playVoice" then

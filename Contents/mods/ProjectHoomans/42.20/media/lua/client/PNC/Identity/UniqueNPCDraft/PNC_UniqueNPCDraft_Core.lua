@@ -317,16 +317,40 @@ function Model.UpdatePreviewDraft(preview, draft)
     return output
 end
 
+-- Debug-only user action: replace the visual scope, retaining authored bio,
+-- attributes, held/carried gear and audio. Never promote the old preview look.
 function Model.Randomize(draft)
     if not draft then return false end
     Model.SyncFromRuntime(draft)
+    local previousSeed = tonumber(draft.previewSeed) or 1
     draft.previewSeed = nextSeed()
-    -- Randomize deliberately changes generation; ordinary edits retain it.
-    if Appearance and Appearance.Normalize then
-        draft.appearance = Appearance.Normalize()
-        draft.appearanceAuthored = draft.appearanceAuthored or {}
-        draft.appearanceAuthored.appearance = true
+    if draft.previewSeed == previousSeed then draft.previewSeed = previousSeed % 2147483645 + 1 end
+    local voice = draft.appearance and copy(draft.appearance.voice)
+    local appearance = Appearance.Normalize({ voice = voice })
+    local values = getAllOutfits and getAllOutfits(draft.isFemale == true)
+    if values and values:size() > 0 then
+        local id = tostring(values:get(draft.previewSeed % values:size()))
+        local slots = OutfitCapture.Capture(id, draft.isFemale)
+        if slots then
+            appearance.outfit, appearance.slots = { mode = "item", id = id }, slots
+        end
     end
+    draft.appearance = appearance
+    draft.appearanceAuthored = draft.appearanceAuthored or {}
+    draft.appearanceAuthored.appearance = true
+    draft.identity = draft.identity or { survivor = {} }
+    draft.identity.survivor = draft.identity.survivor or {}
+    draft.authoringClears = draft.authoringClears or {}
+    for _, field in ipairs({ "hairModel", "beardModel", "skinTexture", "skinColor", "hairColor" }) do
+        draft.identity.survivor[field] = nil
+        draft.appearanceAuthored[field] = nil
+        draft.authoringClears["appearance." .. field] = nil
+    end
+    local items = {}
+    for _, item in ipairs(draft.startingItems or {}) do
+        if not presentationClothing(item) then items[#items + 1] = item end
+    end
+    draft.startingItems = items
     draft.runtimeRecord = nil
     draft._dirty = true
     return true

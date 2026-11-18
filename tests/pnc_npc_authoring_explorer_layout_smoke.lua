@@ -49,6 +49,20 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
         T.equal(explorer.offset, 48, 'Next advances the page')
         explorer:Hide()
         T.truthy(e.tabPanel.visible, 'dismissal restores editor controls')
+        for _, mode in ipairs({ 'carry', 'outfit', 'preset' }) do
+            explorer:Show({ mode = mode, items = mode ~= 'carry' and { { id = 'one', label = 'Long catalog entry', search = 'long catalog entry' } } or nil,
+                onChoose = function() return true end })
+            for _, control in ipairs({ explorer.heading, explorer.hint, explorer.sources, explorer.categories,
+                explorer.grid, explorer.details, explorer.quantity, explorer.quantityLabel, explorer.destination,
+                explorer.confirm, explorer.previous, explorer.counter, explorer.nextButton }) do
+                inside(control, explorer.width, explorer.height, 'contextual browser control fits its viewport')
+            end
+            explorer:Hide()
+        end
+        for _, group in ipairs(e.attributeGroups) do
+            inside(group.browse, e.pages.attributes.width, e.pages.attributes.contentHeight, 'attribute picker fits its content')
+            inside(group.configured, e.pages.attributes.width, e.pages.attributes.contentHeight, 'grouped configured values fit content')
+        end
     end
 end
 T.finish('pnc_npc_authoring_explorer_layout_smoke')

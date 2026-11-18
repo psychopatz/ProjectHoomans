@@ -19,7 +19,7 @@ end
 
 local function buildAppearanceTopControls(self)
     self.randomizeButton = UI.CreateButton(self, {
-        id = "randomize", title = tr("UI_PNC_UniqueNPCEditor_Randomize", "RANDOMIZE"),
+        id = "randomize", title = tr("UI_PNC_Authoring_RandomizeLook", "Randomize look"),
         target = self, onclick = ISPNCUniqueNPCAppearanceWindow.onAction,
         variant = "selected",
     })
@@ -33,9 +33,10 @@ local function buildAppearanceTopControls(self)
         target = self, onclick = ISPNCUniqueNPCAppearanceWindow.onAction,
         variant = "quiet",
     })
-    self.topControls = {
-        self.randomizeButton, self.playVoiceButton, self.stopVoiceButton,
-    }
+    self.topControls = { self.playVoiceButton, self.stopVoiceButton }
+    local random = PNC.NPCAuthoringFields.CanRandomize(self)
+    self.randomizeButton:setVisible(random)
+    if random then table.insert(self.topControls, 1, self.randomizeButton) end
     if not self.integrated and self.parentEditor and self.parentEditor.presentationMode == "companion" then
         self.advancedClothingButton = UI.CreateButton(self, {
             id = "advancedClothing",

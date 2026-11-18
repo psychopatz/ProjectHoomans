@@ -28,7 +28,7 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
     setLabelText(self.voicePitchLabel, tr("UI_PNC_UniqueNPCEditor_VoicePitch", "Voice pitch") .. ": " .. math.floor(voicePitch))
     local voiceID = "random"
     self.syncing = true
-    selectData(self.outfitCombo, outfitID)
+    PNC.NPCAuthoringFields.Select(self, self.outfitCombo, outfitID)
     local explicitVoice = voicePrefix ~= nil
         or voiceType ~= nil or survivor.voicePitch ~= nil
     if (voice.mode == "item" or explicitVoice) and voicePrefix then
@@ -49,7 +49,7 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
             end
         end
     end
-    selectData(self.voiceCombo, voiceID)
+    PNC.NPCAuthoringFields.Select(self, self.voiceCombo, voiceID)
     if self.voicePitch and self.voicePitch.setCurrentValue then
         self.voicePitch:setCurrentValue(
             math.max(-100, math.min(100, math.floor(voicePitch))), true)
@@ -81,7 +81,7 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
             selectData(self.skinModeCombo, "legacy")
         end
     else
-        selectData(self.skinModeCombo, skinTone)
+        PNC.NPCAuthoringFields.Select(self, self.skinModeCombo, skinTone)
     end
     if self.skinSwatch then
         local swatch = survivor.skinColor or skinToneColor(skinTone)
@@ -111,8 +111,8 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
     end
     local skinText = skinToneLabel(skinTone)
     setLabelText(self.skinValue, skinText)
-    if self.hairCombo then selectData(self.hairCombo, survivor.hairModel) end
-    if self.beardCombo then selectData(self.beardCombo, survivor.beardModel) end
+    if self.hairCombo then PNC.NPCAuthoringFields.Select(self, self.hairCombo, survivor.hairModel) end
+    if self.beardCombo then PNC.NPCAuthoringFields.Select(self, self.beardCombo, survivor.beardModel) end
     if self.beardCombo and self.beardCombo.setEnabled then
         self.beardCombo:setEnabled(self.draft and self.draft.isFemale ~= true)
     end
@@ -124,17 +124,15 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
                 and math.abs(color.g - option.g) < 0.001 and math.abs(color.b - option.b) < 0.001
             then id = option.id end
         end
-        Internal.addOptions(self.hairColorCombo, self.hairPalette)
-        if id == "custom" then self.hairColorCombo:addOptionWithData(
-            tr("UI_PNC_Authoring_CustomColor", "Custom color"), "custom") end
-        selectData(self.hairColorCombo, id)
+        PNC.NPCAuthoringFields.Options(self, self.hairColorCombo, self.hairPalette, id)
+        PNC.NPCAuthoringFields.Select(self, self.hairColorCombo, id)
         local capability = self.parentEditor:fieldCapability("appearance.hairColor")
         setControlEnabled(self.hairColorCombo, capability.editable ~= false)
     end
     for _, row in ipairs(self.rows) do
         local policy = appearance.slots and appearance.slots[row.location]
             or { mode = "none" }
-        selectData(row.policy, policy.mode)
+        PNC.NPCAuthoringFields.Select(self, row.policy, policy.mode)
         if policy.type then selectData(row.item, policy.type) end
         row.item:setEnabled(policy.mode == "item")
     end

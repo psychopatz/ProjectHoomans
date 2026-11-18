@@ -45,6 +45,7 @@ function Window:layoutBio(width, rowHeight, gap)
 end
 
 function Window:layoutAttributes(width, rowHeight, gap)
+    if self.attributeGroups then return self:layoutAttributeGroups(width, rowHeight, gap) end
     local page = self.pages.attributes
     local w = math.max(1, width - gap * 2 - 16)
     local y = gap
@@ -141,6 +142,7 @@ function Window:onResponsiveLayout()
         self.roster:setVisible(true); self.rosterLabel:setVisible(true)
     end
     for _, control in ipairs(self.toolbar) do control:setVisible(not exploring) end
+    PNC.NPCAuthoringFields.NativeMetrics(self)
     self.layout = { x = rect.x, y = top, leftWidth = contentWidth,
         portraitX = px, portraitY = top, portraitWidth = portraitWidth,
         portraitHeight = portraitHeight, compact = compact, stacked = compact,

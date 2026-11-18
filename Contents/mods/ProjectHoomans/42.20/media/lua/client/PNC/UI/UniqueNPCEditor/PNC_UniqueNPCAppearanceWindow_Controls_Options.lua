@@ -32,7 +32,7 @@ function ISPNCUniqueNPCAppearanceWindow:buildVoiceOptions()
     for _, style in ipairs(self.voiceStyles) do
         options[#options + 1] = { id = style.id, label = style.label }
     end
-    addOptions(self.voiceCombo, options)
+    PNC.NPCAuthoringFields.Options(self, self.voiceCombo, options, "random")
     self.voiceEvents = AudioDebug and AudioDebug.GetVoiceEvents
         and AudioDebug.GetVoiceEvents() or {}
     local eventOptions = {}
@@ -54,15 +54,15 @@ function ISPNCUniqueNPCAppearanceWindow:buildOutfitOptions()
     }
     if type(getAllOutfits) == "function" then
         local female = self.draft and self.draft.isFemale == true
-        local ok, values = pcall(getAllOutfits, female)
-        if ok and values and values.size then
+        local values = getAllOutfits(female)
+        if values and values.size then
             for index = 0, values:size() - 1 do
                 local id = tostring(values:get(index))
                 options[#options + 1] = { id = "named:" .. id, label = id }
             end
         end
     end
-    addOptions(self.outfitCombo, options)
+    PNC.NPCAuthoringFields.Options(self, self.outfitCombo, options, "random")
 end
 
 function ISPNCUniqueNPCAppearanceWindow:refreshGenderOptions()
@@ -76,8 +76,8 @@ function ISPNCUniqueNPCAppearanceWindow:refreshGenderOptions()
         survivor.skinTexture = skinTextureForTone(tone,
             self.draft.isFemale == true)
     end
-    addOptions(self.skinModeCombo,
-        skinToneOptions(self.draft and self.draft.isFemale == true))
+    PNC.NPCAuthoringFields.Options(self, self.skinModeCombo,
+        skinToneOptions(self.draft and self.draft.isFemale == true), tone)
     self:buildOutfitOptions()
     self:buildVoiceOptions()
     self:refreshHairBeardOptions()
@@ -87,8 +87,8 @@ end
 function ISPNCUniqueNPCAppearanceWindow:refreshHairBeardOptions()
     local parent = self.parentEditor
     if not self.hairCombo or not parent then return end
-    addOptions(self.hairCombo, parentComboOptions(parent.hairCombo))
-    addOptions(self.beardCombo, parentComboOptions(parent.beardCombo))
+    PNC.NPCAuthoringFields.Options(self, self.hairCombo, parentComboOptions(parent.hairCombo), Internal.comboData(parent.hairCombo))
+    PNC.NPCAuthoringFields.Options(self, self.beardCombo, parentComboOptions(parent.beardCombo), Internal.comboData(parent.beardCombo))
     if self.beardCombo and self.beardCombo.setEnabled then
         self.beardCombo:setEnabled(not (self.draft
             and self.draft.isFemale == true))
@@ -105,11 +105,11 @@ function ISPNCUniqueNPCAppearanceWindow:addLocationRow(location)
         ISPNCUniqueNPCAppearanceWindow.onPolicyChanged)
     row.policy:initialise()
     row.policy.bodyLocation = location
-    addOptions(row.policy, {
+    PNC.NPCAuthoringFields.Options(self, row.policy, {
         { id = "random", label = tr("UI_PNC_UniqueNPCEditor_Random", "Random") },
         { id = "none", label = tr("UI_PNC_UniqueNPCEditor_None", "None") },
         { id = "item", label = tr("UI_PNC_UniqueNPCEditor_Selected", "Selected item") },
-    })
+    }, self:policy(location).mode)
     self.content:addChild(row.policy)
     row.item = ISComboBox:new(0, 0, 1, 24, self,
         ISPNCUniqueNPCAppearanceWindow.onItemChanged)

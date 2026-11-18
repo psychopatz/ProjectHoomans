@@ -34,6 +34,14 @@ function Fields.SyncText(editor, entry, value)
     if entry:getText() ~= value then entry:setText(value) end
 end
 
+-- Disabled actions are neutral, not validation errors. Native setEnable uses
+-- a red border; restore the shared quiet theme while retaining native gating.
+function Fields.EnableButton(button, enabled)
+    button.pncEnabledVariant = button.pncEnabledVariant or button.psychopatzVariant or "quiet"
+    button:setEnable(enabled == true)
+    if UI.StyleButton then UI.StyleButton(button, enabled and button.pncEnabledVariant or "quiet") end
+end
+
 function Fields.Lock(editor, control, id, parent)
     local capability = editor:fieldCapability(id)
     local locked = capability.editable == false
@@ -83,7 +91,7 @@ function Fields.Gender(editor, parent)
     panel.buttons = {}
     function panel:setEnabled(value)
         self.enabled = value
-        for _, button in ipairs(self.buttons) do button:setEnable(value) end
+        for _, button in ipairs(self.buttons) do Fields.EnableButton(button, value) end
     end
     function panel:selectData(value)
         self.selected = value == true and 2 or 1
@@ -145,7 +153,7 @@ function Fields.Choice(editor, parent, callback)
     end
     function panel:setEnabled(value)
         self.enabled = value
-        for _, button in ipairs(self.buttons) do button:setEnable(value) end
+        for _, button in ipairs(self.buttons) do Fields.EnableButton(button, value) end
     end
     function panel:onResize()
         local count = math.max(1, #self.buttons)
@@ -155,6 +163,95 @@ function Fields.Choice(editor, parent, callback)
         for index, button in ipairs(self.buttons) do
             UI.Layout.SetBounds(button, ((index - 1) % columns) * (w + 4), math.floor((index - 1) / columns) * (h + 4), w, h)
         end
+    end
+    parent:addChild(panel)
+    return panel
+end
+
+-- Presentation capability, shared by hosts, callbacks and option builders.
+function Fields.CanRandomize(editor)
+    local host = editor and (editor.presentationMode and editor or editor.parentEditor)
+    return not host or host.presentationMode ~= "companion"
+end
+
+-- A generated value is a display-only current selection, never a way to
+-- re-enter Random after choosing a concrete value in companion creation.
+function Fields.Options(editor, combo, values, current)
+    if not combo then return end
+    combo:clear()
+    local random = Fields.CanRandomize(editor)
+    for _, value in ipairs(values or {}) do
+        if random or value.id ~= "random" and value.id ~= "__random" then
+            combo:addOptionWithData(value.label, value.id)
+        end
+    end
+    Fields.Select(editor, combo, current)
+end
+
+function Fields.Select(editor, combo, value)
+    if not combo then return end
+    local generated = value == nil or value == "random" or value == "__random"
+    if not Fields.CanRandomize(editor) and generated then
+        value = "__current"
+        local found
+        for _, option in ipairs(combo.options or {}) do if option.data == value then found = true end end
+        if not found then combo:addOptionWithData(tr("UI_PNC_Authoring_CurrentValue", "Current value"), value) end
+    elseif value == nil then
+        value = ""
+        for _, option in ipairs(combo.options or {}) do if option.data == "__random" then value = "__random" end end
+    end
+    for index, option in ipairs(combo.options or {}) do
+        if option.data == value then combo.selected = index; return end
+    end
+    -- Preserve missing modded values without silently selecting the first row.
+    local label = value == "custom" and tr("UI_PNC_Authoring_CustomColor", "Custom color")
+        or value == "legacy" and tr("UI_PNC_UniqueNPCEditor_LegacySkin", "Legacy custom tone (select a native tone to replace)")
+        or tr("UI_PNC_UniqueNPCEditor_Unavailable", "Unavailable: ") .. tostring(value)
+    combo:addOptionWithData(label, value)
+    combo.selected = #combo.options
+end
+
+function Fields.NativeMetrics(control)
+    if not control then return end
+    if control.pncSmallFont and control.setFont then
+        control:setFont(UIFont.Small, 6)
+        for _, entry in ipairs(control.items or {}) do entry.height = control.itemheight end
+    end
+    if control.baseHeight ~= nil then control.baseHeight = control.height end
+    if control.originalX ~= nil then control.originalX = control.x end
+    for _, child in pairs(control.children or {}) do Fields.NativeMetrics(child) end
+end
+
+function Fields.Level(parent)
+    local panel = ISPanel:new(0, 0, 1, 1)
+    panel:initialise(); panel:instantiate(); panel:noBackground()
+    panel.options, panel.selected = {}, 1
+    function panel:clear() self.options, self.selected = {}, 1 end
+    function panel:refreshValue()
+        local option = self.options[self.selected]
+        self.value:setName(option and tostring(option.data) or "0")
+    end
+    function panel:addOptionWithData(label, data) self.options[#self.options + 1] = { text = label, data = data }; self:refreshValue() end
+    function panel:selectData(data)
+        for index, option in ipairs(self.options) do if option.data == data then self.selected = index end end
+        self:refreshValue()
+    end
+    panel.value = ISLabel:new(0, 0, 24, "0", 1, 1, 1, 1, UIFont.Small, true)
+    panel.value:initialise(); panel:addChild(panel.value)
+    panel.buttons = {}
+    for index, title in ipairs({ "-", "+" }) do
+        local delta = index == 1 and -1 or 1
+        panel.buttons[index] = UI.CreateButton(panel, { title = title, target = panel, onclick = function(target)
+            target.selected = math.max(1, math.min(#target.options, target.selected + delta)); target:refreshValue()
+        end, variant = "quiet" })
+    end
+    function panel:setEnabled(value) for _, b in ipairs(self.buttons) do Fields.EnableButton(b, value) end end
+    function panel:onResize()
+        local size = math.min(self.height, self.width / 3)
+        UI.Layout.SetBounds(self.buttons[1], 0, 0, size, self.height)
+        UI.Layout.SetBounds(self.buttons[2], self.width - size, 0, size, self.height)
+        UI.Layout.SetBounds(self.value, size + 5, 0, math.max(1, self.width - size * 2 - 10), self.height)
+        Fields.NativeMetrics(self)
     end
     parent:addChild(panel)
     return panel

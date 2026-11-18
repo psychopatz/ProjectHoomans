@@ -27,7 +27,7 @@ local function buildEditorToolbar(self)
         { "new", "UI_PNC_UniqueNPCEditor_New", "NEW", "quiet" },
         { "save", "UI_PNC_UniqueNPCEditor_Save", "SAVE", "quiet" },
         { "produce", "UI_PNC_UniqueNPCEditor_Produce", "PRODUCE", "primary" },
-        { "randomize", "UI_PNC_UniqueNPCEditor_Randomize", "RANDOMIZE", "selected" },
+        { "randomize", "UI_PNC_Authoring_RandomizeLook", "Randomize look", "selected" },
     }
     buttons[#buttons + 1] = { "preview", "UI_PNC_Authoring_Preview", "Preview", "quiet" }
     for _, button in ipairs(buttons) do
@@ -124,7 +124,7 @@ local function buildEditorForm(self)
 
     self.controlParent = self.pages.attributes
     self.skillCombo = newCombo(self.controlParent, nil)
-    self.skillLevelCombo = newCombo(self.controlParent, nil)
+    self.skillLevelCombo = PNC.NPCAuthoringFields.Level(self.controlParent)
     self.addRows[#self.addRows + 1] = self:addRepeaterRow("skill",
         "UI_PNC_UniqueNPCEditor_AddSkill", "Skill", {
             self.skillCombo, self.skillLevelCombo,
@@ -175,6 +175,8 @@ local function buildEditorForm(self)
         self.configuredDetails:setVisible(false)
         self.removeConfiguredButton:setVisible(false)
     end
+
+    self:buildAttributeGroups()
 
     self.relationshipDetails = UI.CreateList(self.pages.relations, {
         itemHeight = Layout.Pixels(32, self.uiScale), doDrawItem = drawDetail,

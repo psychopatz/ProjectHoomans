@@ -82,18 +82,18 @@ local function configuredRows(self)
     end
     for _, skillID in ipairs(collectionIDs(draft.skillLevels, true)) do
         add(skillLabel(skillID),
-            "Level " .. tostring(draft.skillLevels[skillID]),
+            tostring(draft.skillLevels[skillID]),
             "skill", skillID)
     end
     for _, traitID in ipairs(collectionIDs(draft.npcTraits)) do
-        add(npcTraitLabel(traitID), "NPC trait", "npcTrait", traitID)
+        add(npcTraitLabel(traitID), "", "npcTrait", traitID)
     end
     for _, traitID in ipairs(collectionIDs(draft.vanillaTraits)) do
-        add(vanillaTraitLabel(traitID), "Physiological trait",
+        add(vanillaTraitLabel(traitID), "",
             "vanillaTrait", traitID)
     end
     for _, traitID in ipairs(collectionIDs(draft.dynamicTraits)) do
-        add(npcTraitLabel(traitID), "Dynamic trait", "dynamicTrait", traitID)
+        add(npcTraitLabel(traitID), "", "dynamicTrait", traitID)
     end
     return rows
 end
@@ -281,6 +281,7 @@ function Window:refreshConfiguredDetails()
         list:addItem(row.label, row)
     end
     list.selected = #self.configuredRows > 0 and 1 or 0
+    if self.refreshAttributeGroups then self:refreshAttributeGroups() end
     local selected = list.getItem and list:getItem() or nil
     if self.removeConfiguredButton then
         if self.removeConfiguredButton.setEnable then
@@ -347,7 +348,14 @@ end
 function Window:removeSelectedConfigured()
     local selected = self.configuredDetails and self.configuredDetails:getItem()
     local row = selected and selected.item or nil
+    return self:removeConfiguredRow(row)
+end
+
+function Window:removeConfiguredRow(row)
     if not row or not row.removable or not self.draft then return end
+    local fieldID = row.kind == "skill" and "skills.baseLevels" or row.kind == "npcTrait" and "traits.npc"
+        or row.kind == "vanillaTrait" and "traits.physiological" or "traits.dynamic"
+    if self:fieldCapability(fieldID).editable == false then return end
     if row.kind == "skill" then
         if self.draft.skillLevels then self.draft.skillLevels[row.key] = nil end
         self.draft.authoredFields = self.draft.authoredFields or {}

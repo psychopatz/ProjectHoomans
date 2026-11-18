@@ -26,18 +26,55 @@ function Window:buildLoadoutPage()
     self.slotTiles, self.slotHeaders = {}, {}
     self.itemExplorer = ISPNCNPCAuthoringItemExplorer:new(0, 0, 1, 1)
     self.itemExplorer:initialise(); self.itemExplorer:instantiate(); self:addChild(self.itemExplorer)
-    self.itemExplorer.onDismiss = function() self:requestResponsiveLayout() end
+    local function modalLayout()
+        self:requestResponsiveLayout()
+        if self.parentEditor and self.parentEditor.onResponsiveLayout then self.parentEditor:onResponsiveLayout() end
+    end
+    self.itemExplorer.onDismiss, self.itemExplorer.onShown = modalLayout, modalLayout
     self.itemExplorer:setVisible(false)
 end
 function Window:browseOutfits()
-    local items = {}
+    if not self.draft or self:pullForm() == false then return end
+    if self:fieldCapability("appearance").editable == false then return end
+    local items, previews = {}, {}
     for _, option in ipairs(self.appearanceTab.outfitCombo.options or {}) do
-        items[#items + 1] = { id = option.data, label = option.text, search = string.lower(option.text), category = '', source = '' }
+        if option.data ~= "__current" and (PNC.NPCAuthoringFields.CanRandomize(self) or option.data ~= "random") then
+            items[#items + 1] = { id = option.data, label = option.text, search = string.lower(option.text) }
+        end
     end
-    self.itemExplorer:Show({ title = tr('UI_PNC_Authoring_BrowseOutfits', 'Browse outfits'), items = items,
-        onChoose = function(item)
-            local ok = self.appearanceTab:onOutfitChanged({ selected = 1, options = { { data = item.id } } })
-            return ok ~= false, ok == false and tr('UI_PNC_Authoring_UnavailableOutfit', 'This outfit is unavailable') or nil
+    local function inspect(item)
+        if previews[item.id] then return previews[item.id].spec end
+        local candidate = PNC.NPCAuthoring.Registry.Copy(self.draft)
+        candidate.runtimeRecord = nil
+        local appearance = PNC.Identity.Appearance.Normalize(candidate.appearance)
+        local named = string.sub(item.id, 1, 6) == "named:"
+        appearance.outfit = named and { mode = "item", id = string.sub(item.id, 7) } or { mode = item.id }
+        appearance.slots = {}
+        if named then
+            local slots = Edits.CaptureOutfit(appearance.outfit.id, candidate.isFemale)
+            if not slots then return nil end
+            appearance.slots = slots
+        end
+        Edits.SetOutfit(candidate, appearance)
+        local preview = I.Model.BuildPreviewDraft(candidate)
+        local record = I.Model.EnsureRuntimeRecord(preview, true)
+        local spec = record and I.Model.BuildPortraitSpec(preview)
+        previews[item.id] = { appearance = appearance, spec = spec }
+        return spec
+    end
+    self.itemExplorer:Show({ mode = "outfit", title = tr('UI_PNC_Authoring_BrowseOutfits', 'Browse outfits'), items = items,
+        preview = inspect, onChoose = function(item)
+            if not previews[item.id] then inspect(item) end
+            local choice = previews[item.id]
+            if not choice then return false, tr('UI_PNC_Authoring_UnavailableOutfit', 'This outfit is unavailable') end
+            local candidate = PNC.NPCAuthoring.Registry.Copy(self.draft)
+            Edits.SetOutfit(candidate, choice.appearance)
+            local valid, reason = I.Model.BuildBlueprint(candidate)
+            if not valid then return false, tostring(reason) end
+            self.draft = candidate
+            self.appearanceTab.draft = self.draft
+            self.appearanceTab:markChanged()
+            return true
         end })
     self:requestResponsiveLayout()
 end
@@ -50,7 +87,10 @@ function Window:openSlot(slot)
         allowed = {}
         for _, item in ipairs(Catalog.Clothing(slot.id)) do allowed[item.id] = true end
     end
-    self.itemExplorer:Show({ title = slot.label, allowed = allowed,
+    self.itemExplorer:Show({ mode = slot.kind, title = slot.label, allowed = allowed,
+        reloadAllowed = slot.kind == 'worn' and function()
+            local refreshed = {}; for _, item in ipairs(Catalog.Clothing(slot.id)) do refreshed[item.id] = true end; return refreshed
+        end or nil,
         onChoose = function(item, quantity, destination) return self:applyLoadout(slot, item.id, quantity, destination) end })
     self:requestResponsiveLayout()
 end
@@ -116,10 +156,11 @@ function Window:refreshLoadoutPage()
                 control:drawTextCentre(L.Ellipsize(row.label, UIFont.Small, math.max(1, control.width - 8)), control.width / 2,
                     control.height - (getTextManager and getTextManager():getFontHeight(UIFont.Small) or 16) - 4, 0.88, 0.93, 0.94, 1, UIFont.Small)
             end
-            tile.clear = button(self.slotContent, self, '×', function(target, clicked)
+            tile.clear = button(self.slotContent, self, 'x', function(target, clicked)
                 local ok, reason = target:applyLoadout(clicked.slot)
                 if not ok and reason then target:setStatus(reason) end
             end)
+            tile.clear.tooltip = tr('UI_PNC_Authoring_Clear', 'Clear slot / Remove')
             self.slotTiles[index] = tile
         end
         tile.slot, tile.clear.slot = slot, slot
@@ -134,6 +175,11 @@ function Window:refreshLoadoutPage()
     local outfitID = outfit and outfit.mode == 'item' and 'named:' .. tostring(outfit.id) or outfit and outfit.mode or 'random'
     local label = ''
     for _, option in ipairs(self.appearanceTab.outfitCombo.options or {}) do if option.data == outfitID then label = option.text end end
+    if not PNC.NPCAuthoringFields.CanRandomize(self) or outfitID == 'none' then
+        local count = 0
+        for _, row in ipairs(rows) do if row.kind == 'worn' and row.type then count = count + 1 end end
+        label = tr('UI_PNC_Authoring_EquippedClothing', 'Equipped clothing slots') .. ': ' .. count
+    end
     self.outfitCaption = label
     self.outfitValue:setName(label)
 end

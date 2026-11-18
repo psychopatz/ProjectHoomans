@@ -177,7 +177,11 @@ function Adapter:RevertToPreset() self.seed = 12 return true end
 
 local editorClass = {}
 function editorClass:new()
-    return setmetatable({}, { __index = self })
+    local explorer = { visible = false }
+    function explorer:getIsVisible() return self.visible end
+    function explorer:Show(options) self.visible = true; self.options = options end
+    function explorer:Hide() self.visible = false; if self.onDismiss then self.onDismiss() end end
+    return setmetatable({ itemExplorer = explorer }, { __index = self })
 end
 function editorClass:initialise() end
 function editorClass:instantiate() end
@@ -272,6 +276,8 @@ package.preload["PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor"] = function()
     return { ISPNCNPCAuthoringEditor = editorClass }
 end
 
+PNC.NPCAuthoringFields = { NativeMetrics = function() end, EnableButton = function(control, enabled) control:setEnable(enabled) end }
+
 local UIState = T.load("ProjectHoomans", "client",
     "PNC/UI/StartingCompanions/PNC_StartingCompanionComposerWindow.lua")
 local window = ISPNCStartingCompanionComposerWindow:new(0, 0, 1060, 800,
@@ -303,10 +309,10 @@ local oldIdentity = window.editor.previewIdentity
 window:onAction({ internal = "randomize" })
 T.equal(window.selectedTraitID, sister,
     "randomize retains the selected companion")
-T.truthy(window.adapter.seed ~= oldSeed,
-    "randomize changes the generation seed")
-T.truthy(window.editor.previewIdentity ~= oldIdentity,
-    "randomize changes preview identity")
+T.equal(window.adapter.seed, oldSeed,
+    "companion host rejects randomization")
+T.equal(window.editor.previewIdentity, oldIdentity,
+    "rejected randomization preserves preview identity")
 T.equal(window.editor.portraitTarget.traitID, sister,
     "randomize keeps the portrait on the selected companion")
 
@@ -315,8 +321,12 @@ window.presetCombo:invokeChange()
 T.equal(window.selectedPresetFile, selectedPreset,
     "vanilla preset callback stores the visible preset")
 window:onAction({ internal = "load" })
-T.equal(appliedPreset.companionTraitID, sister,
-    "load applies the preset selected by the visible combo")
+T.falsy(appliedPreset, "opening the preset browser does not apply a preset")
+local explorer = window.editor.itemExplorer
+T.equal(explorer.options.mode, "preset", "presets use the contextual shared browser")
+explorer.options.onChoose(explorer.options.items[1])
+explorer:Hide()
+T.equal(appliedPreset.companionTraitID, sister, "explicit browser apply loads the selected preset")
 T.equal(window.selectedTraitID, sister,
     "template load rebinds the same selected companion transaction")
 

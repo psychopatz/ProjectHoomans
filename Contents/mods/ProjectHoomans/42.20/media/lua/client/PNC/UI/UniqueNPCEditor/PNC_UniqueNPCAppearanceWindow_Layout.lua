@@ -142,6 +142,7 @@ function Window:onResponsiveLayout()
     end
     if self.content.onResize then self.content:onResize() end
     self:syncAdvancedVisibility()
+    PNC.NPCAuthoringFields.NativeMetrics(self)
     self.layout = {
         x = rect.x, y = rect.y, width = rect.width, height = rect.height,
         contentHeight = self.content.contentHeight,
@@ -194,5 +195,6 @@ function Window:layoutIntegratedAppearance()
     self.content:setScrollHeight(height)
     self.content:setYScroll(math.max(-self.content.maxScroll, math.min(0, self.content:getYScroll())))
     self.content:onResize()
+    PNC.NPCAuthoringFields.NativeMetrics(self)
     self.layout = { contentHeight = height, scrollBounded = true, advancedVisible = false }
 end

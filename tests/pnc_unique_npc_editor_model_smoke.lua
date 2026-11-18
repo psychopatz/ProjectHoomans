@@ -376,4 +376,37 @@ T.equal(updatedNamed.appearance.slots.Shirt.itemState.visualTextureChoice, 6, "o
 T.falsy(oldPreset.appearance.slots.Shirt, "preview materialization does not modify authored preset intent")
 local namedDefinition = Model.BuildDefinition(oldPreset)
 T.falsy(namedDefinition.appearance.slots.Shirt, "saving an unchanged old preset does not author generated clothing")
+-- A deliberate debug reroll replaces explicit visual choices instead of only
+-- changing a seed behind a fixed outfit/hair policy.
+local look = PNC.UniqueNPCEditorModel.New({ previewSeed = 12 })
+look.displayName = "Audit Example"
+look.identity.survivor = { forename = "Audit", surname = "Example", hairModel = "Long", skinTexture = "MaleBody05" }
+look.skillLevels = { Cooking = 8 }
+look.npcTraits = { steady = true }
+look.startingItems = { { type = "Base.Axe", equipSlot = "primary", key = "held" },
+    { type = "Base.Money", stack = 2, key = "carried" }, { type = "Base.OldShirt", wornSlot = "Torso", key = "old" } }
+look.authoredFields.startingItems = true
+look.appearance = { outfit = { mode = "item", id = "Old" }, slots = { Torso = { mode = "item", type = "Base.OldShirt" } } }
+PNC.Identity.RollSeed = function() return 66 end
+getAllOutfits = function() return { size = function() return 2 end, get = function(_, n) return n == 0 and "LookA" or "LookB" end } end
+local captures = 0
+PNC.UniqueNPCOutfitCapture.Capture = function(id)
+    captures = captures + 1
+    return { Torso = { mode = "item", type = "Base.Shirt" .. id, wornSlot = "Torso", itemState = { visualTextureChoice = captures } } }
+end
+PNC.UniqueNPCEditorModel.Randomize(look)
+T.equal(look.previewSeed, 66, "debug look transaction advances the controlled generation")
+T.falsy(look.identity.survivor.hairModel, "debug reroll releases explicit hair")
+T.falsy(look.identity.survivor.skinTexture, "debug reroll releases explicit skin")
+T.equal(look.identity.survivor.forename, "Audit", "look reroll preserves biography")
+T.equal(look.skillLevels.Cooking, 8, "look reroll preserves attributes")
+T.equal(#look.startingItems, 2, "look reroll removes old clothing and preserves held/carried inventory")
+local rerolled = PNC.UniqueNPCEditorModel.BuildDefinition(look)
+T.equal(rerolled.appearance.slots.Torso.type, "Base.ShirtLookA", "new controlled clothing reaches canonical output")
+T.equal(rerolled.appearance.slots.Torso.itemState.visualTextureChoice, 1, "rerolled clothing carries exact native visual state")
+T.falsy(rerolled.identity.survivor.hairModel, "the saved result cannot recapture the old explicit hair")
+PNC.UniqueNPCEditorModel.Randomize(look)
+T.equal(look.previewSeed, 67, "repeated seed source cannot leave an explicit debug action stale")
+T.equal(look.appearance.slots.Torso.type, "Base.ShirtLookB", "the second controlled result replaces clothing")
+
 T.finish("pnc_unique_npc_editor_model_smoke")

@@ -214,8 +214,7 @@ function Adapter:CommitDraft(draft)
 end
 
 function Adapter:Randomize()
-    self._viewSnapshot = nil
-    return self.session:RandomizeSlot(self.traitID)
+    return nil, "randomization_unavailable"
 end
 
 function Adapter:Reset()

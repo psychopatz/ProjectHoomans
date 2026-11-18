@@ -77,7 +77,7 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
     end)
 
     self.loadButton = UI.CreateButton(self, {
-        id = "load", title = tr("UI_PNC_StartingCompanion_Load", "LOAD"),
+        id = "load", title = tr("UI_PNC_Authoring_Presets", "Presets..."),
         target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
         variant = "quiet",
     })
@@ -91,12 +91,6 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
         title = tr("UI_PNC_StartingCompanion_SaveSet", "SAVE SET"),
         target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
         variant = "primary",
-    })
-    self.randomizeButton = UI.CreateButton(self, {
-        id = "randomize",
-        title = tr("UI_PNC_StartingCompanion_Randomize", "RANDOMIZE"),
-        target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
-        variant = "selected",
     })
     self.resetButton = UI.CreateButton(self, {
         id = "reset",
@@ -251,18 +245,21 @@ function ISPNCStartingCompanionComposerWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 0, bottom = 10 })
     local gap = Layout.Pixels(8, self.uiScale)
     local rowHeight = Layout.Pixels(28, self.uiScale)
-    Layout.SetBounds(self.presetCombo, rect.x, rect.y, rect.width, rowHeight)
+    self.presetCombo:setVisible(false)
     local toolbar = Layout.Flow({
         self.loadButton, self.saveButton, self.saveSetButton,
-        self.randomizeButton, self.resetButton, self.revertButton, self.closeButton,
-    }, { x = rect.x, y = rect.y + rowHeight + gap, width = rect.width },
+        self.resetButton, self.revertButton, self.closeButton,
+    }, { x = rect.x, y = rect.y, width = rect.width },
         { scale = self.uiScale, minWidth = 78, gap = 6 })
+    local exploring = self.editor and self.editor.itemExplorer and self.editor.itemExplorer:getIsVisible()
+    for _, control in ipairs({ self.loadButton, self.saveButton, self.saveSetButton, self.resetButton, self.revertButton, self.closeButton }) do PNC.NPCAuthoringFields.EnableButton(control, not exploring) end
     local y = toolbar.bottom + gap
     local statusHeight = Layout.Pixels(22, self.uiScale)
     Layout.SetBounds(self.editor, rect.x, y, rect.width,
         math.max(1, rect.y + rect.height - y - statusHeight - gap))
     self.editor.uiScale = self.uiScale
     self.editor:requestResponsiveLayout()
+    PNC.NPCAuthoringFields.NativeMetrics(self)
     Layout.SetBounds(self.statusLabel, rect.x,
         rect.y + rect.height - statusHeight, rect.width, statusHeight)
 end
@@ -306,10 +303,37 @@ function ISPNCStartingCompanionComposerWindow:loadSelected()
     return true
 end
 
+function ISPNCStartingCompanionComposerWindow:browsePresets()
+    local items = {}
+    for _, entry in ipairs(Store.List()) do
+        local label = tostring(entry.label or entry.fileName)
+        items[#items + 1] = { id = entry.fileName, label = label, search = string.lower(label .. " " .. entry.fileName), category = entry.kind }
+    end
+    self.editor.itemExplorer:Show({ mode = "preset", items = items,
+        title = tr("UI_PNC_Authoring_Presets", "Presets..."),
+        applyLabel = tr("UI_PNC_StartingCompanion_Load", "Load"),
+        describe = function(item)
+            local payload = Store.Load(item.id)
+            return { { label = tr("UI_PNC_Authoring_PresetScope", "Preset scope"),
+                value = payload and tr(payload.kind == "template" and "UI_PNC_Authoring_PresetSingle" or "UI_PNC_Authoring_PresetWhole",
+                    payload.kind == "template" and "One companion" or "Whole companion set") or tr("UI_PNC_Authoring_UnavailableItem", "This item is unavailable") } }
+        end,
+        onChoose = function(item)
+            self:SelectPreset(item.id)
+            local ok, reason = self:loadSelected()
+            if ok then self:refreshSummary() end
+            return ok, reason
+        end })
+    self.editor.itemExplorer.onDismiss = function() self.editor:requestResponsiveLayout(); self:onResponsiveLayout() end
+    self:onResponsiveLayout()
+end
+
 function ISPNCStartingCompanionComposerWindow:onAction(button)
     local id = button and button.internal
     local ok
     local reason
+    if id == "randomize" then return false end
+    if self.editor.itemExplorer and self.editor.itemExplorer:getIsVisible() then return false end
     if self.editor.draft and id ~= "reset" and id ~= "revert" and id ~= "load" and id ~= "close" then
         if self.editor:pullForm() == false then return end
     end
@@ -337,11 +361,8 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
             "Companion set saved") or tostring(reason or "save failed"))
         if ok then self:refreshPresets() end
     elseif id == "load" then
-        ok, reason = self:loadSelected()
-        self:setStatus(ok and tr("UI_PNC_StartingCompanion_Loaded",
-            "Preset loaded") or tostring(reason or "load failed"))
-        if ok then self:refresh() end
-    elseif id == "randomize" or id == "reset" or id == "revert" then
+        self:browsePresets()
+    elseif id == "reset" or id == "revert" then
         ok = self.editor:invokeWorkflow(id)
         self:refreshSummary()
         self:setStatus(self.editor.statusText

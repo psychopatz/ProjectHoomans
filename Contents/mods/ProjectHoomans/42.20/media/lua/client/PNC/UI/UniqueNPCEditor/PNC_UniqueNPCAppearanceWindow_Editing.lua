@@ -26,6 +26,10 @@ function ISPNCUniqueNPCAppearanceWindow:markChanged()
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onPolicyChanged(combo)
+    local selectedValue = comboData(combo)
+    if selectedValue == "__current" then return false end
+    if (selectedValue == "random" or selectedValue == "__random")
+        and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     local location = combo and combo.bodyLocation
     if not location then return end
     local mode = comboData(combo) or "random"
@@ -100,6 +104,10 @@ function ISPNCUniqueNPCAppearanceWindow:onItemChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onOutfitChanged(combo)
+    local selectedValue = comboData(combo)
+    if selectedValue == "__current" then return false end
+    if (selectedValue == "random" or selectedValue == "__random")
+        and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     local value = comboData(combo) or "random"
     local appearance = Appearance.Normalize(self.draft.appearance)
     if string.sub(tostring(value), 1, 6) == "named:" then
@@ -123,6 +131,10 @@ function ISPNCUniqueNPCAppearanceWindow:onOutfitChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onHairChanged(combo)
+    local selectedValue = comboData(combo)
+    if selectedValue == "__current" then return false end
+    if (selectedValue == "random" or selectedValue == "__random")
+        and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     if self.syncing or not self.draft then return end
     local survivor = self.draft.identity and self.draft.identity.survivor or {}
     local value = comboData(combo)
@@ -137,6 +149,10 @@ function ISPNCUniqueNPCAppearanceWindow:onHairChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onBeardChanged(combo)
+    local selectedValue = comboData(combo)
+    if selectedValue == "__current" then return false end
+    if (selectedValue == "random" or selectedValue == "__random")
+        and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     if self.syncing or not self.draft then return end
     local survivor = self.draft.identity and self.draft.identity.survivor or {}
     local value = comboData(combo)
@@ -169,6 +185,10 @@ function ISPNCUniqueNPCAppearanceWindow:setVoiceDraft(profile)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onVoiceChanged(combo)
+    local selectedValue = comboData(combo)
+    if selectedValue == "__current" then return false end
+    if (selectedValue == "random" or selectedValue == "__random")
+        and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     if self.syncing then return end
     local selected = comboData(combo)
     if selected == "random" or selected == nil then
@@ -207,7 +227,13 @@ function ISPNCUniqueNPCAppearanceWindow:onVoicePitchChanged(value)
     if self.syncing then return end
     local appearance = Appearance.Normalize(self.draft.appearance)
     local voice = appearance.voice or {}
-    if voice.mode ~= "item" then return end
+    if voice.mode ~= "item" then
+        local profile = self:voiceProfile()
+        if not profile then return end
+        self:setVoiceDraft(profile)
+        appearance = Appearance.Normalize(self.draft.appearance)
+        voice = appearance.voice
+    end
     local pitch = math.max(-100, math.min(100, math.floor(tonumber(value) or 0)))
     voice.pitch = pitch
     appearance.voice = voice
@@ -231,6 +257,10 @@ function ISPNCUniqueNPCAppearanceWindow:onVoiceSampleChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onSkinModeChanged(combo)
+    local selectedValue = comboData(combo)
+    if selectedValue == "__current" then return false end
+    if (selectedValue == "random" or selectedValue == "__random")
+        and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     if self.syncing then return end
     local mode = comboData(combo) or "random"
     if mode == "legacy" then
@@ -252,6 +282,10 @@ end
 
 
 function Window:onHairColorChanged(combo)
+    local selectedValue = comboData(combo)
+    if selectedValue == "__current" then return false end
+    if (selectedValue == "random" or selectedValue == "__random")
+        and not PNC.NPCAuthoringFields.CanRandomize(self) then return false end
     if self.syncing or not self.draft then return end
     local id = comboData(combo)
     if id == "custom" then return end

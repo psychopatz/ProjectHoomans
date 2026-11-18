@@ -1,6 +1,57 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R4
+## Current state — 2026-11-18 P5R5
+
+Developer implementation of the approved randomization/browser repair is
+complete. Both entry points still use one shared editor and canonical model.
+Native P5R5 acceptance is **UNVERIFIED**; the screenshots rejecting P5R4 remain
+the latest actual game evidence.
+
+- Companion customization omits Random/Randomize controls and blocks stale
+  callbacks, workflow and adapter routes. Generated current values are display
+  placeholders, never silent authored replacements or an option to reroll.
+- Debug **Randomize look** replaces clothing and explicit body/hair/color choices
+  from a new generation, retaining biography, attributes, audio and held/carried
+  gear. Exact new native clothing state reaches the portrait and slot policy;
+  visible Appearance controls are synchronized after the action.
+- Native combo construction/resizing keeps baseHeight aligned with the actual
+  input. Small-font lists refresh font/row metrics; native label positions remain
+  valid after caption changes. Disabled actions use neutral theme colors.
+- The shared browser has contextual outfit, item, preset and attribute modes.
+  Outfits use readable rows and one focused preview, not empty thumbnail cards.
+  Apply uses the reviewed clothing state; Cancel leaves the draft unchanged.
+  Quantity/destination only appear for carried items. Selection is highlighted,
+  empty/failure states explained, and hidden/filtered/stale selections cannot be
+  applied. Dynamic mod item discovery and lazy native creation remain intact.
+- Companion presets use a compact browser with lazy scope details. Attributes
+  have separate skill/NPC/vanilla/dynamic trait groups, searchable pickers, bounded
+  skill steppers and group-local removal. Narrow layouts stack and scroll.
+- Complete outfits remove old authored clothing without removing bags or held
+  gear. Ordinary text/audio/tab/roster edits retain the earlier visual stability
+  contracts and generated/inherited no-op behavior.
+
+`TEST_VERIFIED`: **55/55** focused tests; **1048/1052** full suite. The same four
+recorded failures remain: animation scene debug routes, context debug scene lab,
+population director initialization and Debug Hub translation expectation.
+Four new tests cover browser selection/apply, presentation capability, native
+widget metrics and outfit Apply/Cancel transactions. Existing model, form,
+geometry, voice, collection and host interaction tests were extended.
+
+`STATIC_ONLY`: all **33** owned Lua files parse; all **22** changed production
+Lua files pass Kahlua error checks. JSON, static key references, **15** new EN/TL
+keys, key parity and whitespace checks pass. Coverage for changed/new source was
+checked against the committed graph baseline and current source directly; native
+widget methods were inspected in the installed PZ42.22.2 Lua.
+
+Next responsibility: **P6 user-owned native retest of P5R5**, using
+[RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md](RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md).
+No native game was launched/driven. Actual input/rendering, outfit diversity,
+audible playback and SP/MP/co-op finalization remain unverified by the harness.
+Unrelated concurrent semantic work is preserved. No push or Workshop publication.
+
+## Historical developer checkpoints
+
+### P5R4 — preceding developer checkpoint
 
 Developer-side repair of the user-reported native regressions is complete.
 Both creator entry points retain one shared editor and canonical data model.
@@ -40,8 +91,6 @@ in [NATIVE_REGRESSION_AUDIT_AND_PLAN.md](NATIVE_REGRESSION_AUDIT_AND_PLAN.md).
 Native typing/hit testing, audible sound, rendered geometry and SP/MP/co-op
 outcomes have not been established by the developer harness. No native game
 was launched or driven, and no remote push or Workshop publication occurred.
-
-## Historical developer checkpoints
 
 ### P5R3 — preceding implementation
 

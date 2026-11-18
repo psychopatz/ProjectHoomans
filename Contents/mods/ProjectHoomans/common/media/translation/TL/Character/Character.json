@@ -408,5 +408,20 @@
   "UI_PNC_Authoring_Compatibility": "Pagkaangkop sa puwesto",
   "UI_PNC_Authoring_FitsSlot": "Angkop sa napiling puwesto",
   "UI_PNC_Authoring_DoesNotFit": "Hindi angkop sa napiling puwesto",
-  "UI_PNC_Authoring_AdvancedDetails": "Karagdagang detalye"
+  "UI_PNC_Authoring_AdvancedDetails": "Karagdagang detalye",
+  "UI_PNC_Authoring_CurrentValue": "Kasalukuyang halaga",
+  "UI_PNC_Authoring_RandomizeLook": "Baguhin nang sapalaran ang hitsura",
+  "UI_PNC_Authoring_ApplyOutfit": "Gamitin ang kasuotan",
+  "UI_PNC_Authoring_Choose": "Piliin",
+  "UI_PNC_Authoring_EquippedClothing": "Mga puwesto ng suot na damit",
+  "UI_PNC_Authoring_NoConfigured": "Wala pang nakalagay",
+  "UI_PNC_Authoring_NoMatches": "Walang katugmang resulta",
+  "UI_PNC_Authoring_Presets": "Mga preset...",
+  "UI_PNC_Authoring_ReviewSelection": "Suriin ang napili, saka gamitin",
+  "UI_PNC_Authoring_Search": "Maghanap gamit ang pangalan o ID",
+  "UI_PNC_Authoring_SelectResult": "Pumili ng resulta upang suriin",
+  "UI_PNC_Authoring_PresetScope": "Saklaw ng preset",
+  "UI_PNC_Authoring_PresetWhole": "Buong pangkat ng kasama",
+  "UI_PNC_Authoring_PresetSingle": "Isang kasama",
+  "UI_PNC_Authoring_Clear": "Alisin sa puwesto / Tanggalin"
 }

@@ -1,5 +1,9 @@
 # Shared NPC creator UI: audit and proposed redesign
 
+Latest state: P5R5 developer repair is verified; native acceptance is pending. See
+[RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md](RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md)
+for the implementation evidence and native retest; earlier design/verification below is historical.
+
 Native P5R3 acceptance was rejected in the 2026-11-18 follow-up. The current
 regression findings, implemented P5R4 repair and native retest matrix are in
 [NATIVE_REGRESSION_AUDIT_AND_PLAN.md](NATIVE_REGRESSION_AUDIT_AND_PLAN.md).
