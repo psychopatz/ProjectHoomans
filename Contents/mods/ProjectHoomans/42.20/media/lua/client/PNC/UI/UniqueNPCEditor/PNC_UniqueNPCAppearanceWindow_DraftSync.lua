@@ -25,6 +25,7 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
         or voice.prefix
     local voiceType = tonumber(survivor.voiceType or voice.type)
     local voicePitch = tonumber(survivor.voicePitch or voice.pitch) or 0
+    setLabelText(self.voicePitchLabel, tr("UI_PNC_UniqueNPCEditor_VoicePitch", "Voice pitch") .. ": " .. math.floor(voicePitch))
     local voiceID = "random"
     self.syncing = true
     selectData(self.outfitCombo, outfitID)
@@ -106,17 +107,9 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
         if self.skinModeCombo.setEnabled then
             self.skinModeCombo:setEnabled(skinEditable == true)
         end
-        if self.skinModeCombo.setVisible
-            and self.parentEditor
-            and self.parentEditor.presentationMode == "companion"
-        then
-            self.skinModeCombo:setVisible(skinEditable == true)
-        end
+        self.skinModeCombo:setVisible(true)
     end
     local skinText = skinToneLabel(skinTone)
-    if not skinEditable and skinSource then
-        skinText = skinText .. " · " .. tostring(skinSource)
-    end
     setLabelText(self.skinValue, skinText)
     if self.hairCombo then selectData(self.hairCombo, survivor.hairModel) end
     if self.beardCombo then selectData(self.beardCombo, survivor.beardModel) end
@@ -144,6 +137,16 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
         selectData(row.policy, policy.mode)
         if policy.type then selectData(row.item, policy.type) end
         row.item:setEnabled(policy.mode == "item")
+    end
+    if self.integrated and self.parentEditor then
+        for control, id in pairs({
+            skinModeCombo = "appearance.skinTexture", hairCombo = "appearance.hairModel",
+            beardCombo = "appearance.beardModel", hairColorCombo = "appearance.hairColor",
+            voiceCombo = "appearance.voice", voicePitch = "appearance.voicePitch",
+        }) do
+            if self[control] then PNC.NPCAuthoringFields.Lock(self.parentEditor,
+                self[control], id, self.content) end
+        end
     end
     if self.syncAdvancedVisibility then self:syncAdvancedVisibility() end
     self.syncing = false

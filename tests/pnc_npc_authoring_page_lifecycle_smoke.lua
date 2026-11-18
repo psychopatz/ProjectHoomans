@@ -15,6 +15,7 @@ local function page()
     return { setVisible = function(self, value) self.visible = value end }
 end
 local bio, appearance, attributes = page(), page(), page()
+function appearance:onStopVoice() end
 local tabs = { viewList = {
     { name = "Bio", view = bio }, { name = "Appearance", view = appearance },
     { name = "Attributes", view = attributes },

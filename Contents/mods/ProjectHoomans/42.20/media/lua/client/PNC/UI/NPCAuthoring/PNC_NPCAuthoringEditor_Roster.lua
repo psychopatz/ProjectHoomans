@@ -19,7 +19,12 @@ function Window:buildRoster()
     self.roster = UI.CreateList(self, { itemHeight = 52, doDrawItem = drawRoster })
     self.roster:setOnMouseDownFunction(self, function(target, row)
         if row and row.id ~= target.rosterSelection and target.onSelectRoster then
-            target:pullForm()
+            if target:pullForm() == false then
+                for index, entry in ipairs(target.roster.items) do
+                    if entry.item.id == target.rosterSelection then target.roster.selected = index end
+                end
+                return
+            end
             target.onSelectRoster(row.id)
         end
     end)
@@ -41,11 +46,14 @@ function Window:refreshDebugRoster()
     self.draftRoster = self.draftRoster or {}
     if not self.debugRosterID or self.debugRosterID == "current" then
         self.draftRoster.current = self.draft
+    else
+        self.draftRoster[self.debugRosterID] = self.draft
     end
     local rows = { { id = "current", label = tr("UI_PNC_Authoring_CurrentDraft", "Working draft"),
         subtitle = self.draftRoster.current and self.draftRoster.current.displayName or "" } }
     for _, entry in ipairs(self.savedDraftEntries or {}) do
-        rows[#rows + 1] = { id = entry.fileName, label = entry.label or entry.fileName,
+        rows[#rows + 1] = { id = entry.fileName, label = self.draftRoster[entry.fileName] and self.draftRoster[entry.fileName].displayName
+                or entry.label or entry.fileName,
             subtitle = tr("UI_PNC_Authoring_SavedDraft", "Saved character") }
     end
     self:setRoster(rows, self.debugRosterID or "current", function(id)

@@ -88,8 +88,8 @@ T.equal(require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel",
 T.falsy(PNC.UniqueNPCEditorWindow, "authoring model loaded a window")
 
 local draft = PNC.UniqueNPCEditorModel.New()
-T.equal(draft.appearance.outfit.mode, "none",
-    "new drafts default to no inherited clothing")
+T.equal(draft.appearance.outfit.mode, "random",
+    "new drafts default to a stable clothed look")
 local randomizedDraft = PNC.UniqueNPCEditorModel.New()
 PNC.UniqueNPCEditorModel.Randomize(randomizedDraft)
 T.equal(randomizedDraft.appearance.outfit.mode, "random",
@@ -325,4 +325,55 @@ local packed = Model.BuildDefinition(slotDraft)
 T.equal(packed.startingItems[1].type, "Base.Bag", "bags materialize before their contents even when authored last")
 T.equal(packed.startingItems[2].preferredContainer, "bag", "bag destination remains canonical")
 
+local voiceDraft = Model.New()
+voiceDraft.displayName = "Voice Tester"
+voiceDraft.identity.survivor = { forename = "Voice", surname = "Tester", voicePrefix = "VoiceMale", voiceType = 0, voicePitch = 100 }
+voiceDraft.appearance.voice = { mode = "item", prefix = "VoiceMale", type = 0, pitch = 100 }
+T.truthy(Model.BuildDefinition(voiceDraft), "native positive pitch endpoint is valid")
+voiceDraft.identity.survivor.voicePitch = -100
+voiceDraft.appearance.voice.pitch = -100
+T.truthy(Model.BuildDefinition(voiceDraft), "native negative pitch endpoint is valid")
+voiceDraft.runtimeRecord = { startingItems = {}, equipmentSpawnMode = "none", identitySeed = 7,
+    identity = { survivor = {} }, inventory = { items = {} }, runtime = { appearanceCache = { token = "stable" } },
+    appearance = PNC.Identity.Appearance.Normalize(voiceDraft.appearance) }
+voiceDraft.identity.survivor.voicePitch = 101
+voiceDraft.appearance.voice.pitch = 101
+local retainedInventory = voiceDraft.runtimeRecord.inventory
+local invalidRecord, invalidReason = Model.EnsureRuntimeRecord(voiceDraft, false)
+T.falsy(invalidRecord, "invalid edit returns a validation result")
+T.equal(invalidReason, "number_above_max", "validation reason propagates")
+T.equal(voiceDraft.runtimeRecord.inventory, retainedInventory, "invalid edit leaves valid inventory untouched")
+voiceDraft.identity.survivor.voicePitch = 12
+voiceDraft.appearance.voice.pitch = 12
+local audioRebuilds = 0
+PNC.Inventory.CreateFromTemplate = function() audioRebuilds = audioRebuilds + 1 end
+local recovered = Model.EnsureRuntimeRecord(voiceDraft, false)
+T.truthy(recovered, "valid edit recovers after rejection")
+T.equal(audioRebuilds, 0, "voice-only edit never rebuilds inventory")
+T.equal(recovered.runtime.appearanceCache.token, "stable", "voice edit retains exact cached visual state")
+
+local beforeAudioSpec = Model.BuildPortraitSpec(voiceDraft)
+voiceDraft.identity.survivor.voicePitch = 45
+voiceDraft.appearance.voice.pitch = 45
+local afterAudioSpec = Model.BuildPortraitSpec(voiceDraft)
+T.equal(afterAudioSpec.key, beforeAudioSpec.key, "audio-only edit does not recreate the native portrait descriptor")
+T.falsy(afterAudioSpec.appearance.voicePitch, "render projection does not carry voice-only fields")
+local capture = require "PNC/Identity/PNC_UniqueNPCOutfitCapture"
+local captures = 0
+capture.Capture = function()
+    captures = captures + 1
+    return { Shirt = { mode = "item", type = "Base.Shirt", itemState = { visualTextureChoice = 6 } } }
+end
+local oldPreset = Model.New()
+oldPreset.displayName = "Old Preset"
+oldPreset.identity.survivor = { forename = "Old", surname = "Preset" }
+oldPreset.appearance = { outfit = { mode = "item", id = "Police" }, slots = {} }
+local namedPreview = Model.BuildPreviewDraft(oldPreset)
+oldPreset.identity.survivor.voicePitch = 50
+local updatedNamed = Model.UpdatePreviewDraft(namedPreview, oldPreset)
+T.equal(captures, 1, "older named outfit is materialized once for preview")
+T.equal(updatedNamed.appearance.slots.Shirt.itemState.visualTextureChoice, 6, "ordinary edit reuses named outfit visual choices")
+T.falsy(oldPreset.appearance.slots.Shirt, "preview materialization does not modify authored preset intent")
+local namedDefinition = Model.BuildDefinition(oldPreset)
+T.falsy(namedDefinition.appearance.slots.Shirt, "saving an unchanged old preset does not author generated clothing")
 T.finish("pnc_unique_npc_editor_model_smoke")

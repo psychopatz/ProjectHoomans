@@ -157,8 +157,7 @@ end
 -- Labels stack above fields so inherited-value explanations and large fonts
 -- never compete for a fixed horizontal label width.
 function Window:layoutIntegratedAppearance()
-    local Layout = Internal.Layout
-    local gap = Layout.Pixels(8, self.uiScale)
+    local gap = Layout.Pixels(10, self.uiScale)
     local h = math.max(Layout.Pixels(28, self.uiScale),
         (getTextManager and getTextManager():getFontHeight(UIFont.Small) or 16) + 10)
     local top = Layout.Flow(self.topControls, { x = gap, y = gap,
@@ -166,33 +165,34 @@ function Window:layoutIntegratedAppearance()
         { scale = self.uiScale, minWidth = 80, gap = 6 })
     Layout.SetBounds(self.content, gap, top.bottom + gap,
         math.max(1, self.width - gap * 2), math.max(1, self.height - top.bottom - gap * 2))
-    local w = math.max(1, self.content.width - 20)
-    local y = gap
-    local function row(label, control)
-        label:setVisible(true)
-        Layout.SetBounds(label, 0, y, w, h)
-        y = y + h
-        Layout.SetBounds(control, 0, y, w, h)
-        y = y + h + gap
+    local available = math.max(1, self.content.width - 20)
+    local columns = available >= Layout.Pixels(580, self.uiScale) and 2 or 1
+    local width = math.min(Layout.Pixels(340, self.uiScale), (available - gap) / columns)
+    local fields = {
+        { self.skinLabel, self.skinModeCombo }, { self.hairLabel, self.hairCombo },
+        { self.beardLabel, self.beardCombo }, { self.hairColorLabel, self.hairColorCombo },
+        { self.voiceLabel, self.voiceCombo }, { self.voiceSampleLabel, self.voiceSampleCombo },
+        { self.voicePitchLabel, self.voicePitch },
+    }
+    for index, field in ipairs(fields) do
+        local label, control = field[1], field[2]
+        if label and control then
+            local x = (index - 1) % columns * (width + gap)
+            local y = math.floor((index - 1) / columns) * (h * 2 + gap * 2)
+            label:setVisible(true)
+            Layout.SetBounds(label, x, y, width, h)
+            PNC.NPCAuthoringFields.Bounds(control, x, y + h, width, h)
+        end
     end
-    row(self.skinLabel, self.skinModeCombo)
-    Layout.SetBounds(self.skinSwatch, 0, y, h, h)
-    Layout.SetBounds(self.skinValue, h + gap, y, math.max(1, w - h - gap), h)
-    y = y + h + gap
-    row(self.hairLabel, self.hairCombo)
-    row(self.beardLabel, self.beardCombo)
-    if self.hairColorCombo then row(self.hairColorLabel, self.hairColorCombo) end
-    row(self.voiceLabel, self.voiceCombo)
-    row(self.voiceSampleLabel, self.voiceSampleCombo)
-    row(self.voicePitchLabel, self.voicePitch)
-    Layout.SetBounds(self.voicePitchValue, 0, y, w, h)
-    y = y + h + gap
+    Layout.SetBounds(self.skinSwatch, math.max(0, width - h), 0, h, h)
+    self.skinValue:setVisible(false)
+    self.voicePitchValue:setVisible(false)
     self.advancedLabel:setVisible(false)
-    self.content.contentHeight = y
-    self.content.maxScroll = math.max(0, y - self.content.height)
-    self.content:setScrollHeight(y)
-    self.content:setYScroll(math.max(-self.content.maxScroll,
-        math.min(0, self.content:getYScroll())))
+    local height = math.ceil(#fields / columns) * (h * 2 + gap * 2)
+    self.content.contentHeight = height
+    self.content.maxScroll = math.max(0, height - self.content.height)
+    self.content:setScrollHeight(height)
+    self.content:setYScroll(math.max(-self.content.maxScroll, math.min(0, self.content:getYScroll())))
     self.content:onResize()
-    self.layout = { contentHeight = y, scrollBounded = true, advancedVisible = false }
+    self.layout = { contentHeight = height, scrollBounded = true, advancedVisible = false }
 end

@@ -29,4 +29,34 @@ local imported = { startingItems = { { type = "Base.Axe" }, { type = "Base.Water
 T.truthy(Edits.SetSlot(imported, { kind = "item", id = "item:2", index = 2 }), "imported keyless item can be removed")
 T.equal(#imported.startingItems, 1, "removal affects only selected keyless item")
 T.equal(imported.startingItems[1].type, "Base.Axe", "other imported items survive")
+local clothed = { appearance = { outfit = { mode = "random" }, slots = {} }, startingItems = {} }
+local baseline = { inventory = { items = {
+    shirt = { type = "Base.Shirt", wornSlot = "Shirt", itemState = { visualTextureChoice = 4 } },
+    pants = { type = "Base.Pants", wornSlot = "Pants", itemState = { visualColorR = 0.3 } },
+} } }
+T.truthy(Edits.SetSlot(clothed, { kind = "worn", id = "Shirt" }, { type = "Base.NewShirt" }, baseline), "single-slot replacement")
+T.equal(clothed.appearance.slots.Pants.type, "Base.Pants", "unrelated clothing stays equipped")
+T.equal(clothed.appearance.slots.Pants.itemState.visualColorR, 0.3, "unrelated exact item visual state is preserved")
+local dressed = 0
+local native = { type = "Base.NamedShirt", itemState = { visualTextureChoice = 7 } }
+PNC.Inventory = { CaptureNativeItem = function(item) return item end }
+SurvivorDesc = { new = function(register)
+    T.equal(register, false, "preset capture uses an unregistered preview descriptor")
+    local selected
+    return {
+        setFemale = function(_, female) T.equal(female, true, "preset capture applies selected gender") end,
+        dressInNamedOutfit = function(_, id) selected = id; dressed = dressed + 1 end,
+        getWornItems = function() return {
+            size = function() return selected == "ValidOutfit" and 1 or 0 end,
+            getItemByIndex = function() return native end,
+            getLocation = function() return setmetatable({}, { __tostring = function() return "base:shirt" end }) end,
+        } end,
+    }
+end }
+local captured = Edits.CaptureOutfit("ValidOutfit", true)
+T.equal(captured["base:shirt"].type, "Base.NamedShirt", "native preset becomes ordinary canonical slots")
+T.equal(captured["base:shirt"].itemState.visualTextureChoice, 7, "selected native visual choice is captured exactly")
+T.truthy(captured["base:shirt"].itemState ~= native.itemState, "captured visual state is detached")
+T.equal(dressed, 1, "one native preset capture per explicit choice")
+T.falsy(Edits.CaptureOutfit("MissingOutfit", true), "unavailable preset produces a normal rejection")
 T.finish("pnc_npc_authoring_loadout_smoke")

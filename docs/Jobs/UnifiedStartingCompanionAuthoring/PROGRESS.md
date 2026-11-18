@@ -1,6 +1,49 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R3
+## Current state — 2026-11-18 P5R4
+
+Developer-side repair of the user-reported native regressions is complete.
+Both creator entry points retain one shared editor and canonical data model.
+Native acceptance remains **UNVERIFIED**; the P5R3 screenshots are the latest
+native evidence, not a rendering of these changes.
+
+- Text owns its pending buffer and caret until Enter/focus loss or an explicit
+  action commits it. Candidate validation rejects invalid state before preview
+  mutation and keeps the last valid preview.
+- The canonical pitch range matches installed native creation (-100..100).
+  Slider drags commit once on release. Audio changes preserve inventory, visual
+  caches and portrait descriptors. Voice preview owns an actorless UI sound.
+- Compact fields retain disabled controls for derived values, with native lock
+  icons and explanatory tooltips. Gender uses male/female icon toggles.
+- Loadout uses grouped equipment tiles and a shared paged Item Explorer with
+  search, mod/module/category/compatibility filters, details and explicit equip
+  actions. Loaded vanilla/mod scripts are discovered dynamically; native items
+  are created lazily. Exact existing clothing state survives individual edits.
+- New NPCs use stable randomized clothing. Older named presets materialize once
+  into preview-only exact clothing; saved intent and explicit empty outfits stay
+  valid. Native capture uses an unregistered descriptor.
+
+`TEST_VERIFIED`: **51/51** focused authoring/inventory tests; full suite
+**1044/1048**. The same four recorded failures remain: animation scene debug
+routes, context debug scene lab, population director initialization, and the
+Debug Hub translation expectation. Six new regressions cover real form commits,
+pending text, catalog paging, explorer geometry/modal input, pitch release and
+owned UI audio. Existing model/loadout/cache tests cover the remaining changes.
+
+`STATIC_ONLY`: all 44 owned Lua files parse; all 30 production Lua files pass
+Kahlua error checks. JSON, EN/TL key parity, PNG validation and whitespace checks
+pass. Installed PZ 42.22.2 Lua/Java APIs were inspected. The graph is a committed
+baseline; dirty/new source was inspected directly where coverage was stale.
+
+Next responsibility: **P6 user-owned native acceptance of P5R4** using the matrix
+in [NATIVE_REGRESSION_AUDIT_AND_PLAN.md](NATIVE_REGRESSION_AUDIT_AND_PLAN.md).
+Native typing/hit testing, audible sound, rendered geometry and SP/MP/co-op
+outcomes have not been established by the developer harness. No native game
+was launched or driven, and no remote push or Workshop publication occurred.
+
+## Historical developer checkpoints
+
+### P5R3 — preceding implementation
 
 The requested shared NPC creator redesign is implemented. Both callers use the
 same left roster, compact pages and embedded slot/catalog loadout authoring.
@@ -15,12 +58,11 @@ initialization and Debug Hub translation-expectation failures remain unrelated.
 keys, JSON parsing and whitespace checks passed. Graph freshness/coverage was
 checked; dirty/new files were verified directly against current source.
 
-Current Next Chunk: **P6 user-owned native acceptance of P5R3**. Open both
+Historical next chunk at that checkpoint: **P6 native acceptance of P5R3**. Open both
 creators in a fresh Build 42.20 session. Verify left roster selection, every tab,
 compact preview and font scaling, slot equip/replace/clear, bags and contents,
 Save/Load/Produce, companion finalization and SP/MP/co-op lifecycle. Native PZ
-was not launched, driven or required for developer acceptance. This is the
-current responsibility; the earlier P5R2 handoff below is historical evidence.
+was not launched, driven or required for developer acceptance. That native run exposed the regressions repaired in P5R4; it is historical evidence.
 
 
 **Status:** P5R2 developer repair accepted — P6 native SP/MP/co-op acceptance pending

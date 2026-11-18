@@ -2,47 +2,44 @@
 handoff_schema: 2
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-updated_at: "2026-11-18T02:01:22.240701Z"
+updated_at: "2026-11-18T09:16:28.557729Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
-phase: "P5R3"
-chunk: "P6 native acceptance of shared creator redesign"
+phase: "P5R4"
+chunk: "P6 native input, audio, layout and lifecycle acceptance"
 retrieval_tier: "verify"
+codebase_memory_indexed_commit: "86000e26cc26561a99894a2abb978b6946da3c94"
 checkpoint_mode: "committed_handoff"
 phase_commit: "self"
-phase_commit_phase: "P5R3"
-phase_commit_message: "phase(P5R3): phase(P5R3): redesign shared NPC creator roster and loadout authoring"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=37753f2c600eb168ad3ca8cd2c7b707cabec8863;dynamic-trading=a1f9cbc3e986f5dafa35cdec34d7ac71e9846bf4"
-phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=234f461bd88c6b95d51abf7858ae589d62017ef99691a479c29cfc4770600bfb"
+phase_commit_phase: "P5R4"
+phase_commit_message: "phase(P5R4): repair native creator editing and equipment explorer"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=8a5ba7aec2e5fecad449c3b5abf28648d0e6a148;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
+phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
-codebase_memory_indexed_commit: "dedf15bd3dd564c0c57aabeb86d6a7bfa10d6235"
 ---
 
 
 # Session Handoff
 
-The user approved and authorized the shared UI redesign in
-[UI_REDESIGN_AUDIT_AND_PLAN.md](UI_REDESIGN_AUDIT_AND_PLAN.md).
-P5R3 developer-side work is complete in this local phase commit.
+P5R4 developer repair is complete. Both creator entry points retain one shared
+editor/model. Buffered text commits, validated rollback, isolated audio/visual
+invalidation, actorless owned voice preview, compact fields/locks/gender icons,
+grouped equipment tiles and the mod-aware paged Item Explorer are implemented.
+New drafts start clothed. Old named presets cache preview-only exact clothing;
+individual slot edits preserve untouched native item state.
 
-Both creators share the roster, compact pages, slot/catalog Loadout and preview
-controls. Companion data still passes through its canonical policy adapter;
-startingItems is now covered by that adapter. Pending loadout intent takes
-precedence over retained runtime inventory, and bags materialize before their
-contents. Imported keyless item removal and rejected edits are bounded/atomic.
-The active page alone remains visible through selection and refresh.
+`TEST_VERIFIED`: 51/51 focused, 1044/1048 full suite. The same four failures remain:
+animation scene debug routes, context debug scene lab, population director
+initialization, and Debug Hub translation expectation. `STATIC_ONLY`: 44 Lua
+syntax checks, 30 production Kahlua checks, JSON, EN/TL parity, PNG and whitespace.
+Current native Lua/Java API evidence is PZ42.22.2. Dirty/new graph paths were
+verified from exact source, not stale indexed code.
 
-Validation: 45 focused authoring/inventory tests passed; full Lua harness
-1038/1042. The four unchanged known failures are animation-scene routes,
-context-debug scene lab, population-director initialization, and the Debug Hub
-Tagalog title expectation. Lua syntax, Kahlua compatibility, JSON parsing,
-40-key EN/TL parity and whitespace checks passed. The model/composition tests
-are not native rendering evidence.
+Next action is user-owned P6 native acceptance using
+[NATIVE_REGRESSION_AUDIT_AND_PLAN.md](NATIVE_REGRESSION_AUDIT_AND_PLAN.md).
+Actual typing/hit testing, rendered scale behavior, audible voice and SP/MP/co-op
+outcomes are **UNVERIFIED**. No native game was launched/driven. A native failure
+reopens the repair gate; collect action/build and bounded console evidence.
 
-Next action: user-owned P6 acceptance in a fresh Build 42.20 session. Verify
-both entry points, roster/tab selection, window/font scaling, preview controls,
-slot equip/replace/clear, bag contents, preset Save/Load/Produce and final
-companion/SP/MP/co-op lifecycle. No native game was launched or driven.
-
-No other repository was modified. Existing unrelated semantic changes remain
-preserved. No branch, push or Workshop publication was created.
+Concurrent semantic commits on main were preserved. This checkpoint includes
+only exact UI/model/translation/test/job paths. No push or Workshop publication.

@@ -361,7 +361,7 @@ local DESCRIPTORS = {
         authoredPath = { "appearanceAuthored", "voicePitch" },
         authorable = true, persistable = true, networkable = true,
         bindingAllowed = true, clearable = true,
-        limits = { min = -32, max = 32 },
+        limits = { min = -100, max = 100 },
     }),
     descriptor("appearance", 20, "object", {
         runtimePath = { "appearance" },

@@ -108,8 +108,18 @@ function ISPNCUniqueNPCAppearanceWindow:onOutfitChanged(combo)
     else
         appearance.outfit = { mode = tostring(value) }
     end
+    appearance.slots = {}
+    if self.integrated and appearance.outfit.mode == "item" then
+        local slots = PNC.NPCAuthoringLoadout.CaptureOutfit(appearance.outfit.id, self.draft.isFemale)
+        if not slots then
+            self.parentEditor:setStatus(tr("UI_PNC_Authoring_UnavailableOutfit", "This outfit is unavailable"))
+            return false
+        end
+        appearance.slots = slots
+    end
     self.draft.appearance = appearance
     self:markChanged()
+    return true
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onHairChanged(combo)
@@ -206,6 +216,13 @@ function ISPNCUniqueNPCAppearanceWindow:onVoicePitchChanged(value)
     if self.voicePitchValue and self.voicePitchValue.setName then
         self.voicePitchValue:setName(tostring(pitch))
     end
+    Internal.setLabelText(self.voicePitchLabel, tr("UI_PNC_UniqueNPCEditor_VoicePitch", "Voice pitch") .. ": " .. pitch)
+    self.pendingVoicePitch = true
+end
+
+function ISPNCUniqueNPCAppearanceWindow:commitPendingVoice()
+    if not self.pendingVoicePitch then return end
+    self.pendingVoicePitch = false
     self:markChanged()
 end
 

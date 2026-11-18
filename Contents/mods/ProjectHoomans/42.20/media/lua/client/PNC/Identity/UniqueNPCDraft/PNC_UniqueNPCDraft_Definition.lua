@@ -126,6 +126,7 @@ function Model.BuildBlueprint(draft, options)
         startingItems = startingItems,
         explicitClears = source.authoringClears,
     })
+    if not blueprint then return nil, reason end
     if source.nicknameCleared == true then
         blueprint, reason = Blueprint.Clear(blueprint, "identity.nickname")
     end

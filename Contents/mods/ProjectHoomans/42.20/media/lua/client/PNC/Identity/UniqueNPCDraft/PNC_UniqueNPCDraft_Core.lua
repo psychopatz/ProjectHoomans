@@ -13,6 +13,7 @@ local Unique = PNC.UniqueNPCs
 local Identity = PNC.Identity
 local Appearance = Identity and Identity.Appearance
 local Inventory = PNC.Inventory
+local OutfitCapture = require "PNC/Identity/PNC_UniqueNPCOutfitCapture"
 
 local function copy(value)
     if PNC.Core and PNC.Core.DeepCopy then return PNC.Core.DeepCopy(value) end
@@ -258,13 +259,12 @@ function Model.New(options)
         identity = { nickname = nil, survivor = {} },
         authoringClears = {},
         appearanceAuthored = {},
-        -- A new authored NPC starts without inherited factory clothing.
-        -- Random remains an explicit choice through the appearance tab or
-        -- the Randomize action below.
+        -- New drafts inherit a stable clothed archetype look. Explicit None
+        -- remains available for intentionally empty outfits.
         appearance = Appearance and Appearance.Normalize
-            and Appearance.Normalize({ outfit = { mode = "none" } }) or {
+            and Appearance.Normalize({ outfit = { mode = "random" } }) or {
                 schemaVersion = 2,
-                outfit = { mode = "none" },
+                outfit = { mode = "random" },
                 slots = {},
                 voice = { mode = "random" },
             },
@@ -280,7 +280,7 @@ end
 -- The editor should be able to show the visual result before the author has
 -- entered the final name. Keep this temporary fallback isolated from the
 -- authored draft so it can never leak into Save/Produce output.
-function Model.BuildPreviewDraft(draft)
+function Model.BuildPreviewDraft(draft, previous)
     local output = copy(draft or Model.New())
     if not text(output.displayName) then
         output.displayName = "Preview Survivor"
@@ -289,6 +289,19 @@ function Model.BuildPreviewDraft(draft)
         output.isFemale = false
     end
     output.archetypeID = text(output.archetypeID) or "General"
+    local outfit = output.appearance and output.appearance.outfit
+    if Appearance and outfit and outfit.mode == "item" and outfit.id
+        and not Appearance.HasExplicitSlots(output.appearance)
+    then
+        local key = tostring(outfit.id) .. ":" .. tostring(output.isFemale) .. ":" .. tostring(output.previewSeed)
+        local slots = previous and previous.previewNamedOutfitKey == key and previous.previewNamedOutfitSlots
+        if not slots then slots = OutfitCapture.Capture(outfit.id, output.isFemale) end
+        if slots then
+            output.previewNamedOutfitKey, output.previewNamedOutfitSlots = key, copy(slots)
+            output.appearance = Appearance.Normalize(output.appearance)
+            output.appearance.slots = copy(slots)
+        end
+    end
     return output
 end
 
@@ -296,7 +309,7 @@ end
 -- generated result. The runtime record is deliberately retained so typing a
 -- name or changing another non-random field cannot call SurvivorFactory again.
 function Model.UpdatePreviewDraft(preview, draft)
-    local output = Model.BuildPreviewDraft(draft)
+    local output = Model.BuildPreviewDraft(draft, preview)
     if preview and preview.runtimeRecord then
         output.runtimeRecord = preview.runtimeRecord
         output.id = preview.id
@@ -308,9 +321,7 @@ function Model.Randomize(draft)
     if not draft then return false end
     Model.SyncFromRuntime(draft)
     draft.previewSeed = nextSeed()
-    -- Randomize is the deliberate escape hatch from the nude-by-default
-    -- creator state.  Keep the policy explicit so the preview and produced
-    -- definition agree about where the clothing came from.
+    -- Randomize deliberately changes generation; ordinary edits retain it.
     if Appearance and Appearance.Normalize then
         draft.appearance = Appearance.Normalize()
         draft.appearanceAuthored = draft.appearanceAuthored or {}

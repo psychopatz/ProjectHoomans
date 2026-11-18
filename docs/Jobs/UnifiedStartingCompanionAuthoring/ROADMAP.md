@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R2 developer repair accepted — P6 native SP/MP/co-op acceptance pending
+**Status:** P5R4 developer repair complete — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -784,6 +784,30 @@ Developer-side implementation is complete; native acceptance is unverified.
 P6 must verify actual native rendering, interactions and SP/MP/co-op outcomes;
 no native visual or multiplayer result is claimed by the harness.
 
+### P5R4 — Native regression repair and equipment explorer
+
+User-authorized implementation of [the native regression repair](NATIVE_REGRESSION_AUDIT_AND_PLAN.md).
+Both entry points continue to consume the same editor and canonical model.
+
+- Buffered text with explicit commits, validation rollback and last-valid preview.
+- Canonical native pitch range, one commit per drag, audio-independent clothing/
+  inventory/portrait invalidation, and owned actorless UI voice preview.
+- Compact input geometry, disabled derived controls with native lock/reason
+  tooltips, and gender icon toggles.
+- Grouped equipment icon tiles and a dedicated paged explorer for loaded vanilla/
+  mod items, source/category/search/compatibility filters, details and explicit
+  apply actions. Normal loadout authoring does not use dropdowns.
+- Stable clothed defaults, exact retained clothing state, and cached preview-only
+  materialization of legacy named outfits using unregistered native descriptors.
+- Focused tests **51/51**; full suite **1044/1048**, with the same four recorded
+  unrelated failures. All owned Lua syntax, production Kahlua checks, EN/TL keys,
+  JSON, PNG and whitespace checks pass.
+
+**P5R4 gate:** developer implementation verified; closed by its exact local phase
+commit. Native input/rendering/audio and P6 lifecycle results remain unverified.
+Use the revised native matrix in the linked audit; the installed game is PZ
+42.22.2 while the packaged runtime directory remains 42.20.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
@@ -824,7 +848,7 @@ unless the user explicitly delegates native control:
 - missing/no customization fallback;
 - old save without new customization fields.
 
-**Gate:** native Build 42.20 proves the UI, final bindings, server authority,
+**Gate:** native installed Build 42.22.2 proves the UI, final bindings, server authority,
 persistence, and reconnect behavior all reference the same canonical starter
 companions.
 

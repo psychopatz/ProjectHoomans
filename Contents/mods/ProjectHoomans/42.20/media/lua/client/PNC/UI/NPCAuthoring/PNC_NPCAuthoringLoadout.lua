@@ -10,6 +10,10 @@ local function copy(value)
     return out
 end
 
+local function slotKey(value)
+    return string.lower(string.match(tostring(value or ""), "([^:]+)$") or tostring(value or ""))
+end
+
 function Model.Items(draft)
     return copy(draft and draft.startingItems or {})
 end
@@ -19,6 +23,9 @@ local function editSlot(draft, slot, spec)
     local bagSlot = slot.kind == "worn" and spec and spec.maxWeight ~= nil
     if slot.kind == "worn" then
         local appearance = Appearance.Normalize(draft.appearance)
+        for location in pairs(appearance.slots) do
+            if location ~= slot.id and slotKey(location) == slotKey(slot.id) then appearance.slots[location] = nil end
+        end
         if spec then
             for location, policy in pairs(appearance.slots) do
                 if location ~= slot.id and policy.mode == "item"
@@ -39,7 +46,7 @@ local function editSlot(draft, slot, spec)
         local items = Model.Items(draft)
         local output = {}
         for index, item in ipairs(items) do
-            local replace = slot.kind == "worn" and item.wornSlot == slot.id
+            local replace = slot.kind == "worn" and item.wornSlot and slotKey(item.wornSlot) == slotKey(slot.id)
                 or slot.kind == "held" and item.equipSlot == slot.id
                 or slot.kind == "attached" and item.attachedSlot == slot.id
                 or slot.kind == "item" and (slot.index and index == slot.index
@@ -77,12 +84,25 @@ local function editSlot(draft, slot, spec)
     return true
 end
 
-function Model.SetSlot(draft, slot, spec)
+function Model.SetSlot(draft, slot, spec, baseline)
     if not draft then return false, "draft_unavailable" end
     local fields = { "appearance", "appearanceAuthored", "startingItems",
         "equipmentSpawnMode", "authoredFields", "authoringClears" }
     local candidate = {}
     for _, field in ipairs(fields) do candidate[field] = copy(draft[field]) end
+    if slot and slot.kind == "worn" and baseline then
+        local appearance = Appearance.Normalize(candidate.appearance)
+        for _, item in pairs(baseline.inventory and baseline.inventory.items or {}) do
+            local existing = item.wornSlot and appearance.slots[item.wornSlot]
+            if item.wornSlot and slotKey(item.wornSlot) ~= slotKey(slot.id) and not item.maxWeight
+                and (not existing or existing.mode == "random")
+            then
+                appearance.slots[item.wornSlot] = { mode = "item", type = item.type,
+                    wornSlot = item.wornSlot, itemState = copy(item.itemState) }
+            end
+        end
+        candidate.appearance = appearance
+    end
     local ok, reason = editSlot(candidate, slot, spec)
     if not ok then return false, reason end
     for _, field in ipairs(fields) do draft[field] = candidate[field] end
@@ -90,5 +110,7 @@ function Model.SetSlot(draft, slot, spec)
     draft._dirty = true
     return true
 end
+
+Model.CaptureOutfit = require("PNC/Identity/PNC_UniqueNPCOutfitCapture").Capture
 
 return Model

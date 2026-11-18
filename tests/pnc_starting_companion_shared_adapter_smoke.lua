@@ -74,6 +74,7 @@ local adapter = Adapter.New(session, TID.BROTHER)
 local initialFingerprint = Blueprint.Fingerprint(session:GetBlueprint(TID.BROTHER))
 local draft = adapter:BuildDraft()
 T.truthy(draft, "shared adapter builds a resolved authoring draft")
+T.equal(draft.appearance.outfit.mode, "random", "new companions inherit a clothed default without authoring an override")
 local initialPreviewIdentity = adapter:PreviewIdentity()
 local initialGenerationIdentity = adapter:PreviewGenerationIdentity()
 T.contains(initialPreviewIdentity, TID.BROTHER,

@@ -180,14 +180,15 @@ end
 function Adapter:CommitDraft(draft)
     local intent = self:BlueprintIntent()
     local candidate
+    local reason
     local current
     local changed = false
     if not self.session or not draft or not intent then return false end
-    candidate = Model.BuildBlueprint(draft, {
+    candidate, reason = Model.BuildBlueprint(draft, {
         generationSeed = intent.generationSeed,
         id = intent.id,
     })
-    if not candidate then return false end
+    if not candidate then return false, reason end
     current = self:_snapshotDraft(draft)
     for _, field in ipairs(Profile.List("companion")) do
         local capability = self:FieldCapability(field.id)

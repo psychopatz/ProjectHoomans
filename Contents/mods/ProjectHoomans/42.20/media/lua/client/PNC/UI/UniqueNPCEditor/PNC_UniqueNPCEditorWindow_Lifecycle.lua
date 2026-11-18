@@ -23,14 +23,11 @@ local function initializeEditorState(self)
 end
 
 local function buildEditorToolbar(self)
-    local buttons = self.presentationMode == "companion" and {
-        { "inspector", "UI_PNC_NPCAuthoring_Inspector", "INSPECTOR", "quiet" },
-    } or {
+    local buttons = self.presentationMode == "companion" and {} or {
         { "new", "UI_PNC_UniqueNPCEditor_New", "NEW", "quiet" },
         { "save", "UI_PNC_UniqueNPCEditor_Save", "SAVE", "quiet" },
         { "produce", "UI_PNC_UniqueNPCEditor_Produce", "PRODUCE", "primary" },
         { "randomize", "UI_PNC_UniqueNPCEditor_Randomize", "RANDOMIZE", "selected" },
-        { "inventory", "UI_PNC_UniqueNPCEditor_Inventory", "INVENTORY", "selected" },
     }
     buttons[#buttons + 1] = { "preview", "UI_PNC_Authoring_Preview", "Preview", "quiet" }
     for _, button in ipairs(buttons) do
@@ -164,12 +161,6 @@ local function buildEditorForm(self)
     end
 
     do
-        for _, row in ipairs(self.coreRows) do
-            if row.id == "surname" or row.id == "gender" then
-                row.readOnlyValue = addLabel(self.formView, "")
-                row.readOnlyValue:setVisible(false)
-            end
-        end
         self.configuredDetails = UI.CreateList(self.pages.attributes, {
             itemHeight = Layout.Pixels(25, self.uiScale),
             doDrawItem = drawDetail,
@@ -206,6 +197,12 @@ local function buildEditorForm(self)
         onclick = ISPNCNPCAuthoringEditor.onAction,
         variant = "quiet",
     })
+    if self.presentationMode == "companion" then
+        self.inspectorButton = UI.CreateButton(self.pages.relations, {
+            id = "inspector", title = tr("UI_PNC_Authoring_AdvancedDetails", "Advanced details"),
+            target = self, onclick = ISPNCNPCAuthoringEditor.onAction, variant = "quiet",
+        })
+    end
     self.statusLabel = addLabel(self, "")
 end
 

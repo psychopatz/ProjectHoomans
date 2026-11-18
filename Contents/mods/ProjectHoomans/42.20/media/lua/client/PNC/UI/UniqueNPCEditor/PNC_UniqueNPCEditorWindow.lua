@@ -71,6 +71,10 @@ function ISPNCUniqueNPCEditorWindow:render()
 end
 
 function ISPNCUniqueNPCEditorWindow:close()
+    if self.editor then
+        self.editor:pullForm()
+        self.editor.appearanceTab:onStopVoice()
+    end
     self:setVisible(false)
     self:removeFromUIManager()
     EditorUI.instance = nil

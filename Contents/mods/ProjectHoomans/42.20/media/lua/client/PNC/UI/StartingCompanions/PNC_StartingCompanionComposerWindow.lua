@@ -310,7 +310,9 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
     local id = button and button.internal
     local ok
     local reason
-    if self.editor.draft then self.editor:pullForm() end
+    if self.editor.draft and id ~= "reset" and id ~= "revert" and id ~= "load" and id ~= "close" then
+        if self.editor:pullForm() == false then return end
+    end
     if id == "close" then
         self:close()
         return
@@ -352,6 +354,10 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
 end
 
 function ISPNCStartingCompanionComposerWindow:close()
+    if self.editor then
+        self.editor:pullForm()
+        self.editor.appearanceTab:onStopVoice()
+    end
     self:setVisible(false)
     self:removeFromUIManager()
     UIState.instance = nil

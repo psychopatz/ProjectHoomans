@@ -1,6 +1,10 @@
 # Shared NPC creator UI: audit and proposed redesign
 
-Date: 2026-11-18. Status: user-approved design, implemented in P5R3; native acceptance remains unverified.
+Native P5R3 acceptance was rejected in the 2026-11-18 follow-up. The current
+regression findings, implemented P5R4 repair and native retest matrix are in
+[NATIVE_REGRESSION_AUDIT_AND_PLAN.md](NATIVE_REGRESSION_AUDIT_AND_PLAN.md).
+
+Date: 2026-11-18. Status: user-approved design, repaired in P5R4; native acceptance remains unverified.
 Scope: the starting-companion composer and debug Unique NPC Creator, using one shared authoring UI and the existing canonical NPC authoring system.
 
 ## Requested result

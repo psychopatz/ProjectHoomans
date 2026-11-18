@@ -95,6 +95,13 @@ local function buildAppearanceVoiceControls(self)
     self.voicePitch:instantiate()
     self.voicePitch:setValues(-100, 100, 1, 10)
     self.content:addChild(self.voicePitch)
+    for _, event in ipairs({ "onMouseUp", "onMouseUpOutside" }) do
+        local original = self.voicePitch[event]
+        self.voicePitch[event] = function(slider, x, y)
+            if original then original(slider, x, y) end
+            self:commitPendingVoice()
+        end
+    end
     self.voicePitchValue = ISLabel:new(0, 0, 24, "0",
         0.72, 0.78, 0.84, 1, UIFont.Small, true)
     self.voicePitchValue:initialise()

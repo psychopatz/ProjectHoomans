@@ -25,7 +25,8 @@ function Window:refreshPreview(force)
     if self.presentationAdapter and not self._skipAdapterCommit
         and not self._committingAdapter
     then
-        self:commitAdapterDraft()
+        local _, commitReason = self:commitAdapterDraft()
+        if commitReason then self:setStatus(tostring(commitReason)); return false end
     end
     if self.presentationAdapter then
         local identity = self.presentationAdapter.PreviewIdentity
@@ -40,20 +41,22 @@ function Window:refreshPreview(force)
             self.previewDraft = nil
         end
     end
-    self.previewDraft = Model.UpdatePreviewDraft(self.previewDraft, self.draft)
+    local candidatePreview = Model.UpdatePreviewDraft(self.previewDraft, self.draft)
     local valid, reason = Model.Validate(self.draft)
     local previewRecord, previewReason = Model.EnsureRuntimeRecord(
-        self.previewDraft, force == true)
+        candidatePreview, force == true)
     local rendered = false
     if previewRecord then
+        self.previewDraft = candidatePreview
         local spec = Model.BuildPortraitSpec(self.previewDraft)
         self.previewSpecKey = spec and spec.key or nil
         self.portraitTarget = spec
         self.portraitPanel:setVisible(true)
         rendered = self.portraitPanel:setTarget(
             nil, spec, force == true) == true
-    elseif self.portraitPanel then
-        self.portraitPanel:setVisible(false)
+    else
+        self:setStatus(tostring(previewReason or reason or "preview unavailable"))
+        return false
     end
     self:refreshDetails()
     if valid and rendered then
@@ -74,7 +77,7 @@ end
 
 function Window:onFormChanged(force)
     if self.syncing or not self.draft then return end
-    self:pullForm()
+    if self:pullForm() == false then return end
     self:refreshPreview(force == true)
 end
 

@@ -15,6 +15,7 @@ require "PNC/Identity/PNC_UniqueNPCDefinitionStore"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCAppearanceWindow"
 require "PNC/UI/Inventory/PNC_InventoryWindow"
 require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Profile"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringFields"
 
 PNC = PNC or {}
 PNC.NPCAuthoringEditor = PNC.NPCAuthoringEditor or {}
@@ -85,12 +86,16 @@ function ISPNCNPCAuthoringEditor:syncPageVisibility()
     local tabs = self.tabPanel
     if not tabs then return end
     local active = tabs:getActiveView()
+    if active ~= self.appearanceTab and self.appearanceTab and self.appearanceTab.onStopVoice then
+        self.appearanceTab:onStopVoice()
+    end
     for _, entry in ipairs(tabs.viewList or {}) do
         entry.view:setVisible(self.draft ~= nil and entry.view == active)
     end
 end
 
 function ISPNCNPCAuthoringEditor:setAdapter(adapter)
+    if self.itemExplorer and self.itemExplorer:getIsVisible() then self.itemExplorer:Hide() end
     if not adapter then
         self:clearPresentation()
         return
@@ -105,6 +110,8 @@ function ISPNCNPCAuthoringEditor:setAdapter(adapter)
             preview = self.previewDraft, identity = self.previewIdentity, traitID = self.presentationAdapter and self.presentationAdapter.traitID,
         }
     end
+    if self.appearanceTab then self.appearanceTab:onStopVoice() end
+    self.textEdits = {}
     self.presentationAdapter = adapter
     if adapter.Attach then adapter:Attach(self) end
     self.inspectorVisible = false
@@ -128,6 +135,7 @@ end
 -- companion.  Detaching the adapter alone is not enough: the old draft and
 -- portrait are independent UI state and would otherwise remain on screen.
 function ISPNCNPCAuthoringEditor:clearPresentation()
+    if self.appearanceTab and self.appearanceTab.onStopVoice then self.appearanceTab:onStopVoice() end
     self.presentationAdapter = nil
     self.draft = nil
     self.previewDraft = nil
@@ -220,14 +228,14 @@ function ISPNCNPCAuthoringEditor:commitAdapterDraft()
     if not adapter or not adapter.CommitDraft or not self.draft then return false end
     if self._committingAdapter then return false end
     self._committingAdapter = true
-    local changed = adapter:CommitDraft(self.draft)
+    local changed, reason = adapter:CommitDraft(self.draft)
     self._committingAdapter = false
     if changed then
         self._skipAdapterCommit = true
         self:refreshFromAdapter(false)
         self._skipAdapterCommit = false
     end
-    return changed == true
+    return changed == true, reason
 end
 
 function ISPNCNPCAuthoringEditor:invokeWorkflow(action)
@@ -237,6 +245,7 @@ function ISPNCNPCAuthoringEditor:invokeWorkflow(action)
         or action == "reset" and "Reset"
         or action == "revert" and "RevertToPreset" or nil
     if not method or type(adapter[method]) ~= "function" then return false end
+    self.textEdits = {}
     local ok = adapter[method](adapter)
     self:refreshFromAdapter(true)
     return ok ~= nil and ok ~= false

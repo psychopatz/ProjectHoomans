@@ -184,6 +184,20 @@ T.truthy(cyclicAppearance, "cyclic live record appearance resolved")
 T.equal(cyclicRecord.runtime.localNavigation.record, cyclicRecord,
     "appearance resolution preserved live navigation back-reference")
 
+local priorCache = cyclicRecord.runtime.appearanceCache
+local priorItems = priorCache.outfitItemSpecs
+local priorKey = cyclicRecord.runtime.appearanceCacheKey
+cyclicRecord.appearance = Appearance.Normalize(namedWithExactSlot)
+cyclicRecord.appearance.voice = { mode = "item", prefix = "VoiceMale", type = 1, pitch = 100 }
+cyclicRecord.identity.survivor.voicePrefix = "VoiceMale"
+cyclicRecord.identity.survivor.voiceType = 1
+cyclicRecord.identity.survivor.voicePitch = 100
+local voiceCache = PNC.Identity.RollAppearance(cyclicRecord)
+T.equal(voiceCache, priorCache, "voice edit retains the actual shared appearance cache")
+T.equal(voiceCache.outfitItemSpecs, priorItems, "voice edit retains exact clothing objects")
+T.equal(cyclicRecord.runtime.appearanceCacheKey, priorKey, "voice does not invalidate the visual cache key")
+T.equal(voiceCache.voicePitch, 100, "audio state still updates on the retained cache")
+
 local random = Appearance.Resolve({
     appearance = Appearance.Normalize({ outfit = { mode = "random" } }),
 }, {

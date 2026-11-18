@@ -17,17 +17,23 @@ function Model.BuildPortraitSpec(draft)
     local appearance = snapshot.appearance
         or record and runtime.appearanceCache or {}
     local equipment = snapshot.equipment or record and record.equipment or {}
-    local revision = runtime.previewVisualRevision or 0
-    return {
-        key = tostring(draft.id or Model.BuildID(draft))
-            .. ":preview:" .. tostring(revision),
+    local visual = copy(appearance)
+    -- UI descriptors have no audio role. Audio-only edits must not create a
+    -- new descriptor (which could dress a named outfit again).
+    for _, field in ipairs({ "voice", "voicePrefix", "voiceType", "voicePitch" }) do visual[field] = nil end
+    if visual.appearancePolicy then visual.appearancePolicy.voice = nil end
+    local spec = {
         id = tostring(draft.id or "editor"),
         identitySeed = record and record.identitySeed or draft.previewSeed or 1,
         isFemale = draft.isFemale == true,
         preferDescriptor = true,
-        appearance = copy(appearance),
+        appearance = visual,
         equipment = copy(equipment),
     }
+    spec.key = tostring(draft.id or Model.BuildID(draft)) .. ":preview:"
+        .. PNC.NPCAuthoring.Registry.Hash({ appearance = visual, equipment = spec.equipment,
+            identitySeed = spec.identitySeed, isFemale = spec.isFemale })
+    return spec
 end
 
 function Model.ExportItems(draft)

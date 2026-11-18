@@ -184,16 +184,21 @@ function Model.ApplyDraftToRuntime(draft)
     local appearanceChanged
     local inventoryChanged
     if not record then return nil, "preview_missing" end
-    def = Model.BuildDefinition(draft)
+    local definitionReason
+    def, definitionReason = Model.BuildDefinition(draft)
+    if not def then return nil, definitionReason end
     inventoryChanged = PNC.NPCAuthoring.Registry.Hash(record.startingItems or {})
         ~= PNC.NPCAuthoring.Registry.Hash(def.startingItems or {})
         or record.equipmentSpawnMode ~= def.equipmentSpawnMode
     inventory = record.inventory
     identitySeed = record.identitySeed
-    previousAppearanceSignature = Appearance and Appearance.Signature
-        and Appearance.Signature(record.appearance) or ""
-    nextAppearanceSignature = Appearance and Appearance.Signature
-        and Appearance.Signature(def.appearance) or ""
+    -- Voice parameters are not clothing. Keep exact item state and generated
+    -- visuals alive across slider drags and other audio-only edits.
+    local previousLook = Appearance and Appearance.Normalize and Appearance.Normalize(record.appearance) or copy(record.appearance or {})
+    local nextLook = Appearance and Appearance.Normalize and Appearance.Normalize(def.appearance) or copy(def.appearance or {})
+    previousLook.voice, nextLook.voice = nil, nil
+    previousAppearanceSignature = PNC.NPCAuthoring.Registry.Hash(previousLook)
+    nextAppearanceSignature = PNC.NPCAuthoring.Registry.Hash(nextLook)
     appearanceChanged = previousAppearanceSignature ~= nextAppearanceSignature
     authoredFields = draft.authoredFields or {}
     for _, key in ipairs({
@@ -251,7 +256,8 @@ function Model.EnsureRuntimeRecord(draft, force)
     if draft.runtimeRecord and not force then
         return Model.ApplyDraftToRuntime(draft)
     end
-    local def = Model.BuildDefinition(draft)
+    local def, definitionReason = Model.BuildDefinition(draft)
+    if not def then return nil, definitionReason end
     local record
     local reason
     record, reason = Unique.Resolve(def, {

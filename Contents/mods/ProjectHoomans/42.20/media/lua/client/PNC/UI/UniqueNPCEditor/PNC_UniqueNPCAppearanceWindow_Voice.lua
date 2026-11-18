@@ -1,3 +1,4 @@
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringVoicePreview"
 local Window = ISPNCUniqueNPCAppearanceWindow
 local Internal = Window.Internal or {}
 local Model = Internal.Model
@@ -30,42 +31,18 @@ function ISPNCUniqueNPCAppearanceWindow:voiceProfile()
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onPlayVoice()
-    local player = AudioDebug and AudioDebug.GetCurrentPlayer
-        and AudioDebug.GetCurrentPlayer() or nil
-    local suffix = comboData(self.voiceSampleCombo) or "ShoutHey"
-    local profile = self:voiceProfile()
-    local handle
-    local reason
-    if not player or not AudioDebug or not AudioDebug.PlayDialogue then
-        if self.parentEditor and self.parentEditor.setStatus then
-            self.parentEditor:setStatus(
-                tr("UI_PNC_UniqueNPCEditor_VoiceUnavailable",
-                    "Voice preview unavailable"))
-        end
-        return
-    end
-    handle, reason = AudioDebug.PlayDialogue(player,
-        { suffix = tostring(suffix) }, profile)
-    if handle and handle ~= 0 then
-        if self.parentEditor and self.parentEditor.setStatus then
-            self.parentEditor:setStatus(
-                tr("UI_PNC_UniqueNPCEditor_VoicePlaying",
-                    "Playing voice preview"))
-        end
-    else
-        if self.parentEditor and self.parentEditor.setStatus then
-            self.parentEditor:setStatus(
-                tostring(reason or "voice preview failed"))
-        end
+    if not self.draft then return end
+    self:commitPendingVoice()
+    self.voicePreview = self.voicePreview or PNC.NPCAuthoringVoicePreview.New()
+    local ok = self.voicePreview:Play(self:voiceProfile(), comboData(self.voiceSampleCombo) or "ShoutHey")
+    if self.parentEditor then
+        self.parentEditor:setStatus(tr(ok and "UI_PNC_UniqueNPCEditor_VoicePlaying"
+            or "UI_PNC_UniqueNPCEditor_VoiceUnavailable", ok and "Playing voice preview" or "Voice preview unavailable"))
     end
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onStopVoice()
-    local player = AudioDebug and AudioDebug.GetCurrentPlayer
-        and AudioDebug.GetCurrentPlayer() or nil
-    if player and AudioDebug and AudioDebug.StopDialogue then
-        AudioDebug.StopDialogue(player)
-    end
+    if self.voicePreview then self.voicePreview:Stop() end
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onAction(button)
@@ -77,6 +54,7 @@ function ISPNCUniqueNPCAppearanceWindow:onAction(button)
             -- Companion Randomize is a session operation.  Do not mutate a
             -- local resolved draft and accidentally leave the canonical seed
             -- unchanged.
+            if self.parentEditor:pullForm() == false then return end
             self.parentEditor:invokeWorkflow("randomize")
             return
         end

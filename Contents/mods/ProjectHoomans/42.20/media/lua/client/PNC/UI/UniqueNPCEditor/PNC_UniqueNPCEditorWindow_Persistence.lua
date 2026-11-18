@@ -33,6 +33,7 @@ function Window:loadSelected()
         self:setStatus(tostring(reason or "load failed"))
         return false
     end
+    self.textEdits = {}
     self.draft = draft
     self.previewDraft = nil
     if self.appearanceTab then self.appearanceTab.draft = self.draft end

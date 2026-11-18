@@ -18,7 +18,10 @@ end
 
 function Window:layoutBio(width, rowHeight, gap)
     local y = gap
-    local inputWidth = math.max(1, width - gap * 2 - 16)
+    local available = math.max(1, width - gap * 2 - 16)
+    local columns = available >= Layout.Pixels(580, self.uiScale) and 2 or 1
+    local inputWidth = math.min(Layout.Pixels(340, self.uiScale), (available - gap * (columns - 1)) / columns)
+    local index = 0
     self.fileLabel:setVisible(false)
     self.fileCombo:setVisible(false)
     for _, label in pairs(self.sectionLabels) do label:setVisible(false) end
@@ -26,23 +29,19 @@ function Window:layoutBio(width, rowHeight, gap)
         local capability = self:fieldCapability(row.fieldID)
         local visible = capability.visible ~= false and row.id ~= "hair"
             and row.id ~= "beard" and row.id ~= "equipmentMode"
-        local locked = capability.editable == false and row.readOnlyValue ~= nil
         row.labelControl:setVisible(visible)
-        row.entry:setVisible(visible and not locked)
-        if row.readOnlyValue then row.readOnlyValue:setVisible(visible and locked) end
+        row.entry:setVisible(visible)
         if visible then
-            bounds(row.labelControl, gap, y, inputWidth, rowHeight)
-            y = y + rowHeight
-            if locked and Layout.Ellipsize then
-                local value = row.readOnlyValue.name or ""
-                row.readOnlyValue.tooltip = value
-                row.readOnlyValue:setName(Layout.Ellipsize(value, UIFont.Small, inputWidth))
-            end
-            bounds(locked and row.readOnlyValue or row.entry, gap, y, inputWidth, rowHeight)
-            y = y + rowHeight + gap
-        end
+            local x = gap + (index % columns) * (inputWidth + gap)
+            local top = y + math.floor(index / columns) * (rowHeight * 2 + gap * 2)
+            bounds(row.labelControl, x, top, inputWidth, rowHeight)
+            PNC.NPCAuthoringFields.Lock(self, row.entry, row.fieldID, self.formView)
+            PNC.NPCAuthoringFields.Bounds(row.entry, x, top + rowHeight, inputWidth, rowHeight)
+            if row.entry.onResize then row.entry:onResize() end
+            index = index + 1
+        elseif row.entry.pncLock then row.entry.pncLock:setVisible(false) end
     end
-    scroll(self.formView, y + gap)
+    scroll(self.formView, y + math.ceil(index / columns) * (rowHeight * 2 + gap * 2))
 end
 
 function Window:layoutAttributes(width, rowHeight, gap)
@@ -105,11 +104,16 @@ function Window:onResponsiveLayout()
     self:layoutAttributes(contentWidth, rowHeight, gap)
     self.appearanceTab:onResponsiveLayout()
     self:layoutLoadoutPage(contentWidth, viewHeight, rowHeight, gap)
-    bounds(self.relationshipDetails, gap, gap, contentWidth - gap * 2, viewHeight - gap * 2)
+    bounds(self.relationshipDetails, gap, gap, contentWidth - gap * 2, viewHeight - rowHeight - gap * 3)
+    bounds(self.inspectorButton, gap, viewHeight - rowHeight - gap, contentWidth - gap * 2, rowHeight)
     bounds(self.details, gap, gap, contentWidth - gap * 2, viewHeight - rowHeight * 2 - gap * 3)
     bounds(self.resetDetailsButton, gap, viewHeight - rowHeight * 2 - gap * 2,
         contentWidth - gap * 2, rowHeight)
     bounds(self.removeButton, gap, viewHeight - rowHeight - gap, contentWidth - gap * 2, rowHeight)
+    if Layout.Ellipsize and self.statusLabel.setName then
+        self.statusLabel.tooltip = self.statusText
+        self.statusLabel:setName(Layout.Ellipsize(self.statusText or "", UIFont.Small, remaining))
+    end
     bounds(self.statusLabel, contentX, rect.height - rowHeight, remaining, rowHeight)
     local previewOnly = self.previewExpanded == true
     self.tabPanel:setVisible(self.draft ~= nil and not previewOnly)
@@ -128,6 +132,15 @@ function Window:onResponsiveLayout()
             buttonWidth, rowHeight)
         button:setVisible(showPortrait)
     end
+    local exploring = self.itemExplorer and self.itemExplorer:getIsVisible()
+    if exploring then
+        self.tabPanel:setVisible(false); self.roster:setVisible(false); self.rosterLabel:setVisible(false)
+        self.portraitPanel:setVisible(false)
+        for _, button in ipairs(self.portraitControls or {}) do button:setVisible(false) end
+    else
+        self.roster:setVisible(true); self.rosterLabel:setVisible(true)
+    end
+    for _, control in ipairs(self.toolbar) do control:setVisible(not exploring) end
     self.layout = { x = rect.x, y = top, leftWidth = contentWidth,
         portraitX = px, portraitY = top, portraitWidth = portraitWidth,
         portraitHeight = portraitHeight, compact = compact, stacked = compact,

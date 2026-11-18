@@ -23,12 +23,8 @@ function Window:addTextRow(id, key, fallback,
     row.entry = UI.CreateTextEntry(parent, {
         onlyNumbers = onlyNumbers == true,
         maxTextLength = 160,
-        onTextChange = function()
-            -- Text edits update the existing preview in place.  Only the
-            -- explicit RANDOMIZE action is allowed to roll fallback values.
-            self:onFormChanged(false)
-        end,
     })
+    PNC.NPCAuthoringFields.BindText(self, row.entry, row.fieldID)
     self.coreRows[#self.coreRows + 1] = row
     return row.entry
 end
@@ -37,8 +33,9 @@ function Window:addComboRow(id, key, fallback, fieldID)
     local row = { id = id, fieldID = fieldID or id, label = tr(key, fallback) }
     local parent = self.controlParent or self.formView or self
     row.labelControl = addLabel(parent, row.label)
-    row.entry = newCombo(parent,
-        ISPNCNPCAuthoringEditor.onComboChanged, self)
+    row.entry = id == "gender" and PNC.NPCAuthoringFields.Gender(self, parent)
+        or id == "equipmentMode" and PNC.NPCAuthoringFields.Choice(self, parent, ISPNCNPCAuthoringEditor.onComboChanged)
+        or newCombo(parent, ISPNCNPCAuthoringEditor.onComboChanged, self)
     row.entry.pncKind = id
     self.coreRows[#self.coreRows + 1] = row
     return row.entry
@@ -72,6 +69,7 @@ function Window:refreshArchetypeOptions()
 end
 
 function Window:refreshGenderOptions()
+    if self.genderCombo.buttons then self.genderCombo:selectData(self.draft.isFemale); return end
     addOptions(self.genderCombo, {
         { id = true, label = tr("UI_PNC_UniqueNPCEditor_Female", "Female") },
         { id = false, label = tr("UI_PNC_UniqueNPCEditor_Male", "Male") },
@@ -114,6 +112,10 @@ function Window:refreshRepeaterOptions()
 end
 
 function Window:onComboChanged(combo)
+    if self.syncing or not self.draft then return end
+    if combo and combo.pncKind == "gender" and self:fieldCapability("identity.isFemale").editable == false then
+        self:syncControls(); return
+    end
     local kind = combo and combo.pncKind
     if kind == "gender" then
         self.draft.isFemale = comboData(combo) == true

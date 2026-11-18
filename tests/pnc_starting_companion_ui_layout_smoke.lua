@@ -5,6 +5,7 @@ getTextManager = function() return { getFontHeight = function() return 18 end } 
 local function control()
     local c = { visible = true, height = 1, width = 1 }
     function c:setVisible(v) self.visible = v end
+    function c:getIsVisible() return self.visible end
     function c:setEnabled(v) self.enabled = v end
     function c:setEnable(v) self.enabled = v end
     function c:setScrollHeight(v) self.scrollHeight = v end
@@ -28,6 +29,9 @@ function Layout.Flow(controls, rect, options)
     end
     return { bottom = y + h }
 end
+PsychopatzCore = { UI = { Layout = Layout, CreateButton = function() return control() end } }
+PNC = {}
+T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringFields.lua")
 ISPNCNPCAuthoringEditor = { Internal = { Layout = Layout } }
 T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout.lua")
 local Class = ISPNCNPCAuthoringEditor
@@ -72,7 +76,7 @@ for _, mode in ipairs({ "companion", "debug" }) do
             for _, row in ipairs(e.coreRows) do
                 if row.labelControl.visible then
                     inside(row.labelControl, e.formView.width, e.formView.contentHeight, "Bio label bounded")
-                    inside(row.readOnlyValue.visible and row.readOnlyValue or row.entry, e.formView.width, e.formView.contentHeight, "Bio value bounded")
+                    inside(row.entry, e.formView.width, e.formView.contentHeight, "Bio value bounded")
                 end
             end
             for _, row in ipairs(e.addRows) do

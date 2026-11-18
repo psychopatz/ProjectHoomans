@@ -266,6 +266,8 @@ function Identity.RollAppearance(record)
     skinColor = survivor.skinColor or {}
     runtime = record.runtime or {}
     record.runtime = runtime
+    local visualPolicy = PNC.Core.DeepCopy(appearanceRecord.appearance or {})
+    visualPolicy.voice = nil
     cacheKey = table.concat({
         tostring(seed),
         tostring(corePlan.archetypeID),
@@ -279,12 +281,15 @@ function Identity.RollAppearance(record)
         tostring(skinColor.r or ""),
         tostring(skinColor.g or ""),
         tostring(skinColor.b or ""),
-        tostring(survivor.voicePrefix or ""),
-        tostring(survivor.voiceType or ""),
-        tostring(survivor.voicePitch or ""),
         Appearance and Appearance.Signature
-            and Appearance.Signature(appearanceRecord.appearance) or "",
+            and Appearance.Signature(visualPolicy) or "",
     }, "|")
+    if runtime.appearanceCache then
+        runtime.appearanceCache.voice = survivor.voice
+        runtime.appearanceCache.voicePrefix = survivor.voicePrefix or survivor.voice
+        runtime.appearanceCache.voiceType = survivor.voiceType
+        runtime.appearanceCache.voicePitch = survivor.voicePitch
+    end
     if runtime.appearanceCacheKey == cacheKey and runtime.appearanceCache then
         if not runtime.generatedAppearance then
             runtime.generatedAppearance = PNC.Core.DeepCopy(

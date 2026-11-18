@@ -3,7 +3,6 @@ local Internal = Window.Internal or {}
 local Model = Internal.Model
 local tr = Internal.tr
 local fieldText = Internal.fieldText
-local setField = Internal.setField
 local comboData = Internal.comboData
 local addOptions = Internal.addOptions
 local selectCombo = Internal.selectCombo
@@ -16,11 +15,6 @@ local function setControlEnabled(control, enabled)
     if not control then return end
     if control.setEnabled then control:setEnabled(enabled == true)
     elseif control.setEnable then control:setEnable(enabled == true) end
-end
-
-local function sourceLabel(capability)
-    return capability and capability.editable == false
-        and capability.sourceLabel or nil
 end
 
 local function setLabelText(control, value)
@@ -45,53 +39,18 @@ local function companionRowVisible(self, row, capability)
     return true
 end
 
-local function lockedValue(self, row)
-    if row.id == "surname" then
-        local _, surname = Model.NameParts(self.draft)
-        return surname or "—"
-    end
-    if row.id == "gender" then
-        return self.draft and self.draft.isFemale == true
-            and tr("UI_PNC_UniqueNPCEditor_Female", "Female")
-            or tr("UI_PNC_UniqueNPCEditor_Male", "Male")
-    end
-    return "—"
-end
-
 local function updatePresentation(self)
     for _, row in ipairs(self.coreRows or {}) do
         local fieldID = row.fieldID or row.id
         local capability = self:fieldCapability(fieldID)
         capability = capability or { visible = true, editable = true }
         local visible = companionRowVisible(self, row, capability)
-        local locked = self.presentationMode == "companion"
-            and capability.editable == false
-            and (row.id == "surname" or row.id == "gender")
         local label = Profile and Profile.Label(fieldID) or row.label
-        local help = sourceLabel(capability)
-        if help and not locked then label = label .. " (" .. tostring(help) .. ")" end
         row.label = label
-        if row.labelControl then
-            if Internal.UI and Internal.UI.SetLabelText then
-                Internal.UI.SetLabelText(row.labelControl, label)
-            elseif row.labelControl.setName then
-                row.labelControl:setName(label)
-            end
-        end
-        if row.labelControl and row.labelControl.setVisible then
-            row.labelControl:setVisible(visible)
-        end
-        if row.entry and row.entry.setVisible then
-            row.entry:setVisible(visible and not locked)
-        end
-        setControlEnabled(row.entry,
-            visible and capability.editable ~= false and not locked)
-        if row.readOnlyValue then
-            setLabelText(row.readOnlyValue, locked
-                and (tostring(lockedValue(self, row)) .. " · "
-                    .. tostring(help or "")) or "")
-            row.readOnlyValue:setVisible(visible and locked)
-        end
+        setLabelText(row.labelControl, label)
+        row.labelControl:setVisible(visible)
+        row.entry:setVisible(visible)
+        PNC.NPCAuthoringFields.Lock(self, row.entry, fieldID, row.entry.parent or self.formView)
     end
     for _, row in ipairs(self.addRows or {}) do
         local capability = self:fieldCapability(row.fieldID or row.id)
@@ -109,26 +68,16 @@ local function updatePresentation(self)
         setControlEnabled(row.button,
             capability.visible ~= false and capability.editable ~= false)
     end
-    if self.appearanceTab then
-        local skin = self:fieldCapability("appearance.skinTexture")
-        local skinColor = self:fieldCapability("appearance.skinColor")
-        local enabled = skin.editable ~= false and skinColor.editable ~= false
-        if self.appearanceTab.skinModeCombo then
-            setControlEnabled(self.appearanceTab.skinModeCombo, enabled)
-        end
-        if self.appearanceTab.skinLabel and Internal.UI
-            and Internal.UI.SetLabelText
-        then
-            local label = Profile.Label("appearance.skinTexture")
-            local help = sourceLabel(skin) or sourceLabel(skinColor)
-            if help then label = label .. " (" .. tostring(help) .. ")" end
-            Internal.UI.SetLabelText(self.appearanceTab.skinLabel, label)
-        end
-    end
+
 end
 
 function Window:pullForm()
-    if not self.draft then return end
+    if not self.draft then return false end
+    local previousDraft = self.draft
+    local previousEdits = self.textEdits
+    self.draft = PNC.NPCAuthoring.Registry.Copy(previousDraft)
+    self.draft.runtimeRecord = previousDraft.runtimeRecord
+    self.textEdits = {}
     if self.presentationAdapter then
         local survivor = self.draft.identity.survivor
         local previousNickname = self.draft.identity.nickname
@@ -160,8 +109,17 @@ function Window:pullForm()
         end
         self.draft.equipmentSpawnMode = comboData(self.equipmentModeCombo)
             or "none"
-        self:commitAdapterDraft()
-        return
+        local valid, reason = Model.BuildBlueprint(self.draft)
+        if not valid then
+            self.draft, self.textEdits = previousDraft, previousEdits
+            self:setStatus(tostring(reason)); return false, reason
+        end
+        local _, commitReason = self:commitAdapterDraft()
+        if commitReason then
+            self.draft, self.textEdits = previousDraft, previousEdits
+            self:setStatus(tostring(commitReason)); return false, commitReason
+        end
+        return true
     end
     local survivor = self.draft.identity.survivor
     local previousNickname = self.draft.identity.nickname
@@ -196,7 +154,13 @@ function Window:pullForm()
         self.draft.authoringClears["appearance.beardModel"] = nil
     end
     self.draft.equipmentSpawnMode = comboData(self.equipmentModeCombo) or "none"
+    local valid, reason = Model.BuildBlueprint(self.draft)
+    if not valid then
+        self.draft, self.textEdits = previousDraft, previousEdits
+        self:setStatus(tostring(reason)); return false, reason
+    end
     self.draft._dirty = true
+    return true
 end
 
 function Window:syncControls()
@@ -204,13 +168,13 @@ function Window:syncControls()
     self.syncing = true
     local survivor = self.draft.identity and self.draft.identity.survivor or {}
     local first, last = Model.NameParts(self.draft)
-    setField(self.forenameEntry, first)
-    setField(self.nicknameEntry, self.draft.identity
+    PNC.NPCAuthoringFields.SyncText(self, self.forenameEntry, first)
+    PNC.NPCAuthoringFields.SyncText(self, self.nicknameEntry, self.draft.identity
         and self.draft.identity.nickname or "")
-    setField(self.surnameEntry, last)
+    PNC.NPCAuthoringFields.SyncText(self, self.surnameEntry, last)
     selectCombo(self.genderCombo, self.draft.isFemale == true)
     selectCombo(self.archetypeCombo, self.draft.archetypeID or "General")
-    setField(self.factionEntry, self.draft.factionID)
+    PNC.NPCAuthoringFields.SyncText(self, self.factionEntry, self.draft.factionID)
     addOptions(self.hairCombo, appearanceOptions(self.draft.isFemale == true))
     addOptions(self.beardCombo, beardOptions(self.draft.isFemale == true))
     selectCombo(self.hairCombo, survivor.hairModel)
@@ -254,6 +218,7 @@ function ISPNCNPCAuthoringEditor:onAction(button)
         self.previewExpanded = not self.previewExpanded
         self:requestResponsiveLayout()
     elseif action == "new" then
+        self.textEdits = {}
         self.debugRosterID = "current"
         self.draft = Model.New()
         self.previewDraft = nil
@@ -267,14 +232,14 @@ function ISPNCNPCAuthoringEditor:onAction(button)
     elseif action == "load" then
         self:loadSelected()
     elseif action == "randomize" then
-        self:pullForm()
+        if self:pullForm() == false then return end
         self:adoptPreview()
         Model.Randomize(self.draft)
         self.previewDraft = nil
         self:syncControls()
         self:refreshPreview(true)
     elseif action == "save" or action == "produce" then
-        self:pullForm()
+        if self:pullForm() == false then return end
         self:adoptPreview()
         local ok, reason = Storage.Save(self.draft, action == "produce")
         self:setStatus(ok
@@ -286,7 +251,7 @@ function ISPNCNPCAuthoringEditor:onAction(button)
         self:refreshFiles()
         self:refreshPreview(false)
     elseif action == "inventory" then
-        self:pullForm()
+        if self:pullForm() == false then return end
         self:adoptPreview()
         local valid = Model.Validate(self.draft)
         if valid then
@@ -297,7 +262,7 @@ function ISPNCNPCAuthoringEditor:onAction(button)
                 "Enter a first name and surname first"))
         end
     elseif action == "appearance" then
-        self:pullForm()
+        if self:pullForm() == false then return end
         self:adoptPreview()
         self:showTab("Appearance")
     elseif action == "remove_detail" then
