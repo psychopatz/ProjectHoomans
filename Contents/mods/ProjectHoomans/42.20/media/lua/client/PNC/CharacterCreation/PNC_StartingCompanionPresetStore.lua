@@ -37,14 +37,15 @@ function Store.FileName(label)
     return Database.SafeFileName(candidate)
 end
 
-function Store.Save(preset, label)
+function Store.Save(preset, label, requestedFileName)
     local serialized, reason = Presets.Serialize(preset)
     local fileName
     local payload
     local encoded
     local ok
     if not serialized then return false, reason end
-    fileName = Store.FileName(label or serialized.label)
+    if requestedFileName then fileName = Database.SafeFileName(requestedFileName)
+    else fileName = Store.FileName(label or serialized.label) end
     if not fileName then return false, "invalid_preset_file_name" end
     payload = {
         schemaId = Store.SCHEMA_ID,
@@ -90,6 +91,7 @@ function Store.List()
             fileName = entry.fileName,
             label = entry.displayName,
             schemaVersion = entry.schemaVersion,
+            kind = (Store.Load(entry.fileName) or {}).kind,
         }
     end
     table.sort(output, function(left, right)

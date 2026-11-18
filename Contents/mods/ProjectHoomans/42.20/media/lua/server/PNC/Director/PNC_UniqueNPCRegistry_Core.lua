@@ -12,6 +12,8 @@ local Store = PNC.HoomansWorldView
 local Identity = PNC.Identity
 local Config = PNC.DirectorConfig
 local Core = PNC.Core
+local LocalCollection = require "PNC/Core/Definitions/PNC_LocalNPCCollection"
+local localCollectionLoaded = false
 
 local function copy(value)
     return Core and Core.DeepCopy and Core.DeepCopy(value) or value
@@ -27,6 +29,10 @@ local function ensure()
         return nil, "abstract_world_store_unavailable"
     end
     Store.EnsureLoaded()
+    if not localCollectionLoaded then
+        LocalCollection.Load()
+        localCollectionLoaded = true
+    end
     Store.Registry.uniqueNPCsByID = Store.Registry.uniqueNPCsByID or {}
     return Store.Registry.uniqueNPCsByID
 end

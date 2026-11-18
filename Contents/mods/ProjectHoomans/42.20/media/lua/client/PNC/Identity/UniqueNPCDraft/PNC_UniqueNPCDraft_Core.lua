@@ -213,6 +213,13 @@ local function captureAppearanceItems(draft, appearance)
             then
                 spec = Appearance.CaptureItemSpec(item, slot)
                 previous = policy
+                -- A retained preview may still contain an older outfit's
+                -- generated garment. It cannot replace the pending policy.
+                for existingSlot, existing in pairs(appearance.slots) do
+                    if existingSlot ~= slot and existing.mode == "item"
+                        and Appearance.AreExclusive(spec and spec.wornSlot or slot, existing.wornSlot or existingSlot)
+                    then spec = nil; break end
+                end
                 if spec then
                     if not spec.itemState and previous
                         and type(previous.itemState) == "table"

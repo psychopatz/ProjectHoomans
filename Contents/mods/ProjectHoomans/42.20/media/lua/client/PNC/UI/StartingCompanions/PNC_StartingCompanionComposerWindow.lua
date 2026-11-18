@@ -265,23 +265,34 @@ function ISPNCStartingCompanionComposerWindow:onResponsiveLayout()
 end
 
 function ISPNCStartingCompanionComposerWindow:currentLabel()
+    if self.editor and self.editor.draft and tostring(self.editor.draft.displayName or "") ~= "" then return self.editor.draft.displayName end
     local slot = self.session and self.session:GetSlot(self.selectedTraitID, true)
     local spec = slot and slot.spec or nil
     return spec and tr(spec.uiName, spec.relationshipKind)
         or tr("UI_PNC_StartingCompanion_Companion", "Companion")
 end
 
-function ISPNCStartingCompanionComposerWindow:saveTemplate()
-    local payload, reason = Presets.TemplateFromSession(self.session,
-        self.selectedTraitID, self:currentLabel())
+function ISPNCStartingCompanionComposerWindow:saveTemplate(label, fileName, library, prepared)
+    local payload, reason
+    if prepared then payload = prepared.preset; payload.label = label
+    else payload, reason = Presets.TemplateFromSession(self.session, self.selectedTraitID, label or self:currentLabel()) end
     if not payload then return false, reason end
-    return Store.Save(payload, payload.label or self:currentLabel())
+    local ok, saved = Store.Save(payload, payload.label or self:currentLabel(), fileName)
+    if not ok then return false, saved end
+    if library then
+        local storage = require "PNC/Identity/PNC_UniqueNPCDefinitionStore"
+        local exported, reason = storage.SaveCharacter(prepared and prepared.draft or self.editor:effectiveDraft(), fileName or Store.FileName(payload.label))
+        if not exported then return false, tr("UI_PNC_Authoring_PresetOnlySaved", "Preset saved; encounter character could not be saved: ") .. tostring(reason) end
+    end
+    return true, saved
 end
 
-function ISPNCStartingCompanionComposerWindow:saveSet()
-    local payload, reason = Presets.FromSession(self.session, "Starting companions")
+function ISPNCStartingCompanionComposerWindow:saveSet(label, fileName, prepared)
+    local payload, reason
+    if prepared then payload = prepared; payload.label = label
+    else payload, reason = Presets.FromSession(self.session, label or tr("UI_PNC_StartingCompanion_Title", "Starting companions")) end
     if not payload then return false, reason end
-    return Store.Save(payload, payload.label or "Starting companions")
+    return Store.Save(payload, payload.label, fileName)
 end
 
 function ISPNCStartingCompanionComposerWindow:loadSelected()
@@ -351,15 +362,24 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
         return
     end
     if id == "save" then
-        ok, reason = self:saveTemplate()
-        self:setStatus(ok and tr("UI_PNC_StartingCompanion_Saved",
-            "Companion saved") or tostring(reason or "save failed"))
-        if ok then self:refreshPresets() end
+        local dialog = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringSaveDialog"
+        local preset, why = Presets.TemplateFromSession(self.session, self.selectedTraitID, self:currentLabel())
+        if not preset then self:setStatus(tostring(why)); return end
+        local prepared = { preset = preset, draft = PNC.NPCAuthoring.Registry.Copy(self.editor:effectiveDraft()) }
+        dialog.Open(self, self:currentLabel(), true, function(label, fileName, library)
+            local saved, why = self:saveTemplate(label, fileName, library, prepared)
+            self:setStatus(saved and tr("UI_PNC_StartingCompanion_Saved", "Companion saved") or tostring(why))
+            self:refreshPresets()
+        end)
     elseif id == "save_set" then
-        ok, reason = self:saveSet()
-        self:setStatus(ok and tr("UI_PNC_StartingCompanion_SetSaved",
-            "Companion set saved") or tostring(reason or "save failed"))
-        if ok then self:refreshPresets() end
+        local dialog = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringSaveDialog"
+        local preset, why = Presets.FromSession(self.session)
+        if not preset then self:setStatus(tostring(why)); return end
+        dialog.Open(self, tr("UI_PNC_StartingCompanion_Title", "Starting companions"), nil, function(label, fileName)
+            local saved, why = self:saveSet(label, fileName, preset)
+            self:setStatus(saved and tr("UI_PNC_StartingCompanion_SetSaved", "Companion set saved") or tostring(why))
+            self:refreshPresets()
+        end)
     elseif id == "load" then
         self:browsePresets()
     elseif id == "reset" or id == "revert" then

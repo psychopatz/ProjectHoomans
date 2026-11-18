@@ -242,15 +242,15 @@ function ISPNCNPCAuthoringEditor:onAction(button)
     elseif action == "save" or action == "produce" then
         if self:pullForm() == false then return end
         self:adoptPreview()
-        local ok, reason = Storage.Save(self.draft, action == "produce")
-        self:setStatus(ok
-            and ((action == "produce"
-                and tr("UI_PNC_UniqueNPCEditor_Produced", "Produced ")
-                or tr("UI_PNC_UniqueNPCEditor_Saved", "Saved "))
-                .. tostring(reason))
-            or tostring(reason or "save failed"))
-        self:refreshFiles()
-        self:refreshPreview(false)
+        local dialog = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringSaveDialog"
+        local source = PNC.NPCAuthoring.Registry.Copy(self:effectiveDraft())
+        dialog.Open(self, self.draft.displayName, action == "produce", function(_, fileName, library)
+            local ok, reason
+            if library then ok, reason = Storage.SaveCharacter(source, fileName)
+            else ok, reason = Storage.Save(source, false, fileName) end
+            self:refreshFiles(); self:refreshPreview(false)
+            self:setStatus(ok and tr("UI_PNC_UniqueNPCEditor_Saved", "Saved ") .. fileName or tostring(reason))
+        end)
     elseif action == "inventory" then
         if self:pullForm() == false then return end
         self:adoptPreview()

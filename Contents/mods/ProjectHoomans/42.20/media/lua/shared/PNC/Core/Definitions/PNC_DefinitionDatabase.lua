@@ -186,6 +186,14 @@ function Database.SafeFileName(fileName)
     return validFileName(fileName)
 end
 
+function Database.FileName(label)
+    local name = cleanText(label, 120)
+    name = string.gsub(name, "%.txt$", "")
+    name = string.gsub(name, "[^%w%._%-]+", "_")
+    if name == "" or not string.find(name, "%w") then return nil end
+    return validFileName(name .. ".txt")
+end
+
 function Database.ReadIndex()
     return loadIndex()
 end
@@ -223,9 +231,9 @@ function Database.Upsert(kind, fileName, metadata)
     fileName = validFileName(fileName)
     if not kind or not fileName then return false, "invalid_definition_entry" end
     local index = loadIndex()
-    local replacement = normalizeEntry(metadata or {}, kind)
-    replacement.definitionType = kind
-    replacement.fileName = fileName
+    local source = type(metadata) == "table" and copy(metadata) or {}
+    source.definitionType, source.fileName = kind, fileName
+    local replacement = normalizeEntry(source, kind)
     replacement.path = relativePath(kind, fileName)
     local key = entryKey(kind, fileName)
     local found = false

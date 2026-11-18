@@ -68,6 +68,8 @@ for _, b in ipairs(gender.buttons) do F.UI.StyleButton(b, b.psychopatzVariant) e
 T.equal(gender.buttons[2].backgroundColor.g, .34, 'theme refresh retains selection')
 gender:setEnabled(false)
 T.equal(gender.buttons[2].psychopatzVariant, 'selected', 'locked selected value remains identifiable')
+T.equal(gender.buttons[2].textureColor.r, 1, 'disabled gender retains readable icon contrast')
+T.equal(gender.buttons[2].textureColor.a, 1, 'selected read-only icon remains fully visible')
 gender:setEnabled(true); gender.buttons[1].onclick(gender)
 T.equal(gender.selected, 1, 'unlocked friend-style gender toggles to male')
 T.equal(gender.buttons[1].psychopatzVariant, 'selected', 'new selection is highlighted')

@@ -2,56 +2,52 @@
 handoff_schema: 2
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-updated_at: "2026-11-18T14:22:25.594662Z"
+updated_at: "2026-11-18T15:14:33.615790Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
-phase: "P5R7"
-chunk: "P6 native scoped dice, live constraints and skin/gender retest"
+phase: "P5R8"
+chunk: "P6 native tone, named save/library and per-world death retest"
 retrieval_tier: "verify"
-codebase_memory_indexed_commit: "9fdfc7b63354f6d29912ff90b0d98c5edffdeb8c"
+codebase_memory_indexed_commit: "a380736978309d72a20596e087a86fa866ecd016"
 checkpoint_mode: "committed_handoff"
 phase_commit: "self"
-phase_commit_phase: "P5R7"
-phase_commit_message: "phase(P5R7): add scoped tab dice and relationship constraint explanations"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=7c91517b1f37d042e716eb88d1fb52bca38908c2;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
-phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=cd983a60f5034d1fabb607073b599a86d6f77b72113b2a040ea7cc081019b007;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
+phase_commit_phase: "P5R8"
+phase_commit_message: "phase(P5R8): repair skin editing and add named reusable NPC encounter saves"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=fba98ab4791bde95a12fb1fcb7fbeede88408d7a;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
+phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 ---
 
 
 # Session Handoff
 
-P5R7 adds per-tab dice in the same shared editor. Bio varies names/nickname and
-retains chosen body/archetype; Appearance varies editable skin/hair/voice;
-Attributes uses loaded compatible skills/traits without companion-selection
-traits; Loadout materializes exact clothing/gear. Unrelated scopes and inherited
-values stay stable. Transactions validate before a single canonical commit;
-rejected generation preserves pending text. Random policies stay absent from
-companion selectors.
+P5R8 developer repair is verified. Skin selection no longer restores random
+factory RGB or retains old RGB after canonical rebind; Core portraits use the
+native tone index/neutral tint unless custom/inherited RGB is explicit. Native
+outfit captures reconcile exclusivity and stale preview garments cannot poison
+pending candidates. Read-only gender icons retain contrast and selected state.
 
-Relationships now explains NPC/player roles, originating trait and actual
-constraints. Semantic backstory generation is TODO; its dice is visibly disabled.
-Locks appear only for real constraints and dynamically explain surname/family/
-orientation. Policy reads current context: Friend/bisexual Lover gender editable;
-fixed and straight/gay rules authoritative. Wire sanitization retains partner sex
-intent for authoritative contextual resolution.
+Both hosts offer editable filenames defaulted to NPC name. Companion presets
+remain sparse; optional exact independent encounter export uses the same NPC
+file codec/storage as Unique NPC production. Authority discovery loads produced
+files into the normal one-time pool. User chose death permanent within each
+world, with templates reusable elsewhere. Reload/update never clears dead world
+state. Encounter exports carry no player relationship grant.
 
-Manual appearance commits precede repaint; locked callbacks cannot mutate drafts.
-Native skin texture selection clears stale custom RGB from the preview cache.
-No native rendering/input/audio success is claimed.
+MP clients cannot auto-register local files. Publication requires admin on the
+UI and server mutation boundary; accepted requests persist a server copy. A
+server also reads its own administrator-controlled local files. This phase owns
+only the generic portrait tint/index adjustment and regression in Core; all
+product library/permission policy remains in Hoomans.
 
-`TEST_VERIFIED`: **58/58** focused; **1052/1056** full suite, with the same four
-prior scene-route/context-scene/population-initialization/Debug-Hub-translation
-failures. `STATIC_ONLY`: **32** Lua syntax, **22** production Kahlua, JSON,
-**26** new/one updated EN/TL keys, parity/reference/whitespace checks. Coverage
-checked for 39 Hoomans/two Core evidence paths; dirty/new source read directly.
+`TEST_VERIFIED`: **62/62** focused Hoomans; **1055/1059** full, same four known
+scene-route/context/population/translation failures. Core portrait smoke passes.
+`STATIC_ONLY`: Hoomans 24 Lua syntax/17 production Kahlua, Core two syntax/one
+Kahlua, six new EN/TL Character keys, JSON/parity/references/whitespace pass.
+Graph coverage checked; stale/new source read directly. Installed Java/native
+Lua supplied API contracts. No native rendering/input/audio/MP success is claimed.
 
-Next is user-owned P6: test all page dice and scope stability, repeated skin and
-gender edits, live orientation/surname constraints and tooltip visibility,
-relationship wrapping and saved presets across fonts/sizes. Continue prior
-browser/voice/SP/MP/co-op/finalization matrix. No game launch/control, push or
-Workshop publication. Preserve unrelated work. The phase helper records the exact owned local commit and verifies its checkpoint.
-
-Concurrent semantic/test commits advanced main to `77994e19dccc5a4d94579b480fd24f3db8e68979` during
-this repair. Their committed paths are disjoint from all 39 phase-owned paths;
-those commits are preserved. Final focused/full validation ran on that state.
+Next: user-owned fresh-session matrix in PERSISTENCE_AND_SKIN_RETEST.md, then
+previous voice/browser/SP/MP/co-op gates. No game launch/control, push or Workshop
+publication. Preserve unrelated concurrent semantic/test work. Participant Core
+commit must precede the exact owned primary commit/checkpoint.

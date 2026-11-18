@@ -803,3 +803,22 @@ handshake for an already-resolved survivor.
 - Treating trait selection alone as authored customization.
 - Sending a default blueprint envelope when the player intentionally skips
   customization; the established starter default generator owns that path.
+
+
+## Reusable character export (P5R8)
+
+Companion presets continue to store sparse blueprint intent in the starter
+namespace. The optional encounter export captures a separate, exact resolved
+character with a stable `user:<filename>` definition identity in the NPC
+namespace. It does not convert inherited companion fields into authored preset
+values. Both creator hosts use the same NPC definition file codec and storage.
+Only produced NPC files enter world generation; ordinary drafts/presets do not.
+
+Authority discovery is bounded to 256 indexed files and joins the existing
+Unique NPC catalog before reservation. Its existing generation chance and
+world-owned alive/dead entries remain authoritative. Registration/reloading
+never clears world death state; reusable files survive for other worlds.
+Multiplayer clients do not automatically contribute files. Publishing requires
+an admin player on both client presentation and authoritative mutation paths;
+the server persists its copy and may discover its own administrator-controlled
+local files on subsequent worlds. Semantic backstories remain deferred.

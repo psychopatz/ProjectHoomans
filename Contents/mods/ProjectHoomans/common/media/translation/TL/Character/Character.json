@@ -454,5 +454,11 @@
   "UI_PNC_Authoring_PlayerSibling": "Ikaw ang kaniyang kapatid.",
   "UI_PNC_Authoring_PlayerPartner": "Ikaw ang kaniyang kapareha.",
   "UI_PNC_Authoring_PlayerFriend": "Ikaw ang kaniyang kaibigan.",
-  "UI_PNC_Authoring_ReasonSurnamePending": "Ilagay ang apelyido ng iyong karakter; namamana ito ng relasyong ito."
+  "UI_PNC_Authoring_ReasonSurnamePending": "Ilagay ang apelyido ng iyong karakter; namamana ito ng relasyong ito.",
+  "UI_PNC_Authoring_SaveName": "Pangalan ng file na ise-save",
+  "UI_PNC_Authoring_InvalidFilename": "Maglagay ng pangalan ng file na may mga letra o numero",
+  "UI_PNC_Authoring_WorldLibrary": "Isama sa mga makakatagpo sa mundo",
+  "UI_PNC_Authoring_WorldLibraryHelp": "Maaaring magamit sa ibang mundo. Permanente ang kamatayan sa bawat mundo.",
+  "UI_PNC_Authoring_AdminLibrary": "Administrator lamang ng multiplayer ang maaaring magdagdag ng mga karakter na makakatagpo.",
+  "UI_PNC_Authoring_PresetOnlySaved": "Na-save ang preset; hindi ma-save ang karakter para sa mundo: "
 }

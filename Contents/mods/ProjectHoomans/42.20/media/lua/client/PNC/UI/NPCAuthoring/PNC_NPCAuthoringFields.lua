@@ -93,6 +93,11 @@ function Fields.SelectButton(button, selected, enabled)
     if UI.StyleButton then UI.StyleButton(button, variant)
     else button.backgroundColor = selected and { r = .11, g = .34, b = .24, a = 1 }
         or { r = .08, g = .10, b = .12, a = 1 } end
+    if button.pncGender then
+        -- Native setEnable darkens textureColor to .3. Read-only gender still
+        -- conveys a value, so preserve icon contrast while retaining gating.
+        button.textureColor = { r = 1, g = 1, b = 1, a = selected and 1 or .8 }
+    end
 end
 
 function Fields.Gender(editor, parent)
@@ -126,6 +131,7 @@ function Fields.Gender(editor, parent)
                 editor:onComboChanged(target)
             end, variant = "quiet" })
         if button.setImage and getTexture then button:setImage(getTexture("media/PNC_Gender" .. name .. ".png")) end
+        button.pncGender = true
         button.tooltip = tr("UI_PNC_UniqueNPCEditor_" .. name, name)
         panel.buttons[index] = button
     end

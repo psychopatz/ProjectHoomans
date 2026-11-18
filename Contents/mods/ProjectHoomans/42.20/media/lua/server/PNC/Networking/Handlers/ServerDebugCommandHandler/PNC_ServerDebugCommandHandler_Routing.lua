@@ -15,6 +15,12 @@ Router.Register(Const.CMD_DEBUG, function(player, normalizedArgs, rawArgs)
         return
     end
     if not args then return end
+    if args.action == "register_unique_definition" then
+        local collection = require "PNC/Core/Definitions/PNC_LocalNPCCollection"
+        local ok, reason = collection.Publish(player, args.fileName, args.blueprint)
+        if not ok then PNC.Core.LogWarn("Unique NPC library import rejected: " .. tostring(reason)) end
+        return
+    end
     if args.action == "spawn" then
         H.HandleDebugSpawn(player, args)
         return

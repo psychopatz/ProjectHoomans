@@ -352,4 +352,6 @@ T.equal(window.editor.portraitTarget.traitID, brother,
     "rebinding after an invalid selection restores the portrait target")
 
 T.truthy(UIState, "starting companion UI state remains loadable")
+window.editor.draft = { displayName = 'Lemuel Colbert' }
+T.equal(window:currentLabel(), 'Lemuel Colbert', 'the real host defaults single-character saves to the NPC name rather than the relationship trait')
 T.finish("pnc_starting_companion_ui_interaction_smoke")

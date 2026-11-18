@@ -40,9 +40,14 @@ local function wardrobe(generated, original)
     local appearance = copy(original or {})
     appearance.outfit = copy(generated.draft.appearance.outfit)
     appearance.slots = copy(generated.draft.appearance.slots)
-    for _, item in pairs(generated.record.inventory and generated.record.inventory.items or {}) do
+    local items = generated.record.inventory and generated.record.inventory.items or {}
+    local ids = {}
+    for id in pairs(items) do ids[#ids + 1] = id end
+    table.sort(ids, function(a, b) return tostring(a) < tostring(b) end)
+    for _, id in ipairs(ids) do
+        local item = items[id]
         if item.wornSlot and not item.equipSlot and not item.maxWeight and not item.bagContainer then
-            appearance.slots[item.wornSlot] = { mode = "item", type = item.type, wornSlot = item.wornSlot, itemState = copy(item.itemState) }
+            PNC.Identity.Appearance.CaptureSlot(appearance.slots, item.wornSlot, { mode = "item", type = item.type, wornSlot = item.wornSlot, itemState = copy(item.itemState) })
         end
     end
     return appearance

@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R7 developer repair verified — P6 native acceptance pending
+**Status:** P5R8 developer repair verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -48,7 +48,10 @@ The system must:
 - make the character-creation companion window fixed/non-collapsible while
   remaining closeable, responsive, and resizable;
 - expose practical preset/template Save/Load actions directly in the companion
-  editor.
+  editor;
+- offer nameable reusable NPC snapshots for normal world encounters through the
+  existing Unique NPC catalog, with singleplayer access, multiplayer admin
+  publication, per-world permanent death and reuse across different worlds.
 
 Target flow:
 
@@ -888,6 +891,32 @@ TODO dice.
 Native hit testing, rendering/audio and final SP/MP/co-op behavior remain P6.
 Backstory generation is a future feature and not a condition of this repair.
 
+### P5R8 — Native tone, readable locks and reusable character saves
+
+- Reconcile native/materialized clothing exclusivity and prevent stale preview
+  garment capture from rejecting unrelated edits. Preserve manual validation.
+- Suppress factory RGB when a native texture is explicitly chosen; remove old
+  retained-record tint after canonical rebind. Core applies native tone index
+  and neutral RGB unless inherited/custom RGB was explicitly provided.
+- Keep disabled gender icons readable while preserving native input gating.
+- Add a shared editable save-name dialog with NPC-name default. Keep companion
+  preset intent sparse and export an independent exact encounter character
+  through the same codec/storage as the Unique NPC creator.
+- Discover produced characters on the authority into the existing unique pool.
+  Preserve normal chance, reservations and per-world permanent death. The user
+  explicitly chose reuse across different worlds with no template deletion.
+- Prevent client-side automatic MP import. Require admin publication on both
+  presentation and server mutation boundaries; server-local files remain an
+  administrator-controlled source.
+- **62/62** focused Hoomans tests plus Core portrait smoke pass; full Hoomans
+  **1055/1059**, same four known failures. Hoomans 24 Lua syntax/17 production
+  Kahlua and Core two syntax/one Kahlua checks pass, as do six new EN/TL keys,
+  JSON/parity/reference and whitespace checks.
+
+**P5R8 gate:** developer checks verified; participant-then-primary exact local
+commits required. Fresh native rendering/input, saved-file reload and MP admin
+transport acceptance remain user-owned; see the focused retest document.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
@@ -923,6 +952,12 @@ unless the user explicitly delegates native control:
   lock visibility/tooltips and directional relationship explanations;
 - verify browser selection, focused outfit preview, Apply/Cancel, grouped
   attributes and compact preset scope using the P5R5 native matrix;
+- verify native tone changes remove old tint; disabled selected gender remains
+  legible; save filenames default to NPC names and can be edited;
+- verify sparse companion presets and independent exact encounter exports,
+  produced-only discovery, same-world death/reload and reuse in another world;
+- verify remote non-admin cannot publish, admin publication reaches server
+  storage/catalog, and ordinary client-local files are never auto-imported;
 - verify the final active-companion summary before world entry;
 - use the Resolution Inspector to confirm shared field-source traces when
   diagnosing a mismatch;

@@ -47,6 +47,12 @@ T.load("ProjectHoomans", "shared", "PNC/Core/Identity/PNC_Identity_ID.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Identity/PNC_UniqueNPCs.lua")
 
 local Unique = PNC.UniqueNPCs
+factoryDescription.visual.getSkinColor = function() return { r = .2, g = .1, b = .1 } end
+local chosenTone = PNC.Identity.GenerateResolvedIdentity({ isFemale = false, identity = { survivor = { skinTexture = "MaleBody02" } } })
+T.equal(chosenTone.survivor.skinColor, nil, "selected native texture cannot inherit random factory RGB")
+local inheritedTone = PNC.Identity.GenerateResolvedIdentity({ isFemale = false, identity = { survivor = { skinTexture = "MaleBody02", skinColor = { r = .4, g = .3, b = .2 } } } })
+T.equal(inheritedTone.survivor.skinColor.r, .4, "explicit inherited skin color is retained")
+factoryCalls = 0
 
 local ok, reason = Unique.RegisterInventoryTemplate({
     id = "unique:gorgon_ramsee:v1",

@@ -23,6 +23,11 @@ local function applyExplicitIdentity(record, def, draft)
         "voiceType", "voicePitch" }) do
         if explicit[key] ~= nil then
             survivor[key] = copy(explicit[key])
+        elseif key == "skinColor" and explicit.skinTexture ~= nil then
+            -- Rebinding a canonical native tone has no RGB authoring flag.
+            -- Remove the previous factory tint from the retained record too.
+            survivor[key] = nil
+            cleared[key] = true
         elseif draft.appearanceAuthored
             and (draft.appearanceAuthored[key] == true
                 or key == "voice"

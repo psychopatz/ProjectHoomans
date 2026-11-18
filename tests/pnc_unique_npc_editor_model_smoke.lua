@@ -420,7 +420,9 @@ T.equal(nextBody.isFemale, true, "new body uses selected gender")
 local skinDraft = Model.New()
 skinDraft.displayName = 'Skin Tester'; skinDraft.isFemale = false
 skinDraft.identity.survivor = { forename = 'Skin', surname = 'Tester', skinTexture = 'MaleBody05' }
-skinDraft.appearanceAuthored.skinTexture = true; skinDraft.appearanceAuthored.skinColor = true
+skinDraft.appearanceAuthored.skinTexture = true
+-- A real adapter rebind has no RGB authoring flag after clearing the field.
+skinDraft.appearanceAuthored.skinColor = nil
 skinDraft.runtimeRecord = { isFemale = false, identitySeed = 7, equipmentSpawnMode = 'none', startingItems = {},
     identity = { survivor = { skinTexture = 'MaleBody01', skinColor = { r = .1, g = .1, b = .1 } } },
     inventory = { items = {} }, appearance = PNC.Identity.Appearance.Normalize(skinDraft.appearance),

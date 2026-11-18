@@ -1,51 +1,52 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R7
+## Current state — 2026-11-18 P5R8
 
-Developer-side scoped randomization and constraint repair is verified. Native
-P5R7 acceptance remains **UNVERIFIED**. Both entry points use the shared editor.
-Per-tab dice replace the wide visual footer; companion selectors still omit
-Random policies.
+Developer-side skin, disabled-gender contrast and reusable-character persistence
+repair is verified. Native acceptance remains **UNVERIFIED**. Both creator hosts
+retain the shared editor and canonical blueprint pipeline.
 
-- Bio dice generates names/nickname, retaining chosen gender/archetype and
-  inherited values. Appearance varies editable skin/hair/voice while retaining
-  wardrobe/gear. Attributes uses loaded catalogs and existing compatibility
-  validators, excluding companion-selection traits and their native aliases.
-  Loadout materializes exact clothes/gear while retaining face/voice/identity.
-  Each companion action validates and commits one canonical candidate, leaving
-  unrelated generated scopes stable. Rejected generation preserves pending text.
-- Relationships explains the NPC's role toward the player, reciprocal role,
-  originating trait and current editable/inherited constraints in wrapped rows.
-  Its dice is visibly disabled with a backstory TODO explanation. Semantic
-  backstory generation is explicitly deferred; paid relationship types remain
-  selected-trait authority.
-- Lock icons appear only for actual applicable constraints. Reasons include the
-  current inherited surname, family trait or orientation rule. Policy is rebuilt
-  from current context: Friend and bisexual Lover gender are editable; fixed
-  family and straight/gay partner rules remain authoritative. Context-free wire
-  sanitization retains optional partner sex intent for final contextual resolution.
-- Manual edits validate/commit the complete candidate before repainting. Locked
-  appearance callbacks cannot mutate drafts. Selecting a native skin texture
-  clears stale cached custom RGB so it reaches the portrait consistently.
-- Each page reserves dice space above its controls; the wide footer is removed.
-  EN/TL Character catalogs contain 26 new keys and one updated failure message.
+- Native outfit materialization now reconciles mutually exclusive clothing in
+  wear order; stale preview clothes cannot poison a pending policy. Manually
+  authored conflicts remain validation errors. This addresses the screenshot's
+  shorts/pants rejection blocking unrelated skin edits.
+- Choosing a native skin texture suppresses random factory RGB fallback, clears
+  old tint from retained preview records even after adapter rebinding, and uses
+  matching native index plus neutral RGB in Core's descriptor portrait. Explicit
+  inherited/custom RGB remains valid. Disabled gender icons retain contrast and
+  selected backgrounds while input remains disabled.
+- Both hosts offer editable save filenames defaulting to the NPC's name. Preset
+  kind/scope is available in the browser. A save captures its source before the
+  dialog, so later selection changes cannot redirect it.
+- Single-character saves offer **Include in world encounters**. Companion
+  templates retain sparse/inherited intent; an independent exact character
+  snapshot uses the same data-only file codec/storage as the Unique NPC creator.
+  The authority discovers produced files into the existing Unique NPC pool,
+  with its normal generation chance and per-world reservation/death state.
+- User decision: death is permanent **within each world**; templates remain
+  reusable elsewhere. Library reload/update never resets dead world entries.
+- Multiplayer clients cannot auto-import local files. Publication is disabled
+  without an admin player and the server independently requires admin access.
+  Remote admin publishing persists through the authoritative debug transport;
+  a server also reads its own administrator-controlled definition directory.
 
-`TEST_VERIFIED`: **58/58** focused; **1052/1056** full suite. The same four prior
-failures remain: animation scene debug routes, context scene lab, population
-initialization and Debug Hub translation expectation. New real adapter/session
-regressions cover scoped isolation, compatible generation, exact gear, native
-trait aliases, live Lover policy, contextual authority and skin callback commits.
+`TEST_VERIFIED`: **62/62** focused Hoomans tests and the Core portrait smoke pass.
+Full Hoomans suite: **1055/1059**, with the same four known scene-route,
+context-scene, population-initialization and Debug-Hub-translation failures.
+New regressions cover native exclusive capture, source-safe named saves,
+exact snapshots, produced-only discovery, non-admin rejection, same-world death
+and reuse in a different world. Existing tests cover rebind tint and icon contrast.
 
-`STATIC_ONLY`: **32** owned Lua files parse; **22** production Kahlua checks pass.
-JSON, EN/TL key/placeholder parity, static/dynamic key references and whitespace
-checks pass. Coverage checked for 39 Hoomans and two Core evidence paths;
-changed/new source supplied current evidence against the committed graph baseline.
+`STATIC_ONLY`: Hoomans **24** Lua syntax/**17** production Kahlua checks; Core
+**two** syntax/**one** production Kahlua check. Six new EN/TL Character keys,
+JSON/key/placeholder parity, static references and whitespace checks pass.
+Graph coverage checked; changed/new sources read directly. Installed Java
+baseline and native Lua supplied skin/index/button/dialog API evidence.
 
-Next: **P6 user-owned native retest** of per-page dice at compact/large-font
-sizes, repeated skin/gender edits, dynamic locks, directional relationship text,
-Save/Load and scope stability. Continue prior audible voice, browser and
-SP/MP/co-op/finalization matrix. No game was launched/driven; native rendering,
-input and audio success remain unverified. No push or Workshop publication.
+Next: **P6 user-owned fresh-session retest**, using
+[PERSISTENCE_AND_SKIN_RETEST.md](PERSISTENCE_AND_SKIN_RETEST.md), then previous
+browser/audio and SP/MP/co-op acceptance. No native game launch/control or
+rendered/input/audible success is claimed. No push or Workshop publication.
 
 ## Historical developer checkpoints
 

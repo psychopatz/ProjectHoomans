@@ -235,6 +235,20 @@ function Appearance.Validate(source)
     return true
 end
 
+-- Native/materialized clothing is a sequence of wear operations: the later
+-- garment replaces an exclusive earlier one. Manual authored policies still
+-- use Validate and are never silently repaired here.
+function Appearance.CaptureSlot(slots, key, spec)
+    local location = Appearance.ResolveBodyLocation(spec.type) or spec.wornSlot or key
+    for previousKey, previous in pairs(slots) do
+        local previousLocation = Appearance.ResolveBodyLocation(previous.type) or previous.wornSlot or previousKey
+        if previousKey == key or previousLocation == location or Appearance.AreExclusive(location, previousLocation) then
+            slots[previousKey] = nil
+        end
+    end
+    slots[key] = copy(spec)
+end
+
 local function removeSlot(items, slot)
     local output = {}
     local item

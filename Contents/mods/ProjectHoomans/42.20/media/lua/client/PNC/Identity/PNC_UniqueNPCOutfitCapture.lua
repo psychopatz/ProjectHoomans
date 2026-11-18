@@ -26,7 +26,7 @@ function Capture.Capture(id, female)
         -- Bags remain inventory-owned. Browsing clothing never replaces gear.
         if spec and location and not spec.maxWeight then
             local key = tostring(location)
-            slots[key] = { mode = "item", type = spec.type, wornSlot = key, itemState = copy(spec.itemState) }
+            PNC.Identity.Appearance.CaptureSlot(slots, key, { mode = "item", type = spec.type, wornSlot = key, itemState = copy(spec.itemState) })
             count = count + 1
         end
     end

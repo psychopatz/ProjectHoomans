@@ -1,9 +1,11 @@
 # Creator randomization and browser audit / proposed P5R5
 
-Date: 2026-11-18. Status: P5R7 developer follow-up verified; native acceptance
+Date: 2026-11-18. Status: P5R8 developer follow-up verified; native acceptance
 pending. The historical P5R4/P5R5 audit below is preserved for provenance.
 
-## Current P5R7 clarification and repair
+P5R8 follow-up: see [PERSISTENCE_AND_SKIN_RETEST.md](PERSISTENCE_AND_SKIN_RETEST.md) for native clothing/tint and reusable-save changes.
+
+## P5R7 clarification and repair
 
 Per-tab dice replace the wide footer. Bio varies names/nickname, preserving
 chosen gender/archetype and inherited surname. Appearance varies editable body,
