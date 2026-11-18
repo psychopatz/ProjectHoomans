@@ -1959,7 +1959,7 @@
           "reason": "interaction behavior structural diff and inspector evidence linkage: real worker inspector exposes interaction evidence"
         },
         {
-          "name": "test_developer_surface_links_structure_to_dialogue_content",
+          "name": "test_developer_surface_links_structure_to_conversations_home",
           "category": "GUI_CONTRACT",
           "usesDirectWorker": true,
           "reason": "interaction behavior structural diff and inspector evidence linkage: developer surface links structure to dialogue content"
@@ -4648,12 +4648,12 @@
           "usesDirectWorker": false
         },
         {
-          "name": "test_interaction_module_content_link_uses_dialogue_content_home",
+          "name": "test_interaction_module_content_link_uses_conversations_home",
           "category": "GUI_CONTRACT",
           "usesDirectWorker": false
         },
         {
-          "name": "test_dialogue_content_review_uses_shared_review_home",
+          "name": "test_review_tab_uses_shared_review_home",
           "category": "GUI_CONTRACT",
           "usesDirectWorker": false
         },
