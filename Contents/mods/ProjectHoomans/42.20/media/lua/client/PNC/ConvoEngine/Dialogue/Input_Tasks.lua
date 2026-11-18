@@ -19,6 +19,8 @@ local TaskResultPresentation = require
     "PNC/ConvoEngine/Dialogue/Input_TaskResultPresentation"
 local TaskResultRouting = require
     "PNC/ConvoEngine/Dialogue/Input_TaskResultRouting"
+local TaskProjection = PNC.Semantics.TaskProjection
+    or require "PNC/Semantics/PNC_SemanticTaskProjection"
 local actionName = TaskResponses.ActionName
 
 local function audit(eventName, data, options)
@@ -89,6 +91,30 @@ function Input.ReceiveSemanticTaskResult(payload)
 
     session.semanticTaskRequests[requestID] = nil
     local action = actionName(payload, pending)
+    local normalizedStatus = TaskProjection.NormalizeStatus(payload.status)
+        or (payload.accepted == true and "completed" or "rejected")
+    local npcID = tostring(payload.npcID
+        or (view and view.spec and view.spec.npcID) or "")
+    if action ~= "" and normalizedStatus then
+        local outcome = {
+            action = action,
+            status = normalizedStatus,
+            requestID = requestID,
+            npcID = npcID ~= "" and npcID or nil,
+            reason = payload.reason,
+            authoritative = true,
+        }
+        session.semanticTaskOutcomes = session.semanticTaskOutcomes or {}
+        session.semanticTaskOutcomes[action] = outcome
+        local clientState = PNC.Network and PNC.Network.ClientState or nil
+        if clientState and npcID ~= "" then
+            clientState.semanticTaskOutcomes =
+                clientState.semanticTaskOutcomes or {}
+            clientState.semanticTaskOutcomes[npcID] =
+                clientState.semanticTaskOutcomes[npcID] or {}
+            clientState.semanticTaskOutcomes[npcID][action] = outcome
+        end
+    end
     audit("semantic.task.presentation", {
         npcID = payload.npcID,
         requestID = requestID,
@@ -98,7 +124,13 @@ function Input.ReceiveSemanticTaskResult(payload)
         siteLabel = payload.siteLabel,
         response = TaskResponses.ForResult(payload, pending, action),
     }, { requestID = requestID })
-    return TaskResultPresentation.QueueResult(view, payload, pending, action)
+    local queued, queueReason = TaskResultPresentation.QueueResult(
+        view, payload, pending, action
+    )
+    if queued and type(Internal.RefreshRootSuggestions) == "function" then
+        Internal.RefreshRootSuggestions(view)
+    end
+    return queued, queueReason
 end
 
 return Input

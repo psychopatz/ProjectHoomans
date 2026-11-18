@@ -165,6 +165,7 @@ local function onResetLua()
     ClientState.semanticInventoryQueryResultOrder = {}
     ClientState.semanticTaskResults = {}
     ClientState.semanticTaskResultOrder = {}
+    ClientState.semanticTaskOutcomes = {}
     ClientState.needsDebug = nil
     ClientState.needsDebugAuthorized = false
     ClientState.needsDebugReason = nil

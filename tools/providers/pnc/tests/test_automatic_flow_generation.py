@@ -270,7 +270,7 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
         for terminal_status in ("completed", "failed", "rejected"):
             terminal_scen = merge(
                 scen,
-                {"runtime": {"taskStates": {"WAIT_AT": {"status": terminal_status}}}},
+                {"runtime": {"taskProjection": {"WAIT_AT": {"status": terminal_status, "authoritative": True}}}},
             )
             with self.subTest(terminal_status=terminal_status):
                 with self.warm_worker(terminal_scen) as worker:
@@ -289,6 +289,47 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
                         wait_at_capabilities(worker.snapshot()["suggestions"]),
                         [],
                     )
+
+    def test_native_task_projection_parity_lifecycle_and_duplicate_suppression(self) -> None:
+        """auditClaims: ["task_native_projection_parity"]"""
+        import subprocess
+        from pathlib import Path
+
+        repo_root = Path(__file__).resolve().parents[4]
+        lua_test = repo_root / "tests" / "pnc_native_task_projection_parity_smoke.lua"
+        self.assertTrue(lua_test.is_file(), f"Missing native parity Lua test: {lua_test}")
+        proc = subprocess.run(
+            ["lua", str(lua_test)],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(
+            proc.returncode,
+            0,
+            f"Native task projection parity Lua test failed:\n{proc.stdout}\n{proc.stderr}",
+        )
+
+        # Worker parity guard: production suggestion presentation and worker
+        # runtime must share `taskProjection` with no worker-only `taskStates`.
+        guarded_paths = [
+            repo_root / "Contents" / "mods" / "ProjectHoomans" / "42.20" / "media" / "lua" / "shared" / "PNC" / "ConvoEngine" / "Dialogue" / "Suggestions_Capabilities_Rows.lua",
+            repo_root / "tools" / "providers" / "pnc" / "lua" / "worker" / "Conversation_Context_Builder.lua",
+            repo_root / "tools" / "providers" / "pnc" / "lua" / "worker" / "SemanticAdapters_Knowledge_Commands.lua",
+            repo_root / "tools" / "providers" / "pnc" / "lua" / "worker" / "ScenarioSession_Lifecycle.lua",
+        ]
+        for path in guarded_paths:
+            text = path.read_text(encoding="utf-8")
+            self.assertNotIn("taskStates", text, f"Worker-only taskStates must not remain in {path}")
+
+        native_producers = [
+            repo_root / "Contents" / "mods" / "ProjectHoomans" / "42.20" / "media" / "lua" / "client" / "PNC" / "Conversation" / "Blocks" / "ConversationComposer" / "PNC_ConversationComposer_Context.lua",
+            repo_root / "Contents" / "mods" / "ProjectHoomans" / "42.20" / "media" / "lua" / "client" / "PNC" / "ConvoEngine" / "Dialogue" / "Input_ContextProjection.lua",
+        ]
+        for path in native_producers:
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("taskProjection", text, f"Native producer must project taskProjection: {path}")
 
     def test_real_worker_records_result_nodes_and_one_dispatch(self) -> None:
         with self.warm_worker(DEFAULT_SCENARIO) as worker:

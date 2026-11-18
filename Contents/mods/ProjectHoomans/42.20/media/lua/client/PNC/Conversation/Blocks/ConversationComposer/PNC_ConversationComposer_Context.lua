@@ -9,6 +9,9 @@ local Composer = Conversation.Composer
 local ActorConversationContext = PNC.Semantics
     and PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
+local TaskProjection = PNC.Semantics
+    and PNC.Semantics.TaskProjection
+    or require "PNC/Semantics/PNC_SemanticTaskProjection"
 local Registry = PsychopatzCore.Conversation.Registry
 local Loader = PsychopatzCore.Conversation.TextCatalog
 local Audience = Conversation.Audience
@@ -219,6 +222,11 @@ function Composer.BuildContext(
             and relationship.settlementVisit or nil,
         ambientVisitPreview = relationship
             and relationship.ambientVisitPreview or nil,
+        taskProjection = TaskProjection.Build({
+            npcID = npcID,
+            clientState = state,
+            entry = entry,
+        }),
     }
     context.blockValidator = function(block)
         return Loader.EnsureSource(

@@ -7,6 +7,8 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 require "PNC/ConvoEngine/Dialogue/Input_Tasks"
 local TaskResponses = require
     "PNC/ConvoEngine/Dialogue/Input_TaskResponses"
+local TaskProjection = PNC.Semantics.TaskProjection
+    or require "PNC/Semantics/PNC_SemanticTaskProjection"
 
 local Input = PNC.ConvoEngine.DialogueInput or {}
 PNC.ConvoEngine.DialogueInput = Input
@@ -37,6 +39,40 @@ function Internal.DispatchTaskAction(view, actionIntent, context, value)
     end
 
     local session = view and view.session
+    local actionName = string.upper(tostring(
+        actionIntent and actionIntent.action or ""
+    ))
+    if actionName == "WAIT_AT" then
+        local projection = TaskProjection.Build({
+            session = session,
+            npcID = context and context.npcID,
+            clientState = PNC.Network and PNC.Network.ClientState or nil,
+            entry = view and view.spec and view.spec.context
+                and view.spec.context.entry or nil,
+            existing = context and context.taskProjection or nil,
+        })
+        local existing = projection[actionName]
+        local st = type(existing) == "table"
+            and tostring(existing.status or "") or ""
+        if st == "active" or st == "completed" or st == "failed"
+            or st == "rejected"
+        then
+            local reason = st == "active" and "task_already_active"
+                or ("task_already_" .. st)
+            local resultStatus = st == "active" and "rejected" or st
+            return {
+                status = resultStatus,
+                accepted = false,
+                reason = reason,
+                action = actionName,
+                details = {
+                    status = resultStatus,
+                    taskStatus = st,
+                    duplicate = true,
+                },
+            }
+        end
+    end
     local provisionalID = context.requestID
     if session and provisionalID then
         session.semanticTaskRequests = session.semanticTaskRequests or {}

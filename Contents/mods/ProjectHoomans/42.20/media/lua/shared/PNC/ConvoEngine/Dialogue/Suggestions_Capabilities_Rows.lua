@@ -16,6 +16,8 @@ local companionOrderReason = Internal.companionOrderReason
 local isCompanionOrderAction = Internal.isCompanionOrderAction
 local appendCampSiteCapabilityRows = Internal.appendCampSiteCapabilityRows
 local CAPABILITY_DEFINITIONS = Internal.CAPABILITY_DEFINITIONS
+local TaskProjection = PNC.Semantics.TaskProjection
+    or require "PNC/Semantics/PNC_SemanticTaskProjection"
 
 local function capabilityRows(revision, currentAction, context, ir)
     local catalog = PNC.Semantics and PNC.Semantics.CapabilityCatalog
@@ -41,17 +43,9 @@ local function capabilityRows(revision, currentAction, context, ir)
         local definition = CAPABILITY_DEFINITIONS[action]
         if definition and row.dispatchable == true then
             local menuOnlyWhenDestination = definition.menuOnlyWhenDestination
-            local taskKey = tostring(context.npcID or "") .. ":" .. action
-            local taskState = type(context.taskStates) == "table"
-                and (context.taskStates[taskKey] or context.taskStates[action])
-                or nil
-            local taskStatus = type(taskState) == "table"
-                and tostring(taskState.status or "") or ""
-            local hideCompletedOrActiveTask = action == "WAIT_AT"
-                and (taskStatus == "active"
-                    or taskStatus == "completed"
-                    or taskStatus == "failed"
-                    or taskStatus == "rejected")
+            local hideCompletedOrActiveTask = TaskProjection.ShouldRetire(
+                action, context
+            )
             local hideWithoutDestination = menuOnlyWhenDestination == false
                 and action == "WAIT_AT"
                 and (type(context.suggestionDestination) ~= "table"

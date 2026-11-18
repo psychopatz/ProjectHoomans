@@ -7,6 +7,8 @@ local Sources = require "worker/Conversation_Context_Sources"
 local Health = require "worker/Conversation_Context_Health"
 local ActorConversationContext = require
     "PNC/Semantics/PNC_ActorConversationContext"
+local TaskProjection = require
+    "PNC/Semantics/PNC_SemanticTaskProjection"
 
 function Builder.build(context)
     local Runtime = context.Runtime
@@ -81,13 +83,21 @@ function Builder.build(context)
         or (npc.identityState or "unknown")
     local priorContext = Runtime.view and Runtime.view.spec
         and Runtime.view.spec.context or nil
-    local hasTaskStates = false
-    if type(Runtime.taskStates) == "table" then
-        for _, _ in pairs(Runtime.taskStates) do
-            hasTaskStates = true
+    local hasTaskProjection = false
+    if type(Runtime.taskProjection) == "table" then
+        for _, _ in pairs(Runtime.taskProjection) do
+            hasTaskProjection = true
             break
         end
     end
+    local taskProjection = TaskProjection.Build({
+        session = Runtime.view and Runtime.view.session or nil,
+        npcID = npc.npcID,
+        existing = hasTaskProjection
+            and Runtime.taskProjection
+            or (scenario.runtime and scenario.runtime.taskProjection)
+            or {},
+    })
     local output = {
         npcID = npc.npcID,
         worldContext = {
@@ -104,12 +114,7 @@ function Builder.build(context)
         suggestionDestination = copy(scenario.suggestionDestination
             or (type(npc.suggestionDestination) == "table" and npc.suggestionDestination)
             or (priorContext and priorContext.suggestionDestination)),
-        taskStates = copy(
-            hasTaskStates
-                and Runtime.taskStates
-                or (scenario.runtime and scenario.runtime.taskStates)
-                or {}
-        ),
+        taskProjection = copy(taskProjection),
         saveSeed = world.seedString or world.worldSeedString
             or world.worldSeed,
         phraseSalt = (scenario.runtime and scenario.runtime.phraseSalt)

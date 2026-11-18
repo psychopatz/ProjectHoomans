@@ -61,16 +61,14 @@ return function(deps)
         context = type(context) == "table" and context or {}
         local action = string.upper(tostring(request.action or ""))
         local npcID = tostring(request.npcID or context.npcID or context.targetID or "npc")
-        local taskKey = npcID .. ":" .. action
-        Runtime.taskStates = Runtime.taskStates or {}
+        Runtime.taskProjection = Runtime.taskProjection or {}
         local responses = runtime.taskResponses or {}
         local configured = responses[action]
-        local configuredStates = runtime.taskStates or {}
-        local existingState = configuredStates[taskKey]
-            or configuredStates[action]
-            or Runtime.taskStates[taskKey]
+        local configuredProjection = runtime.taskProjection or {}
+        local existingState = configuredProjection[action]
+            or Runtime.taskProjection[action]
         if existingState then
-            Runtime.taskStates[taskKey] = Values.copy(existingState)
+            Runtime.taskProjection[action] = Values.copy(existingState)
         end
         local accepted = true
         local reason = "network_queued"
@@ -105,11 +103,12 @@ return function(deps)
                 st == "active" and "task_already_active" or ("task_already_" .. st),
                 { status = st == "active" and "rejected" or st, taskStatus = st, duplicate = true }
         else
-            Runtime.taskStates[taskKey] = {
+            Runtime.taskProjection[action] = {
                 status = "active",
                 action = action,
                 npcID = npcID,
                 requestID = request.requestID or context.requestID,
+                authoritative = true,
             }
             details = { status = "admitted", taskStatus = "active" }
         end

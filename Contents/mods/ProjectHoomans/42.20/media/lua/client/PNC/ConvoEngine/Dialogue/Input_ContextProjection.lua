@@ -9,6 +9,8 @@ local ActorConversationContext = PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
 local LocationObservation = PNC.Semantics.LocationObservation
     or require "PNC/Semantics/PNC_SemanticLocationObservation"
+local TaskProjection = PNC.Semantics.TaskProjection
+    or require "PNC/Semantics/PNC_SemanticTaskProjection"
 
 local WorldContext
 local EntityResolver
@@ -385,6 +387,13 @@ function Projection.Build(view, getProviderStatus)
             EntityCandidates.Build(view, source)
         )
     end
+    output.taskProjection = TaskProjection.Build({
+        session = session,
+        npcID = output.npcID,
+        clientState = clientState,
+        entry = output.entry,
+        existing = output.taskProjection,
+    })
     output.actorConversationContext = ActorConversationContext.Build(output)
     return output
 end
