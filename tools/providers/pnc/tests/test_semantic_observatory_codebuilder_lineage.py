@@ -43,7 +43,7 @@ class ObservatoryCodeBuilderLineageTests(WarmWorkerTestMixin, unittest.TestCase)
         )
         self.assertEqual(
             row["canonicalSource"]["canonicalID"],
-            "flow.greeting.opening.default",
+            "flow.greeting.opening",
         )
         self.assertEqual(
             row["canonicalSource"]["generatedArtifactParity"],

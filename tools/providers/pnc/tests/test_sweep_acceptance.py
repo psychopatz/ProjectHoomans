@@ -58,7 +58,7 @@ class SweepAcceptanceTests(WarmWorkerTestMixin, unittest.TestCase):
             pools = enumerate_all_response_pools(worker, limit=64)
             t_pagination = time.monotonic() - t0
             self.assertLess(t_pagination, 3.0, f"Full pool pagination too slow: {t_pagination:.3f}s")
-            self.assertEqual(len(pools), 234)
+            self.assertEqual(len(pools), 227)
 
             # 3. Compact row size in bytes vs raw worker record
             record = worker.input("how are you?")
@@ -453,7 +453,7 @@ class SweepAcceptanceTests(WarmWorkerTestMixin, unittest.TestCase):
             first_page = worker.response_pool_list(offset=0, limit=1)
             total_reported = first_page.get("total", 234)
             self.assertEqual(len(all_pools), total_reported)
-            self.assertEqual(len(all_pools), 234)
+            self.assertEqual(len(all_pools), 227)
 
     def test_frontier_expansion_discovers_unique_variant(self) -> None:
         """Verify that frontier expansion discovers at least one additional unique selected variant beyond baseline review."""
