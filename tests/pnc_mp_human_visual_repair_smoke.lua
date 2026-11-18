@@ -63,7 +63,11 @@ local beard = "FullBeard"
 local female = false
 local modelRefreshes = 0
 local noTeeth = false
+local bodyVisuals = { ["Base.Tattoo"] = true }
 local humanVisual = {
+    hasBodyVisualFromItemType = function(_, item) return bodyVisuals[item] == true end,
+    addBodyVisualFromItemType = function(_, item) bodyVisuals[item] = true end,
+    removeBodyVisualFromItemType = function(_, item) bodyVisuals[item] = nil end,
     removeDirt = function() end,
     removeBlood = function() end,
     getSkinTexture = function() return skin end,
@@ -98,6 +102,8 @@ local body = {
     end,
 }
 local desired = {
+    hairStubble = true,
+    beardStubble = true,
     skinTexture = "MaleBody01",
     hairModel = "Short",
     beardModel = "Goatee",
@@ -116,6 +122,9 @@ T.equal(reason, "repaired", "visual repair reason")
 T.equal(skin, "MaleBody01", "survivor skin was not restored")
 T.equal(hair, "Short", "survivor hair was not restored")
 T.equal(beard, "Goatee", "survivor beard was not restored")
+T.truthy(bodyVisuals["Base.M_Hair_Stubble"], "replica receives male scalp stubble")
+T.truthy(bodyVisuals["Base.M_Beard_Stubble"], "replica receives beard stubble")
+T.truthy(bodyVisuals["Base.Tattoo"], "stubble repair keeps unrelated body visuals")
 T.truthy(noTeeth, "humanized replica regained zombie teeth")
 T.truthy(modelRefreshes > 0,
     "visual repair did not refresh the rendered model")
@@ -164,5 +173,19 @@ T.equal(skin, "MaleBody01",
     "post-bind repair did not restore survivor skin")
 T.truthy(modelRefreshes > refreshAfterRepair,
     "post-bind drift repair did not refresh model")
+
+PNC.Visuals.MaintainHumanAppearance(body, desired, true, false)
+T.truthy(bodyVisuals["Base.F_Hair_Stubble"], "female actor receives female scalp stubble")
+T.falsy(bodyVisuals["Base.M_Hair_Stubble"], "body change removes mismatched scalp stubble")
+T.falsy(bodyVisuals["Base.M_Beard_Stubble"], "female actor omits beard stubble")
+PNC.Visuals.MaintainHumanAppearance(body, { hairStubble = false }, true, false)
+T.falsy(bodyVisuals["Base.F_Hair_Stubble"], "shaving clears the existing overlay")
+T.truthy(bodyVisuals["Base.Tattoo"], "shaving keeps unrelated body visuals")
+
+PNC.Visuals.MaintainHumanAppearance(body, { skinTexture = "MaleBody04", chestHair = true }, false, false)
+T.equal(skin, "MaleBody04a", "IsoZombie chest hair uses the matching vanilla hairy texture")
+T.truthy(PNC.Visuals.ReplicaHumanAppearanceMatches(body, { skinTexture = "MaleBody04", chestHair = true }, false))
+PNC.Visuals.MaintainHumanAppearance(body, { skinTexture = "MaleBody04a", chestHair = false }, false, false)
+T.equal(skin, "MaleBody04", "disabling chest hair restores the shaved texture of the same tone")
 
 return T.finish("pnc_mp_human_visual_repair_smoke")

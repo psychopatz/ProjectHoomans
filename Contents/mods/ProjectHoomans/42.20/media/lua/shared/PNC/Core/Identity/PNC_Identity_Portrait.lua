@@ -140,6 +140,9 @@ function Identity.NormalizePortraitSummary(source, fallback)
             beardModel = source.isFemale == true
                 and nil
                 or normalizeString(appearance.beardModel),
+            hairStubble = appearance.hairStubble == true,
+            beardStubble = source.isFemale ~= true and appearance.beardStubble == true,
+            chestHair = source.isFemale ~= true and appearance.chestHair,
             hairColor = normalizeColor(appearance.hairColor),
             outfitItems = normalizeArray(appearance.outfitItems),
             outfitItemSpecs = type(appearance.outfitItemSpecs) == "table"
@@ -181,6 +184,9 @@ function Identity.BuildPortraitSummary(record)
         tostring(appearance.skinTexture or ""),
         tostring(appearance.hairModel or ""),
         tostring(appearance.beardModel or ""),
+        tostring(appearance.hairStubble == true),
+        tostring(appearance.beardStubble == true),
+        tostring(appearance.chestHair),
         tostring(hairColor.r or ""),
         tostring(hairColor.g or ""),
         tostring(hairColor.b or ""),

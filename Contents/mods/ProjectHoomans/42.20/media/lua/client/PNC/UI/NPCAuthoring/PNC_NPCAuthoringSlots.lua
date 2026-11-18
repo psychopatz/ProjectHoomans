@@ -42,7 +42,7 @@ function Slots.Build(draft, record)
         local identity = string.lower(string.match(location, '([^:]+)$') or location)
         if seen[identity] then return end
         seen[identity] = true
-        local options = Catalog.Clothing(location)
+        local options = Catalog.Clothing(location, draft.isFemale == true)
         local selected
         local normalized = string.lower(string.match(location, '([^:]+)$') or location)
         for _, item in pairs(effective) do

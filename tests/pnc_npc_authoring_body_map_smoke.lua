@@ -25,6 +25,8 @@ T.equal(selected, 'neck', 'neck has its own clickable region')
 map:onMouseDown(120, 250)
 T.equal(selected, 'waist', 'native groin z-order wins over overlapping abdomen')
 T.falsy(map:Hit(-1, -1), 'outside body map never changes a loadout region')
+map:onMouseDown(3, 3)
+T.equal(selected, nil, 'empty silhouette space clears the body-map selection')
 local drawn = {}
 function map:drawTextureScaledUniform(texture, _, _, _, alpha, r, g, b) drawn[texture.path] = { alpha, r, g, b } end
 map:render()

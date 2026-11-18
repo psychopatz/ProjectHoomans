@@ -522,6 +522,11 @@ function Resolver.AttachIdentityTrace(trace, identity)
         ["appearance.hairColor"] = survivor and survivor.hairColor or nil,
     }
     if identity then values["identity.isFemale"] = identity.isFemale end
+    if survivor then
+        values["appearance.hairStubble"] = survivor.hairStubble
+        values["appearance.beardStubble"] = survivor.beardStubble
+        values["appearance.chestHair"] = survivor.chestHair
+    end
     local fieldID
     local value
     for fieldID, value in pairs(values) do

@@ -172,6 +172,15 @@ local function buildAppearanceIdentityControls(self)
     self.content:addChild(self.beardCombo)
 end
 
+local function addAppearanceToggle(self, field, key, fallback)
+    local toggle = ISTickBox:new(0, 0, 1, 24, "", self, Window.onAppearanceToggle, field)
+    toggle:initialise()
+    toggle:addOption(tr(key, fallback))
+    function toggle:setEnabled(enabled) self.enable = enabled == true end
+    self.content:addChild(toggle)
+    self[field .. "Toggle"] = toggle
+end
+
 local function buildAdvancedLabel(self)
     self.advancedLabel = ISLabel:new(0, 0, 24,
         tr("UI_PNC_NPCAuthoring_AdvancedClothing",
@@ -201,6 +210,11 @@ function ISPNCUniqueNPCAppearanceWindow:createChildren()
     buildAppearanceVoiceControls(self)
     buildAppearanceSkinControls(self)
     buildAppearanceIdentityControls(self)
+    if self.integrated then
+        addAppearanceToggle(self, "hairStubble", "UI_PNC_Authoring_HairStubble", "Scalp stubble")
+        addAppearanceToggle(self, "beardStubble", "UI_PNC_Authoring_BeardStubble", "Beard stubble")
+        addAppearanceToggle(self, "chestHair", "UI_PNC_Authoring_ChestHair", "Chest hair")
+    end
     buildAdvancedLabel(self)
     finishAppearanceControls(self)
 end

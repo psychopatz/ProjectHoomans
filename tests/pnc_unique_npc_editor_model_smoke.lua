@@ -218,6 +218,8 @@ local firstPreviewSpec = PNC.UniqueNPCEditorModel.BuildPortraitSpec(
     updatedPreview)
 draft.identity.survivor.hairModel = "Short"
 draft.appearanceAuthored.hairModel = true
+draft.identity.survivor.hairStubble = true
+draft.appearanceAuthored.hairStubble = true
 updatedPreview = PNC.UniqueNPCEditorModel.UpdatePreviewDraft(
     updatedPreview, draft)
 local secondPreviewSpec = PNC.UniqueNPCEditorModel.BuildPortraitSpec(
@@ -232,6 +234,13 @@ T.equal(secondPreviewSpec.equipment.wornVisuals.Shirt.textureChoice, 3,
     "hair edit preserves clothing visual metadata")
 T.falsy(firstPreviewSpec.key == secondPreviewSpec.key,
     "visual edit advances the portrait revision")
+
+T.equal(secondPreviewSpec.appearance.hairStubble, true, "retained preview receives the stubble edit")
+draft.identity.survivor.hairStubble = false
+updatedPreview = PNC.UniqueNPCEditorModel.UpdatePreviewDraft(updatedPreview, draft)
+local shavedPreview = PNC.UniqueNPCEditorModel.BuildPortraitSpec(updatedPreview)
+T.equal(shavedPreview.appearance.hairStubble, false, "retained preview clears the stubble edit")
+T.falsy(secondPreviewSpec.key == shavedPreview.key, "turning off stubble refreshes the portrait descriptor")
 
 local loaded = PNC.UniqueNPCEditorModel.FromDefinition({
     id = "unique:loaded",

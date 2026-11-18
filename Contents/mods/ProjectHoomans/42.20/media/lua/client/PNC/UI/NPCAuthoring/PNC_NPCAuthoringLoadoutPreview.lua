@@ -12,7 +12,7 @@ function Window:loadoutPickerCallbacks(slot, allowed)
         if source ~= self.draft then refresh() end
         if not selections[item.id] then
             if count >= 32 then refresh() end
-            local native, reason = Catalog.Create(item.id)
+            local native, reason = Catalog.Create(item.id, slot.kind == 'worn' and slot.id or nil)
             if not native then return nil, reason end
             local spec
             spec, reason = PNC.Inventory.CaptureNativeItem(native)
@@ -35,7 +35,11 @@ function Window:loadoutPickerCallbacks(slot, allowed)
             local record
             record, reason = model.EnsureRuntimeRecord(draft, true)
             if not record then return nil, nil, 1, reason end
-            portraits[item.id] = model.BuildPortraitSpec(draft)
+            local spec = model.BuildPortraitSpec(draft)
+            if spec and slot.kind == 'held' then
+                spec.previewHandItems = { [slot.id] = selection.native }
+            end
+            portraits[item.id] = spec
         end
         return portraits[item.id], item.label, 1
     end

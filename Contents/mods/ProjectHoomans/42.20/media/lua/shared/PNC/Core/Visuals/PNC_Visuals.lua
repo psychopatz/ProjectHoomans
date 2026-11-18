@@ -2,6 +2,7 @@ PNC = PNC or {}
 PNC.Visuals = PNC.Visuals or {}
 
 local Visuals = PNC.Visuals
+local Stubble = require "PNC/Core/Visuals/PNC_Visuals_Stubble"
 
 local function applyIdentityVoice(zombie, record, appearance)
     local identity = record and record.identity or nil
@@ -84,6 +85,15 @@ function Visuals.ClearBodySoiledState(zombie)
     clearBodySoiledState(humanVisual)
 end
 
+-- HumanVisual skips body hair for IsoZombie. The native human texture
+-- variants let the actor use the same authored look as the portrait.
+function Visuals.ResolveSkinTexture(appearance, isFemale)
+    local texture = appearance.skinTexture
+    if isFemale or type(appearance.chestHair) ~= "boolean" then return texture end
+    local tone = string.match(tostring(texture or "MaleBody01"), "^(MaleBody0[1-5])a?$")
+    return tone and (tone .. (appearance.chestHair and "a" or "")) or texture
+end
+
 function Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, refreshModel)
     local humanVisual
     local immutableColor
@@ -104,8 +114,10 @@ function Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, refreshMo
     humanVisual = zombie.getHumanVisual and zombie:getHumanVisual() or nil
     clearBodySoiledState(humanVisual)
     if humanVisual then
-        if appearance.skinTexture and humanVisual.setSkinTextureName then
-            humanVisual:setSkinTextureName(appearance.skinTexture)
+        Stubble.Apply(humanVisual, appearance, isFemale == true)
+        local skinTexture = Visuals.ResolveSkinTexture(appearance, isFemale == true)
+        if skinTexture and humanVisual.setSkinTextureName then
+            humanVisual:setSkinTextureName(skinTexture)
         end
         if appearance.hairModel and humanVisual.setHairModel then
             humanVisual:setHairModel(appearance.hairModel)

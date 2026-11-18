@@ -1,6 +1,7 @@
 require "ISUI/ISPanel"
 require "ISUI/ISLabel"
 require "ISUI/ISComboBox"
+require "ISUI/ISTickBox"
 require "RadioCom/ISUIRadio/ISSliderPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/PNC_AudioDebugModel"

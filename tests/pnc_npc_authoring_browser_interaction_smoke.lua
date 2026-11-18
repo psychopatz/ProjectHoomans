@@ -8,7 +8,7 @@ local items = { { id = 'A', label = 'Alpha', search = 'alpha' }, { id = 'B', lab
 browser:Show({ mode = 'outfit', items = items, onChoose = function(item) applied = item.id; return true end })
 T.falsy(browser.quantity.visible, 'outfits do not expose item quantity')
 T.falsy(browser.destination.visible, 'outfits do not expose bag destinations')
-T.falsy(browser.compatible.visible, 'outfits do not expose slot compatibility filters')
+T.falsy(browser.compatible, 'the compatibility bypass control is absent')
 T.equal(browser.confirm.title, 'Apply outfit', 'outfits have a contextual apply action')
 T.falsy(browser.confirm.enabled, 'an explicit selection is required')
 browser.tiles[1].onclick(browser, browser.tiles[1])

@@ -40,4 +40,13 @@ appearance.draft.identity = { survivor = { hairModel = 'Long' } }
 appearance:onHairChanged({ selected = 1, options = { { data = '__random' } } })
 T.equal(appearance.draft.identity.survivor.hairModel, 'Long', 'stale random style callback cannot clear companion hair')
 T.equal(changed, 0, 'rejected random style cannot commit')
+appearance:onAppearanceToggle(1, true, "chestHair")
+T.equal(appearance.draft.identity.survivor.chestHair, true, 'checked appearance toggle authors true')
+appearance:onAppearanceToggle(1, false, "chestHair")
+T.equal(appearance.draft.identity.survivor.chestHair, false, 'unchecked appearance toggle authors false')
+appearance.draft.isFemale = true
+appearance:onAppearanceToggle(1, true, "chestHair")
+T.equal(changed, 2, 'disabled female chest hair cannot be authored by a stale click')
+appearance:onAppearanceToggle(1, true, "hairStubble")
+T.equal(appearance.draft.identity.survivor.hairStubble, true, 'female scalp stubble stays editable')
 T.finish('pnc_npc_authoring_presentation_policy_smoke')

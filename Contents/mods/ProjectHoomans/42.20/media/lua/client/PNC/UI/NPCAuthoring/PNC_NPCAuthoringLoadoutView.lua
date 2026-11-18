@@ -8,12 +8,30 @@ function Window:selectLoadoutPart(id, region)
     self.loadoutViewRegion = region or id
     self.slotContent:setYScroll(0); self.pages.loadout:setYScroll(0)
     self:refreshLoadoutPage(); self:requestResponsiveLayout()
-    if self.syncPortraitView then self:syncPortraitView() end
+    if self.syncPortraitView then self:syncPortraitView(false, id == nil) end
 end
+
+function Window:deselectLoadoutPart()
+    if not self.loadoutPart or self.tabPanel:getActiveView() ~= self.pages.loadout then return false end
+    if self.itemExplorer and self.itemExplorer:getIsVisible() then return false end
+    self:selectLoadoutPart(nil)
+    return true
+end
+
+function Window:onMouseUp(x, y)
+    if self:deselectLoadoutPart() then return true end
+    if ISPanel.onMouseUp then return ISPanel.onMouseUp(self, x, y) end
+end
+
 function Window:buildLoadoutNavigation()
-    self.loadoutPart = 'torso'
     self.loadoutParts = {}
-    self.bodyMap = BodyMap:new(0, 0, 123, 302, function(id, region) self:selectLoadoutPart(id, region) end)
+    self.bodyMap = BodyMap:new(0, 0, 123, 302, function(id, region)
+        if id then self:selectLoadoutPart(id, region) else self:deselectLoadoutPart() end
+    end)
+    local function onBackgroundClick() return self:deselectLoadoutPart() end
+    self.pages.loadout.onMouseUp = onBackgroundClick
+    self.slotContent.onMouseUp = onBackgroundClick
+    self.portraitPanel.onMouseUp = onBackgroundClick
     self.bodyMap:initialise(); self.bodyMap:instantiate(); self.pages.loadout:addChild(self.bodyMap)
     self.loadoutSelectionLabel = I.addLabel(self.pages.loadout, '')
     self.loadoutLegend = I.addLabel(self.pages.loadout, I.tr('UI_PNC_Authoring_BodyMapLegend', 'Green: equipped. Click a body part.'))
@@ -45,7 +63,9 @@ function Window:refreshLoadoutNavigation()
         counts[row.group].total = counts[row.group].total + 1
         if row.type then counts[row.group].equipped = counts[row.group].equipped + 1 end
     end
-    if not counts[self.loadoutPart] then self.loadoutPart = 'carry' end
+    if self.loadoutPart == 'other' and not counts.other then
+        self.loadoutPart, self.loadoutViewRegion = nil, nil
+    end
     self.bodyMap:SetState(self.draft and self.draft.isFemale == true, counts, self.loadoutPart, self.slotRows)
     local selected
     for _, group in ipairs(Slots.Groups()) do if group.id == self.loadoutPart then selected = group end end
@@ -78,7 +98,7 @@ function Window:layoutSlotTiles()
     local order = 0
     for index, row in ipairs(self.slotRows or {}) do
         local tile = self.slotTiles[index]
-        local visible = row.group == self.loadoutPart and self.loadoutPart ~= 'carry'
+        local visible = self.loadoutPart ~= nil and row.group == self.loadoutPart and self.loadoutPart ~= 'carry'
         tile:setVisible(visible); tile.clear:setVisible(visible and row.type ~= nil)
         if visible then
             local x, y = order % columns * (tileWidth + gap), math.floor(order / columns) * (size + gap)
@@ -97,14 +117,12 @@ end
 function Window:layoutLoadoutPage(width, height, rowHeight, gap)
     local w, y = math.max(1, width - gap * 2 - 16), rowHeight + gap * 2
     local carry = self.loadoutPart == 'carry'
-    self.outfitBrowse:setVisible(not carry); self.outfitValue:setVisible(not carry)
+    self.outfitValue:setVisible(not carry)
     local generation = not carry and self.presentationMode ~= 'companion'
     self.loadoutModeRow.labelControl:setVisible(generation); self.loadoutModeRow.entry:setVisible(generation)
     if not carry then
-        local browseWidth = math.min(w, L.Pixels(170, self.uiScale))
-        L.SetBounds(self.outfitBrowse, gap, y, browseWidth, rowHeight)
-        L.SetBounds(self.outfitValue, gap + browseWidth + gap, y, math.max(1, w - browseWidth - gap), rowHeight)
-        self.outfitValue:setName(L.Ellipsize(self.outfitCaption or '', UIFont.Small, math.max(1, w - browseWidth - gap)))
+        L.SetBounds(self.outfitValue, gap, y, w, rowHeight)
+        self.outfitValue:setName(L.Ellipsize(self.outfitCaption or '', UIFont.Small, w))
         self.outfitValue.tooltip = self.outfitCaption
         y = y + rowHeight + gap
     end

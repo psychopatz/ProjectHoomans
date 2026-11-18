@@ -550,6 +550,27 @@ local DESCRIPTORS = {
             return normalizeCollection(value, { maxDepth = 6, maxEntries = 128 })
         end,
     }),
+    descriptor("appearance.hairStubble", 47, "boolean", {
+        runtimePath = { "identity", "survivor", "hairStubble" },
+        draftPath = { "identity", "survivor", "hairStubble" },
+        authoredPath = { "appearanceAuthored", "hairStubble" },
+        authorable = true, persistable = true, networkable = true,
+        bindingAllowed = true, clearable = true,
+    }),
+    descriptor("appearance.beardStubble", 48, "boolean", {
+        runtimePath = { "identity", "survivor", "beardStubble" },
+        draftPath = { "identity", "survivor", "beardStubble" },
+        authoredPath = { "appearanceAuthored", "beardStubble" },
+        authorable = true, persistable = true, networkable = true,
+        bindingAllowed = true, clearable = true,
+    }),
+    descriptor("appearance.chestHair", 49, "boolean", {
+        runtimePath = { "identity", "survivor", "chestHair" },
+        draftPath = { "identity", "survivor", "chestHair" },
+        authoredPath = { "appearanceAuthored", "chestHair" },
+        authorable = true, persistable = true, networkable = true,
+        bindingAllowed = true, clearable = true,
+    }),
     descriptor("factionID", nil, "string", {
         runtimePath = { "factionID" }, draftPath = { "factionID" },
         authorable = true, persistable = true, networkable = false,

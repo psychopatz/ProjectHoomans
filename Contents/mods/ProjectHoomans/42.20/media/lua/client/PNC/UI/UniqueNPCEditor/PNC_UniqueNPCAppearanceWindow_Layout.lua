@@ -173,16 +173,19 @@ function Window:layoutIntegratedAppearance()
         { self.skinLabel, self.skinModeCombo }, { self.hairLabel, self.hairCombo },
         { self.beardLabel, self.beardCombo }, { self.hairColorLabel, self.hairColorCombo },
         { self.voiceLabel, self.voiceCombo }, { self.voiceSampleLabel, self.voiceSampleCombo },
-        { self.voicePitchLabel, self.voicePitch },
+        { self.voicePitchLabel, self.voicePitch }, { nil, self.hairStubbleToggle },
+        { nil, self.beardStubbleToggle }, { nil, self.chestHairToggle },
     }
     for index, field in ipairs(fields) do
         local label, control = field[1], field[2]
-        if label and control then
+        if control then
             local x = (index - 1) % columns * (width + gap)
             local y = math.floor((index - 1) / columns) * (h * 2 + gap * 2)
-            label:setVisible(true)
-            Layout.SetBounds(label, x, y, width, h)
-            PNC.NPCAuthoringFields.Bounds(control, x, y + h, width, h)
+            if label then
+                label:setVisible(true)
+                Layout.SetBounds(label, x, y, width, h)
+            end
+            PNC.NPCAuthoringFields.Bounds(control, x, y + (label and h or 0), width, h)
         end
     end
     Layout.SetBounds(self.skinSwatch, math.max(0, width - h), 0, h, h)

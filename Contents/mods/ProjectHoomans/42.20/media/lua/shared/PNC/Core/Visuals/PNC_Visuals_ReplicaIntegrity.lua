@@ -5,6 +5,7 @@ PNC = PNC or {}
 PNC.Visuals = PNC.Visuals or {}
 
 local Visuals = PNC.Visuals
+local Stubble = require "PNC/Core/Visuals/PNC_Visuals_Stubble"
 local Core = PNC.Core
 local NEXT_CHECK_AT = setmetatable({}, { __mode = "k" })
 local CHECK_INTERVAL_MS = 250
@@ -24,10 +25,10 @@ function Visuals.ReplicaHumanAppearanceMatches(
     humanVisual = zombie.getHumanVisual
         and zombie:getHumanVisual() or nil
     if not humanVisual then return false end
-    if appearance.skinTexture
+    local skinTexture = Visuals.ResolveSkinTexture(appearance, isFemale == true)
+    if skinTexture
         and humanVisual.getSkinTexture
-        and tostring(humanVisual:getSkinTexture())
-            ~= tostring(appearance.skinTexture)
+        and tostring(humanVisual:getSkinTexture()) ~= tostring(skinTexture)
     then
         return false
     end
@@ -45,7 +46,7 @@ function Visuals.ReplicaHumanAppearanceMatches(
     then
         return false
     end
-    return true
+    return Stubble.Matches(humanVisual, appearance, isFemale == true)
 end
 
 function Visuals.RepairReplicaHumanAppearance(

@@ -36,6 +36,7 @@ function ISPNCUniqueNPCAppearanceWindow:onPlayVoice()
     self.voicePreview = self.voicePreview or PNC.NPCAuthoringVoicePreview.New()
     local ok, reason = self.voicePreview:Play(self:voiceProfile(), comboData(self.voiceSampleCombo) or "ShoutHey")
     if self.parentEditor then
+        if ok and self.parentEditor.wavePortrait then self.parentEditor:wavePortrait(getTimeInMillis()) end
         local keys = { audio_unavailable = { "UI_PNC_Authoring_AudioUnavailable", "Audio output is unavailable" },
             voice_event_unavailable = { "UI_PNC_Authoring_VoiceEventMissing", "The selected voice sample is unavailable" },
             voice_play_failed = { "UI_PNC_Authoring_VoicePlayFailed", "Voice playback could not start" } }

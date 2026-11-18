@@ -25,6 +25,8 @@ T.equal(e.portraitMode, 'body', 'leaving Appearance restores full body')
 T.equal(e.portraitPanel.zoom, 1, 'body zoom preference survives the face view')
 T.equal(targets[#targets].equipment.primaryFullType, 'Base.Axe', 'body equipment reappears')
 e.tabPanel:activateView(PNC.Translation.GetKey('UI_PNC_Authoring_Loadout', 'Loadout')); e:syncPageVisibility()
+T.equal(e.loadoutPart, nil, 'loadout opens without a selected region')
+T.equal(e.portraitPanel:getViewRegion(), 'body', 'loadout opens on the full actor')
 e:selectLoadoutPart('head')
 T.equal(e.portraitPanel:getViewRegion(), 'head', 'head selection uses the reusable Core camera API')
 T.equal(targets[#targets].faceOnly, false, 'loadout head framing keeps the equipped headgear visible')
@@ -35,7 +37,52 @@ T.equal(e.portraitPanel:getViewRegion(), 'legs', 'leg selection activates lower-
 e.tabPanel:activateView(e.generalTabName); e:syncPageVisibility()
 T.equal(e.portraitPanel:getViewRegion(), 'body', 'leaving loadout restores the default body view')
 T.equal(e.portraitPanel.zoom, 1, 'region views preserve the existing body camera preference')
+e.tabPanel:activateView(PNC.Translation.GetKey('UI_PNC_Authoring_Loadout', 'Loadout')); e:syncPageVisibility()
+e.itemExplorer:setVisible(true)
+T.falsy(e.slotContent:onMouseUp(), 'a visible picker retains the current slot focus')
+T.equal(e.loadoutPart, 'legs')
+e.itemExplorer:setVisible(false)
+T.truthy(e.slotContent:onMouseUp(), 'clicking empty grid space clears the selection')
+T.equal(e.loadoutPart, nil)
+T.equal(e.loadoutViewRegion, nil)
+T.equal(e.portraitPanel:getViewRegion(), 'body')
+T.equal(e.portraitPanel.zoom, -3, 'deselection restores the default full-body zoom')
+e:selectLoadoutPart('torso')
+local model = {
+    onMouseDown = function(view) view.mouseDown = true; return true end,
+    onMouseUp = function(view) view.mouseDown = false; return true end,
+}
+e.portraitPanel.modelView = model
+e:syncPortraitView()
+model:onMouseDown(10, 10); model:onMouseUp(60, 10)
+T.equal(e.loadoutPart, 'torso', 'dragging to rotate the actor keeps the selected region')
+model:onMouseDown(10, 10); model:onMouseUp(10, 10)
+T.equal(e.loadoutPart, nil, 'a click on the preview clears the selected region')
 local updated = 0
 e.appearanceTab.voicePreview = { Update = function() updated = updated + 1 end }
 e:update(); T.equal(updated, 1, 'editor update releases completed menu audio')
+local now, waves = 1000, 0
+getTimeInMillis = function() return now end
+ZombRand = function() return 0 end
+function e.portraitPanel:playAnimation(id, duration)
+    T.equal(id, 'greeting.wavehi')
+    T.equal(duration, 2200)
+    waves = waves + 1
+end
+e.tabPanel:activateView(e.appearanceTabName); e:syncPageVisibility()
+e.appearanceTab.voicePreview.handle = 1
+e:update()
+now = 9000
+e:update()
+T.equal(waves, 0, 'voice playback defers a due wave')
+e.appearanceTab.voicePreview.handle = 0
+e:update()
+T.equal(waves, 1, 'appearance preview waves after the initial idle')
+e:update()
+T.equal(waves, 1, 'wave cooldown prevents repeated triggers')
+e.portraitPanel:setVisible(false)
+now = 30000
+e:update()
+T.equal(waves, 1, 'hidden preview does not wave')
+T.equal(e.nextPreviewWaveAt, nil, 'hidden preview drops its pending wave')
 T.finish('pnc_npc_authoring_portrait_framing_smoke')

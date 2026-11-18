@@ -118,6 +118,6 @@ explorer.tiles[1]:onMouseDoubleClick()
 T.equal(applied, 1, 'the trailing native mouse-up/double-click cannot apply twice')
 explorer:Show({ mode = 'worn', items = { { id = 'bad', label = 'Incompatible', search = 'bad' } }, allowed = {},
     onChoose = function() error('incompatible item applied') end })
-explorer.compatibleOnly = false; explorer:refreshResults(); explorer.tiles[1]:onMouseDoubleClick()
+explorer.tiles[1]:onMouseDoubleClick()
 T.truthy(explorer.visible, 'double-click cannot bypass slot compatibility')
 T.finish('pnc_npc_authoring_explorer_layout_smoke')

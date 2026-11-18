@@ -18,6 +18,15 @@ T.equal(Slots.Group('base:ForearmLeft').id, 'hands', 'forearm is not mistaken fo
 T.equal(Slots.Group('base:UnderwearBra').id, 'torso', 'bra is not mistaken for an ear')
 T.equal(Slots.Group('base:UnderwearLongJohns').id, 'legs', 'leg underwear is grouped with legs')
 T.equal(Slots.Group('base:FullSuitHead').id, 'head', 'specific head component wins over generic suit')
+for _, id in ipairs({ 'base:left_ringfinger', 'base:right_middlefinger', 'base:rightwrist' }) do
+    T.equal(Slots.Group(id).id, 'hands', id .. ' belongs with hand accessories')
+end
+for _, id in ipairs({ 'base:tshirt', 'base:shortsleeveshirt', 'base:jersey', 'base:vesttexture', 'base:wound' }) do
+    T.equal(Slots.Group(id).id, 'torso', id .. ' belongs with torso layers')
+end
+T.equal(Slots.Group('base:makeup_eyesshadow').id, 'head', 'makeup is available from the head')
+T.equal(Slots.Group('base:cuirass').id, 'torso', 'cuirass is torso armor')
+T.equal(Slots.Group('base:scbanotank').id, 'head', 'SCBA without tank belongs to head')
 T.equal(Slots.Group('mod:UtilitySocket').id, 'other', 'unknown mod locations remain accessible')
 local draft = { identity = { survivor = {} }, appearance = { slots = { Pants = { mode = 'item', type = 'Base.Pants' } } }, startingItems = {
     { key = 'money', type = 'Base.Money', stack = 5, preferredContainer = 'bag' },

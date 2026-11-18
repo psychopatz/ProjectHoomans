@@ -16,7 +16,7 @@ end
 catalog.Query = function(options)
     return { { id = 'Base.Necklace', label = 'Necklace', script = script } }, 1
 end
-catalog.Filters = function() return {} end
+catalog.Filters = function() return {}, {} end
 PNC.Equipment = { NormalizeLoadoutSpec = function(v) return v end }
 PNC.UniqueNPCAppearanceUI.Internal.locations = function() return { 'Neck' } end
 PNC.Inventory = { CaptureNativeItem = function(item) return { type = item.fullType, itemState = { visualTintR = item.tint } } end }
@@ -47,4 +47,14 @@ T.falsy(browser.visible, 'confirmed item preview is dismissed')
 local accepted = e.draft
 e:openSlot(slot); browser.tiles[1].onclick(browser, browser.tiles[1]); browser:Hide()
 T.equal(e.draft, accepted, 'Cancel preserves the previously accepted loadout')
+local held = { kind = 'held', id = 'secondary', group = 'held', label = 'Off hand' }
+local candidateSpec = { key = 'weapon-look', equipment = { secondaryFullType = 'Base.Hammer' } }
+local chosen
+function e:buildLoadoutCandidate(_, _, _, _, selection) chosen = selection; return {} end
+F.Model.BuildPortraitSpec = function() return candidateSpec end
+local inspect = e:loadoutPickerCallbacks(held, { ['Base.Hammer'] = true })
+local portrait = inspect({ id = 'Base.Hammer', label = 'Hammer' })
+T.equal(portrait.previewHandItems.secondary, chosen.native, 'selected weapon goes into the requested preview hand')
+T.equal(portrait.previewHandItems.primary, nil, 'off-hand selection does not replace the primary hand')
+T.equal(e.draft, accepted, 'in-hand rendering never mutates the accepted loadout')
 T.finish('pnc_npc_authoring_item_preview_smoke')

@@ -20,7 +20,7 @@ end
 function Explorer:new(x, y, w, h)
     local o = ISPanel.new(self, x, y, w, h)
     setmetatable(o, self); self.__index = self
-    o.offset, o.pageSize, o.compatibleOnly = 0, 48, true
+    o.offset, o.pageSize = 0, 48
     o.options = nil -- idle until Show supplies a browsing session
     o.backgroundColor = { r = 0.055, g = 0.065, b = 0.075, a = 1 }
     return o
@@ -51,17 +51,14 @@ function Explorer:createChildren()
             control.tooltip = entry and entry.text or nil
         end
     end
-    self.sources:setOnMouseDownFunction(self, function(target, row) target.source = row.value; target.offset = 0; target:refreshResults() end)
+    self.sources:setOnMouseDownFunction(self, function(target, row) target.source, target.category, target.offset = row.value, nil, 0; target:refreshResults() end)
     self.categories:setOnMouseDownFunction(self, function(target, row) target.category = row.value; target.offset = 0; target:refreshResults() end)
-    self.compatible = button(self, tr('UI_PNC_Authoring_Compatible', 'Compatible only'), function(target)
-        target.compatibleOnly = not target.compatibleOnly; target.offset = 0; target:refreshResults()
-    end)
     self.refreshButton = button(self, tr('UI_PNC_Authoring_Refresh', 'Refresh items'), function(target)
         Catalog.Invalidate(); target.source, target.category, target.offset = nil, nil, 0
         target.selectedID = nil
         if target.options.reloadAllowed then target.allowed = target.options.reloadAllowed() end
         if target.options.onRefresh then target.options.onRefresh(target.allowed) end
-        target:refreshFilters(); target:refreshResults()
+        target:refreshResults()
     end)
     self.grid = ISPNCUniqueNPCAppearanceScrollPanel:new(0, 0, 1, 1)
     self.grid:initialise(); self.grid:instantiate(); self:addChild(self.grid)
@@ -137,7 +134,6 @@ function Explorer:Show(options)
     self.mode = options.mode or 'item'
     self.titleText = options.title or tr('UI_PNC_Authoring_ItemExplorer', 'Item Explorer')
     self.source, self.category, self.offset, self.selectedID, self.selectedItem = nil, nil, 0, options.initialID, nil
-    self.compatibleOnly = true
     self.deleteArmedID = nil
     self.confirming = false
     self.previewItemID, self.previewIndex = nil, 1
@@ -148,14 +144,14 @@ function Explorer:Show(options)
     self.contextActionButton:setTitle(action and action.title or '')
     self.contextActionButton.tooltip = action and action.tooltip or nil
     self.contextActionButton:setVisible(action ~= nil)
-    self.search:setText(options.initialQuery or ''); self:refreshFilters(); self:refreshResults()
+    self.search:setText(options.initialQuery or ''); self:refreshResults()
     self:setVisible(true); self:bringToTop(); self:onResize(); self.search:focus()
     if self.onShown then self.onShown() end
 end
 function Explorer:confirmSelection()
     if not self:getIsVisible() or self.confirming then return false end
     local item = self:currentSelection()
-    if not item or not self.onChoose or self.allowed and not self.allowed[item.id] then return false end
+    if not item or not self.onChoose or self.previewReason or self.allowed and not self.allowed[item.id] then return false end
     local quantity = self.mode == 'carry' and tonumber(self.quantity:getText()) or 1
     if not quantity or quantity < 1 or quantity > 99 or quantity ~= math.floor(quantity) then
         self:setHint(tr('UI_PNC_Authoring_QuantityInvalid', 'Enter a quantity from 1 to 99')); return false
@@ -173,15 +169,28 @@ function Explorer:Hide()
     if self.preview then self.preview:setVisible(false); self.preview.targetKey = nil end
     if self.onDismiss then self.onDismiss() end
 end
-function Explorer:refreshFilters()
-    for field, list in pairs({ source = self.sources, category = self.categories }) do
-        list:clear()
-        list:addItem(tr(field == 'source' and 'UI_PNC_Authoring_AllMods' or 'UI_PNC_Authoring_AllCategories', field == 'source' and 'All mods / modules' or 'All categories'), {})
-        if not self.customItems then
-            for _, value in ipairs(Catalog.Filters(field)) do list:addItem(field == 'category' and category(value) or value, { value = value }) end
-        end
-        list.selected = 1
+local function fillFilter(list, label, values, selected, display)
+    list:clear()
+    list:addItem(label, {})
+    list.selected = 1
+    for index, value in ipairs(values) do
+        list:addItem(display and display(value) or value, { value = value })
+        if value == selected then list.selected = index + 1 end
     end
+    if list.selected > 1 then return selected end
+end
+
+function Explorer:refreshFilters(query)
+    if self.customItems then return end
+    local sources, categories = Catalog.Filters(self.allowed, query, self.source)
+    local source = fillFilter(self.sources, tr('UI_PNC_Authoring_AllMods', 'All mods / modules'), sources, self.source)
+    if source ~= self.source then
+        self.source, self.category, self.offset = source, nil, 0
+        local _, allCategories = Catalog.Filters(self.allowed, query, source)
+        categories = allCategories
+    end
+    local selected = fillFilter(self.categories, tr('UI_PNC_Authoring_AllCategories', 'All categories'), categories, self.category, category)
+    if selected ~= self.category then self.category, self.offset = selected, 0 end
 end
 function Explorer:currentSelection()
     for _, item in ipairs(self.visibleRows or {}) do if item.id == self.selectedID then return item end end
@@ -197,15 +206,16 @@ function Explorer:refreshSelection()
 end
 function Explorer:refreshResults()
     if not self.tiles or not self.options then return end
-    local rows, total = Catalog.Query({ query = self.search:getText(), source = self.source, category = self.category,
-        allowed = self.allowed, compatibleOnly = self.compatibleOnly, offset = self.offset, limit = self.pageSize, items = self.customItems })
+    local query = self.search:getText()
+    self:refreshFilters(query)
+    local rows, total = Catalog.Query({ query = query, source = self.source, category = self.category,
+        allowed = self.allowed, offset = self.offset, limit = self.pageSize, items = self.customItems })
     self.total, self.visibleRows = total, rows
     if #rows == 0 and total > 0 and self.offset > 0 then self.offset = 0; return self:refreshResults() end
     if not self:currentSelection() then self.selectedID = nil end
     for index, tile in ipairs(self.tiles) do tile.item = rows[index]; tile:setVisible(rows[index] ~= nil); tile.tooltip = rows[index] and rows[index].label end
     PNC.NPCAuthoringFields.EnableButton(self.previous, self.offset > 0); PNC.NPCAuthoringFields.EnableButton(self.nextButton, self.offset + self.pageSize < total)
     self.counter:setName(tostring(total == 0 and 0 or self.offset + 1) .. '-' .. tostring(self.offset + #rows) .. ' / ' .. total)
-    self.compatible.backgroundColor = self.compatibleOnly and { r = .10, g = .32, b = .23, a = 1 } or { r = .08, g = .10, b = .12, a = 1 }
     self:refreshSelection(); self:refreshDetails(); self:onResize()
 end
 function Explorer:refreshDetails()
@@ -225,11 +235,11 @@ function Explorer:refreshDetails()
         for _, detail in ipairs(self.options.describe and self.options.describe(item) or {}) do UI.AddKeyValue(self.details, detail.label, detail.value) end
         if not self.customItems then UI.AddKeyValue(self.details, tr('UI_PNC_Authoring_ItemID', 'Item ID'), item.id) end
     end
-    local compatible = not self.allowed or item and self.allowed[item.id] == true
+    self:refreshExplorerPortrait(item)
+    local compatible = not self.previewReason and (not self.allowed or item and self.allowed[item.id] == true)
     PNC.NPCAuthoringFields.EnableButton(self.confirm, item ~= nil and compatible == true)
     self.hintText = tr(not item and (#(self.visibleRows or {}) == 0 and 'UI_PNC_Authoring_NoMatches' or 'UI_PNC_Authoring_SelectResult') or not compatible and 'UI_PNC_Authoring_DoesNotFit' or 'UI_PNC_Authoring_ReviewSelection',
         not item and (#(self.visibleRows or {}) == 0 and 'No matching results' or 'Select a result to review it') or not compatible and 'Does not fit the selected slot' or 'Review the selection, then apply')
-    self:refreshExplorerPortrait(item)
     self:onResize()
 end
 function Explorer:onResize()
@@ -248,10 +258,9 @@ function Explorer:onResize()
     L.SetBounds(self.heading, g, g, width - 110, h); L.SetBounds(self.closeButton, self.width - 100 - g, g, 100, h)
     local contextHeight = self.options.contextAction and h + g or 0
     L.SetBounds(self.contextActionButton, g, h + g * 2, width, h)
-    local filterActions = filters and (self.allowed and 260 or 128) or 0
+    local filterActions = filters and 128 or 0
     L.SetBounds(self.search, g, h + g * 2 + contextHeight, width - filterActions, h)
-    self.compatible:setVisible(filters and self.allowed ~= nil); self.refreshButton:setVisible(filters)
-    L.SetBounds(self.compatible, self.width - 252 - g, h + g * 2 + contextHeight, 124, h)
+    self.refreshButton:setVisible(filters)
     L.SetBounds(self.refreshButton, self.width - 120 - g, h + g * 2 + contextHeight, 120, h)
     local carry = self.mode == 'carry'
     self.quantityLabel:setVisible(carry); self.quantity:setVisible(carry); self.destination:setVisible(carry)

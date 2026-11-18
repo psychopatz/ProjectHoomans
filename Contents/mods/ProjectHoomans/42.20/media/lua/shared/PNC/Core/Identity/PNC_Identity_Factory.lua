@@ -214,6 +214,9 @@ function Identity.GenerateResolvedIdentity(source)
                 and tostring(survivorOverride.beardModel)
                 or (humanVisual and humanVisual.getBeardModel
                     and normalizeString(humanVisual:getBeardModel()) or nil),
+            hairStubble = survivorOverride.hairStubble == true,
+            beardStubble = survivorOverride.beardStubble == true,
+            chestHair = survivorOverride.chestHair == true,
             skinColor = survivorOverride.skinColor
                 or (not normalizeString(survivorOverride.skinTexture) and appearance and appearance.skinColor or nil),
             hairColor = survivorOverride.hairColor

@@ -176,6 +176,17 @@ function ISPNCUniqueNPCAppearanceWindow:onBeardChanged(combo)
     self:markChanged()
 end
 
+function Window:onAppearanceToggle(_, selected, field)
+    if self.syncing or not self.draft or not self:canEdit("appearance." .. field) then return end
+    if self.draft.isFemale and field ~= "hairStubble" then return end
+    local survivor = self.draft.identity.survivor
+    survivor[field] = selected == true
+    self.draft.appearanceAuthored = self.draft.appearanceAuthored or {}
+    self.draft.appearanceAuthored[field] = true
+    if self.draft.authoringClears then self.draft.authoringClears["appearance." .. field] = nil end
+    self:markChanged()
+end
+
 function ISPNCUniqueNPCAppearanceWindow:setVoiceDraft(profile)
     if not profile then return end
     self.draft.identity = self.draft.identity or { survivor = {} }

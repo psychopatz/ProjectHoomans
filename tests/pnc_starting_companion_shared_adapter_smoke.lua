@@ -43,6 +43,14 @@ local visualDraft = adapter:BuildDraft()
 local generationSeed = visualDraft.previewSeed
 visualDraft.identity.survivor.hairModel = "Long"
 visualDraft.appearanceAuthored.hairModel = true
+T.truthy(adapter:FieldCapability("appearance.hairStubble").editable, "companion scalp stubble is editable")
+T.truthy(adapter:FieldCapability("appearance.beardStubble").editable, "companion beard stubble is editable")
+visualDraft.identity.survivor.hairStubble = true
+visualDraft.identity.survivor.beardStubble = true
+visualDraft.identity.survivor.chestHair = true
+visualDraft.appearanceAuthored.hairStubble = true
+visualDraft.appearanceAuthored.beardStubble = true
+visualDraft.appearanceAuthored.chestHair = true
 T.truthy(adapter:CommitDraft(visualDraft),
     "shared adapter commits a visual field edit")
 local visualBlueprint = session:GetBlueprint(TID.BROTHER)
@@ -51,6 +59,10 @@ local hairState, hair = Blueprint.Get(
 local seedState, seedValue = Blueprint.Get(visualBlueprint, "identity.forename")
 T.equal(hairState, "value", "hair edit remains canonical")
 T.equal(hair, "Long", "hair edit round-trips through the session")
+local resolvedStubble = adapter:BuildDraft().identity.survivor
+T.equal(resolvedStubble.hairStubble, true, "companion scalp stubble survives session resolution")
+T.equal(resolvedStubble.beardStubble, true, "companion beard stubble survives session resolution")
+T.equal(resolvedStubble.chestHair, true, "companion chest hair survives session resolution")
 T.equal(seedState, "value", "unrelated identity remains authored")
 T.equal(seedValue, "Riley", "visual edit does not reroll unrelated values")
 T.equal(visualBlueprint.generationSeed, generationSeed,

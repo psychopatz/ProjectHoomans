@@ -19,8 +19,6 @@ function Window:buildLoadoutPage()
             page:addChild(row.entry); page:addChild(row.labelControl); self.loadoutModeRow = row
         end
     end
-    self.outfitBrowse = button(page, self, tr('UI_PNC_Authoring_BrowseOutfits', 'Browse outfits'), function(target) target:browseOutfits() end)
-    self.outfitBrowse.tooltip = tr('UI_PNC_Authoring_LoadoutEditHelp', 'Changes update this NPC in the editor immediately. Save NPC preset keeps a reusable copy of all tabs, including this loadout.')
     self.outfitValue = I.addLabel(page, '')
     self.slotContent = ISPNCUniqueNPCAppearanceScrollPanel:new(0, 0, 1, 1)
     self.slotContent:initialise(); self.slotContent:instantiate(); page:addChild(self.slotContent)
@@ -65,7 +63,7 @@ function Window:browseOutfits()
         return spec
     end
     self.itemExplorer:Show({ mode = "outfit", title = tr('UI_PNC_Authoring_BrowseOutfits', 'Browse outfits'), items = items,
-        preview = inspect, applyTooltip = self.outfitBrowse.tooltip, onChoose = function(item)
+        preview = inspect, applyTooltip = tr('UI_PNC_Authoring_LoadoutEditHelp', 'Changes update this NPC in the editor immediately.'), onChoose = function(item)
             if not previews[item.id] then inspect(item) end
             local choice = previews[item.id]
             if not choice then return false, tr('UI_PNC_Authoring_UnavailableOutfit', 'This outfit is unavailable') end
@@ -87,7 +85,7 @@ function Window:openSlot(slot)
     local allowed
     if slot.kind == 'worn' then
         allowed = {}
-        for _, item in ipairs(Catalog.Clothing(slot.id)) do allowed[item.id] = true end
+        for _, item in ipairs(Catalog.Clothing(slot.id, self.draft.isFemale == true)) do allowed[item.id] = true end
     elseif slot.weapon then
         allowed = Catalog.Weapons()
     end
@@ -103,7 +101,7 @@ function Window:openSlot(slot)
         initialID = carried and slot.type or nil, initialQuery = carried and slot.type or nil,
         initialQuantity = carried and slot.quantity or nil, initialDestination = carried and slot.destination or nil,
         reloadAllowed = slot.weapon and function() return Catalog.Weapons() end or slot.kind == 'worn' and function()
-            local refreshed = {}; for _, item in ipairs(Catalog.Clothing(slot.id)) do refreshed[item.id] = true end; return refreshed
+            local refreshed = {}; for _, item in ipairs(Catalog.Clothing(slot.id, self.draft.isFemale == true)) do refreshed[item.id] = true end; return refreshed
         end or nil,
         onChoose = choose })
     self:requestResponsiveLayout()
@@ -115,7 +113,7 @@ function Window:buildLoadoutCandidate(slot, fullType, quantity, destination, sel
     local spec, native, reason
     local targetSlot = slot
     if fullType then
-        if selection then native = selection.native else native, reason = Catalog.Create(fullType) end
+        if selection then native = selection.native else native, reason = Catalog.Create(fullType, slot.kind == 'worn' and slot.id or nil) end
         if not native then return false, tr('UI_PNC_Authoring_UnavailableItem', 'This item is unavailable') end
         if selection then spec = PNC.NPCAuthoring.Registry.Copy(selection.spec)
         else spec, reason = PNC.Inventory.CaptureNativeItem(native) end

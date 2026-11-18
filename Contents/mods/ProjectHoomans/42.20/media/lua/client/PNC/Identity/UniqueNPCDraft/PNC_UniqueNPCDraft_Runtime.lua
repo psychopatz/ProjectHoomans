@@ -20,7 +20,7 @@ local function applyExplicitIdentity(record, def, draft)
     record.identity = record.identity or {}
     record.identity.survivor = survivor
     for _, key in ipairs({ "forename", "surname", "hairModel", "beardModel",
-        "skinTexture", "hairColor", "skinColor", "voice", "voicePrefix",
+        "hairStubble", "beardStubble", "chestHair", "skinTexture", "hairColor", "skinColor", "voice", "voicePrefix",
         "voiceType", "voicePitch" }) do
         if explicit[key] ~= nil then
             survivor[key] = copy(explicit[key])
@@ -77,6 +77,9 @@ local function applyPreviewAppearance(record, cleared)
     if survivor.beardModel ~= nil then
         appearance.beardModel = record.isFemale and nil or survivor.beardModel
     end
+    appearance.hairStubble = survivor.hairStubble == true
+    appearance.beardStubble = not record.isFemale and survivor.beardStubble == true
+    appearance.chestHair = not record.isFemale and survivor.chestHair == true
     if survivor.hairColor ~= nil then appearance.hairColor = copy(survivor.hairColor) end
     if survivor.skinColor ~= nil then appearance.skinColor = copy(survivor.skinColor) end
     if cleared then

@@ -51,4 +51,20 @@ p:Stop()
 for index = beforeDebug + 1, #actions do T.falsy(string.find(actions[index], "music:", 1, true), "debug playback does not change world music state") end
 getSoundManager = function() return {} end
 T.falsy(p:Play({ prefix = "VoiceMale" }, "ShoutHey"), "dummy/unavailable audio is a normal rejection")
+local waves = 0
+getTimeInMillis = function() return 1234 end
+ISPNCUniqueNPCAppearanceWindow = { Internal = { tr = function(_, value) return value end, comboData = function() return "ShoutHey" end } }
+local appearance = setmetatable({
+    draft = {}, commitPendingVoice = function() end, voiceProfile = function() return {} end,
+    parentEditor = { setStatus = function() end, wavePortrait = function(_, now)
+        T.equal(now, 1234); waves = waves + 1
+    end },
+}, { __index = ISPNCUniqueNPCAppearanceWindow })
+T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCAppearanceWindow_Voice.lua")
+appearance.voicePreview = { Play = function() return true end }
+appearance:onPlayVoice()
+T.equal(waves, 1, "play voice starts a wave immediately")
+appearance.voicePreview.Play = function() return false, "voice_play_failed" end
+appearance:onPlayVoice()
+T.equal(waves, 1, "failed playback does not start a wave")
 T.finish("pnc_npc_authoring_voice_preview_smoke")

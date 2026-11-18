@@ -68,9 +68,10 @@ end
 function Map:onMouseDown(x, y)
     local region = self:HitRegion(x, y)
     self:hideTooltip()
-    if region and self.onSelect then self.onSelect(region.group, region.viewRegion) end
+    if self.onSelect then self.onSelect(region and region.group, region and region.viewRegion) end
     return true
 end
+function Map:onMouseUp() return true end
 function Map:onMouseMove()
     local region = self:HitRegion(self:getMouseX(), self:getMouseY())
     self.hovered = region and region.group

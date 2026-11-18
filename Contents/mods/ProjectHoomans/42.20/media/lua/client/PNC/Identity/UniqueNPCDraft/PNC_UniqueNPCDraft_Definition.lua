@@ -69,7 +69,7 @@ function Model.FromDefinition(definition, fileName, options)
         "npcTraits", "startingItems" }) do
         if source[key] ~= nil then output.authoredFields[key] = true end
     end
-    for _, key in ipairs({ "hairModel", "beardModel", "skinTexture",
+    for _, key in ipairs({ "hairModel", "beardModel", "hairStubble", "beardStubble", "chestHair", "skinTexture",
         "hairColor", "skinColor", "voice", "voicePrefix", "voiceType",
         "voicePitch" }) do
         if output.identity.survivor[key] ~= nil then

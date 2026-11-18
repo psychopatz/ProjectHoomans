@@ -218,7 +218,7 @@ local function buildEditorPortrait(self)
         zoom = -3,
         yOffset = 0,
         direction = IsoDirections and IsoDirections.S,
-        animSetName = false,
+        portraitAnimation = true,
         stateName = "idle",
         animate = true,
     })

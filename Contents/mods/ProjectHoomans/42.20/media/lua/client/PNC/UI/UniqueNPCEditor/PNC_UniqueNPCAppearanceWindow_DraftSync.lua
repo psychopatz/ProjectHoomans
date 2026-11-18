@@ -116,6 +116,11 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
     if self.beardCombo and self.beardCombo.setEnabled then
         self.beardCombo:setEnabled(self.draft and self.draft.isFemale ~= true)
     end
+    local female = self.draft and self.draft.isFemale == true
+    for _, field in ipairs({ "hairStubble", "beardStubble", "chestHair" }) do
+        local toggle = self[field .. "Toggle"]
+        if toggle then toggle:setSelected(1, (not female or field == "hairStubble") and survivor[field] == true) end
+    end
     if self.hairColorCombo then
         local color = survivor.hairColor
         local id = color and "custom" or "random"
@@ -140,11 +145,17 @@ function ISPNCUniqueNPCAppearanceWindow:syncFromDraft()
         for control, id in pairs({
             skinModeCombo = "appearance.skinTexture", hairCombo = "appearance.hairModel",
             beardCombo = "appearance.beardModel", hairColorCombo = "appearance.hairColor",
+            hairStubbleToggle = "appearance.hairStubble", beardStubbleToggle = "appearance.beardStubble",
+            chestHairToggle = "appearance.chestHair",
             voiceCombo = "appearance.voice", voicePitch = "appearance.voicePitch",
         }) do
             if self[control] then PNC.NPCAuthoringFields.Lock(self.parentEditor,
                 self[control], id, self.content) end
         end
+    end
+    if female then
+        setControlEnabled(self.beardStubbleToggle, false)
+        setControlEnabled(self.chestHairToggle, false)
     end
     if self.syncAdvancedVisibility then self:syncAdvancedVisibility() end
     self.syncing = false

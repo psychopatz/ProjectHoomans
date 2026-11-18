@@ -195,13 +195,11 @@ function ISPNCNPCAuthoringEditor:onAction(button)
         self.portraitDirectionIndex = ((self.portraitDirectionIndex or 1) - 1
             + (action == "rotate_left" and -1 or 1)) % #directions + 1
         self.portraitPanel.direction = directions[self.portraitDirectionIndex]
-        if self.portraitPanel.modelView then
-            self.portraitPanel.modelView:setDirection(self.portraitPanel.direction)
-        end
+        self.portraitPanel:applyCameraState()
     elseif action == "zoom_in" or action == "zoom_out" then
         self.portraitPanel.zoom = math.max(-10, math.min(15,
             (self.portraitPanel.zoom or -3) + (action == "zoom_in" and 1 or -1)))
-        if self.portraitPanel.modelView then self.portraitPanel.modelView:setZoom(self.portraitPanel.zoom) end
+        self.portraitPanel:applyCameraState()
     elseif action == "preview" then
         self.previewExpanded = not self.previewExpanded
         self:requestResponsiveLayout()

@@ -129,7 +129,7 @@ local function locations()
         for index = 0, group:size() - 1 do
             local location = group:getLocationByIndex(index)
             local id = location and location.getId and tostring(location:getId()) or nil
-            if id and id ~= "Wound" and id ~= "ZedDmg" and not seen[id] then
+            if id and not seen[id] then
                 seen[id] = true
                 output[#output + 1] = id
             end
