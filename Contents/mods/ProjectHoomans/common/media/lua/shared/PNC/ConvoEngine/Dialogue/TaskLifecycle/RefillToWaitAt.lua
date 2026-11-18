@@ -463,6 +463,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -715,8 +721,30 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
         },
         ["slots"] = {
         },
@@ -1363,6 +1391,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -1615,8 +1649,30 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
         },
         ["slots"] = {
         },

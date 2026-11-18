@@ -24,5 +24,38 @@
   "textSidecars": {
     "EN": "translations/navigation_subject_change.en.json",
     "TL": "translations/navigation_subject_change.tl.json"
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "navigation",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "navigation",
+      "domain": "navigation"
+    }
+  ],
+  "slots": {
+    "location": {
+      "type": "entity.location",
+      "required": false
+    }
+  },
+  "owner": "ProjectHoomans"
 }

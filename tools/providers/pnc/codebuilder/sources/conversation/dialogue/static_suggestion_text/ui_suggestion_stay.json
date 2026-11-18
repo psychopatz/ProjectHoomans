@@ -32,5 +32,32 @@
   "say": {
     "EN": "Wait here.",
     "TL": "Dito ka maghintay."
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "ui",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "ui_suggestion",
+      "domain": "ui"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

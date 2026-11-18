@@ -111,6 +111,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -159,6 +171,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -183,6 +201,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -341,6 +375,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -389,6 +435,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -413,6 +465,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -571,6 +639,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -619,6 +699,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -643,6 +729,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -801,6 +903,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -849,6 +963,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -873,6 +993,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1031,6 +1167,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -1079,6 +1227,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1103,6 +1257,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1261,6 +1431,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -1309,6 +1491,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1333,6 +1521,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1491,6 +1695,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -1539,6 +1755,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1563,6 +1785,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1721,6 +1959,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "medical",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_emergency",
+                    ["kind"] = "health_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
@@ -1769,6 +2019,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "medical",
+                    ["id"] = "medical_distress",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1793,6 +2049,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {

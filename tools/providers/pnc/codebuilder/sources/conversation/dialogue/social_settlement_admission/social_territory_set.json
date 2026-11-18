@@ -53,5 +53,31 @@
         "TL": "Naitakda na ang teritoryo."
       }
     }
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "settlement_relationship",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "settlement",
+      "domain": "settlement_relationship"
+    }
+  ]
 }

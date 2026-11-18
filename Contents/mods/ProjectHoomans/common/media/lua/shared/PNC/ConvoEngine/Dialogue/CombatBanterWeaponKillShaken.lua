@@ -53,6 +53,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.shaken",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Oh God... there's blood everywhere.",
@@ -111,6 +119,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -160,6 +180,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_reaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -186,7 +212,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["weapon"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_blade_head.json",
         ["target"] = {
@@ -284,6 +340,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.shaken",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Jesus... I actually hit it.",
@@ -342,6 +406,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -391,6 +467,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_reaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -417,7 +499,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["weapon"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_firearm_low.json",
         ["target"] = {
@@ -515,6 +627,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.shaken",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Oh God. I did that with my hands.",
@@ -573,6 +693,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -622,6 +754,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_reaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -648,7 +786,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["weapon"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_unarmed.json",
         ["target"] = {

@@ -20,5 +20,38 @@
         }
       }
     ]
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "integration",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "necroa",
+      "domain": "integration"
+    }
+  ],
+  "slots": {
+    "threat": {
+      "type": "entity.threat",
+      "required": false
+    }
+  },
+  "owner": "ProjectHoomans"
 }

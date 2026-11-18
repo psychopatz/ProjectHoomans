@@ -149,6 +149,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "navigation",
+            ["slots"] = {
+                ["location"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.location",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Where should we set up?",
@@ -306,6 +314,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
@@ -441,6 +455,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["id"] = "navigation",
+                },
+            },
         },
         ["references"] = {
         },
@@ -467,7 +487,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["location"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.location",
+            },
         },
         ["sourceShard"] = "dialogue/navigation/navigation_camp.json",
         ["target"] = {
@@ -760,6 +802,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "navigation",
+            ["slots"] = {
+                ["location"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.location",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "I don't see a good place to set up here.",
@@ -917,6 +967,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
@@ -1052,6 +1108,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["id"] = "navigation",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1078,7 +1140,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["location"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.location",
+            },
         },
         ["sourceShard"] = "dialogue/navigation/navigation_camp_empty.json",
         ["target"] = {
@@ -1371,6 +1455,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "navigation",
+            ["slots"] = {
+                ["location"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.location",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "All right. What would you like to discuss?",
@@ -1528,6 +1620,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
@@ -1663,6 +1761,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["id"] = "navigation",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1689,7 +1793,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["location"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.location",
+            },
         },
         ["sourceShard"] = "dialogue/navigation/navigation_default.json",
         ["target"] = {
@@ -1982,6 +2108,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "navigation",
+            ["slots"] = {
+                ["location"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.location",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "All right. What do you need?",
@@ -2139,6 +2273,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
@@ -2274,6 +2414,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["id"] = "navigation",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2300,7 +2446,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["location"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.location",
+            },
         },
         ["sourceShard"] = "dialogue/navigation/navigation_orders.json",
         ["target"] = {
@@ -2593,6 +2761,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "navigation",
+            ["slots"] = {
+                ["location"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.location",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "All right. What did you want to talk about?",
@@ -2750,6 +2926,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
@@ -2885,6 +3067,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "navigation",
+                    ["id"] = "navigation",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2911,7 +3099,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["location"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.location",
+            },
         },
         ["sourceShard"] = "dialogue/navigation/navigation_subject_change.json",
         ["target"] = {

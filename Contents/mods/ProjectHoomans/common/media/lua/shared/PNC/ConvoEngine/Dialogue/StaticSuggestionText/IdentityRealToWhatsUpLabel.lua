@@ -8,6 +8,358 @@ return {
                 ["consumers"] = {
                     "player",
                 },
+                ["labelFallback"] = "Say your real name",
+                ["labelKey"] = "convo.ui.suggestion.identity.real.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Say your real name",
+                    },
+                    ["TL"] = {
+                        "Sabihin ang tunay mong pangalan",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.identity.real",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I'm {slot.identity_claim.name}.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I'm {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "My name's {slot.identity_claim.name}.",
+                                        "My name is {slot.identity_claim.name}.",
+                                        "It's {slot.identity_claim.name}.",
+                                        "Name's {slot.identity_claim.name}.",
+                                        "You can call me {slot.identity_claim.name}.",
+                                        "They call me {slot.identity_claim.name}.",
+                                        "I go by {slot.identity_claim.name}.",
+                                        "The name's {slot.identity_claim.name}.",
+                                        "Call me {slot.identity_claim.name}.",
+                                        "Folks call me {slot.identity_claim.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Ako si {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                                        "Pangalan ko'y {slot.identity_claim.name}.",
+                                        "Si {slot.identity_claim.name} ito.",
+                                        "{slot.identity_claim.name} ang pangalan ko.",
+                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                                        "Kilala ako bilang {slot.identity_claim.name}.",
+                                        "Ako nga pala si {slot.identity_claim.name}.",
+                                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion.identity",
+            ["slots"] = {
+                ["identity_claim"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "fact",
+                },
+            },
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Say your real name",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.identity.real.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Say your real name",
+                        },
+                        ["TL"] = {
+                            "Sabihin ang tunay mong pangalan",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "I'm {slot.identity_claim.name}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'm {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name}.",
+                            "My name's {slot.identity_claim.name}.",
+                            "My name is {slot.identity_claim.name}.",
+                            "It's {slot.identity_claim.name}.",
+                            "Name's {slot.identity_claim.name}.",
+                            "You can call me {slot.identity_claim.name}.",
+                            "They call me {slot.identity_claim.name}.",
+                            "I go by {slot.identity_claim.name}.",
+                            "The name's {slot.identity_claim.name}.",
+                            "Call me {slot.identity_claim.name}.",
+                            "Folks call me {slot.identity_claim.name}.",
+                        },
+                        ["TL"] = {
+                            "Ako si {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name}.",
+                            "Ang pangalan ko ay {slot.identity_claim.name}.",
+                            "Pangalan ko'y {slot.identity_claim.name}.",
+                            "Si {slot.identity_claim.name} ito.",
+                            "{slot.identity_claim.name} ang pangalan ko.",
+                            "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                            "{slot.identity_claim.name} ang tawag nila sa akin.",
+                            "Kilala ako bilang {slot.identity_claim.name}.",
+                            "Ako nga pala si {slot.identity_claim.name}.",
+                            "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                            "Lagi akong tinatawag na {slot.identity_claim.name}.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.identity.real",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "real",
+            ["sourceId"] = "ui.suggestion.identity.real",
+            ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
+        ["namespace"] = "ui.suggestion.identity",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Say your real name",
+                    },
+                    ["TL"] = {
+                        "Sabihin ang tunay mong pangalan",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.identity.real.label",
+                        ["text"] = {
+                            ["EN"] = "Say your real name",
+                            ["TL"] = "Sabihin ang tunay mong pangalan",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I'm {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "My name's {slot.identity_claim.name}.",
+                                        "My name is {slot.identity_claim.name}.",
+                                        "It's {slot.identity_claim.name}.",
+                                        "Name's {slot.identity_claim.name}.",
+                                        "You can call me {slot.identity_claim.name}.",
+                                        "They call me {slot.identity_claim.name}.",
+                                        "I go by {slot.identity_claim.name}.",
+                                        "The name's {slot.identity_claim.name}.",
+                                        "Call me {slot.identity_claim.name}.",
+                                        "Folks call me {slot.identity_claim.name}.",
+                                    },
+                                    ["TL"] = {
+                                        "Ako si {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name}.",
+                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                                        "Pangalan ko'y {slot.identity_claim.name}.",
+                                        "Si {slot.identity_claim.name} ito.",
+                                        "{slot.identity_claim.name} ang pangalan ko.",
+                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                                        "Kilala ako bilang {slot.identity_claim.name}.",
+                                        "Ako nga pala si {slot.identity_claim.name}.",
+                                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.identity.real",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I'm {slot.identity_claim.name}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.ui.suggestion.identity.real.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
+        ["slots"] = {
+            ["identity_claim"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "fact",
+            },
+        },
+        ["sourceShard"] = "dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Say your real name",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.identity.real.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Say your real name",
+                    },
+                    ["TL"] = {
+                        "Sabihin ang tunay mong pangalan",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "I'm {slot.identity_claim.name}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'm {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name}.",
+                        "My name's {slot.identity_claim.name}.",
+                        "My name is {slot.identity_claim.name}.",
+                        "It's {slot.identity_claim.name}.",
+                        "Name's {slot.identity_claim.name}.",
+                        "You can call me {slot.identity_claim.name}.",
+                        "They call me {slot.identity_claim.name}.",
+                        "I go by {slot.identity_claim.name}.",
+                        "The name's {slot.identity_claim.name}.",
+                        "Call me {slot.identity_claim.name}.",
+                        "Folks call me {slot.identity_claim.name}.",
+                    },
+                    ["TL"] = {
+                        "Ako si {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name}.",
+                        "Ang pangalan ko ay {slot.identity_claim.name}.",
+                        "Pangalan ko'y {slot.identity_claim.name}.",
+                        "Si {slot.identity_claim.name} ito.",
+                        "{slot.identity_claim.name} ang pangalan ko.",
+                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
+                        "{slot.identity_claim.name} ang tawag nila sa akin.",
+                        "Kilala ako bilang {slot.identity_claim.name}.",
+                        "Ako nga pala si {slot.identity_claim.name}.",
+                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
+                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["domainPath"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
                 ["labelFallback"] = "Don't tell your name",
                 ["labelKey"] = "convo.ui.suggestion.identity.rude.affordance.label",
                 ["textRole"] = "button_label",
@@ -120,7 +472,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -145,6 +497,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -205,6 +563,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -229,6 +593,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -348,7 +728,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_needs_destination_tooltip.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.needs_destination",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -360,6 +740,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.needs_destination.tooltip",
                 ["textRows"] = {
@@ -399,6 +785,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -423,6 +815,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -544,7 +952,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -569,6 +977,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -615,6 +1029,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -639,6 +1059,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -773,7 +1209,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_stay.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -798,6 +1234,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -844,6 +1286,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -868,6 +1316,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -973,7 +1437,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_talk_again_about_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.talk_again_about",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -985,6 +1449,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.talk_again_about.label",
                 ["textRows"] = {
@@ -1024,6 +1494,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1048,6 +1524,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1140,7 +1632,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_talk_something_else_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.talk_something_else",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1152,6 +1644,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.talk_something_else.label",
                 ["textRows"] = {
@@ -1191,6 +1689,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1215,6 +1719,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1336,7 +1856,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_trade.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1361,6 +1881,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -1407,6 +1933,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1431,6 +1963,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1536,7 +2084,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_unavailable_tooltip.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.unavailable",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1548,6 +2096,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.unavailable.tooltip",
                 ["textRows"] = {
@@ -1587,6 +2141,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1611,6 +2171,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1732,7 +2308,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_wait_at.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1757,6 +2333,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -1803,6 +2385,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1827,6 +2415,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1932,7 +2536,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_whats_up_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRealToWhatsUpLabel",
         ["namespace"] = "ui.suggestion.whats_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1944,6 +2548,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.whats_up.label",
                 ["textRows"] = {
@@ -1983,6 +2593,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2007,6 +2623,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {

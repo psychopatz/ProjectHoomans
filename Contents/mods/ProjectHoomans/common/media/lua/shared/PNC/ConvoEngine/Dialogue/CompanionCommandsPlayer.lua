@@ -79,8 +79,20 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
             ["closure"] = {
                 ["closureClass"] = "state_transition",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["inputPolicy"] = "typed_parity",
             ["invoke"] = {
@@ -196,6 +208,12 @@ return {
                     ["reason"] = "ready",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -220,6 +238,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -328,8 +370,20 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
             ["closure"] = {
                 ["closureClass"] = "state_transition",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["inputPolicy"] = "typed_parity",
             ["invoke"] = {
@@ -428,6 +482,12 @@ return {
                     ["reason"] = "ready",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -452,6 +512,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -560,8 +644,20 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
             ["closure"] = {
                 ["closureClass"] = "state_transition",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["inputPolicy"] = "typed_parity",
             ["invoke"] = {
@@ -660,6 +756,12 @@ return {
                     ["reason"] = "ready",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -684,6 +786,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -796,6 +922,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -831,6 +969,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -855,6 +999,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -971,6 +1139,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1006,6 +1186,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1030,6 +1216,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1146,6 +1356,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1181,6 +1403,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1205,6 +1433,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1321,6 +1573,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1356,6 +1620,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1380,6 +1650,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1504,6 +1798,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1543,6 +1849,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1567,6 +1879,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1679,6 +2015,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1710,6 +2058,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1734,6 +2088,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1846,6 +2224,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1881,6 +2271,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1905,6 +2301,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -2021,6 +2441,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2056,6 +2488,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2080,6 +2518,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -2188,6 +2650,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2219,6 +2693,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2243,6 +2723,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -2355,6 +2859,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2390,6 +2906,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2414,6 +2936,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -2530,6 +3076,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2565,6 +3123,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2589,6 +3153,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {

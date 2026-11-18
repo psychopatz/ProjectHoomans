@@ -37,5 +37,38 @@
         }
       }
     ]
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "medical",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "medical_distress",
+      "domain": "medical"
+    }
+  ],
+  "events": [
+    {
+      "id": "medical_emergency",
+      "kind": "health_event"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

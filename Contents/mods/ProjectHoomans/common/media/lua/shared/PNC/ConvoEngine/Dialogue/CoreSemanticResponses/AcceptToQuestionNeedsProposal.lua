@@ -100,7 +100,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/accept.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -111,6 +111,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "ACCEPT",
                 ["responsePoolID"] = "accept",
@@ -172,6 +178,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -196,6 +208,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -330,7 +358,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/compliment.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -341,6 +369,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "COMPLIMENT",
                 ["responsePoolID"] = "compliment",
@@ -390,6 +424,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -414,6 +454,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -526,7 +582,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/flow_weather_raining.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "flow.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -538,6 +594,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "RAINING",
                 ["responsePoolID"] = "flow.weather.raining",
@@ -611,6 +673,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -635,6 +703,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -783,7 +867,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/greeting.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -794,6 +878,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "GREETING",
                 ["responsePoolID"] = "greeting",
@@ -858,6 +948,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -882,6 +978,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1069,7 +1181,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/offer.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1080,6 +1192,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "OFFER",
                 ["responsePoolID"] = "offer",
@@ -1169,6 +1287,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1193,6 +1317,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1358,7 +1498,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_activity.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1370,6 +1510,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "ACTIVITY",
                 ["responsePoolID"] = "question.activity",
@@ -1434,6 +1580,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1458,6 +1610,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1580,7 +1748,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_ambiguous.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1592,6 +1760,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "AMBIGUOUS",
                 ["responsePoolID"] = "question.backstory.ambiguous",
@@ -1626,6 +1806,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1650,6 +1836,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -1742,7 +1952,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_follow_up_location.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.follow_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1754,6 +1964,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "LOCATION",
                 ["responsePoolID"] = "question.backstory.follow_up.location",
@@ -1788,6 +2010,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1812,6 +2040,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -1904,7 +2156,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_follow_up_miss.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.follow_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1916,6 +2168,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "MISS",
                 ["responsePoolID"] = "question.backstory.follow_up.miss",
@@ -1950,6 +2214,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1974,6 +2244,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -2066,7 +2360,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2078,6 +2372,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "KNOWN",
                 ["responsePoolID"] = "question.backstory.known",
@@ -2115,6 +2421,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2139,6 +2451,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -2231,7 +2567,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known_education.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2243,6 +2579,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "EDUCATION",
                 ["responsePoolID"] = "question.backstory.known.education",
@@ -2280,6 +2628,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2304,6 +2658,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -2396,7 +2774,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known_family_background.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2408,6 +2786,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "FAMILY_BACKGROUND",
                 ["responsePoolID"] = "question.backstory.known.family_background",
@@ -2445,6 +2835,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2469,6 +2865,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -2561,7 +2981,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known_fear.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2573,6 +2993,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "FEAR",
                 ["responsePoolID"] = "question.backstory.known.fear",
@@ -2610,6 +3042,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2634,6 +3072,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -2726,7 +3188,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known_former_job.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2738,6 +3200,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "FORMER_JOB",
                 ["responsePoolID"] = "question.backstory.known.former_job",
@@ -2775,6 +3249,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2799,6 +3279,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -2891,7 +3395,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known_hobby.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2903,6 +3407,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "HOBBY",
                 ["responsePoolID"] = "question.backstory.known.hobby",
@@ -2940,6 +3456,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2964,6 +3486,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -3056,7 +3602,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known_hometown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3068,6 +3614,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "HOMETOWN",
                 ["responsePoolID"] = "question.backstory.known.hometown",
@@ -3105,6 +3663,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3129,6 +3693,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -3221,7 +3809,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_known_tragedy.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3233,6 +3821,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "TRAGEDY",
                 ["responsePoolID"] = "question.backstory.known.tragedy",
@@ -3270,6 +3870,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3294,6 +3900,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -3386,7 +4016,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_refusal.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3398,6 +4028,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "REFUSAL",
                 ["responsePoolID"] = "question.backstory.refusal",
@@ -3432,6 +4074,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3456,6 +4104,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -3548,7 +4220,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_backstory_suspected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3560,6 +4232,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["memories"] = {
+                {
+                    ["id"] = "backstory_memory",
+                    ["scope"] = "durable",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "SUSPECTED",
                 ["responsePoolID"] = "question.backstory.suspected",
@@ -3597,6 +4281,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "backstory",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3621,6 +4311,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
             },
         },
         ["slots"] = {
@@ -3732,7 +4446,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_needs_proposal.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsProposal",
         ["namespace"] = "question.needs",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3744,6 +4458,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "needs",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "PROPOSAL",
                 ["responsePoolID"] = "question.needs.proposal",
@@ -3830,6 +4550,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "needs",
+                    ["id"] = "needs",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3856,6 +4582,22 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
         },
         ["sourceShard"] = "dialogue/core_semantic_responses/question_needs_proposal.json",
@@ -3879,229 +4621,6 @@ return {
                     },
                 },
                 ["variantID"] = "question.needs.proposal.dataset.thirst",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "core_semantic_responses",
-        ["domainPath"] = "core_semantic_responses",
-        ["exchangeFamily"] = {
-            ["familyID"] = "question.needs.quantity",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "I can confirm water is a need, but which item do you mean?",
-                                ["id"] = "question.needs.quantity.dataset.clarify_thirst",
-                                ["templateID"] = "convo.question.needs.quantity.say.1.question.needs.quantity.dataset.clarify_thirst",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I can confirm water is a need, but which item do you mean?",
-                                    },
-                                    ["TL"] = {
-                                        "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
-                                    },
-                                },
-                                ["when"] = {
-                                    ["all"] = {
-                                        {
-                                            ["op"] = "eq",
-                                            ["path"] = "conversation.lastIntent",
-                                            ["value"] = "CLARIFY",
-                                        },
-                                        {
-                                            ["op"] = "eq",
-                                            ["path"] = "conversation.needType",
-                                            ["value"] = "thirst",
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "question.needs",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "I can confirm water is a need, but which item do you mean?",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.question.needs.quantity.say.1.question.needs.quantity.dataset.clarify_thirst",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I can confirm water is a need, but which item do you mean?",
-                        },
-                        ["TL"] = {
-                            "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
-                        },
-                    },
-                    ["variantID"] = "question.needs.quantity.dataset.clarify_thirst",
-                },
-            },
-        },
-        ["id"] = "question.needs.quantity",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "quantity",
-            ["sourceId"] = "question.needs.quantity",
-            ["sourcePath"] = "dialogue/core_semantic_responses/question_needs_quantity.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
-        ["namespace"] = "question.needs",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["responseAct"] = "QUANTITY",
-                ["responsePoolID"] = "question.needs.quantity",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "question.needs.quantity.dataset.clarify_thirst",
-                                ["metadata"] = {
-                                    ["fallback"] = "I can confirm water is a need, but which item do you mean?",
-                                    ["plan"] = {
-                                        ["dialogueAct"] = "ASK_CLARIFICATION",
-                                        ["groundedFactRefs"] = {
-                                            "npc.needs.thirst",
-                                        },
-                                        ["sourcePoolID"] = "semantic.question.needs.quantity",
-                                        ["tone"] = "clarifying",
-                                        ["topic"] = "NEEDS",
-                                        ["turns"] = {
-                                            {
-                                                ["continuation"] = "continue",
-                                                ["id"] = "dataset_needs_clarification",
-                                                ["segments"] = {
-                                                    {
-                                                        ["fallback"] = "I can confirm water is a need, but which item do you mean?",
-                                                        ["kind"] = "translation",
-                                                        ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
-                                                        ["translations"] = {
-                                                            ["EN"] = "I can confirm water is a need, but which item do you mean?",
-                                                            ["TL"] = "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                        },
-                                        ["uncertainty"] = "ambiguous",
-                                    },
-                                    ["priority"] = 4,
-                                    ["reviewed"] = true,
-                                    ["sourceRefs"] = {
-                                        "MASSIVE",
-                                        "SGD",
-                                    },
-                                    ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I can confirm water is a need, but which item do you mean?",
-                                    },
-                                    ["TL"] = {
-                                        "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
-                                    },
-                                },
-                                ["when"] = {
-                                    ["all"] = {
-                                        {
-                                            ["op"] = "eq",
-                                            ["path"] = "conversation.lastIntent",
-                                            ["value"] = "CLARIFY",
-                                        },
-                                        {
-                                            ["op"] = "eq",
-                                            ["path"] = "conversation.needType",
-                                            ["value"] = "thirst",
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "QUANTITY",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "question.needs.quantity",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "I can confirm water is a need, but which item do you mean?",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.question.needs.quantity.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/core_semantic_responses/question_needs_quantity.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "I can confirm water is a need, but which item do you mean?",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.question.needs.quantity.say.1.question.needs.quantity.dataset.clarify_thirst",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I can confirm water is a need, but which item do you mean?",
-                    },
-                    ["TL"] = {
-                        "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
-                    },
-                },
-                ["variantID"] = "question.needs.quantity.dataset.clarify_thirst",
             },
         },
         ["when"] = nil,

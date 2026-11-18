@@ -53,6 +53,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.brave",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "One chop. Done.",
@@ -111,6 +119,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -160,6 +180,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_reaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -186,7 +212,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["weapon"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
         ["target"] = {
@@ -284,6 +340,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.brave",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Clean cut. Next.",
@@ -342,6 +406,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -391,6 +467,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_reaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -417,7 +499,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["weapon"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head.json",
         ["target"] = {
@@ -515,6 +627,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.brave",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Dead center. Keep moving.",
@@ -573,6 +693,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -622,6 +754,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_reaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -648,7 +786,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["weapon"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high.json",
         ["target"] = {
@@ -746,6 +914,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.brave",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Kept it right where I wanted it.",
@@ -804,6 +980,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -853,6 +1041,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_reaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -879,7 +1073,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["weapon"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear.json",
         ["target"] = {

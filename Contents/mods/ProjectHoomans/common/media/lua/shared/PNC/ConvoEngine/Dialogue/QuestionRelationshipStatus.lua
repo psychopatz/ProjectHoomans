@@ -75,6 +75,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textRows"] = {
                     {
@@ -183,6 +189,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["id"] = "relationship",
+                },
+            },
         },
         ["references"] = {
         },
@@ -207,6 +219,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -467,6 +495,12 @@ return {
             ["closure"] = {
                 ["closureClass"] = "state_transition",
             },
+            ["domains"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["inputPolicy"] = "typed_parity",
             ["invoke"] = {
                 ["action"] = "RELATIONSHIP_PROPOSAL",
@@ -618,6 +652,12 @@ return {
                     ["reason"] = "ready",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["id"] = "relationship",
+                },
+            },
         },
         ["references"] = {
         },
@@ -642,6 +682,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {

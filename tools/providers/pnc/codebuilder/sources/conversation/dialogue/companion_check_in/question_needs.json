@@ -43,5 +43,32 @@
   "say": {
     "EN": "Do you need anything?",
     "TL": "May kailangan ka ba?"
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "needs",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "needs",
+      "domain": "needs"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

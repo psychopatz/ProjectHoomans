@@ -25,5 +25,32 @@
   "textSidecars": {
     "EN": "translations/question_needs_offer_hunger.en.json",
     "TL": "translations/question_needs_offer_hunger.tl.json"
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "needs",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "needs",
+      "domain": "needs"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

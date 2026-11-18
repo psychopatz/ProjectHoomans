@@ -231,6 +231,12 @@ return {
             ["closure"] = {
                 ["closureClass"] = "state_transition",
             },
+            ["domains"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["inputPolicy"] = "typed_parity",
             ["invoke"] = {
                 ["action"] = "RECRUIT",
@@ -405,6 +411,12 @@ return {
                     ["reason"] = "ready",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["id"] = "settlement",
+                },
+            },
         },
         ["references"] = {
         },
@@ -429,6 +441,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -589,6 +617,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["audiences"] = {
                     "neutral",
@@ -663,6 +697,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -687,6 +727,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -906,6 +962,12 @@ return {
             ["closure"] = {
                 ["closureClass"] = "state_transition",
             },
+            ["domains"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["inputPolicy"] = "typed_parity",
             ["invoke"] = {
                 ["action"] = "SET_TERRITORY",
@@ -1023,6 +1085,12 @@ return {
                     ["reason"] = "ready",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "settlement_relationship",
+                    ["id"] = "settlement",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1047,6 +1115,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {

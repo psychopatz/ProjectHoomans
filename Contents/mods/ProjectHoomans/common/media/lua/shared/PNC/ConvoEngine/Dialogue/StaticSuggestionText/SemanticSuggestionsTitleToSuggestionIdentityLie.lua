@@ -63,7 +63,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.semantic_suggestions",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -75,6 +75,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "semantic_suggestions.title",
                 ["textRows"] = {
@@ -114,6 +120,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -138,6 +150,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -230,7 +258,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_availability_tooltips.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.availability",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -242,6 +270,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textRows"] = {
                     {
@@ -350,6 +384,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -374,6 +414,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -466,7 +522,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_back_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.back",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -478,6 +534,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.back.label",
                 ["textRows"] = {
@@ -517,6 +579,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -541,6 +609,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -662,7 +746,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_check_in.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -687,6 +771,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -733,6 +823,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -757,6 +853,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -963,7 +1075,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_companion_camp.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -988,6 +1100,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -1084,6 +1202,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1108,6 +1232,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1243,7 +1383,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_companion_orders_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.companion_orders",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1255,6 +1395,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.companion_orders.label",
                 ["textRows"] = {
@@ -1294,6 +1440,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1318,6 +1470,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1439,7 +1607,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_follow.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1464,6 +1632,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -1510,6 +1684,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1534,6 +1714,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1668,7 +1864,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1693,6 +1889,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -1739,6 +1941,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1763,6 +1971,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1897,7 +2121,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_greeting_thank.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1922,6 +2146,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -1968,6 +2198,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1992,6 +2228,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2097,7 +2349,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_actions_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.actions",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2109,6 +2361,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.actions.label",
                 ["textRows"] = {
@@ -2148,6 +2406,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2172,6 +2436,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2264,7 +2544,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_flow_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.flow",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2276,6 +2556,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.flow.label",
                 ["textRows"] = {
@@ -2315,6 +2601,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2339,6 +2631,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2431,7 +2739,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_identity_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2443,6 +2751,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.identity.label",
                 ["textRows"] = {
@@ -2482,6 +2796,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2506,6 +2826,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2598,7 +2934,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_landing_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.landing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2610,6 +2946,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.landing.label",
                 ["textRows"] = {
@@ -2649,6 +2991,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2673,6 +3021,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2765,7 +3129,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_medical_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.medical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2777,6 +3141,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.medical.label",
                 ["textRows"] = {
@@ -2816,6 +3186,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2840,6 +3216,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2932,7 +3324,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_movement_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.movement",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2944,6 +3336,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.movement.label",
                 ["textRows"] = {
@@ -2983,6 +3381,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3007,6 +3411,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3099,7 +3519,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_needs_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.needs",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3111,6 +3531,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.needs.label",
                 ["textRows"] = {
@@ -3150,6 +3576,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3174,6 +3606,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3266,7 +3714,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_response_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.response",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3278,6 +3726,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.response.label",
                 ["textRows"] = {
@@ -3317,6 +3771,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3341,6 +3801,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3433,7 +3909,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_time_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.time",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3445,6 +3921,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.time.label",
                 ["textRows"] = {
@@ -3484,6 +3966,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3508,6 +3996,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3600,7 +4104,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_utilities_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.utilities",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3612,6 +4116,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.utilities.label",
                 ["textRows"] = {
@@ -3651,6 +4161,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3675,6 +4191,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3767,7 +4299,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_weather_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3779,6 +4311,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.weather.label",
                 ["textRows"] = {
@@ -3818,6 +4356,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3842,6 +4386,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3934,7 +4494,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_wellbeing_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3946,6 +4506,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.wellbeing.label",
                 ["textRows"] = {
@@ -3985,6 +4551,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -4009,6 +4581,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -4101,7 +4689,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_group_whats_up_label.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.group.whats_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -4113,6 +4701,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textKey"] = "suggestion.group.whats_up.label",
                 ["textRows"] = {
@@ -4152,6 +4746,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -4176,6 +4776,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -4349,7 +4965,7 @@ return {
             ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_identity_lie.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityLie",
         ["namespace"] = "ui.suggestion.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -4374,6 +4990,12 @@ return {
                     },
                 },
                 ["textRole"] = "button_label",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "ui",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["metadata"] = {
                 ["textRows"] = {
@@ -4435,6 +5057,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "ui",
+                    ["id"] = "ui_suggestion",
+                },
+            },
         },
         ["references"] = {
         },
@@ -4459,6 +5087,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -4522,330 +5166,6 @@ return {
                         "Sabihin na nating {slot.identity_claim.name}.",
                         "{slot.identity_claim.name}. Iyan ang tawag sa akin.",
                         "Magpapakilala akong si {slot.identity_claim.name}.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["domainPath"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["labelFallback"] = "Say your real name",
-                ["labelKey"] = "convo.ui.suggestion.identity.real.affordance.label",
-                ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Say your real name",
-                    },
-                    ["TL"] = {
-                        "Sabihin ang tunay mong pangalan",
-                    },
-                },
-            },
-            ["familyID"] = "ui.suggestion.identity.real",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "keyed",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "I'm {slot.identity_claim.name}.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm {slot.identity_claim.name}.",
-                                        "{slot.identity_claim.name}.",
-                                        "My name's {slot.identity_claim.name}.",
-                                        "My name is {slot.identity_claim.name}.",
-                                        "It's {slot.identity_claim.name}.",
-                                        "Name's {slot.identity_claim.name}.",
-                                        "You can call me {slot.identity_claim.name}.",
-                                        "They call me {slot.identity_claim.name}.",
-                                        "I go by {slot.identity_claim.name}.",
-                                        "The name's {slot.identity_claim.name}.",
-                                        "Call me {slot.identity_claim.name}.",
-                                        "Folks call me {slot.identity_claim.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "Ako si {slot.identity_claim.name}.",
-                                        "{slot.identity_claim.name}.",
-                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
-                                        "Pangalan ko'y {slot.identity_claim.name}.",
-                                        "Si {slot.identity_claim.name} ito.",
-                                        "{slot.identity_claim.name} ang pangalan ko.",
-                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
-                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
-                                        "Kilala ako bilang {slot.identity_claim.name}.",
-                                        "Ako nga pala si {slot.identity_claim.name}.",
-                                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
-                                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.identity",
-            ["slots"] = {
-                ["identity_claim"] = {
-                    ["multiple"] = false,
-                    ["public"] = true,
-                    ["required"] = false,
-                    ["type"] = "fact",
-                },
-            },
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Say your real name",
-                    ["role"] = "button_label",
-                    ["templateID"] = "convo.ui.suggestion.identity.real.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Say your real name",
-                        },
-                        ["TL"] = {
-                            "Sabihin ang tunay mong pangalan",
-                        },
-                    },
-                },
-                {
-                    ["fallback"] = "I'm {slot.identity_claim.name}.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm {slot.identity_claim.name}.",
-                            "{slot.identity_claim.name}.",
-                            "My name's {slot.identity_claim.name}.",
-                            "My name is {slot.identity_claim.name}.",
-                            "It's {slot.identity_claim.name}.",
-                            "Name's {slot.identity_claim.name}.",
-                            "You can call me {slot.identity_claim.name}.",
-                            "They call me {slot.identity_claim.name}.",
-                            "I go by {slot.identity_claim.name}.",
-                            "The name's {slot.identity_claim.name}.",
-                            "Call me {slot.identity_claim.name}.",
-                            "Folks call me {slot.identity_claim.name}.",
-                        },
-                        ["TL"] = {
-                            "Ako si {slot.identity_claim.name}.",
-                            "{slot.identity_claim.name}.",
-                            "Ang pangalan ko ay {slot.identity_claim.name}.",
-                            "Pangalan ko'y {slot.identity_claim.name}.",
-                            "Si {slot.identity_claim.name} ito.",
-                            "{slot.identity_claim.name} ang pangalan ko.",
-                            "Tawagin mo na lang akong {slot.identity_claim.name}.",
-                            "{slot.identity_claim.name} ang tawag nila sa akin.",
-                            "Kilala ako bilang {slot.identity_claim.name}.",
-                            "Ako nga pala si {slot.identity_claim.name}.",
-                            "Pwede mo akong tawaging {slot.identity_claim.name}.",
-                            "Lagi akong tinatawag na {slot.identity_claim.name}.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.identity.real",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "real",
-            ["sourceId"] = "ui.suggestion.identity.real",
-            ["sourcePath"] = "dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
-        ["namespace"] = "ui.suggestion.identity",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["affordance"] = {
-                ["consumers"] = {
-                    "player",
-                },
-                ["label"] = {
-                    ["EN"] = {
-                        "Say your real name",
-                    },
-                    ["TL"] = {
-                        "Sabihin ang tunay mong pangalan",
-                    },
-                },
-                ["textRole"] = "button_label",
-            },
-            ["metadata"] = {
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.identity.real.label",
-                        ["text"] = {
-                            ["EN"] = "Say your real name",
-                            ["TL"] = "Sabihin ang tunay mong pangalan",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "keyed",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm {slot.identity_claim.name}.",
-                                        "{slot.identity_claim.name}.",
-                                        "My name's {slot.identity_claim.name}.",
-                                        "My name is {slot.identity_claim.name}.",
-                                        "It's {slot.identity_claim.name}.",
-                                        "Name's {slot.identity_claim.name}.",
-                                        "You can call me {slot.identity_claim.name}.",
-                                        "They call me {slot.identity_claim.name}.",
-                                        "I go by {slot.identity_claim.name}.",
-                                        "The name's {slot.identity_claim.name}.",
-                                        "Call me {slot.identity_claim.name}.",
-                                        "Folks call me {slot.identity_claim.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "Ako si {slot.identity_claim.name}.",
-                                        "{slot.identity_claim.name}.",
-                                        "Ang pangalan ko ay {slot.identity_claim.name}.",
-                                        "Pangalan ko'y {slot.identity_claim.name}.",
-                                        "Si {slot.identity_claim.name} ito.",
-                                        "{slot.identity_claim.name} ang pangalan ko.",
-                                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
-                                        "{slot.identity_claim.name} ang tawag nila sa akin.",
-                                        "Kilala ako bilang {slot.identity_claim.name}.",
-                                        "Ako nga pala si {slot.identity_claim.name}.",
-                                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
-                                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.identity.real",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "I'm {slot.identity_claim.name}.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.ui.suggestion.identity.real.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-            ["identity_claim"] = {
-                ["multiple"] = false,
-                ["public"] = true,
-                ["required"] = false,
-                ["type"] = "fact",
-            },
-        },
-        ["sourceShard"] = "dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Say your real name",
-                ["role"] = "button_label",
-                ["templateID"] = "convo.ui.suggestion.identity.real.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Say your real name",
-                    },
-                    ["TL"] = {
-                        "Sabihin ang tunay mong pangalan",
-                    },
-                },
-            },
-            {
-                ["fallback"] = "I'm {slot.identity_claim.name}.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm {slot.identity_claim.name}.",
-                        "{slot.identity_claim.name}.",
-                        "My name's {slot.identity_claim.name}.",
-                        "My name is {slot.identity_claim.name}.",
-                        "It's {slot.identity_claim.name}.",
-                        "Name's {slot.identity_claim.name}.",
-                        "You can call me {slot.identity_claim.name}.",
-                        "They call me {slot.identity_claim.name}.",
-                        "I go by {slot.identity_claim.name}.",
-                        "The name's {slot.identity_claim.name}.",
-                        "Call me {slot.identity_claim.name}.",
-                        "Folks call me {slot.identity_claim.name}.",
-                    },
-                    ["TL"] = {
-                        "Ako si {slot.identity_claim.name}.",
-                        "{slot.identity_claim.name}.",
-                        "Ang pangalan ko ay {slot.identity_claim.name}.",
-                        "Pangalan ko'y {slot.identity_claim.name}.",
-                        "Si {slot.identity_claim.name} ito.",
-                        "{slot.identity_claim.name} ang pangalan ko.",
-                        "Tawagin mo na lang akong {slot.identity_claim.name}.",
-                        "{slot.identity_claim.name} ang tawag nila sa akin.",
-                        "Kilala ako bilang {slot.identity_claim.name}.",
-                        "Ako nga pala si {slot.identity_claim.name}.",
-                        "Pwede mo akong tawaging {slot.identity_claim.name}.",
-                        "Lagi akong tinatawag na {slot.identity_claim.name}.",
                     },
                 },
                 ["variantID"] = "neutral",

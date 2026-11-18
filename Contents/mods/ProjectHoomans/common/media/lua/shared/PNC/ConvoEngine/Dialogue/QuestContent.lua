@@ -164,6 +164,14 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["slots"] = {
+                ["item"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "I couldn't accept that request.",
@@ -291,6 +299,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "quest",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
@@ -445,10 +459,38 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "quest",
+                    ["id"] = "quest",
+                },
+            },
         },
         ["references"] = {
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["item"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_accept.json",
         ["target"] = {
@@ -726,6 +768,14 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["slots"] = {
+                ["item"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "I couldn't check that clinic-supplies request.",
@@ -853,6 +903,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "quest",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
@@ -1007,10 +1063,38 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "quest",
+                    ["id"] = "quest",
+                },
+            },
         },
         ["references"] = {
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["item"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_offer.json",
         ["target"] = {
@@ -1288,6 +1372,14 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["slots"] = {
+                ["item"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "I couldn't check that request.",
@@ -1415,6 +1507,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "quest",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
@@ -1569,10 +1667,38 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "quest",
+                    ["id"] = "quest",
+                },
+            },
         },
         ["references"] = {
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["item"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_status.json",
         ["target"] = {
@@ -1850,6 +1976,14 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["slots"] = {
+                ["item"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "I couldn't turn in the clinic supplies.",
@@ -1977,6 +2111,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "quest",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
@@ -2131,10 +2271,38 @@ return {
                     ["textRole"] = "response",
                 },
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "quest",
+                    ["id"] = "quest",
+                },
+            },
         },
         ["references"] = {
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["item"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
         },
         ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_turn_in.json",
         ["target"] = {

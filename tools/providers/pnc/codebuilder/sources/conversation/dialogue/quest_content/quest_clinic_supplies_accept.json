@@ -94,5 +94,38 @@
         ]
       }
     }
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "quest",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "quest",
+      "domain": "quest"
+    }
+  ],
+  "slots": {
+    "item": {
+      "type": "entity.item",
+      "required": false
+    }
+  },
+  "owner": "ProjectHoomans"
 }

@@ -22,7 +22,11 @@
       "when": {
         "path": "relationship.state",
         "op": "in",
-        "values": ["lover", "partner", "spouse"]
+        "values": [
+          "lover",
+          "partner",
+          "spouse"
+        ]
       },
       "outcome": "already_satisfied",
       "reason": "already_partner",
@@ -59,5 +63,31 @@
         "TL": "Hindi pa ako handa para diyan."
       }
     }
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "settlement_relationship",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "relationship",
+      "domain": "settlement_relationship"
+    }
+  ]
 }

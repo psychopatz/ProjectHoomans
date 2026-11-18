@@ -32,5 +32,32 @@
   "say": {
     "EN": "Anything bothering you?",
     "TL": "May bumabagabag ba sa'yo?"
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "ui",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "ui_suggestion",
+      "domain": "ui"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

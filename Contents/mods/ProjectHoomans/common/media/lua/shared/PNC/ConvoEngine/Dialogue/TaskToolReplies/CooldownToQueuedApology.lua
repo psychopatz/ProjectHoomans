@@ -171,7 +171,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_cooldown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -183,6 +183,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -268,6 +280,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -292,6 +310,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -615,7 +657,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_order_camp.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -627,6 +669,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -748,6 +802,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -772,6 +832,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1128,7 +1212,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_order_follow.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1140,6 +1224,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -1261,6 +1357,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1285,6 +1387,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1641,7 +1767,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_order_generic.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1653,6 +1779,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -1774,6 +1912,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1798,6 +1942,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -2082,7 +2250,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_order_rejected.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2094,6 +2262,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -2179,6 +2359,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2203,6 +2389,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -2454,7 +2664,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_order_stay.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2466,6 +2676,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -2551,6 +2773,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2575,6 +2803,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -2826,7 +3078,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_queued_admire.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2838,6 +3090,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -2923,6 +3187,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2947,6 +3217,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -3198,7 +3492,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_queued_apology.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3210,6 +3504,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -3295,6 +3601,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3319,6 +3631,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -3392,378 +3728,6 @@ return {
                         "Lilinawin natin ang lahat mamaya.",
                         "Mag-uusap tayo nang masinsinan tungkol diyan.",
                         "Pag-usapan natin kapag nakarating sa kampo.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "task_tool_replies",
-        ["domainPath"] = "task_tool_replies",
-        ["exchangeFamily"] = {
-            ["familyID"] = "tool_reply.queued_comfort",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                    "2",
-                },
-                ["mode"] = "keyed",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "I hear you.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.tool_reply.queued_comfort.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I hear you.",
-                                        "I hear your comfort.",
-                                        "Got the message. Thanks.",
-                                        "I hear what you're trying to do.",
-                                        "Heard and appreciated.",
-                                        "I hear your reassurance.",
-                                        "Got it. Taking it to heart.",
-                                        "I hear you. It helps a bit.",
-                                        "Understood. I hear your voice.",
-                                        "Heard clearly.",
-                                    },
-                                    ["TL"] = {
-                                        "Narinig kita.",
-                                        "Naririnig ko ang pampalubag-loob mo.",
-                                        "Nakuha ko ang mensahe. Salamat.",
-                                        "Naririnig ko ang sinusubukan mong gawin.",
-                                        "Narinig at pinahahalagahan.",
-                                        "Naririnig ko ang pampanatag mo.",
-                                        "Nakuha ko. Isinasapuso ko.",
-                                        "Naririnig kita. Nakakatulong nang kaunti.",
-                                        "Naintindihan. Naririnig ko ang boses mo.",
-                                        "Narinig nang malinaw.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                    ["2"] = {
-                        ["key"] = "2",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Thanks for saying that.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.tool_reply.queued_comfort.say.2.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Thanks for saying that.",
-                                        "I appreciate you saying that to me.",
-                                        "Thank you. That takes some edge off.",
-                                        "I needed to hear that. Thank you.",
-                                        "Appreciate the soothing words.",
-                                        "Thanks for taking the time to say that.",
-                                        "Good of you to speak up. Thanks.",
-                                        "Thank you for the comfort.",
-                                        "Thanks. That means something out here.",
-                                        "Appreciate your kindness today.",
-                                    },
-                                    ["TL"] = {
-                                        "Salamat sa pagsabi niyan.",
-                                        "Salamat at sinabi mo 'yan sa akin.",
-                                        "Maraming salamat. Nabawasan ang kaba ko.",
-                                        "Kailangan kong marinig 'yan. Salamat.",
-                                        "Salamat sa nakapagpapatahang mga salita.",
-                                        "Salamat sa paglalaan ng oras para sabihin 'yan.",
-                                        "Mabuti sa 'yo ang magsalita. Salamat.",
-                                        "Salamat sa pampalubag-loob.",
-                                        "Salamat. May halaga 'yan dito.",
-                                        "Salamat sa kabaitan mo ngayong araw.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "tool_reply",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "I hear you.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.tool_reply.queued_comfort.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I hear you.",
-                            "I hear your comfort.",
-                            "Got the message. Thanks.",
-                            "I hear what you're trying to do.",
-                            "Heard and appreciated.",
-                            "I hear your reassurance.",
-                            "Got it. Taking it to heart.",
-                            "I hear you. It helps a bit.",
-                            "Understood. I hear your voice.",
-                            "Heard clearly.",
-                        },
-                        ["TL"] = {
-                            "Narinig kita.",
-                            "Naririnig ko ang pampalubag-loob mo.",
-                            "Nakuha ko ang mensahe. Salamat.",
-                            "Naririnig ko ang sinusubukan mong gawin.",
-                            "Narinig at pinahahalagahan.",
-                            "Naririnig ko ang pampanatag mo.",
-                            "Nakuha ko. Isinasapuso ko.",
-                            "Naririnig kita. Nakakatulong nang kaunti.",
-                            "Naintindihan. Naririnig ko ang boses mo.",
-                            "Narinig nang malinaw.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-                {
-                    ["fallback"] = "Thanks for saying that.",
-                    ["realizationKey"] = "2",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.tool_reply.queued_comfort.say.2.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Thanks for saying that.",
-                            "I appreciate you saying that to me.",
-                            "Thank you. That takes some edge off.",
-                            "I needed to hear that. Thank you.",
-                            "Appreciate the soothing words.",
-                            "Thanks for taking the time to say that.",
-                            "Good of you to speak up. Thanks.",
-                            "Thank you for the comfort.",
-                            "Thanks. That means something out here.",
-                            "Appreciate your kindness today.",
-                        },
-                        ["TL"] = {
-                            "Salamat sa pagsabi niyan.",
-                            "Salamat at sinabi mo 'yan sa akin.",
-                            "Maraming salamat. Nabawasan ang kaba ko.",
-                            "Kailangan kong marinig 'yan. Salamat.",
-                            "Salamat sa nakapagpapatahang mga salita.",
-                            "Salamat sa paglalaan ng oras para sabihin 'yan.",
-                            "Mabuti sa 'yo ang magsalita. Salamat.",
-                            "Salamat sa pampalubag-loob.",
-                            "Salamat. May halaga 'yan dito.",
-                            "Salamat sa kabaitan mo ngayong araw.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "tool_reply.queued_comfort",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "queued_comfort",
-            ["sourceId"] = "tool_reply.queued_comfort",
-            ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_queued_comfort.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
-        ["namespace"] = "tool_reply",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:tool_replies",
-                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-                ["responseAct"] = "REACT",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                    "2",
-                },
-                ["mode"] = "keyed",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I hear you.",
-                                        "I hear your comfort.",
-                                        "Got the message. Thanks.",
-                                        "I hear what you're trying to do.",
-                                        "Heard and appreciated.",
-                                        "I hear your reassurance.",
-                                        "Got it. Taking it to heart.",
-                                        "I hear you. It helps a bit.",
-                                        "Understood. I hear your voice.",
-                                        "Heard clearly.",
-                                    },
-                                    ["TL"] = {
-                                        "Narinig kita.",
-                                        "Naririnig ko ang pampalubag-loob mo.",
-                                        "Nakuha ko ang mensahe. Salamat.",
-                                        "Naririnig ko ang sinusubukan mong gawin.",
-                                        "Narinig at pinahahalagahan.",
-                                        "Naririnig ko ang pampanatag mo.",
-                                        "Nakuha ko. Isinasapuso ko.",
-                                        "Naririnig kita. Nakakatulong nang kaunti.",
-                                        "Naintindihan. Naririnig ko ang boses mo.",
-                                        "Narinig nang malinaw.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                    ["2"] = {
-                        ["key"] = "2",
-                        ["shorthand"] = false,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Thanks for saying that.",
-                                        "I appreciate you saying that to me.",
-                                        "Thank you. That takes some edge off.",
-                                        "I needed to hear that. Thank you.",
-                                        "Appreciate the soothing words.",
-                                        "Thanks for taking the time to say that.",
-                                        "Good of you to speak up. Thanks.",
-                                        "Thank you for the comfort.",
-                                        "Thanks. That means something out here.",
-                                        "Appreciate your kindness today.",
-                                    },
-                                    ["TL"] = {
-                                        "Salamat sa pagsabi niyan.",
-                                        "Salamat at sinabi mo 'yan sa akin.",
-                                        "Maraming salamat. Nabawasan ang kaba ko.",
-                                        "Kailangan kong marinig 'yan. Salamat.",
-                                        "Salamat sa nakapagpapatahang mga salita.",
-                                        "Salamat sa paglalaan ng oras para sabihin 'yan.",
-                                        "Mabuti sa 'yo ang magsalita. Salamat.",
-                                        "Salamat sa pampalubag-loob.",
-                                        "Salamat. May halaga 'yan dito.",
-                                        "Salamat sa kabaitan mo ngayong araw.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "REACT",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "tool_reply.queued_comfort",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "I hear you.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.tool_reply.queued_comfort.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/task_tool_replies/tool_reply_queued_comfort.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "I hear you.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.tool_reply.queued_comfort.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I hear you.",
-                        "I hear your comfort.",
-                        "Got the message. Thanks.",
-                        "I hear what you're trying to do.",
-                        "Heard and appreciated.",
-                        "I hear your reassurance.",
-                        "Got it. Taking it to heart.",
-                        "I hear you. It helps a bit.",
-                        "Understood. I hear your voice.",
-                        "Heard clearly.",
-                    },
-                    ["TL"] = {
-                        "Narinig kita.",
-                        "Naririnig ko ang pampalubag-loob mo.",
-                        "Nakuha ko ang mensahe. Salamat.",
-                        "Naririnig ko ang sinusubukan mong gawin.",
-                        "Narinig at pinahahalagahan.",
-                        "Naririnig ko ang pampanatag mo.",
-                        "Nakuha ko. Isinasapuso ko.",
-                        "Naririnig kita. Nakakatulong nang kaunti.",
-                        "Naintindihan. Naririnig ko ang boses mo.",
-                        "Narinig nang malinaw.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-            {
-                ["fallback"] = "Thanks for saying that.",
-                ["realizationKey"] = "2",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.tool_reply.queued_comfort.say.2.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Thanks for saying that.",
-                        "I appreciate you saying that to me.",
-                        "Thank you. That takes some edge off.",
-                        "I needed to hear that. Thank you.",
-                        "Appreciate the soothing words.",
-                        "Thanks for taking the time to say that.",
-                        "Good of you to speak up. Thanks.",
-                        "Thank you for the comfort.",
-                        "Thanks. That means something out here.",
-                        "Appreciate your kindness today.",
-                    },
-                    ["TL"] = {
-                        "Salamat sa pagsabi niyan.",
-                        "Salamat at sinabi mo 'yan sa akin.",
-                        "Maraming salamat. Nabawasan ang kaba ko.",
-                        "Kailangan kong marinig 'yan. Salamat.",
-                        "Salamat sa nakapagpapatahang mga salita.",
-                        "Salamat sa paglalaan ng oras para sabihin 'yan.",
-                        "Mabuti sa 'yo ang magsalita. Salamat.",
-                        "Salamat sa pampalubag-loob.",
-                        "Salamat. May halaga 'yan dito.",
-                        "Salamat sa kabaitan mo ngayong araw.",
                     },
                 },
                 ["variantID"] = "neutral",

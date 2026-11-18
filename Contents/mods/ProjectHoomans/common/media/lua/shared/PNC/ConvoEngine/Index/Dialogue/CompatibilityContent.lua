@@ -3,7 +3,7 @@ return {
     ["integration.bandits.hooman_hurt.colonist"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.bandits.hooman_hurt.colonist",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["integration.bandits.hooman_hurt.default"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.bandits.hooman_hurt.default",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["integration.bandits.hooman_hurt.family"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.bandits.hooman_hurt.family",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["integration.bandits.hooman_hurt.lover"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.bandits.hooman_hurt.lover",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["integration.companion_dogs.feed.female"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.companion_dogs.feed.female",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["integration.companion_dogs.feed.male"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.companion_dogs.feed.male",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["integration.companion_dogs.feed.unknown"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.companion_dogs.feed.unknown",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["integration.companion_dogs.greeting.female"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.companion_dogs.greeting.female",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["integration.companion_dogs.greeting.male"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.companion_dogs.greeting.male",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["integration.companion_dogs.greeting.unknown"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.companion_dogs.greeting.unknown",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["integration.necroa.mask_warning.colonist"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.necroa.mask_warning.colonist",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["integration.necroa.mask_warning.default"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.necroa.mask_warning.default",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["integration.necroa.mask_warning.family"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.necroa.mask_warning.family",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["integration.necroa.player_mask_removed.default"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.necroa.player_mask_removed.default",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["integration.necroa.player_mask_removed.hostile"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.necroa.player_mask_removed.hostile",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["integration.necroa.player_mask_removed.lover"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.necroa.player_mask_removed.lover",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["integration.projectalife.encounter.friendly"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.encounter.friendly",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["integration.projectalife.encounter.hostile"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.encounter.hostile",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["integration.projectalife.encounter.unknown"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.encounter.unknown",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["integration.projectalife.faction.hostile"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.faction.hostile",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["integration.projectalife.faction.incoming"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.faction.incoming",
         ["kind"] = "dialogue",
@@ -192,7 +192,7 @@ return {
     ["integration.projectalife.faction.outgoing"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.faction.outgoing",
         ["kind"] = "dialogue",
@@ -201,7 +201,7 @@ return {
     ["integration.projectalife.meta.aircraft.heli"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.meta.aircraft.heli",
         ["kind"] = "dialogue",
@@ -210,7 +210,7 @@ return {
     ["integration.projectalife.meta.aircraft.military"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.meta.aircraft.military",
         ["kind"] = "dialogue",
@@ -219,7 +219,7 @@ return {
     ["integration.projectalife.meta.ambience"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         },
         ["id"] = "integration.projectalife.meta.ambience",
         ["kind"] = "dialogue",
@@ -228,7 +228,7 @@ return {
     ["integration.projectalife.meta.crash"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/CrashToGunfire",
         },
         ["id"] = "integration.projectalife.meta.crash",
         ["kind"] = "dialogue",
@@ -237,7 +237,7 @@ return {
     ["integration.projectalife.meta.gunfire"] = {
         ["domain"] = "compatibility_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+            "PNC/ConvoEngine/Dialogue/CompatibilityContent/CrashToGunfire",
         },
         ["id"] = "integration.projectalife.meta.gunfire",
         ["kind"] = "dialogue",

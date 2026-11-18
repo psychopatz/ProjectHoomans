@@ -53,6 +53,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde.choice",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Go around.",
@@ -111,6 +119,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -160,6 +180,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -186,7 +212,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
         ["target"] = {
@@ -284,6 +340,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde.choice",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Take them.",
@@ -342,6 +406,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -391,6 +467,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -417,7 +499,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_choice_engage.json",
         ["target"] = {
@@ -515,6 +627,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde.choice",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Hold for now.",
@@ -573,6 +693,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -622,6 +754,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -648,7 +786,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_choice_hold.json",
         ["target"] = {
@@ -746,6 +914,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "They're thinning out. Don't relax yet.",
@@ -804,6 +980,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -853,6 +1041,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -879,7 +1073,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_deescalated.json",
         ["target"] = {
@@ -977,6 +1201,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Horde nearby. Keep your eyes up.",
@@ -1035,6 +1267,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1084,6 +1328,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1110,7 +1360,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_default.json",
         ["target"] = {
@@ -1208,6 +1488,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "More are piling in. This is getting bad.",
@@ -1266,6 +1554,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1315,6 +1615,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1341,7 +1647,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_escalated.json",
         ["target"] = {
@@ -1439,6 +1775,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde.prompt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "That's a lot of them. We fighting or going around?",
@@ -1497,6 +1841,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1546,6 +1902,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1572,7 +1934,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_prompt_default.json",
         ["target"] = {
@@ -1670,6 +2062,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde.prompt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "That's a hell of a crowd. We taking them?",
@@ -1728,6 +2128,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -1777,6 +2189,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1803,7 +2221,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_prompt_eager.json",
         ["target"] = {
@@ -1901,6 +2349,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde.prompt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Horde ahead. Engage or go around?",
@@ -1959,6 +2415,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2008,6 +2476,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2034,7 +2508,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_prompt_reserved.json",
         ["target"] = {
@@ -2132,6 +2636,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde.prompt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "God... that's a lot. Are we really fighting all of them?",
@@ -2190,6 +2702,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2239,6 +2763,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2265,7 +2795,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_prompt_shaken.json",
         ["target"] = {
@@ -2363,6 +2923,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.horde",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "That's a lot of them. Stay sharp.",
@@ -2421,6 +2989,18 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "horde_detected",
+                    ["kind"] = "world_event",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2470,6 +3050,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "horde_threat",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2496,7 +3082,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_started.json",
         ["target"] = {

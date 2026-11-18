@@ -151,8 +151,24 @@
               },
               "constraints": {
                 "all": [
-                  { "path": "npcState.activeBehavior", "op": "not_in", "values": ["hostile", "combat", "busy", "dead"] },
-                  { "path": "npcState.healthState", "op": "not_in", "values": ["dead", "incapacitated"] }
+                  {
+                    "path": "npcState.activeBehavior",
+                    "op": "not_in",
+                    "values": [
+                      "hostile",
+                      "combat",
+                      "busy",
+                      "dead"
+                    ]
+                  },
+                  {
+                    "path": "npcState.healthState",
+                    "op": "not_in",
+                    "values": [
+                      "dead",
+                      "incapacitated"
+                    ]
+                  }
                 ]
               }
             }
@@ -180,5 +196,31 @@
         }
       }
     }
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    }
+  ]
 }

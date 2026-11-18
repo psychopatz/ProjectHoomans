@@ -4,6 +4,290 @@ return {
         ["domain"] = "social_greetings",
         ["domainPath"] = "social_greetings",
         ["exchangeFamily"] = {
+            ["familyID"] = "social.greetings.member.dawn",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "You're up. Good—we have plenty to do.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.social.greetings.member.dawn.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "You're up. Good—we have plenty to do.",
+                                        "Morning. I already checked the perimeter.",
+                                        "Couldn't sleep either? We may as well get started.",
+                                        "First light. What's the plan today?",
+                                        "Morning. Everyone else is still asleep, so it's just us.",
+                                    },
+                                    ["TL"] = {
+                                        "Gising ka na. Mabuti—marami tayong gagawin.",
+                                        "Umaga. Sinuri ko na ang perimeter.",
+                                        "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                                        "Unang liwanag. Ano ang plano ngayon?",
+                                        "Umaga. Tulog pa ang iba kaya kami na lang.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "social.greetings.member",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "You're up. Good—we have plenty to do.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.greetings.member.dawn.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "You're up. Good—we have plenty to do.",
+                            "Morning. I already checked the perimeter.",
+                            "Couldn't sleep either? We may as well get started.",
+                            "First light. What's the plan today?",
+                            "Morning. Everyone else is still asleep, so it's just us.",
+                        },
+                        ["TL"] = {
+                            "Gising ka na. Mabuti—marami tayong gagawin.",
+                            "Umaga. Sinuri ko na ang perimeter.",
+                            "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                            "Unang liwanag. Ano ang plano ngayon?",
+                            "Umaga. Tulog pa ang iba kaya kami na lang.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "social.greetings.member.dawn",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "dawn",
+            ["sourceId"] = "social.greetings.member.dawn",
+            ["sourcePath"] = "dialogue/social_greetings/social_greetings_member_dawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DawnToTwilight",
+        ["namespace"] = "social.greetings.member",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["audience"] = "member",
+                ["category"] = "projecthoomans:greetings",
+                ["portraitAnimation"] = "greeting.wavehi",
+                ["priority"] = 10,
+                ["responseAct"] = "GREETING",
+                ["runtimeBlockID"] = "projecthoomans:greeting_member_dawn",
+                ["textDomain"] = "pnc.convo.social.greetings.member.dawn",
+                ["textRows"] = {
+                    {
+                        ["key"] = "greeting.001",
+                        ["text"] = {
+                            ["EN"] = "You're up. Good—we have plenty to do.",
+                            ["TL"] = "Gising ka na. Mabuti—marami tayong gagawin.",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.002",
+                        ["text"] = {
+                            ["EN"] = "Morning. I already checked the perimeter.",
+                            ["TL"] = "Umaga. Sinuri ko na ang perimeter.",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.003",
+                        ["text"] = {
+                            ["EN"] = "Couldn't sleep either? We may as well get started.",
+                            ["TL"] = "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.004",
+                        ["text"] = {
+                            ["EN"] = "First light. What's the plan today?",
+                            ["TL"] = "Unang liwanag. Ano ang plano ngayon?",
+                        },
+                    },
+                    {
+                        ["key"] = "greeting.005",
+                        ["text"] = {
+                            ["EN"] = "Morning. Everyone else is still asleep, so it's just us.",
+                            ["TL"] = "Umaga. Tulog pa ang iba kaya kami na lang.",
+                        },
+                    },
+                },
+                ["textTarget"] = "convo/social/greetings/member/dawn",
+                ["weight"] = 100,
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "You're up. Good—we have plenty to do.",
+                                        "Morning. I already checked the perimeter.",
+                                        "Couldn't sleep either? We may as well get started.",
+                                        "First light. What's the plan today?",
+                                        "Morning. Everyone else is still asleep, so it's just us.",
+                                    },
+                                    ["TL"] = {
+                                        "Gising ka na. Mabuti—marami tayong gagawin.",
+                                        "Umaga. Sinuri ko na ang perimeter.",
+                                        "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                                        "Unang liwanag. Ano ang plano ngayon?",
+                                        "Umaga. Tulog pa ang iba kaya kami na lang.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "greeting",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "GREETING",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "social.greetings.member.dawn",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "You're up. Good—we have plenty to do.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.social.greetings.member.dawn.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/social_greetings/social_greetings_member_dawn.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "You're up. Good—we have plenty to do.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.greetings.member.dawn.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "You're up. Good—we have plenty to do.",
+                        "Morning. I already checked the perimeter.",
+                        "Couldn't sleep either? We may as well get started.",
+                        "First light. What's the plan today?",
+                        "Morning. Everyone else is still asleep, so it's just us.",
+                    },
+                    ["TL"] = {
+                        "Gising ka na. Mabuti—marami tayong gagawin.",
+                        "Umaga. Sinuri ko na ang perimeter.",
+                        "Hindi rin makatulog? Maaari rin tayong magsimula.",
+                        "Unang liwanag. Ano ang plano ngayon?",
+                        "Umaga. Tulog pa ang iba kaya kami na lang.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = {
+            ["all"] = {
+                {
+                    ["op"] = "eq",
+                    ["path"] = "relationship.speakerToAddressee.state",
+                    ["value"] = "Member",
+                },
+                {
+                    ["all"] = {
+                        {
+                            ["op"] = "gte",
+                            ["path"] = "world.time.hour",
+                            ["value"] = 5,
+                        },
+                        {
+                            ["op"] = "lt",
+                            ["path"] = "world.time.hour",
+                            ["value"] = 6.5,
+                        },
+                    },
+                },
+            },
+        },
+    },
+    {
+        ["domain"] = "social_greetings",
+        ["domainPath"] = "social_greetings",
+        ["exchangeFamily"] = {
             ["familyID"] = "social.greetings.member.dusk",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -79,7 +363,7 @@ return {
             ["sourcePath"] = "dialogue/social_greetings/social_greetings_member_dusk.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DuskToTwilight",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DawnToTwilight",
         ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -91,6 +375,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["audience"] = "member",
                 ["category"] = "projecthoomans:greetings",
@@ -173,6 +463,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "greeting",
+                },
+            },
         },
         ["references"] = {
         },
@@ -197,6 +493,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -335,7 +647,7 @@ return {
             ["sourcePath"] = "dialogue/social_greetings/social_greetings_member_sunrise.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DuskToTwilight",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DawnToTwilight",
         ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -347,6 +659,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["audience"] = "member",
                 ["category"] = "projecthoomans:greetings",
@@ -429,6 +747,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "greeting",
+                },
+            },
         },
         ["references"] = {
         },
@@ -453,6 +777,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -591,7 +931,7 @@ return {
             ["sourcePath"] = "dialogue/social_greetings/social_greetings_member_sunset.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DuskToTwilight",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DawnToTwilight",
         ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -603,6 +943,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["audience"] = "member",
                 ["category"] = "projecthoomans:greetings",
@@ -685,6 +1031,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "greeting",
+                },
+            },
         },
         ["references"] = {
         },
@@ -709,6 +1061,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -847,7 +1215,7 @@ return {
             ["sourcePath"] = "dialogue/social_greetings/social_greetings_member_twilight.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DuskToTwilight",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DawnToTwilight",
         ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -859,6 +1227,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["audience"] = "member",
                 ["category"] = "projecthoomans:greetings",
@@ -941,6 +1315,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "greeting",
+                },
+            },
         },
         ["references"] = {
         },
@@ -965,6 +1345,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {

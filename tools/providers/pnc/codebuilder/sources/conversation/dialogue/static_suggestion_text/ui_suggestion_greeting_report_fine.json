@@ -32,5 +32,32 @@
   "say": {
     "EN": "I'm fine, thank you.",
     "TL": "Ayos lang ako, salamat."
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "ui",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "ui_suggestion",
+      "domain": "ui"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

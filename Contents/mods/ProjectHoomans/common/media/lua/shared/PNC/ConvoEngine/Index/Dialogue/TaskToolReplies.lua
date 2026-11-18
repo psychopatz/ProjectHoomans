@@ -3,7 +3,7 @@ return {
     ["tool_reply.cooldown"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.cooldown",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["tool_reply.order_camp"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.order_camp",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["tool_reply.order_follow"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.order_follow",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["tool_reply.order_generic"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.order_generic",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["tool_reply.order_rejected"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.order_rejected",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["tool_reply.order_stay"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.order_stay",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["tool_reply.queued_admire"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.queued_admire",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["tool_reply.queued_apology"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedApology",
         },
         ["id"] = "tool_reply.queued_apology",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["tool_reply.queued_comfort"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_comfort",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["tool_reply.queued_compliment"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_compliment",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["tool_reply.queued_flirt"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_flirt",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["tool_reply.queued_generic"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_generic",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["tool_reply.queued_hostile"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_hostile",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["tool_reply.queued_insult"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_insult",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["tool_reply.queued_praise"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_praise",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["tool_reply.queued_romantic"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_romantic",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["tool_reply.queued_sexual"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComfortToQueuedSexual",
         },
         ["id"] = "tool_reply.queued_sexual",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["tool_reply.rejected_game"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
         },
         ["id"] = "tool_reply.rejected_game",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["tool_reply.rejected_generic"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
         },
         ["id"] = "tool_reply.rejected_generic",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["tool_reply.rejected_hostile"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedHostileToRejectedSexual",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
         },
         ["id"] = "tool_reply.rejected_hostile",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["tool_reply.rejected_sexual"] = {
         ["domain"] = "task_tool_replies",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedHostileToRejectedSexual",
+            "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
         },
         ["id"] = "tool_reply.rejected_sexual",
         ["kind"] = "dialogue",

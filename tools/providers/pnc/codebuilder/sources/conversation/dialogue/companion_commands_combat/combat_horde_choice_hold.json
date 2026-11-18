@@ -38,5 +38,51 @@
         }
       }
     ]
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "target": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "horde_threat",
+      "domain": "combat"
+    }
+  ],
+  "events": [
+    {
+      "id": "horde_detected",
+      "kind": "world_event"
+    }
+  ],
+  "slots": {
+    "threat": {
+      "type": "entity.threat",
+      "required": false
+    }
+  },
+  "owner": "ProjectHoomans"
 }

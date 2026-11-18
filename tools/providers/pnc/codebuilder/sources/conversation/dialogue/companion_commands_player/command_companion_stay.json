@@ -21,11 +21,39 @@
       "id": "actor_blocked_or_hostile",
       "when": {
         "any": [
-          { "path": "roles.hostile", "op": "==", "value": true },
-          { "path": "roles.authorityEligible", "op": "==", "value": false },
-          { "path": "roles.status", "op": "==", "value": "hostile" },
-          { "path": "npcState.activeBehavior", "op": "in", "values": ["hostile", "combat", "dead"] },
-          { "path": "situation.activeBehavior", "op": "in", "values": ["hostile", "combat", "dead"] }
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          },
+          {
+            "path": "roles.authorityEligible",
+            "op": "==",
+            "value": false
+          },
+          {
+            "path": "roles.status",
+            "op": "==",
+            "value": "hostile"
+          },
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "dead"
+            ]
+          }
         ]
       },
       "outcome": "blocked",
@@ -53,5 +81,44 @@
   "say": {
     "EN": "Stay here.",
     "TL": "Dito ka lang."
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "target": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "companion_commands",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "companion_command",
+      "domain": "companion_commands"
+    }
+  ],
+  "activities": [
+    {
+      "id": "companion_order",
+      "role": "target"
+    }
+  ]
 }

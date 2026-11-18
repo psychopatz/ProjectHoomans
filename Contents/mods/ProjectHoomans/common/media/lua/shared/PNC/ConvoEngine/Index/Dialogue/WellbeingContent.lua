@@ -3,7 +3,7 @@ return {
     ["question.wellbeing.dataset.getting_by"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.dataset.getting_by",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["question.wellbeing.default"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.default",
         ["kind"] = "dialogue",
@@ -24,7 +24,7 @@ return {
     ["question.wellbeing.fatigue"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.fatigue",
         ["kind"] = "dialogue",
@@ -36,7 +36,7 @@ return {
     ["question.wellbeing.fatigue_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.fatigue_alt",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["question.wellbeing.follow_up.responses"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.follow_up.responses",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["question.wellbeing.hunger"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.hunger",
         ["kind"] = "dialogue",
@@ -69,7 +69,7 @@ return {
     ["question.wellbeing.hunger_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.hunger_alt",
         ["kind"] = "dialogue",
@@ -81,7 +81,7 @@ return {
     ["question.wellbeing.injured"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.injured",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["question.wellbeing.panic"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         },
         ["id"] = "question.wellbeing.panic",
         ["kind"] = "dialogue",
@@ -105,7 +105,7 @@ return {
     ["question.wellbeing.stress"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/StressToThirstAlt",
         },
         ["id"] = "question.wellbeing.stress",
         ["kind"] = "dialogue",
@@ -117,7 +117,7 @@ return {
     ["question.wellbeing.thirst"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/ThirstToThirstAlt",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/StressToThirstAlt",
         },
         ["id"] = "question.wellbeing.thirst",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["question.wellbeing.thirst_alt"] = {
         ["domain"] = "wellbeing_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/WellbeingContent/ThirstToThirstAlt",
+            "PNC/ConvoEngine/Dialogue/WellbeingContent/StressToThirstAlt",
         },
         ["id"] = "question.wellbeing.thirst_alt",
         ["kind"] = "dialogue",

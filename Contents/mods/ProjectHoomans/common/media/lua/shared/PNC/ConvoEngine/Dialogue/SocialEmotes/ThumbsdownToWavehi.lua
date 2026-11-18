@@ -4,6 +4,273 @@ return {
         ["domain"] = "social_emotes",
         ["domainPath"] = "social_emotes",
         ["exchangeFamily"] = {
+            ["familyID"] = "emote.reply.thumbsdown",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I got the message. Tell me what's wrong.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.emote.reply.thumbsdown.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I got the message. Tell me what's wrong.",
+                                        "Not happy with that? What's your take?",
+                                        "Understood. You disagree.",
+                                        "Message received. We can rethink it.",
+                                        "Got it. You don't like the look of this.",
+                                        "Fair enough. What's the alternative?",
+                                        "I hear the disapproval. Let's adjust.",
+                                        "Noted. We won't go that route then.",
+                                        "Understood. Point taken.",
+                                        "All right, let's look for a better option.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                                        "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                                        "Naiintindihan ko. Hindi ka sang-ayon.",
+                                        "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                                        "Naintindihan. Hindi maganda ang kutob mo rito.",
+                                        "Makatwiran. Ano ang alternatibo?",
+                                        "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                                        "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                                        "Naintindihan. Nakuha ko ang punto mo.",
+                                        "Sige, maghanap tayo ng mas magandang paraan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "emote.reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I got the message. Tell me what's wrong.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.emote.reply.thumbsdown.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I got the message. Tell me what's wrong.",
+                            "Not happy with that? What's your take?",
+                            "Understood. You disagree.",
+                            "Message received. We can rethink it.",
+                            "Got it. You don't like the look of this.",
+                            "Fair enough. What's the alternative?",
+                            "I hear the disapproval. Let's adjust.",
+                            "Noted. We won't go that route then.",
+                            "Understood. Point taken.",
+                            "All right, let's look for a better option.",
+                        },
+                        ["TL"] = {
+                            "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                            "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                            "Naiintindihan ko. Hindi ka sang-ayon.",
+                            "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                            "Naintindihan. Hindi maganda ang kutob mo rito.",
+                            "Makatwiran. Ano ang alternatibo?",
+                            "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                            "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                            "Naintindihan. Nakuha ko ang punto mo.",
+                            "Sige, maghanap tayo ng mas magandang paraan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "emote.reply.thumbsdown",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "thumbsdown",
+            ["sourceId"] = "emote.reply.thumbsdown",
+            ["sourcePath"] = "dialogue/social_emotes/emote_reply_thumbsdown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
+        ["namespace"] = "emote.reply",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseAct"] = "REACT",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I got the message. Tell me what's wrong.",
+                                        "Not happy with that? What's your take?",
+                                        "Understood. You disagree.",
+                                        "Message received. We can rethink it.",
+                                        "Got it. You don't like the look of this.",
+                                        "Fair enough. What's the alternative?",
+                                        "I hear the disapproval. Let's adjust.",
+                                        "Noted. We won't go that route then.",
+                                        "Understood. Point taken.",
+                                        "All right, let's look for a better option.",
+                                    },
+                                    ["TL"] = {
+                                        "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                                        "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                                        "Naiintindihan ko. Hindi ka sang-ayon.",
+                                        "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                                        "Naintindihan. Hindi maganda ang kutob mo rito.",
+                                        "Makatwiran. Ano ang alternatibo?",
+                                        "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                                        "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                                        "Naintindihan. Nakuha ko ang punto mo.",
+                                        "Sige, maghanap tayo ng mas magandang paraan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "emote.reply.thumbsdown",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I got the message. Tell me what's wrong.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.emote.reply.thumbsdown.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/social_emotes/emote_reply_thumbsdown.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I got the message. Tell me what's wrong.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.emote.reply.thumbsdown.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I got the message. Tell me what's wrong.",
+                        "Not happy with that? What's your take?",
+                        "Understood. You disagree.",
+                        "Message received. We can rethink it.",
+                        "Got it. You don't like the look of this.",
+                        "Fair enough. What's the alternative?",
+                        "I hear the disapproval. Let's adjust.",
+                        "Noted. We won't go that route then.",
+                        "Understood. Point taken.",
+                        "All right, let's look for a better option.",
+                    },
+                    ["TL"] = {
+                        "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+                        "Hindi ka sang-ayon? Ano ang opinyon mo?",
+                        "Naiintindihan ko. Hindi ka sang-ayon.",
+                        "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+                        "Naintindihan. Hindi maganda ang kutob mo rito.",
+                        "Makatwiran. Ano ang alternatibo?",
+                        "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+                        "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+                        "Naintindihan. Nakuha ko ang punto mo.",
+                        "Sige, maghanap tayo ng mas magandang paraan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_emotes",
+        ["domainPath"] = "social_emotes",
+        ["exchangeFamily"] = {
             ["familyID"] = "emote.reply.thumbsup",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -164,7 +431,7 @@ return {
             ["sourcePath"] = "dialogue/social_emotes/emote_reply_thumbsup.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsupToWavehi",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
         ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -176,6 +443,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
@@ -254,6 +527,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -278,6 +557,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -457,7 +760,7 @@ return {
             ["sourcePath"] = "dialogue/social_emotes/emote_reply_thumbsup_active.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsupToWavehi",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
         ["namespace"] = "emote.reply.thumbsup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -469,6 +772,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
@@ -518,6 +827,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -542,6 +857,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -753,7 +1092,7 @@ return {
             ["sourcePath"] = "dialogue/social_emotes/emote_reply_wavebye.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsupToWavehi",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
         ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -765,6 +1104,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
@@ -843,6 +1188,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -867,6 +1218,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -1176,7 +1551,7 @@ return {
             ["sourcePath"] = "dialogue/social_emotes/emote_reply_wavehi.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsupToWavehi",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
         ["namespace"] = "emote.reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1188,6 +1563,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
@@ -1295,6 +1676,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1319,6 +1706,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {

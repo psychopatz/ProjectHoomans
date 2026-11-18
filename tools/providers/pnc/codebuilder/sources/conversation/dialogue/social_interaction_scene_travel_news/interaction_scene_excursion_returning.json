@@ -25,5 +25,38 @@
   "textSidecars": {
     "EN": "translations/interaction_scene_excursion_returning.en.json",
     "TL": "translations/interaction_scene_excursion_returning.tl.json"
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "scene_excursion",
+      "domain": "social"
+    }
+  ],
+  "activities": [
+    {
+      "id": "excursion",
+      "role": "actor"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

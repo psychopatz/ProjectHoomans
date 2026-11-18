@@ -294,7 +294,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing.dataset",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -306,6 +306,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -442,6 +448,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -466,6 +478,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -906,7 +934,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -918,6 +946,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -1054,6 +1088,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1078,6 +1118,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1323,7 +1379,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_fatigue.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1335,6 +1391,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -1384,6 +1446,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1408,6 +1476,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1554,7 +1638,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_fatigue_alt.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1566,6 +1650,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -1615,6 +1705,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1639,6 +1735,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1749,7 +1861,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_follow_up.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing.follow_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1761,6 +1873,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["textRows"] = {
                     {
@@ -1918,6 +2036,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1942,6 +2066,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2070,7 +2210,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_hunger.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2082,6 +2222,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -2131,6 +2277,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2155,6 +2307,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2301,7 +2469,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_hunger_alt.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2313,6 +2481,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -2362,6 +2536,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2386,6 +2566,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2727,7 +2923,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_injured.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2739,6 +2935,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -2875,6 +3077,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2899,6 +3107,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3144,7 +3368,7 @@ return {
             ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_panic.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
+        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToPanic",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3156,6 +3380,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
@@ -3205,6 +3435,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3229,6 +3465,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3269,237 +3521,6 @@ return {
                         "Mataas pa ang adrenaline ko. Hirap mag-isip nang tuwid.",
                         "Nararamdaman ko pa rin ang takot na gumagapang sa akin.",
                         "Bigyan mo ako ng ilang sandali para makabawi ng katinuan.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "wellbeing_content",
-        ["domainPath"] = "wellbeing_content",
-        ["exchangeFamily"] = {
-            ["familyID"] = "question.wellbeing.stress",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "I'm tense, but I can keep going.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.question.wellbeing.stress.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm tense, but I can keep going.",
-                                        "Nerves are frayed. The tension is getting to me.",
-                                        "Feeling the pressure constantly out here.",
-                                        "On edge, jumping at every shadow.",
-                                        "Stress is wearing me down faster than the walking.",
-                                        "Hard to unwind when danger could be anywhere.",
-                                        "My shoulders are tight as iron from all this stress.",
-                                        "Just trying to keep my sanity intact.",
-                                        "Every little noise has me reaching for my weapon.",
-                                        "It's a lot to process, but I'm holding it in.",
-                                    },
-                                    ["TL"] = {
-                                        "Tensiyonado ako, pero kaya ko pa.",
-                                        "Naiipit ang mga nerbyos ko. Ramdam ko ang tensiyon.",
-                                        "Laging mabigat ang pakiramdam dito sa labas.",
-                                        "Kabado ako, nabibigla sa bawat anino.",
-                                        "Mas nakakapagod ang stress kaysa sa mismong paglalakad.",
-                                        "Mahirap magrelaks kapag may panganib kahit saan.",
-                                        "Mabigat ang mga balikat ko sa sobrang stress.",
-                                        "Pinipilit ko lang mapanatili ang katinuan ko.",
-                                        "Bawat kaluskos napapahawak ako agad sa armas ko.",
-                                        "Mabigat dalhin ang lahat, pero tinitiis ko.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "question.wellbeing",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "I'm tense, but I can keep going.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.question.wellbeing.stress.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm tense, but I can keep going.",
-                            "Nerves are frayed. The tension is getting to me.",
-                            "Feeling the pressure constantly out here.",
-                            "On edge, jumping at every shadow.",
-                            "Stress is wearing me down faster than the walking.",
-                            "Hard to unwind when danger could be anywhere.",
-                            "My shoulders are tight as iron from all this stress.",
-                            "Just trying to keep my sanity intact.",
-                            "Every little noise has me reaching for my weapon.",
-                            "It's a lot to process, but I'm holding it in.",
-                        },
-                        ["TL"] = {
-                            "Tensiyonado ako, pero kaya ko pa.",
-                            "Naiipit ang mga nerbyos ko. Ramdam ko ang tensiyon.",
-                            "Laging mabigat ang pakiramdam dito sa labas.",
-                            "Kabado ako, nabibigla sa bawat anino.",
-                            "Mas nakakapagod ang stress kaysa sa mismong paglalakad.",
-                            "Mahirap magrelaks kapag may panganib kahit saan.",
-                            "Mabigat ang mga balikat ko sa sobrang stress.",
-                            "Pinipilit ko lang mapanatili ang katinuan ko.",
-                            "Bawat kaluskos napapahawak ako agad sa armas ko.",
-                            "Mabigat dalhin ang lahat, pero tinitiis ko.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "question.wellbeing.stress",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "stress",
-            ["sourceId"] = "question.wellbeing.stress",
-            ["sourcePath"] = "dialogue/wellbeing_content/question_wellbeing_stress.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
-        ["namespace"] = "question.wellbeing",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:wellbeing_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
-                ["responseAct"] = "REACT",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm tense, but I can keep going.",
-                                        "Nerves are frayed. The tension is getting to me.",
-                                        "Feeling the pressure constantly out here.",
-                                        "On edge, jumping at every shadow.",
-                                        "Stress is wearing me down faster than the walking.",
-                                        "Hard to unwind when danger could be anywhere.",
-                                        "My shoulders are tight as iron from all this stress.",
-                                        "Just trying to keep my sanity intact.",
-                                        "Every little noise has me reaching for my weapon.",
-                                        "It's a lot to process, but I'm holding it in.",
-                                    },
-                                    ["TL"] = {
-                                        "Tensiyonado ako, pero kaya ko pa.",
-                                        "Naiipit ang mga nerbyos ko. Ramdam ko ang tensiyon.",
-                                        "Laging mabigat ang pakiramdam dito sa labas.",
-                                        "Kabado ako, nabibigla sa bawat anino.",
-                                        "Mas nakakapagod ang stress kaysa sa mismong paglalakad.",
-                                        "Mahirap magrelaks kapag may panganib kahit saan.",
-                                        "Mabigat ang mga balikat ko sa sobrang stress.",
-                                        "Pinipilit ko lang mapanatili ang katinuan ko.",
-                                        "Bawat kaluskos napapahawak ako agad sa armas ko.",
-                                        "Mabigat dalhin ang lahat, pero tinitiis ko.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "REACT",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "question.wellbeing.stress",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "I'm tense, but I can keep going.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.question.wellbeing.stress.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/wellbeing_content/question_wellbeing_stress.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "I'm tense, but I can keep going.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.question.wellbeing.stress.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm tense, but I can keep going.",
-                        "Nerves are frayed. The tension is getting to me.",
-                        "Feeling the pressure constantly out here.",
-                        "On edge, jumping at every shadow.",
-                        "Stress is wearing me down faster than the walking.",
-                        "Hard to unwind when danger could be anywhere.",
-                        "My shoulders are tight as iron from all this stress.",
-                        "Just trying to keep my sanity intact.",
-                        "Every little noise has me reaching for my weapon.",
-                        "It's a lot to process, but I'm holding it in.",
-                    },
-                    ["TL"] = {
-                        "Tensiyonado ako, pero kaya ko pa.",
-                        "Naiipit ang mga nerbyos ko. Ramdam ko ang tensiyon.",
-                        "Laging mabigat ang pakiramdam dito sa labas.",
-                        "Kabado ako, nabibigla sa bawat anino.",
-                        "Mas nakakapagod ang stress kaysa sa mismong paglalakad.",
-                        "Mahirap magrelaks kapag may panganib kahit saan.",
-                        "Mabigat ang mga balikat ko sa sobrang stress.",
-                        "Pinipilit ko lang mapanatili ang katinuan ko.",
-                        "Bawat kaluskos napapahawak ako agad sa armas ko.",
-                        "Mabigat dalhin ang lahat, pero tinitiis ko.",
                     },
                 },
                 ["variantID"] = "neutral",

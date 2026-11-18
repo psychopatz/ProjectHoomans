@@ -4,6 +4,561 @@ return {
         ["domain"] = "social_tool_replies_affirmation",
         ["domainPath"] = "social_tool_replies_affirmation",
         ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.comfort",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Thanks. I needed that.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.comfort.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Thanks. I needed that.",
+                                        "I appreciate that. It has been a rough stretch.",
+                                        "Thanks. Sometimes you just need to hear that.",
+                                        "That helps steady my nerves. Thank you.",
+                                        "I did not know how much I needed to hear that. Thanks.",
+                                        "Thank you. That takes some of the weight off.",
+                                        "I am glad you said that. Thanks.",
+                                        "Much appreciated. Really.",
+                                        "Thanks for checking in on me.",
+                                        "That makes a difference. Thank you.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat. Kailangan ko talaga 'yon.",
+                                        "Salamat. Napakahirap ng mga nakaraang araw.",
+                                        "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                                        "Nakakatulong 'yan para kumalma ako. Salamat.",
+                                        "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                                        "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                                        "Mabuti at sinabi mo 'yan. Salamat.",
+                                        "Talagang pinahahalagahan ko. Salamat.",
+                                        "Salamat sa pangungumusta sa akin.",
+                                        "Malaki ang nagagawa niyan. Salamat.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I appreciate you being here.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.comfort.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I appreciate you being here.",
+                                        "Having you nearby makes this easier.",
+                                        "Good to know I am not facing this alone.",
+                                        "Thanks for sticking with me.",
+                                        "It is easier having someone reliable around. Thank you.",
+                                        "I am glad you are on my side.",
+                                        "Thanks for being here. It counts for a lot.",
+                                        "You being around keeps me grounded.",
+                                        "I am thankful we crossed paths.",
+                                        "Thanks. Do not go wandering off too far.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat at narito ka.",
+                                        "Mas madali ang lahat kapag kasama kita rito.",
+                                        "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                                        "Salamat sa pananatili sa tabi ko.",
+                                        "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                                        "Mabuti at kakampi kita.",
+                                        "Salamat sa presensya mo. Malaking bagay ito.",
+                                        "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                                        "Nagpapasalamat ako at nagkasama tayo rito.",
+                                        "Salamat. Huwag kang lalayo masyado.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That helps more than I expected.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.comfort.say.3.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That helps more than I expected.",
+                                        "I feel a bit better hearing that.",
+                                        "That took some edge off the stress.",
+                                        "Honestly, that clears my head a little.",
+                                        "That actually helped. Thank you.",
+                                        "I can breathe a little easier now.",
+                                        "Thanks. That takes the bite out of things.",
+                                        "I needed a reminder that we can handle this.",
+                                        "You have a calming effect. Thanks.",
+                                        "That put things back into perspective for me.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                                        "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                                        "Nabawasan ang kaba ko sa sinabi mo.",
+                                        "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                                        "Talagang nakatulong 'yon. Salamat.",
+                                        "Medyo nakakahinga na ako nang maluwag.",
+                                        "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                                        "Kailangan ko ng paalala na kaya natin 'to.",
+                                        "Nakakapagpakalma ka. Salamat.",
+                                        "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Thanks. I needed that.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.comfort.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thanks. I needed that.",
+                            "I appreciate that. It has been a rough stretch.",
+                            "Thanks. Sometimes you just need to hear that.",
+                            "That helps steady my nerves. Thank you.",
+                            "I did not know how much I needed to hear that. Thanks.",
+                            "Thank you. That takes some of the weight off.",
+                            "I am glad you said that. Thanks.",
+                            "Much appreciated. Really.",
+                            "Thanks for checking in on me.",
+                            "That makes a difference. Thank you.",
+                        },
+                        ["TL"] = {
+                            "Salamat. Kailangan ko talaga 'yon.",
+                            "Salamat. Napakahirap ng mga nakaraang araw.",
+                            "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                            "Nakakatulong 'yan para kumalma ako. Salamat.",
+                            "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                            "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                            "Mabuti at sinabi mo 'yan. Salamat.",
+                            "Talagang pinahahalagahan ko. Salamat.",
+                            "Salamat sa pangungumusta sa akin.",
+                            "Malaki ang nagagawa niyan. Salamat.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "I appreciate you being here.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.comfort.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I appreciate you being here.",
+                            "Having you nearby makes this easier.",
+                            "Good to know I am not facing this alone.",
+                            "Thanks for sticking with me.",
+                            "It is easier having someone reliable around. Thank you.",
+                            "I am glad you are on my side.",
+                            "Thanks for being here. It counts for a lot.",
+                            "You being around keeps me grounded.",
+                            "I am thankful we crossed paths.",
+                            "Thanks. Do not go wandering off too far.",
+                        },
+                        ["TL"] = {
+                            "Salamat at narito ka.",
+                            "Mas madali ang lahat kapag kasama kita rito.",
+                            "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                            "Salamat sa pananatili sa tabi ko.",
+                            "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                            "Mabuti at kakampi kita.",
+                            "Salamat sa presensya mo. Malaking bagay ito.",
+                            "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                            "Nagpapasalamat ako at nagkasama tayo rito.",
+                            "Salamat. Huwag kang lalayo masyado.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "That helps more than I expected.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.comfort.say.3.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That helps more than I expected.",
+                            "I feel a bit better hearing that.",
+                            "That took some edge off the stress.",
+                            "Honestly, that clears my head a little.",
+                            "That actually helped. Thank you.",
+                            "I can breathe a little easier now.",
+                            "Thanks. That takes the bite out of things.",
+                            "I needed a reminder that we can handle this.",
+                            "You have a calming effect. Thanks.",
+                            "That put things back into perspective for me.",
+                        },
+                        ["TL"] = {
+                            "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                            "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                            "Nabawasan ang kaba ko sa sinabi mo.",
+                            "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                            "Talagang nakatulong 'yon. Salamat.",
+                            "Medyo nakakahinga na ako nang maluwag.",
+                            "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                            "Kailangan ko ng paalala na kaya natin 'to.",
+                            "Nakakapagpakalma ka. Salamat.",
+                            "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "tool_reply.comfort",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "comfort",
+            ["sourceId"] = "tool_reply.comfort",
+            ["sourcePath"] = "dialogue/social_tool_replies_affirmation/tool_reply_comfort.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt",
+        ["namespace"] = "tool_reply",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseAct"] = "REACT",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                    "3",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Thanks. I needed that.",
+                                        "I appreciate that. It has been a rough stretch.",
+                                        "Thanks. Sometimes you just need to hear that.",
+                                        "That helps steady my nerves. Thank you.",
+                                        "I did not know how much I needed to hear that. Thanks.",
+                                        "Thank you. That takes some of the weight off.",
+                                        "I am glad you said that. Thanks.",
+                                        "Much appreciated. Really.",
+                                        "Thanks for checking in on me.",
+                                        "That makes a difference. Thank you.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat. Kailangan ko talaga 'yon.",
+                                        "Salamat. Napakahirap ng mga nakaraang araw.",
+                                        "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                                        "Nakakatulong 'yan para kumalma ako. Salamat.",
+                                        "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                                        "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                                        "Mabuti at sinabi mo 'yan. Salamat.",
+                                        "Talagang pinahahalagahan ko. Salamat.",
+                                        "Salamat sa pangungumusta sa akin.",
+                                        "Malaki ang nagagawa niyan. Salamat.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I appreciate you being here.",
+                                        "Having you nearby makes this easier.",
+                                        "Good to know I am not facing this alone.",
+                                        "Thanks for sticking with me.",
+                                        "It is easier having someone reliable around. Thank you.",
+                                        "I am glad you are on my side.",
+                                        "Thanks for being here. It counts for a lot.",
+                                        "You being around keeps me grounded.",
+                                        "I am thankful we crossed paths.",
+                                        "Thanks. Do not go wandering off too far.",
+                                    },
+                                    ["TL"] = {
+                                        "Salamat at narito ka.",
+                                        "Mas madali ang lahat kapag kasama kita rito.",
+                                        "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                                        "Salamat sa pananatili sa tabi ko.",
+                                        "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                                        "Mabuti at kakampi kita.",
+                                        "Salamat sa presensya mo. Malaking bagay ito.",
+                                        "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                                        "Nagpapasalamat ako at nagkasama tayo rito.",
+                                        "Salamat. Huwag kang lalayo masyado.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That helps more than I expected.",
+                                        "I feel a bit better hearing that.",
+                                        "That took some edge off the stress.",
+                                        "Honestly, that clears my head a little.",
+                                        "That actually helped. Thank you.",
+                                        "I can breathe a little easier now.",
+                                        "Thanks. That takes the bite out of things.",
+                                        "I needed a reminder that we can handle this.",
+                                        "You have a calming effect. Thanks.",
+                                        "That put things back into perspective for me.",
+                                    },
+                                    ["TL"] = {
+                                        "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                                        "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                                        "Nabawasan ang kaba ko sa sinabi mo.",
+                                        "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                                        "Talagang nakatulong 'yon. Salamat.",
+                                        "Medyo nakakahinga na ako nang maluwag.",
+                                        "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                                        "Kailangan ko ng paalala na kaya natin 'to.",
+                                        "Nakakapagpakalma ka. Salamat.",
+                                        "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.comfort",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Thanks. I needed that.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.tool_reply.comfort.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/social_tool_replies_affirmation/tool_reply_comfort.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Thanks. I needed that.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.comfort.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thanks. I needed that.",
+                        "I appreciate that. It has been a rough stretch.",
+                        "Thanks. Sometimes you just need to hear that.",
+                        "That helps steady my nerves. Thank you.",
+                        "I did not know how much I needed to hear that. Thanks.",
+                        "Thank you. That takes some of the weight off.",
+                        "I am glad you said that. Thanks.",
+                        "Much appreciated. Really.",
+                        "Thanks for checking in on me.",
+                        "That makes a difference. Thank you.",
+                    },
+                    ["TL"] = {
+                        "Salamat. Kailangan ko talaga 'yon.",
+                        "Salamat. Napakahirap ng mga nakaraang araw.",
+                        "Salamat. Minsan kailangan mo lang marinig ang ganoon.",
+                        "Nakakatulong 'yan para kumalma ako. Salamat.",
+                        "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat.",
+                        "Maraming salamat. Nabawasan ang bigat sa dibdib ko.",
+                        "Mabuti at sinabi mo 'yan. Salamat.",
+                        "Talagang pinahahalagahan ko. Salamat.",
+                        "Salamat sa pangungumusta sa akin.",
+                        "Malaki ang nagagawa niyan. Salamat.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "I appreciate you being here.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.comfort.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I appreciate you being here.",
+                        "Having you nearby makes this easier.",
+                        "Good to know I am not facing this alone.",
+                        "Thanks for sticking with me.",
+                        "It is easier having someone reliable around. Thank you.",
+                        "I am glad you are on my side.",
+                        "Thanks for being here. It counts for a lot.",
+                        "You being around keeps me grounded.",
+                        "I am thankful we crossed paths.",
+                        "Thanks. Do not go wandering off too far.",
+                    },
+                    ["TL"] = {
+                        "Salamat at narito ka.",
+                        "Mas madali ang lahat kapag kasama kita rito.",
+                        "Mabuting malaman na hindi ako nag-iisa sa laban na 'to.",
+                        "Salamat sa pananatili sa tabi ko.",
+                        "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat.",
+                        "Mabuti at kakampi kita.",
+                        "Salamat sa presensya mo. Malaking bagay ito.",
+                        "Ang pananatili mo rito ay nagpapahinahon sa akin.",
+                        "Nagpapasalamat ako at nagkasama tayo rito.",
+                        "Salamat. Huwag kang lalayo masyado.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "That helps more than I expected.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.comfort.say.3.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That helps more than I expected.",
+                        "I feel a bit better hearing that.",
+                        "That took some edge off the stress.",
+                        "Honestly, that clears my head a little.",
+                        "That actually helped. Thank you.",
+                        "I can breathe a little easier now.",
+                        "Thanks. That takes the bite out of things.",
+                        "I needed a reminder that we can handle this.",
+                        "You have a calming effect. Thanks.",
+                        "That put things back into perspective for me.",
+                    },
+                    ["TL"] = {
+                        "Mas nakakatulong 'yan kaysa sa inasahan ko.",
+                        "Medyo gumaan ang pakiramdam ko nang marinig 'yan.",
+                        "Nabawasan ang kaba ko sa sinabi mo.",
+                        "Sa totoo lang, luminaw nang kaunti ang isip ko.",
+                        "Talagang nakatulong 'yon. Salamat.",
+                        "Medyo nakakahinga na ako nang maluwag.",
+                        "Salamat. Nabawasan ang tindi ng sitwasyon.",
+                        "Kailangan ko ng paalala na kaya natin 'to.",
+                        "Nakakapagpakalma ka. Salamat.",
+                        "Nailagay muli niyan sa tamang ayos ang pananaw ko.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_tool_replies_affirmation",
+        ["domainPath"] = "social_tool_replies_affirmation",
+        ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.compliment",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -243,7 +798,7 @@ return {
             ["sourcePath"] = "dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComplimentToFlirt",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -255,6 +810,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
@@ -376,6 +943,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -400,6 +973,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -756,7 +1353,7 @@ return {
             ["sourcePath"] = "dialogue/social_tool_replies_affirmation/tool_reply_flirt.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComplimentToFlirt",
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -768,6 +1365,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
@@ -889,6 +1498,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -913,6 +1528,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {

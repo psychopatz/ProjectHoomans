@@ -32,5 +32,32 @@
   "say": {
     "EN": "Thanks.",
     "TL": "Salamat."
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "ui",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "ui_suggestion",
+      "domain": "ui"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

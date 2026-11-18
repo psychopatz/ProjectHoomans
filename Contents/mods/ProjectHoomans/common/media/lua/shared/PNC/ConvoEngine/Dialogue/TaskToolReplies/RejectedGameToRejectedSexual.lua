@@ -4,6 +4,834 @@ return {
         ["domain"] = "task_tool_replies",
         ["domainPath"] = "task_tool_replies",
         ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.rejected_game",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Not now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.rejected_game.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Not now.",
+                                        "Now is not the time for games.",
+                                        "We have real survival to worry about. Not now.",
+                                        "I'm busy staying alive. Not playing games.",
+                                        "Not in the mood for games right now.",
+                                        "Save the distractions for later.",
+                                        "Not now. Stay focused on our safety.",
+                                        "Too much danger around for games.",
+                                        "I have to pass on that right now.",
+                                        "Not happening today. Focus.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ngayon.",
+                                        "Hindi ngayon ang oras para sa laro.",
+                                        "May tunay na kaligtasan tayong iniisip. Hindi ngayon.",
+                                        "Abala ako sa pananatiling buhay. Di ako maglalaro.",
+                                        "Wala ako sa mood para maglaro ngayon.",
+                                        "Itabi ang pampalipas-oras mamaya.",
+                                        "Hindi ngayon. Magpokus sa kaligtasan natin.",
+                                        "Masyadong maraming panganib sa paligid para maglaro.",
+                                        "Lalampasan ko muna 'yan ngayon.",
+                                        "Di mangyayari ngayon. Magpokus.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That did not land well.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.rejected_game.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That did not land well.",
+                                        "That was poorly timed.",
+                                        "Bad moment for that attempt.",
+                                        "That fell completely flat.",
+                                        "Wrong audience, wrong time.",
+                                        "That missed the mark entirely.",
+                                        "That did not go over the way you hoped.",
+                                        "Poor execution on that one.",
+                                        "That landed terribly. Try focusing instead.",
+                                        "That didn't work at all.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi naging maganda ang dating niyan.",
+                                        "Maling-mali ang tiyempo niyan.",
+                                        "Masamang sandali para sa pagtatangkang 'yan.",
+                                        "Bumagsak lang nang walang saysay 'yon.",
+                                        "Maling kausap, maling oras.",
+                                        "Lumihis nang buo sa dapat patunguhan.",
+                                        "Di naging ayon sa inasahan mo ang takbo niyan.",
+                                        "Mahina ang pagkagawa sa isang 'yon.",
+                                        "Napakasama ng dating niyan. Magpokus ka na lang.",
+                                        "Hindi talaga umubra 'yan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Not now.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.rejected_game.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Not now.",
+                            "Now is not the time for games.",
+                            "We have real survival to worry about. Not now.",
+                            "I'm busy staying alive. Not playing games.",
+                            "Not in the mood for games right now.",
+                            "Save the distractions for later.",
+                            "Not now. Stay focused on our safety.",
+                            "Too much danger around for games.",
+                            "I have to pass on that right now.",
+                            "Not happening today. Focus.",
+                        },
+                        ["TL"] = {
+                            "Hindi ngayon.",
+                            "Hindi ngayon ang oras para sa laro.",
+                            "May tunay na kaligtasan tayong iniisip. Hindi ngayon.",
+                            "Abala ako sa pananatiling buhay. Di ako maglalaro.",
+                            "Wala ako sa mood para maglaro ngayon.",
+                            "Itabi ang pampalipas-oras mamaya.",
+                            "Hindi ngayon. Magpokus sa kaligtasan natin.",
+                            "Masyadong maraming panganib sa paligid para maglaro.",
+                            "Lalampasan ko muna 'yan ngayon.",
+                            "Di mangyayari ngayon. Magpokus.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "That did not land well.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.rejected_game.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That did not land well.",
+                            "That was poorly timed.",
+                            "Bad moment for that attempt.",
+                            "That fell completely flat.",
+                            "Wrong audience, wrong time.",
+                            "That missed the mark entirely.",
+                            "That did not go over the way you hoped.",
+                            "Poor execution on that one.",
+                            "That landed terribly. Try focusing instead.",
+                            "That didn't work at all.",
+                        },
+                        ["TL"] = {
+                            "Hindi naging maganda ang dating niyan.",
+                            "Maling-mali ang tiyempo niyan.",
+                            "Masamang sandali para sa pagtatangkang 'yan.",
+                            "Bumagsak lang nang walang saysay 'yon.",
+                            "Maling kausap, maling oras.",
+                            "Lumihis nang buo sa dapat patunguhan.",
+                            "Di naging ayon sa inasahan mo ang takbo niyan.",
+                            "Mahina ang pagkagawa sa isang 'yon.",
+                            "Napakasama ng dating niyan. Magpokus ka na lang.",
+                            "Hindi talaga umubra 'yan.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "tool_reply.rejected_game",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "rejected_game",
+            ["sourceId"] = "tool_reply.rejected_game",
+            ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_rejected_game.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
+        ["namespace"] = "tool_reply",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["category"] = "projecthoomans:tool_replies",
+                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
+                ["responseAct"] = "REACT",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Not now.",
+                                        "Now is not the time for games.",
+                                        "We have real survival to worry about. Not now.",
+                                        "I'm busy staying alive. Not playing games.",
+                                        "Not in the mood for games right now.",
+                                        "Save the distractions for later.",
+                                        "Not now. Stay focused on our safety.",
+                                        "Too much danger around for games.",
+                                        "I have to pass on that right now.",
+                                        "Not happening today. Focus.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ngayon.",
+                                        "Hindi ngayon ang oras para sa laro.",
+                                        "May tunay na kaligtasan tayong iniisip. Hindi ngayon.",
+                                        "Abala ako sa pananatiling buhay. Di ako maglalaro.",
+                                        "Wala ako sa mood para maglaro ngayon.",
+                                        "Itabi ang pampalipas-oras mamaya.",
+                                        "Hindi ngayon. Magpokus sa kaligtasan natin.",
+                                        "Masyadong maraming panganib sa paligid para maglaro.",
+                                        "Lalampasan ko muna 'yan ngayon.",
+                                        "Di mangyayari ngayon. Magpokus.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That did not land well.",
+                                        "That was poorly timed.",
+                                        "Bad moment for that attempt.",
+                                        "That fell completely flat.",
+                                        "Wrong audience, wrong time.",
+                                        "That missed the mark entirely.",
+                                        "That did not go over the way you hoped.",
+                                        "Poor execution on that one.",
+                                        "That landed terribly. Try focusing instead.",
+                                        "That didn't work at all.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi naging maganda ang dating niyan.",
+                                        "Maling-mali ang tiyempo niyan.",
+                                        "Masamang sandali para sa pagtatangkang 'yan.",
+                                        "Bumagsak lang nang walang saysay 'yon.",
+                                        "Maling kausap, maling oras.",
+                                        "Lumihis nang buo sa dapat patunguhan.",
+                                        "Di naging ayon sa inasahan mo ang takbo niyan.",
+                                        "Mahina ang pagkagawa sa isang 'yon.",
+                                        "Napakasama ng dating niyan. Magpokus ka na lang.",
+                                        "Hindi talaga umubra 'yan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.rejected_game",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Not now.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.tool_reply.rejected_game.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/task_tool_replies/tool_reply_rejected_game.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Not now.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.rejected_game.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Not now.",
+                        "Now is not the time for games.",
+                        "We have real survival to worry about. Not now.",
+                        "I'm busy staying alive. Not playing games.",
+                        "Not in the mood for games right now.",
+                        "Save the distractions for later.",
+                        "Not now. Stay focused on our safety.",
+                        "Too much danger around for games.",
+                        "I have to pass on that right now.",
+                        "Not happening today. Focus.",
+                    },
+                    ["TL"] = {
+                        "Hindi ngayon.",
+                        "Hindi ngayon ang oras para sa laro.",
+                        "May tunay na kaligtasan tayong iniisip. Hindi ngayon.",
+                        "Abala ako sa pananatiling buhay. Di ako maglalaro.",
+                        "Wala ako sa mood para maglaro ngayon.",
+                        "Itabi ang pampalipas-oras mamaya.",
+                        "Hindi ngayon. Magpokus sa kaligtasan natin.",
+                        "Masyadong maraming panganib sa paligid para maglaro.",
+                        "Lalampasan ko muna 'yan ngayon.",
+                        "Di mangyayari ngayon. Magpokus.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "That did not land well.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.rejected_game.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That did not land well.",
+                        "That was poorly timed.",
+                        "Bad moment for that attempt.",
+                        "That fell completely flat.",
+                        "Wrong audience, wrong time.",
+                        "That missed the mark entirely.",
+                        "That did not go over the way you hoped.",
+                        "Poor execution on that one.",
+                        "That landed terribly. Try focusing instead.",
+                        "That didn't work at all.",
+                    },
+                    ["TL"] = {
+                        "Hindi naging maganda ang dating niyan.",
+                        "Maling-mali ang tiyempo niyan.",
+                        "Masamang sandali para sa pagtatangkang 'yan.",
+                        "Bumagsak lang nang walang saysay 'yon.",
+                        "Maling kausap, maling oras.",
+                        "Lumihis nang buo sa dapat patunguhan.",
+                        "Di naging ayon sa inasahan mo ang takbo niyan.",
+                        "Mahina ang pagkagawa sa isang 'yon.",
+                        "Napakasama ng dating niyan. Magpokus ka na lang.",
+                        "Hindi talaga umubra 'yan.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
+        ["exchangeFamily"] = {
+            ["familyID"] = "tool_reply.rejected_generic",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That did not land well.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.rejected_generic.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That did not land well.",
+                                        "That went over poorly.",
+                                        "That didn't work out.",
+                                        "That was not well received.",
+                                        "You miscalculated that one.",
+                                        "That completely backfired.",
+                                        "Not a good approach.",
+                                        "That fell flat on its face.",
+                                        "That missed completely.",
+                                        "That was a mistake.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi naging maganda ang dating niyan.",
+                                        "Pangit ang naging dating niyan.",
+                                        "Hindi naging maayos 'yan.",
+                                        "Hindi maganda ang pagtanggap diyan.",
+                                        "Nagkamali ka sa kalkulasyon doon.",
+                                        "Bumalik sa 'yo ang epekto niyan.",
+                                        "Hindi magandang paraan 'yan.",
+                                        "Bumagsak lang 'yan nang kusa.",
+                                        "Sumablay nang buo.",
+                                        "Isang pagkakamali 'yon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I am not taking that from you right now.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.tool_reply.rejected_generic.say.2.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I am not taking that from you right now.",
+                                        "I'm not in the mood for that kind of talk.",
+                                        "I'm rejecting that completely.",
+                                        "You can keep that nonsense to yourself.",
+                                        "I'm not putting up with that today.",
+                                        "Not taking that. Walk it back.",
+                                        "I refuse to engage with that.",
+                                        "I'm shutting that down immediately.",
+                                        "Not tolerating that right now.",
+                                        "I'm not accepting that from you.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko tatanggapin iyan mula sa iyo ngayon.",
+                                        "Wala ako sa mood para sa ganyang usapan.",
+                                        "Tinatanggihan ko 'yan nang buo.",
+                                        "Itago mo sa sarili mo ang kalokohang 'yan.",
+                                        "Di ko pagtitiisan 'yan ngayong araw.",
+                                        "Di tatanggapin 'yan. Bawiin mo.",
+                                        "Tumatanggi akong makipag-usap tungkol diyan.",
+                                        "Papatayin ko agad ang usapang 'yan.",
+                                        "Di ko palalampasin 'yan ngayon.",
+                                        "Hindi ko tatanggapin 'yan galing sa 'yo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "tool_reply",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "That did not land well.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.rejected_generic.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That did not land well.",
+                            "That went over poorly.",
+                            "That didn't work out.",
+                            "That was not well received.",
+                            "You miscalculated that one.",
+                            "That completely backfired.",
+                            "Not a good approach.",
+                            "That fell flat on its face.",
+                            "That missed completely.",
+                            "That was a mistake.",
+                        },
+                        ["TL"] = {
+                            "Hindi naging maganda ang dating niyan.",
+                            "Pangit ang naging dating niyan.",
+                            "Hindi naging maayos 'yan.",
+                            "Hindi maganda ang pagtanggap diyan.",
+                            "Nagkamali ka sa kalkulasyon doon.",
+                            "Bumalik sa 'yo ang epekto niyan.",
+                            "Hindi magandang paraan 'yan.",
+                            "Bumagsak lang 'yan nang kusa.",
+                            "Sumablay nang buo.",
+                            "Isang pagkakamali 'yon.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "I am not taking that from you right now.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.tool_reply.rejected_generic.say.2.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I am not taking that from you right now.",
+                            "I'm not in the mood for that kind of talk.",
+                            "I'm rejecting that completely.",
+                            "You can keep that nonsense to yourself.",
+                            "I'm not putting up with that today.",
+                            "Not taking that. Walk it back.",
+                            "I refuse to engage with that.",
+                            "I'm shutting that down immediately.",
+                            "Not tolerating that right now.",
+                            "I'm not accepting that from you.",
+                        },
+                        ["TL"] = {
+                            "Hindi ko tatanggapin iyan mula sa iyo ngayon.",
+                            "Wala ako sa mood para sa ganyang usapan.",
+                            "Tinatanggihan ko 'yan nang buo.",
+                            "Itago mo sa sarili mo ang kalokohang 'yan.",
+                            "Di ko pagtitiisan 'yan ngayong araw.",
+                            "Di tatanggapin 'yan. Bawiin mo.",
+                            "Tumatanggi akong makipag-usap tungkol diyan.",
+                            "Papatayin ko agad ang usapang 'yan.",
+                            "Di ko palalampasin 'yan ngayon.",
+                            "Hindi ko tatanggapin 'yan galing sa 'yo.",
+                        },
+                    },
+                    ["variantID"] = "neutral",
+                },
+            },
+        },
+        ["id"] = "tool_reply.rejected_generic",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "rejected_generic",
+            ["sourceId"] = "tool_reply.rejected_generic",
+            ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_rejected_generic.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
+        ["namespace"] = "tool_reply",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["category"] = "projecthoomans:tool_replies",
+                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
+                ["responseAct"] = "REACT",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                    "2",
+                },
+                ["mode"] = "keyed",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That did not land well.",
+                                        "That went over poorly.",
+                                        "That didn't work out.",
+                                        "That was not well received.",
+                                        "You miscalculated that one.",
+                                        "That completely backfired.",
+                                        "Not a good approach.",
+                                        "That fell flat on its face.",
+                                        "That missed completely.",
+                                        "That was a mistake.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi naging maganda ang dating niyan.",
+                                        "Pangit ang naging dating niyan.",
+                                        "Hindi naging maayos 'yan.",
+                                        "Hindi maganda ang pagtanggap diyan.",
+                                        "Nagkamali ka sa kalkulasyon doon.",
+                                        "Bumalik sa 'yo ang epekto niyan.",
+                                        "Hindi magandang paraan 'yan.",
+                                        "Bumagsak lang 'yan nang kusa.",
+                                        "Sumablay nang buo.",
+                                        "Isang pagkakamali 'yon.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "neutral",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I am not taking that from you right now.",
+                                        "I'm not in the mood for that kind of talk.",
+                                        "I'm rejecting that completely.",
+                                        "You can keep that nonsense to yourself.",
+                                        "I'm not putting up with that today.",
+                                        "Not taking that. Walk it back.",
+                                        "I refuse to engage with that.",
+                                        "I'm shutting that down immediately.",
+                                        "Not tolerating that right now.",
+                                        "I'm not accepting that from you.",
+                                    },
+                                    ["TL"] = {
+                                        "Hindi ko tatanggapin iyan mula sa iyo ngayon.",
+                                        "Wala ako sa mood para sa ganyang usapan.",
+                                        "Tinatanggihan ko 'yan nang buo.",
+                                        "Itago mo sa sarili mo ang kalokohang 'yan.",
+                                        "Di ko pagtitiisan 'yan ngayong araw.",
+                                        "Di tatanggapin 'yan. Bawiin mo.",
+                                        "Tumatanggi akong makipag-usap tungkol diyan.",
+                                        "Papatayin ko agad ang usapang 'yan.",
+                                        "Di ko palalampasin 'yan ngayon.",
+                                        "Hindi ko tatanggapin 'yan galing sa 'yo.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "tool_reply.rejected_generic",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That did not land well.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.tool_reply.rejected_generic.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/task_tool_replies/tool_reply_rejected_generic.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "That did not land well.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.rejected_generic.say.1.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That did not land well.",
+                        "That went over poorly.",
+                        "That didn't work out.",
+                        "That was not well received.",
+                        "You miscalculated that one.",
+                        "That completely backfired.",
+                        "Not a good approach.",
+                        "That fell flat on its face.",
+                        "That missed completely.",
+                        "That was a mistake.",
+                    },
+                    ["TL"] = {
+                        "Hindi naging maganda ang dating niyan.",
+                        "Pangit ang naging dating niyan.",
+                        "Hindi naging maayos 'yan.",
+                        "Hindi maganda ang pagtanggap diyan.",
+                        "Nagkamali ka sa kalkulasyon doon.",
+                        "Bumalik sa 'yo ang epekto niyan.",
+                        "Hindi magandang paraan 'yan.",
+                        "Bumagsak lang 'yan nang kusa.",
+                        "Sumablay nang buo.",
+                        "Isang pagkakamali 'yon.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "I am not taking that from you right now.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.tool_reply.rejected_generic.say.2.neutral",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I am not taking that from you right now.",
+                        "I'm not in the mood for that kind of talk.",
+                        "I'm rejecting that completely.",
+                        "You can keep that nonsense to yourself.",
+                        "I'm not putting up with that today.",
+                        "Not taking that. Walk it back.",
+                        "I refuse to engage with that.",
+                        "I'm shutting that down immediately.",
+                        "Not tolerating that right now.",
+                        "I'm not accepting that from you.",
+                    },
+                    ["TL"] = {
+                        "Hindi ko tatanggapin iyan mula sa iyo ngayon.",
+                        "Wala ako sa mood para sa ganyang usapan.",
+                        "Tinatanggihan ko 'yan nang buo.",
+                        "Itago mo sa sarili mo ang kalokohang 'yan.",
+                        "Di ko pagtitiisan 'yan ngayong araw.",
+                        "Di tatanggapin 'yan. Bawiin mo.",
+                        "Tumatanggi akong makipag-usap tungkol diyan.",
+                        "Papatayin ko agad ang usapang 'yan.",
+                        "Di ko palalampasin 'yan ngayon.",
+                        "Hindi ko tatanggapin 'yan galing sa 'yo.",
+                    },
+                },
+                ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "task_tool_replies",
+        ["domainPath"] = "task_tool_replies",
+        ["exchangeFamily"] = {
             ["familyID"] = "tool_reply.rejected_hostile",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -171,7 +999,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_rejected_hostile.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedHostileToRejectedSexual",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -183,6 +1011,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -268,6 +1108,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -292,6 +1138,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {
@@ -615,7 +1485,7 @@ return {
             ["sourcePath"] = "dialogue/task_tool_replies/tool_reply_rejected_sexual.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedHostileToRejectedSexual",
+        ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedGameToRejectedSexual",
         ["namespace"] = "tool_reply",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -627,6 +1497,18 @@ return {
             },
         },
         ["payload"] = {
+            ["activities"] = {
+                {
+                    ["id"] = "companion_order",
+                    ["role"] = "target",
+                },
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
@@ -748,6 +1630,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "companion_commands",
+                    ["id"] = "companion_command",
+                },
+            },
         },
         ["references"] = {
         },
@@ -772,6 +1660,30 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "target",
             },
         },
         ["slots"] = {

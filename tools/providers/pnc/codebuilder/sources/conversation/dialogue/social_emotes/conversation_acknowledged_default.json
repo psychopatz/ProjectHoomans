@@ -25,5 +25,32 @@
   "textSidecars": {
     "EN": "translations/conversation_acknowledged_default.en.json",
     "TL": "translations/conversation_acknowledged_default.tl.json"
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

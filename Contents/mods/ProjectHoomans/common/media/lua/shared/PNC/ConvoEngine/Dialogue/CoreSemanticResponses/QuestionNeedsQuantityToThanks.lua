@@ -4,6 +4,257 @@ return {
         ["domain"] = "core_semantic_responses",
         ["domainPath"] = "core_semantic_responses",
         ["exchangeFamily"] = {
+            ["familyID"] = "question.needs.quantity",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                                ["id"] = "question.needs.quantity.dataset.clarify_thirst",
+                                ["templateID"] = "convo.question.needs.quantity.say.1.question.needs.quantity.dataset.clarify_thirst",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I can confirm water is a need, but which item do you mean?",
+                                    },
+                                    ["TL"] = {
+                                        "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
+                                    },
+                                },
+                                ["when"] = {
+                                    ["all"] = {
+                                        {
+                                            ["op"] = "eq",
+                                            ["path"] = "conversation.lastIntent",
+                                            ["value"] = "CLARIFY",
+                                        },
+                                        {
+                                            ["op"] = "eq",
+                                            ["path"] = "conversation.needType",
+                                            ["value"] = "thirst",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "question.needs",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.question.needs.quantity.say.1.question.needs.quantity.dataset.clarify_thirst",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I can confirm water is a need, but which item do you mean?",
+                        },
+                        ["TL"] = {
+                            "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
+                        },
+                    },
+                    ["variantID"] = "question.needs.quantity.dataset.clarify_thirst",
+                },
+            },
+        },
+        ["id"] = "question.needs.quantity",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "quantity",
+            ["sourceId"] = "question.needs.quantity",
+            ["sourcePath"] = "dialogue/core_semantic_responses/question_needs_quantity.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
+        ["namespace"] = "question.needs",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "needs",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["metadata"] = {
+                ["responseAct"] = "QUANTITY",
+                ["responsePoolID"] = "question.needs.quantity",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "question.needs.quantity.dataset.clarify_thirst",
+                                ["metadata"] = {
+                                    ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                                    ["plan"] = {
+                                        ["dialogueAct"] = "ASK_CLARIFICATION",
+                                        ["groundedFactRefs"] = {
+                                            "npc.needs.thirst",
+                                        },
+                                        ["sourcePoolID"] = "semantic.question.needs.quantity",
+                                        ["tone"] = "clarifying",
+                                        ["topic"] = "NEEDS",
+                                        ["turns"] = {
+                                            {
+                                                ["continuation"] = "continue",
+                                                ["id"] = "dataset_needs_clarification",
+                                                ["segments"] = {
+                                                    {
+                                                        ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                                                        ["kind"] = "translation",
+                                                        ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
+                                                        ["translations"] = {
+                                                            ["EN"] = "I can confirm water is a need, but which item do you mean?",
+                                                            ["TL"] = "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                        ["uncertainty"] = "ambiguous",
+                                    },
+                                    ["priority"] = 4,
+                                    ["reviewed"] = true,
+                                    ["sourceRefs"] = {
+                                        "MASSIVE",
+                                        "SGD",
+                                    },
+                                    ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
+                                },
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I can confirm water is a need, but which item do you mean?",
+                                    },
+                                    ["TL"] = {
+                                        "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
+                                    },
+                                },
+                                ["when"] = {
+                                    ["all"] = {
+                                        {
+                                            ["op"] = "eq",
+                                            ["path"] = "conversation.lastIntent",
+                                            ["value"] = "CLARIFY",
+                                        },
+                                        {
+                                            ["op"] = "eq",
+                                            ["path"] = "conversation.needType",
+                                            ["value"] = "thirst",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "needs",
+                    ["id"] = "needs",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "QUANTITY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "question.needs.quantity",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.question.needs.quantity.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/core_semantic_responses/question_needs_quantity.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.question.needs.quantity.say.1.question.needs.quantity.dataset.clarify_thirst",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I can confirm water is a need, but which item do you mean?",
+                    },
+                    ["TL"] = {
+                        "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
+                    },
+                },
+                ["variantID"] = "question.needs.quantity.dataset.clarify_thirst",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "core_semantic_responses",
+        ["domainPath"] = "core_semantic_responses",
+        ["exchangeFamily"] = {
             ["familyID"] = "question.wellbeing",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -265,7 +516,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_wellbeing.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionWellbeingToThanks",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
         ["namespace"] = "question",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -277,6 +528,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "WELLBEING",
                 ["responsePoolID"] = "question.wellbeing",
@@ -446,6 +703,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -470,6 +733,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -651,7 +930,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_wellbeing_unknown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionWellbeingToThanks",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
         ["namespace"] = "question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -663,6 +942,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "UNKNOWN",
                 ["responsePoolID"] = "question.wellbeing.unknown",
@@ -744,6 +1029,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -768,6 +1059,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -897,7 +1204,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/refuse.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionWellbeingToThanks",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -908,6 +1215,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "REFUSE",
                 ["responsePoolID"] = "refuse",
@@ -969,6 +1282,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -993,6 +1312,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1197,7 +1532,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/question_identity.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionWellbeingToThanks",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
         ["namespace"] = "response_pool.question",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1209,6 +1544,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "IDENTITY",
                 ["responsePoolID"] = "question.identity",
@@ -1300,6 +1641,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1324,6 +1671,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -1517,7 +1880,7 @@ return {
             ["sourcePath"] = "dialogue/core_semantic_responses/thanks.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionWellbeingToThanks",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionNeedsQuantityToThanks",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1528,6 +1891,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "social",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["responseAct"] = "THANKS",
                 ["responsePoolID"] = "thanks",
@@ -1592,6 +1961,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "social",
+                    ["id"] = "social_interaction",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1616,6 +1991,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {

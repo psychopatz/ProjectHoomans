@@ -35,6 +35,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.bandits.hooman_hurt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Bandit fire! Pull back and cover the wounded colonist.",
@@ -63,7 +71,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.bandits.hooman_hurt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -75,6 +83,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -106,6 +120,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "bandits",
+                },
+            },
         },
         ["references"] = {
         },
@@ -132,7 +152,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
         ["target"] = {
@@ -194,6 +244,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.bandits.hooman_hurt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Bandit fire! Stay with the wounded survivor and watch the flank.",
@@ -222,7 +280,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.bandits.hooman_hurt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -234,6 +292,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -265,6 +329,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "bandits",
+                },
+            },
         },
         ["references"] = {
         },
@@ -291,7 +361,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_default.json",
         ["target"] = {
@@ -353,6 +453,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.bandits.hooman_hurt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Bandit fire! Stay together and cover the wounded family member.",
@@ -381,7 +489,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.bandits.hooman_hurt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -393,6 +501,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -424,6 +538,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "bandits",
+                },
+            },
         },
         ["references"] = {
         },
@@ -450,7 +570,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_family.json",
         ["target"] = {
@@ -512,6 +662,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.bandits.hooman_hurt",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Bandit fire. Stay close; I have got you.",
@@ -540,7 +698,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.bandits.hooman_hurt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -552,6 +710,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -583,6 +747,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "bandits",
+                },
+            },
         },
         ["references"] = {
         },
@@ -609,7 +779,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_lover.json",
         ["target"] = {
@@ -671,6 +871,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.companion_dogs.feed",
+            ["slots"] = {
+                ["subject"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.any",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Here you go, good girl.",
@@ -699,7 +907,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.companion_dogs.feed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -711,6 +919,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -742,6 +956,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "companion_dogs",
+                },
+            },
         },
         ["references"] = {
         },
@@ -768,7 +988,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["subject"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.any",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_feed_female.json",
         ["target"] = {
@@ -830,6 +1080,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.companion_dogs.feed",
+            ["slots"] = {
+                ["subject"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.any",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Here you go, good boy.",
@@ -858,7 +1116,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.companion_dogs.feed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -870,6 +1128,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -901,6 +1165,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "companion_dogs",
+                },
+            },
         },
         ["references"] = {
         },
@@ -927,7 +1197,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["subject"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.any",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_feed_male.json",
         ["target"] = {
@@ -989,6 +1289,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.companion_dogs.feed",
+            ["slots"] = {
+                ["subject"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.any",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Here you go, good dog.",
@@ -1017,7 +1325,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.companion_dogs.feed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1029,6 +1337,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -1060,6 +1374,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "companion_dogs",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1086,7 +1406,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["subject"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.any",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_feed_unknown.json",
         ["target"] = {
@@ -1148,6 +1498,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.companion_dogs.greeting",
+            ["slots"] = {
+                ["subject"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.any",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Who is a good girl?",
@@ -1176,7 +1534,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.companion_dogs.greeting",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1188,6 +1546,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -1219,6 +1583,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "companion_dogs",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1245,7 +1615,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["subject"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.any",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_female.json",
         ["target"] = {
@@ -1307,6 +1707,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.companion_dogs.greeting",
+            ["slots"] = {
+                ["subject"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.any",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Who is a good boy?",
@@ -1335,7 +1743,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.companion_dogs.greeting",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1347,6 +1755,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -1378,6 +1792,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "companion_dogs",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1404,7 +1824,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["subject"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.any",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_male.json",
         ["target"] = {
@@ -1466,6 +1916,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.companion_dogs.greeting",
+            ["slots"] = {
+                ["subject"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.any",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Who is a good dog?",
@@ -1494,7 +1952,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.companion_dogs.greeting",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1506,6 +1964,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -1537,6 +2001,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "companion_dogs",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1563,7 +2033,37 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["subject"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                    "entity",
+                },
+                ["role"] = "subject",
+            },
+        },
         ["slots"] = {
+            ["subject"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.any",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_companion_dogs_greeting_unknown.json",
         ["target"] = {
@@ -1625,6 +2125,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.necroa.mask_warning",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Mask up. We keep the camp safe together.",
@@ -1653,7 +2161,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.necroa.mask_warning",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1665,6 +2173,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -1696,6 +2210,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "necroa",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1722,7 +2242,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_mask_warning_colonist.json",
         ["target"] = {
@@ -1784,6 +2326,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.necroa.mask_warning",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Put your mask back on. Knox is airborne.",
@@ -1812,7 +2362,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.necroa.mask_warning",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1824,6 +2374,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -1855,6 +2411,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "necroa",
+                },
+            },
         },
         ["references"] = {
         },
@@ -1881,7 +2443,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_mask_warning_default.json",
         ["target"] = {
@@ -1943,6 +2527,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.necroa.mask_warning",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Put your mask on, family. I am not losing you to the air.",
@@ -1971,7 +2563,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.necroa.mask_warning",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1983,6 +2575,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -2014,6 +2612,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "necroa",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2040,7 +2644,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_mask_warning_family.json",
         ["target"] = {
@@ -2102,6 +2728,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.necroa.player_mask_removed",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Put your mask back on. The air is not safe.",
@@ -2130,7 +2764,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.necroa.player_mask_removed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2142,6 +2776,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -2173,6 +2813,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "necroa",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2199,7 +2845,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_default.json",
         ["target"] = {
@@ -2261,6 +2929,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.necroa.player_mask_removed",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Put your mask back on before you become a problem.",
@@ -2289,7 +2965,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.necroa.player_mask_removed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2301,6 +2977,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -2332,6 +3014,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "necroa",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2358,7 +3046,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_hostile.json",
         ["target"] = {
@@ -2420,6 +3130,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "integration.necroa.player_mask_removed",
+            ["slots"] = {
+                ["threat"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.threat",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "Please put your mask back on, love. This air is not safe.",
@@ -2448,7 +3166,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.necroa.player_mask_removed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2460,6 +3178,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -2491,6 +3215,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "necroa",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2517,7 +3247,29 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
+            ["threat"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.threat",
+            },
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_necroa_player_mask_removed_lover.json",
         ["target"] = {
@@ -2607,7 +3359,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_encounter.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.encounter",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2619,6 +3371,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -2650,6 +3408,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2674,6 +3438,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2766,7 +3546,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_encounter_hostile.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.encounter",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2778,6 +3558,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -2809,6 +3595,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2833,6 +3625,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -2925,7 +3733,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_encounter_unknown.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.encounter",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2937,6 +3745,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -2968,6 +3782,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -2992,6 +3812,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3084,7 +3920,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_faction_hostile.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.faction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3096,6 +3932,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -3127,6 +3969,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3151,6 +3999,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3243,7 +4107,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_faction_incoming.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.faction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3255,6 +4119,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -3286,6 +4156,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3310,6 +4186,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3402,7 +4294,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_faction_outgoing.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.faction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3414,6 +4306,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -3445,6 +4343,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3469,6 +4373,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3561,7 +4481,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_heli.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.meta.aircraft",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3573,6 +4493,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -3604,6 +4530,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3628,6 +4560,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3720,7 +4668,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_aircraft_military.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.meta.aircraft",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3732,6 +4680,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -3763,6 +4717,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
+            },
         },
         ["references"] = {
         },
@@ -3787,6 +4747,22 @@ return {
                         },
                     },
                 },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
             },
         },
         ["slots"] = {
@@ -3879,7 +4855,7 @@ return {
             ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent/BanditsHoomanHurtColonistToProjectalifeMetaAmbience",
         ["namespace"] = "integration.projectalife.meta",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -3891,6 +4867,12 @@ return {
             },
         },
         ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "integration",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
@@ -3921,6 +4903,12 @@ return {
                     },
                 },
                 ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "integration",
+                    ["id"] = "projectalife",
+                },
             },
         },
         ["references"] = {
@@ -3948,6 +4936,22 @@ return {
                 },
             },
         },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
         ["slots"] = {
         },
         ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_ambience.json",
@@ -3968,324 +4972,6 @@ return {
                     },
                     ["TL"] = {
                         "I do not like that sound. Stay close.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "compatibility_content",
-        ["domainPath"] = "compatibility_content",
-        ["exchangeFamily"] = {
-            ["familyID"] = "integration.projectalife.meta.crash",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "That crash sounded close. Keep your eyes open.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.integration.projectalife.meta.crash.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                    ["TL"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "integration.projectalife.meta",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "That crash sounded close. Keep your eyes open.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.integration.projectalife.meta.crash.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That crash sounded close. Keep your eyes open.",
-                        },
-                        ["TL"] = {
-                            "That crash sounded close. Keep your eyes open.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "integration.projectalife.meta.crash",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "crash",
-            ["sourceId"] = "integration.projectalife.meta.crash",
-            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_crash.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
-        ["namespace"] = "integration.projectalife.meta",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:compatibility_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-                ["responseAct"] = "REACT",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                    ["TL"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "REACT",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "integration.projectalife.meta.crash",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "That crash sounded close. Keep your eyes open.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.integration.projectalife.meta.crash.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_crash.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "That crash sounded close. Keep your eyes open.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.integration.projectalife.meta.crash.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That crash sounded close. Keep your eyes open.",
-                    },
-                    ["TL"] = {
-                        "That crash sounded close. Keep your eyes open.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "compatibility_content",
-        ["domainPath"] = "compatibility_content",
-        ["exchangeFamily"] = {
-            ["familyID"] = "integration.projectalife.meta.gunfire",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Someone is shooting nearby. Keep your head down.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.integration.projectalife.meta.gunfire.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                    ["TL"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "integration.projectalife.meta",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Someone is shooting nearby. Keep your head down.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.integration.projectalife.meta.gunfire.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Someone is shooting nearby. Keep your head down.",
-                        },
-                        ["TL"] = {
-                            "Someone is shooting nearby. Keep your head down.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "integration.projectalife.meta.gunfire",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "gunfire",
-            ["sourceId"] = "integration.projectalife.meta.gunfire",
-            ["sourcePath"] = "dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
-        ["namespace"] = "integration.projectalife.meta",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:compatibility_content",
-                ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-                ["responseAct"] = "REACT",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                    ["TL"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "REACT",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "integration.projectalife.meta.gunfire",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Someone is shooting nearby. Keep your head down.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.integration.projectalife.meta.gunfire.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/compatibility_content/integration_projectalife_meta_gunfire.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Someone is shooting nearby. Keep your head down.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.integration.projectalife.meta.gunfire.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Someone is shooting nearby. Keep your head down.",
-                    },
-                    ["TL"] = {
-                        "Someone is shooting nearby. Keep your head down.",
                     },
                 },
                 ["variantID"] = "neutral",

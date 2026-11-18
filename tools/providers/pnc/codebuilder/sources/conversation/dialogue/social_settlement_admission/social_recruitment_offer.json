@@ -21,8 +21,16 @@
       "id": "already_member",
       "when": {
         "any": [
-          { "path": "roles.companion", "op": "==", "value": true },
-          { "path": "roles.owned", "op": "==", "value": true }
+          {
+            "path": "roles.companion",
+            "op": "==",
+            "value": true
+          },
+          {
+            "path": "roles.owned",
+            "op": "==",
+            "value": true
+          }
         ]
       },
       "outcome": "already_satisfied",
@@ -78,5 +86,31 @@
         "TL": "Sige, sasama ako sa iyo."
       }
     }
-  }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "settlement_relationship",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "settlement",
+      "domain": "settlement_relationship"
+    }
+  ]
 }
