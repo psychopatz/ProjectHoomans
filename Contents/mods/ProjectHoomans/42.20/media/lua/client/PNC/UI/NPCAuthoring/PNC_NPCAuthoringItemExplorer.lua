@@ -104,6 +104,23 @@ function Explorer:createChildren()
         local ok, reason = target.onChoose(item, quantity, target.mode == 'carry' and option and option.data or nil)
         if ok ~= false then target:Hide() else target:setHint(reason or tr('UI_PNC_Authoring_UnavailableItem', 'This item is unavailable')) end
     end)
+    self.deleteButton = button(self, tr('UI_PNC_Authoring_Delete', 'Delete saved record'), function(target)
+        local item = target:currentSelection()
+        if not item or not target.options.onDelete then return end
+        if target.deleteArmedID ~= item.id then
+            target.deleteArmedID = item.id
+            target.deleteButton:setTitle(tr('UI_PNC_Authoring_ConfirmDelete', 'Confirm delete'))
+            target:setHint(tr('UI_PNC_Authoring_DeleteHint', 'Click Confirm delete to erase this saved record.'))
+            return
+        end
+        local ok, reason = target.options.onDelete(item)
+        target.deleteArmedID = nil
+        if not ok then target:setHint(tostring(reason)); return end
+        target.customItems = target.options.reloadItems and target.options.reloadItems() or {}
+        target.selectedID = nil
+        target:refreshResults()
+        target:setHint(tr('UI_PNC_Authoring_Deleted', 'Saved record deleted'))
+    end)
     self.closeButton = button(self, tr('UI_PNC_StartingCompanion_Close', 'Close'), function(target) target:Hide() end)
     self.previous = button(self, '<', function(target) target.offset = math.max(0, target.offset - target.pageSize); target:refreshResults() end)
     self.nextButton = button(self, '>', function(target) if target.offset + target.pageSize < target.total then target.offset = target.offset + target.pageSize; target:refreshResults() end end)
@@ -115,11 +132,12 @@ function Explorer:Show(options)
     self.allowed, self.onChoose, self.customItems = options.allowed, options.onChoose, options.items
     self.mode = options.mode or 'item'
     self.titleText = options.title or tr('UI_PNC_Authoring_ItemExplorer', 'Item Explorer')
-    self.source, self.category, self.offset, self.selectedID, self.selectedItem = nil, nil, 0, nil, nil
+    self.source, self.category, self.offset, self.selectedID, self.selectedItem = nil, nil, 0, options.initialID, nil
     self.compatibleOnly = true
-    self.quantity:setText('1'); self.destination:selectData('root')
+    self.deleteArmedID = nil
+    self.quantity:setText(tostring(options.initialQuantity or 1)); self.destination:selectData(options.initialDestination or 'root')
     self.confirm:setTitle(options.applyLabel or tr(self.mode == 'outfit' and 'UI_PNC_Authoring_ApplyOutfit' or 'UI_PNC_Authoring_Equip', self.mode == 'outfit' and 'Apply outfit' or 'Equip / Add'))
-    self.search:setText(''); self:refreshFilters(); self:refreshResults()
+    self.search:setText(options.initialQuery or ''); self:refreshFilters(); self:refreshResults()
     self:setVisible(true); self:bringToTop(); self:onResize(); self.search:focus()
     if self.onShown then self.onShown() end
 end
@@ -166,6 +184,12 @@ end
 function Explorer:refreshDetails()
     local item = self:currentSelection()
     self.selectedItem = item
+    if not item or self.deleteArmedID ~= item.id then self.deleteArmedID = nil end
+    if self.deleteButton then
+        self.deleteButton:setVisible(self.options.onDelete ~= nil)
+        self.deleteButton:setTitle(tr(self.deleteArmedID and 'UI_PNC_Authoring_ConfirmDelete' or 'UI_PNC_Authoring_Delete', self.deleteArmedID and 'Confirm delete' or 'Delete saved record'))
+        PNC.NPCAuthoringFields.EnableButton(self.deleteButton, item ~= nil)
+    end
     self.details:clear()
     if item then
         UI.AddKeyValue(self.details, tr('UI_PNC_Authoring_ItemName', 'Item'), item.label)
@@ -239,7 +263,9 @@ function Explorer:onResize()
         L.SetBounds(self.quantity, x, y, math.max(1, contentWidth * .15 - g), h)
         L.SetBounds(self.destination, x + contentWidth * .15, y, contentWidth * .85, h); self.destination:onResize(); y = y + h + g
     end
-    L.SetBounds(self.confirm, x, y, math.min(contentWidth, 340), h)
+    local actionWidth = math.min(self.options.onDelete and (contentWidth - g) / 2 or contentWidth, 340)
+    L.SetBounds(self.confirm, x, y, actionWidth, h)
+    L.SetBounds(self.deleteButton, x + actionWidth + g, y, actionWidth, h)
     PNC.NPCAuthoringFields.NativeMetrics(self)
 end
 return Explorer

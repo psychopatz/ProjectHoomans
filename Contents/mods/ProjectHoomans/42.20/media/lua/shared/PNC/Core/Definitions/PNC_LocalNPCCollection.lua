@@ -59,4 +59,21 @@ function Collection.Publish(player, fileName, serialized)
     if not ok then return false, reason end
     return Collection.Register(blueprint, fileName)
 end
+function Collection.ForgetFile(fileName)
+    if isClient and isClient() then return end
+    for id, ownedFile in pairs(Collection.owned) do
+        if ownedFile == fileName then
+            PNC.UniqueNPCs.Unregister(id)
+            Collection.owned[id] = nil
+        end
+    end
+end
+function Collection.Delete(player, fileName)
+    if isClient and isClient() then return false, "not_authority" end
+    if not Collection.CanPublish(player) then return false, "admin_required" end
+    local ok, reason = Database.Delete("npc", fileName)
+    if not ok then return false, reason end
+    Collection.ForgetFile(fileName)
+    return true
+end
 return Collection

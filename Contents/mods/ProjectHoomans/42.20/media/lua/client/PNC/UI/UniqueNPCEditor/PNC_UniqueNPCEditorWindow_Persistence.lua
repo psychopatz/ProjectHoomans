@@ -45,3 +45,35 @@ function Window:loadSelected()
     return true
 end
 
+function Window:browseSavedCharacters()
+    if self:pullForm() == false then return end
+    local function entries()
+        local items = {}
+        for _, entry in ipairs(Storage.List()) do
+            local label = entry.label or entry.fileName
+            items[#items + 1] = { id = entry.fileName, label = label, search = string.lower(label .. ' ' .. entry.fileName) }
+        end
+        return items
+    end
+    self.itemExplorer:Show({ mode = 'preset', title = tr('UI_PNC_Authoring_Presets', 'Presets...'), items = entries(), reloadItems = entries,
+        applyLabel = tr('UI_PNC_StartingCompanion_Load', 'Load'),
+        onChoose = function(item)
+            selectCombo(self.fileCombo, item.id)
+            local previous = self.debugRosterID
+            self.debugRosterID = item.id
+            local ok = self:loadSelected()
+            if not ok then self.debugRosterID = previous end
+            return ok
+        end,
+        onDelete = function(item)
+            local ok, reason = Storage.Delete(item.id)
+            if ok then
+                if self.draftRoster then self.draftRoster[item.id] = nil end
+                if self.draftRosterPreviews then self.draftRosterPreviews[item.id] = nil end
+                if self.debugRosterID == item.id then self.debugRosterID = 'current' end
+                self:refreshFiles()
+            end
+            return ok, reason
+        end })
+end
+

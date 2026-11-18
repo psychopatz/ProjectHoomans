@@ -822,3 +822,27 @@ Multiplayer clients do not automatically contribute files. Publishing requires
 an admin player on both client presentation and authoritative mutation paths;
 the server persists its copy and may discover its own administrator-controlled
 local files on subsequent worlds. Semantic backstories remain deferred.
+
+
+## Loadout presentation and saved-record deletion (P5R9)
+
+Body-part metadata, equipment navigation/tiles, carried inventory and camera
+framing have separate presentation responsibilities. Canonical slot/item edits
+remain in the existing loadout model. Native exclusivity derives visibility;
+no hide-state is persisted, equipped entries stay removable and unknown modded
+locations have a fallback view. Carried quantities/destinations use startingItems
+and the same dynamic Item Explorer rather than an equipment-slot abstraction.
+
+Face framing projects a copy of the body portrait spec, removes obscuring gear
+only in that copy and keeps separate camera preferences. It never author-controls
+clothing or changes saved NPC values. Menu voice owns one handle and a shared
+menu routing lease; completing/stopping the last owned preview restores MainMenu,
+while in-game playback never changes world music state.
+
+Saved-record deletion erases the data payload with a non-loadable marker and
+removes its exact kind/filename entry. It does not unlink the physical file.
+Catalog withdrawal is limited to file-owned definitions; existing actors and
+world death/reservation state are preserved. Recreated files with the same ID
+cannot revive a dead identity. Remote server-library mutation requires admin
+access; local private preset records remain user-owned. Browser confirmation
+is selection-bound and resets when the selection disappears or changes.

@@ -169,7 +169,7 @@ function Fields.Choice(editor, parent, callback)
     end
     function panel:onResize()
         local count = math.max(1, #self.buttons)
-        local columns = math.min(2, count)
+        local columns = math.min(self.columns or 2, count)
         local rows = math.ceil(count / columns)
         local w, h = math.max(1, (self.width - 4) / columns), math.max(1, (self.height - 4 * (rows - 1)) / rows)
         for index, button in ipairs(self.buttons) do

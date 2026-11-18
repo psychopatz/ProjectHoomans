@@ -93,6 +93,7 @@ function ISPNCNPCAuthoringEditor:syncPageVisibility()
     for _, entry in ipairs(tabs.viewList or {}) do
         entry.view:setVisible(self.draft ~= nil and entry.view == active)
     end
+    if self.syncPortraitView then self:syncPortraitView() end
 end
 
 function ISPNCNPCAuthoringEditor:setAdapter(adapter)
@@ -143,6 +144,7 @@ function ISPNCNPCAuthoringEditor:clearPresentation()
     self.previewIdentity = nil
     self.previewGenerationIdentity = nil
     self.previewSpecKey = nil
+    self.portraitSourceSpec = nil
     self.inspectorVisible = false
     self:syncPageVisibility()
     if self.formView and self.formView.setVisible then
@@ -269,6 +271,7 @@ require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Details"
 require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringAttributes"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Preview"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Persistence"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringPortraitView"
 require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringRandomization"
 
 return Editor

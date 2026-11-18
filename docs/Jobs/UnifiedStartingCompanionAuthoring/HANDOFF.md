@@ -2,52 +2,53 @@
 handoff_schema: 2
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-updated_at: "2026-11-18T15:14:33.615790Z"
+updated_at: "2026-11-18T15:54:07.624974Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
-phase: "P5R8"
-chunk: "P6 native tone, named save/library and per-world death retest"
+phase: "P5R9"
+chunk: "P6 modular loadout, face framing, audible voice and CRUD retest"
 retrieval_tier: "verify"
-codebase_memory_indexed_commit: "a380736978309d72a20596e087a86fa866ecd016"
+codebase_memory_indexed_commit: "a64c3bcb325f209c599a77689387135e918c2de1"
 checkpoint_mode: "committed_handoff"
 phase_commit: "self"
-phase_commit_phase: "P5R8"
-phase_commit_message: "phase(P5R8): repair skin editing and add named reusable NPC encounter saves"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=fba98ab4791bde95a12fb1fcb7fbeede88408d7a;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
-phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
+phase_commit_phase: "P5R9"
+phase_commit_message: "phase(P5R9): simplify body-part loadouts and repair voice, framing and preset deletion"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=a79c98b315c0d028d9977067b0200446e1e1d274;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
+phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=e4075dd5d5a8931d7634873b398172efdbc44c26b0555cd49c3b51deef9d925b;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 ---
 
 
 # Session Handoff
 
-P5R8 developer repair is verified. Skin selection no longer restores random
-factory RGB or retains old RGB after canonical rebind; Core portraits use the
-native tone index/neutral tint unless custom/inherited RGB is explicit. Native
-outfit captures reconcile exclusivity and stale preview garments cannot poison
-pending candidates. Read-only gender icons retain contrast and selected state.
+P5R9 developer work is verified: modular body-part loadout navigation with native
+blocked-empty-slot hide/restore, a separate carried inventory list with actual
+quantity/destination edits, and face framing in Appearance/body framing elsewhere.
+Metadata classification avoids ear/forearm/underwear and sock/socket collisions;
+unknown mod slots remain reachable. Camera projection never edits authored data.
 
-Both hosts offer editable filenames defaulted to NPC name. Companion presets
-remain sparse; optional exact independent encounter export uses the same NPC
-file codec/storage as Unique NPC production. Authority discovery loads produced
-files into the normal one-time pool. User chose death permanent within each
-world, with templates reusable elsewhere. Reload/update never clears dead world
-state. Encounter exports carry no player relationship grant.
+Voice now mirrors native PLAYDEMOVOICE's FMOD InGame menu routing and restores
+MainMenu when the last owned Hoomans preview completes/stops. In-game debug does
+not alter world music. Owned-handle/origin/pitch/type handling remains. Actual
+audibility is UNVERIFIED; prior mocks omitted the native routing requirement.
 
-MP clients cannot auto-register local files. Publication requires admin on the
-UI and server mutation boundary; accepted requests persist a server copy. A
-server also reads its own administrator-controlled local files. This phase owns
-only the generic portrait tint/index adjustment and regression in Core; all
-product library/permission policy remains in Hoomans.
+Both saved-record browsers expose select/Delete/Confirm delete and reset stale
+confirmation on selection/filter change. Delete erases payload and index entry,
+leaving a non-loadable marker file instead of unlinking it. File-owned encounter
+catalog entries are withdrawn; existing actors and world death survive. Remote
+server-library deletion requires admin; private local templates remain user-owned.
 
-`TEST_VERIFIED`: **62/62** focused Hoomans; **1055/1059** full, same four known
-scene-route/context/population/translation failures. Core portrait smoke passes.
-`STATIC_ONLY`: Hoomans 24 Lua syntax/17 production Kahlua, Core two syntax/one
-Kahlua, six new EN/TL Character keys, JSON/parity/references/whitespace pass.
-Graph coverage checked; stale/new source read directly. Installed Java/native
-Lua supplied API contracts. No native rendering/input/audio/MP success is claimed.
+`TEST_VERIFIED`: **65/65** focused; **1058/1062** full suite, same four known
+scene-route/context-scene/population/translation failures. `STATIC_ONLY`: 28 Lua
+syntax/21 production Kahlua checks, six new EN/TL keys, JSON/key/placeholder/
+reference and whitespace checks pass. Coverage checked for 38 Hoomans, three
+Core and five Java evidence paths; changed/new source read directly. Native
+CharacterCreationMain/Avatar supplied voice/framing constants. Core is unchanged.
 
-Next: user-owned fresh-session matrix in PERSISTENCE_AND_SKIN_RETEST.md, then
-previous voice/browser/SP/MP/co-op gates. No game launch/control, push or Workshop
-publication. Preserve unrelated concurrent semantic/test work. Participant Core
-commit must precede the exact owned primary commit/checkpoint.
+Next: user-owned fresh-session retest in LOADOUT_AUDIO_CRUD_RETEST.md, then prior
+skin/save/library/SP/MP/co-op gates. No native launch/control, rendering/input/
+audible success, push or Workshop publication. Exact local phase commit/checkpoint
+required before handoff; preserve unrelated work.
+
+Core has concurrent semantic-tooling work outside this phase. No Core paths
+are phase-owned; preserve that dirty work and its checkpoint fingerprint.

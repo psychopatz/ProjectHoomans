@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R8 developer repair verified — P6 native acceptance pending
+**Status:** P5R9 developer repair verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -917,6 +917,30 @@ Backstory generation is a future feature and not a condition of this repair.
 commits required. Fresh native rendering/input, saved-file reload and MP admin
 transport acceptance remain user-owned; see the focused retest document.
 
+### P5R9 — Body-part loadout, carried inventory, framing, voice and CRUD
+
+- Selectable modular body-part views replace the all-slots scroll wall. Native
+  exclusivity hides only blocked empty alternatives and clearing restores them;
+  unknown mod locations stay reachable. Equipped entries remain clearable.
+- Carried inventory owns a distinct list and Add/Edit/Remove/quantity/destination
+  workflow over existing canonical startingItems and dynamic item discovery.
+- Appearance uses vanilla face zoom/offset in a copied portrait projection;
+  other tabs restore body view and independent camera preferences. Preview
+  framing never edits appearance, inventory or preset data.
+- Menu voice mirrors native PLAYDEMOVOICE's FMOD InGame state and restores
+  MainMenu at completion/stop. Debug audio preserves world music state.
+- Add saved-record deletion in companion and Unique NPC browsers, with explicit
+  two-click confirmation and stale-selection cancellation. Erase payload, remove
+  its index entry and retain a non-loadable marker. Preserve other namespaces,
+  living actors and world death state. MP library deletion remains admin gated.
+- **65/65** focused and **1058/1062** full suite, same four known failures;
+  28 Lua syntax/21 production Kahlua, six new EN/TL keys, JSON/parity/reference
+  and whitespace checks pass.
+
+**P5R9 gate:** developer verification complete; exact owned local phase commit
+required. Native layout/hit testing and audible playback remain user-owned; see
+LOADOUT_AUDIO_CRUD_RETEST.md.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
@@ -958,6 +982,13 @@ unless the user explicitly delegates native control:
   produced-only discovery, same-world death/reload and reuse in another world;
 - verify remote non-admin cannot publish, admin publication reaches server
   storage/catalog, and ordinary client-local files are never auto-imported;
+- verify body-part navigation, native blocked-slot hide/restore and the separate
+  carried inventory quantity/destination workflow on both creator hosts;
+- verify Appearance face framing and body restoration without data mutation;
+- verify audible menu/debug voice, stop/replay, tab/close cleanup and return of
+  menu music after completion;
+- verify Delete/Confirm delete, filter/selection cancellation, restart/index
+  reload, namespace isolation and preserved per-world death/actors;
 - verify the final active-companion summary before world entry;
 - use the Resolution Inspector to confirm shared field-source traces when
   diagnosing a mismatch;

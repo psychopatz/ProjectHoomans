@@ -87,17 +87,22 @@ end
 function Store.List()
     local output = {}
     for _, entry in ipairs(Database.List(Store.KIND)) do
-        output[#output + 1] = {
+        local preset = Store.Load(entry.fileName)
+        if preset then output[#output + 1] = {
             fileName = entry.fileName,
             label = entry.displayName,
             schemaVersion = entry.schemaVersion,
-            kind = (Store.Load(entry.fileName) or {}).kind,
-        }
+            kind = preset.kind,
+        } end
     end
     table.sort(output, function(left, right)
         return tostring(left.label) < tostring(right.label)
     end)
     return output
+end
+
+function Store.Delete(fileName)
+    return Database.Delete(Store.KIND, fileName)
 end
 
 return Store

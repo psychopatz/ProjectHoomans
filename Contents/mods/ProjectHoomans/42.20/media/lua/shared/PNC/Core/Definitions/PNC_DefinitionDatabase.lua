@@ -252,6 +252,24 @@ function Database.Upsert(kind, fileName, metadata)
     return saveIndex(index)
 end
 
+function Database.Delete(kind, fileName)
+    kind, fileName = validKind(kind), validFileName(fileName)
+    if not kind or not fileName then return false, "invalid_definition_path" end
+    local index, retained, found = loadIndex(), {}, false
+    for _, entry in ipairs(index.entries) do
+        if entry.definitionType == kind and entry.fileName == fileName then found = true
+        else retained[#retained + 1] = entry end
+    end
+    if not found then return false, "definition_not_indexed" end
+    -- Native mod file I/O provides bounded read/write. Erase the payload and
+    -- leave a non-loadable marker so index rebuilding cannot resurrect it.
+    local ok, reason = Database.WriteFile(kind, fileName,
+        encode({ kind = "ProjectHoomans.DeletedDefinition", schemaVersion = 1 }))
+    if not ok then return false, reason end
+    index.entries = retained
+    return saveIndex(index)
+end
+
 function Database.ReplaceKind(kind, fileNames)
     kind = validKind(kind)
     if not kind then return false, "invalid_definition_type" end

@@ -30,6 +30,15 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
     for _, size in ipairs({ { 780, 420 }, { 1060, 620 }, { 1540, 900 } }) do
         e.width, e.height, e.uiScale = size[1], size[2], scale
         e:onResponsiveLayout()
+        for _, part in ipairs({ 'head', 'legs', 'carry' }) do
+            e.loadoutPart = part; e:onResponsiveLayout()
+            for _, action in ipairs(e.loadoutParts) do inside(action, e.pages.loadout.width, e.pages.loadout.contentHeight, 'body-part navigation fits scrollable page') end
+            if part == 'carry' then
+                inside(e.carriedPanel, e.pages.loadout.width, e.pages.loadout.contentHeight, 'inventory view fits scrollable page')
+                inside(e.carriedList, e.carriedPanel.width, e.carriedPanel.height, 'inventory list fits its panel at compact/large-font sizes')
+                for _, action in ipairs(e.carriedActions) do inside(action, e.carriedPanel.width, e.carriedPanel.height, 'inventory actions fit their panel') end
+            end
+        end
         for scope, dice in pairs(e.pageDice) do inside(dice, e.pages[scope].width, e.pages[scope].contentHeight or e.pages[scope].height, 'tab dice stays inside its page') end
         for _, tile in ipairs(e.slotTiles) do
             inside(tile, e.slotContent.width, e.slotContent.contentHeight, 'slot tile stays inside its scroll content')

@@ -1,52 +1,50 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R8
+## Current state — 2026-11-18 P5R9
 
-Developer-side skin, disabled-gender contrast and reusable-character persistence
-repair is verified. Native acceptance remains **UNVERIFIED**. Both creator hosts
-retain the shared editor and canonical blueprint pipeline.
+Developer-side modular loadout, dynamic portrait, native audio routing and local
+record-deletion work is verified. Native acceptance remains **UNVERIFIED**.
+Both creator hosts keep one canonical authoring model and shared editor.
 
-- Native outfit materialization now reconciles mutually exclusive clothing in
-  wear order; stale preview clothes cannot poison a pending policy. Manually
-  authored conflicts remain validation errors. This addresses the screenshot's
-  shorts/pants rejection blocking unrelated skin edits.
-- Choosing a native skin texture suppresses random factory RGB fallback, clears
-  old tint from retained preview records even after adapter rebinding, and uses
-  matching native index plus neutral RGB in Core's descriptor portrait. Explicit
-  inherited/custom RGB remains valid. Disabled gender icons retain contrast and
-  selected backgrounds while input remains disabled.
-- Both hosts offer editable save filenames defaulting to the NPC's name. Preset
-  kind/scope is available in the browser. A save captures its source before the
-  dialog, so later selection changes cannot redirect it.
-- Single-character saves offer **Include in world encounters**. Companion
-  templates retain sparse/inherited intent; an independent exact character
-  snapshot uses the same data-only file codec/storage as the Unique NPC creator.
-  The authority discovers produced files into the existing Unique NPC pool,
-  with its normal generation chance and per-world reservation/death state.
-- User decision: death is permanent **within each world**; templates remain
-  reusable elsewhere. Library reload/update never resets dead world entries.
-- Multiplayer clients cannot auto-import local files. Publication is disabled
-  without an admin player and the server independently requires admin access.
-  Remote admin publishing persists through the authoritative debug transport;
-  a server also reads its own administrator-controlled definition directory.
+- Loadout has selectable body-part views and a separate carried-inventory list.
+  Metadata classification avoids substring collisions such as forearm/ear,
+  underwear/ear and socket/sock; unfamiliar mod locations remain accessible.
+  Empty native-exclusive alternatives hide while their blocking item is worn,
+  then return after clearing. Equipped slots remain available to remove.
+- Carried money/food/supplies have explicit quantity/destination, Add/Edit/Remove
+  actions and the same loaded-game/mod Item Explorer. Body equipment and held
+  attachments keep their equipment controls. Model edits/persistence stay shared.
+- Appearance uses vanilla face framing (zoom 14, Y offset -.85), strips obscuring
+  clothes only from its copied descriptor projection, and restores body framing
+  on other pages. Body/face zoom preferences are separate. NPC data is unchanged.
+- Voice preview now follows native PLAYDEMOVOICE's menu FMOD InGame routing,
+  then returns to MainMenu on completion/stop. Owned-handle stopping and menu
+  origin/pitch/type handling remain. In-game debug playback does not change
+  music state. Native playback, rather than a catalog precheck, determines success.
+- Both saved-record browsers expose select/Delete/Confirm delete. Selection or
+  filter changes cancel stale confirmation. Deletion erases the payload, removes
+  only that namespace/index record and leaves a non-loadable marker file on disk.
+  Rebuild cannot resurrect it. A deleted local encounter definition leaves the
+  future catalog while existing actors and per-world death records remain.
+  MP server-library deletion independently requires admin access.
 
-`TEST_VERIFIED`: **62/62** focused Hoomans tests and the Core portrait smoke pass.
-Full Hoomans suite: **1055/1059**, with the same four known scene-route,
-context-scene, population-initialization and Debug-Hub-translation failures.
-New regressions cover native exclusive capture, source-safe named saves,
-exact snapshots, produced-only discovery, non-admin rejection, same-world death
-and reuse in a different world. Existing tests cover rebind tint and icon contrast.
+`TEST_VERIFIED`: **65/65** focused tests; full suite **1058/1062**, with the same
+four known scene-route/context-scene/population-initialization/translation
+failures. New regressions cover classification, slot hide/restore, carried
+editing, non-mutating face/body transitions and stale deletion confirmation.
+Existing database/library/audio tests cover namespace isolation, payload erasure,
+admin deletion rejection, retained world death and FMOD routing/cleanup.
 
-`STATIC_ONLY`: Hoomans **24** Lua syntax/**17** production Kahlua checks; Core
-**two** syntax/**one** production Kahlua check. Six new EN/TL Character keys,
-JSON/key/placeholder parity, static references and whitespace checks pass.
-Graph coverage checked; changed/new sources read directly. Installed Java
-baseline and native Lua supplied skin/index/button/dialog API evidence.
+`STATIC_ONLY`: **28** owned Lua syntax/**21** production Kahlua checks pass.
+Six new EN/TL Character keys, JSON/key/placeholder parity, static/dynamic key
+references and whitespace checks pass. Coverage checked for 38 Hoomans, three
+Core and five Java evidence paths; dirty/new source read directly. Installed
+CharacterCreationMain/Avatar and current Java baseline supplied native contracts.
 
-Next: **P6 user-owned fresh-session retest**, using
-[PERSISTENCE_AND_SKIN_RETEST.md](PERSISTENCE_AND_SKIN_RETEST.md), then previous
-browser/audio and SP/MP/co-op acceptance. No native game launch/control or
-rendered/input/audible success is claimed. No push or Workshop publication.
+Next: **P6 user-owned fresh-session retest** in
+[LOADOUT_AUDIO_CRUD_RETEST.md](LOADOUT_AUDIO_CRUD_RETEST.md), followed by prior
+skin/save/library and SP/MP/co-op matrices. No native game launch/control,
+rendered/input/audible success, push or Workshop publication is claimed.
 
 ## Historical developer checkpoints
 

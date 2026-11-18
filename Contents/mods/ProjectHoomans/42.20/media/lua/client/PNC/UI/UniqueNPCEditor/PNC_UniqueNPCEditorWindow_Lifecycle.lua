@@ -25,6 +25,7 @@ end
 local function buildEditorToolbar(self)
     local buttons = self.presentationMode == "companion" and {} or {
         { "new", "UI_PNC_UniqueNPCEditor_New", "NEW", "quiet" },
+        { "presets", "UI_PNC_Authoring_Presets", "Presets...", "quiet" },
         { "save", "UI_PNC_UniqueNPCEditor_Save", "SAVE", "quiet" },
         { "produce", "UI_PNC_UniqueNPCEditor_Produce", "PRODUCE", "primary" },
     }

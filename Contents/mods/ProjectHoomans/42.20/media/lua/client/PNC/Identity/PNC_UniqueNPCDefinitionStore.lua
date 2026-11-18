@@ -167,6 +167,18 @@ function Storage.List()
     return output
 end
 
+function Storage.Delete(fileName)
+    local ok, reason = Database.Delete("npc", fileName)
+    if not ok then return false, reason end
+    local collection = require "PNC/Core/Definitions/PNC_LocalNPCCollection"
+    collection.ForgetFile(fileName)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if isClient and isClient() and collection.CanPublish(player) and sendClientCommand then
+        sendClientCommand(player, PNC.Const.MODULE, PNC.Const.CMD_DEBUG, { action = "delete_unique_definition", fileName = fileName })
+    end
+    return true
+end
+
 Storage.ROOT = ROOT
 Storage.INDEX = INDEX
 Storage.DIRECTORY = DIRECTORY

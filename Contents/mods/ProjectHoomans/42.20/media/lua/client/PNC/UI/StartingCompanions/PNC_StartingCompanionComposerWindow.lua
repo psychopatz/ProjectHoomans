@@ -315,14 +315,27 @@ function ISPNCStartingCompanionComposerWindow:loadSelected()
 end
 
 function ISPNCStartingCompanionComposerWindow:browsePresets()
+    local function entries()
     local items = {}
     for _, entry in ipairs(Store.List()) do
         local label = tostring(entry.label or entry.fileName)
         items[#items + 1] = { id = entry.fileName, label = label, search = string.lower(label .. " " .. entry.fileName), category = entry.kind }
     end
+    return items
+    end
+    local items = entries()
     self.editor.itemExplorer:Show({ mode = "preset", items = items,
         title = tr("UI_PNC_Authoring_Presets", "Presets..."),
         applyLabel = tr("UI_PNC_StartingCompanion_Load", "Load"),
+        reloadItems = entries,
+        onDelete = function(item)
+            local ok, reason = Store.Delete(item.id)
+            if ok then
+                if self.selectedPresetFile == item.id then self:SelectPreset(nil) end
+                self:refreshPresets()
+            end
+            return ok, reason
+        end,
         describe = function(item)
             local payload = Store.Load(item.id)
             return { { label = tr("UI_PNC_Authoring_PresetScope", "Preset scope"),

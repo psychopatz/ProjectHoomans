@@ -282,6 +282,16 @@ function Unique.Get(id)
     return id and copy(Unique.Definitions[id]) or nil
 end
 
+function Unique.Unregister(id)
+    id = safeID(id)
+    if not id or not Unique.Definitions[id] then return false, "definition_missing" end
+    Unique.Definitions[id], Unique.Errors[id] = nil, nil
+    for index = #Unique.Ordered, 1, -1 do
+        if Unique.Ordered[index] == id then table.remove(Unique.Ordered, index) end
+    end
+    return true
+end
+
 function Unique.List()
     local ids = {}
     local output = {}

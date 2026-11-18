@@ -219,6 +219,8 @@ function ISPNCNPCAuthoringEditor:onAction(button)
         self:refreshPreview(true)
     elseif action == "load" then
         self:loadSelected()
+    elseif action == "presets" then
+        self:browseSavedCharacters()
     elseif action == "vary_look" then
         if self:pullForm() == false then return end
         if self.presentationAdapter then

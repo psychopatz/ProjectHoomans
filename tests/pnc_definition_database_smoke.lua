@@ -48,4 +48,20 @@ T.equal(#index.files, 1,
 T.equal(index.files[1], "Example.txt",
     "derived NPC file list contains the expected filename")
 
+local writes = {}
+getFileWriter = function(path)
+    return { write = function(_, value)
+        writes[path] = value
+        if path == Database.INDEX_PATH then indexContent = value end
+    end, close = function() end }
+end
+T.truthy(Database.Delete('starter', 'Family.txt'), 'indexed preset can be deleted')
+T.equal(#Database.List('starter'), 0, 'deleted preset is absent from subsequent index reads')
+T.equal(#Database.List('npc'), 1, 'deleting a starter preset preserves other namespaces')
+T.truthy(string.find(writes[Database.GetPath('starter', 'Family.txt')], 'DeletedDefinition', 1, true), 'old payload is replaced by a non-loadable deletion marker')
+local before = writes[Database.INDEX_PATH]
+T.falsy(Database.Delete('npc', '../outside.txt'), 'deletion rejects path traversal')
+T.falsy(Database.Delete('npc', 'Unindexed.txt'), 'deletion cannot target an unindexed file')
+T.equal(writes[Database.INDEX_PATH], before, 'rejected deletion cannot change index state')
+
 T.finish("pnc_definition_database_smoke")

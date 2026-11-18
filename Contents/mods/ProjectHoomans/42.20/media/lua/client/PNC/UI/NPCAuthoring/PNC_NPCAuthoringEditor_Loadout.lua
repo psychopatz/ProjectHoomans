@@ -23,7 +23,8 @@ function Window:buildLoadoutPage()
     self.outfitValue = I.addLabel(page, '')
     self.slotContent = ISPNCUniqueNPCAppearanceScrollPanel:new(0, 0, 1, 1)
     self.slotContent:initialise(); self.slotContent:instantiate(); page:addChild(self.slotContent)
-    self.slotTiles, self.slotHeaders = {}, {}
+    self.slotTiles = {}
+    self:buildLoadoutNavigation()
     self.itemExplorer = ISPNCNPCAuthoringItemExplorer:new(0, 0, 1, 1)
     self.itemExplorer:initialise(); self.itemExplorer:instantiate(); self:addChild(self.itemExplorer)
     local function modalLayout()
@@ -87,7 +88,10 @@ function Window:openSlot(slot)
         allowed = {}
         for _, item in ipairs(Catalog.Clothing(slot.id)) do allowed[item.id] = true end
     end
-    self.itemExplorer:Show({ mode = slot.kind, title = slot.label, allowed = allowed,
+    local carried = slot.group == 'carry' and slot.kind == 'item'
+    self.itemExplorer:Show({ mode = carried and 'carry' or slot.kind, title = slot.label, allowed = allowed,
+        initialID = carried and slot.type or nil, initialQuery = carried and slot.type or nil,
+        initialQuantity = carried and slot.quantity or nil, initialDestination = carried and slot.destination or nil,
         reloadAllowed = slot.kind == 'worn' and function()
             local refreshed = {}; for _, item in ipairs(Catalog.Clothing(slot.id)) do refreshed[item.id] = true end; return refreshed
         end or nil,
@@ -105,7 +109,7 @@ function Window:applyLoadout(slot, fullType, quantity, destination)
         if not native then return false, tr('UI_PNC_Authoring_UnavailableItem', 'This item is unavailable') end
         spec, reason = PNC.Inventory.CaptureNativeItem(native)
         if not spec then return false, tostring(reason) end
-        spec.stack = slot.kind == 'carry' and quantity or 1
+        spec.stack = (slot.kind == 'carry' or slot.group == 'carry') and quantity or 1
         if spec.maxWeight then spec.stack = 1 end
         spec.preferredContainer = destination == 'bag' and 'bag' or nil
         if slot.kind == 'attach' then
@@ -170,6 +174,7 @@ function Window:refreshLoadoutPage()
         tile.clear:setVisible(slot.kind ~= 'carry' and slot.kind ~= 'attach')
     end
     for index = #rows + 1, #self.slotTiles do self.slotTiles[index]:setVisible(false); self.slotTiles[index].clear:setVisible(false) end
+    self:refreshLoadoutNavigation()
     self:layoutSlotTiles()
     local outfit = self.draft and self.draft.appearance and self.draft.appearance.outfit
     local outfitID = outfit and outfit.mode == 'item' and 'named:' .. tostring(outfit.id) or outfit and outfit.mode or 'random'
@@ -183,65 +188,6 @@ function Window:refreshLoadoutPage()
     self.outfitCaption = label
     self.outfitValue:setName(label)
 end
-function Window:layoutSlotTiles()
-    if not self.slotContent then return end
-    local g, tileSize = L.Pixels(8, self.uiScale), L.Pixels(86, self.uiScale)
-    local width = math.max(1, self.slotContent.width - 18)
-    local columns = math.max(1, math.floor((width + g) / (tileSize + g)))
-    local tileWidth = math.max(1, (width - g * (columns - 1)) / columns)
-    local groups = {}
-    for _, group in ipairs(Slots.Groups()) do groups[#groups + 1] = group end
-    groups[#groups + 1] = { id = 'held', key = 'Held', label = 'Held items and attachments' }
-    groups[#groups + 1] = { id = 'carry', key = 'Carried', label = 'Carried items' }
-    local y, headerIndex = 0, 0
-    for _, group in ipairs(groups) do
-        local members = {}
-        for index, row in ipairs(self.slotRows or {}) do if row.group == group.id then members[#members + 1] = index end end
-        if #members > 0 then
-            headerIndex = headerIndex + 1
-            local label = self.slotHeaders[headerIndex] or I.addLabel(self.slotContent, '')
-            self.slotHeaders[headerIndex] = label
-            label:setName(tr('UI_PNC_Authoring_Group_' .. group.key, group.label)); label:setVisible(true)
-            L.SetBounds(label, 0, y, width, L.Pixels(26, self.uiScale)); y = y + L.Pixels(30, self.uiScale)
-            for order, index in ipairs(members) do
-                local x, top = (order - 1) % columns * (tileWidth + g), y + math.floor((order - 1) / columns) * (tileSize + g)
-                local tile = self.slotTiles[index]
-                L.SetBounds(tile, x, top, tileWidth, tileSize)
-                local clearSize = math.min(tileWidth, math.max(L.Pixels(22, self.uiScale),
-                    (getTextManager and getTextManager():getFontHeight(UIFont.Small) or 16) + 6))
-                L.SetBounds(tile.clear, x + tileWidth - clearSize, top, clearSize, clearSize)
-            end
-            y = y + math.ceil(#members / columns) * (tileSize + g)
-        end
-    end
-    for index = headerIndex + 1, #self.slotHeaders do self.slotHeaders[index]:setVisible(false) end
-    self.slotContent.contentHeight = y
-    self.slotContent.maxScroll = math.max(0, y - self.slotContent.height)
-    self.slotContent:setScrollHeight(y)
-    self.slotContent:setYScroll(math.max(-self.slotContent.maxScroll, math.min(0, self.slotContent:getYScroll())))
-    self.slotContent:onResize()
-end
-function Window:layoutLoadoutPage(width, height, rowHeight, gap)
-    local w = math.max(1, width - gap * 2 - 16)
-    L.SetBounds(self.outfitBrowse, gap, rowHeight + gap * 2, math.min(w, L.Pixels(170, self.uiScale)), rowHeight)
-    self.outfitValue:setName(L.Ellipsize(self.outfitCaption or "", UIFont.Small, w))
-    self.outfitValue.tooltip = self.outfitCaption
-    L.SetBounds(self.outfitValue, gap, gap * 2 + rowHeight * 2, w, rowHeight)
-    L.SetBounds(self.loadoutModeRow.labelControl, gap, rowHeight * 3 + gap * 3, w, rowHeight)
-    self.loadoutModeRow.labelControl:setVisible(true); self.loadoutModeRow.entry:setVisible(true)
-    L.SetBounds(self.loadoutModeRow.entry, gap, rowHeight * 4 + gap * 3, math.min(w, L.Pixels(360, self.uiScale)), rowHeight * 2 + 4)
-    self.loadoutModeRow.entry:onResize()
-    local top = rowHeight * 6 + gap * 4 + 4
-    local contentHeight = math.max(rowHeight * 3, height - top - gap)
-    L.SetBounds(self.slotContent, gap, top, w, contentHeight)
-    local page = self.pages.loadout
-    page.contentHeight = top + contentHeight + gap
-    page.maxScroll = math.max(0, page.contentHeight - height)
-    page:setScrollHeight(page.contentHeight); page:onResize()
-    self:layoutSlotTiles()
-    if self.itemExplorer then
-        L.SetBounds(self.itemExplorer, 0, 0, self.width, self.height)
-        self.itemExplorer:onResize()
-    end
-end
+require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringCarriedInventory'
+require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringLoadoutView'
 return Window

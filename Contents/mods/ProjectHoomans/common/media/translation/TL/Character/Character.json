@@ -460,5 +460,11 @@
   "UI_PNC_Authoring_WorldLibrary": "Isama sa mga makakatagpo sa mundo",
   "UI_PNC_Authoring_WorldLibraryHelp": "Maaaring magamit sa ibang mundo. Permanente ang kamatayan sa bawat mundo.",
   "UI_PNC_Authoring_AdminLibrary": "Administrator lamang ng multiplayer ang maaaring magdagdag ng mga karakter na makakatagpo.",
-  "UI_PNC_Authoring_PresetOnlySaved": "Na-save ang preset; hindi ma-save ang karakter para sa mundo: "
+  "UI_PNC_Authoring_PresetOnlySaved": "Na-save ang preset; hindi ma-save ang karakter para sa mundo: ",
+  "UI_PNC_Authoring_EditCarried": "I-edit ang dami / lalagyan",
+  "UI_PNC_Authoring_RemoveCarried": "Alisin ang gamit",
+  "UI_PNC_Authoring_Delete": "Burahin ang naka-save na rekord",
+  "UI_PNC_Authoring_ConfirmDelete": "Kumpirmahin ang pagbura",
+  "UI_PNC_Authoring_DeleteHint": "Pindutin ang Kumpirmahin ang pagbura upang burahin ang rekord na ito.",
+  "UI_PNC_Authoring_Deleted": "Nabura na ang naka-save na rekord"
 }

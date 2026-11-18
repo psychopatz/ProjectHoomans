@@ -52,6 +52,11 @@ T.truthy(Registry.MarkDead({ uniqueDefinitionId = 'user:Custom', id = 'runtime:1
 C.Load()
 T.equal(Registry.Get('user:Custom').status, 'dead', 'reload never resurrects a dead character in the same world')
 T.equal(Registry.ReserveForGeneration({ force = true, seed = 12 }), nil, 'dead character is excluded from later generation')
+T.truthy(C.Delete(nil, 'Custom.txt'), 'singleplayer can delete its reusable character')
+T.equal(PNC.UniqueNPCs.Get('user:Custom'), nil, 'deletion withdraws future catalog encounters')
+T.equal(Registry.Get('user:Custom').status, 'dead', 'deleting the template cannot erase world death records')
+T.truthy(Storage.SaveCharacter(draft, 'Custom.txt'), 'saved character can be created again under the same identity')
+T.equal(Registry.Get('user:Custom').status, 'dead', 'recreating the file does not revive the character in this world')
 PNC.HoomansWorldView.Registry = {}
 T.truthy(Registry.ReserveForGeneration({ force = true, seed = 12 }), 'a different world can encounter the same saved character')
 isServer = function() return true end
@@ -60,6 +65,7 @@ local member = { getAccessLevel = function() return '' end }
 local encoded = B.Serialize(M.BuildBlueprint(saved))
 local before = files[D.GetPath('npc', 'Custom.txt')]
 T.falsy(C.Publish(member, 'Custom.txt', encoded), 'authority rejects non-admin publication')
+T.falsy(C.Delete(member, 'Custom.txt'), 'authority rejects non-admin library deletion')
 T.equal(files[D.GetPath('npc', 'Custom.txt')], before, 'rejected client cannot write the server library')
 T.truthy(C.Publish(admin, 'Custom.txt', encoded), 'admin can publish through the same validated file pipeline')
 isClient = function() return true end

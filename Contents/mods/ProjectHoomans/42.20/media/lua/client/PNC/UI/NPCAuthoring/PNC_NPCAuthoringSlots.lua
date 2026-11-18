@@ -3,27 +3,8 @@ PNC.NPCAuthoringSlots = PNC.NPCAuthoringSlots or {}
 local Slots = PNC.NPCAuthoringSlots
 local Catalog = PNC.NPCAuthoringCatalog
 local function tr(key, fallback) return PNC.Translation.GetKey(key, fallback) end
-local groups = {
-    { id = 'head', key = 'Head', label = 'Head and face', pattern = 'hat|head|mask|eyes|eye|ears|ear|nose' },
-    { id = 'neck', key = 'Neck', label = 'Neck', pattern = 'neck|scarf|gorget' },
-    { id = 'hands', key = 'Hands', label = 'Hands and jewelry', pattern = 'hand|finger|wrist|forearm' },
-    { id = 'back', key = 'Back', label = 'Back and bags', pattern = 'back|fanny|webbing' },
-    { id = 'waist', key = 'Waist', label = 'Waist and holsters', pattern = 'belt|holster|ammo|strap' },
-    { id = 'feet', key = 'Feet', label = 'Feet', pattern = 'shoe|sock|foot' },
-    { id = 'legs', key = 'Legs', label = 'Legs', pattern = 'pants|skirt|leg|thigh|knee|calf|shorts' },
-    { id = 'torso', key = 'Torso', label = 'Torso and layers', pattern = 'shirt|vest|jacket|torso|suit|sweater|dress|underwear|robe' },
-    { id = 'other', key = 'Other', label = 'Other equipment', pattern = '' },
-}
-function Slots.Group(location)
-    local raw = string.lower(location)
-    for _, group in ipairs(groups) do
-        for token in string.gmatch(group.pattern, '[^|]+') do
-            if string.find(raw, token, 1, true) then return group end
-        end
-    end
-    return groups[#groups]
-end
-function Slots.Groups() return groups end
+local Parts = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringBodyParts'
+Slots.Group, Slots.Groups = Parts.Group, Parts.All
 local nativeNames, nativeCount, nativeGroup = {}, -1, nil
 local function translationName(location)
     local group = BodyLocations and BodyLocations.getGroup and BodyLocations.getGroup('Human')
@@ -84,6 +65,20 @@ function Slots.Build(draft, record)
     for _, item in pairs(effective) do if item.wornSlot then add(item.wornSlot) end end
     for _, item in ipairs(draft.startingItems or {}) do if item.wornSlot then add(item.wornSlot) end end
     table.sort(rows, function(a, b) return a.label < b.label end)
+    local visible = {}
+    local appearance = PNC.Identity.Appearance
+    for _, row in ipairs(rows) do
+        local blocked = false
+        if not row.type then
+            for _, occupied in ipairs(rows) do
+                if occupied.type and (appearance.AreExclusive(row.id, occupied.id) or appearance.AreExclusive(occupied.id, row.id)) then
+                    blocked = true; break
+                end
+            end
+        end
+        if not blocked then visible[#visible + 1] = row end
+    end
+    rows = visible
     for _, id in ipairs({ 'primary', 'secondary' }) do
         local kind = id == 'primary' and 'Primary' or 'Secondary'
         local row = { kind = 'held', id = id, group = 'held', label = tr('UI_PNC_Authoring_' .. kind,
@@ -96,7 +91,8 @@ function Slots.Build(draft, record)
     for index, item in ipairs(draft.startingItems or {}) do
         if not item.wornSlot and not item.equipSlot then rows[#rows + 1] = { kind = 'item', id = item.key or 'item:' .. index,
             index = index, group = item.attachedSlot and 'held' or 'carry',
-            label = item.attachedSlot and Slots.Label(item.attachedSlot) or '×' .. tostring(item.stack or 1), type = item.type } end
+            label = item.attachedSlot and Slots.Label(item.attachedSlot) or '×' .. tostring(item.stack or 1), type = item.type,
+            quantity = item.stack or 1, destination = item.preferredContainer or 'root' } end
     end
     rows[#rows + 1] = { kind = 'carry', id = 'new', group = 'carry', label = tr('UI_PNC_Authoring_AddItem', 'Add carried item or bag') }
     return rows

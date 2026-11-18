@@ -460,5 +460,11 @@
   "UI_PNC_Authoring_WorldLibrary": "Include in world encounters",
   "UI_PNC_Authoring_WorldLibraryHelp": "Reusable in other worlds. Death is permanent within each world.",
   "UI_PNC_Authoring_AdminLibrary": "Only a multiplayer administrator can publish encounter characters.",
-  "UI_PNC_Authoring_PresetOnlySaved": "Preset saved; encounter character could not be saved: "
+  "UI_PNC_Authoring_PresetOnlySaved": "Preset saved; encounter character could not be saved: ",
+  "UI_PNC_Authoring_EditCarried": "Edit quantity / destination",
+  "UI_PNC_Authoring_RemoveCarried": "Remove item",
+  "UI_PNC_Authoring_Delete": "Delete saved record",
+  "UI_PNC_Authoring_ConfirmDelete": "Confirm delete",
+  "UI_PNC_Authoring_DeleteHint": "Click Confirm delete to erase this saved record.",
+  "UI_PNC_Authoring_Deleted": "Saved record deleted"
 }

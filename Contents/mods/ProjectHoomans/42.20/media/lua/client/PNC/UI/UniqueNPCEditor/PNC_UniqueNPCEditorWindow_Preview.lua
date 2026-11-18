@@ -49,11 +49,12 @@ function Window:refreshPreview(force)
     if previewRecord then
         self.previewDraft = candidatePreview
         local spec = Model.BuildPortraitSpec(self.previewDraft)
+        self.portraitSourceSpec = spec
         self.previewSpecKey = spec and spec.key or nil
         self.portraitTarget = spec
         self.portraitPanel:setVisible(true)
-        rendered = self.portraitPanel:setTarget(
-            nil, spec, force == true) == true
+        if self.syncPortraitView then rendered = self:syncPortraitView(force)
+        else rendered = self.portraitPanel:setTarget(nil, spec, force == true) == true end
     else
         self:setStatus(tostring(previewReason or reason or "preview unavailable"))
         return false
