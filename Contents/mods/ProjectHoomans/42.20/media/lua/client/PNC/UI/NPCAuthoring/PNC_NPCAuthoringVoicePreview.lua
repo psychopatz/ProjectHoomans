@@ -22,8 +22,11 @@ function Preview:Play(profile, suffix)
     if not self.emitter or not profile or not profile.prefix then return false, "audio_unavailable" end
     local name = tostring(profile.prefix) .. tostring(suffix or "ShoutHey")
     if GameSounds and not GameSounds.isKnownSound(name) then return false, "voice_event_unavailable" end
+    local menu = MainScreen and MainScreen.instance and not MainScreen.instance.inGame
+    if menu and manager.resumeSoundAndMusic then manager:resumeSoundAndMusic() end
     self.handle = manager:playUISound(name) or 0
     if self.handle == 0 then return false, "voice_play_failed" end
+    if menu and self.emitter.setPos then self.emitter:setPos(0, 0, 0) end
     self.emitter:setParameterValueByName(self.handle, "CharacterVoicePitch", tonumber(profile.pitch) or 0)
     self.emitter:setParameterValueByName(self.handle, "CharacterVoiceType", tonumber(profile.voiceType) or 0)
     self.emitter:tick()

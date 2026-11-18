@@ -75,6 +75,7 @@ local UI = {
 }
 function UI.Layout.Pixels(value) return value end
 function UI.Layout.Flow(controls, rect)
+    for index, control in ipairs(controls) do UI.Layout.SetBounds(control, rect.x + (index - 1) * 110, rect.y, 100, 32) end
     return { bottom = rect.y + 32 }
 end
 function UI.Layout.SetBounds(control, x, y, width, height)
@@ -107,8 +108,10 @@ function BaseWindow:addChild(child) self.children[#self.children + 1] = child en
 function BaseWindow:setVisible(value) self.visible = value end
 function BaseWindow:removeFromUIManager() self.removed = true end
 function BaseWindow:bringToTop() self.broughtToTop = true end
-function BaseWindow:getContentRect()
-    return { x = 0, y = 0, width = self.width, height = self.height }
+function BaseWindow:getContentRect(options)
+    options = options or {}
+    local top = options.top or 30
+    return { x = 8, y = top, width = self.width - 16, height = self.height - top - (options.bottom or 8) }
 end
 function BaseWindow:close() self:setVisible(false) end
 PsychopatzFixedWindow = BaseWindow:derive("PsychopatzFixedWindow")
@@ -285,6 +288,8 @@ local window = ISPNCStartingCompanionComposerWindow:new(0, 0, 1060, 800,
 window:initialise()
 window:createChildren()
 window:refresh()
+T.truthy(window.loadButton.y >= 30, "toolbar reserves the native title bar")
+T.truthy(window.editor.y >= window.loadButton.y + 32, "editor starts below the toolbar")
 
 T.equal(window.selectedTraitID, brother,
     "native callback harness starts on the first active companion")

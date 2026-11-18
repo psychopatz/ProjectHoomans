@@ -423,5 +423,10 @@
   "UI_PNC_Authoring_PresetScope": "Saklaw ng preset",
   "UI_PNC_Authoring_PresetWhole": "Buong pangkat ng kasama",
   "UI_PNC_Authoring_PresetSingle": "Isang kasama",
-  "UI_PNC_Authoring_Clear": "Alisin sa puwesto / Tanggalin"
+  "UI_PNC_Authoring_Clear": "Alisin sa puwesto / Tanggalin",
+  "UI_PNC_Authoring_VaryLook": "Baguhin nang sapalaran ang mukha at kasuotan",
+  "UI_PNC_Authoring_AudioUnavailable": "Hindi magagamit ang audio output",
+  "UI_PNC_Authoring_VoiceEventMissing": "Hindi magagamit ang napiling sample ng boses",
+  "UI_PNC_Authoring_VoicePlayFailed": "Hindi masimulan ang pagpapatugtog ng boses",
+  "UI_PNC_Authoring_VariationFailed": "Hindi makagawa ng bagong hitsura"
 }

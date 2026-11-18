@@ -34,9 +34,7 @@ local function buildAppearanceTopControls(self)
         variant = "quiet",
     })
     self.topControls = { self.playVoiceButton, self.stopVoiceButton }
-    local random = PNC.NPCAuthoringFields.CanRandomize(self)
-    self.randomizeButton:setVisible(random)
-    if random then table.insert(self.topControls, 1, self.randomizeButton) end
+    self.randomizeButton:setVisible(false)
     if not self.integrated and self.parentEditor and self.parentEditor.presentationMode == "companion" then
         self.advancedClothingButton = UI.CreateButton(self, {
             id = "advancedClothing",

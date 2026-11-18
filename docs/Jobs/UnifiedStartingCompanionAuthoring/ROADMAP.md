@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R5 developer repair verified — P6 native acceptance pending
+**Status:** P5R6 developer repair verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -836,6 +836,30 @@ checks. P6 must establish actual native rendering/input/audio and SP/MP/co-op
 outcomes. Registered native outfit names remain available; no guessed test-name
 blacklist or fabricated outfit-visibility API was introduced.
 
+### P5R6 — Free companion gender, explicit variation and native frame/audio
+
+The latest native report reopens P5R5 acceptance and clarifies that a wide
+quick appearance-variation action is wanted in companion creation. Random
+selector policies remain excluded; the explicit action is allowed.
+
+- Free-sex traits use an editable generated default; family/orientation-bound
+  gender stays protected. Concrete male/female values round-trip and a body
+  change rebuilds its gender-specific generated preview.
+- Selected buttons retain their themed background through enable/theme updates.
+- The composer reserves the native title bar and the shared editor has a wide
+  variation footer, hidden behind modal browsers.
+- Companion variation projects concrete editable visuals in one validated
+  transaction, retaining biography generation, gender, locks and unrelated data.
+- Menu voice follows the native resume/origin sequence and reports localized
+  failures, while debug playback preserves paused gameplay audio ownership.
+- **56/56** focused, **1049/1053** full suite; same four recorded failures.
+  Twenty Lua syntax checks, twelve production Kahlua checks, five new EN/TL
+  keys, JSON/static references/parity and whitespace checks pass.
+
+**P5R6 gate:** developer checks verified; exact local phase commit required.
+Native rendered/input/audio acceptance remains P6, including the new Friend,
+selection-color, title-frame, wide-action and menu-voice retest.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
@@ -864,7 +888,8 @@ unless the user explicitly delegates native control:
   blueprint intent;
 - reopen the editor repeatedly and confirm no reroll until Randomize is used;
 - verify companion Reset/Revert and debug Randomize look have distinct behavior;
-- verify companion customization exposes no Random choices/actions, including
+- verify companion customization exposes no Random policy choices, while the
+  wide explicit appearance-variation action works, including
   after loading older randomized presets;
 - verify browser selection, focused outfit preview, Apply/Cancel, grouped
   attributes and compact preset scope using the P5R5 native matrix;

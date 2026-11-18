@@ -82,6 +82,15 @@ function Fields.Bounds(control, x, y, width, height)
     end
 end
 
+function Fields.SelectButton(button, selected, enabled)
+    local variant = selected and "selected" or "quiet"
+    button.pncEnabledVariant = variant
+    button:setEnable(enabled ~= false)
+    if UI.StyleButton then UI.StyleButton(button, variant)
+    else button.backgroundColor = selected and { r = .11, g = .34, b = .24, a = 1 }
+        or { r = .08, g = .10, b = .12, a = 1 } end
+end
+
 function Fields.Gender(editor, parent)
     local panel = ISPanel:new(0, 0, 1, 1)
     panel:initialise(); panel:instantiate(); panel:noBackground()
@@ -91,15 +100,11 @@ function Fields.Gender(editor, parent)
     panel.buttons = {}
     function panel:setEnabled(value)
         self.enabled = value
-        for _, button in ipairs(self.buttons) do Fields.EnableButton(button, value) end
+        for index, button in ipairs(self.buttons) do Fields.SelectButton(button, index == self.selected, value) end
     end
     function panel:selectData(value)
         self.selected = value == true and 2 or 1
-        for index, button in ipairs(self.buttons) do
-            button.backgroundColor = index == self.selected
-                and { r = 0.11, g = 0.34, b = 0.24, a = 1 }
-                or { r = 0.08, g = 0.10, b = 0.12, a = 1 }
-        end
+        for index, button in ipairs(self.buttons) do Fields.SelectButton(button, index == self.selected, self.enabled) end
     end
     function panel:onResize()
         local w = math.max(1, (self.width - 6) / 2)
@@ -136,10 +141,7 @@ function Fields.Choice(editor, parent, callback)
         for index, option in ipairs(self.options) do
             if option.data == value then self.selected = index end
         end
-        for index, button in ipairs(self.buttons) do
-            button.backgroundColor = index == self.selected and { r = 0.10, g = 0.32, b = 0.23, a = 1 }
-                or { r = 0.07, g = 0.09, b = 0.11, a = 1 }
-        end
+        for index, button in ipairs(self.buttons) do Fields.SelectButton(button, index == self.selected, self.enabled) end
     end
     function panel:addOptionWithData(label, data)
         local index = #self.options + 1
@@ -153,7 +155,7 @@ function Fields.Choice(editor, parent, callback)
     end
     function panel:setEnabled(value)
         self.enabled = value
-        for _, button in ipairs(self.buttons) do Fields.EnableButton(button, value) end
+        for index, button in ipairs(self.buttons) do Fields.SelectButton(button, index == self.selected, value) end
     end
     function panel:onResize()
         local count = math.max(1, #self.buttons)

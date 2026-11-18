@@ -187,6 +187,10 @@ function Model.ApplyDraftToRuntime(draft)
     local definitionReason
     def, definitionReason = Model.BuildDefinition(draft)
     if not def then return nil, definitionReason end
+    -- A body change needs a new gender-specific generated visual/profile.
+    local previousFemale = record.isFemale
+    if previousFemale == nil and record.identity then previousFemale = record.identity.isFemale end
+    if previousFemale ~= nil and previousFemale ~= def.isFemale then return Model.EnsureRuntimeRecord(draft, true) end
     inventoryChanged = PNC.NPCAuthoring.Registry.Hash(record.startingItems or {})
         ~= PNC.NPCAuthoring.Registry.Hash(def.startingItems or {})
         or record.equipmentSpawnMode ~= def.equipmentSpawnMode

@@ -242,7 +242,7 @@ function ISPNCStartingCompanionComposerWindow:refresh()
 end
 
 function ISPNCStartingCompanionComposerWindow:onResponsiveLayout()
-    local rect = self:getContentRect({ top = 0, bottom = 10 })
+    local rect = self:getContentRect({ bottom = 10 })
     local gap = Layout.Pixels(8, self.uiScale)
     local rowHeight = Layout.Pixels(28, self.uiScale)
     self.presetCombo:setVisible(false)

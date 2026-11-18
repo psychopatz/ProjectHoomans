@@ -55,4 +55,20 @@ local changed = 0
 function editor:onComboChanged() changed = changed + 1 end
 gender.buttons[2].onclick(gender)
 T.equal(changed, 0, 'locked gender cannot toggle even through the callback boundary')
+F.UI.StyleButton = function(button, variant)
+    button.psychopatzVariant = variant
+    button.backgroundColor = { g = variant == 'selected' and .34 or .10 }
+end
+gender:setEnabled(true)
+gender:selectData(true)
+T.equal(gender.buttons[2].psychopatzVariant, 'selected', 'selected gender belongs to theme state')
+gender:setEnabled(true)
+T.equal(gender.buttons[2].backgroundColor.g, .34, 'enabling cannot erase selected gender color')
+for _, b in ipairs(gender.buttons) do F.UI.StyleButton(b, b.psychopatzVariant) end
+T.equal(gender.buttons[2].backgroundColor.g, .34, 'theme refresh retains selection')
+gender:setEnabled(false)
+T.equal(gender.buttons[2].psychopatzVariant, 'selected', 'locked selected value remains identifiable')
+gender:setEnabled(true); gender.buttons[1].onclick(gender)
+T.equal(gender.selected, 1, 'unlocked friend-style gender toggles to male')
+T.equal(gender.buttons[1].psychopatzVariant, 'selected', 'new selection is highlighted')
 T.finish('pnc_npc_authoring_text_edit_smoke')

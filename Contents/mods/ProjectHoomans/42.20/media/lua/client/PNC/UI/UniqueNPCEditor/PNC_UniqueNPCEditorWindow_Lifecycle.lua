@@ -27,7 +27,6 @@ local function buildEditorToolbar(self)
         { "new", "UI_PNC_UniqueNPCEditor_New", "NEW", "quiet" },
         { "save", "UI_PNC_UniqueNPCEditor_Save", "SAVE", "quiet" },
         { "produce", "UI_PNC_UniqueNPCEditor_Produce", "PRODUCE", "primary" },
-        { "randomize", "UI_PNC_Authoring_RandomizeLook", "Randomize look", "selected" },
     }
     buttons[#buttons + 1] = { "preview", "UI_PNC_Authoring_Preview", "Preview", "quiet" }
     for _, button in ipairs(buttons) do
@@ -205,6 +204,9 @@ local function buildEditorForm(self)
             target = self, onclick = ISPNCNPCAuthoringEditor.onAction, variant = "quiet",
         })
     end
+    self.variationButton = UI.CreateButton(self, { id = "vary_look",
+        title = tr("UI_PNC_Authoring_VaryLook", "Randomize face and clothes"), target = self,
+        onclick = ISPNCNPCAuthoringEditor.onAction, variant = "primary" })
     self.statusLabel = addLabel(self, "")
 end
 

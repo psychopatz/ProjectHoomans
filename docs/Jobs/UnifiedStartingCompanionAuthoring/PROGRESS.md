@@ -1,53 +1,48 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R5
+## Current state — 2026-11-18 P5R6
 
-Developer implementation of the approved randomization/browser repair is
-complete. Both entry points still use one shared editor and canonical model.
-Native P5R5 acceptance is **UNVERIFIED**; the screenshots rejecting P5R4 remain
-the latest actual game evidence.
+Developer repair of the latest native control report is complete. Native P5R6
+acceptance remains **UNVERIFIED**. Both entry points still use the shared editor.
+The user's latest clarification permits a wide explicit appearance-variation
+action in companion creation; Random policies remain absent from selectors.
 
-- Companion customization omits Random/Randomize controls and blocks stale
-  callbacks, workflow and adapter routes. Generated current values are display
-  placeholders, never silent authored replacements or an option to reroll.
-- Debug **Randomize look** replaces clothing and explicit body/hair/color choices
-  from a new generation, retaining biography, attributes, audio and held/carried
-  gear. Exact new native clothing state reaches the portrait and slot policy;
-  visible Appearance controls are synchronized after the action.
-- Native combo construction/resizing keeps baseHeight aligned with the actual
-  input. Small-font lists refresh font/row metrics; native label positions remain
-  valid after caption changes. Disabled actions use neutral theme colors.
-- The shared browser has contextual outfit, item, preset and attribute modes.
-  Outfits use readable rows and one focused preview, not empty thumbnail cards.
-  Apply uses the reviewed clothing state; Cancel leaves the draft unchanged.
-  Quantity/destination only appear for carried items. Selection is highlighted,
-  empty/failure states explained, and hidden/filtered/stale selections cannot be
-  applied. Dynamic mod item discovery and lazy native creation remain intact.
-- Companion presets use a compact browser with lazy scope details. Attributes
-  have separate skill/NPC/vanilla/dynamic trait groups, searchable pickers, bounded
-  skill steppers and group-local removal. Narrow layouts stack and scroll.
-- Complete outfits remove old authored clothing without removing bags or held
-  gear. Ordinary text/audio/tab/roster edits retain the earlier visual stability
-  contracts and generated/inherited no-op behavior.
+- Friend gender is editable because random sex is a default, not a mandatory
+  relationship binding. Fixed family/orientation rules remain locked. Both
+  boolean choices survive canonical form commits, presets and context refresh.
+  Male values also remain present in identity traces. Body changes create a
+  fresh gender-specific preview instead of retaining old skin/hair caches.
+- Gender/segmented selections own a selected theme variant, so enabling,
+  disabling and theme refresh cannot erase the selected background color.
+- The composer reserves Core's title-bar content inset. Its toolbar no longer
+  starts at top=0. A wide **Randomize face and clothes** action spans the shared
+  editor footer and is unavailable behind browser overlays.
+- Companion variation materializes concrete visuals, projects only editable
+  appearance fields/wardrobe, validates once and commits atomically. It keeps
+  the original generation seed, names, gender, relationship inheritance,
+  attributes, voice and held/carried gear. Failed materialization changes nothing.
+- Actorless menu voice preview now follows native creation's audio-bus resume
+  and emitter-origin reset, without changing music state. In-game debug playback
+  does not resume unrelated paused world audio. Playback failures have localized
+  output/sample/startup explanations; only the owned sound handle is stopped.
 
-`TEST_VERIFIED`: **55/55** focused tests; **1048/1052** full suite. The same four
-recorded failures remain: animation scene debug routes, context debug scene lab,
-population director initialization and Debug Hub translation expectation.
-Four new tests cover browser selection/apply, presentation capability, native
-widget metrics and outfit Apply/Cancel transactions. Existing model, form,
-geometry, voice, collection and host interaction tests were extended.
+`TEST_VERIFIED`: **56/56** focused; **1049/1053** full suite. The same four prior
+failures remain: scene debug routes, context scene lab, population director
+initialization and Debug Hub translation expectation. Added a real wide-button
+routing regression and extended policy/adapter, gender/form, theme, frame/footer,
+body-cache and actorless audio-boundary tests.
 
-`STATIC_ONLY`: all **33** owned Lua files parse; all **22** changed production
-Lua files pass Kahlua error checks. JSON, static key references, **15** new EN/TL
-keys, key parity and whitespace checks pass. Coverage for changed/new source was
-checked against the committed graph baseline and current source directly; native
-widget methods were inspected in the installed PZ42.22.2 Lua.
+`STATIC_ONLY`: **20** changed/new Lua files parse, **12** production Kahlua checks
+pass, JSON/static references/**five** new EN/TL keys/parity/whitespace pass.
+Graph coverage was checked for 26 Hoomans/four Core paths and SoundManager;
+dirty/new source and installed native CharacterCreationMain supplied current
+source evidence. Java harness confirms the installed baseline is current.
 
-Next responsibility: **P6 user-owned native retest of P5R5**, using
-[RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md](RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md).
-No native game was launched/driven. Actual input/rendering, outfit diversity,
-audible playback and SP/MP/co-op finalization remain unverified by the harness.
-Unrelated concurrent semantic work is preserved. No push or Workshop publication.
+Next: **P6 user-owned native retest** of Friend male/female selection and colors,
+fixed family locks, header spacing/font scales, wide visual variation, wardrobe
+stability and audible play/stop before world entry, then existing SP/MP/co-op
+finalization. No game was launched/driven and no native audibility/rendering
+success is claimed. No push or Workshop publication.
 
 ## Historical developer checkpoints
 

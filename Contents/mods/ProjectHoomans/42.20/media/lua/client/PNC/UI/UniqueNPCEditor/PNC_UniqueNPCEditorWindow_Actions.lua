@@ -87,6 +87,9 @@ function Window:pullForm()
     self.textEdits = {}
     if self.presentationAdapter then
         local survivor = self.draft.identity.survivor
+        if self:fieldCapability("identity.isFemale").editable ~= false then
+            self.draft.isFemale = comboData(self.genderCombo) == true
+        end
         local previousNickname = self.draft.identity.nickname
         local first = fieldText(self.forenameEntry):trim()
         local nickname = fieldText(self.nicknameEntry):trim()
@@ -216,6 +219,18 @@ function ISPNCNPCAuthoringEditor:onAction(button)
         self:refreshPreview(true)
     elseif action == "load" then
         self:loadSelected()
+    elseif action == "vary_look" then
+        if self:pullForm() == false then return end
+        if self.presentationAdapter then
+            local ok, reason = self.presentationAdapter:VaryLook()
+            if not ok then self:setStatus(tr("UI_PNC_Authoring_VariationFailed", "Could not generate a new appearance")); return end
+            self:refreshFromAdapter(true)
+        else
+            self:adoptPreview()
+            Model.Randomize(self.draft)
+            self.previewDraft = nil
+            self:syncControls(); self:refreshPreview(true)
+        end
     elseif action == "randomize" then
         if not PNC.NPCAuthoringFields.CanRandomize(self) then return end
         if self:pullForm() == false then return end

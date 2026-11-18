@@ -117,6 +117,17 @@ function Window:onComboChanged(combo)
     local kind = combo and combo.pncKind
     if kind == "gender" then
         self.draft.isFemale = comboData(combo) == true
+        local survivor = self.draft.identity.survivor
+        local compatible = survivor.hairModel == nil
+        for _, option in ipairs(appearanceOptions(self.draft.isFemale)) do
+            if option.id == survivor.hairModel then compatible = true end
+        end
+        self.draft.authoringClears = self.draft.authoringClears or {}
+        if not compatible then
+            survivor.hairModel = nil
+            self.draft.authoringClears["appearance.hairModel"] = true
+        end
+        if self.draft.isFemale then survivor.beardModel = "" end
         self:refreshStyleOptions()
         if self.appearanceTab and self.appearanceTab.refreshGenderOptions then
             self.appearanceTab:refreshGenderOptions()

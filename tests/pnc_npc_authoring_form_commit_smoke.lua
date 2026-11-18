@@ -59,4 +59,8 @@ T.truthy(synced > 0, 'production synchronization also refreshes the visible appe
 e:pullForm()
 T.falsy(e.draft.authoringClears['appearance.hairModel'], 'unrelated companion commit cannot clear generated hair')
 T.falsy(e.draft.authoringClears['appearance.beardModel'], 'unrelated companion commit cannot clear generated beard')
+e.genderCombo:selectData(true); e:pullForm()
+T.equal(e.draft.isFemale, true, 'editable companion gender is read by the production form commit')
+e.genderCombo:selectData(false); e:pullForm()
+T.equal(e.draft.isFemale, false, 'production form preserves the male false value')
 T.finish('pnc_npc_authoring_form_commit_smoke')

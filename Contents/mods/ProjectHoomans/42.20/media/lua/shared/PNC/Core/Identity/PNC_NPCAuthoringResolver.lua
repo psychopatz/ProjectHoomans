@@ -197,6 +197,8 @@ local function relationshipPolicy(spec)
             end,
         }
     end
+    -- Random is a default for free-sex relationships, not a mandatory rule.
+    if spec.sex ~= "random" then
     policy.bindings["identity.isFemale"] = {
         mandatory = true,
         source = "derived",
@@ -207,6 +209,7 @@ local function relationshipPolicy(spec)
             return relationshipFemale(spec, context, seedValue)
         end,
     }
+    end
     return policy
 end
 
@@ -511,13 +514,14 @@ function Resolver.AttachIdentityTrace(trace, identity)
         ["identity.forename"] = survivor and survivor.forename or nil,
         ["identity.surname"] = survivor and survivor.surname or nil,
         ["identity.nickname"] = identity and identity.nickname or nil,
-        ["identity.isFemale"] = identity and identity.isFemale or nil,
+
         ["appearance.hairModel"] = survivor and survivor.hairModel or nil,
         ["appearance.beardModel"] = survivor and survivor.beardModel or nil,
         ["appearance.skinTexture"] = survivor and survivor.skinTexture or nil,
         ["appearance.skinColor"] = survivor and survivor.skinColor or nil,
         ["appearance.hairColor"] = survivor and survivor.hairColor or nil,
     }
+    if identity then values["identity.isFemale"] = identity.isFemale end
     local fieldID
     local value
     for fieldID, value in pairs(values) do

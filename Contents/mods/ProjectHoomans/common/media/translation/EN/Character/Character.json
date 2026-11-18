@@ -423,5 +423,10 @@
   "UI_PNC_Authoring_PresetScope": "Preset scope",
   "UI_PNC_Authoring_PresetWhole": "Whole companion set",
   "UI_PNC_Authoring_PresetSingle": "One companion",
-  "UI_PNC_Authoring_Clear": "Clear slot / Remove"
+  "UI_PNC_Authoring_Clear": "Clear slot / Remove",
+  "UI_PNC_Authoring_VaryLook": "Randomize face and clothes",
+  "UI_PNC_Authoring_AudioUnavailable": "Audio output is unavailable",
+  "UI_PNC_Authoring_VoiceEventMissing": "The selected voice sample is unavailable",
+  "UI_PNC_Authoring_VoicePlayFailed": "Voice playback could not start",
+  "UI_PNC_Authoring_VariationFailed": "Could not generate a new appearance"
 }

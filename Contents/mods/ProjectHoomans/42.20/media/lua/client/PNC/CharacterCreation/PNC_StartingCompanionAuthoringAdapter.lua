@@ -213,6 +213,58 @@ function Adapter:CommitDraft(draft)
     return changed
 end
 
+-- Explicit visual variation is allowed in character creation. Random policies
+-- remain absent from selectors; only concrete editable visual fields are saved.
+function Adapter:VaryLook()
+    local intent = self:BlueprintIntent()
+    local draft = self:BuildDraft()
+    if not intent or not draft then return nil, "slot_not_found" end
+    Model.Randomize(draft)
+    local preview = Model.BuildPreviewDraft(draft)
+    local record, reason = Model.EnsureRuntimeRecord(preview, true)
+    if not record then return nil, reason end
+    local spec = Model.BuildPortraitSpec(preview)
+    local look = spec and spec.appearance or {}
+    -- Freeze the actual generated wardrobe too: fallback archetype clothing
+    -- must not revert to the old global seed after the visual-only transaction.
+    local appearance = PNC.Identity.Appearance.Normalize(draft.appearance)
+    for _, item in pairs(record.inventory and record.inventory.items or {}) do
+        if item.wornSlot and not item.equipSlot and not item.maxWeight and not item.bagContainer then
+            appearance.slots[item.wornSlot] = { mode = "item", type = item.type,
+                wornSlot = item.wornSlot, itemState = copy(item.itemState) }
+        end
+    end
+    draft.appearance = appearance
+    for _, key in ipairs({ "hairModel", "beardModel", "skinTexture", "skinColor", "hairColor" }) do
+        draft.identity.survivor[key] = copy(look[key])
+    end
+    local generated
+    generated, reason = Model.BuildBlueprint(draft)
+    if not generated then return nil, reason end
+    local candidate = Blueprint.Clone(intent)
+    for _, field in ipairs(Profile.List("companion")) do
+        local visual = field.group == "appearance" and not string.find(field.id, "appearance.voice", 1, true)
+        if (visual or field.id == "startingItems") and self:FieldCapability(field.id).editable ~= false then
+            local state, value = Blueprint.Get(generated, field.id)
+            if state == "value" then candidate, reason = Blueprint.Set(candidate, field.id, value)
+            else candidate, reason = Blueprint.Clear(candidate, field.id) end
+            if not candidate then return nil, reason end
+        end
+    end
+    -- Keep the original generation seed: rerolling it would also change names,
+    -- relationship defaults and attributes outside this action's visual scope.
+    local slot = self:Slot()
+    local plan
+    plan, reason = Authoring.Resolver.ResolvePlan(candidate, self.session:GetContext(),
+        Authoring.Resolver.PolicyForStartingCompanion(slot.spec))
+    if not plan then return nil, reason end
+    local ok
+    ok, reason = self.session:SetBlueprint(self.traitID, candidate)
+    if not ok then return nil, reason end
+    self._viewSnapshot = nil
+    return true
+end
+
 function Adapter:Randomize()
     return nil, "randomization_unavailable"
 end

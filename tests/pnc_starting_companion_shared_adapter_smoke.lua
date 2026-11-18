@@ -188,4 +188,60 @@ T.truthy(adapter:CommitDraft(afterClear), "empty inventory intent commits")
 local emptyState = Blueprint.Get(session:GetBlueprint(TID.BROTHER), "startingItems")
 T.equal(emptyState, "clear", "empty loadout cannot resurrect previous authored items")
 
+-- Free-sex companion traits accept both concrete choices; fixed family and
+-- orientation policies remain authoritative through preview and serialization.
+session:Reconcile({ TID.FRIEND, TID.BROTHER }, context("Reyes", true, "straight"))
+local friend = Adapter.New(session, TID.FRIEND)
+T.truthy(friend:FieldCapability("identity.isFemale").editable, "Friend gender is editable")
+T.truthy(session:SetField(TID.FRIEND, "identity.isFemale", false), "free-sex policy accepts an explicit male default")
+for _, female in ipairs({ true, false }) do
+    local selected = friend:BuildDraft()
+    selected.isFemale = female
+    friend:CommitDraft(selected)
+    T.equal(session:GetSlot(TID.FRIEND).resolvedDefinition.isFemale, female, "friend gender choice survives resolution")
+    local state, value = Blueprint.Get(session:GetBlueprint(TID.FRIEND), "identity.isFemale")
+    T.equal(state, "value", "friend gender is authored")
+    T.equal(value, female, "false male value is preserved")
+    local serialized = Blueprint.Serialize(session:GetBlueprint(TID.FRIEND))
+    local decoded = Blueprint.Deserialize(serialized)
+    local _, restoredGender = Blueprint.Get(decoded, "identity.isFemale")
+    T.equal(restoredGender, female, "friend gender round trips in canonical presets")
+end
+local freeFingerprint = Blueprint.Fingerprint(session:GetBlueprint(TID.FRIEND))
+session:Refresh(context("Changed", false, "gay"))
+T.equal(session:GetSlot(TID.FRIEND).resolvedDefinition.isFemale, false, "player sex/orientation cannot override a selected friend gender")
+T.equal(Blueprint.Fingerprint(session:GetBlueprint(TID.FRIEND)), freeFingerprint, "context rebinding does not rewrite friend intent")
+local trace = Authoring.Resolver.AttachIdentityTrace({}, { isFemale = false, survivor = {} })
+T.equal(trace.fields['identity.isFemale'].value, false, "trace preserves male values")
+
+-- Exercise the real policy-aware visual transaction with controlled native
+-- materialization at the runtime boundary, never changing nonvisual defaults.
+local savedEnsure, savedPortrait = Model.EnsureRuntimeRecord, Model.BuildPortraitSpec
+Model.EnsureRuntimeRecord = function() return { inventory = { items = { shirt = { type = "Base.VariationShirt", wornSlot = "Torso", itemState = { visualTextureChoice = 2 } } } } } end
+Model.BuildPortraitSpec = function() return { appearance = { hairModel = "Short", beardModel = "", skinTexture = "MaleBody02",
+    hairColor = { r = .2, g = .3, b = .4 }, skinColor = { r = .5, g = .5, b = .5 } } } end
+local oldSeed = session:GetBlueprint(TID.FRIEND).generationSeed
+local beforeName = session:GetSlot(TID.FRIEND).resolvedDefinition.displayName
+T.truthy(friend:VaryLook(), "explicit companion variation uses the canonical transaction")
+T.equal(session:GetBlueprint(TID.FRIEND).generationSeed, oldSeed, "visual variation preserves the biography generation seed")
+T.equal(session:GetSlot(TID.FRIEND).resolvedDefinition.displayName, beforeName, "visual variation preserves name")
+T.equal(session:GetSlot(TID.FRIEND).resolvedDefinition.isFemale, false, "visual variation preserves selected gender")
+local _, variedHair = Blueprint.Get(session:GetBlueprint(TID.FRIEND), "appearance.hairModel")
+T.equal(variedHair, "Short", "concrete generated visual fields are authored")
+local _, wardrobe = Blueprint.Get(session:GetBlueprint(TID.FRIEND), "appearance")
+T.equal(wardrobe.slots.Torso.type, "Base.VariationShirt", "fallback generated wardrobe is frozen into concrete slots")
+T.equal(wardrobe.slots.Torso.itemState.visualTextureChoice, 2, "concrete wardrobe preserves its reviewed native visual state")
+local brotherAdapter = Adapter.New(session, TID.BROTHER)
+T.falsy(brotherAdapter:FieldCapability("identity.isFemale").editable, "fixed-sex family gender remains locked")
+T.truthy(brotherAdapter:VaryLook(), "family look can vary within relationship rules")
+T.equal(Blueprint.Get(session:GetBlueprint(TID.BROTHER), "appearance.skinTexture"), "absent", "variation never authors inherited family skin")
+T.equal(Blueprint.Get(session:GetBlueprint(TID.BROTHER), "appearance.hairColor"), "absent", "variation never authors inherited family hair color")
+local beforeFailure = Blueprint.Fingerprint(session:GetBlueprint(TID.FRIEND))
+Model.EnsureRuntimeRecord = function() return nil, "preview_unavailable" end
+local failed, why = friend:VaryLook()
+T.falsy(failed, "failed native materialization rejects variation")
+T.equal(why, "preview_unavailable", "variation explains materialization failure")
+T.equal(Blueprint.Fingerprint(session:GetBlueprint(TID.FRIEND)), beforeFailure, "failed variation leaves accepted state unchanged")
+Model.EnsureRuntimeRecord, Model.BuildPortraitSpec = savedEnsure, savedPortrait
+
 T.finish("pnc_starting_companion_shared_adapter_smoke")

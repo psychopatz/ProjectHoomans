@@ -85,7 +85,7 @@ function Window:onResponsiveLayout()
     local toolbar = Layout.Flow(self.toolbar, rect,
         { scale = scale, minWidth = 76, gap = 6 })
     local top = toolbar.bottom + gap
-    local height = math.max(1, rect.height - top - rowHeight - gap)
+    local height = math.max(1, rect.height - top - rowHeight * 2 - gap * 2)
     local rosterWidth = math.min(Layout.Pixels(200, scale), rect.width * 0.23)
     local remaining = math.max(1, rect.width - rosterWidth - gap)
     local compact = remaining < Layout.Pixels(690, scale)
@@ -116,6 +116,7 @@ function Window:onResponsiveLayout()
         self.statusLabel:setName(Layout.Ellipsize(self.statusText or "", UIFont.Small, remaining))
     end
     bounds(self.statusLabel, contentX, rect.height - rowHeight, remaining, rowHeight)
+    bounds(self.variationButton, 0, rect.height - rowHeight * 2 - gap, rect.width, rowHeight)
     local previewOnly = self.previewExpanded == true
     self.tabPanel:setVisible(self.draft ~= nil and not previewOnly)
     local px = contentX + contentWidth + gap
@@ -142,6 +143,7 @@ function Window:onResponsiveLayout()
         self.roster:setVisible(true); self.rosterLabel:setVisible(true)
     end
     for _, control in ipairs(self.toolbar) do control:setVisible(not exploring) end
+    if self.variationButton then self.variationButton:setVisible(self.draft ~= nil and not exploring) end
     PNC.NPCAuthoringFields.NativeMetrics(self)
     self.layout = { x = rect.x, y = top, leftWidth = contentWidth,
         portraitX = px, portraitY = top, portraitWidth = portraitWidth,

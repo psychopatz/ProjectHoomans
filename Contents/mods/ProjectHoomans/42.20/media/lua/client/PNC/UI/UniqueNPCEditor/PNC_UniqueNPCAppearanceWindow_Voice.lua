@@ -34,10 +34,13 @@ function ISPNCUniqueNPCAppearanceWindow:onPlayVoice()
     if not self.draft then return end
     self:commitPendingVoice()
     self.voicePreview = self.voicePreview or PNC.NPCAuthoringVoicePreview.New()
-    local ok = self.voicePreview:Play(self:voiceProfile(), comboData(self.voiceSampleCombo) or "ShoutHey")
+    local ok, reason = self.voicePreview:Play(self:voiceProfile(), comboData(self.voiceSampleCombo) or "ShoutHey")
     if self.parentEditor then
-        self.parentEditor:setStatus(tr(ok and "UI_PNC_UniqueNPCEditor_VoicePlaying"
-            or "UI_PNC_UniqueNPCEditor_VoiceUnavailable", ok and "Playing voice preview" or "Voice preview unavailable"))
+        local keys = { audio_unavailable = { "UI_PNC_Authoring_AudioUnavailable", "Audio output is unavailable" },
+            voice_event_unavailable = { "UI_PNC_Authoring_VoiceEventMissing", "The selected voice sample is unavailable" },
+            voice_play_failed = { "UI_PNC_Authoring_VoicePlayFailed", "Voice playback could not start" } }
+        local message = keys[reason] or keys.audio_unavailable
+        self.parentEditor:setStatus(ok and tr("UI_PNC_UniqueNPCEditor_VoicePlaying", "Playing voice preview") or tr(message[1], message[2]))
     end
 end
 

@@ -1,8 +1,35 @@
 # Creator randomization and browser audit / proposed P5R5
 
-Date: 2026-11-18. Status: approved P5R5 repair implemented and developer-verified;
-native acceptance pending. The audit findings below describe the rejected P5R4
-baseline. No native game was launched/driven.
+Date: 2026-11-18. Status: P5R6 developer follow-up verified; native acceptance
+pending. The historical P5R4/P5R5 audit below is preserved for provenance.
+
+## P5R6 clarification and repair
+
+The latest user report requests editable Friend gender, persistent selected
+button color, a wide explicit appearance-variation action, proper title-bar
+spacing and working menu voice playback. This supersedes the earlier blanket
+ban on companion random actions; Random **policies in selectors** remain hidden.
+
+The shared resolver now treats free-sex traits as editable generated defaults,
+with fixed family/orientation rules still locked. Male/female values round-trip
+and body changes refresh the native preview. Selected theme variants survive
+control updates. The composer uses Core's title inset; variation occupies a
+bounded wide footer. Companion variation generates concrete appearance fields,
+projects only editable visuals and wardrobe, preserves nonvisual generation and
+commits once after validation. Audio follows native CharacterCreationMain's menu
+resume/emitter-origin contract, retains owned-handle stopping, and reports
+specific localized failures. Music state is not changed.
+
+Evidence: **56/56** focused, **1049/1053** full suite (same four known failures),
+**20** Lua syntax/**12** production Kahlua checks, **five** new EN/TL keys plus
+JSON/static references/parity/whitespace. Native audio/rendering remains
+unverified; the harness checks the call sequence, not audible sound.
+
+Current native retest: choose Friend male then female, confirm colors survive
+refresh, verify family locks, resize/change fonts without header overlap, use
+the wide variation action while preserving name/skills/gender/gear, and play/stop
+voice before entering the world. Complete the earlier browser/preset and P6
+lifecycle matrix afterward. Native game control remains user-owned.
 
 ## Implemented result and validation
 
@@ -26,7 +53,8 @@ baseline was stale or untracked. This does not establish native visual success.
 Use a fresh installed PZ42.22.2 session and both entry points:
 
 1. In companion customization, inspect every page/browser after new generation,
-   reset and loading old presets: no Random option/action should be exposed.
+   reset and loading old presets: no Random policy option should be exposed; the
+   wide explicit appearance-variation action should be available.
    Opening/closing without edits must preserve generated/inherited defaults.
 2. In debug, select explicit hair, body tone and clothes; use Randomize look.
    Confirm controls, slot icons and portrait agree, old visual overrides are

@@ -409,4 +409,12 @@ PNC.UniqueNPCEditorModel.Randomize(look)
 T.equal(look.previewSeed, 67, "repeated seed source cannot leave an explicit debug action stale")
 T.equal(look.appearance.slots.Torso.type, "Base.ShirtLookB", "the second controlled result replaces clothing")
 
+local genderPreview = PNC.UniqueNPCEditorModel.BuildPreviewDraft(look)
+genderPreview.isFemale = false
+local previousBody = PNC.UniqueNPCEditorModel.EnsureRuntimeRecord(genderPreview, true)
+genderPreview.isFemale = true
+local nextBody = PNC.UniqueNPCEditorModel.EnsureRuntimeRecord(genderPreview, false)
+T.truthy(previousBody ~= nextBody, "gender change creates a new body-specific runtime preview")
+T.equal(nextBody.isFemale, true, "new body uses selected gender")
+
 T.finish("pnc_unique_npc_editor_model_smoke")

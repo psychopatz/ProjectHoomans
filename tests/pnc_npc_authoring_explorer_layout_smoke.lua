@@ -30,6 +30,8 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
     for _, size in ipairs({ { 780, 420 }, { 1060, 620 }, { 1540, 900 } }) do
         e.width, e.height, e.uiScale = size[1], size[2], scale
         e:onResponsiveLayout()
+        inside(e.variationButton, e.width, e.height, 'wide variation action fits its footer')
+        T.equal(e.variationButton.width, e.width, 'variation action spans the editor')
         for _, tile in ipairs(e.slotTiles) do
             inside(tile, e.slotContent.width, e.slotContent.contentHeight, 'slot tile stays inside its scroll content')
             inside(tile.clear, e.slotContent.width, e.slotContent.contentHeight, 'clear action stays inside slot content')
@@ -37,6 +39,7 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
         explorer:Show({ title = 'Choose item', onChoose = function() return true end })
         e:onResponsiveLayout()
         T.falsy(e.tabPanel.visible, 'explorer hides underlying page hit targets')
+        T.falsy(e.variationButton.visible, 'variation action cannot change the NPC behind a modal')
         T.falsy(e.roster.visible, 'explorer prevents changing the target behind the picker')
         for _, control in ipairs({ explorer.sources, explorer.categories, explorer.search, explorer.grid,
             explorer.details, explorer.quantity, explorer.destination, explorer.confirm, explorer.closeButton,
