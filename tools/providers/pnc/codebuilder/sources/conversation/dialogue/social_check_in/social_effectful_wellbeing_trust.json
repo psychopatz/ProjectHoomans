@@ -1,0 +1,69 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "social.effectful",
+  "id": "wellbeing_trust",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "cooldown",
+  "cooldownTurns": 3,
+  "postconditions": [
+    "social.trust_check_in_recorded"
+  ],
+  "closure": {
+    "closureClass": "resolved_episode",
+    "episodeId": "social_wellbeing_trust"
+  },
+  "modifiers": [
+    {
+      "id": "trust_check_in_boost",
+      "domain": "relationship",
+      "field": "trust",
+      "delta": 1,
+      "retention": {
+        "kind": "TIMED",
+        "duration": "1d"
+      },
+      "stacking": "ignore",
+      "targetRole": "addressee"
+    }
+  ],
+  "statePolicy": [
+    {
+      "id": "hostile_blocked",
+      "when": {
+        "path": "roles.hostile",
+        "op": "==",
+        "value": true
+      },
+      "outcome": "blocked",
+      "reason": "hostile_npc",
+      "admission": "no_op",
+      "replyOutcome": "blocked"
+    },
+    {
+      "id": "ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "EN": "I appreciate you watching my back.",
+    "TL": "Pinahahalagahan ko ang pagbabantay mo sa akin."
+  },
+  "reply": {
+    "blocked": {
+      "say": {
+        "EN": "Save it.",
+        "TL": "Huwag na."
+      }
+    },
+    "accepted": {
+      "say": {
+        "EN": "Always.",
+        "TL": "Palagi."
+      }
+    }
+  }
+}

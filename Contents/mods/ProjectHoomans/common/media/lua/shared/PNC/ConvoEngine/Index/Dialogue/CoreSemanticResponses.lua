@@ -53,6 +53,7 @@ return {
             "flow.needs.exchange",
             "needs",
             "quest.clinic_supplies.offer",
+            "social.recruitment.offer",
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {

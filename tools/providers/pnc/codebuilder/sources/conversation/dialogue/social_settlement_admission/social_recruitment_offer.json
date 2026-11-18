@@ -1,0 +1,76 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "social.recruitment",
+  "id": "offer",
+  "owner": "ProjectHoomans",
+  "invoke": {
+    "intent": "REQUEST",
+    "action": "RECRUIT"
+  },
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "state_retired",
+  "postconditions": [
+    "npc.companion_member"
+  ],
+  "closure": {
+    "closureClass": "state_transition"
+  },
+  "statePolicy": [
+    {
+      "id": "already_member",
+      "when": {
+        "any": [
+          { "path": "roles.companion", "op": "==", "value": true },
+          { "path": "roles.owned", "op": "==", "value": true }
+        ]
+      },
+      "outcome": "already_satisfied",
+      "reason": "already_member",
+      "admission": "no_op",
+      "replyOutcome": "already_member"
+    },
+    {
+      "id": "hostile_or_ineligible",
+      "when": {
+        "path": "roles.hostile",
+        "op": "==",
+        "value": true
+      },
+      "outcome": "blocked",
+      "reason": "actor_blocked_or_hostile",
+      "admission": "no_op",
+      "replyOutcome": "rejected"
+    },
+    {
+      "id": "ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "EN": "Join my group.",
+    "TL": "Sumali ka sa grupo ko."
+  },
+  "reply": {
+    "already_member": {
+      "say": {
+        "EN": "I'm already with your group.",
+        "TL": "Kasama na ako sa grupo mo."
+      }
+    },
+    "rejected": {
+      "say": {
+        "EN": "Not a chance.",
+        "TL": "Hindi maaari."
+      }
+    },
+    "accepted": {
+      "say": {
+        "EN": "Alright, I'll join you.",
+        "TL": "Sige, sasama ako sa iyo."
+      }
+    }
+  }
+}

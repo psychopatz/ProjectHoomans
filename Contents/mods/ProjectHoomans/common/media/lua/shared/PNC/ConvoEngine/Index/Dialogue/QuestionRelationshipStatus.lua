@@ -9,4 +9,13 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "dialogue/question_relationship_status/question_relationship_status.json",
     },
+    ["social.relationship.proposal"] = {
+        ["domain"] = "question_relationship_status",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/QuestionRelationshipStatus",
+        },
+        ["id"] = "social.relationship.proposal",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/question_relationship_status/social_relationship_proposal.json",
+    },
 }

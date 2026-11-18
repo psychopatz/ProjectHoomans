@@ -472,7 +472,7 @@ return {
         ["domain"] = "question_relationship_status",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/QuestionRelationshipStatus",
-        ["recordCount"] = 1,
+        ["recordCount"] = 2,
     },
     {
         ["domain"] = "question_residence",
@@ -502,7 +502,7 @@ return {
         ["domain"] = "social_check_in",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialCheckIn",
-        ["recordCount"] = 6,
+        ["recordCount"] = 7,
     },
     {
         ["domain"] = "social_companion_topics",
@@ -580,13 +580,13 @@ return {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialReactionsHostileOfferThreat",
-        ["recordCount"] = 6,
+        ["recordCount"] = 7,
     },
     {
         ["domain"] = "social_settlement_admission",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/SocialSettlementAdmission",
-        ["recordCount"] = 1,
+        ["recordCount"] = 3,
     },
     {
         ["domain"] = "social_tool_replies_affirmation",

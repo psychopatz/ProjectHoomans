@@ -39,6 +39,15 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_offer_friendly.json",
     },
+    ["social.parley.ceasefire"] = {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
+        },
+        ["id"] = "social.parley.ceasefire",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/social_reactions_hostile_offer_threat/social_parley_ceasefire.json",
+    },
     ["social.profanity"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {

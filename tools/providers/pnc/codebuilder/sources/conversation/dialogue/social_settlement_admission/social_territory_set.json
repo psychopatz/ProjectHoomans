@@ -1,0 +1,57 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "social.territory",
+  "id": "set",
+  "owner": "ProjectHoomans",
+  "invoke": {
+    "intent": "COMMAND",
+    "action": "SET_TERRITORY"
+  },
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "state_retired",
+  "postconditions": [
+    "settlement.territory_updated"
+  ],
+  "closure": {
+    "closureClass": "state_transition"
+  },
+  "statePolicy": [
+    {
+      "id": "not_member",
+      "when": {
+        "path": "roles.companion",
+        "op": "==",
+        "value": false
+      },
+      "outcome": "blocked",
+      "reason": "not_settlement_member",
+      "admission": "no_op",
+      "replyOutcome": "blocked"
+    },
+    {
+      "id": "ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "EN": "Claim this area as our territory.",
+    "TL": "Itakda natin ang lugar na ito bilang teritoryo natin."
+  },
+  "reply": {
+    "blocked": {
+      "say": {
+        "EN": "I don't belong to your settlement.",
+        "TL": "Hindi ako kabilang sa settlement mo."
+      }
+    },
+    "accepted": {
+      "say": {
+        "EN": "Territory marked.",
+        "TL": "Naitakda na ang teritoryo."
+      }
+    }
+  }
+}

@@ -3,6 +3,398 @@ return {
     {
         ["domain"] = "social_check_in",
         ["domainPath"] = "social_check_in",
+        ["exchangeFamily"] = {
+            ["familyID"] = "social.effectful.wellbeing_trust",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "I appreciate you watching my back.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.social.effectful.wellbeing_trust.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "I appreciate you watching my back.",
+                                    },
+                                    ["TL"] = {
+                                        "Pinahahalagahan ko ang pagbabantay mo sa akin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "social.effectful",
+            ["replies"] = {
+                ["accepted"] = {
+                    ["outcome"] = "accepted",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Always.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.accepted.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "Always.",
+                                            },
+                                            ["TL"] = {
+                                                "Palagi.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["blocked"] = {
+                    ["outcome"] = "blocked",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Save it.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.blocked.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "Save it.",
+                                            },
+                                            ["TL"] = {
+                                                "Huwag na.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "I appreciate you watching my back.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.effectful.wellbeing_trust.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I appreciate you watching my back.",
+                        },
+                        ["TL"] = {
+                            "Pinahahalagahan ko ang pagbabantay mo sa akin.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "Always.",
+                    ["outcome"] = "accepted",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.accepted.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Always.",
+                        },
+                        ["TL"] = {
+                            "Palagi.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "Save it.",
+                    ["outcome"] = "blocked",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.blocked.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Save it.",
+                        },
+                        ["TL"] = {
+                            "Huwag na.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "social.effectful.wellbeing_trust",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "wellbeing_trust",
+            ["sourceId"] = "social.effectful.wellbeing_trust",
+            ["sourcePath"] = "dialogue/social_check_in/social_effectful_wellbeing_trust.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        ["namespace"] = "social.effectful",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "resolved_episode",
+                ["episodeId"] = "social_wellbeing_trust",
+            },
+            ["cooldownTurns"] = 3,
+            ["inputPolicy"] = "typed_parity",
+            ["modifiers"] = {
+                {
+                    ["delta"] = 1,
+                    ["domain"] = "relationship",
+                    ["field"] = "trust",
+                    ["id"] = "trust_check_in_boost",
+                    ["retention"] = {
+                        ["durationMinutes"] = 1440,
+                        ["kind"] = "TIMED",
+                    },
+                    ["stacking"] = "ignore",
+                    ["targetRole"] = "addressee",
+                },
+            },
+            ["postconditions"] = {
+                "social.trust_check_in_recorded",
+            },
+            ["repeatPolicy"] = "cooldown",
+            ["reply"] = {
+                ["accepted"] = {
+                    ["outcome"] = "accepted",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "Always.",
+                                            },
+                                            ["TL"] = {
+                                                "Palagi.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["blocked"] = {
+                    ["outcome"] = "blocked",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "Save it.",
+                                            },
+                                            ["TL"] = {
+                                                "Huwag na.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "I appreciate you watching my back.",
+                                    },
+                                    ["TL"] = {
+                                        "Pinahahalagahan ko ang pagbabantay mo sa akin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "hostile_blocked",
+                    ["outcome"] = "blocked",
+                    ["reason"] = "hostile_npc",
+                    ["replyOutcome"] = "blocked",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "roles.hostile",
+                        ["value"] = true,
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "social.effectful.wellbeing_trust",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "I appreciate you watching my back.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.social.effectful.wellbeing_trust.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/social_check_in/social_effectful_wellbeing_trust.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "I appreciate you watching my back.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.effectful.wellbeing_trust.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I appreciate you watching my back.",
+                    },
+                    ["TL"] = {
+                        "Pinahahalagahan ko ang pagbabantay mo sa akin.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "Always.",
+                ["outcome"] = "accepted",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.accepted.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Always.",
+                    },
+                    ["TL"] = {
+                        "Palagi.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "Save it.",
+                ["outcome"] = "blocked",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.blocked.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Save it.",
+                    },
+                    ["TL"] = {
+                        "Huwag na.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_check_in",
+        ["domainPath"] = "social_check_in",
         ["id"] = "social.small_talk.member",
         ["kind"] = "dialogue",
         ["lineage"] = {

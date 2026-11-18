@@ -1,5 +1,14 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["social.effectful.wellbeing_trust"] = {
+        ["domain"] = "social_check_in",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        },
+        ["id"] = "social.effectful.wellbeing_trust",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/social_check_in/social_effectful_wellbeing_trust.json",
+    },
     ["social.small_talk.member"] = {
         ["domain"] = "social_check_in",
         ["generated"] = {

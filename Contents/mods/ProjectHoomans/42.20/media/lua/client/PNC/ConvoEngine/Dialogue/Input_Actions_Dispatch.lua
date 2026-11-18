@@ -35,9 +35,25 @@ return function(Input, Internal, Support)
             and Internal.ShallowContext(view) or {}
         local record = context.npcID and PNC.Registry and PNC.Registry.Get
             and PNC.Registry.Get(context.npcID) or nil
-        local roles = type(shallow.roles) == "table" and shallow.roles
+        local baseRoles = type(shallow.roles) == "table" and shallow.roles
             or (type(record) == "table" and type(record.roles) == "table" and record.roles)
             or {}
+        local isRecruited = (type(record) == "table" and record.recruited == true)
+            or (type(shallow) == "table" and shallow.recruited == true)
+        local roles = {
+            companion = baseRoles.companion == true or isRecruited,
+            owned = baseRoles.owned == true or isRecruited,
+            hostile = baseRoles.hostile == true,
+            authorityEligible = baseRoles.authorityEligible,
+        }
+        local rel = type(shallow.relationship) == "table" and shallow.relationship
+            or (type(record) == "table" and type(record.relationship) == "table" and record.relationship)
+            or {}
+        local bondClass = type(rel.bond) == "table" and tostring(rel.bond.class or "") or ""
+        local relState = tostring(rel.state or rel.relationshipState or "")
+        if bondClass == "lover" or bondClass == "partner" or bondClass == "spouse" then
+            relState = bondClass
+        end
         local activeBehavior = tostring(
             (type(shallow.npcState) == "table" and shallow.npcState.activeBehavior)
             or (type(shallow.situation) == "table" and shallow.situation.activeBehavior)
@@ -53,6 +69,9 @@ return function(Input, Internal, Support)
         )
         return {
             roles = roles,
+            relationship = {
+                state = relState,
+            },
             npcState = {
                 activeBehavior = activeBehavior,
                 orderKind = orderKind,
@@ -120,6 +139,26 @@ return function(Input, Internal, Support)
                 decision, Support.EXECUTABLE_ACTION_BRANCHES)
         if not actionAllowed then
             return Support.blockedDispatch(actionBlockReason)
+        end
+        if decision.actionIntent.action == "RELATIONSHIP_PROPOSAL"
+            or decision.actionIntent.action == "RECRUIT"
+        then
+            local policyContext = Support.actionContext(view, result, value)
+            local actionPlan = findActionPolicyPlan(tostring(decision.actionIntent.action or ""))
+            if actionPlan then
+                local evalRes = S11PolicyEvaluator.EvaluateStatePolicy(
+                    actionPlan,
+                    buildPolicyEvalContext(view, policyContext)
+                )
+                if type(evalRes) == "table"
+                    and (evalRes.admission == "no_op" or evalRes.admission == "reject")
+                then
+                    if type(generatedFlow) == "table" then
+                        generatedFlow.dispatchCount = 0
+                    end
+                    return Support.blockedDispatch(evalRes.reason or "state_policy_blocked")
+                end
+            end
         end
         if decision.actionIntent.action == "RELATIONSHIP_PROPOSAL" then
             return Internal.DispatchRelationshipProposal(view, result, value)

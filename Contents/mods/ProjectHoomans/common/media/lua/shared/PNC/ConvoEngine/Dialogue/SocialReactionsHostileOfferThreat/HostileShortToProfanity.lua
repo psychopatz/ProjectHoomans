@@ -2960,6 +2960,390 @@ return {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["domainPath"] = "social_reactions_hostile_offer_threat",
         ["exchangeFamily"] = {
+            ["familyID"] = "social.parley.ceasefire",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Let's call a ceasefire.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.social.parley.ceasefire.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Let's call a ceasefire.",
+                                    },
+                                    ["TL"] = {
+                                        "Itigil na natin ang away.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["invoke"] = {
+                ["action"] = "CEASEFIRE",
+                ["intent"] = "REQUEST",
+            },
+            ["namespace"] = "social.parley",
+            ["replies"] = {
+                ["accepted"] = {
+                    ["outcome"] = "accepted",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Fine. Stand down.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.parley.ceasefire.reply.accepted.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "Fine. Stand down.",
+                                            },
+                                            ["TL"] = {
+                                                "Sige. Tigil-putukan.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["already_peaceful"] = {
+                    ["outcome"] = "already_peaceful",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "We aren't fighting.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.parley.ceasefire.reply.already_peaceful.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "We aren't fighting.",
+                                            },
+                                            ["TL"] = {
+                                                "Hindi naman tayo nag-aaway.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Let's call a ceasefire.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.social.parley.ceasefire.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Let's call a ceasefire.",
+                        },
+                        ["TL"] = {
+                            "Itigil na natin ang away.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "Fine. Stand down.",
+                    ["outcome"] = "accepted",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.parley.ceasefire.reply.accepted.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Fine. Stand down.",
+                        },
+                        ["TL"] = {
+                            "Sige. Tigil-putukan.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "We aren't fighting.",
+                    ["outcome"] = "already_peaceful",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.parley.ceasefire.reply.already_peaceful.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "We aren't fighting.",
+                        },
+                        ["TL"] = {
+                            "Hindi naman tayo nag-aaway.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "social.parley.ceasefire",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "ceasefire",
+            ["sourceId"] = "social.parley.ceasefire",
+            ["sourcePath"] = "dialogue/social_reactions_hostile_offer_threat/social_parley_ceasefire.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
+        ["namespace"] = "social.parley",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "state_transition",
+            },
+            ["inputPolicy"] = "typed_parity",
+            ["invoke"] = {
+                ["action"] = "CEASEFIRE",
+                ["intent"] = "REQUEST",
+            },
+            ["postconditions"] = {
+                "relationship.ceasefire_active",
+            },
+            ["repeatPolicy"] = "state_retired",
+            ["reply"] = {
+                ["accepted"] = {
+                    ["outcome"] = "accepted",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "Fine. Stand down.",
+                                            },
+                                            ["TL"] = {
+                                                "Sige. Tigil-putukan.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["already_peaceful"] = {
+                    ["outcome"] = "already_peaceful",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "We aren't fighting.",
+                                            },
+                                            ["TL"] = {
+                                                "Hindi naman tayo nag-aaway.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Let's call a ceasefire.",
+                                    },
+                                    ["TL"] = {
+                                        "Itigil na natin ang away.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "already_peaceful",
+                    ["outcome"] = "already_satisfied",
+                    ["reason"] = "not_hostile",
+                    ["replyOutcome"] = "already_peaceful",
+                    ["when"] = {
+                        ["op"] = "neq",
+                        ["path"] = "roles.hostile",
+                        ["value"] = true,
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "hostile_parley_ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "social.parley.ceasefire",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Let's call a ceasefire.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.social.parley.ceasefire.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/social_reactions_hostile_offer_threat/social_parley_ceasefire.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Let's call a ceasefire.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.social.parley.ceasefire.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Let's call a ceasefire.",
+                    },
+                    ["TL"] = {
+                        "Itigil na natin ang away.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "Fine. Stand down.",
+                ["outcome"] = "accepted",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.parley.ceasefire.reply.accepted.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Fine. Stand down.",
+                    },
+                    ["TL"] = {
+                        "Sige. Tigil-putukan.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "We aren't fighting.",
+                ["outcome"] = "already_peaceful",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.parley.ceasefire.reply.already_peaceful.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "We aren't fighting.",
+                    },
+                    ["TL"] = {
+                        "Hindi naman tayo nag-aaway.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["domainPath"] = "social_reactions_hostile_offer_threat",
+        ["exchangeFamily"] = {
             ["familyID"] = "social.profanity",
             ["initiatingSay"] = {
                 ["keyOrder"] = {

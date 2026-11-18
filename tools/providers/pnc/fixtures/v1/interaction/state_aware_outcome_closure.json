@@ -230,6 +230,102 @@
         }
       ],
       "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.recruitment_transition_refresh_and_repeat_noop",
+      "description": "Actionable recruitment mutates membership, refreshes active conversation, retires recruit affordance, and turns repeated typed recruitment into a zero-dispatch already_member no-op.",
+      "tags": ["interaction", "recruitment", "state_outcome", "state_transition"],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "tacticalClass": "neutral",
+          "relationship": {
+            "approval": 94,
+            "respect": 95,
+            "familiarity": 92,
+            "revision": 2
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "Would you like to join us?",
+          "expect": {
+            "accepted": true,
+            "result.actionResult.action": "RECRUIT",
+            "result.actionResult.status": "conversation_recruitment_pending"
+          }
+        },
+        {
+          "text": "Would you like to join us?",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 0},
+            "result.actionResult.status": "semantic_dispatch_blocked",
+            "result.actionResult.reason": "already_member",
+            "observation.suggestions.candidates": {
+              "notContains": {"id": "conversation.root:menu:recruit"}
+            }
+          }
+        },
+        {
+          "text": "hello",
+          "expect": {
+            "accepted": true,
+            "observation.suggestions.candidates": {
+              "notContains": {"id": "conversation.root:menu:recruit"}
+            }
+          }
+        }
+      ],
+      "domain": "interaction"
+    },
+    {
+      "id": "interaction.state_aware_outcome_closure.relationship_proposal_transition_refresh_and_repeat_noop",
+      "description": "Actionable relationship proposal applies bond, refreshes active conversation, retires proposal affordance, and turns repeated proposal input into a zero-dispatch no-op.",
+      "tags": ["interaction", "relationship", "state_outcome", "state_transition"],
+      "scenario": {
+        "npc": {
+          "identityState": "known",
+          "identitySeed": "production-mutation-proposal",
+          "relationship": {
+            "approval": 100,
+            "respect": 100,
+            "familiarity": 100,
+            "revision": 2
+          }
+        }
+      },
+      "turns": [
+        {
+          "text": "hello",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "suggestionClick": {"candidateID": "social.relationship_proposal"},
+          "expect": {
+            "accepted": true,
+            "result.actionResult.action": "RELATIONSHIP_PROPOSAL",
+            "result.actionResult.status": "relationship_proposal_applied",
+            "observation.suggestions.candidates": {
+              "notContains": {"id": "social.relationship_proposal"}
+            }
+          }
+        },
+        {
+          "text": "be my partner",
+          "expect": {
+            "accepted": true,
+            "dispatchTransport": {"count": 0},
+            "observation.suggestions.candidates": {
+              "notContains": {"id": "social.relationship_proposal"}
+            }
+          }
+        }
+      ],
+      "domain": "interaction"
     }
   ]
 }

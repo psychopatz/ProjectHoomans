@@ -26,8 +26,30 @@ function Refresh.apply(context, Conversation)
             and refreshedContext.conversationBlockContext or nil
         local menuOptions = refreshedContext.conversationMenuOptions
             or previousBlockContext and previousBlockContext.conversationMenuOptions
-        if refreshedBlockContext and type(menuOptions) == "table" then
-            refreshedBlockContext.conversationMenuOptions = menuOptions
+        if refreshedBlockContext then
+            if type(menuOptions) == "table" then
+                refreshedBlockContext.conversationMenuOptions = menuOptions
+            end
+            local scenarioNpc = context.Runtime and context.Runtime.scenario
+                and context.Runtime.scenario.npc or nil
+            local npcID = scenarioNpc and scenarioNpc.npcID
+                or (refreshedBlockContext.npcRecord and refreshedBlockContext.npcRecord.id)
+            local liveRecord = npcID and PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(npcID) or nil
+            if type(liveRecord) == "table" then
+                refreshedBlockContext.npcRecord = liveRecord
+            end
+            local isRecruited = (type(liveRecord) == "table" and liveRecord.recruited == true)
+                or (type(scenarioNpc) == "table" and scenarioNpc.recruited == true)
+            if type(refreshedBlockContext.npcRecord) == "table" then
+                refreshedBlockContext.npcRecord.recruited = isRecruited
+            end
+            if type(refreshedBlockContext.entry) == "table" then
+                refreshedBlockContext.entry.recruited = isRecruited
+                if type(refreshedBlockContext.entry.snapshot) == "table" then
+                    refreshedBlockContext.entry.snapshot.recruited = isRecruited
+                end
+            end
         end
         Runtime.view.spec.context = refreshedContext
         local block = Conversation.blockProjection(Runtime.view)

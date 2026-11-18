@@ -1,0 +1,63 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "social.relationship",
+  "id": "proposal",
+  "owner": "ProjectHoomans",
+  "invoke": {
+    "intent": "REQUEST",
+    "action": "RELATIONSHIP_PROPOSAL"
+  },
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "state_retired",
+  "postconditions": [
+    "relationship.partner_accepted"
+  ],
+  "closure": {
+    "closureClass": "state_transition"
+  },
+  "statePolicy": [
+    {
+      "id": "already_partner",
+      "when": {
+        "path": "relationship.state",
+        "op": "in",
+        "values": ["lover", "partner", "spouse"]
+      },
+      "outcome": "already_satisfied",
+      "reason": "already_partner",
+      "admission": "no_op",
+      "replyOutcome": "already_partner"
+    },
+    {
+      "id": "ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "EN": "Be my partner.",
+    "TL": "Maging kapareha kita."
+  },
+  "reply": {
+    "already_partner": {
+      "say": {
+        "EN": "We're already together.",
+        "TL": "Magkasama na tayo."
+      }
+    },
+    "accepted": {
+      "say": {
+        "EN": "Yes, I want that too.",
+        "TL": "Oo, gusto ko rin iyon."
+      }
+    },
+    "rejected": {
+      "say": {
+        "EN": "I'm not ready for that.",
+        "TL": "Hindi pa ako handa para diyan."
+      }
+    }
+  }
+}
