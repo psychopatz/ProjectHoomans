@@ -1,6 +1,28 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R9
+## Current state — 2026-11-18 P5R10
+
+The native startup regression is repaired on the developer side. Console session
+`4c35d197` confirms `E4A983F`: Item Explorer onResize indexed `options.onDelete`
+while options was nil during composer construction. The explorer now explicitly
+starts idle and defers layout until Show supplies a browsing session.
+
+The new regression reproduces pre-child and post-child idle resize, the real
+companion-host startup layout, then normal Show/Delete/Hide behavior. This also
+removes the widget fixture's implicit empty-options table from the production
+constructor contract, which had masked the native lifecycle difference.
+
+`TEST_VERIFIED`: **66/66** focused; full **1059/1063**, with the same four known
+scene-route/context-scene/population/translation failures. `STATIC_ONLY`: both
+owned Lua files parse, the production file passes Kahlua error checks, whitespace
+passes, and seven evidence paths have coverage/current-source checks. No strings
+or schemas changed. No native game launch/control or native success is claimed.
+
+Next: restart the installed game, open the companion composer and debug creator,
+then run the P5R9 native matrix below. Actual opening/rendering/audible acceptance
+remains user-owned.
+
+## P5R9 implemented features — native acceptance pending
 
 Developer-side modular loadout, dynamic portrait, native audio routing and local
 record-deletion work is verified. Native acceptance remains **UNVERIFIED**.

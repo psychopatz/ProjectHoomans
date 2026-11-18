@@ -1,4 +1,11 @@
-# Loadout, framing, voice and saved records — P5R9
+# Loadout, framing, voice and saved records — P5R9/P5R10
+
+P5R10 follow-up: the next native run hit `options.onDelete` on nil during
+composer construction. Console `4c35d197`/`E4A983F` confirms the hidden Explorer
+was resized before Show. Idle resize now defers until browsing configuration
+exists. The new real-host initialization regression passes; current counts are
+66/66 focused and 1059/1063 full, with the same four known failures. Start the
+native retest by opening both creator hosts in a fresh session.
 
 The P5R8 native retest still showed a wall of slots, including misplaced
 forearm/underwear locations, body framing during appearance edits, inaudible

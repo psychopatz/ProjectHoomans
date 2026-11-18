@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R9 developer repair verified — P6 native acceptance pending
+**Status:** P5R10 startup repair verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -940,6 +940,19 @@ transport acceptance remain user-owned; see the focused retest document.
 **P5R9 gate:** developer verification complete; exact owned local phase commit
 required. Native layout/hit testing and audible playback remain user-owned; see
 LOADOUT_AUDIO_CRUD_RETEST.md.
+
+### P5R10 — Explorer idle-resize startup regression
+
+The user native retest confirms a nil `options.onDelete` access while the host
+resizes its hidden Item Explorer before any Show call. The constructor now
+explicitly owns the idle nil-options state; onResize defers until both children
+and browsing configuration exist. A new regression covers early/constructed idle
+resize, actual host startup and subsequent Show/Delete/Hide behavior.
+
+**Gate:** **66/66** focused and **1059/1063** full (same four known failures), two
+Lua syntax checks, one production Kahlua check and whitespace/coverage checks
+pass. Exact owned local commit required. Native startup and the previous P5R9
+interaction/audio matrix remain P6 user-owned acceptance.
 
 ### P6 — Native acceptance
 

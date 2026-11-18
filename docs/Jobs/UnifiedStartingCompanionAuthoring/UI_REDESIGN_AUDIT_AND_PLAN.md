@@ -1,6 +1,6 @@
 # Shared NPC creator UI: audit and proposed redesign
 
-Latest state: P5R9 adds body-part loadout navigation, carried inventory, face/body framing, native voice routing and saved-record CRUD deletion; native acceptance is pending. See
+Latest state: P5R10 repairs the Explorer idle-resize startup regression after P5R9; native opening and P5R9 interaction/audio acceptance are pending. See
 [RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md](RANDOMIZATION_AND_BROWSER_AUDIT_AND_PLAN.md)
 for the implementation evidence and native retest; earlier design/verification below is historical.
 

@@ -21,6 +21,7 @@ function Explorer:new(x, y, w, h)
     local o = ISPanel.new(self, x, y, w, h)
     setmetatable(o, self); self.__index = self
     o.offset, o.pageSize, o.compatibleOnly = 0, 48, true
+    o.options = nil -- idle until Show supplies a browsing session
     o.backgroundColor = { r = 0.055, g = 0.065, b = 0.075, a = 1 }
     return o
 end
@@ -210,7 +211,9 @@ function Explorer:refreshDetails()
     self:onResize()
 end
 function Explorer:onResize()
-    if not self.tiles then return end
+    -- Native size setters can resize this hidden child while the host is
+    -- constructing itself, before Show has supplied any browsing options.
+    if not self.tiles or not self.options then return end
     local g = 8
     self.fontHeight = getTextManager and getTextManager():getFontHeight(UIFont.Small) or 16
     local h, width = math.max(28, self.fontHeight + 10), math.max(1, self.width - g * 2)
