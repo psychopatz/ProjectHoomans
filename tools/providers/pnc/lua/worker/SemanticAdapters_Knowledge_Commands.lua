@@ -60,8 +60,13 @@ return function(deps)
         request = type(request) == "table" and request or {}
         context = type(context) == "table" and context or {}
         local action = string.upper(tostring(request.action or ""))
+        local npcID = tostring(request.npcID or context.npcID or context.targetID or "npc")
+        local taskKey = npcID .. ":" .. action
+        Runtime.taskStates = Runtime.taskStates or {}
         local responses = runtime.taskResponses or {}
         local configured = responses[action]
+        local configuredStates = runtime.taskStates or {}
+        local existingState = configuredStates[taskKey] or configuredStates[action] or Runtime.taskStates[taskKey]
         local accepted = true
         local reason = "network_queued"
         local details = {}
@@ -84,6 +89,24 @@ return function(deps)
             reason = tostring(configured.reason
                 or (accepted and "network_queued" or "mock_task_rejected"))
             details = Values.copy(configured.details or {})
+        elseif type(existingState) == "table"
+            and (existingState.status == "active"
+                or existingState.status == "completed"
+                or existingState.status == "failed"
+                or existingState.status == "rejected")
+        then
+            local st = tostring(existingState.status)
+            return false,
+                st == "active" and "task_already_active" or ("task_already_" .. st),
+                { status = st == "active" and "rejected" or st, taskStatus = st, duplicate = true }
+        else
+            Runtime.taskStates[taskKey] = {
+                status = "active",
+                action = action,
+                npcID = npcID,
+                requestID = request.requestID or context.requestID,
+            }
+            details = { status = "admitted", taskStatus = "active" }
         end
         Runtime.transport[#Runtime.transport + 1] = {
             direction = "client_to_server",

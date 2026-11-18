@@ -32,6 +32,39 @@ local function buildHarnessRequest(deps)
         local operation = string.lower(tostring(request.operation or ""))
         local configured = runtime.questResponses
             and runtime.questResponses[operation]
+        local questService = _G.PNC and _G.PNC.QuestService or nil
+        if configured == nil and questService and type(questService.HandleRequest) == "function" then
+            local playerData = Runtime.scenario and Runtime.scenario.player or {}
+            local playerObj = {
+                characterUUID = playerData.characterUUID or playerData.playerUUID or "char_patrick",
+            }
+            local serviceResult = questService.HandleRequest(playerObj, {
+                requestID = request.requestID,
+                questID = request.questID or "pnc.quest.clinic_supplies",
+                giverNPCID = request.giverNPCID or request.npcID or context.npcID,
+                operation = operation,
+                expectedRevision = request.expectedRevision,
+            })
+            local accepted = serviceResult and serviceResult.accepted == true
+            local reason = tostring(serviceResult and serviceResult.reason or "quest_operation_invalid")
+            local result = Values.copy(serviceResult or {})
+            result.requestID = result.requestID or request.requestID
+            result.npcID = result.npcID or request.npcID or context.npcID
+            result.giverNPCID = result.giverNPCID or result.npcID
+            Runtime.transport[#Runtime.transport + 1] = {
+                direction = "client_to_server",
+                mode = runtime.mode,
+                command = "SemanticQuestRequest",
+                payload = Values.copy(request),
+            }
+            Runtime.transport[#Runtime.transport + 1] = {
+                direction = "server_to_client",
+                mode = runtime.mode,
+                command = "SemanticQuestResult",
+                payload = Values.copy(result),
+            }
+            return accepted, reason, result
+        end
         local accepted = true
         local status = operation == "offer" and "available"
             or operation == "accept" and "accepted"
@@ -54,6 +87,47 @@ local function buildHarnessRequest(deps)
             reason = tostring(configured.reason
                 or (accepted and reason or "mock_quest_rejected"))
             details = Values.copy(configured)
+        else
+            Runtime.questStates = Runtime.questStates or {}
+            local qid = tostring(request.questID or "pnc.quest.clinic_supplies")
+            local qstate = Runtime.questStates[qid]
+            if operation == "offer" then
+                if qstate == "active" then
+                    status = "active"
+                    reason = "already_active"
+                elseif qstate == "ready" then
+                    status = "ready"
+                    reason = "ready"
+                elseif qstate == "rewarded" then
+                    status = "rewarded"
+                    reason = "already_rewarded"
+                end
+            elseif operation == "accept" then
+                if qstate == "active" then
+                    status = "active"
+                    reason = "already_active"
+                elseif qstate == "rewarded" then
+                    accepted = false
+                    status = "rejected"
+                    reason = "already_rewarded"
+                else
+                    Runtime.questStates[qid] = "active"
+                end
+            elseif operation == "status" then
+                if qstate == "ready" then
+                    status = "ready"
+                elseif qstate == "rewarded" then
+                    status = "rewarded"
+                end
+            elseif operation == "turn_in" then
+                if qstate == "rewarded" then
+                    accepted = true
+                    status = "rewarded"
+                    reason = "already_rewarded"
+                else
+                    Runtime.questStates[qid] = "rewarded"
+                end
+            end
         end
         local result = details.result and Values.copy(details.result)
             or details

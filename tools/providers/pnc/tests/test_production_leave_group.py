@@ -516,6 +516,46 @@ class ProductionLeaveGroupTests(WarmWorkerTestMixin, unittest.TestCase):
                 self._message_text(confirmed, "departure.confirmed")
                 self.assertEqual(worker.snapshot()["translation"]["language"], language)
 
+    def test_disband_presentation_only_typed_input_cannot_bypass_confirmation_and_replay_is_idempotent(self) -> None:
+        with self._worker() as worker:
+            worker.import_saved_selection(
+                self.save_path,
+                player_uuid="char_leave_group_fixture",
+                npc_id=self.npc_id,
+            )
+            # 1. Free-text typed disband/leave cannot bypass confirmation modal
+            for phrase in ("disband", "leave my group"):
+                typed = worker.input(phrase)
+                self.assertEqual(typed["dispatchTransport"], [])
+                self.assertTrue(worker.snapshot()["scenario"]["npc"]["recruited"])
+
+            # 2. UI warning -> cancel leaves state unchanged
+            opened = worker.open_conversation()
+            self.assertEqual(opened["presentation"]["lifecycle"]["state"], "active")
+            disband = self._candidate(worker.snapshot(), "disband")
+            self.assertIsNotNone(disband)
+            worker.suggestion_click(disband["frame"])
+            cancel = self._candidate(worker.snapshot(), "disband_cancel")
+            self.assertIsNotNone(cancel)
+            worker.suggestion_click(cancel["frame"])
+            self.assertTrue(worker.snapshot()["scenario"]["npc"]["recruited"])
+
+            # 3. Reopen -> UI warning -> confirm performs one authoritative mutation
+            worker.open_conversation()
+            disband_again = self._candidate(worker.snapshot(), "disband")
+            self.assertIsNotNone(disband_again)
+            worker.suggestion_click(disband_again["frame"])
+            confirm = self._candidate(worker.snapshot(), "disband_confirm")
+            self.assertIsNotNone(confirm)
+            confirmed = worker.suggestion_click(confirm["frame"])
+            self.assertTrue(self._departure_payload(confirmed)["success"])
+            self.assertFalse(worker.snapshot()["scenario"]["npc"]["recruited"])
+
+            # 4. Replaying stale confirm frame does not repeat destructive mutation
+            replay = worker.suggestion_click(confirm["frame"])
+            self.assertEqual(replay["dispatchTransport"], [])
+            self.assertFalse(worker.snapshot()["scenario"]["npc"]["recruited"])
+
 
 if __name__ == "__main__":
     unittest.main()

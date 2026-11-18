@@ -206,6 +206,38 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
             "semantic_dispatch_blocked",
         )
 
+    def test_parameterized_task_conversation_lifecycle_and_duplicate_suppression(self) -> None:
+        from copy import deepcopy
+
+        scen = deepcopy(DEFAULT_SCENARIO)
+        scen.get("runtime", {}).pop("taskResponses", None)
+        # 1. Available -> admitted/active (1 dispatch) -> duplicate while active (0 dispatch)
+        with self.warm_worker(scen) as worker:
+            admitted = worker.input("Wait at the campfire")
+            self.assertEqual(admitted["result"]["flow"]["resultNodeId"], "admitted")
+            self.assertEqual(len(admitted["dispatchTransport"]), 1)
+            self.assertEqual(admitted["dispatchTransport"][0]["command"], "SemanticTaskRequest")
+
+            duplicate_active = worker.input("Wait at the campfire")
+            self.assertEqual(duplicate_active["dispatchTransport"], [])
+            self.assertEqual(duplicate_active["result"]["actionResult"]["reason"], "task_already_active")
+            self.assertEqual(duplicate_active["result"]["flow"]["resultNodeId"], "rejected")
+
+        # 2. Terminal state (completed/failed/rejected) -> repeat input yields zero dispatch
+        for terminal_status in ("completed", "failed", "rejected"):
+            terminal_scen = merge(
+                scen,
+                {"runtime": {"taskStates": {"WAIT_AT": {"status": terminal_status}}}},
+            )
+            with self.subTest(terminal_status=terminal_status):
+                with self.warm_worker(terminal_scen) as worker:
+                    repeat_terminal = worker.input("Wait at the campfire")
+                    self.assertEqual(repeat_terminal["dispatchTransport"], [])
+                    self.assertEqual(
+                        repeat_terminal["result"]["actionResult"]["reason"],
+                        f"task_already_{terminal_status}",
+                    )
+
     def test_real_worker_records_result_nodes_and_one_dispatch(self) -> None:
         with self.warm_worker(DEFAULT_SCENARIO) as worker:
             follow = worker.input("Follow me")

@@ -92,7 +92,7 @@
     {
       "module": "test_automatic_flow_generation.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 9,
+      "methods": 10,
       "usesDirectWorker": true,
       "justification": "Authoring/capability/grievance contract (Acceptance for metadata-driven simple-command flow generation.): verifies worker authoring validation, capability ABI, or grievance evidence invariants.",
       "methodDetails": [
@@ -119,6 +119,12 @@
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
           "reason": "metadata-driven simple-command flow generation and handler binding: parameterized task result branches and gate are truthful"
+        },
+        {
+          "name": "test_parameterized_task_conversation_lifecycle_and_duplicate_suppression",
+          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+          "usesDirectWorker": true,
+          "reason": "S11 R5B parameterized task conversation lifecycle: available -> active -> duplicate suppressed -> terminal zero dispatch"
         },
         {
           "name": "test_real_worker_records_result_nodes_and_one_dispatch",
@@ -2689,7 +2695,7 @@
     {
       "module": "test_production_leave_group.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 4,
+      "methods": 5,
       "usesDirectWorker": true,
       "justification": "Implementation runtime contract: production-worker Leave Group lifecycle acceptance coverage.",
       "methodDetails": [
@@ -2716,6 +2722,12 @@
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
           "reason": "save-backed global_mod_data leave-group authority and ownership rejection: warning and confirmation present in en and tl"
+        },
+        {
+          "name": "test_disband_presentation_only_typed_input_cannot_bypass_confirmation_and_replay_is_idempotent",
+          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+          "usesDirectWorker": true,
+          "reason": "S11 R5B disband EXPLICIT_PRESENTATION_ONLY policy: typed disband cannot bypass confirmation, cancel preserves state, replay is idempotent"
         }
       ]
     },
@@ -2852,7 +2864,7 @@
     {
       "module": "test_quest_flow_binding.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 5,
+      "methods": 6,
       "usesDirectWorker": true,
       "justification": "Authoring/capability/grievance contract (Acceptance for the semantic Clinic Supplies quest contract.): verifies worker authoring validation, capability ABI, or grievance evidence invariants.",
       "methodDetails": [
@@ -2885,6 +2897,12 @@
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
           "reason": "metadata-generated quest operation binding and replay deduplication: multiplayer uses production boundary and deduplicates replay"
+        },
+        {
+          "name": "test_production_quest_service_conversation_lifecycle",
+          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+          "usesDirectWorker": true,
+          "reason": "S11 R5B quest conversation lifecycle: offer -> accept -> active -> repeated offer no-op -> status -> turn-in validation"
         }
       ]
     },

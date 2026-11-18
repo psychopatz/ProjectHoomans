@@ -218,6 +218,33 @@ class QuestFlowBindingTests(WarmWorkerTestMixin, unittest.TestCase):
                 "UI_PNC_Conversation_Semantic_QuestOffer",
             )
 
+    def test_production_quest_service_conversation_lifecycle(self) -> None:
+        from copy import deepcopy
+
+        scen = deepcopy(DEFAULT_SCENARIO)
+        scen.get("runtime", {}).pop("questResponses", None)
+        with self.warm_worker(scen) as worker:
+            # 1. Offer -> available
+            offer1 = worker.input("Can you help me?")
+            self.assertEqual(offer1["result"]["actionResult"]["status"], "available")
+
+            # 2. Accept -> accepted (active)
+            accepted = worker.input("Yes I will help with the supplies")
+            self.assertEqual(accepted["result"]["actionResult"]["status"], "accepted")
+
+            # 3. Repeated offer while active must NOT return 'available' again
+            offer2 = worker.input("Can you help me?")
+            self.assertEqual(offer2["result"]["actionResult"]["status"], "active")
+            self.assertEqual(offer2["result"]["actionResult"]["reason"], "already_allocated")
+
+            # 4. Status -> active
+            status_active = worker.input("Is the clinic supplies quest done")
+            self.assertEqual(status_active["result"]["actionResult"]["status"], "active")
+
+            # 5. Premature turn-in before delivery is rejected (missing objective)
+            premature = worker.input("I want to turn in the supplies")
+            self.assertEqual(premature["result"]["actionResult"]["status"], "rejected")
+
 
 if __name__ == "__main__":
     unittest.main()
