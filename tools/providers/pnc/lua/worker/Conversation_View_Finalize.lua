@@ -16,12 +16,34 @@ function Finalize.apply(workerContext, Conversation, view, session, spec)
     view.spec.context.conversationGraph = Conversation.graphProjection(view)
     local composer = PNC.Conversation and PNC.Conversation.Composer
     local scenarioNpc = Runtime.scenario and Runtime.scenario.npc or nil
-    if type(scenarioNpc) == "table"
-        and type(scenarioNpc.ambientVisitPreview) == "table"
-        and type(view.spec.context.conversationBlockContext) == "table"
+    local npcID = scenarioNpc and (scenarioNpc.npcID or scenarioNpc.id)
+        or spec.npcID
+    local visitService = PNC.MobileSettlementVisitService
+    local activeSettlementVisit = npcID and visitService
+        and type(visitService.GetNPCVisit) == "function"
+        and visitService.GetNPCVisit(
+            npcID,
+            workerContext.player,
+            Runtime.scenario and Runtime.scenario.world
+                and Runtime.scenario.world.worldAgeHours or 0
+        ) or nil
+    if type(view.spec.context.conversationBlockContext) == "table"
+        and (activeSettlementVisit ~= nil
+            or (type(scenarioNpc) == "table"
+                and type(scenarioNpc.ambientVisitPreview) == "table"))
     then
-        view.spec.context.conversationBlockContext.ambientVisitPreview =
-            workerContext.Values.copy(scenarioNpc.ambientVisitPreview)
+        if activeSettlementVisit ~= nil then
+            view.spec.context.settlementVisit =
+                workerContext.Values.copy(activeSettlementVisit)
+            view.spec.context.conversationBlockContext.settlementVisit =
+                workerContext.Values.copy(activeSettlementVisit)
+        end
+        if type(scenarioNpc) == "table"
+            and type(scenarioNpc.ambientVisitPreview) == "table"
+        then
+            view.spec.context.conversationBlockContext.ambientVisitPreview =
+                workerContext.Values.copy(scenarioNpc.ambientVisitPreview)
+        end
         if composer and type(composer.BuildRootNode) == "function" then
             local ok, root = pcall(
                 composer.BuildRootNode,
@@ -31,7 +53,13 @@ function Finalize.apply(workerContext, Conversation, view, session, spec)
                     or {}
             )
             if ok and type(root) == "table" then
+                view.spec.nodes.greeting = root
                 view.spec.nodes.menu = { choices = root.choices or {} }
+                if session.currentNodeID == "greeting" then
+                    session.currentNode = view.spec.nodes.greeting
+                elseif session.currentNodeID == "menu" then
+                    session.currentNode = view.spec.nodes.menu
+                end
             end
         end
     end

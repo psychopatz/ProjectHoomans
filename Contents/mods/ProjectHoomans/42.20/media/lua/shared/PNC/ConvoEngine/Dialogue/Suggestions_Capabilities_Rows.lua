@@ -41,9 +41,21 @@ local function capabilityRows(revision, currentAction, context, ir)
         local definition = CAPABILITY_DEFINITIONS[action]
         if definition and row.dispatchable == true then
             local menuOnlyWhenDestination = definition.menuOnlyWhenDestination
+            local taskKey = tostring(context.npcID or "") .. ":" .. action
+            local taskState = type(context.taskStates) == "table"
+                and (context.taskStates[taskKey] or context.taskStates[action])
+                or nil
+            local taskStatus = type(taskState) == "table"
+                and tostring(taskState.status or "") or ""
+            local hideCompletedOrActiveTask = action == "WAIT_AT"
+                and (taskStatus == "active"
+                    or taskStatus == "completed"
+                    or taskStatus == "failed"
+                    or taskStatus == "rejected")
             local hideWithoutDestination = menuOnlyWhenDestination == false
                 and action == "WAIT_AT"
-                and type(context.suggestionDestination) ~= "table"
+                and (type(context.suggestionDestination) ~= "table"
+                    or hideCompletedOrActiveTask)
             if not hideWithoutDestination then
                 local eligibility = Predicates.Evaluate(
                     definition.constraints, predicateContext

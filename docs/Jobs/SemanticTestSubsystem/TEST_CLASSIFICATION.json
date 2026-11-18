@@ -1,7 +1,7 @@
 {
   "schema": "semantic.test-classification.v1",
   "totalModules": 165,
-  "totalMethods": 648,
+  "totalMethods": 649,
   "categoryCounts": {
     "COMPILER_CONTRACT": 11,
     "GUI_CONTRACT": 38,
@@ -2695,7 +2695,7 @@
     {
       "module": "test_production_leave_group.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 6,
+      "methods": 7,
       "usesDirectWorker": true,
       "justification": "Implementation runtime contract: production-worker Leave Group lifecycle acceptance coverage.",
       "methodDetails": [
@@ -2733,7 +2733,13 @@
           "name": "test_ambient_visit_root_choice_refreshes_and_retires_after_start",
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "S11 R6B ambient visit / settlement admission conversation refresh and stale affordance retirement"
+          "reason": "S11 R7A ambient visit post-success conversation refresh and stale affordance retirement"
+        },
+        {
+          "name": "test_settlement_admission_root_choice_executes_authority_and_refreshes_conversation",
+          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+          "usesDirectWorker": true,
+          "reason": "S11 R7A settlement admission post-success authority execution, conversation refresh, and stale replay deduplication"
         }
       ]
     },

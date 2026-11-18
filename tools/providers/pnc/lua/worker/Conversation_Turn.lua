@@ -45,6 +45,11 @@ function Turn.run(context, text, Conversation)
     -- set reflects follow/stay state rather than replaying stale affordances.
     Conversation.refreshViewContext(context)
     local result = view.lastSemanticDialogueResult
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
+    local internal = input and input.Internal or nil
+    if result and internal and type(internal.RefreshSuggestions) == "function" then
+        internal.RefreshSuggestions(view, result)
+    end
     -- Inspect the exact situation built by the production input router, not
     -- a separately re-created approximation in the Python test harness.
     local router = view.session and view.session.semanticDialogueRouter

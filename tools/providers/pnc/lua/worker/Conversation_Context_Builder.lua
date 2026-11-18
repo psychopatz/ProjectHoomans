@@ -81,6 +81,13 @@ function Builder.build(context)
         or (npc.identityState or "unknown")
     local priorContext = Runtime.view and Runtime.view.spec
         and Runtime.view.spec.context or nil
+    local hasTaskStates = false
+    if type(Runtime.taskStates) == "table" then
+        for _, _ in pairs(Runtime.taskStates) do
+            hasTaskStates = true
+            break
+        end
+    end
     local output = {
         npcID = npc.npcID,
         worldContext = {
@@ -94,6 +101,15 @@ function Builder.build(context)
         ),
         locationObservation = copy(scenario.locationObservation
             or (priorContext and priorContext.locationObservation)),
+        suggestionDestination = copy(scenario.suggestionDestination
+            or (type(npc.suggestionDestination) == "table" and npc.suggestionDestination)
+            or (priorContext and priorContext.suggestionDestination)),
+        taskStates = copy(
+            hasTaskStates
+                and Runtime.taskStates
+                or (scenario.runtime and scenario.runtime.taskStates)
+                or {}
+        ),
         saveSeed = world.seedString or world.worldSeedString
             or world.worldSeed,
         phraseSalt = (scenario.runtime and scenario.runtime.phraseSalt)

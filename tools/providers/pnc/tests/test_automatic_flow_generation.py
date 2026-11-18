@@ -210,33 +210,63 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
         )
 
     def test_parameterized_task_conversation_lifecycle_and_duplicate_suppression(self) -> None:
-        """auditClaims: ["task_generation_and_result_routing"]"""
+        """auditClaims: ["task_generation_and_result_routing", "task_conversation_projection_lifecycle"]"""
         from copy import deepcopy
+
+        def wait_at_capabilities(suggestions: dict) -> list[dict]:
+            rows: list[dict] = []
+            seen_ids: set[str] = set()
+            for row in suggestions.get("permittedCapabilities", []):
+                binding_id = (row.get("binding") or {}).get("id")
+                if row.get("id") == "action.wait_at" or binding_id == "pnc:task.wait_at":
+                    key = f"{row.get('id')}:{binding_id}"
+                    if key not in seen_ids:
+                        seen_ids.add(key)
+                        rows.append(row)
+            for group in suggestions.get("groups", []):
+                for row in group.get("capabilities", []):
+                    binding_id = (row.get("binding") or {}).get("id")
+                    if row.get("id") == "action.wait_at" or binding_id == "pnc:task.wait_at":
+                        key = f"{row.get('id')}:{binding_id}"
+                        if key not in seen_ids:
+                            seen_ids.add(key)
+                            rows.append(row)
+            return rows
 
         scen = deepcopy(DEFAULT_SCENARIO)
         scen.get("runtime", {}).pop("taskResponses", None)
-        # 1. Available -> admitted/active (1 dispatch) -> duplicate while active (0 dispatch)
+        scen["suggestionDestination"] = {
+            "kind": "campfire",
+            "targetID": "campfire@mock",
+            "x": 100,
+            "y": 200,
+            "z": 0,
+        }
+        # 1. Before task request -> pnc:task.wait_at is present/actionable -> request -> admitted (1 dispatch)
+        #    -> after active transition -> affordance disappears -> typed repeat while active (0 dispatch)
         with self.warm_worker(scen) as worker:
-            before_ids = {
-                c["id"] for g in worker.snapshot()["suggestions"].get("groups", [])
-                for c in g.get("candidates", [])
-            }
-            self.assertNotIn("task.wait_at.active", before_ids)
+            before_wait_at = wait_at_capabilities(worker.snapshot()["suggestions"])
+            self.assertEqual(len(before_wait_at), 1)
+            self.assertEqual(before_wait_at[0]["id"], "action.wait_at")
+            self.assertEqual(before_wait_at[0]["binding"]["id"], "pnc:task.wait_at")
+            self.assertTrue(before_wait_at[0]["enabled"])
+            self.assertEqual(before_wait_at[0]["status"], "eligible")
+
             admitted = worker.input("Wait at the campfire")
             self.assertEqual(admitted["result"]["flow"]["resultNodeId"], "admitted")
             self.assertEqual(len(admitted["dispatchTransport"]), 1)
             self.assertEqual(admitted["dispatchTransport"][0]["command"], "SemanticTaskRequest")
-            after_admit_ids = {
-                c["id"] for c in admitted["observation"]["suggestions"].get("candidates", [])
-            }
-            self.assertNotIn("pnc:task.wait_at", after_admit_ids)
+            self.assertEqual(wait_at_capabilities(admitted["observation"]["suggestions"]), [])
+            self.assertEqual(wait_at_capabilities(worker.snapshot()["suggestions"]), [])
 
             duplicate_active = worker.input("Wait at the campfire")
             self.assertEqual(duplicate_active["dispatchTransport"], [])
             self.assertEqual(duplicate_active["result"]["actionResult"]["reason"], "task_already_active")
             self.assertEqual(duplicate_active["result"]["flow"]["resultNodeId"], "rejected")
+            self.assertEqual(wait_at_capabilities(duplicate_active["observation"]["suggestions"]), [])
 
-        # 2. Terminal state (completed/failed/rejected) -> repeat input yields zero dispatch
+        # 2. Terminal state (completed/failed/rejected) -> refreshed suggestion surface remains terminal/retired
+        #    and repeat input yields zero dispatch
         for terminal_status in ("completed", "failed", "rejected"):
             terminal_scen = merge(
                 scen,
@@ -251,10 +281,14 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
                         f"task_already_{terminal_status}",
                     )
                     self.assertEqual(repeat_terminal["result"]["flow"]["resultNodeId"], terminal_status)
-                    after_term_ids = {
-                        c["id"] for c in repeat_terminal["observation"]["suggestions"].get("candidates", [])
-                    }
-                    self.assertNotIn("pnc:task.wait_at", after_term_ids)
+                    self.assertEqual(
+                        wait_at_capabilities(repeat_terminal["observation"]["suggestions"]),
+                        [],
+                    )
+                    self.assertEqual(
+                        wait_at_capabilities(worker.snapshot()["suggestions"]),
+                        [],
+                    )
 
     def test_real_worker_records_result_nodes_and_one_dispatch(self) -> None:
         with self.warm_worker(DEFAULT_SCENARIO) as worker:

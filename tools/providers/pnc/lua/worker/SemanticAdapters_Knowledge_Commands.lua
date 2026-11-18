@@ -66,7 +66,12 @@ return function(deps)
         local responses = runtime.taskResponses or {}
         local configured = responses[action]
         local configuredStates = runtime.taskStates or {}
-        local existingState = configuredStates[taskKey] or configuredStates[action] or Runtime.taskStates[taskKey]
+        local existingState = configuredStates[taskKey]
+            or configuredStates[action]
+            or Runtime.taskStates[taskKey]
+        if existingState then
+            Runtime.taskStates[taskKey] = Values.copy(existingState)
+        end
         local accepted = true
         local reason = "network_queued"
         local details = {}

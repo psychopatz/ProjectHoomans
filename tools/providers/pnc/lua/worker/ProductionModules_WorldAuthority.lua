@@ -309,6 +309,16 @@ load(
         "PNC/Companions/PNC_DebugCompanionRecruit.lua",
         "recruitment_authority"
     )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Director/PNC_DirectorConfig.lua",
+        "settlement_visit_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Director/PNC_MobileSettlementVisitService.lua",
+        "settlement_visit_authority"
+    )
 end
 
 return loadWorldAuthority

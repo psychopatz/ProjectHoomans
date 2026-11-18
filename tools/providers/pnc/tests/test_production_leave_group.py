@@ -559,7 +559,7 @@ class ProductionLeaveGroupTests(WarmWorkerTestMixin, unittest.TestCase):
             self.assertFalse(worker.snapshot()["scenario"]["npc"]["recruited"])
 
     def test_ambient_visit_root_choice_refreshes_and_retires_after_start(self) -> None:
-        """auditClaims: ["settlement_ambient_admission_boundary"]"""
+        """auditClaims: ["ambient_visit_post_success_refresh"]"""
         from copy import deepcopy
         from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 
@@ -578,6 +578,152 @@ class ProductionLeaveGroupTests(WarmWorkerTestMixin, unittest.TestCase):
             replay = worker.suggestion_click(ambient["frame"])
             self.assertEqual(replay["dispatchTransport"], [])
             self.assertIsNone(self._candidate(worker.snapshot(), "conversation.root:menu:ambient_visit"))
+
+    def test_settlement_admission_root_choice_executes_authority_and_refreshes_conversation(self) -> None:
+        """auditClaims: ["settlement_admission_post_success_refresh"]"""
+        mobile_faction_id = "faction_settlement_visit_mobile"
+        community_id = "community_leave_group_fixture_player"
+        visit_id = f"{mobile_faction_id}:settlement_admission:1"
+
+        def mutate(tables: dict) -> None:
+            player_fac = tables["PNC_Factions"]["byID"][self.player_faction]
+            player_fac["memberIDs"] = {}
+            player_fac["tags"] = {}
+            tables["PNC_Factions"]["byID"][mobile_faction_id] = {
+                "id": mobile_faction_id,
+                "name": "Wandering Survivors",
+                "archetypeID": "refugee",
+                "status": "active",
+                "memberIDs": {self.npc_id: True},
+                "relations": {},
+                "mobile": {
+                    "active": True,
+                    "site": {
+                        "id": "community_site_settlement_visit_mobile",
+                        "kind": "radius",
+                        "home": {"x": 100, "y": 200, "z": 0, "radius": 24},
+                    },
+                    "visit": {
+                        "active": True,
+                        "id": visit_id,
+                        "kind": "settlement_admission",
+                        "settlementFactionID": self.player_faction,
+                        "communityID": community_id,
+                        "startedAt": 10.0,
+                        "expiresAt": 200.0,
+                        "pendingMemberIDs": {self.npc_id: True},
+                        "completedMemberIDs": {},
+                        "revision": 1,
+                    },
+                },
+            }
+            tables["PNC_Communities"]["byID"][community_id] = {
+                "id": community_id,
+                "name": "Player Settlement",
+                "factionID": self.player_faction,
+                "mode": "settled",
+                "status": "active",
+                "home": {"x": 100, "y": 200, "z": 0, "radius": 32},
+                "capacity": {"population": 8, "beds": 8, "storage": 200},
+                "currentPopulation": 1,
+                "memberIDs": {},
+            }
+            npc = tables["PNC_" + self.npc_id]
+            npc["recruited"] = False
+            npc["companion"] = False
+            npc.pop("ownerPlayerKey", None)
+            npc["affiliation"] = {
+                "factionID": mobile_faction_id,
+                "membershipStatus": "member",
+                "role": "civilian",
+                "rank": "member",
+            }
+            npc.pop("orderSpec", None)
+
+        save_path = self._variant_save("settlement-admission.bin", mutate)
+        with self._worker() as worker:
+            imported = worker.import_saved_selection(
+                save_path,
+                player_uuid="char_leave_group_fixture",
+                npc_id=self.npc_id,
+            )
+            self.assertEqual(imported["productionFactionRehydration"]["status"], "HYDRATED")
+            self.assertEqual(imported["scenario"]["npc"]["factionID"], mobile_faction_id)
+            self.assertIsNone(imported["scenario"]["npc"].get("communityID"))
+
+            opened = worker.open_conversation()
+            self.assertEqual(opened["presentation"]["lifecycle"]["state"], "active")
+            admission = self._candidate(
+                worker.snapshot(),
+                "conversation.root:menu:settlement_admission",
+            )
+            self.assertIsNotNone(admission, worker.snapshot())
+
+            clicked = worker.suggestion_click(admission["frame"])
+            self.assertTrue(clicked["accepted"], clicked)
+            results = [
+                event
+                for event in clicked.get("transport", [])
+                if event.get("command") == "ConversationSettlementAdmissionResult"
+            ]
+            self.assertEqual(len(results), 1, clicked)
+            result_payload = results[0]["payload"]
+            self.assertTrue(result_payload["success"], result_payload)
+            self.assertEqual(result_payload["reason"], "settlement_member_admitted")
+            self.assertEqual(
+                result_payload["responseKey"],
+                "response.settlement_admission.accepted.1",
+            )
+            self.assertEqual(
+                result_payload["admission"],
+                {
+                    "npcID": self.npc_id,
+                    "communityID": community_id,
+                    "factionID": self.player_faction,
+                },
+            )
+            self._message_text(clicked, "response.settlement_admission.accepted.1")
+
+            post = worker.snapshot()
+            post_npc = post["scenario"]["npc"]
+            self.assertEqual(post_npc["factionID"], self.player_faction)
+            self.assertEqual(post_npc["communityID"], community_id)
+            self.assertEqual(post_npc["affiliation"]["factionID"], self.player_faction)
+            self.assertEqual(post_npc["affiliation"]["communityID"], community_id)
+            self.assertEqual(
+                post["productionFactionContext"]["npcFaction"]["id"],
+                self.player_faction,
+            )
+            self.assertEqual(
+                post["productionFactionContext"]["community"]["id"],
+                community_id,
+            )
+            self.assertEqual(
+                post["conversationPresentation"]["lifecycle"]["state"],
+                "closed",
+            )
+            self.assertTrue(post["conversationPresentation"]["lifecycle"]["closed"])
+            self.assertIsNone(
+                self._candidate(post, "conversation.root:menu:settlement_admission")
+            )
+
+            replay = worker.suggestion_click(admission["frame"])
+            self.assertEqual(replay["dispatchTransport"], [])
+            replay_results = [
+                event
+                for event in replay.get("transport", [])
+                if event.get("command") == "ConversationSettlementAdmissionResult"
+            ]
+            self.assertEqual(replay_results, [])
+            after_replay = worker.snapshot()
+            self.assertEqual(after_replay["scenario"]["npc"]["factionID"], self.player_faction)
+            self.assertEqual(after_replay["scenario"]["npc"]["communityID"], community_id)
+            self.assertIsNone(
+                self._candidate(
+                    after_replay,
+                    "conversation.root:menu:settlement_admission",
+                )
+            )
 
 
 if __name__ == "__main__":

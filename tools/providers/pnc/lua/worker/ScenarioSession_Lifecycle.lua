@@ -108,6 +108,7 @@ local function install(ScenarioSession)
         Runtime.conversationSuspended = false
         context.WorkingWorld.beginReset(Runtime)
         context.RuntimeState.resetContainers(Runtime)
+        Runtime.taskStates = {}
         if PNC.ConvoEngine
             and PNC.ConvoEngine.ResponseCatalog
             and type(PNC.ConvoEngine.ResponseCatalog.ResetSelections) == "function"

@@ -58,6 +58,20 @@ function Refresh.apply(context, Conversation)
                 refreshedBlockContext.ambientVisitPreview =
                     context.Values.copy(scenarioNpc.ambientVisitPreview)
             end
+            local visitService = PNC.MobileSettlementVisitService
+            local activeVisit = npcID and visitService
+                and type(visitService.GetNPCVisit) == "function"
+                and visitService.GetNPCVisit(
+                    npcID,
+                    context.player,
+                    context.Runtime and context.Runtime.scenario
+                        and context.Runtime.scenario.world
+                        and context.Runtime.scenario.world.worldAgeHours or 0
+                ) or nil
+            refreshedBlockContext.settlementVisit =
+                activeVisit and context.Values.copy(activeVisit) or nil
+            refreshedContext.settlementVisit =
+                activeVisit and context.Values.copy(activeVisit) or nil
         end
         Runtime.view.spec.context = refreshedContext
         local block = Conversation.blockProjection(Runtime.view)
@@ -107,6 +121,7 @@ function Refresh.apply(context, Conversation)
                     or {}
             )
             if ok and type(root) == "table" then
+                Runtime.view.spec.nodes.greeting = root
                 Runtime.view.spec.nodes.menu = { choices = root.choices or {} }
                 if composer
                     and type(composer.BuildSemanticRootProjection)
@@ -115,7 +130,10 @@ function Refresh.apply(context, Conversation)
                     Runtime.view.spec.context.conversationRoot =
                         composer.BuildSemanticRootProjection(Runtime.view)
                 end
-                if Runtime.view.session.currentNodeID == "menu" then
+                if Runtime.view.session.currentNodeID == "greeting" then
+                    Runtime.view.session.currentNode =
+                        Runtime.view.spec.nodes.greeting
+                elseif Runtime.view.session.currentNodeID == "menu" then
                     Runtime.view.session.currentNode =
                         Runtime.view.spec.nodes.menu
                     Runtime.view.session:setChoices(
