@@ -8,6 +8,26 @@ local GREETING_DIALOGUE_CONSTRAINTS = {
             values = { "hostile", "combat", "busy", "dead" },
         },
         {
+            path = "situation.activeBehavior",
+            op = "not_in",
+            values = { "hostile", "combat", "busy", "dead" },
+        },
+        {
+            path = "roles.hostile",
+            op = "neq",
+            value = true,
+        },
+        {
+            path = "actorConversationContext.roles.hostile",
+            op = "neq",
+            value = true,
+        },
+        {
+            path = "actorConversationContext.situation.activeBehavior",
+            op = "not_in",
+            values = { "hostile", "combat", "busy", "dead" },
+        },
+        {
             path = "npcState.healthState",
             op = "not_in",
             values = { "dead", "incapacitated" },
@@ -19,6 +39,7 @@ return {
     id = "greeting",
     version = 1,
     owner = "ProjectHoomans",
+    constraints = GREETING_DIALOGUE_CONSTRAINTS,
     triggers = {
         { intent = "GREET", speechAct = "GREET" },
     },

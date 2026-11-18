@@ -99,6 +99,50 @@ return function(Input, Internal, Support)
         end
         actionIntent = ActionTargetHints.AttachWorldTargetHint(
             actionIntent, context, WorldTargetHints, Support.audit)
+        local cmdAction = actionIntent and tostring(actionIntent.action or "") or ""
+        if cmdAction == "FOLLOW" or cmdAction == "STAY" or cmdAction == "RETURN"
+            or cmdAction == "GO_HOME" or cmdAction == "CAMP"
+        then
+            local shallow = type(Internal.ShallowContext) == "function"
+                and Internal.ShallowContext(view) or {}
+            local record = context.npcID and PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(context.npcID) or nil
+            local roles = type(shallow.roles) == "table" and shallow.roles
+                or (type(record) == "table" and type(record.roles) == "table" and record.roles)
+                or {}
+            local activeBehavior = tostring(
+                (type(shallow.npcState) == "table" and shallow.npcState.activeBehavior)
+                or (type(shallow.situation) == "table" and shallow.situation.activeBehavior)
+                or (type(record) == "table" and record.activeBehavior)
+                or ""
+            )
+            if roles.hostile == true or roles.authorityEligible == false
+                or roles.status == "hostile"
+                or activeBehavior == "hostile" or activeBehavior == "combat" or activeBehavior == "dead"
+            then
+                if type(generatedFlow) == "table" then
+                    generatedFlow.dispatchCount = 0
+                end
+                return Support.blockedDispatch("actor_blocked_or_hostile")
+            end
+            local orderKind = tostring(
+                shallow.orderKind
+                or (type(record) == "table" and record.orderKind)
+                or (type(shallow.followState) == "table" and shallow.followState.mode)
+                or (type(record) == "table" and type(record.followState) == "table" and record.followState.mode)
+                or ""
+            )
+            if (cmdAction == "FOLLOW" and (orderKind == "follow" or activeBehavior == "follow" or activeBehavior == "following"))
+                or (cmdAction == "STAY" and orderKind == "stay")
+                or (cmdAction == "CAMP" and orderKind == "camp")
+                or ((cmdAction == "RETURN" or cmdAction == "GO_HOME") and orderKind == "return")
+            then
+                if type(generatedFlow) == "table" then
+                    generatedFlow.dispatchCount = 0
+                end
+                return Support.blockedDispatch("already_" .. string.lower(cmdAction))
+            end
+        end
         if QuestResponses
             and type(QuestResponses.IsQuestAction) == "function"
             and QuestResponses.IsQuestAction(nil, actionIntent.action)

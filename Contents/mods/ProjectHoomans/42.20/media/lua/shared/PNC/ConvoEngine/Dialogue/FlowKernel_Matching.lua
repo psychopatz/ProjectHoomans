@@ -105,19 +105,31 @@ local function slotValues(flow, node, ir)
     return output
 end
 
-local function flowTrigger(flow, ir)
+local Predicate = require "PsychopatzCore/Semantics/PsychopatzSemanticPredicate"
+
+local function flowTrigger(flow, ir, context)
     local matches = Registry.MatchesAny(flow and flow.triggers, ir)
-    return matches == true
+    if matches ~= true then
+        return false
+    end
+    local guard = type(flow) == "table" and (flow.constraints or flow.when) or nil
+    if guard ~= nil and type(context) == "table" then
+        local eval = Predicate.Evaluate(guard, context)
+        if type(eval) ~= "table" or eval.allowed ~= true then
+            return false
+        end
+    end
+    return true
 end
 
-local function findTriggeredFlow(ir)
+local function findTriggeredFlow(ir, context)
     local flowID
     local flow
     local candidates = {}
     for _, registeredID in ipairs(Registry.List()) do
         flowID = registeredID
         flow = Registry.Get(flowID)
-        if flowTrigger(flow, ir) then
+        if flowTrigger(flow, ir, context) then
             candidates[#candidates + 1] = flowID
         end
     end

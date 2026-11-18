@@ -97,6 +97,8 @@ function Registry.Validate(definition)
         triggers = normalizedTriggers,
         nodes = normalizedNodes,
         slotOwners = slotOwners,
+        constraints = definition.constraints,
+        when = definition.when,
     }
 end
 

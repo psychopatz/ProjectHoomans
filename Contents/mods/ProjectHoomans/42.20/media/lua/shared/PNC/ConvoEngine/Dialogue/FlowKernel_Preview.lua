@@ -179,7 +179,7 @@ function Kernel.Preview(ir, state, context, options)
         return finalizePreview(preview)
     end
 
-    local triggeredID, triggered = findTriggeredFlow(ir)
+    local triggeredID, triggered = findTriggeredFlow(ir, context)
     preview.diagnostics.candidateFlows = triggered
     if triggeredID then
         local flow = Registry.Get(triggeredID)
