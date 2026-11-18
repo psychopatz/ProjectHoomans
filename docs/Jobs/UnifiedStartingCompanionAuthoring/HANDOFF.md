@@ -2,43 +2,42 @@
 handoff_schema: 2
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-updated_at: "2026-11-18T15:59:32.563922Z"
+updated_at: "2026-11-18T16:16:42.501697Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
-phase: "P5R10"
-chunk: "P6 fresh-session startup followed by P5R9 interaction/audio retest"
+phase: "P5R11"
+chunk: "P6 backpack-color retest followed by remaining native matrices"
 retrieval_tier: "verify"
 codebase_memory_indexed_commit: "6635ccc81e21f02383feb598dc3b92c91b093d6a"
 checkpoint_mode: "committed_handoff"
 phase_commit: "self"
-phase_commit_phase: "P5R10"
-phase_commit_message: "phase(P5R10): guard idle item explorer resize during creator startup"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=ec6ddbf0c3d19d0f57768f59feba229e65b0e186;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
-phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=046c5dbcb03dfcabcbfb3cee6ab3f847e9af1efd9ea3bb379200c3aa76dc10af;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
-residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
+phase_commit_phase: "P5R11"
+phase_commit_message: "phase(P5R11): preserve backpack visuals across creator preview rebuilds"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=0c6f62400b813679c79634ee4cc915b2ba0bd0cf;dynamic-trading=0fcf35196452db0675788167df205aec09748caa"
+phase_residual_vector: "project-hoomans=a83b7d817b191e2630e7d55cceb8e82805c137912135e4e058d017e1358a3402;psychopatz-core=f50fccd35f4245892a23a8c190209de7d24736ea687d4a71966086027450797c;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
+residual_worktree_fingerprint: "a83b7d817b191e2630e7d55cceb8e82805c137912135e4e058d017e1358a3402"
 ---
 
 
 # Session Handoff
 
-P5R10 repairs the native startup failure introduced by the P5R9 delete-action
-layout. Console session 4c35d197, E4A983F confirms options.onDelete was indexed
-while options was nil during hidden Explorer resize in composer construction.
-The constructor now explicitly starts idle; resize defers until children and
-Show configuration exist. No broad fallback/protected-call workaround was added.
+P5R11 preserves captured backpack tint/texture/decal across preview inventory
+and body rebuilds. The same item type plus logical template/placement restores
+only missing visuals. Explicit new visuals, replacements and fresh generations
+remain authoritative. This is transient shared-editor continuity, not authored
+inventory promotion or a persistence-schema change.
 
-The new regression reproduces both idle resize stages and actual companion-host
-layout, then verifies normal configured browsing/deletion/dismissal. Explicit
-nil initialization prevents the widget fixture's empty-options default masking
-this native lifecycle contract again.
+`TEST_VERIFIED`: 67/67 focused; full 1060/1064, same four known scene-route,
+context-scene, population initialization and translation failures. The new test
+uses real model/visual codec/equipment projection; disabling continuity reproduces
+the carried-edit tint change. Ordinary edits, body/outfit rebuilds, replacement
+visuals/types/keys and new seeds/previews pass. `STATIC_ONLY`: three Lua syntax,
+two production Kahlua, whitespace and twelve evidence-path coverage/current-source
+checks pass. Graph baseline is older; changed/new source was read directly.
 
-`TEST_VERIFIED`: 66/66 focused; full 1059/1063, same four known scene-route,
-context-scene, population initialization and translation failures. `STATIC_ONLY`:
-two Lua syntax checks, one production Kahlua check, whitespace and seven-path
-coverage/current-source checks pass. No strings/schemas changed.
-
-Next: user-owned fresh-session opening of companion/debug hosts, followed by
-LOADOUT_AUDIO_CRUD_RETEST.md and prior skin/save/library/SP/MP/co-op acceptance.
-P5R9 behavior remains implemented; native visual/audible success is unverified.
-No native launch/control, push or Workshop publication. No Core paths owned;
-preserve concurrent semantic-tooling work. Exact phase commit/checkpoint required.
+Next: user-owned fresh-session backpack-color retest in both creators, followed
+by LOADOUT_AUDIO_CRUD_RETEST.md and prior skin/save/library/SP/MP/co-op acceptance.
+No native launch/control, visual/audible success, push or Workshop publication.
+No Core paths owned. Preserve concurrent semantic-tooling work in Hoomans/Core;
+phase helper records current participant heads/residual fingerprints. Exact owned
+local phase commit and checkpoint verification are required.

@@ -90,3 +90,19 @@ future catalog. Remote library deletion independently requires admin access.
    permanent. MP: ordinary clients cannot delete server-library records; an
    administrator can request deletion. Existing actors remain alive and intact.
 8. Continue prior skin/save/library and SP/MP/co-op lifecycle acceptance matrices.
+
+
+## P5R11 backpack-color regression
+
+Developer-side continuity preserves captured bag tint/texture/decal across
+inventory/body rebuilds, matching the same logical item and full type. Explicit
+new visuals, different items and fresh generations still win; carried nonvisual
+state is preserved. Focused **67/67**, full **1060/1064** (same four known failures).
+The new regression fails at a carried-item edit when continuity is disabled.
+Native rendering is unverified.
+
+In both creators, note an existing backpack's color, then edit name, skin/hair,
+voice pitch, carried contents and gender where allowed. Switch pages between
+edits. The same backpack must retain its exact tint and texture. Deliberately
+replace it, select a captured custom visual, and reroll Loadout: these actions
+must still apply the requested/new visual. Save/reload and continue prior tests.

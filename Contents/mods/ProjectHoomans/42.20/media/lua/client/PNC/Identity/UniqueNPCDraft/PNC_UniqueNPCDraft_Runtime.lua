@@ -11,6 +11,7 @@ local Appearance = Identity and Identity.Appearance
 local Inventory = PNC.Inventory
 local copy = Internal.copy
 local exportItems = Internal.exportItems
+local EquipmentVisuals = require "PNC/Identity/UniqueNPCDraft/PNC_UniqueNPCDraft_EquipmentVisuals"
 
 local function applyExplicitIdentity(record, def, draft)
     local survivor = record.identity and record.identity.survivor or {}
@@ -243,12 +244,14 @@ function Model.ApplyDraftToRuntime(draft)
     record.name = def.displayName
     applyPreviewAppearance(record, clearedAppearance)
     if (appearanceChanged or inventoryChanged) and Inventory and Inventory.CreateFromTemplate then
+        local previousVisuals = EquipmentVisuals.Remember(record)
         record.runtime = record.runtime or {}
         if appearanceChanged then
             record.runtime.appearanceCache = nil
             record.runtime.appearanceCacheKey = nil
         end
         Inventory.CreateFromTemplate(record)
+        EquipmentVisuals.Restore(record, previousVisuals)
     else
         if inventory then record.inventory = inventory end
         if Inventory and Inventory.SyncEquipmentFromInventory then
@@ -266,6 +269,9 @@ function Model.EnsureRuntimeRecord(draft, force)
     if draft.runtimeRecord and not force then
         return Model.ApplyDraftToRuntime(draft)
     end
+    local previous = draft.runtimeRecord
+    local previousVisuals = previous and tonumber(previous.identitySeed) == tonumber(draft.previewSeed)
+        and EquipmentVisuals.Remember(previous) or nil
     local def, definitionReason = Model.BuildDefinition(draft)
     if not def then return nil, definitionReason end
     local record
@@ -287,6 +293,7 @@ function Model.EnsureRuntimeRecord(draft, force)
     if Inventory and Inventory.EnsureRecordInventory then
         Inventory.EnsureRecordInventory(record, { reconcileWaterContainer = false })
     end
+    EquipmentVisuals.Restore(record, previousVisuals)
     capturePreviewEquipmentVisuals(record)
     if Inventory and Inventory.SyncEquipmentFromInventory then
         Inventory.SyncEquipmentFromInventory(record)

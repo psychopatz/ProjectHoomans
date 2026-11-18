@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R10 startup repair verified — P6 native acceptance pending
+**Status:** P5R11 backpack visual continuity verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -953,6 +953,21 @@ resize, actual host startup and subsequent Show/Delete/Hide behavior.
 Lua syntax checks, one production Kahlua check and whitespace/coverage checks
 pass. Exact owned local commit required. Native startup and the previous P5R9
 interaction/audio matrix remain P6 user-owned acceptance.
+
+### P5R11 — Preserve backpack visuals across creator edits
+
+The user reports a backpack changing color after other edits. Preview inventory
+reconstruction discarded its captured native tint. Retain visual state for the
+same item type and logical template/placement across inventory/body rebuilds,
+without overriding explicit visuals, new generations or nonvisual state. Keep
+this continuity preview-only and share it between both creator hosts.
+
+**Gate:** **67/67** focused; full **1060/1064**, same four known failures. A new
+behavioral regression reproduces the tint change with continuity disabled and
+passes for ordinary edits, reconstruction and deliberate replacement/reroll
+boundaries. Three Lua syntax, two production Kahlua, whitespace and twelve-path
+coverage/current-source checks pass. Exact owned local phase commit required;
+native backpack-color confirmation remains user-owned P6 acceptance.
 
 ### P6 — Native acceptance
 

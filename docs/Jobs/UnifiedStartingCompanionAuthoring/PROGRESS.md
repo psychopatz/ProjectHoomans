@@ -1,6 +1,34 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R10
+## Current state — 2026-11-19 P5R11
+
+The creator preview now retains the exact tint, texture and decal of an existing
+backpack across inventory and body reconstruction. Previously a fresh generated
+bag had no visual state, so the next native capture randomized its tint again.
+Preview-only continuity matches item type and logical template/placement, never
+new runtime item IDs. It fills only absent visual state; explicit replacement
+visuals and new generations remain authoritative. Nonvisual item state and sparse
+authored intent are unchanged. Both creator hosts use this shared model fix.
+
+`TEST_VERIFIED`: **67/67** focused; full **1060/1064**, same four known failures
+(animation-scene debug routes, context debug, population initialization and
+translation-manager TL expectation). The new regression uses the real preview
+model, visual codec and inventory-to-equipment projection. It covers name,
+skin/hair/pitch, carried-item and outfit-policy edits, body rebuilds, replacement
+visuals/types/keys, fresh seeds/previews and nonvisual state preservation. With
+continuity disabled at the module boundary, it reproduces the carried-edit tint
+change (.1 to .2); the repaired path passes. Three Lua syntax checks, two
+production Kahlua checks and whitespace checks pass. Coverage/current source
+checked for the twelve implementation/test evidence paths. No strings/schema or
+Core edits were needed; concurrent semantic-tooling work remains unowned.
+
+Next: user-owned fresh-session test in both creators: note backpack color, edit
+name, skin/hair, pitch, carried contents and gender where allowed, and switch tabs.
+The same backpack should retain its exact color. Deliberate replacements and
+Loadout rerolls should still work. Continue the remaining P6 matrices; native
+visual/audible success is unverified and no game launch/control was performed.
+
+## P5R10 startup repair — native acceptance pending
 
 The native startup regression is repaired on the developer side. Console session
 `4c35d197` confirms `E4A983F`: Item Explorer onResize indexed `options.onDelete`
@@ -443,16 +471,15 @@ SP/MP/co-op acceptance.
 
 ## Next Chunk
 
-**P6 — user-owned native SP/MP/co-op acceptance after the local P5R2 developer
-repair commit. Start a fresh Build 42.20 session and validate the final-screen
-Companions workflow, relationship policy, presets, default/no-op paths, visual
-preview, and SP/MP/co-op reconnect/replacement-survivor authority behavior.**
+**P6 — user-owned fresh-session backpack-color retest after P5R11, then the
+loadout/audio/CRUD, skin/save/library and SP/MP/co-op matrices. Developer-side
+P5R11 gates pass; native rendering/audio/lifecycle acceptance remains open.**
 
 ## Repository safety
 
 ProjectHoomans and PsychopatzCore remain on existing `main` branches. Current
-ProjectHoomans HEAD observed during this audit is
-`1c7fe2c87908fd5cf0aa4b3b3995baf5eaa3c9c1`.
+ProjectHoomans pre-P5R11 HEAD observed is
+`5ced43e44d957ff1fe090cb16cc224d3d4aeabbd`.
 The worktree contains unrelated active semantic/UI edits; preserve them. No new
 branch, push, Workshop publication, reset, stash, broad staging, or agent-run
 native PZ validation is authorized. All native regressions were supplied by
