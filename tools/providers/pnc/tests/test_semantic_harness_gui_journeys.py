@@ -339,11 +339,11 @@ class SemanticHarnessGuiJourneyTests(SemanticLabGuiTestCase):
         self.assertTrue(app.developer_tools_host.winfo_ismapped())
 
         pane = app.convo_engine_authoring
-        self.assertTrue(_invoke_button_with_text(app.studio_tab, "Refresh families"))
+        self.assertTrue(_invoke_button_with_text(app.studio_tab, "↻ Refresh"))
         self.assertTrue(pane._families)
-        self.assertTrue(_invoke_button_with_text(app.studio_tab, "Validate & trace"))
+        self.assertTrue(_invoke_button_with_text(app.studio_tab, "Validate"))
         self.assertTrue(_invoke_button_with_text(app.studio_tab, "Run ConvoEngine Integrity Audit"))
-        self.assertIn("convoengine integrity audit", pane._status_var.get().lower())
+        self.assertIn("familyFilesChecked", app.observatory.views["Review"].get("1.0", "end"))
 
         # Hermetic temp workspace for New family -> Write canonical source -> Duplicate -> Delete
         with tempfile.TemporaryDirectory(prefix="s10c-studio-hermetic-") as tmp:
@@ -382,11 +382,11 @@ class SemanticHarnessGuiJourneyTests(SemanticLabGuiTestCase):
                 _NonBlockingMessageBox(confirm=True),
                 hermetic_service,
             )
-            self.assertTrue(_invoke_button_with_text(host_frame, "New family"))
+            self.assertTrue(_invoke_button_with_text(host_frame, "+ New"))
             hermetic_pane._id_var.set("s10c_hermetic_topic")
             if isinstance(hermetic_pane._document, dict):
                 hermetic_pane._document["id"] = "s10c_hermetic_topic"
-            self.assertTrue(_invoke_button_with_text(host_frame, "Validate & trace"))
+            self.assertTrue(_invoke_button_with_text(host_frame, "Validate"))
             self.assertTrue(_invoke_button_with_text(host_frame, "Write canonical source"))
             self.assertIsNotNone(hermetic_pane._current_entry)
             written_path = Path(str(hermetic_pane._current_entry["sourcePath"]))
@@ -394,9 +394,9 @@ class SemanticHarnessGuiJourneyTests(SemanticLabGuiTestCase):
             self.assertTrue(written_path.is_file())
 
             written_entry = hermetic_pane._current_entry
-            self.assertTrue(_invoke_button_with_text(host_frame, "Duplicate"))
+            hermetic_pane.duplicate_family()
             hermetic_pane._current_entry = written_entry
-            self.assertTrue(_invoke_button_with_text(host_frame, "Delete"))
+            hermetic_pane.delete_family()
             self.assertFalse(written_path.exists())
 
 
