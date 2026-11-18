@@ -76,6 +76,37 @@ return {
         },
         ["payload"] = {
             ["metadata"] = {
+                ["flow"] = {
+                    ["id"] = "identity",
+                    ["initial"] = "await_player_name",
+                    ["nodes"] = {
+                        ["await_player_name"] = {
+                            ["accepts"] = {
+                                {
+                                    ["identityClaim"] = true,
+                                    ["intent"] = "INFORM",
+                                    ["subject"] = "IDENTITY",
+                                },
+                            },
+                            ["onMatch"] = "complete",
+                            ["onRefuse"] = "cancel",
+                            ["onUnrelated"] = "suspend",
+                            ["responsePool"] = "semantic.question.identity",
+                            ["slots"] = {
+                                ["name"] = {
+                                    ["owner"] = "identity",
+                                    ["source"] = "slots.identityClaim.name",
+                                    ["type"] = "string",
+                                },
+                            },
+                        },
+                        ["complete"] = {
+                            ["terminal"] = true,
+                        },
+                    },
+                    ["owner"] = "ProjectHoomans",
+                    ["version"] = 1,
+                },
                 ["textRows"] = {
                     {
                         ["key"] = "UI_PNC_Conversation_Identity_Evasion_Rude_1",
@@ -233,6 +264,12 @@ return {
                     },
                 },
                 ["textTarget"] = "convo/SemanticResponses",
+                ["triggers"] = {
+                    {
+                        ["intent"] = "QUESTION",
+                        ["subject"] = "IDENTITY",
+                    },
+                },
             },
             ["say"] = {
                 ["keyOrder"] = {

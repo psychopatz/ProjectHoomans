@@ -115,7 +115,7 @@ local function flowTrigger(flow, ir, context)
     local guard = type(flow) == "table" and (flow.constraints or flow.when) or nil
     if guard ~= nil and type(context) == "table" then
         local eval = Predicate.Evaluate(guard, context)
-        if type(eval) ~= "table" or eval.allowed ~= true then
+        if type(eval) ~= "table" or eval.status == "rejected" then
             return false
         end
     end

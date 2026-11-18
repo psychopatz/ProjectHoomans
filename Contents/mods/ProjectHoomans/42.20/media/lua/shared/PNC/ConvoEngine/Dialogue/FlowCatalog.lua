@@ -7,7 +7,6 @@ local ConversationRegistry = require
     "PNC/ConvoEngine/Registry"
 
 local definitions = {
-    require "PNC/ConvoEngine/Dialogue/Flow_Identity",
     require "PNC/ConvoEngine/Dialogue/Flow_Wellbeing",
     require "PNC/ConvoEngine/Dialogue/Flow_Needs",
     require "PNC/ConvoEngine/Dialogue/Flow_Weather",

@@ -2,6 +2,43 @@
   "schema": "psychopatz.psdl.v2",
   "id": "identity.exchange.responses",
   "metadata": {
+    "triggers": [
+      {
+        "intent": "QUESTION",
+        "subject": "IDENTITY"
+      }
+    ],
+    "flow": {
+      "id": "identity",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "initial": "await_player_name",
+      "nodes": {
+        "await_player_name": {
+          "responsePool": "semantic.question.identity",
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "subject": "IDENTITY",
+              "identityClaim": true
+            }
+          ],
+          "slots": {
+            "name": {
+              "type": "string",
+              "owner": "identity",
+              "source": "slots.identityClaim.name"
+            }
+          },
+          "onMatch": "complete",
+          "onRefuse": "cancel",
+          "onUnrelated": "suspend"
+        },
+        "complete": {
+          "terminal": true
+        }
+      }
+    },
     "textTarget": "convo/SemanticResponses",
     "textRows": [
       {

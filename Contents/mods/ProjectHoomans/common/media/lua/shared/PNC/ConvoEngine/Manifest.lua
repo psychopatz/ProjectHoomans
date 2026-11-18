@@ -241,6 +241,20 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_identity/question_identity.json",
         },
         {
+            ["bytes"] = 1241,
+            ["domain"] = "semantic",
+            ["kind"] = "Flows",
+            ["module"] = "PNC/ConvoEngine/Flows/Semantic/Identity",
+            ["owner"] = "ProjectHoomans",
+            ["recordCount"] = 1,
+            ["recordIDs"] = {
+                "identity",
+            },
+            ["registryOwner"] = "ProjectHoomans",
+            ["shardOwner"] = "ProjectHoomans",
+            ["sourceShard"] = "semantic/identity.json",
+        },
+        {
             ["bytes"] = 904,
             ["domain"] = "semantic",
             ["kind"] = "Flows",
@@ -1654,7 +1668,7 @@ return {
             ["sourceShard"] = "dialogue/health_content/question_medical_bite.json",
         },
         {
-            ["bytes"] = 14547,
+            ["bytes"] = 16140,
             ["domain"] = "identity_exchange",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/IdentityExchange",
@@ -5501,5 +5515,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "c8443fdb139d204eddb0e086c864185e88d218f4a7fb89cf6d91acf062d956ba",
+    ["wholeModelFingerprint"] = "0f0a75958f10ec3169eb39af1324a0952533be2c8a6cb3a35a42bd03c3753a44",
 }

@@ -100,8 +100,8 @@ local conflictingOwner = Registry.Validate({
 })
 T.falsy(conflictingOwner, "registry rejects conflicting slot owners")
 
-local duplicateRegistered, duplicateReason = Registry.Register(require
-    "PNC/ConvoEngine/Dialogue/Flow_Identity")
+local duplicateRegistered, duplicateReason = Registry.Register(
+    Registry.Get("identity"))
 T.falsy(duplicateRegistered, "registry rejects duplicate flow IDs")
 T.equal(duplicateReason, "duplicate_flow_id:identity",
     "registry explains duplicate flow IDs")
