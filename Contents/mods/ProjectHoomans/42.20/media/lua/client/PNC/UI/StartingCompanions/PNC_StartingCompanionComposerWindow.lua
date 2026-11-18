@@ -328,11 +328,12 @@ function ISPNCStartingCompanionComposerWindow:loadSelected()
 end
 
 function ISPNCStartingCompanionComposerWindow:browsePresets()
+    local portraitProviders = {}
     local function entries()
     local items = {}
     for _, entry in ipairs(Store.List()) do
         local label = tostring(entry.label or entry.fileName)
-        items[#items + 1] = { id = entry.fileName, label = label, search = string.lower(label .. " " .. entry.fileName), category = entry.kind }
+        items[#items + 1] = { id = entry.fileName, label = label, search = string.lower(label .. " " .. entry.fileName) }
     end
     return items
     end
@@ -346,6 +347,15 @@ function ISPNCStartingCompanionComposerWindow:browsePresets()
             onClick = function() self:promptSaveSet() end,
         },
         reloadItems = entries,
+        preview = function(item, index)
+            if not portraitProviders[item.id] then
+                local payload = Store.Load(item.id)
+                if not payload then return nil end
+                local previews = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'
+                portraitProviders[item.id] = previews.Companions(payload, self.session:GetContext())
+            end
+            return portraitProviders[item.id](index)
+        end,
         onDelete = function(item)
             local ok, reason = Store.Delete(item.id)
             if ok then

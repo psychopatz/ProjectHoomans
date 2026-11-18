@@ -87,6 +87,7 @@ function Explorer:createChildren()
         self.preview = UI.PortraitPanel:new(0, 0, 1, 1, { zoom = -3, animSetName = false, stateName = 'idle', animate = true })
         self.preview:initialise(); self.preview:instantiate(); self:addChild(self.preview); self.preview:setVisible(false)
     end
+    self:buildExplorerPortraitControls()
     self.quantityLabel = ISLabel:new(0, 0, 24, tr('UI_PNC_Authoring_Quantity', 'Quantity / Destination'), .8, .85, .85, 1, UIFont.Small, true)
     self.quantityLabel:initialise(); self:addChild(self.quantityLabel)
     self.quantity = UI.CreateTextEntry(self, { onlyNumbers = true, maxTextLength = 2, text = '1' })
@@ -141,6 +142,7 @@ function Explorer:Show(options)
     self.source, self.category, self.offset, self.selectedID, self.selectedItem = nil, nil, 0, options.initialID, nil
     self.compatibleOnly = true
     self.deleteArmedID = nil
+    self.previewItemID, self.previewIndex = nil, 1
     self.quantity:setText(tostring(options.initialQuantity or 1)); self.destination:selectData(options.initialDestination or 'root')
     self.confirm:setTitle(options.applyLabel or tr(self.mode == 'outfit' and 'UI_PNC_Authoring_ApplyOutfit' or 'UI_PNC_Authoring_Equip', self.mode == 'outfit' and 'Apply outfit' or 'Equip / Add'))
     self.confirm.tooltip = options.applyTooltip
@@ -213,11 +215,7 @@ function Explorer:refreshDetails()
     PNC.NPCAuthoringFields.EnableButton(self.confirm, item ~= nil and compatible == true)
     self.hintText = tr(not item and (#(self.visibleRows or {}) == 0 and 'UI_PNC_Authoring_NoMatches' or 'UI_PNC_Authoring_SelectResult') or not compatible and 'UI_PNC_Authoring_DoesNotFit' or 'UI_PNC_Authoring_ReviewSelection',
         not item and (#(self.visibleRows or {}) == 0 and 'No matching results' or 'Select a result to review it') or not compatible and 'Does not fit the selected slot' or 'Review the selection, then apply')
-    if self.preview then
-        local spec = item and self.options.preview and self.options.preview(item)
-        self.hasPreview = spec ~= nil
-        if spec and self.preview.setTarget then self.preview:setTarget(nil, spec, false) end
-    end
+    self:refreshExplorerPortrait(item)
     self:onResize()
 end
 function Explorer:onResize()
@@ -229,7 +227,7 @@ function Explorer:onResize()
     local h, width = math.max(28, self.fontHeight + 10), math.max(1, self.width - g * 2)
     local filters = not self.customItems
     local filterWidth = filters and math.min(230, math.max(140, width * .19)) or 0
-    local side = (width >= 850 or self.mode == 'outfit' and width >= 550) and math.min(300, width * .28) or 0
+    local side = (width >= 850 or self.options.preview and width >= 550) and math.min(300, width * .28) or 0
     local x = g + (filters and filterWidth + g or 0)
     local contentWidth = math.max(1, width - (filters and filterWidth + g or 0) - (side > 0 and side + g or 0))
     self.heading:setName(L.Ellipsize(self.titleText or '', UIFont.Small, math.max(1, width - 110))); self.heading.tooltip = self.titleText
@@ -257,14 +255,7 @@ function Explorer:onResize()
     self.grid:setScrollHeight(self.grid.contentHeight); self.grid:setYScroll(math.max(-self.grid.maxScroll, math.min(0, self.grid:getYScroll()))); self.grid:onResize()
     for index, tile in ipairs(self.tiles) do L.SetBounds(tile, (index - 1) % columns * tileWidth, math.floor((index - 1) / columns) * tileHeight, tileWidth - 5, tileHeight - 5) end
     self.details:setVisible(side > 0)
-    local detailY, detailHeight = top, gridHeight
-    if self.preview then
-        local visible = side > 0 and self.hasPreview == true
-        self.preview:setVisible(visible)
-        L.SetBounds(self.preview, x + contentWidth + g, top, side, math.max(1, gridHeight * .65))
-        if visible and self.preview.setPortraitBounds then self.preview:setPortraitBounds(x + contentWidth + g, top, side, gridHeight * .65) end
-        if visible then detailY, detailHeight = top + gridHeight * .65 + g, gridHeight * .35 - g end
-    end
+    local detailY, detailHeight = self:layoutExplorerPortrait(x + contentWidth + g, top, side, gridHeight, h, g)
     L.SetBounds(self.details, x + contentWidth + g, detailY, side, math.max(1, detailHeight))
     local y = top + gridHeight + g
     L.SetBounds(self.previous, x, y, 40, h); L.SetBounds(self.counter, x + 48, y, math.max(1, contentWidth - 96), h); L.SetBounds(self.nextButton, x + contentWidth - 40, y, 40, h)
@@ -283,4 +274,5 @@ function Explorer:onResize()
     L.SetBounds(self.deleteButton, x + actionWidth + g, y, actionWidth, h)
     PNC.NPCAuthoringFields.NativeMetrics(self)
 end
+require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringExplorerPortrait'
 return Explorer

@@ -2,19 +2,37 @@
 local Window, UI = ISPNCNPCAuthoringEditor, PsychopatzCore.UI
 local I, L = Window.Internal, UI.Layout
 local Slots, Catalog, Fields = PNC.NPCAuthoringSlots, PNC.NPCAuthoringCatalog, PNC.NPCAuthoringFields
+local BodyMap = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringBodyMap'
+function Window:selectLoadoutPart(id)
+    self.loadoutPart = id
+    self.slotContent:setYScroll(0); self.pages.loadout:setYScroll(0)
+    self:refreshLoadoutPage(); self:requestResponsiveLayout()
+end
 function Window:buildLoadoutNavigation()
     self.loadoutPart = 'torso'
     self.loadoutParts = {}
+    self.bodyMap = BodyMap:new(0, 0, 123, 302, function(id) self:selectLoadoutPart(id) end)
+    self.bodyMap:initialise(); self.bodyMap:instantiate(); self.pages.loadout:addChild(self.bodyMap)
+    self.loadoutSelectionLabel = I.addLabel(self.pages.loadout, '')
+    self.loadoutLegend = I.addLabel(self.pages.loadout, I.tr('UI_PNC_Authoring_BodyMapLegend', 'Green: equipped. Click a body part.'))
+    self.loadoutLegend.tooltip = I.tr('UI_PNC_Authoring_BodyMapHelp', 'Select a body region to edit its clothing. Green regions have equipped items. Bags, carried supplies and weapons use the shortcuts below.')
     for _, group in ipairs(Slots.Groups()) do
-        local control = UI.CreateButton(self.pages.loadout, { title = I.tr('UI_PNC_Authoring_Group_' .. group.key, group.label),
-            target = self, variant = 'quiet', onclick = function(target)
-                target.loadoutPart = group.id
-                target.slotContent:setYScroll(0)
-                target.pages.loadout:setYScroll(0)
-                target:refreshLoadoutPage(); target:requestResponsiveLayout()
-            end })
-        control.part = group
-        self.loadoutParts[#self.loadoutParts + 1] = control
+        if group.id == 'back' or group.id == 'carry' or group.id == 'held' or group.id == 'other' then
+            local control = UI.CreateButton(self.pages.loadout, { title = I.tr('UI_PNC_Authoring_Group_' .. group.key, group.label),
+                target = self, variant = 'quiet', onclick = function(target)
+                    target:selectLoadoutPart(group.id)
+                end })
+            control.part = group
+            if group.id == 'back' or group.id == 'carry' then control.navImage = getTexture and getTexture('media/ui/Sidebar/64/Inventory_On_64.png') end
+            control.render = function(c)
+                ISButton.render(c)
+                local fontHeight = getTextManager():getFontHeight(UIFont.Small)
+                if c.navImage then c:drawTextureScaledAspect(c.navImage, 6, 3, c.width - 12, math.max(1, c.height - fontHeight - 8), 1, 1, 1, 1) end
+                c:drawTextCentre(L.Ellipsize(c.caption or '', UIFont.Small, math.max(1, c.width - 8)), c.width / 2,
+                    c.height - fontHeight - 4, .9, .95, .95, 1, UIFont.Small)
+            end
+            self.loadoutParts[#self.loadoutParts + 1] = control
+        end
     end
     self:buildCarriedInventory()
 end
@@ -26,10 +44,23 @@ function Window:refreshLoadoutNavigation()
         if row.type then counts[row.group].equipped = counts[row.group].equipped + 1 end
     end
     if not counts[self.loadoutPart] then self.loadoutPart = 'carry' end
+    self.bodyMap:SetState(self.draft and self.draft.isFemale == true, counts, self.loadoutPart)
+    local selected
+    for _, group in ipairs(Slots.Groups()) do if group.id == self.loadoutPart then selected = group end end
+    self.loadoutSelectionLabel:setName(selected and I.tr('UI_PNC_Authoring_Group_' .. selected.key, selected.label) or '')
     for _, button in ipairs(self.loadoutParts) do
         local group, count = button.part, counts[button.part.id]
+        if group.id == 'held' then
+            local entry = Catalog.Find('Base.Axe')
+            for _, row in ipairs(self.slotRows or {}) do
+                if row.kind == 'held' and row.type then entry = Catalog.Find(row.type); break end
+            end
+            button.navImage = entry and entry.script:getNormalTexture()
+        end
         local title = I.tr('UI_PNC_Authoring_Group_' .. group.key, group.label)
-        button:setTitle(title .. ' (' .. tostring(count and count.equipped or 0) .. ')')
+        local key = ({ back = 'BagsShortcut', carry = 'InventoryShortcut', held = 'WeaponsShortcut', other = 'OtherShortcut' })[group.id]
+        button.caption = I.tr('UI_PNC_Authoring_' .. key, group.label) .. ' (' .. tostring(count and count.equipped or 0) .. ')'
+        button:setTitle(''); button.tooltip = title
         button.pncPartVisible = count ~= nil
         button:setVisible(count ~= nil)
         Fields.SelectButton(button, self.loadoutPart == group.id, true)
@@ -65,7 +96,8 @@ function Window:layoutLoadoutPage(width, height, rowHeight, gap)
     local w, y = math.max(1, width - gap * 2 - 16), rowHeight + gap * 2
     local carry = self.loadoutPart == 'carry'
     self.outfitBrowse:setVisible(not carry); self.outfitValue:setVisible(not carry)
-    self.loadoutModeRow.labelControl:setVisible(not carry); self.loadoutModeRow.entry:setVisible(not carry)
+    local generation = not carry and self.presentationMode ~= 'companion'
+    self.loadoutModeRow.labelControl:setVisible(generation); self.loadoutModeRow.entry:setVisible(generation)
     if not carry then
         local browseWidth = math.min(w, L.Pixels(170, self.uiScale))
         L.SetBounds(self.outfitBrowse, gap, y, browseWidth, rowHeight)
@@ -73,6 +105,10 @@ function Window:layoutLoadoutPage(width, height, rowHeight, gap)
         self.outfitValue:setName(L.Ellipsize(self.outfitCaption or '', UIFont.Small, math.max(1, w - browseWidth - gap)))
         self.outfitValue.tooltip = self.outfitCaption
         y = y + rowHeight + gap
+    end
+    if generation then
+        self.loadoutModeRow.labelControl:setName(I.tr('UI_PNC_Authoring_GeneratedWeapons', 'Generated weapon fallback'))
+        self.loadoutModeRow.entry.tooltip = I.tr('UI_PNC_Authoring_GeneratedWeaponsHelp', 'Used for generated NPCs without an explicit weapon. Choose exact weapons from the Weapons shortcut.')
         L.SetBounds(self.loadoutModeRow.labelControl, gap, y, w, rowHeight); y = y + rowHeight
         local columns = w >= L.Pixels(500, self.uiScale) and 4 or 2
         self.loadoutModeRow.entry.columns = columns
@@ -80,17 +116,29 @@ function Window:layoutLoadoutPage(width, height, rowHeight, gap)
         L.SetBounds(self.loadoutModeRow.entry, gap, y, math.min(w, L.Pixels(650, self.uiScale)), choiceHeight)
         self.loadoutModeRow.entry:onResize(); y = y + choiceHeight + gap
     end
-    local controls = {}
-    for _, control in ipairs(self.loadoutParts or {}) do if control.pncPartVisible then controls[#controls + 1] = control end end
-    local nav = L.Flow(controls, { x = gap, y = y, width = w }, { scale = self.uiScale, minWidth = 100, gap = 5 })
-    y = nav.bottom + gap
-    local h = math.max(rowHeight * 3, height - y - gap)
+    local navWidth = math.min(L.Pixels(175, self.uiScale), math.max(85, w * .27))
+    local mapHeight = navWidth * 302 / 123
+    L.SetBounds(self.bodyMap, gap, y, navWidth, mapHeight)
+    L.SetBounds(self.loadoutLegend, gap, y + mapHeight + gap, navWidth, rowHeight)
+    self.loadoutLegend:setName(L.Ellipsize(I.tr('UI_PNC_Authoring_BodyMapLegend', 'Green: equipped. Click a body part.'), UIFont.Small, navWidth))
+    local shortcutY, order = y + mapHeight + gap + rowHeight, 0
+    local shortcutHeight = math.max(60, rowHeight * 2)
+    for _, control in ipairs(self.loadoutParts) do
+        if control.pncPartVisible then
+            L.SetBounds(control, gap + order % 2 * (navWidth + gap) / 2, shortcutY + math.floor(order / 2) * (shortcutHeight + gap), (navWidth - gap) / 2, shortcutHeight)
+            order = order + 1
+        end
+    end
+    local mainX, mainWidth = gap + navWidth + gap, math.max(1, w - navWidth - gap)
+    L.SetBounds(self.loadoutSelectionLabel, mainX, y, mainWidth, rowHeight)
+    local mainY = y + rowHeight + gap
+    local h = math.max(rowHeight * 3, height - mainY - gap, shortcutY + math.ceil(order / 2) * (shortcutHeight + gap) - mainY)
     self.slotContent:setVisible(not carry); self.carriedPanel:setVisible(carry)
-    L.SetBounds(self.slotContent, gap, y, w, h)
-    local inventoryHeight = self:layoutCarriedInventory(gap, y, w, h, rowHeight, gap)
+    L.SetBounds(self.slotContent, mainX, mainY, mainWidth, h)
+    local inventoryHeight = self:layoutCarriedInventory(mainX, mainY, mainWidth, h, rowHeight, gap)
     if carry then h = inventoryHeight end
     local page = self.pages.loadout
-    page.contentHeight, page.maxScroll = y + h + gap, math.max(0, y + h + gap - height)
+    page.contentHeight, page.maxScroll = mainY + h + gap, math.max(0, mainY + h + gap - height)
     page:setScrollHeight(page.contentHeight); page:onResize()
     page:setYScroll(math.max(-page.maxScroll, math.min(0, page:getYScroll())))
     self:layoutSlotTiles()

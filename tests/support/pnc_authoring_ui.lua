@@ -78,6 +78,9 @@ function Layout.Flow(controls, rect, options)
     return { bottom = y + h }
 end
 local UI = { Layout = Layout, Theme = { colors = {} }, PortraitPanel = Base }
+UI.PortraitPanel = Base:derive()
+function UI.PortraitPanel:setTarget(actor, spec) self.actor, self.spec = actor, spec end
+function UI.PortraitPanel:setPortraitBounds(x, y, width, height) self.bounds = { x, y, width, height } end
 for _, method in ipairs({ "CreateButton", "CreateTextEntry", "CreateList", "CreateKeyValueList" }) do
     UI[method] = function(parent, options)
         local c = Base:new(0, 0, 1, 1)

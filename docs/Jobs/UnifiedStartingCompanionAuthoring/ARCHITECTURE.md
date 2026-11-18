@@ -846,3 +846,28 @@ world death/reservation state are preserved. Recreated files with the same ID
 cannot revive a dead identity. Remote server-library mutation requires admin
 access; local private preset records remain user-owned. Browser confirmation
 is selection-bound and resets when the selection disappears or changes.
+
+
+## Visual loadout navigation and saved previews
+
+The authoring body map reuses native male/female silhouette textures, trimmed
+texture bounds and native region z-order. It is a draft navigation projection,
+not a health/temperature model and never requires a live actor or BodyDamage.
+Region/group counts derive from visible canonical loadout rows; exclusive empty
+alternatives remain owned by slot compatibility. Bags, carried inventory,
+weapons and unfamiliar mod locations retain explicit accessible views.
+
+Saved portraits resolve data without applying it. Companion presets use the
+current relationship/player resolver; debug presets use the same draft model.
+Only visited members create a portrait snapshot, with a bounded per-browser
+member cache. Member cycling and empty/error selections cannot mutate session
+blueprints or leave a visible stale NPC. The shared browser owns portrait layout;
+preset providers own read-only resolution.
+
+Explicit weapons remain ordinary startingItems with equipSlot and native item
+state. The picker uses loaded vanilla/mod script weapon types without eagerly
+constructing catalog items. Two-hand constraints precede mutation. Generated
+weapon modes are debug fallback policy; an authored primary weapon determines
+the resulting generated-inventory combat mode. No new persistence schema or
+parallel loadout authority is introduced; canonical foreign inventory providers
+keep their existing combat policy ownership.

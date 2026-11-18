@@ -134,3 +134,33 @@ full 1060/1064, same four known failures. Native interaction remains unverified.
 6. Repeat Presets at compact resolution/large fonts; the roster-save row must
    not overlap search/results or leak into item/outfit browsers. Debug Save NPC
    preset and Save encounter NPC use the same repaired filename dialog.
+
+
+## P5R13 preset portraits, body map and weapons
+
+Developer checks: 71/71 focused; full 1062/1066 with the same four known failures.
+Native rendering/input/combat is unverified; test in a fresh game session.
+
+1. Select saved single-NPC presets in both creators. The side portrait must show
+   the saved NPC rather than the currently edited one. Try different skins,
+   genders, clothing and exact weapons. Browsing and Cancel must not change the
+   current companion, saved data or world registry.
+2. Select a roster preset and cycle previous/next portraits and captions. Verify
+   all members, current-player surname/skin/gender inheritance and stable looks
+   on reselecting. Filter away/delete the selection: no old NPC should remain
+   visible. Confirm side portrait/navigation at compact sizes and large fonts.
+3. In Loadout click head, neck, torso, arms/hands, groin/waist, legs and feet.
+   Appropriate grouped slots must appear. Equipped regions are green; clearing
+   updates the map. Check both NPC genders, scaled/letterboxed clicks, scroll
+   bounds, native exclusive-slot hide/restore and unknown mod equipment.
+4. Bags and Inventory use the native open-box icon and open separate slot/list
+   views. Add/change/remove a backpack and carried money/food. Verify capacity,
+   destinations, exact colors and preset round trips.
+5. Weapons opens primary/off-hand/attachments. Search vanilla and loaded mod
+   weapons, equip and clear them, and verify saved/reloaded native item state.
+   A two-handed primary must reject a conflicting off hand. Companion creation
+   must not show melee/ranged generation buttons; debug retains labeled fallback.
+6. With suitable ammunition, spawn an authored firearm NPC with random equipment
+   disabled and verify ranged combat behavior; test a melee choice and clearing.
+   Generated NPC pool/chance behavior and configured mixed firearm policy should
+   remain intact. Continue MP admin/library and world-death acceptance separately.

@@ -81,8 +81,8 @@ function Slots.Build(draft, record)
     rows = visible
     for _, id in ipairs({ 'primary', 'secondary' }) do
         local kind = id == 'primary' and 'Primary' or 'Secondary'
-        local row = { kind = 'held', id = id, group = 'held', label = tr('UI_PNC_Authoring_' .. kind,
-            id == 'primary' and 'Primary hand' or 'Secondary hand') }
+        local row = { kind = 'held', id = id, group = 'held', weapon = true, label = tr('UI_PNC_Authoring_' .. kind,
+            id == 'primary' and 'Primary weapon' or 'Off-hand weapon') }
         for _, item in pairs(effective) do if item.equipSlot == id then row.type = item.type end end
         for _, item in ipairs(draft.startingItems or {}) do if item.equipSlot == id then row.type = item.type end end
         rows[#rows + 1] = row

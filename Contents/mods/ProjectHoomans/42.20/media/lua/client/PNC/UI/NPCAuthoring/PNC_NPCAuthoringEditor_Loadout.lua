@@ -88,6 +88,8 @@ function Window:openSlot(slot)
     if slot.kind == 'worn' then
         allowed = {}
         for _, item in ipairs(Catalog.Clothing(slot.id)) do allowed[item.id] = true end
+    elseif slot.weapon then
+        allowed = Catalog.Weapons()
     end
     local carried = slot.group == 'carry' and slot.kind == 'item'
     self.itemExplorer:Show({ mode = carried and 'carry' or slot.kind, title = slot.label, allowed = allowed,
@@ -96,7 +98,7 @@ function Window:openSlot(slot)
         applyTooltip = tr('UI_PNC_Authoring_LoadoutEditHelp', 'Changes update this NPC in the editor immediately. Save NPC preset keeps a reusable copy of all tabs, including this loadout.'),
         initialID = carried and slot.type or nil, initialQuery = carried and slot.type or nil,
         initialQuantity = carried and slot.quantity or nil, initialDestination = carried and slot.destination or nil,
-        reloadAllowed = slot.kind == 'worn' and function()
+        reloadAllowed = slot.weapon and function() return Catalog.Weapons() end or slot.kind == 'worn' and function()
             local refreshed = {}; for _, item in ipairs(Catalog.Clothing(slot.id)) do refreshed[item.id] = true end; return refreshed
         end or nil,
         onChoose = function(item, quantity, destination) return self:applyLoadout(slot, item.id, quantity, destination) end })

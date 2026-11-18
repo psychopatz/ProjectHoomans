@@ -237,7 +237,7 @@ function Internal.buildTemplateSnapshot(record, options)
     Internal.removeLegacyIdentityItems(record, base, { bumpRevision = false })
 
     base.template.equipmentPoolID = template.startingEquipment.poolID
-    base.template.weaponMode = template.startingEquipment.weaponMode
+    base.template.weaponMode = Inventory.ResolveAuthoredWeaponMode(record, base, template.startingEquipment.weaponMode)
     base.template.templateRef = template.templateRef
     Internal.calculateWeights(base)
     return base

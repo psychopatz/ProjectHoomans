@@ -163,6 +163,29 @@ local function makeRecord(id, seed, archetypeID, override)
     }
 end
 
+local explicit = makeRecord('npc:authored-firearm', 91, 'General', 'none')
+explicit.weaponMode = 'melee'
+explicit.startingItems = { { type = 'Base.Pistol', equipSlot = 'primary',
+    itemState = { condition = 7, ammoCount = 4 } } }
+local explicitInventory = PNC.Inventory.CreateFromTemplate(explicit)
+T.equal(explicitInventory.items[explicitInventory.equipped.primary].type, 'Base.Pistol',
+    'authored firearm owns the actual primary hand')
+T.equal(explicit.weaponMode, 'ranged',
+    'suppressing generated weapons does not force an authored firearm into melee combat')
+T.equal(explicitInventory.template.weaponMode, 'ranged', 'resolved mode survives template metadata')
+explicit.startingItems = {}
+explicitInventory = PNC.Inventory.CreateFromTemplate(explicit)
+T.falsy(explicitInventory.equipped.primary, 'clearing an authored weapon cannot restore a generated weapon')
+T.equal(explicit.weaponMode, 'melee', 'unarmed fallback returns to melee policy')
+explicit.startingItems = { { type = 'Base.Axe', equipSlot = 'primary' } }
+explicit.weaponMode = 'ranged'
+PNC.Inventory.CreateFromTemplate(explicit)
+T.equal(explicit.weaponMode, 'melee', 'an explicit melee weapon replaces stale firearm policy')
+explicit.startingItems = { { type = 'Base.Pistol', equipSlot = 'primary' } }
+explicit.weaponMode = 'mixed'
+PNC.Inventory.CreateFromTemplate(explicit)
+T.equal(explicit.weaponMode, 'mixed', 'an explicitly configured mixed firearm policy stays available')
+
 local function itemByTemplateKey(inventory, templateKey)
     for _, item in pairs(inventory.items) do
         if item.templateKey == templateKey then return item end

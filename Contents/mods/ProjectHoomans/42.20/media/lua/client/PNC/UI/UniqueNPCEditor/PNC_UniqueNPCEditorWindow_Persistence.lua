@@ -47,6 +47,7 @@ end
 
 function Window:browseSavedCharacters()
     if self:pullForm() == false then return end
+    local portraitProviders = {}
     local function entries()
         local items = {}
         for _, entry in ipairs(Storage.List()) do
@@ -57,6 +58,15 @@ function Window:browseSavedCharacters()
     end
     self.itemExplorer:Show({ mode = 'preset', title = tr('UI_PNC_Authoring_Presets', 'Presets...'), items = entries(), reloadItems = entries,
         applyLabel = tr('UI_PNC_StartingCompanion_Load', 'Load'),
+        preview = function(item, index)
+            if not portraitProviders[item.id] then
+                local draft = Storage.LoadFile(item.id)
+                if not draft then return nil end
+                local previews = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'
+                portraitProviders[item.id] = previews.Draft(draft)
+            end
+            return portraitProviders[item.id](index)
+        end,
         onChoose = function(item)
             selectCombo(self.fileCombo, item.id)
             local previous = self.debugRosterID

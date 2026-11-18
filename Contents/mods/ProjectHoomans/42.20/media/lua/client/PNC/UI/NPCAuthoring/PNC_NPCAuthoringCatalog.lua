@@ -46,6 +46,15 @@ function Catalog.Filters(field)
     return out
 end
 
+-- Script metadata includes vanilla and mod weapons without constructing them.
+function Catalog.Weapons()
+    local allowed = {}
+    for _, entry in ipairs(Catalog.Items()) do
+        if entry.script.getItemType and entry.script:getItemType() == ItemType.WEAPON then allowed[entry.id] = true end
+    end
+    return allowed
+end
+
 function Catalog.Query(options)
     options = options or {}
     local query = string.lower(tostring(options.query or ''))

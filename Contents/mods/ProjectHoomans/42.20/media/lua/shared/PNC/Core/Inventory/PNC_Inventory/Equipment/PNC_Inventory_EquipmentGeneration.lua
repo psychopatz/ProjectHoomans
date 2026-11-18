@@ -119,4 +119,21 @@ function Inventory.ResolveStartingEquipment(record)
     }
 end
 
+-- A concrete authored hand item supersedes the generated pool's combat mode.
+-- In particular, equipmentSpawnMode=none suppresses random weapons; it must
+-- not turn an explicitly equipped firearm into a melee-only NPC.
+function Inventory.ResolveAuthoredWeaponMode(record, inventory, fallback)
+    local authored = false
+    for _, item in ipairs(record.startingItems or {}) do
+        if item.equipSlot == 'primary' then authored = true; break end
+    end
+    if not authored then return fallback end
+    local id = inventory.equipped and inventory.equipped.primary
+    local item = id and inventory.items and inventory.items[id]
+    if not item or not PNC.Equipment or not PNC.Equipment.ResolveWeaponMode then return fallback end
+    local mode = PNC.Equipment.ResolveWeaponMode(item.type)
+    if mode == 'ranged' and record.weaponMode == 'mixed' then return 'mixed' end
+    return mode or fallback
+end
+
 require "PNC/EquipmentDefinitions/PNC_EquipmentPools"

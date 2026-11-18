@@ -1,6 +1,51 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-19 P5R12
+## Current state — 2026-11-19 P5R13
+
+Developer implementation is complete for read-only preset portraits, native body
+navigation and explicit weapon selection in the shared creator. Native visual/
+input/combat acceptance remains user-owned.
+
+- Selecting a companion/debug saved preset displays its own portrait. Roster
+  presets expose previous/next member controls and names. Members build lazily
+  and cache per browsing session; previews resolve current-player inheritance
+  without applying presets, changing live session intent or touching world state.
+  Missing/empty selections hide stale portraits. Side portraits fit compact and
+  large-font browser layouts.
+- Loadout uses the native protection/temperature silhouette assets and native
+  trimmed bounds/z-order, adapted for editor drafts without a live BodyDamage
+  object. Green marks equipped regions; clicking selects the same modular slots.
+  Gender changes switch native silhouettes. The native open-box inventory icon
+  provides distinct Bags/Inventory shortcuts; Weapons and unknown mod equipment
+  remain accessible. Native exclusive-slot hide/restore behavior is retained.
+- Weapons opens the primary/off-hand/attachment view and a default weapon-only
+  explorer populated from vanilla/mod script ItemType.WEAPON metadata. Exact
+  items retain native payloads and two-hand validation. Generated melee/ranged
+  controls remain debug-only and are labeled as fallback policy. Authoring uses
+  existing startingItems/equipSlot fields, requiring no preset migration.
+- Inventory generation now derives combat mode from an authored primary weapon;
+  equipmentSpawnMode=none suppresses random weapons without forcing a selected
+  firearm into melee-only combat. Existing generated pools and canonical foreign
+  inventory authority remain unchanged; configured mixed firearm mode survives.
+
+`TEST_VERIFIED`: **71/71** focused including equipment generation/catalog
+translations; full **1062/1066**, the same four known scene-route/context/
+population/translation failures. New tests cover native-map scaling/hits/colors,
+roster portrait/inheritance/nonmutation/caching and stale-selection clearing;
+extended tests cover browser/host wiring and geometry, mod weapons, two-handed
+conflicts, explicit equipment and actual inventory-generation combat mode.
+`STATIC_ONLY`: **20** owned Lua syntax and **12** production Kahlua checks pass,
+as do EN/TL JSON/key/placeholder parity and owned whitespace checks. Eleven new
+and three updated Character keys in EN/TL. Coverage checked 34 Hoomans, one Core,
+four current Java and five installed native Lua paths, with exact changed/new/
+unindexed source fallback. No Core edits, new bitmap assets or schema changes.
+Concurrent semantic CodeBuilder work is outside this phase's exact ownership.
+
+Next: user-owned fresh-session P5R13 retest in LOADOUT_AUDIO_CRUD_RETEST.md,
+then remaining save/backpack/audio/skin/library/SP/MP gates. No native launch,
+rendered/input/audible/combat success, push or publication is claimed.
+
+## P5R12 save repair and scope clarity — native acceptance pending
 
 The save-dialog crash is repaired on the developer side. Console session
 `65ae9e31`, issue `EDF66F8`, identifies SaveDialog.Open line 29 calling the absent
@@ -505,9 +550,9 @@ SP/MP/co-op acceptance.
 
 ## Next Chunk
 
-**P6 — user-owned fresh-session save-dialog and Presets roster-save retest after
-P5R12, then the backpack/loadout/audio/CRUD, skin/library and SP/MP/co-op matrices.
-Developer-side gates pass; native rendering/audio/lifecycle acceptance stays open.**
+**P6 — user-owned fresh-session preset portraits, body-map clicks and explicit
+weapon/combat retest after P5R13, then the remaining save/backpack/audio/skin/
+library/SP/MP/co-op matrices. Developer gates pass; native acceptance stays open.**
 
 ## Repository safety
 

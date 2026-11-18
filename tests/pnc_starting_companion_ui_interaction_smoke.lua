@@ -330,6 +330,20 @@ window:onAction({ internal = "load" })
 T.falsy(appliedPreset, "opening the preset browser does not apply a preset")
 local explorer = window.editor.itemExplorer
 T.equal(explorer.options.mode, "preset", "presets use the contextual shared browser")
+local portraitProviders = 0
+function session:GetContext() return { playerSurname = 'patz' } end
+package.loaded['PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'] = {
+    Companions = function(payload, context)
+        portraitProviders = portraitProviders + 1
+        T.equal(payload.companionTraitID, sister, 'browser previews the saved file instead of the edited NPC')
+        T.equal(context.playerSurname, 'patz', 'preview receives current inheritance context')
+        return function() return { key = 'saved-sister' }, 'Jane patz', 1 end
+    end,
+}
+T.equal(explorer.options.preview(explorer.options.items[1], 1).key, 'saved-sister', 'host supplies a portrait for preset selection')
+explorer.options.preview(explorer.options.items[1], 1)
+T.equal(portraitProviders, 1, 'reselecting a saved record reuses its read-only provider')
+T.falsy(appliedPreset, 'previewing a saved record never applies it to the current companions')
 explorer.options.onChoose(explorer.options.items[1])
 explorer:Hide()
 T.equal(appliedPreset.companionTraitID, sister, "explicit browser apply loads the selected preset")

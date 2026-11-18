@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R12 save repair and workflow clarity verified — P6 native acceptance pending
+**Status:** P5R13 preset portraits, body map and explicit weapons verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -990,6 +990,30 @@ Nine Lua syntax, six production Kahlua, EN/TL parity and whitespace checks pass;
 ten new/six updated Character keys. Sixteen repo plus two installed native Lua
 evidence paths checked with direct source fallback. Exact local commit required;
 native interaction/rendering/audio remains user-owned P6 acceptance.
+
+### P5R13 — Preset portraits, native body map and explicit weapons
+
+Selecting a saved NPC shows its own side portrait; roster presets cycle member
+portraits without loading or authoring the preset. Respect current inheritance,
+keep lazy bounded caches and clear stale previews. Both creator hosts share the
+canonical draft model. Native silhouette assets/trimmed hit bounds replace the
+body-group button bar; green marks equipped regions. Native box shortcuts expose
+bags/carried inventory. Preserve exclusive-slot visibility and unknown mod slots.
+
+Use exact primary/off-hand weapons and attachments with native/mod weapon script
+filtering and two-hand validation. Keep generation-mode buttons debug-only. Fix
+the generation handoff so an authored firearm receives ranged combat mode even
+when random equipment is suppressed. Reuse existing canonical item/equipSlot
+fields and retain procedural/canonical-provider behavior without a schema bump.
+
+**Gate:** **71/71** focused; full **1062/1066**, same four known failures.
+Native-map projection/hits/colors, preset inheritance/nonmutation/cache/cycling,
+empty-selection clearing, browser geometry/host wiring, mod weapons, two-hand
+conflicts and actual inventory-generation combat mode pass. Twenty owned Lua
+syntax, twelve production Kahlua, EN/TL parity and owned whitespace checks pass;
+eleven new/three updated Character keys. Coverage checked 34 Hoomans, one Core,
+four Java and five native Lua evidence paths with direct fallback. Exact local
+phase commit required; native input/rendering/combat remains P6 user acceptance.
 
 ### P6 — Native acceptance
 

@@ -65,10 +65,20 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
             local saves = 0
             explorer:Show({ mode = mode, items = mode ~= 'carry' and { { id = 'one', label = 'Long catalog entry', search = 'long catalog entry' } } or nil,
                 contextAction = mode == 'preset' and { title = 'Save roster preset...', onClick = function() saves = saves + 1 end } or nil,
+                preview = mode == 'preset' and function(_, index) return { key = 'saved-member:' .. index }, 'Member ' .. index, 2 end or nil,
                 onChoose = function() return true end })
+            if mode == 'preset' then
+                explorer.tiles[1].onclick(explorer, explorer.tiles[1])
+                T.equal(explorer.preview.spec.key, 'saved-member:1', 'preset selection targets the side portrait')
+                explorer.portraitNext.onclick(explorer)
+                T.equal(explorer.preview.spec.key, 'saved-member:2', 'roster next control changes the portrait')
+                explorer.portraitPrevious.onclick(explorer)
+                T.equal(explorer.preview.spec.key, 'saved-member:1', 'roster previous control returns to the first member')
+            end
             for _, control in ipairs({ explorer.heading, explorer.hint, explorer.sources, explorer.categories,
                 explorer.grid, explorer.details, explorer.quantity, explorer.quantityLabel, explorer.destination,
-                explorer.confirm, explorer.previous, explorer.counter, explorer.nextButton, explorer.contextActionButton }) do
+                explorer.confirm, explorer.previous, explorer.counter, explorer.nextButton, explorer.contextActionButton,
+                explorer.preview, explorer.portraitPrevious, explorer.portraitNext, explorer.portraitCaption }) do
                 inside(control, explorer.width, explorer.height, 'contextual browser control fits its viewport')
             end
             if mode == 'preset' then
@@ -79,6 +89,8 @@ for _, scale in ipairs({ 1, 1.25, 1.5 }) do
                 explorer:Show({ mode = 'preset', items = {}, contextAction = { title = 'Save roster preset...', onClick = function() saves = saves + 1 end } })
                 explorer.contextActionButton.onclick(explorer)
                 T.equal(saves, 2, 'the first roster can be saved from an empty preset browser')
+                T.falsy(explorer.preview.visible, 'empty/changed selection hides the old NPC portrait')
+                T.falsy(explorer.portraitNext.visible, 'empty selection hides roster navigation')
             end
             explorer:Hide()
         end
