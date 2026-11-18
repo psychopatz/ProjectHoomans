@@ -214,7 +214,7 @@ return {
         ["domain"] = "companion_commands_player",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCommandsPlayer",
-        ["recordCount"] = 15,
+        ["recordCount"] = 14,
     },
     {
         ["domain"] = "companion_commands_replies",

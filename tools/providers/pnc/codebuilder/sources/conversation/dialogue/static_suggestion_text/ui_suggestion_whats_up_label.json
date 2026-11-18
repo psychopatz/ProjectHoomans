@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "ui.suggestion.whats_up.label",
   "metadata": {
     "textKey": "suggestion.whats_up.label",

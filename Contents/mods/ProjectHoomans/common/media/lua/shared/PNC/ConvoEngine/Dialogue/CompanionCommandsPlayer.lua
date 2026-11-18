@@ -4,238 +4,6 @@ return {
         ["domain"] = "companion_commands_player",
         ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
-            ["familyID"] = "command.companion.camp",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Let's camp here.",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.command.companion.camp.say.1.default",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Let's camp here.",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo rito.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["invoke"] = {
-                ["action"] = "CAMP",
-                ["intent"] = "COMMAND",
-            },
-            ["namespace"] = "command.companion",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Let's camp here.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.command.companion.camp.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Let's camp here.",
-                        },
-                        ["TL"] = {
-                            "Magkampo tayo rito.",
-                        },
-                    },
-                    ["variantID"] = "default",
-                },
-            },
-        },
-        ["id"] = "command.companion.camp",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "camp",
-            ["sourceId"] = "command.companion.camp",
-            ["sourcePath"] = "dialogue/companion_commands_player/command_companion_camp.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
-        ["namespace"] = "command.companion",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["closure"] = {
-                ["closureClass"] = "state_transition",
-            },
-            ["inputPolicy"] = "typed_parity",
-            ["invoke"] = {
-                ["action"] = "CAMP",
-                ["intent"] = "COMMAND",
-            },
-            ["postconditions"] = {
-                "companion.camping",
-            },
-            ["repeatPolicy"] = "state_retired",
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Let's camp here.",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo rito.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["statePolicy"] = {
-                {
-                    ["admission"] = "no_op",
-                    ["id"] = "actor_blocked_or_hostile",
-                    ["outcome"] = "blocked",
-                    ["reason"] = "actor_blocked_or_hostile",
-                    ["when"] = {
-                        ["any"] = {
-                            {
-                                ["op"] = "eq",
-                                ["path"] = "roles.hostile",
-                                ["value"] = true,
-                            },
-                            {
-                                ["op"] = "eq",
-                                ["path"] = "roles.authorityEligible",
-                                ["value"] = false,
-                            },
-                            {
-                                ["op"] = "eq",
-                                ["path"] = "roles.status",
-                                ["value"] = "hostile",
-                            },
-                            {
-                                ["op"] = "in",
-                                ["path"] = "npcState.activeBehavior",
-                                ["values"] = {
-                                    "hostile",
-                                    "combat",
-                                    "dead",
-                                },
-                            },
-                            {
-                                ["op"] = "in",
-                                ["path"] = "situation.activeBehavior",
-                                ["values"] = {
-                                    "hostile",
-                                    "combat",
-                                    "dead",
-                                },
-                            },
-                        },
-                    },
-                },
-                {
-                    ["admission"] = "no_op",
-                    ["id"] = "already_camping",
-                    ["outcome"] = "already_satisfied",
-                    ["reason"] = "already_camp",
-                    ["when"] = {
-                        ["op"] = "eq",
-                        ["path"] = "npcState.orderKind",
-                        ["value"] = "camp",
-                    },
-                },
-                {
-                    ["admission"] = "dispatch",
-                    ["id"] = "ready",
-                    ["outcome"] = "actionable",
-                    ["reason"] = "ready",
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "command.companion.camp",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Let's camp here.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.command.companion.camp.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/companion_commands_player/command_companion_camp.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Let's camp here.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.command.companion.camp.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Let's camp here.",
-                    },
-                    ["TL"] = {
-                        "Magkampo tayo rito.",
-                    },
-                },
-                ["variantID"] = "default",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "companion_commands_player",
-        ["domainPath"] = "companion_commands_player",
-        ["exchangeFamily"] = {
             ["familyID"] = "command.companion.follow",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -1009,12 +777,12 @@ return {
         ["id"] = "command.player.attack_auto",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "attack_auto",
             ["sourceId"] = "command.player.attack_auto",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_attack_auto.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -1184,12 +952,12 @@ return {
         ["id"] = "command.player.attack_melee",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "attack_melee",
             ["sourceId"] = "command.player.attack_melee",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_attack_melee.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -1359,12 +1127,12 @@ return {
         ["id"] = "command.player.attack_none",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "attack_none",
             ["sourceId"] = "command.player.attack_none",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_attack_none.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -1534,12 +1302,12 @@ return {
         ["id"] = "command.player.attack_ranged",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "attack_ranged",
             ["sourceId"] = "command.player.attack_ranged",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_attack_ranged.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -1717,12 +1485,12 @@ return {
         ["id"] = "command.player.camp",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "camp",
             ["sourceId"] = "command.player.camp",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_camp.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -1892,12 +1660,12 @@ return {
         ["id"] = "command.player.camp_none",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "camp_none",
             ["sourceId"] = "command.player.camp_none",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_camp_none.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -2059,12 +1827,12 @@ return {
         ["id"] = "command.player.camp_rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "camp_rejected",
             ["sourceId"] = "command.player.camp_rejected",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_camp_rejected.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -2234,12 +2002,12 @@ return {
         ["id"] = "command.player.follow",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "follow",
             ["sourceId"] = "command.player.follow",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_follow.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -2401,12 +2169,12 @@ return {
         ["id"] = "command.player.generic",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "generic",
             ["sourceId"] = "command.player.generic",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_generic.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -2568,12 +2336,12 @@ return {
         ["id"] = "command.player.return_home",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "return_home",
             ["sourceId"] = "command.player.return_home",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_return_home.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",
@@ -2743,12 +2511,12 @@ return {
         ["id"] = "command.player.stay",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "stay",
             ["sourceId"] = "command.player.stay",
             ["sourcePath"] = "dialogue/companion_commands_player/command_player_stay.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
         ["namespace"] = "command.player",

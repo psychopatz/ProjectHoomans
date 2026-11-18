@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "task.fetch",
   "metadata": {
     "category": "projecthoomans:task_lifecycle",

@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "work_orders.member.status",
   "metadata": {
     "runtimeBlockID": "projecthoomans:work_orders_member",

@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "command.camp",
   "action": {
     "capability": "hoomans.camp.establish",
@@ -198,5 +198,80 @@
   "textSidecars": {
     "EN": "translations/command_camp.en.json",
     "TL": "translations/command_camp.tl.json"
-  }
+  },
+  "invoke": {
+    "intent": "COMMAND",
+    "action": "CAMP"
+  },
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "state_retired",
+  "postconditions": [
+    "companion.camping"
+  ],
+  "closure": {
+    "closureClass": "state_transition"
+  },
+  "statePolicy": [
+    {
+      "id": "actor_blocked_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          },
+          {
+            "path": "roles.authorityEligible",
+            "op": "==",
+            "value": false
+          },
+          {
+            "path": "roles.status",
+            "op": "==",
+            "value": "hostile"
+          },
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "dead"
+            ]
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "actor_blocked_or_hostile",
+      "admission": "no_op"
+    },
+    {
+      "id": "already_camping",
+      "when": {
+        "path": "npcState.orderKind",
+        "op": "==",
+        "value": "camp"
+      },
+      "outcome": "already_satisfied",
+      "reason": "already_camp",
+      "admission": "no_op"
+    },
+    {
+      "id": "ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "corpse.reaction.default",
   "metadata": {
     "category": "projecthoomans:event_reactions",

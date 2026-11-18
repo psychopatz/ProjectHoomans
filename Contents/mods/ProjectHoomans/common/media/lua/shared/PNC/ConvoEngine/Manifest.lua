@@ -697,7 +697,7 @@ return {
             ["sourceShard"] = "dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
         },
         {
-            ["bytes"] = 13691,
+            ["bytes"] = 13787,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/Excursion",
@@ -716,7 +716,7 @@ return {
             ["sourceShard"] = "behavior/scene/excursion/scene_excursion_acknowledge.json",
         },
         {
-            ["bytes"] = 9449,
+            ["bytes"] = 9513,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/Horde",
@@ -733,7 +733,7 @@ return {
             ["sourceShard"] = "behavior/scene/horde/scene_horde_prompt.json",
         },
         {
-            ["bytes"] = 7071,
+            ["bytes"] = 7119,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/News",
@@ -749,7 +749,7 @@ return {
             ["sourceShard"] = "behavior/scene/news/scene_grounded_news_share.json",
         },
         {
-            ["bytes"] = 2233,
+            ["bytes"] = 2249,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/PostCombat",
@@ -763,7 +763,7 @@ return {
             ["sourceShard"] = "behavior/scene/post_combat/scene_post_combat_clear.json",
         },
         {
-            ["bytes"] = 4409,
+            ["bytes"] = 4441,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/TaskWork",
@@ -778,7 +778,7 @@ return {
             ["sourceShard"] = "behavior/scene/task_work/scene_task_work_assigned.json",
         },
         {
-            ["bytes"] = 65385,
+            ["bytes"] = 65465,
             ["domain"] = "combat_banter_weapon_kill_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
@@ -796,7 +796,7 @@ return {
             ["sourceShard"] = "dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head.json",
         },
         {
-            ["bytes"] = 43940,
+            ["bytes"] = 44004,
             ["domain"] = "combat_banter_weapon_kill_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
@@ -813,7 +813,7 @@ return {
             ["sourceShard"] = "dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe.json",
         },
         {
-            ["bytes"] = 31093,
+            ["bytes"] = 31141,
             ["domain"] = "combat_banter_weapon_kill_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
@@ -829,7 +829,7 @@ return {
             ["sourceShard"] = "dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head.json",
         },
         {
-            ["bytes"] = 70619,
+            ["bytes"] = 70715,
             ["domain"] = "combat_banter_weapon_kill_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
@@ -848,7 +848,7 @@ return {
             ["sourceShard"] = "dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear.json",
         },
         {
-            ["bytes"] = 18506,
+            ["bytes"] = 18538,
             ["domain"] = "combat_banter_weapon_kill_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
@@ -863,7 +863,7 @@ return {
             ["sourceShard"] = "dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade.json",
         },
         {
-            ["bytes"] = 35228,
+            ["bytes"] = 35276,
             ["domain"] = "combat_banter_weapon_kill_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillShaken",
@@ -879,7 +879,7 @@ return {
             ["sourceShard"] = "dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_blade_head.json",
         },
         {
-            ["bytes"] = 22462,
+            ["bytes"] = 22494,
             ["domain"] = "combat_banter_weapon_kill_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillSupportive",
@@ -894,7 +894,7 @@ return {
             ["sourceShard"] = "dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm.json",
         },
         {
-            ["bytes"] = 27265,
+            ["bytes"] = 27281,
             ["domain"] = "combat_human_banter_human_kill_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillAggressive",
@@ -908,7 +908,7 @@ return {
             ["sourceShard"] = "dialogue/combat_human_banter_human_kill_aggressive/combat_human_kill_aggressive.json",
         },
         {
-            ["bytes"] = 28666,
+            ["bytes"] = 28682,
             ["domain"] = "combat_human_banter_human_kill_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillBrave",
@@ -922,7 +922,7 @@ return {
             ["sourceShard"] = "dialogue/combat_human_banter_human_kill_brave/combat_human_kill_brave.json",
         },
         {
-            ["bytes"] = 27797,
+            ["bytes"] = 27813,
             ["domain"] = "combat_human_banter_human_kill_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillCold",
@@ -936,7 +936,7 @@ return {
             ["sourceShard"] = "dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold.json",
         },
         {
-            ["bytes"] = 30154,
+            ["bytes"] = 30170,
             ["domain"] = "combat_human_banter_human_kill_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillPractical",
@@ -950,7 +950,7 @@ return {
             ["sourceShard"] = "dialogue/combat_human_banter_human_kill_practical/combat_human_kill_practical.json",
         },
         {
-            ["bytes"] = 21985,
+            ["bytes"] = 22001,
             ["domain"] = "combat_human_banter_human_kill_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillReserved",
@@ -964,7 +964,7 @@ return {
             ["sourceShard"] = "dialogue/combat_human_banter_human_kill_reserved/combat_human_kill_reserved.json",
         },
         {
-            ["bytes"] = 28189,
+            ["bytes"] = 28205,
             ["domain"] = "combat_human_banter_human_kill_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillShaken",
@@ -978,7 +978,7 @@ return {
             ["sourceShard"] = "dialogue/combat_human_banter_human_kill_shaken/combat_human_kill_shaken.json",
         },
         {
-            ["bytes"] = 28573,
+            ["bytes"] = 28589,
             ["domain"] = "combat_human_banter_human_kill_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHumanKillSupportive",
@@ -992,7 +992,7 @@ return {
             ["sourceShard"] = "dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive.json",
         },
         {
-            ["bytes"] = 27325,
+            ["bytes"] = 27341,
             ["domain"] = "combat_kill_killer_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerAggressive",
@@ -1006,7 +1006,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_killer_aggressive/combat_reaction_kill_killer_aggressive.json",
         },
         {
-            ["bytes"] = 27259,
+            ["bytes"] = 27275,
             ["domain"] = "combat_kill_killer_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerBrave",
@@ -1020,7 +1020,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_killer_brave/combat_reaction_kill_killer_brave.json",
         },
         {
-            ["bytes"] = 25195,
+            ["bytes"] = 25211,
             ["domain"] = "combat_kill_killer_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerCold",
@@ -1034,7 +1034,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_killer_cold/combat_reaction_kill_killer_cold.json",
         },
         {
-            ["bytes"] = 28030,
+            ["bytes"] = 28046,
             ["domain"] = "combat_kill_killer_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerPractical",
@@ -1048,7 +1048,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_killer_practical/combat_reaction_kill_killer_practical.json",
         },
         {
-            ["bytes"] = 21379,
+            ["bytes"] = 21395,
             ["domain"] = "combat_kill_killer_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerReserved",
@@ -1062,7 +1062,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_killer_reserved/combat_reaction_kill_killer_reserved.json",
         },
         {
-            ["bytes"] = 29106,
+            ["bytes"] = 29122,
             ["domain"] = "combat_kill_killer_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerShaken",
@@ -1076,7 +1076,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_killer_shaken/combat_reaction_kill_killer_shaken.json",
         },
         {
-            ["bytes"] = 28142,
+            ["bytes"] = 28158,
             ["domain"] = "combat_kill_killer_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillKillerSupportive",
@@ -1090,7 +1090,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive.json",
         },
         {
-            ["bytes"] = 27709,
+            ["bytes"] = 27725,
             ["domain"] = "combat_kill_witness_aggressive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessAggressive",
@@ -1104,7 +1104,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_witness_aggressive/combat_reaction_kill_witness_aggressive.json",
         },
         {
-            ["bytes"] = 28613,
+            ["bytes"] = 28629,
             ["domain"] = "combat_kill_witness_brave",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessBrave",
@@ -1118,7 +1118,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_witness_brave/combat_reaction_kill_witness_brave.json",
         },
         {
-            ["bytes"] = 27111,
+            ["bytes"] = 27127,
             ["domain"] = "combat_kill_witness_cold",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessCold",
@@ -1132,7 +1132,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_witness_cold/combat_reaction_kill_witness_cold.json",
         },
         {
-            ["bytes"] = 29094,
+            ["bytes"] = 29110,
             ["domain"] = "combat_kill_witness_practical",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessPractical",
@@ -1146,7 +1146,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_witness_practical/combat_reaction_kill_witness_practical.json",
         },
         {
-            ["bytes"] = 21133,
+            ["bytes"] = 21149,
             ["domain"] = "combat_kill_witness_reserved",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessReserved",
@@ -1160,7 +1160,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_witness_reserved/combat_reaction_kill_witness_reserved.json",
         },
         {
-            ["bytes"] = 30022,
+            ["bytes"] = 30038,
             ["domain"] = "combat_kill_witness_shaken",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessShaken",
@@ -1174,7 +1174,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken.json",
         },
         {
-            ["bytes"] = 28234,
+            ["bytes"] = 28250,
             ["domain"] = "combat_kill_witness_supportive",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessSupportive",
@@ -1188,7 +1188,7 @@ return {
             ["sourceShard"] = "dialogue/combat_kill_witness_supportive/combat_reaction_kill_witness_supportive.json",
         },
         {
-            ["bytes"] = 54264,
+            ["bytes"] = 54344,
             ["domain"] = "combat_player_assault_reactions",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
@@ -1206,7 +1206,7 @@ return {
             ["sourceShard"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
         },
         {
-            ["bytes"] = 27441,
+            ["bytes"] = 27489,
             ["domain"] = "companion_check_in",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCheckIn",
@@ -1222,7 +1222,7 @@ return {
             ["sourceShard"] = "dialogue/companion_check_in/question_gossip.json",
         },
         {
-            ["bytes"] = 129454,
+            ["bytes"] = 129630,
             ["domain"] = "companion_commands_combat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
@@ -1246,7 +1246,7 @@ return {
             ["sourceShard"] = "dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
         },
         {
-            ["bytes"] = 160172,
+            ["bytes"] = 163239,
             ["domain"] = "companion_commands_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow",
@@ -1261,7 +1261,7 @@ return {
             ["sourceShard"] = "dialogue/companion_commands_lifecycle/command_camp.json",
         },
         {
-            ["bytes"] = 133068,
+            ["bytes"] = 133100,
             ["domain"] = "companion_commands_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/ReturnHomeToStay",
@@ -1276,7 +1276,7 @@ return {
             ["sourceShard"] = "dialogue/companion_commands_lifecycle/command_return_home.json",
         },
         {
-            ["bytes"] = 68090,
+            ["bytes"] = 68106,
             ["domain"] = "companion_commands_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CommandStopFollowing",
@@ -1290,14 +1290,13 @@ return {
             ["sourceShard"] = "dialogue/companion_commands_lifecycle/command_stop_following.json",
         },
         {
-            ["bytes"] = 114795,
+            ["bytes"] = 106296,
             ["domain"] = "companion_commands_player",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
             ["owner"] = "ProjectHoomans",
-            ["recordCount"] = 15,
+            ["recordCount"] = 14,
             ["recordIDs"] = {
-                "command.companion.camp",
                 "command.companion.follow",
                 "command.companion.return_home",
                 "command.companion.stay",
@@ -1315,10 +1314,10 @@ return {
             },
             ["registryOwner"] = "ProjectHoomans",
             ["shardOwner"] = "ProjectHoomans",
-            ["sourceShard"] = "dialogue/companion_commands_player/command_companion_camp.json",
+            ["sourceShard"] = "dialogue/companion_commands_player/command_companion_follow.json",
         },
         {
-            ["bytes"] = 191094,
+            ["bytes"] = 191366,
             ["domain"] = "companion_commands_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies/CombatHordeAckAvoidDefaultToCommandReplyGenericRejected",
@@ -1348,7 +1347,7 @@ return {
             ["sourceShard"] = "dialogue/companion_commands_replies/combat_horde_ack_avoid_default.json",
         },
         {
-            ["bytes"] = 30011,
+            ["bytes"] = 30059,
             ["domain"] = "companion_commands_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies/CommandReplyReturnHomeToCompanionActionResponses",
@@ -1364,7 +1363,7 @@ return {
             ["sourceShard"] = "dialogue/companion_commands_replies/command_reply_return_home.json",
         },
         {
-            ["bytes"] = 15537,
+            ["bytes"] = 15569,
             ["domain"] = "companion_flows",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionFlows",
@@ -1379,7 +1378,7 @@ return {
             ["sourceShard"] = "dialogue/companion_flows/follow.json",
         },
         {
-            ["bytes"] = 172120,
+            ["bytes"] = 172552,
             ["domain"] = "compatibility_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompatibilityContent",
@@ -1419,7 +1418,7 @@ return {
             ["sourceShard"] = "dialogue/compatibility_content/integration_bandits_hooman_hurt_colonist.json",
         },
         {
-            ["bytes"] = 12848,
+            ["bytes"] = 12864,
             ["domain"] = "conversation_context",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationContext",
@@ -1433,7 +1432,7 @@ return {
             ["sourceShard"] = "dialogue/conversation_context/conversation_context_replies.json",
         },
         {
-            ["bytes"] = 161103,
+            ["bytes"] = 161247,
             ["domain"] = "conversation_greeting",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
@@ -1456,7 +1455,7 @@ return {
             ["sourceShard"] = "dialogue/conversation_greeting/conversation_landing_whats_up.json",
         },
         {
-            ["bytes"] = 176908,
+            ["bytes"] = 177068,
             ["domain"] = "conversation_needs",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
@@ -1480,7 +1479,7 @@ return {
             ["sourceShard"] = "dialogue/conversation_needs/flow_needs_exchange.json",
         },
         {
-            ["bytes"] = 188545,
+            ["bytes"] = 188625,
             ["domain"] = "conversation_whats_up",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
@@ -1498,7 +1497,7 @@ return {
             ["sourceShard"] = "dialogue/conversation_whats_up/question_whats_up_busy.json",
         },
         {
-            ["bytes"] = 7748,
+            ["bytes"] = 7764,
             ["domain"] = "core_knowledge_facts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CoreKnowledgeFacts",
@@ -1512,7 +1511,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_facts/question_knowledge_and_bite_responses.json",
         },
         {
-            ["bytes"] = 177345,
+            ["bytes"] = 177681,
             ["domain"] = "core_semantic_responses",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
@@ -1546,7 +1545,7 @@ return {
             ["sourceShard"] = "dialogue/core_semantic_responses/accept.json",
         },
         {
-            ["bytes"] = 79843,
+            ["bytes"] = 79923,
             ["domain"] = "core_semantic_responses",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/QuestionWellbeingToThanks",
@@ -1564,7 +1563,7 @@ return {
             ["sourceShard"] = "dialogue/core_semantic_responses/question_wellbeing.json",
         },
         {
-            ["bytes"] = 34860,
+            ["bytes"] = 34908,
             ["domain"] = "event_reactions_combat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
@@ -1580,7 +1579,7 @@ return {
             ["sourceShard"] = "dialogue/event_reactions_combat/combat_reaction_default.json",
         },
         {
-            ["bytes"] = 37206,
+            ["bytes"] = 37254,
             ["domain"] = "event_reactions_companion",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCompanion",
@@ -1596,7 +1595,7 @@ return {
             ["sourceShard"] = "dialogue/event_reactions_companion/companion_reaction_abandonment.json",
         },
         {
-            ["bytes"] = 24368,
+            ["bytes"] = 24400,
             ["domain"] = "event_reactions_corpse",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
@@ -1611,7 +1610,7 @@ return {
             ["sourceShard"] = "dialogue/event_reactions_corpse/corpse_reaction_default.json",
         },
         {
-            ["bytes"] = 21761,
+            ["bytes"] = 21793,
             ["domain"] = "event_reactions_farewell",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsFarewell",
@@ -1626,7 +1625,7 @@ return {
             ["sourceShard"] = "dialogue/event_reactions_farewell/flow_farewell_default.json",
         },
         {
-            ["bytes"] = 77317,
+            ["bytes"] = 77413,
             ["domain"] = "event_reactions_leader_loss",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss",
@@ -1645,7 +1644,7 @@ return {
             ["sourceShard"] = "dialogue/event_reactions_leader_loss/leader_loss_close.json",
         },
         {
-            ["bytes"] = 21677,
+            ["bytes"] = 21709,
             ["domain"] = "event_reactions_safety",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSafety",
@@ -1660,7 +1659,7 @@ return {
             ["sourceShard"] = "dialogue/event_reactions_safety/conversation_safety_danger.json",
         },
         {
-            ["bytes"] = 9361,
+            ["bytes"] = 9377,
             ["domain"] = "event_reactions_social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSocial",
@@ -1674,7 +1673,7 @@ return {
             ["sourceShard"] = "dialogue/event_reactions_social/social_reaction_default.json",
         },
         {
-            ["bytes"] = 111336,
+            ["bytes"] = 111352,
             ["domain"] = "health_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/HealthContent/QuestionHealthState",
@@ -1688,7 +1687,7 @@ return {
             ["sourceShard"] = "dialogue/health_content/question_health_state.json",
         },
         {
-            ["bytes"] = 110976,
+            ["bytes"] = 110992,
             ["domain"] = "health_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/HealthContent/QuestionMedicalBite",
@@ -1702,7 +1701,7 @@ return {
             ["sourceShard"] = "dialogue/health_content/question_medical_bite.json",
         },
         {
-            ["bytes"] = 16140,
+            ["bytes"] = 16156,
             ["domain"] = "identity_exchange",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/IdentityExchange",
@@ -1716,7 +1715,7 @@ return {
             ["sourceShard"] = "dialogue/identity_exchange/identity_exchange_responses.json",
         },
         {
-            ["bytes"] = 96970,
+            ["bytes"] = 97098,
             ["domain"] = "medical_event_call",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
@@ -1737,7 +1736,7 @@ return {
             ["sourceShard"] = "dialogue/medical_event_call/medical_distress_call_bandage.json",
         },
         {
-            ["bytes"] = 35983,
+            ["bytes"] = 36031,
             ["domain"] = "medical_event_overview",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventOverview",
@@ -1753,7 +1752,7 @@ return {
             ["sourceShard"] = "dialogue/medical_event_overview/medical_distress_default.json",
         },
         {
-            ["bytes"] = 99126,
+            ["bytes"] = 99254,
             ["domain"] = "medical_event_repeat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventRepeat",
@@ -1774,7 +1773,7 @@ return {
             ["sourceShard"] = "dialogue/medical_event_repeat/medical_distress_repeat_bandage.json",
         },
         {
-            ["bytes"] = 39542,
+            ["bytes"] = 39590,
             ["domain"] = "medical_event_teammate",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
@@ -1790,7 +1789,7 @@ return {
             ["sourceShard"] = "dialogue/medical_event_teammate/medical_distress_teammate_default.json",
         },
         {
-            ["bytes"] = 24184,
+            ["bytes"] = 24216,
             ["domain"] = "medical_event_treatment",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
@@ -1805,7 +1804,7 @@ return {
             ["sourceShard"] = "dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
         },
         {
-            ["bytes"] = 99958,
+            ["bytes"] = 100086,
             ["domain"] = "medical_event_update",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventUpdate",
@@ -1826,7 +1825,7 @@ return {
             ["sourceShard"] = "dialogue/medical_event_update/medical_distress_update_bandage.json",
         },
         {
-            ["bytes"] = 167459,
+            ["bytes"] = 167539,
             ["domain"] = "navigation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/Navigation",
@@ -1844,7 +1843,7 @@ return {
             ["sourceShard"] = "dialogue/navigation/navigation_camp.json",
         },
         {
-            ["bytes"] = 55634,
+            ["bytes"] = 55682,
             ["domain"] = "needs_support",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
@@ -1860,7 +1859,7 @@ return {
             ["sourceShard"] = "dialogue/needs_support/needs_member_support.json",
         },
         {
-            ["bytes"] = 136757,
+            ["bytes"] = 136821,
             ["domain"] = "quest_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
@@ -1877,7 +1876,7 @@ return {
             ["sourceShard"] = "dialogue/quest_content/quest_clinic_supplies_accept.json",
         },
         {
-            ["bytes"] = 31210,
+            ["bytes"] = 31226,
             ["domain"] = "question_relationship_status",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/QuestionRelationshipStatus",
@@ -1892,7 +1891,7 @@ return {
             ["sourceShard"] = "dialogue/question_relationship_status/question_relationship_status.json",
         },
         {
-            ["bytes"] = 7426,
+            ["bytes"] = 7442,
             ["domain"] = "question_residence",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/QuestionResidence",
@@ -1906,7 +1905,7 @@ return {
             ["sourceShard"] = "dialogue/question_residence/question_residence.json",
         },
         {
-            ["bytes"] = 136938,
+            ["bytes"] = 137002,
             ["domain"] = "social_apology",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
@@ -1923,7 +1922,7 @@ return {
             ["sourceShard"] = "dialogue/social_apology/social_apology_default.json",
         },
         {
-            ["bytes"] = 26635,
+            ["bytes"] = 26683,
             ["domain"] = "social_ask_about",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
@@ -1939,7 +1938,7 @@ return {
             ["sourceShard"] = "dialogue/social_ask_about/social_ask_about_member.json",
         },
         {
-            ["bytes"] = 81187,
+            ["bytes"] = 81283,
             ["domain"] = "social_check_in",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
@@ -1959,7 +1958,7 @@ return {
             ["sourceShard"] = "dialogue/social_check_in/social_effectful_wellbeing_trust.json",
         },
         {
-            ["bytes"] = 29947,
+            ["bytes"] = 30011,
             ["domain"] = "social_companion_topics",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
@@ -1976,7 +1975,7 @@ return {
             ["sourceShard"] = "dialogue/social_companion_topics/social_personal_special_trust.json",
         },
         {
-            ["bytes"] = 185996,
+            ["bytes"] = 186236,
             ["domain"] = "social_emotes",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThumbsdown",
@@ -2004,7 +2003,7 @@ return {
             ["sourceShard"] = "dialogue/social_emotes/conversation_acknowledged_default.json",
         },
         {
-            ["bytes"] = 70720,
+            ["bytes"] = 70784,
             ["domain"] = "social_emotes",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsupToWavehi",
@@ -2021,7 +2020,7 @@ return {
             ["sourceShard"] = "dialogue/social_emotes/emote_reply_thumbsup.json",
         },
         {
-            ["bytes"] = 194758,
+            ["bytes"] = 195030,
             ["domain"] = "social_greetings",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/AcquaintanceDawnToMemberDawn",
@@ -2051,7 +2050,7 @@ return {
             ["sourceShard"] = "dialogue/social_greetings/social_greetings_acquaintance_dawn.json",
         },
         {
-            ["bytes"] = 46246,
+            ["bytes"] = 46310,
             ["domain"] = "social_greetings",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings/DuskToTwilight",
@@ -2068,7 +2067,7 @@ return {
             ["sourceShard"] = "dialogue/social_greetings/social_greetings_member_dusk.json",
         },
         {
-            ["bytes"] = 70408,
+            ["bytes"] = 70440,
             ["domain"] = "social_interaction_argument",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
@@ -2083,7 +2082,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         },
         {
-            ["bytes"] = 11565,
+            ["bytes"] = 11581,
             ["domain"] = "social_interaction_context",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionContext",
@@ -2097,7 +2096,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_context/interaction_context_clarify.json",
         },
         {
-            ["bytes"] = 34509,
+            ["bytes"] = 34525,
             ["domain"] = "social_interaction_first_contact",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionFirstContact",
@@ -2111,7 +2110,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
         },
         {
-            ["bytes"] = 107859,
+            ["bytes"] = 107907,
             ["domain"] = "social_interaction_memory",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
@@ -2127,7 +2126,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         },
         {
-            ["bytes"] = 34955,
+            ["bytes"] = 34971,
             ["domain"] = "social_interaction_news",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionNews",
@@ -2141,7 +2140,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_news/interaction_news_acknowledge.json",
         },
         {
-            ["bytes"] = 46964,
+            ["bytes"] = 47028,
             ["domain"] = "social_interaction_scene_combat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
@@ -2158,7 +2157,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
         },
         {
-            ["bytes"] = 184797,
+            ["bytes"] = 184877,
             ["domain"] = "social_interaction_scene_horde_work",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/HordePromptToPostCombatClear",
@@ -2176,7 +2175,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
         },
         {
-            ["bytes"] = 71128,
+            ["bytes"] = 71160,
             ["domain"] = "social_interaction_scene_horde_work",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/TaskWorkAssignedToTaskWorkCompleted",
@@ -2191,7 +2190,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
         },
         {
-            ["bytes"] = 180399,
+            ["bytes"] = 180479,
             ["domain"] = "social_interaction_scene_travel_news",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/ExcursionDepartingToExcursionReturning",
@@ -2209,7 +2208,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
         },
         {
-            ["bytes"] = 71787,
+            ["bytes"] = 71819,
             ["domain"] = "social_interaction_scene_travel_news",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/GroundedNewsAnswerToGroundedNewsShare",
@@ -2224,7 +2223,7 @@ return {
             ["sourceShard"] = "dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
         },
         {
-            ["bytes"] = 169720,
+            ["bytes"] = 169784,
             ["domain"] = "social_reactions_ack_dispute",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
@@ -2241,7 +2240,7 @@ return {
             ["sourceShard"] = "dialogue/social_reactions_ack_dispute/social_acknowledged.json",
         },
         {
-            ["bytes"] = 85387,
+            ["bytes"] = 85435,
             ["domain"] = "social_reactions_ack_dispute",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/DisputeWithdrawnToReactionResponses",
@@ -2257,7 +2256,7 @@ return {
             ["sourceShard"] = "dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
         },
         {
-            ["bytes"] = 190648,
+            ["bytes"] = 190728,
             ["domain"] = "social_reactions_hostile_offer_threat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/HostileShortToProfanity",
@@ -2276,7 +2275,7 @@ return {
             ["sourceShard"] = "dialogue/social_reactions_hostile_offer_threat/social_hostile_short.json",
         },
         {
-            ["bytes"] = 34414,
+            ["bytes"] = 34430,
             ["domain"] = "social_reactions_hostile_offer_threat",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostileOfferThreat/SocialThreatBoundary",
@@ -2290,7 +2289,7 @@ return {
             ["sourceShard"] = "dialogue/social_reactions_hostile_offer_threat/social_threat_boundary.json",
         },
         {
-            ["bytes"] = 48395,
+            ["bytes"] = 48411,
             ["domain"] = "social_settlement_admission",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialSettlementAdmission",
@@ -2306,7 +2305,7 @@ return {
             ["sourceShard"] = "dialogue/social_settlement_admission/social_recruitment_offer.json",
         },
         {
-            ["bytes"] = 188668,
+            ["bytes"] = 188796,
             ["domain"] = "social_tool_replies_affirmation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToComfort",
@@ -2327,7 +2326,7 @@ return {
             ["sourceShard"] = "dialogue/social_tool_replies_affirmation/tool_reply_accepted_generic.json",
         },
         {
-            ["bytes"] = 56739,
+            ["bytes"] = 56771,
             ["domain"] = "social_tool_replies_affirmation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComplimentToFlirt",
@@ -2342,7 +2341,7 @@ return {
             ["sourceShard"] = "dialogue/social_tool_replies_affirmation/tool_reply_compliment.json",
         },
         {
-            ["bytes"] = 178707,
+            ["bytes"] = 178819,
             ["domain"] = "social_tool_replies_boundary_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
@@ -2362,7 +2361,7 @@ return {
             ["sourceShard"] = "dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json",
         },
         {
-            ["bytes"] = 29842,
+            ["bytes"] = 29858,
             ["domain"] = "social_tool_replies_boundary_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/ToolReplySexual",
@@ -2376,7 +2375,7 @@ return {
             ["sourceShard"] = "dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
         },
         {
-            ["bytes"] = 190457,
+            ["bytes"] = 190841,
             ["domain"] = "static_suggestion_text",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/SemanticSuggestionsTitleToSuggestionIdentityReal",
@@ -2413,7 +2412,7 @@ return {
             ["sourceShard"] = "dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
         },
         {
-            ["bytes"] = 78035,
+            ["bytes"] = 78195,
             ["domain"] = "static_suggestion_text",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText/IdentityRudeToWhatsUpLabel",
@@ -2436,7 +2435,7 @@ return {
             ["sourceShard"] = "dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
         },
         {
-            ["bytes"] = 149022,
+            ["bytes"] = 149070,
             ["domain"] = "task_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle/GiftToTaskDrink",
@@ -2452,7 +2451,7 @@ return {
             ["sourceShard"] = "dialogue/task_lifecycle/gift.json",
         },
         {
-            ["bytes"] = 147315,
+            ["bytes"] = 147363,
             ["domain"] = "task_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle/EatToGive",
@@ -2468,7 +2467,7 @@ return {
             ["sourceShard"] = "dialogue/task_lifecycle/task_eat.json",
         },
         {
-            ["bytes"] = 102232,
+            ["bytes"] = 102264,
             ["domain"] = "task_lifecycle",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle/RefillToWaitAt",
@@ -2483,7 +2482,7 @@ return {
             ["sourceShard"] = "dialogue/task_lifecycle/task_refill.json",
         },
         {
-            ["bytes"] = 192828,
+            ["bytes"] = 192972,
             ["domain"] = "task_tool_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/CooldownToQueuedComfort",
@@ -2505,7 +2504,7 @@ return {
             ["sourceShard"] = "dialogue/task_tool_replies/tool_reply_cooldown.json",
         },
         {
-            ["bytes"] = 191916,
+            ["bytes"] = 192076,
             ["domain"] = "task_tool_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/QueuedComplimentToRejectedGeneric",
@@ -2528,7 +2527,7 @@ return {
             ["sourceShard"] = "dialogue/task_tool_replies/tool_reply_queued_compliment.json",
         },
         {
-            ["bytes"] = 48383,
+            ["bytes"] = 48415,
             ["domain"] = "task_tool_replies",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies/RejectedHostileToRejectedSexual",
@@ -2543,7 +2542,7 @@ return {
             ["sourceShard"] = "dialogue/task_tool_replies/tool_reply_rejected_hostile.json",
         },
         {
-            ["bytes"] = 194693,
+            ["bytes"] = 194853,
             ["domain"] = "wellbeing_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/DatasetGettingByToStress",
@@ -2566,7 +2565,7 @@ return {
             ["sourceShard"] = "dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
         },
         {
-            ["bytes"] = 25556,
+            ["bytes"] = 25588,
             ["domain"] = "wellbeing_content",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent/ThirstToThirstAlt",
@@ -2581,7 +2580,7 @@ return {
             ["sourceShard"] = "dialogue/wellbeing_content/question_wellbeing_thirst.json",
         },
         {
-            ["bytes"] = 3358,
+            ["bytes"] = 3374,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Beat/Social/Conflict",
@@ -2598,7 +2597,7 @@ return {
             ["sourceShard"] = "beat/social/conflict/argument_escalation.json",
         },
         {
-            ["bytes"] = 3348,
+            ["bytes"] = 3364,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Beat/Social/FirstContact",
@@ -2615,7 +2614,7 @@ return {
             ["sourceShard"] = "beat/social/first_contact/suspicious_first_contact.json",
         },
         {
-            ["bytes"] = 3330,
+            ["bytes"] = 3346,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Beat/Social/Repair",
@@ -2632,7 +2631,7 @@ return {
             ["sourceShard"] = "beat/social/repair/reconciliation.json",
         },
         {
-            ["bytes"] = 10058,
+            ["bytes"] = 10122,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Acknowledgement",
@@ -2652,7 +2651,7 @@ return {
             ["sourceShard"] = "behavior/social/acknowledgement/acknowledge_memory.json",
         },
         {
-            ["bytes"] = 7763,
+            ["bytes"] = 7811,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Conflict",
@@ -2671,7 +2670,7 @@ return {
             ["sourceShard"] = "behavior/social/conflict/challenge.json",
         },
         {
-            ["bytes"] = 4944,
+            ["bytes"] = 4976,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Context",
@@ -2689,7 +2688,7 @@ return {
             ["sourceShard"] = "behavior/social/context/ask_memory_followup.json",
         },
         {
-            ["bytes"] = 11146,
+            ["bytes"] = 11210,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Repair",
@@ -2709,7 +2708,7 @@ return {
             ["sourceShard"] = "behavior/social/repair/acknowledge_repair.json",
         },
         {
-            ["bytes"] = 2249,
+            ["bytes"] = 2265,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/WorldEvents",
@@ -2726,7 +2725,7 @@ return {
             ["sourceShard"] = "behavior/social/world_events/world_event_warn.json",
         },
         {
-            ["bytes"] = 54055,
+            ["bytes"] = 54151,
             ["domain"] = "core_check_in",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreCheckIn",
@@ -2748,7 +2747,7 @@ return {
             ["sourceShard"] = "dialogue/core_check_in/question_activity.json",
         },
         {
-            ["bytes"] = 36982,
+            ["bytes"] = 37046,
             ["domain"] = "core_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreIdentity",
@@ -2768,7 +2767,7 @@ return {
             ["sourceShard"] = "dialogue/core_identity/question_identity.json",
         },
         {
-            ["bytes"] = 74027,
+            ["bytes"] = 74059,
             ["domain"] = "core_knowledge_activity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeActivity",
@@ -2786,7 +2785,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_activity/question_activity_dataset_keep_moving.json",
         },
         {
-            ["bytes"] = 74232,
+            ["bytes"] = 74248,
             ["domain"] = "core_knowledge_facts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeFacts",
@@ -2803,7 +2802,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_facts/question_knowledge.json",
         },
         {
-            ["bytes"] = 70350,
+            ["bytes"] = 70366,
             ["domain"] = "core_knowledge_gossip",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeGossip",
@@ -2820,7 +2819,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_gossip/gossip_unknown.json",
         },
         {
-            ["bytes"] = 74630,
+            ["bytes"] = 74646,
             ["domain"] = "core_knowledge_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreKnowledgeIdentity",
@@ -2837,7 +2836,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_identity/question_identity.json",
         },
         {
-            ["bytes"] = 103042,
+            ["bytes"] = 103122,
             ["domain"] = "core_text_memory_gossip_corpse_ordinary",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseOrdinary",
@@ -2858,7 +2857,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_corpse_ordinary/corpse_comrade.json",
         },
         {
-            ["bytes"] = 105498,
+            ["bytes"] = 105546,
             ["domain"] = "core_text_memory_gossip_corpse_revenge",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipCorpseRevenge",
@@ -2877,7 +2876,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_corpse_revenge/corpse_revenge_comrade.json",
         },
         {
-            ["bytes"] = 13076,
+            ["bytes"] = 13108,
             ["domain"] = "core_text_memory_gossip_death",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipDeath",
@@ -2895,7 +2894,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_death/death_report.json",
         },
         {
-            ["bytes"] = 74707,
+            ["bytes"] = 74883,
             ["domain"] = "core_text_memory_gossip_reactions",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextMemoryGossipReactions",
@@ -2922,7 +2921,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_memory_gossip_reactions/negative_mockery_gear.json",
         },
         {
-            ["bytes"] = 24997,
+            ["bytes"] = 25061,
             ["domain"] = "core_text_needs_gifts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextNeedsGifts",
@@ -2942,7 +2941,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_needs_gifts/gift_preference_dislike.json",
         },
         {
-            ["bytes"] = 21028,
+            ["bytes"] = 21076,
             ["domain"] = "core_text_social_departure",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialDeparture",
@@ -2961,7 +2960,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_departure/departure_confirmed.json",
         },
         {
-            ["bytes"] = 44104,
+            ["bytes"] = 44136,
             ["domain"] = "core_text_social_goodbye",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialGoodbye",
@@ -2979,7 +2978,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_goodbye/choice_goodbye.json",
         },
         {
-            ["bytes"] = 6937,
+            ["bytes"] = 6953,
             ["domain"] = "core_text_social_greetings",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialGreetings",
@@ -2996,7 +2995,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_greetings/response_ambient_visit_accepted.json",
         },
         {
-            ["bytes"] = 6237,
+            ["bytes"] = 6253,
             ["domain"] = "core_text_social_identity",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialIdentity",
@@ -3013,7 +3012,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_identity/identity_introduction.json",
         },
         {
-            ["bytes"] = 139399,
+            ["bytes"] = 139543,
             ["domain"] = "core_text_social_recruitment",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/CoreTextSocialRecruitment",
@@ -3038,7 +3037,7 @@ return {
             ["sourceShard"] = "dialogue/core_text_social_recruitment/recruitment_admire.json",
         },
         {
-            ["bytes"] = 74582,
+            ["bytes"] = 74614,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Dialogue/Social",
@@ -3056,7 +3055,7 @@ return {
             ["sourceShard"] = "dialogue/social/interaction_world_event_warning.json",
         },
         {
-            ["bytes"] = 11482,
+            ["bytes"] = 11578,
             ["domain"] = "social_affirmation",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialAffirmation",
@@ -3078,7 +3077,7 @@ return {
             ["sourceShard"] = "realization/social_affirmation/social_acknowledge.json",
         },
         {
-            ["bytes"] = 16686,
+            ["bytes"] = 16830,
             ["domain"] = "social_challenge",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialChallenge",
@@ -3103,7 +3102,7 @@ return {
             ["sourceShard"] = "realization/social_challenge/social_ask_followup.json",
         },
         {
-            ["bytes"] = 12839,
+            ["bytes"] = 12935,
             ["domain"] = "social_identity_closure",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialIdentityClosure",
@@ -3125,7 +3124,7 @@ return {
             ["sourceShard"] = "realization/social_identity_closure/social_disclose_name.json",
         },
         {
-            ["bytes"] = 6084,
+            ["bytes"] = 6148,
             ["domain"] = "social_lexemes",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialLexemes",
@@ -3145,7 +3144,7 @@ return {
             ["sourceShard"] = "realization/social_lexemes/social_agreement_yes.json",
         },
         {
-            ["bytes"] = 19168,
+            ["bytes"] = 19328,
             ["domain"] = "social_warning_wellbeing",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Realization/SocialWarningWellbeing",
@@ -3841,15 +3840,14 @@ return {
             ["sourceShard"] = "@index/dialogue/companion_commands_lifecycle",
         },
         {
-            ["bytes"] = 5484,
+            ["bytes"] = 5130,
             ["domain"] = "companion_commands_player",
             ["indexKind"] = "dialogue",
             ["kind"] = "Index",
             ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCommandsPlayer",
             ["owner"] = "ProjectHoomans",
-            ["recordCount"] = 15,
+            ["recordCount"] = 14,
             ["recordIDs"] = {
-                "command.companion.camp",
                 "command.companion.follow",
                 "command.companion.return_home",
                 "command.companion.stay",
@@ -5565,5 +5563,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "c30d7149c46b0349c93f8cb43f45e819c2cc8563f78b42bfbf1768e6d34cf450",
+    ["wholeModelFingerprint"] = "f88a36f78eb66b6d4164df3ebdeb578904c8730be1b96f4e105ae4d82cc1dad1",
 }

@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "social.personal.special.trust",
   "when": "relationship.speakerToAddressee.familiarity >= 10",
   "metadata": {

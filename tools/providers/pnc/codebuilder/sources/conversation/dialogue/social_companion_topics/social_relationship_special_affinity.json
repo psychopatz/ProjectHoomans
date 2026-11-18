@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "social.relationship.special.affinity",
   "when": "relationship.speakerToAddressee.approval >= 20",
   "metadata": {

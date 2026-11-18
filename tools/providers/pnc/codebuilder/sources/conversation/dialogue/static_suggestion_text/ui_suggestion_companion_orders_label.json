@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "ui.suggestion.companion_orders.label",
   "metadata": {
     "textKey": "suggestion.companion_orders.label",

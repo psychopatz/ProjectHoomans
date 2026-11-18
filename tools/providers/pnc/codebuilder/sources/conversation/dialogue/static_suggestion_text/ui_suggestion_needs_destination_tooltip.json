@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "ui.suggestion.needs_destination.tooltip",
   "metadata": {
     "textKey": "suggestion.needs_destination.tooltip",

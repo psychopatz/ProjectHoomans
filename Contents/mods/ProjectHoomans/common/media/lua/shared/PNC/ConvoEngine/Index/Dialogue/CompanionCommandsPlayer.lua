@@ -1,14 +1,5 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["command.companion.camp"] = {
-        ["domain"] = "companion_commands_player",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
-        },
-        ["id"] = "command.companion.camp",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/companion_commands_player/command_companion_camp.json",
-    },
     ["command.companion.follow"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {

@@ -103,7 +103,7 @@ class PragmaticInteractionBeatInspectorTests(WarmWorkerTestMixin, unittest.TestC
             )
             canonical = (
                 source_document
-                if source_document.get("schema") in {"psychopatz.convo-engine.v1", "psychopatz.psdl.v2"}
+                if source_document.get("schema") == "psychopatz.convo-engine.v1"
                 else next(
                     row for row in source_document["beats"]
                     if row["id"] == "beat.argument_escalation"

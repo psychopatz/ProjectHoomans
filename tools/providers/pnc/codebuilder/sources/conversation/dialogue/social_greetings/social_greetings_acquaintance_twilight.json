@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "social.greetings.acquaintance.twilight",
   "when": "relationship.speakerToAddressee.state == \"Acquaintance\" && (world.time.hour >= 21 || world.time.hour < 5)",
   "metadata": {

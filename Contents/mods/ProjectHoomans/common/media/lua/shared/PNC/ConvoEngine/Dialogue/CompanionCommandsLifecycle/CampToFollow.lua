@@ -73,6 +73,10 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
+            ["invoke"] = {
+                ["action"] = "CAMP",
+                ["intent"] = "COMMAND",
+            },
             ["namespace"] = "command",
             ["replies"] = {
                 ["completed"] = {
@@ -852,12 +856,12 @@ return {
         ["id"] = "command.camp",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "camp",
             ["sourceId"] = "command.camp",
             ["sourcePath"] = "dialogue/companion_commands_lifecycle/command_camp.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow",
         ["namespace"] = "command",
@@ -904,6 +908,9 @@ return {
                     ["type"] = "entity.location",
                 },
             },
+            ["closure"] = {
+                ["closureClass"] = "state_transition",
+            },
             ["execute"] = {
                 ["mode"] = "request_response",
                 ["use"] = "pnc.companion.camp",
@@ -912,11 +919,20 @@ return {
                     ["target"] = "$slot.camp_site",
                 },
             },
+            ["inputPolicy"] = "typed_parity",
+            ["invoke"] = {
+                ["action"] = "CAMP",
+                ["intent"] = "COMMAND",
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
             },
+            ["postconditions"] = {
+                "companion.camping",
+            },
+            ["repeatPolicy"] = "state_retired",
             ["reply"] = {
                 ["completed"] = {
                     ["act"] = "REPLY",
@@ -1344,6 +1360,68 @@ return {
                     },
                 },
                 ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "actor_blocked_or_hostile",
+                    ["outcome"] = "blocked",
+                    ["reason"] = "actor_blocked_or_hostile",
+                    ["when"] = {
+                        ["any"] = {
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.hostile",
+                                ["value"] = true,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.authorityEligible",
+                                ["value"] = false,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.status",
+                                ["value"] = "hostile",
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "already_camping",
+                    ["outcome"] = "already_satisfied",
+                    ["reason"] = "already_camp",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "npcState.orderKind",
+                        ["value"] = "camp",
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
             },
         },
         ["references"] = {
@@ -2257,12 +2335,12 @@ return {
         ["id"] = "command.follow",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.psdl.v2",
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
             ["canonicalSchema"] = "psychopatz.convo-engine.v1",
             ["localId"] = "follow",
             ["sourceId"] = "command.follow",
             ["sourcePath"] = "dialogue/companion_commands_lifecycle/command_follow.json",
-            ["sourceSchema"] = "psychopatz.psdl.v2",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow",
         ["namespace"] = "command",

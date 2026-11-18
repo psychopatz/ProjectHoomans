@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "conversation.safety.danger",
   "metadata": {
     "category": "projecthoomans:event_reactions",

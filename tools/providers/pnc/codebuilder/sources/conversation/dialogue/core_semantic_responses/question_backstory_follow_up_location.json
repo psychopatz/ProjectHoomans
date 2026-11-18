@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "question.backstory.follow_up.location",
   "metadata": {
     "responsePoolID": "question.backstory.follow_up.location",

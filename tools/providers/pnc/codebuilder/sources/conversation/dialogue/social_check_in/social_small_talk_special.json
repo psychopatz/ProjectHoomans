@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "social.small_talk.special",
   "metadata": {
     "runtimeBlockID": "projecthoomans:small_talk_special",

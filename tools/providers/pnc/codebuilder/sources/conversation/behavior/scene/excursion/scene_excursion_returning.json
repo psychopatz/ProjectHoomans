@@ -1,5 +1,5 @@
 {
-  "schema": "psychopatz.psdl.v2",
+  "schema": "psychopatz.convo-engine.v1",
   "id": "behavior.scene_excursion_returning",
   "act": "EXCURSION_STATUS_REPORT",
   "baseRelevance": 1.0,
