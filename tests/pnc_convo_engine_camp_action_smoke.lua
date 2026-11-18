@@ -45,6 +45,7 @@ T.load("ProjectHoomans", "client", "PNC/Networking/PNC_ClientRequests.lua")
 local CampAction = T.load("ProjectHoomans", "shared",
     "PNC/ConvoEngine/CampActionContract.lua")
 
+-- @auditClaims command.camp: ["camp_state_policy_parity"]
 local Registry = PNC.ConvoEngine.Registry
 local Client = PNC.Client
 local campPlan = Registry.ConvoPlan("command.camp")

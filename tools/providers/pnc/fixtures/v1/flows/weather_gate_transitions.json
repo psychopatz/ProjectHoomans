@@ -49,7 +49,10 @@
           }
         }
       ],
-      "domain": "flows"
+      "domain": "flows",
+      "auditClaims": [
+        "weather_context_realization"
+      ]
     },
     {
       "id": "flows.weather_gate_transitions.weather_gate_clear",
@@ -82,7 +85,10 @@
           }
         }
       ],
-      "domain": "flows"
+      "domain": "flows",
+      "auditClaims": [
+        "weather_context_realization"
+      ]
     },
     {
       "id": "flows.weather_gate_transitions.weather_gate_unknown",

@@ -6,7 +6,12 @@
     {
       "id": "interaction.state_aware_outcome_closure.known_identity_question_no_player_name_obligation",
       "description": "Known NPC asked 'What's your name?' answers with reminder and does not create a first-contact PLAYER_NAME obligation.",
-      "tags": ["interaction", "identity", "state_outcome", "p0_regression"],
+      "tags": [
+        "interaction",
+        "identity",
+        "state_outcome",
+        "p0_regression"
+      ],
       "scenario": {
         "npc": {
           "identityState": "known"
@@ -17,16 +22,27 @@
           "text": "What's your name?",
           "expect": {
             "accepted": true,
-            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+            "contextAfter.dialogue.pendingIdentityExchange": {
+              "absent": true
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "known_reminder",
+        "terminal_goodbye_close"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.repeat_truthful_identity_no_reward_farming",
       "description": "Repeated truthful identity claim after first introduction does not reapply first-introduction relationship reward.",
-      "tags": ["interaction", "identity", "idempotence", "p0_regression"],
+      "tags": [
+        "interaction",
+        "identity",
+        "idempotence",
+        "p0_regression"
+      ],
       "turns": [
         {
           "text": "who are you",
@@ -36,14 +52,18 @@
           }
         },
         {
-          "suggestionClick": {"candidateID": "identity.choice.real_name"},
+          "suggestionClick": {
+            "candidateID": "identity.choice.real_name"
+          },
           "expect": {
             "accepted": true,
             "relationshipAfter.identityTrust": "trusted",
             "relationshipAfter.approval": 1,
             "relationshipAfter.respect": 2,
             "relationshipAfter.familiarity": 6,
-            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+            "contextAfter.dialogue.pendingIdentityExchange": {
+              "absent": true
+            }
           }
         },
         {
@@ -53,16 +73,27 @@
             "relationshipAfter.approval": 1,
             "relationshipAfter.respect": 2,
             "relationshipAfter.familiarity": 6,
-            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+            "contextAfter.dialogue.pendingIdentityExchange": {
+              "absent": true
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "first_contact_idempotence",
+        "effectful_social_repeat_idempotence"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.resolved_identity_choices_do_not_resurrect",
       "description": "Resolved identity choices remain retired across subsequent turns and refreshes.",
-      "tags": ["interaction", "identity", "projection", "p0_regression"],
+      "tags": [
+        "interaction",
+        "identity",
+        "projection",
+        "p0_regression"
+      ],
       "turns": [
         {
           "text": "who are you",
@@ -72,55 +103,92 @@
           }
         },
         {
-          "suggestionClick": {"candidateID": "identity.choice.real_name"},
+          "suggestionClick": {
+            "candidateID": "identity.choice.real_name"
+          },
           "expect": {
             "accepted": true,
-            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true}
+            "contextAfter.dialogue.pendingIdentityExchange": {
+              "absent": true
+            }
           }
         },
         {
           "text": "hello",
           "expect": {
             "accepted": true,
-            "contextAfter.dialogue.pendingIdentityExchange": {"absent": true},
+            "contextAfter.dialogue.pendingIdentityExchange": {
+              "absent": true
+            },
             "observation.suggestions.candidates": {
-              "notContains": {"id": "identity.choice.real_name"}
+              "notContains": {
+                "id": "identity.choice.real_name"
+              }
             }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "retired_choices_stay_retired"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.already_following_typed_command_zero_dispatch",
       "description": "Typed FOLLOW when NPC is already following dispatches zero gameplay commands and gives an already-satisfied reply.",
-      "tags": ["interaction", "actions", "follow", "state_outcome", "p0_regression"],
+      "tags": [
+        "interaction",
+        "actions",
+        "follow",
+        "state_outcome",
+        "p0_regression"
+      ],
       "turns": [
         {
           "text": "Follow me",
           "expect": {
             "accepted": true,
-            "dispatchTransport": {"count": 1}
+            "dispatchTransport": {
+              "count": 1
+            }
           }
         },
         {
           "text": "Follow me",
           "expect": {
             "accepted": true,
-            "dispatchTransport": {"count": 0}
+            "dispatchTransport": {
+              "count": 0
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "already_following_noop",
+        "blocked_zero_dispatch",
+        "territory_state_policy"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.busy_blocked_typed_command_zero_dispatch",
       "description": "Typed companion command while NPC is hostile/blocked dispatches zero gameplay commands.",
-      "tags": ["interaction", "actions", "blocked", "state_outcome", "p0_regression"],
+      "tags": [
+        "interaction",
+        "actions",
+        "blocked",
+        "state_outcome",
+        "p0_regression"
+      ],
       "scenario": {
         "npc": {
           "activeBehavior": "hostile",
-          "actorAuthority": {"companion": false, "owned": false, "eligible": false, "status": "hostile"}
+          "actorAuthority": {
+            "companion": false,
+            "owned": false,
+            "eligible": false,
+            "status": "hostile"
+          }
         }
       },
       "turns": [
@@ -128,16 +196,28 @@
           "text": "Follow me",
           "expect": {
             "accepted": true,
-            "dispatchTransport": {"count": 0}
+            "dispatchTransport": {
+              "count": 0
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "busy_blocked_noop",
+        "state_policy_parity",
+        "return_home_state_policy_parity"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.needs_proposal_acceptance_closes_or_progresses",
       "description": "Accepting a Needs proposal must close or progress pendingFollowUp instead of looping in proposal_pending.",
-      "tags": ["interaction", "needs", "bounded_progress", "p0_regression"],
+      "tags": [
+        "interaction",
+        "needs",
+        "bounded_progress",
+        "p0_regression"
+      ],
       "turns": [
         {
           "text": "do you need anything",
@@ -161,20 +241,38 @@
           "text": "okay",
           "expect": {
             "accepted": true,
-            "contextAfter.dialogue.pendingFollowUp": {"absent": true}
+            "contextAfter.dialogue.pendingFollowUp": {
+              "absent": true
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "needs_proposal_closure",
+        "bounded_progress",
+        "gift_consent_regression"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.hostile_greeting_no_friendly_continuation",
       "description": "Hostile NPC greeted by player responds with hostile boundary and does not open friendly greeting continuation.",
-      "tags": ["interaction", "greeting", "hostile", "state_outcome", "p0_regression"],
+      "tags": [
+        "interaction",
+        "greeting",
+        "hostile",
+        "state_outcome",
+        "p0_regression"
+      ],
       "scenario": {
         "npc": {
           "activeBehavior": "hostile",
-          "actorAuthority": {"companion": false, "owned": false, "eligible": false, "status": "hostile"}
+          "actorAuthority": {
+            "companion": false,
+            "owned": false,
+            "eligible": false,
+            "status": "hostile"
+          }
         }
       },
       "turns": [
@@ -182,20 +280,37 @@
           "text": "hello",
           "expect": {
             "accepted": true,
-            "contextAfter.dialogue.pendingFollowUp": {"absent": true}
+            "contextAfter.dialogue.pendingFollowUp": {
+              "absent": true
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "hostile_no_friendly_continuation",
+        "friendly_continuation_parity",
+        "ceasefire_state_policy"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.already_member_recruitment_not_actionable",
       "description": "Already-recruited companion asked to join group dispatches zero recruitment commands.",
-      "tags": ["interaction", "recruitment", "state_outcome", "p0_regression"],
+      "tags": [
+        "interaction",
+        "recruitment",
+        "state_outcome",
+        "p0_regression"
+      ],
       "scenario": {
         "npc": {
           "identityState": "known",
-          "actorAuthority": {"companion": true, "owned": true, "eligible": true, "status": "eligible"}
+          "actorAuthority": {
+            "companion": true,
+            "owned": true,
+            "eligible": true,
+            "status": "eligible"
+          }
         }
       },
       "turns": [
@@ -203,21 +318,39 @@
           "text": "join my group",
           "expect": {
             "accepted": true,
-            "dispatchTransport": {"count": 0}
+            "dispatchTransport": {
+              "count": 0
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "already_member_noop"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.accepted_relationship_proposal_not_actionable",
       "description": "NPC already in romantic/lover relationship does not redispatch relationship proposal.",
-      "tags": ["interaction", "relationship", "state_outcome", "p0_regression"],
+      "tags": [
+        "interaction",
+        "relationship",
+        "state_outcome",
+        "p0_regression"
+      ],
       "scenario": {
         "npc": {
           "identityState": "known",
-          "actorAuthority": {"companion": true, "owned": true, "eligible": true, "status": "eligible"},
-          "startingRelationship": {"kind": "lover", "source": "starting_companion_trait"}
+          "actorAuthority": {
+            "companion": true,
+            "owned": true,
+            "eligible": true,
+            "status": "eligible"
+          },
+          "startingRelationship": {
+            "kind": "lover",
+            "source": "starting_companion_trait"
+          }
         }
       },
       "turns": [
@@ -225,16 +358,26 @@
           "text": "be my partner",
           "expect": {
             "accepted": true,
-            "dispatchTransport": {"count": 0}
+            "dispatchTransport": {
+              "count": 0
+            }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "already_partner_noop"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.recruitment_transition_refresh_and_repeat_noop",
       "description": "Actionable recruitment mutates membership, refreshes active conversation, retires recruit affordance, and turns repeated typed recruitment into a zero-dispatch already_member no-op.",
-      "tags": ["interaction", "recruitment", "state_outcome", "state_transition"],
+      "tags": [
+        "interaction",
+        "recruitment",
+        "state_outcome",
+        "state_transition"
+      ],
       "scenario": {
         "npc": {
           "identityState": "known",
@@ -260,11 +403,15 @@
           "text": "Would you like to join us?",
           "expect": {
             "accepted": true,
-            "dispatchTransport": {"count": 0},
+            "dispatchTransport": {
+              "count": 0
+            },
             "result.actionResult.status": "semantic_dispatch_blocked",
             "result.actionResult.reason": "already_member",
             "observation.suggestions.candidates": {
-              "notContains": {"id": "conversation.root:menu:recruit"}
+              "notContains": {
+                "id": "conversation.root:menu:recruit"
+              }
             }
           }
         },
@@ -273,17 +420,27 @@
           "expect": {
             "accepted": true,
             "observation.suggestions.candidates": {
-              "notContains": {"id": "conversation.root:menu:recruit"}
+              "notContains": {
+                "id": "conversation.root:menu:recruit"
+              }
             }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "recruitment_transition_refresh_repeat_noop"
+      ]
     },
     {
       "id": "interaction.state_aware_outcome_closure.relationship_proposal_transition_refresh_and_repeat_noop",
       "description": "Actionable relationship proposal applies bond, refreshes active conversation, retires proposal affordance, and turns repeated proposal input into a zero-dispatch no-op.",
-      "tags": ["interaction", "relationship", "state_outcome", "state_transition"],
+      "tags": [
+        "interaction",
+        "relationship",
+        "state_outcome",
+        "state_transition"
+      ],
       "scenario": {
         "npc": {
           "identityState": "known",
@@ -304,13 +461,17 @@
           }
         },
         {
-          "suggestionClick": {"candidateID": "social.relationship_proposal"},
+          "suggestionClick": {
+            "candidateID": "social.relationship_proposal"
+          },
           "expect": {
             "accepted": true,
             "result.actionResult.action": "RELATIONSHIP_PROPOSAL",
             "result.actionResult.status": "relationship_proposal_applied",
             "observation.suggestions.candidates": {
-              "notContains": {"id": "social.relationship_proposal"}
+              "notContains": {
+                "id": "social.relationship_proposal"
+              }
             }
           }
         },
@@ -318,14 +479,21 @@
           "text": "be my partner",
           "expect": {
             "accepted": true,
-            "dispatchTransport": {"count": 0},
+            "dispatchTransport": {
+              "count": 0
+            },
             "observation.suggestions.candidates": {
-              "notContains": {"id": "social.relationship_proposal"}
+              "notContains": {
+                "id": "social.relationship_proposal"
+              }
             }
           }
         }
       ],
-      "domain": "interaction"
+      "domain": "interaction",
+      "auditClaims": [
+        "proposal_transition_refresh_repeat_noop"
+      ]
     }
   ]
 }

@@ -267,6 +267,7 @@ class ProductionLeaveGroupTests(WarmWorkerTestMixin, unittest.TestCase):
         self.assertEqual(hashlib.sha256(save_path.read_bytes()).digest(), source_hash)
 
     def test_positive_warning_and_confirmation_use_production_worker_route(self) -> None:
+        """auditClaims: ["departure_confirmation_and_ownership", "confirmation_modal_required"]"""
         before_hash = hashlib.sha256(self.save_path.read_bytes()).digest()
         with self._worker() as worker:
             imported = worker.import_saved_selection(
@@ -517,6 +518,7 @@ class ProductionLeaveGroupTests(WarmWorkerTestMixin, unittest.TestCase):
                 self.assertEqual(worker.snapshot()["translation"]["language"], language)
 
     def test_disband_presentation_only_typed_input_cannot_bypass_confirmation_and_replay_is_idempotent(self) -> None:
+        """auditClaims: ["confirmation_modal_required", "no_unconfirmed_destructive_dispatch"]"""
         with self._worker() as worker:
             worker.import_saved_selection(
                 self.save_path,

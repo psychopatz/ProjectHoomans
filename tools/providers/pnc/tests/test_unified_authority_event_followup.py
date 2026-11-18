@@ -201,6 +201,7 @@ class UnifiedAuthorityEventFollowUpTests(WarmWorkerTestMixin, unittest.TestCase)
                     )
 
     def test_no_fact_refs_hide_followups_and_expire_the_window(self) -> None:
+        """auditClaims: ["event_window_expiry_hides_followups"]"""
         with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             event = worker.interaction_npc_event(
                 self._event_payload(with_facts=False)

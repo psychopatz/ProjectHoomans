@@ -49,6 +49,7 @@ class QuestFlowBindingTests(WarmWorkerTestMixin, unittest.TestCase):
             self.assertEqual(action["dispatchCount"], 1)
 
     def test_real_worker_routes_offer_accept_query_and_turn_in_results(self) -> None:
+        """auditClaims: ["quest_offer_accept_turnin_repeat"]"""
         phrases = (
             ("Can you help me?", "HELP", "available",
              "UI_PNC_Conversation_Semantic_QuestOffer"),
@@ -82,6 +83,7 @@ class QuestFlowBindingTests(WarmWorkerTestMixin, unittest.TestCase):
                     )
 
     def test_quest_denied_failed_preview_and_repeat_are_truthful(self) -> None:
+        """auditClaims: ["quest_offer_accept_turnin_repeat"]"""
         denied_scenario = merge(
             DEFAULT_SCENARIO,
             {"runtime": {"questResponses": {
@@ -219,6 +221,7 @@ class QuestFlowBindingTests(WarmWorkerTestMixin, unittest.TestCase):
             )
 
     def test_production_quest_service_conversation_lifecycle(self) -> None:
+        """auditClaims: ["quest_offer_accept_turnin_repeat"]"""
         from copy import deepcopy
 
         scen = deepcopy(DEFAULT_SCENARIO)

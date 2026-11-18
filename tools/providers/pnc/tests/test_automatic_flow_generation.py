@@ -65,6 +65,7 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
             )
 
     def test_parameterized_task_template_generates_wait_at_and_fetch(self) -> None:
+        """auditClaims: ["task_generation_and_result_routing"]"""
         with self.warm_worker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
             wait_at = worker.input("Wait at the campfire")
@@ -114,6 +115,7 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
             self.assertEqual(result["messages"][0]["payload"]["text"], text)
 
     def test_all_dispatchable_registered_capabilities_use_existing_handlers(self) -> None:
+        """auditClaims: ["registered_capability_handlers"]"""
         phrases = {
             "CAMP": "Camp here",
             "GO": "Go home",
@@ -158,6 +160,7 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
             self.assertTrue(result["messages"], action)
 
     def test_parameterized_task_result_branches_and_gate_are_truthful(self) -> None:
+        """auditClaims: ["task_generation_and_result_routing"]"""
         rejected_scenario = merge(
             DEFAULT_SCENARIO,
             {"runtime": {"taskResponses": {
@@ -207,6 +210,7 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
         )
 
     def test_parameterized_task_conversation_lifecycle_and_duplicate_suppression(self) -> None:
+        """auditClaims: ["task_generation_and_result_routing"]"""
         from copy import deepcopy
 
         scen = deepcopy(DEFAULT_SCENARIO)

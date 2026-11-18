@@ -207,6 +207,7 @@ PNC.Communities = {
     end,
 }
 
+-- @auditClaims settlement: ["settlement_ambient_admission_boundary"]
 T.load(SERVER .. "Director/PNC_MobileSettlementVisitService.lua")
 local Service = PNC.MobileSettlementVisitService
 local target = {
