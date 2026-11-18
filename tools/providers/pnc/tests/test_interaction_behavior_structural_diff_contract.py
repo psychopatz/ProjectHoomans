@@ -111,19 +111,19 @@ class InteractionBehaviorStructuralDiffContractTests(WarmWorkerTestMixin, unitte
         self.assertIn("output adapters:", summary)
         self.assertIn("Bounded evaluation", summary)
 
-    def test_developer_surface_links_structure_to_dialogue_content(self) -> None:
+    def test_developer_surface_links_structure_to_conversations_home(self) -> None:
         builder = (
             CORE_REPOSITORY
             / "tools/semantic_harness/ui/studio_surface_builder.py"
         ).read_text(encoding="utf-8")
-        content_pane = (
+        authoring_pane = (
             CORE_REPOSITORY
-            / "tools/semantic_harness/studio/dialogue_content_pane.py"
+            / "tools/semantic_harness/studio/convo_engine_authoring_pane.py"
         ).read_text(encoding="utf-8")
         self.assertIn('text="Interaction Modules"', builder)
         self.assertNotIn('text="Beat Studio"', builder)
         self.assertIn("on_open_content=", builder)
-        self.assertIn("def select_content(", content_pane)
+        self.assertIn("def open_family_from_completeness(", authoring_pane)
 
 
 if __name__ == "__main__":

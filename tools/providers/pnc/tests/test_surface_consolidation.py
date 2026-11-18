@@ -41,33 +41,22 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
             lambda: getattr(app, "_studio_editors_ready", False),
             "timed out waiting for deferred Studio editors",
         )
-        self.assertTrue(app.toggle_legacy_surfaces(True))
-        self.assertEqual(_labels(app.studio_notebook), [
-            "Conversations",
-            "Source / Impact",
-            "Review",
-            "Explore (Legacy)",
-            "Dialogue Content (Legacy)",
-        ])
-        self.assertEqual(_labels(app.studio_explore_notebook), [
-            "Responses", "Interactions",
-        ])
+        self.assertFalse(hasattr(app, "toggle_legacy_surfaces"))
+        self.assertFalse(hasattr(app, "dialogue_content"))
         self.assertEqual(_labels(app.advanced_notebook), [
             "Interaction Modules",
             "Flow editor",
-            "Canonical source editor",
+            "Interaction Explorer",
+            "Canonical Data Sources",
             "Block contracts",
-            "Interaction composer",
-            "Workflow composer",
+            "Responses",
         ])
         self.assertTrue(hasattr(app, "developer_tools_button"))
-        self.assertTrue(hasattr(app, "dialogue_content"))
         self.assertEqual(_labels(app.observatory.tabs), [
             "Registered responses",
         ])
         self.assertNotIn("Test Lab", _labels(app.observatory.tabs))
         self.assertNotIn("Coverage", _labels(app.observatory.tabs))
-        self.assertFalse(app.toggle_legacy_surfaces(False))
         self.assertEqual(_labels(app.studio_notebook), [
             "Conversations", "Source / Impact", "Review",
         ])
@@ -118,7 +107,7 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         root.update_idletasks()
         self.assertFalse(app.developer_tools_host.winfo_ismapped())
 
-    def test_interaction_module_content_link_uses_dialogue_content_home(self) -> None:
+    def test_interaction_module_content_link_uses_conversations_home(self) -> None:
         root = tk.Tk()
         app = self.make_gui_app(root)
         self.wait_for(
@@ -128,22 +117,17 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         )
         root.update()
 
-        app.interaction_modules._on_open_content(
-            "semantic.interaction.memory.acknowledge"
-        )
+        app.interaction_modules._on_open_content("accept")
         root.update_idletasks()
 
         self.assertEqual(
             app.studio_notebook.tab(app.studio_notebook.select(), "text"),
-            "Dialogue Content (Legacy)",
+            "Conversations",
         )
         self.assertEqual(app.authoring_service.list_dialogue_content(), [])
-        self.assertIn(
-            "semantic.interaction.memory.acknowledge",
-            app.dialogue_content._status_var.get(),
-        )
+        self.assertEqual(app.convo_engine_authoring._current_family_id, "accept")
 
-    def test_dialogue_content_review_uses_shared_review_home(self) -> None:
+    def test_review_tab_uses_shared_review_home(self) -> None:
         root = tk.Tk()
         app = self.make_gui_app(root)
         self.wait_for(
@@ -151,47 +135,16 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
             lambda: getattr(app, "_studio_editors_ready", False),
             "timed out waiting for deferred Studio editors",
         )
-        app.toggle_legacy_surfaces(True)
         root.update()
-        greeting = next(
-            row
-            for row in app.authoring_service.list_convo_engine_families()
-            if (row.get("canonicalID") or row["id"]) == "flow.greeting.opening.default"
-        )
-        document = json.loads(
-            Path(greeting["sourcePath"]).read_text(encoding="utf-8")
-        )
-        preview = app.authoring_service.preview_convo_engine_document(
-            document, source_path=greeting["sourcePath"]
-        )
-        say_variants = preview["compiled"]["records"][0]["payload"]["say"]["realizations"]["1"]["variants"]
-        line = next(v for v in say_variants if v["id"] == "neutral")["text"]["EN"][0]
-        report = {
-            "contentID": greeting["canonicalID"],
-            "kind": "phraseFamily",
-            "sourceFingerprint": greeting["sourceFingerprint"],
-            "contentFingerprint": greeting["sourceFingerprint"],
-            "contentBefore": {
-                "kind": "phraseFamily",
-                "semanticTemplateID": greeting["canonicalID"],
-                "styles": {"neutral": [{"translations": {"EN": line}}]},
-            },
-            "contentAfter": {
-                "kind": "phraseFamily",
-                "semanticTemplateID": greeting["canonicalID"],
-                "styles": {"neutral": [{"translations": {"EN": line}}]},
-            },
-        }
-        app.dialogue_content.on_send_review(report)
+        app.studio_notebook.select(app.review_tab)
         root.update_idletasks()
         self.assertEqual(
             app.studio_notebook.tab(app.studio_notebook.select(), "text"),
             "Review",
         )
         review = app.observatory.views["Review"].get("1.0", "end")
-        self.assertIn("Dialogue Content review", review)
-        self.assertIn("Structural metadata: PRESERVED / LOCKED", review)
-        self.assertIn("Hey there. Good to see you.", review)
+        self.assertIn("Select a proposal", review)
+        self.assertIn("No review action writes production files by itself.", review)
 
     def test_regression_and_selection_explanation_stay_in_simulation(self) -> None:
         root = tk.Tk()
