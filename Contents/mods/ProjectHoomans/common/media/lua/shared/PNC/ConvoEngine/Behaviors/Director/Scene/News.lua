@@ -13,6 +13,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/news",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_grounded_news_share",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -29,6 +35,12 @@ return {
         },
         ["stimuli"] = {
             "AMBIENT_SOCIAL_OPPORTUNITY",
+        },
+        ["topics"] = {
+            {
+                ["domain"] = "scene",
+                ["id"] = "news",
+            },
         },
         ["version"] = 1,
         ["when"] = {
@@ -50,6 +62,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/news",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_news_followup",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -76,6 +94,12 @@ return {
         ["stimuli"] = {
             "NPC_SEMANTIC_ACT",
         },
+        ["topics"] = {
+            {
+                ["domain"] = "scene",
+                ["id"] = "news",
+            },
+        },
         ["version"] = 1,
         ["when"] = {
             ["op"] = "eq",
@@ -94,6 +118,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/news",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_news_followup_answer",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -110,6 +140,12 @@ return {
         },
         ["stimuli"] = {
             "NPC_SEMANTIC_ACT",
+        },
+        ["topics"] = {
+            {
+                ["domain"] = "scene",
+                ["id"] = "news",
+            },
         },
         ["version"] = 1,
         ["when"] = {

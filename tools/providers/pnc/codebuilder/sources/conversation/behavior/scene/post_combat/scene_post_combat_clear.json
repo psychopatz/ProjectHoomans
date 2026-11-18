@@ -20,5 +20,18 @@
   "stimuli": [
     "DANGER_CHANGED"
   ],
-  "when": "stimulus.semantic.intent == \"POST_COMBAT_CLEAR\""
+  "when": "stimulus.semantic.intent == \"POST_COMBAT_CLEAR\"",
+  "events": [
+    {
+      "id": "combat_event",
+      "kind": "combat_event"
+    }
+  ],
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

@@ -21,5 +21,18 @@
   "stimuli": [
     "NPC_SEMANTIC_ACT"
   ],
-  "when": "stimulus.semantic.intent == \"ACKNOWLEDGE_EXCURSION\""
+  "when": "stimulus.semantic.intent == \"ACKNOWLEDGE_EXCURSION\"",
+  "activities": [
+    {
+      "id": "excursion",
+      "kind": "excursion"
+    }
+  ],
+  "domains": [
+    {
+      "domain": "scene",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

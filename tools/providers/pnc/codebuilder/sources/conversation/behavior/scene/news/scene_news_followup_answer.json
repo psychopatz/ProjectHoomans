@@ -20,5 +20,18 @@
   "stimuli": [
     "NPC_SEMANTIC_ACT"
   ],
-  "when": "stimulus.semantic.intent == \"ASK_NEWS_FOLLOWUP\""
+  "when": "stimulus.semantic.intent == \"ASK_NEWS_FOLLOWUP\"",
+  "topics": [
+    {
+      "id": "news",
+      "domain": "scene"
+    }
+  ],
+  "domains": [
+    {
+      "domain": "scene",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

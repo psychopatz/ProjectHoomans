@@ -26,5 +26,24 @@
   "stimuli": [
     "DANGER_CHANGED"
   ],
-  "when": "stimulus.semantic.intent == \"COMBAT_HORDE_ALERT\""
+  "when": "stimulus.semantic.intent == \"COMBAT_HORDE_ALERT\"",
+  "events": [
+    {
+      "id": "horde_detected",
+      "kind": "world_event"
+    }
+  ],
+  "topics": [
+    {
+      "id": "horde_threat",
+      "domain": "combat"
+    }
+  ],
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

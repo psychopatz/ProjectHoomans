@@ -23,5 +23,18 @@
   "stimuli": [
     "TASK_EVENT"
   ],
-  "when": "stimulus.semantic.intent == \"EXCURSION_RETURNING\""
+  "when": "stimulus.semantic.intent == \"EXCURSION_RETURNING\"",
+  "activities": [
+    {
+      "id": "excursion",
+      "kind": "excursion"
+    }
+  ],
+  "domains": [
+    {
+      "domain": "scene",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

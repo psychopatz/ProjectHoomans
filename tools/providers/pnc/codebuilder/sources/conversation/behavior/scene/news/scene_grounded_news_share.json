@@ -23,5 +23,18 @@
   "stimuli": [
     "AMBIENT_SOCIAL_OPPORTUNITY"
   ],
-  "when": "stimulus.semantic.intent == \"SHARE_GROUNDED_NEWS\""
+  "when": "stimulus.semantic.intent == \"SHARE_GROUNDED_NEWS\"",
+  "topics": [
+    {
+      "id": "news",
+      "domain": "scene"
+    }
+  ],
+  "domains": [
+    {
+      "domain": "scene",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

@@ -11,6 +11,18 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/post_combat",
+        ["domains"] = {
+            {
+                ["domain"] = "combat",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
+        ["events"] = {
+            {
+                ["id"] = "combat_event",
+                ["kind"] = "combat_event",
+            },
+        },
         ["id"] = "behavior.scene_post_combat_clear",
         ["mode"] = "one_shot",
         ["modifiers"] = {

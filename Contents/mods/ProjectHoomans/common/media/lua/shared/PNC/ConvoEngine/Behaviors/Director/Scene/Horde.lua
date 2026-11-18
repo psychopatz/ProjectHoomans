@@ -13,6 +13,18 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/horde",
+        ["domains"] = {
+            {
+                ["domain"] = "combat",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
+        ["events"] = {
+            {
+                ["id"] = "horde_detected",
+                ["kind"] = "world_event",
+            },
+        },
         ["id"] = "behavior.scene_horde_prompt",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -33,6 +45,12 @@ return {
         ["stimuli"] = {
             "DANGER_CHANGED",
         },
+        ["topics"] = {
+            {
+                ["domain"] = "combat",
+                ["id"] = "horde_threat",
+            },
+        },
         ["version"] = 1,
         ["when"] = {
             ["op"] = "eq",
@@ -51,6 +69,18 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/horde",
+        ["domains"] = {
+            {
+                ["domain"] = "combat",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
+        ["events"] = {
+            {
+                ["id"] = "horde_detected",
+                ["kind"] = "world_event",
+            },
+        },
         ["id"] = "behavior.scene_horde_reply_brave",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -67,6 +97,12 @@ return {
         },
         ["stimuli"] = {
             "NPC_SEMANTIC_ACT",
+        },
+        ["topics"] = {
+            {
+                ["domain"] = "combat",
+                ["id"] = "horde_threat",
+            },
         },
         ["version"] = 1,
         ["when"] = {
@@ -95,6 +131,18 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/horde",
+        ["domains"] = {
+            {
+                ["domain"] = "combat",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
+        ["events"] = {
+            {
+                ["id"] = "horde_detected",
+                ["kind"] = "world_event",
+            },
+        },
         ["id"] = "behavior.scene_horde_reply_cautious",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -111,6 +159,12 @@ return {
         },
         ["stimuli"] = {
             "NPC_SEMANTIC_ACT",
+        },
+        ["topics"] = {
+            {
+                ["domain"] = "combat",
+                ["id"] = "horde_threat",
+            },
         },
         ["version"] = 1,
         ["when"] = {
@@ -139,6 +193,18 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/horde",
+        ["domains"] = {
+            {
+                ["domain"] = "combat",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
+        ["events"] = {
+            {
+                ["id"] = "horde_detected",
+                ["kind"] = "world_event",
+            },
+        },
         ["id"] = "behavior.scene_horde_reply_steady",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -155,6 +221,12 @@ return {
         },
         ["stimuli"] = {
             "NPC_SEMANTIC_ACT",
+        },
+        ["topics"] = {
+            {
+                ["domain"] = "combat",
+                ["id"] = "horde_threat",
+            },
         },
         ["version"] = 1,
         ["when"] = {

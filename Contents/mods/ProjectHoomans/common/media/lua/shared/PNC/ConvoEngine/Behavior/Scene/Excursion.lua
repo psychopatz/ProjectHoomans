@@ -26,12 +26,24 @@ return {
         },
         ["payload"] = {
             ["act"] = "ACKNOWLEDGE",
+            ["activities"] = {
+                {
+                    ["id"] = "excursion",
+                    ["kind"] = "excursion",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
                 ["inheritFactRefs"] = true,
                 ["mode"] = "terminate",
                 ["target"] = "none",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {
@@ -94,6 +106,12 @@ return {
         },
         ["payload"] = {
             ["act"] = "EXCURSION_STATUS_REPORT",
+            ["activities"] = {
+                {
+                    ["id"] = "excursion",
+                    ["kind"] = "excursion",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
@@ -102,6 +120,12 @@ return {
                 ["mode"] = "emit",
                 ["speechAct"] = "ACKNOWLEDGE",
                 ["target"] = "other",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {
@@ -162,6 +186,12 @@ return {
         },
         ["payload"] = {
             ["act"] = "EXCURSION_STATUS_REPORT",
+            ["activities"] = {
+                {
+                    ["id"] = "excursion",
+                    ["kind"] = "excursion",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
@@ -170,6 +200,12 @@ return {
                 ["mode"] = "emit",
                 ["speechAct"] = "ACKNOWLEDGE",
                 ["target"] = "other",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {
@@ -230,6 +266,12 @@ return {
         },
         ["payload"] = {
             ["act"] = "EXCURSION_STATUS_REPORT",
+            ["activities"] = {
+                {
+                    ["id"] = "excursion",
+                    ["kind"] = "excursion",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
@@ -238,6 +280,12 @@ return {
                 ["mode"] = "emit",
                 ["speechAct"] = "ACKNOWLEDGE",
                 ["target"] = "other",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {
@@ -298,6 +346,12 @@ return {
         },
         ["payload"] = {
             ["act"] = "EXCURSION_STATUS_REPORT",
+            ["activities"] = {
+                {
+                    ["id"] = "excursion",
+                    ["kind"] = "excursion",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
@@ -306,6 +360,12 @@ return {
                 ["mode"] = "emit",
                 ["speechAct"] = "ACKNOWLEDGE",
                 ["target"] = "other",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {
@@ -366,6 +426,12 @@ return {
         },
         ["payload"] = {
             ["act"] = "EXCURSION_STATUS_REPORT",
+            ["activities"] = {
+                {
+                    ["id"] = "excursion",
+                    ["kind"] = "excursion",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
@@ -374,6 +440,12 @@ return {
                 ["mode"] = "emit",
                 ["speechAct"] = "ACKNOWLEDGE",
                 ["target"] = "other",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {

@@ -2,6 +2,12 @@
 return {
     {
         ["act"] = "ACKNOWLEDGE",
+        ["activities"] = {
+            {
+                ["id"] = "excursion",
+                ["kind"] = "excursion",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -11,6 +17,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/excursion",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_excursion_acknowledge",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -39,6 +51,12 @@ return {
     },
     {
         ["act"] = "EXCURSION_STATUS_REPORT",
+        ["activities"] = {
+            {
+                ["id"] = "excursion",
+                ["kind"] = "excursion",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -50,6 +68,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/excursion",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_excursion_departing",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -76,6 +100,12 @@ return {
     },
     {
         ["act"] = "EXCURSION_STATUS_REPORT",
+        ["activities"] = {
+            {
+                ["id"] = "excursion",
+                ["kind"] = "excursion",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -87,6 +117,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/excursion",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_excursion_failed",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -113,6 +149,12 @@ return {
     },
     {
         ["act"] = "EXCURSION_STATUS_REPORT",
+        ["activities"] = {
+            {
+                ["id"] = "excursion",
+                ["kind"] = "excursion",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -124,6 +166,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/excursion",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_excursion_home",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -150,6 +198,12 @@ return {
     },
     {
         ["act"] = "EXCURSION_STATUS_REPORT",
+        ["activities"] = {
+            {
+                ["id"] = "excursion",
+                ["kind"] = "excursion",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -161,6 +215,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/excursion",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_excursion_preparing",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -187,6 +247,12 @@ return {
     },
     {
         ["act"] = "EXCURSION_STATUS_REPORT",
+        ["activities"] = {
+            {
+                ["id"] = "excursion",
+                ["kind"] = "excursion",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -198,6 +264,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/excursion",
+        ["domains"] = {
+            {
+                ["domain"] = "scene",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_excursion_returning",
         ["mode"] = "one_shot",
         ["modifiers"] = {

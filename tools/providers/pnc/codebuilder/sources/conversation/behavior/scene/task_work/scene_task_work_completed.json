@@ -20,5 +20,18 @@
   "stimuli": [
     "TASK_EVENT"
   ],
-  "when": "stimulus.semantic.intent == \"TASK_WORK_COMPLETED\""
+  "when": "stimulus.semantic.intent == \"TASK_WORK_COMPLETED\"",
+  "activities": [
+    {
+      "id": "task_work",
+      "kind": "task"
+    }
+  ],
+  "domains": [
+    {
+      "domain": "task",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "owner": "ProjectHoomans"
 }

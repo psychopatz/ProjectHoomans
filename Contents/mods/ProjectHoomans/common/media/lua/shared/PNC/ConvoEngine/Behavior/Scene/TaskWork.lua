@@ -26,12 +26,24 @@ return {
         },
         ["payload"] = {
             ["act"] = "TASK_WORK_STATUS",
+            ["activities"] = {
+                {
+                    ["id"] = "task_work",
+                    ["kind"] = "task",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
                 ["inheritFactRefs"] = true,
                 ["mode"] = "terminate",
                 ["target"] = "none",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "task",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {
@@ -92,12 +104,24 @@ return {
         },
         ["payload"] = {
             ["act"] = "TASK_WORK_STATUS",
+            ["activities"] = {
+                {
+                    ["id"] = "task_work",
+                    ["kind"] = "task",
+                },
+            },
             ["baseRelevance"] = 1,
             ["continuation"] = {
                 ["inheritEventRefs"] = true,
                 ["inheritFactRefs"] = true,
                 ["mode"] = "terminate",
                 ["target"] = "none",
+            },
+            ["domains"] = {
+                {
+                    ["domain"] = "task",
+                    ["owner"] = "ProjectHoomans",
+                },
             },
             ["mode"] = "one_shot",
             ["modifiers"] = {

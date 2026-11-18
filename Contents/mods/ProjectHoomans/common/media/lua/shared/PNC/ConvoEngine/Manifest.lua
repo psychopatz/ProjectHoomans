@@ -315,7 +315,7 @@ return {
             ["sourceShard"] = "semantic/pnc.lab.stay_with_you.flow.json",
         },
         {
-            ["bytes"] = 6683,
+            ["bytes"] = 8441,
             ["domain"] = "scene",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/ConvoEngine/Behaviors/Director/Scene/Excursion",
@@ -334,7 +334,7 @@ return {
             ["sourceShard"] = "behavior/scene/excursion/scene_excursion_acknowledge.json",
         },
         {
-            ["bytes"] = 4857,
+            ["bytes"] = 6617,
             ["domain"] = "scene",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/ConvoEngine/Behaviors/Director/Scene/Horde",
@@ -351,7 +351,7 @@ return {
             ["sourceShard"] = "behavior/scene/horde/scene_horde_prompt.json",
         },
         {
-            ["bytes"] = 3592,
+            ["bytes"] = 4438,
             ["domain"] = "scene",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/ConvoEngine/Behaviors/Director/Scene/News",
@@ -367,7 +367,7 @@ return {
             ["sourceShard"] = "behavior/scene/news/scene_grounded_news_share.json",
         },
         {
-            ["bytes"] = 1072,
+            ["bytes"] = 1368,
             ["domain"] = "scene",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/ConvoEngine/Behaviors/Director/Scene/PostCombat",
@@ -381,7 +381,7 @@ return {
             ["sourceShard"] = "behavior/scene/post_combat/scene_post_combat_clear.json",
         },
         {
-            ["bytes"] = 2087,
+            ["bytes"] = 2661,
             ["domain"] = "scene",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/ConvoEngine/Behaviors/Director/Scene/TaskWork",
@@ -396,7 +396,7 @@ return {
             ["sourceShard"] = "behavior/scene/task_work/scene_task_work_assigned.json",
         },
         {
-            ["bytes"] = 5346,
+            ["bytes"] = 6224,
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PsychopatzCore/ConvoEngine/Behaviors/Director/Social/Acknowledgement",
@@ -416,7 +416,7 @@ return {
             ["sourceShard"] = "behavior/social/acknowledgement/acknowledge_memory.json",
         },
         {
-            ["bytes"] = 4294,
+            ["bytes"] = 5158,
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PsychopatzCore/ConvoEngine/Behaviors/Director/Social/Conflict",
@@ -435,7 +435,7 @@ return {
             ["sourceShard"] = "behavior/social/conflict/challenge.json",
         },
         {
-            ["bytes"] = 2636,
+            ["bytes"] = 3086,
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PsychopatzCore/ConvoEngine/Behaviors/Director/Social/Context",
@@ -453,7 +453,7 @@ return {
             ["sourceShard"] = "behavior/social/context/ask_memory_followup.json",
         },
         {
-            ["bytes"] = 6530,
+            ["bytes"] = 7527,
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PsychopatzCore/ConvoEngine/Behaviors/Director/Social/Repair",
@@ -473,7 +473,7 @@ return {
             ["sourceShard"] = "behavior/social/repair/acknowledge_repair.json",
         },
         {
-            ["bytes"] = 1095,
+            ["bytes"] = 1394,
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PsychopatzCore/ConvoEngine/Behaviors/Director/Social/WorldEvents",
@@ -490,7 +490,7 @@ return {
             ["sourceShard"] = "behavior/social/world_events/world_event_warn.json",
         },
         {
-            ["bytes"] = 2051,
+            ["bytes"] = 2339,
             ["domain"] = "social",
             ["kind"] = "Beats",
             ["module"] = "PsychopatzCore/ConvoEngine/Beats/Director/Social/Conflict",
@@ -507,7 +507,7 @@ return {
             ["sourceShard"] = "beat/social/conflict/argument_escalation.json",
         },
         {
-            ["bytes"] = 2011,
+            ["bytes"] = 2304,
             ["domain"] = "social",
             ["kind"] = "Beats",
             ["module"] = "PsychopatzCore/ConvoEngine/Beats/Director/Social/FirstContact",
@@ -524,7 +524,7 @@ return {
             ["sourceShard"] = "beat/social/first_contact/suspicious_first_contact.json",
         },
         {
-            ["bytes"] = 2053,
+            ["bytes"] = 2339,
             ["domain"] = "social",
             ["kind"] = "Beats",
             ["module"] = "PsychopatzCore/ConvoEngine/Beats/Director/Social/Repair",
@@ -701,7 +701,7 @@ return {
             ["sourceShard"] = "dialogue/social_reactions_hostile_offer_threat/social_profanity.json",
         },
         {
-            ["bytes"] = 13787,
+            ["bytes"] = 15833,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/Excursion",
@@ -720,7 +720,7 @@ return {
             ["sourceShard"] = "behavior/scene/excursion/scene_excursion_acknowledge.json",
         },
         {
-            ["bytes"] = 9513,
+            ["bytes"] = 11561,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/Horde",
@@ -737,7 +737,7 @@ return {
             ["sourceShard"] = "behavior/scene/horde/scene_horde_prompt.json",
         },
         {
-            ["bytes"] = 7119,
+            ["bytes"] = 8109,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/News",
@@ -753,7 +753,7 @@ return {
             ["sourceShard"] = "behavior/scene/news/scene_grounded_news_share.json",
         },
         {
-            ["bytes"] = 2249,
+            ["bytes"] = 2593,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/PostCombat",
@@ -767,7 +767,7 @@ return {
             ["sourceShard"] = "behavior/scene/post_combat/scene_post_combat_clear.json",
         },
         {
-            ["bytes"] = 4441,
+            ["bytes"] = 5111,
             ["domain"] = "scene",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Behavior/Scene/TaskWork",
@@ -2329,7 +2329,7 @@ return {
             ["sourceShard"] = "dialogue/wellbeing_content/question_wellbeing_stress.json",
         },
         {
-            ["bytes"] = 3374,
+            ["bytes"] = 3710,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Beat/Social/Conflict",
@@ -2346,7 +2346,7 @@ return {
             ["sourceShard"] = "beat/social/conflict/argument_escalation.json",
         },
         {
-            ["bytes"] = 3364,
+            ["bytes"] = 3705,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Beat/Social/FirstContact",
@@ -2363,7 +2363,7 @@ return {
             ["sourceShard"] = "beat/social/first_contact/suspicious_first_contact.json",
         },
         {
-            ["bytes"] = 3346,
+            ["bytes"] = 3680,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Beat/Social/Repair",
@@ -2380,7 +2380,7 @@ return {
             ["sourceShard"] = "beat/social/repair/reconciliation.json",
         },
         {
-            ["bytes"] = 10122,
+            ["bytes"] = 11120,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Acknowledgement",
@@ -2400,7 +2400,7 @@ return {
             ["sourceShard"] = "behavior/social/acknowledgement/acknowledge_memory.json",
         },
         {
-            ["bytes"] = 7811,
+            ["bytes"] = 8819,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Conflict",
@@ -2419,7 +2419,7 @@ return {
             ["sourceShard"] = "behavior/social/conflict/challenge.json",
         },
         {
-            ["bytes"] = 4976,
+            ["bytes"] = 5486,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Context",
@@ -2437,7 +2437,7 @@ return {
             ["sourceShard"] = "behavior/social/context/ask_memory_followup.json",
         },
         {
-            ["bytes"] = 11210,
+            ["bytes"] = 12363,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/Repair",
@@ -2457,7 +2457,7 @@ return {
             ["sourceShard"] = "behavior/social/repair/acknowledge_repair.json",
         },
         {
-            ["bytes"] = 2265,
+            ["bytes"] = 2612,
             ["domain"] = "social",
             ["kind"] = "ConvoEngine",
             ["module"] = "PsychopatzCore/ConvoEngine/Behavior/Social/WorldEvents",
@@ -5090,5 +5090,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "bdc88e192a1a8e1b13c232540cd1c27ab157fd1f43bf04ff8cf693775f498025",
+    ["wholeModelFingerprint"] = "5170f7c72eb96ec99942c175f3f4cd1776c816fcd492ee86940d7bc46d90e4be",
 }

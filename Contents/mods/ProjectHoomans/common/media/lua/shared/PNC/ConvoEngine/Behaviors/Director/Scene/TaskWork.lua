@@ -2,6 +2,12 @@
 return {
     {
         ["act"] = "TASK_WORK_STATUS",
+        ["activities"] = {
+            {
+                ["id"] = "task_work",
+                ["kind"] = "task",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -11,6 +17,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/task_work",
+        ["domains"] = {
+            {
+                ["domain"] = "task",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_task_work_assigned",
         ["mode"] = "one_shot",
         ["modifiers"] = {
@@ -37,6 +49,12 @@ return {
     },
     {
         ["act"] = "TASK_WORK_STATUS",
+        ["activities"] = {
+            {
+                ["id"] = "task_work",
+                ["kind"] = "task",
+            },
+        },
         ["baseRelevance"] = 1,
         ["continuation"] = {
             ["inheritEventRefs"] = true,
@@ -46,6 +64,12 @@ return {
         },
         ["domain"] = "scene",
         ["domainPath"] = "scene/task_work",
+        ["domains"] = {
+            {
+                ["domain"] = "task",
+                ["owner"] = "ProjectHoomans",
+            },
+        },
         ["id"] = "behavior.scene_task_work_completed",
         ["mode"] = "one_shot",
         ["modifiers"] = {

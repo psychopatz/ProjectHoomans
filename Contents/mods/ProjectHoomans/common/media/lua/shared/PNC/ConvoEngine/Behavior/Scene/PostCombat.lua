@@ -33,6 +33,18 @@ return {
                 ["mode"] = "terminate",
                 ["target"] = "none",
             },
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_event",
+                    ["kind"] = "combat_event",
+                },
+            },
             ["mode"] = "one_shot",
             ["modifiers"] = {
             },

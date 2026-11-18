@@ -35,6 +35,12 @@ return {
                 ["speechAct"] = "INFORM",
                 ["target"] = "other",
             },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["mode"] = "one_shot",
             ["modifiers"] = {
             },
@@ -49,6 +55,12 @@ return {
             },
             ["stimuli"] = {
                 "AMBIENT_SOCIAL_OPPORTUNITY",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "scene",
+                    ["id"] = "news",
+                },
             },
             ["version"] = 1,
         },
@@ -103,6 +115,12 @@ return {
                 ["speechAct"] = "ASK_FOLLOWUP",
                 ["target"] = "source",
             },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["mode"] = "one_shot",
             ["modifiers"] = {
                 {
@@ -126,6 +144,12 @@ return {
             },
             ["stimuli"] = {
                 "NPC_SEMANTIC_ACT",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "scene",
+                    ["id"] = "news",
+                },
             },
             ["version"] = 1,
         },
@@ -178,6 +202,12 @@ return {
                 ["mode"] = "terminate",
                 ["target"] = "none",
             },
+            ["domains"] = {
+                {
+                    ["domain"] = "scene",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
             ["mode"] = "one_shot",
             ["modifiers"] = {
             },
@@ -192,6 +222,12 @@ return {
             },
             ["stimuli"] = {
                 "NPC_SEMANTIC_ACT",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "scene",
+                    ["id"] = "news",
+                },
             },
             ["version"] = 1,
         },
