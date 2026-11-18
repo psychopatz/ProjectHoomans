@@ -4,6 +4,397 @@ return {
         ["domain"] = "conversation_needs",
         ["domainPath"] = "conversation_needs",
         ["exchangeFamily"] = {
+            ["familyID"] = "flow.needs.exchange",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Do you need anything?",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.flow.needs.exchange.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Do you need anything?",
+                                    },
+                                    ["TL"] = {
+                                        "May kailangan ka ba?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "flow.needs",
+            ["replies"] = {
+                ["completed"] = {
+                    ["outcome"] = "completed",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Thanks, that helps.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.flow.needs.exchange.reply.completed.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "Thanks, that helps.",
+                                            },
+                                            ["TL"] = {
+                                                "Salamat, malaking tulong iyan.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Do you need anything?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.flow.needs.exchange.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Do you need anything?",
+                        },
+                        ["TL"] = {
+                            "May kailangan ka ba?",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "Thanks, that helps.",
+                    ["outcome"] = "completed",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.flow.needs.exchange.reply.completed.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thanks, that helps.",
+                        },
+                        ["TL"] = {
+                            "Salamat, malaking tulong iyan.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "flow.needs.exchange",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "exchange",
+            ["sourceId"] = "flow.needs.exchange",
+            ["sourcePath"] = "dialogue/conversation_needs/flow_needs_exchange.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "flow.needs",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "resolved_episode",
+                ["episodeId"] = "needs_exchange",
+            },
+            ["inputPolicy"] = "typed_parity",
+            ["metadata"] = {
+                ["flow"] = {
+                    ["id"] = "needs",
+                    ["initial"] = "await_player_quantity",
+                    ["nodes"] = {
+                        ["await_player_quantity"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "QUESTION",
+                                    ["subject"] = "QUANTITY",
+                                },
+                                {
+                                    ["intent"] = "CLARIFY",
+                                    ["speechAct"] = "CLARIFY",
+                                    ["subject"] = "NEEDS",
+                                },
+                            },
+                            ["onClarify"] = "clarification",
+                            ["onMatch"] = "quantity_answer",
+                            ["onRefuse"] = "cancel",
+                            ["onUnrelated"] = "suspend",
+                            ["requiredSlots"] = {
+                                "quantity",
+                            },
+                            ["responsePool"] = "semantic.question.needs.offer",
+                            ["sourceFactRefs"] = {
+                                "npc.needs",
+                            },
+                        },
+                        ["clarification"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "QUESTION",
+                                    ["subject"] = "QUANTITY",
+                                },
+                                {
+                                    ["intent"] = "CLARIFY",
+                                    ["speechAct"] = "CLARIFY",
+                                    ["subject"] = "NEEDS",
+                                },
+                            },
+                            ["onClarify"] = "clarification",
+                            ["onMatch"] = "quantity_answer",
+                            ["onRefuse"] = "cancel",
+                            ["onUnrelated"] = "suspend",
+                            ["requiredSlots"] = {
+                                "quantity",
+                            },
+                            ["responsePool"] = "semantic.question.needs.quantity",
+                            ["sourceFactRefs"] = {
+                                "npc.needs",
+                            },
+                        },
+                        ["complete"] = {
+                            ["responsePool"] = "semantic.question.needs.proposal",
+                            ["terminal"] = true,
+                        },
+                        ["proposal_pending"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "ACCEPT",
+                                },
+                                {
+                                    ["intent"] = "AGREE",
+                                },
+                            },
+                            ["onMatch"] = "complete",
+                            ["onRefuse"] = "cancel",
+                            ["onUnrelated"] = "suspend",
+                            ["pendingKind"] = "PROPOSAL",
+                            ["requiredSlots"] = {
+                                "confirmation",
+                            },
+                            ["responsePool"] = "semantic.question.needs.proposal",
+                            ["sourceFactRefs"] = {
+                                "npc.needs",
+                            },
+                        },
+                        ["quantity_answer"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "PROMISE",
+                                    ["speechAct"] = "PROMISE",
+                                    ["subject"] = "NEEDS",
+                                },
+                            },
+                            ["onMatch"] = "proposal_pending",
+                            ["onRefuse"] = "cancel",
+                            ["onUnrelated"] = "suspend",
+                            ["pendingKind"] = "PROPOSAL",
+                            ["requiredSlots"] = {
+                                "offer",
+                            },
+                            ["responsePool"] = "semantic.question.needs.quantity",
+                            ["sourceFactRefs"] = {
+                                "npc.needs",
+                            },
+                        },
+                    },
+                    ["owner"] = "ProjectHoomans",
+                    ["version"] = 1,
+                },
+                ["triggers"] = {
+                    {
+                        ["intent"] = "QUESTION",
+                        ["subject"] = "NEEDS",
+                    },
+                },
+            },
+            ["postconditions"] = {
+                "needs.exchange_closed",
+            },
+            ["repeatPolicy"] = "state_retired",
+            ["reply"] = {
+                ["completed"] = {
+                    ["outcome"] = "completed",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "Thanks, that helps.",
+                                            },
+                                            ["TL"] = {
+                                                "Salamat, malaking tulong iyan.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Do you need anything?",
+                                    },
+                                    ["TL"] = {
+                                        "May kailangan ka ba?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "needs_proposal_accepted",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "proposal_complete",
+                    ["replyOutcome"] = "completed",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "flow.nodeId",
+                        ["value"] = "proposal_pending",
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "needs_inquiry_ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "flow.needs.exchange",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Do you need anything?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.flow.needs.exchange.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/conversation_needs/flow_needs_exchange.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Do you need anything?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.flow.needs.exchange.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Do you need anything?",
+                    },
+                    ["TL"] = {
+                        "May kailangan ka ba?",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "Thanks, that helps.",
+                ["outcome"] = "completed",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.flow.needs.exchange.reply.completed.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thanks, that helps.",
+                    },
+                    ["TL"] = {
+                        "Salamat, malaking tulong iyan.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_needs",
+        ["domainPath"] = "conversation_needs",
+        ["exchangeFamily"] = {
             ["familyID"] = "question.needs.offer.fatigue",
             ["initiatingSay"] = {
                 ["keyOrder"] = {

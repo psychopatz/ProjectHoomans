@@ -37,6 +37,9 @@ return {
         ["source"] = "dialogue/core_semantic_responses/flow_weather_raining.json",
     },
     ["greeting"] = {
+        ["dependents"] = {
+            "flow.greeting.exchange",
+        },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CoreSemanticResponses/AcceptToQuestionNeedsQuantity",
@@ -47,6 +50,8 @@ return {
     },
     ["offer"] = {
         ["dependents"] = {
+            "flow.needs.exchange",
+            "needs",
             "quest.clinic_supplies.offer",
         },
         ["domain"] = "core_semantic_responses",

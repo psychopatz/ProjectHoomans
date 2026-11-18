@@ -214,7 +214,7 @@ return {
         ["domain"] = "companion_commands_player",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCommandsPlayer",
-        ["recordCount"] = 11,
+        ["recordCount"] = 15,
     },
     {
         ["domain"] = "companion_commands_replies",
@@ -244,13 +244,13 @@ return {
         ["domain"] = "conversation_greeting",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/ConversationGreeting",
-        ["recordCount"] = 9,
+        ["recordCount"] = 10,
     },
     {
         ["domain"] = "conversation_needs",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/ConversationNeeds",
-        ["recordCount"] = 10,
+        ["recordCount"] = 11,
     },
     {
         ["domain"] = "conversation_whats_up",

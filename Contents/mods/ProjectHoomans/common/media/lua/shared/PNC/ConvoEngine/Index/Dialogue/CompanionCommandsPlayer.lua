@@ -1,5 +1,41 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["command.companion.camp"] = {
+        ["domain"] = "companion_commands_player",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        },
+        ["id"] = "command.companion.camp",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/companion_commands_player/command_companion_camp.json",
+    },
+    ["command.companion.follow"] = {
+        ["domain"] = "companion_commands_player",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        },
+        ["id"] = "command.companion.follow",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/companion_commands_player/command_companion_follow.json",
+    },
+    ["command.companion.return_home"] = {
+        ["domain"] = "companion_commands_player",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        },
+        ["id"] = "command.companion.return_home",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/companion_commands_player/command_companion_return_home.json",
+    },
+    ["command.companion.stay"] = {
+        ["domain"] = "companion_commands_player",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        },
+        ["id"] = "command.companion.stay",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/companion_commands_player/command_companion_stay.json",
+    },
     ["command.player.attack_auto"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {

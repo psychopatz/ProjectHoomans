@@ -4,6 +4,951 @@ return {
         ["domain"] = "companion_commands_player",
         ["domainPath"] = "companion_commands_player",
         ["exchangeFamily"] = {
+            ["familyID"] = "command.companion.camp",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Let's camp here.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.command.companion.camp.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Let's camp here.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkampo tayo rito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["invoke"] = {
+                ["action"] = "CAMP",
+                ["intent"] = "COMMAND",
+            },
+            ["namespace"] = "command.companion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Let's camp here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.companion.camp.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Let's camp here.",
+                        },
+                        ["TL"] = {
+                            "Magkampo tayo rito.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "command.companion.camp",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "camp",
+            ["sourceId"] = "command.companion.camp",
+            ["sourcePath"] = "dialogue/companion_commands_player/command_companion_camp.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        ["namespace"] = "command.companion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "state_transition",
+            },
+            ["inputPolicy"] = "typed_parity",
+            ["invoke"] = {
+                ["action"] = "CAMP",
+                ["intent"] = "COMMAND",
+            },
+            ["postconditions"] = {
+                "companion.camping",
+            },
+            ["repeatPolicy"] = "state_retired",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Let's camp here.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkampo tayo rito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "actor_blocked_or_hostile",
+                    ["outcome"] = "blocked",
+                    ["reason"] = "actor_blocked_or_hostile",
+                    ["when"] = {
+                        ["any"] = {
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.hostile",
+                                ["value"] = true,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.authorityEligible",
+                                ["value"] = false,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.status",
+                                ["value"] = "hostile",
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "already_camping",
+                    ["outcome"] = "already_satisfied",
+                    ["reason"] = "already_camp",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "npcState.orderKind",
+                        ["value"] = "camp",
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.companion.camp",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Let's camp here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.command.companion.camp.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/companion_commands_player/command_companion_camp.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Let's camp here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.companion.camp.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Let's camp here.",
+                    },
+                    ["TL"] = {
+                        "Magkampo tayo rito.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.companion.follow",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Follow me.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.command.companion.follow.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Follow me.",
+                                    },
+                                    ["TL"] = {
+                                        "Sumunod ka sa akin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["invoke"] = {
+                ["action"] = "FOLLOW",
+                ["intent"] = "COMMAND",
+            },
+            ["namespace"] = "command.companion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Follow me.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.companion.follow.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Follow me.",
+                        },
+                        ["TL"] = {
+                            "Sumunod ka sa akin.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "command.companion.follow",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "follow",
+            ["sourceId"] = "command.companion.follow",
+            ["sourcePath"] = "dialogue/companion_commands_player/command_companion_follow.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        ["namespace"] = "command.companion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "state_transition",
+            },
+            ["inputPolicy"] = "typed_parity",
+            ["invoke"] = {
+                ["action"] = "FOLLOW",
+                ["intent"] = "COMMAND",
+            },
+            ["postconditions"] = {
+                "companion.following",
+            },
+            ["repeatPolicy"] = "state_retired",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Follow me.",
+                                    },
+                                    ["TL"] = {
+                                        "Sumunod ka sa akin.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "actor_blocked_or_hostile",
+                    ["outcome"] = "blocked",
+                    ["reason"] = "actor_blocked_or_hostile",
+                    ["when"] = {
+                        ["any"] = {
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.hostile",
+                                ["value"] = true,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.authorityEligible",
+                                ["value"] = false,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.status",
+                                ["value"] = "hostile",
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "already_following",
+                    ["outcome"] = "already_satisfied",
+                    ["reason"] = "already_follow",
+                    ["when"] = {
+                        ["any"] = {
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "npcState.orderKind",
+                                ["value"] = "follow",
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "follow",
+                                    "following",
+                                },
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "followState.mode",
+                                ["value"] = "follow",
+                            },
+                        },
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.companion.follow",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Follow me.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.command.companion.follow.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/companion_commands_player/command_companion_follow.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Follow me.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.companion.follow.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Follow me.",
+                    },
+                    ["TL"] = {
+                        "Sumunod ka sa akin.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.companion.return_home",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Go home.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.command.companion.return_home.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Go home.",
+                                    },
+                                    ["TL"] = {
+                                        "Umuwi ka na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["invoke"] = {
+                ["action"] = "RETURN_HOME",
+                ["intent"] = "COMMAND",
+            },
+            ["namespace"] = "command.companion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Go home.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.companion.return_home.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Go home.",
+                        },
+                        ["TL"] = {
+                            "Umuwi ka na.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "command.companion.return_home",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "return_home",
+            ["sourceId"] = "command.companion.return_home",
+            ["sourcePath"] = "dialogue/companion_commands_player/command_companion_return_home.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        ["namespace"] = "command.companion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "state_transition",
+            },
+            ["inputPolicy"] = "typed_parity",
+            ["invoke"] = {
+                ["action"] = "RETURN_HOME",
+                ["intent"] = "COMMAND",
+            },
+            ["postconditions"] = {
+                "companion.returning_home",
+            },
+            ["repeatPolicy"] = "state_retired",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Go home.",
+                                    },
+                                    ["TL"] = {
+                                        "Umuwi ka na.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "actor_blocked_or_hostile",
+                    ["outcome"] = "blocked",
+                    ["reason"] = "actor_blocked_or_hostile",
+                    ["when"] = {
+                        ["any"] = {
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.hostile",
+                                ["value"] = true,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.authorityEligible",
+                                ["value"] = false,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.status",
+                                ["value"] = "hostile",
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "already_returning",
+                    ["outcome"] = "already_satisfied",
+                    ["reason"] = "already_return_home",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "npcState.orderKind",
+                        ["value"] = "return",
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.companion.return_home",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Go home.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.command.companion.return_home.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/companion_commands_player/command_companion_return_home.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Go home.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.companion.return_home.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Go home.",
+                    },
+                    ["TL"] = {
+                        "Umuwi ka na.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
+        ["exchangeFamily"] = {
+            ["familyID"] = "command.companion.stay",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Stay here.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.command.companion.stay.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Stay here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka lang.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["invoke"] = {
+                ["action"] = "STAY",
+                ["intent"] = "COMMAND",
+            },
+            ["namespace"] = "command.companion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Stay here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.companion.stay.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Stay here.",
+                        },
+                        ["TL"] = {
+                            "Dito ka lang.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "command.companion.stay",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "stay",
+            ["sourceId"] = "command.companion.stay",
+            ["sourcePath"] = "dialogue/companion_commands_player/command_companion_stay.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer",
+        ["namespace"] = "command.companion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "state_transition",
+            },
+            ["inputPolicy"] = "typed_parity",
+            ["invoke"] = {
+                ["action"] = "STAY",
+                ["intent"] = "COMMAND",
+            },
+            ["postconditions"] = {
+                "companion.staying",
+            },
+            ["repeatPolicy"] = "state_retired",
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Stay here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka lang.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "actor_blocked_or_hostile",
+                    ["outcome"] = "blocked",
+                    ["reason"] = "actor_blocked_or_hostile",
+                    ["when"] = {
+                        ["any"] = {
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.hostile",
+                                ["value"] = true,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.authorityEligible",
+                                ["value"] = false,
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.status",
+                                ["value"] = "hostile",
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "dead",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "already_staying",
+                    ["outcome"] = "already_satisfied",
+                    ["reason"] = "already_stay",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "npcState.orderKind",
+                        ["value"] = "stay",
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "ready",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.companion.stay",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Stay here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.command.companion.stay.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/companion_commands_player/command_companion_stay.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Stay here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.companion.stay.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Stay here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka lang.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "companion_commands_player",
+        ["domainPath"] = "companion_commands_player",
+        ["exchangeFamily"] = {
             ["familyID"] = "command.player.attack_auto",
             ["initiatingSay"] = {
                 ["keyOrder"] = {

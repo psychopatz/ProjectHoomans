@@ -65,6 +65,507 @@ return {
         ["domain"] = "conversation_greeting",
         ["domainPath"] = "conversation_greeting",
         ["exchangeFamily"] = {
+            ["familyID"] = "flow.greeting.exchange",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hello.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.flow.greeting.exchange.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Hello.",
+                                    },
+                                    ["TL"] = {
+                                        "Kamusta.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "flow.greeting",
+            ["replies"] = {
+                ["friendly"] = {
+                    ["outcome"] = "friendly",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Good to see you.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.flow.greeting.exchange.reply.friendly.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "Good to see you.",
+                                            },
+                                            ["TL"] = {
+                                                "Mabuti at nandito ka.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["hostile"] = {
+                    ["outcome"] = "hostile",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Stay back.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.flow.greeting.exchange.reply.hostile.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "Stay back.",
+                                            },
+                                            ["TL"] = {
+                                                "Lumayo ka.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Hello.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.flow.greeting.exchange.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Hello.",
+                        },
+                        ["TL"] = {
+                            "Kamusta.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "Good to see you.",
+                    ["outcome"] = "friendly",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.flow.greeting.exchange.reply.friendly.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Good to see you.",
+                        },
+                        ["TL"] = {
+                            "Mabuti at nandito ka.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "Stay back.",
+                    ["outcome"] = "hostile",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.flow.greeting.exchange.reply.hostile.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Stay back.",
+                        },
+                        ["TL"] = {
+                            "Lumayo ka.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "flow.greeting.exchange",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "exchange",
+            ["sourceId"] = "flow.greeting.exchange",
+            ["sourcePath"] = "dialogue/conversation_greeting/flow_greeting_exchange.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "flow.greeting",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["closure"] = {
+                ["closureClass"] = "none",
+            },
+            ["inputPolicy"] = "typed_parity",
+            ["metadata"] = {
+                ["flow"] = {
+                    ["constraints"] = {
+                        ["all"] = {
+                            {
+                                ["op"] = "not_in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "busy",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "not_in",
+                                ["path"] = "situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "busy",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "neq",
+                                ["path"] = "roles.hostile",
+                                ["value"] = true,
+                            },
+                            {
+                                ["op"] = "neq",
+                                ["path"] = "actorConversationContext.roles.hostile",
+                                ["value"] = true,
+                            },
+                            {
+                                ["op"] = "not_in",
+                                ["path"] = "actorConversationContext.situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "busy",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "not_in",
+                                ["path"] = "npcState.healthState",
+                                ["values"] = {
+                                    "dead",
+                                    "incapacitated",
+                                },
+                            },
+                        },
+                    },
+                    ["id"] = "greeting",
+                    ["initial"] = "await_thanks",
+                    ["nodes"] = {
+                        ["await_thanks"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "THANK",
+                                    ["speechAct"] = "THANK",
+                                },
+                                {
+                                    ["intent"] = "INFORM",
+                                    ["selfDirected"] = true,
+                                    ["speechAct"] = "INFORM",
+                                    ["stateType"] = "WELLBEING",
+                                    ["target"] = "SELF",
+                                },
+                            },
+                            ["branchOffers"] = {
+                                {
+                                    ["frame"] = {
+                                        ["intent"] = "THANK",
+                                        ["speechAct"] = "THANK",
+                                    },
+                                    ["id"] = "greeting.thanks",
+                                    ["labelFallback"] = "Thank them",
+                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_GreetingThank_Label",
+                                    ["utteranceFallback"] = "Thanks.",
+                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_GreetingThank_Utterance",
+                                },
+                            },
+                            ["onMatch"] = "complete",
+                            ["onRefuse"] = "cancel",
+                            ["onUnrelated"] = "suspend",
+                            ["responsePool"] = "semantic.flow.greeting.opening",
+                        },
+                        ["complete"] = {
+                            ["responsePool"] = "semantic.flow.greeting.followup",
+                            ["terminal"] = true,
+                        },
+                    },
+                    ["owner"] = "ProjectHoomans",
+                    ["version"] = 1,
+                },
+                ["triggers"] = {
+                    {
+                        ["intent"] = "GREET",
+                        ["speechAct"] = "GREET",
+                    },
+                },
+            },
+            ["repeatPolicy"] = "repeatable",
+            ["reply"] = {
+                ["friendly"] = {
+                    ["outcome"] = "friendly",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "Good to see you.",
+                                            },
+                                            ["TL"] = {
+                                                "Mabuti at nandito ka.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["hostile"] = {
+                    ["outcome"] = "hostile",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "Stay back.",
+                                            },
+                                            ["TL"] = {
+                                                "Lumayo ka.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Hello.",
+                                    },
+                                    ["TL"] = {
+                                        "Kamusta.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["statePolicy"] = {
+                {
+                    ["admission"] = "no_op",
+                    ["id"] = "hostile_or_blocked_greeting",
+                    ["outcome"] = "blocked",
+                    ["reason"] = "hostile_or_busy_npc",
+                    ["replyOutcome"] = "hostile",
+                    ["when"] = {
+                        ["any"] = {
+                            {
+                                ["op"] = "in",
+                                ["path"] = "npcState.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "busy",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "in",
+                                ["path"] = "situation.activeBehavior",
+                                ["values"] = {
+                                    "hostile",
+                                    "combat",
+                                    "busy",
+                                    "dead",
+                                },
+                            },
+                            {
+                                ["op"] = "eq",
+                                ["path"] = "roles.hostile",
+                                ["value"] = true,
+                            },
+                        },
+                    },
+                },
+                {
+                    ["admission"] = "dispatch",
+                    ["id"] = "friendly_greeting",
+                    ["outcome"] = "actionable",
+                    ["reason"] = "ready",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "flow.greeting.exchange",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Hello.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.flow.greeting.exchange.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "dialogue/conversation_greeting/flow_greeting_exchange.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Hello.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.flow.greeting.exchange.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Hello.",
+                    },
+                    ["TL"] = {
+                        "Kamusta.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "Good to see you.",
+                ["outcome"] = "friendly",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.flow.greeting.exchange.reply.friendly.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Good to see you.",
+                    },
+                    ["TL"] = {
+                        "Mabuti at nandito ka.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "Stay back.",
+                ["outcome"] = "hostile",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.flow.greeting.exchange.reply.hostile.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Stay back.",
+                    },
+                    ["TL"] = {
+                        "Lumayo ka.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["domainPath"] = "conversation_greeting",
+        ["exchangeFamily"] = {
             ["familyID"] = "flow.greeting.followup.default",
             ["initiatingSay"] = {
                 ["keyOrder"] = {

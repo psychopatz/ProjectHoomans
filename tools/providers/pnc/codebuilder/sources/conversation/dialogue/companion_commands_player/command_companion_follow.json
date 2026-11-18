@@ -1,0 +1,59 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command.companion",
+  "id": "follow",
+  "owner": "ProjectHoomans",
+  "invoke": {
+    "intent": "COMMAND",
+    "action": "FOLLOW"
+  },
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "state_retired",
+  "postconditions": [
+    "companion.following"
+  ],
+  "closure": {
+    "closureClass": "state_transition"
+  },
+  "statePolicy": [
+    {
+      "id": "actor_blocked_or_hostile",
+      "when": {
+        "any": [
+          { "path": "roles.hostile", "op": "==", "value": true },
+          { "path": "roles.authorityEligible", "op": "==", "value": false },
+          { "path": "roles.status", "op": "==", "value": "hostile" },
+          { "path": "npcState.activeBehavior", "op": "in", "values": ["hostile", "combat", "dead"] },
+          { "path": "situation.activeBehavior", "op": "in", "values": ["hostile", "combat", "dead"] }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "actor_blocked_or_hostile",
+      "admission": "no_op"
+    },
+    {
+      "id": "already_following",
+      "when": {
+        "any": [
+          { "path": "npcState.orderKind", "op": "==", "value": "follow" },
+          { "path": "npcState.activeBehavior", "op": "in", "values": ["follow", "following"] },
+          { "path": "followState.mode", "op": "==", "value": "follow" }
+        ]
+      },
+      "outcome": "already_satisfied",
+      "reason": "already_follow",
+      "admission": "no_op"
+    },
+    {
+      "id": "ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "EN": "Follow me.",
+    "TL": "Sumunod ka sa akin."
+  }
+}

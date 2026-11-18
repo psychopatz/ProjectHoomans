@@ -1,0 +1,57 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command.companion",
+  "id": "stay",
+  "owner": "ProjectHoomans",
+  "invoke": {
+    "intent": "COMMAND",
+    "action": "STAY"
+  },
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "state_retired",
+  "postconditions": [
+    "companion.staying"
+  ],
+  "closure": {
+    "closureClass": "state_transition"
+  },
+  "statePolicy": [
+    {
+      "id": "actor_blocked_or_hostile",
+      "when": {
+        "any": [
+          { "path": "roles.hostile", "op": "==", "value": true },
+          { "path": "roles.authorityEligible", "op": "==", "value": false },
+          { "path": "roles.status", "op": "==", "value": "hostile" },
+          { "path": "npcState.activeBehavior", "op": "in", "values": ["hostile", "combat", "dead"] },
+          { "path": "situation.activeBehavior", "op": "in", "values": ["hostile", "combat", "dead"] }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "actor_blocked_or_hostile",
+      "admission": "no_op"
+    },
+    {
+      "id": "already_staying",
+      "when": {
+        "path": "npcState.orderKind",
+        "op": "==",
+        "value": "stay"
+      },
+      "outcome": "already_satisfied",
+      "reason": "already_stay",
+      "admission": "no_op"
+    },
+    {
+      "id": "ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "EN": "Stay here.",
+    "TL": "Dito ka lang."
+  }
+}

@@ -1,5 +1,17 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["flow.needs.exchange"] = {
+        ["domain"] = "conversation_needs",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        },
+        ["id"] = "flow.needs.exchange",
+        ["kind"] = "dialogue",
+        ["related"] = {
+            "offer",
+        },
+        ["source"] = "dialogue/conversation_needs/flow_needs_exchange.json",
+    },
     ["question.needs.offer.fatigue"] = {
         ["domain"] = "conversation_needs",
         ["generated"] = {

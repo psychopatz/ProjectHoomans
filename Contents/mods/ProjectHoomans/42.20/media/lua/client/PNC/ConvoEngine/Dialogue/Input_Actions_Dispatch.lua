@@ -9,6 +9,62 @@ return function(Input, Internal, Support)
     local CampSite = PNC.Semantics.CampSite
     local ActionTargetHints = PNC.ConvoEngine.DialogueInputActionTargetHints
     local QuestResponses = Internal.QuestResponses
+    local S11PolicyEvaluator = require "PsychopatzCore/ConvoEngine/S11PolicyEvaluator"
+
+    local function findActionPolicyPlan(actionName)
+        local reg = PNC and PNC.ConvoEngine and PNC.ConvoEngine.Registry or nil
+        local plans = reg and reg.CONVO_PLANS or nil
+        if type(plans) ~= "table" or actionName == "" then
+            return nil
+        end
+        local normalized = actionName == "GO_HOME" and "RETURN_HOME" or (actionName == "RETURN" and "RETURN_HOME" or actionName)
+        for _, plan in pairs(plans) do
+            if type(plan) == "table" and type(plan.payload) == "table"
+                and type(plan.payload.invoke) == "table"
+                and tostring(plan.payload.invoke.action or "") == normalized
+                and type(plan.payload.statePolicy) == "table"
+            then
+                return plan
+            end
+        end
+        return nil
+    end
+
+    local function buildPolicyEvalContext(view, context)
+        local shallow = type(Internal.ShallowContext) == "function"
+            and Internal.ShallowContext(view) or {}
+        local record = context.npcID and PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(context.npcID) or nil
+        local roles = type(shallow.roles) == "table" and shallow.roles
+            or (type(record) == "table" and type(record.roles) == "table" and record.roles)
+            or {}
+        local activeBehavior = tostring(
+            (type(shallow.npcState) == "table" and shallow.npcState.activeBehavior)
+            or (type(shallow.situation) == "table" and shallow.situation.activeBehavior)
+            or (type(record) == "table" and record.activeBehavior)
+            or ""
+        )
+        local orderKind = tostring(
+            shallow.orderKind
+            or (type(record) == "table" and record.orderKind)
+            or (type(shallow.followState) == "table" and shallow.followState.mode)
+            or (type(record) == "table" and type(record.followState) == "table" and record.followState.mode)
+            or ""
+        )
+        return {
+            roles = roles,
+            npcState = {
+                activeBehavior = activeBehavior,
+                orderKind = orderKind,
+            },
+            situation = {
+                activeBehavior = activeBehavior,
+            },
+            followState = type(shallow.followState) == "table" and shallow.followState
+                or (type(record) == "table" and type(record.followState) == "table" and record.followState)
+                or {},
+        }
+    end
 
     function Internal.DispatchAction(view, result, value)
         local decision = result and result.decision or {}
@@ -99,48 +155,19 @@ return function(Input, Internal, Support)
         end
         actionIntent = ActionTargetHints.AttachWorldTargetHint(
             actionIntent, context, WorldTargetHints, Support.audit)
-        local cmdAction = actionIntent and tostring(actionIntent.action or "") or ""
-        if cmdAction == "FOLLOW" or cmdAction == "STAY" or cmdAction == "RETURN"
-            or cmdAction == "GO_HOME" or cmdAction == "CAMP"
-        then
-            local shallow = type(Internal.ShallowContext) == "function"
-                and Internal.ShallowContext(view) or {}
-            local record = context.npcID and PNC.Registry and PNC.Registry.Get
-                and PNC.Registry.Get(context.npcID) or nil
-            local roles = type(shallow.roles) == "table" and shallow.roles
-                or (type(record) == "table" and type(record.roles) == "table" and record.roles)
-                or {}
-            local activeBehavior = tostring(
-                (type(shallow.npcState) == "table" and shallow.npcState.activeBehavior)
-                or (type(shallow.situation) == "table" and shallow.situation.activeBehavior)
-                or (type(record) == "table" and record.activeBehavior)
-                or ""
+        local actionPlan = actionIntent and findActionPolicyPlan(tostring(actionIntent.action or "")) or nil
+        if actionPlan then
+            local evalRes = S11PolicyEvaluator.EvaluateStatePolicy(
+                actionPlan,
+                buildPolicyEvalContext(view, context)
             )
-            if roles.hostile == true or roles.authorityEligible == false
-                or roles.status == "hostile"
-                or activeBehavior == "hostile" or activeBehavior == "combat" or activeBehavior == "dead"
+            if type(evalRes) == "table"
+                and (evalRes.admission == "no_op" or evalRes.admission == "reject")
             then
                 if type(generatedFlow) == "table" then
                     generatedFlow.dispatchCount = 0
                 end
-                return Support.blockedDispatch("actor_blocked_or_hostile")
-            end
-            local orderKind = tostring(
-                shallow.orderKind
-                or (type(record) == "table" and record.orderKind)
-                or (type(shallow.followState) == "table" and shallow.followState.mode)
-                or (type(record) == "table" and type(record.followState) == "table" and record.followState.mode)
-                or ""
-            )
-            if (cmdAction == "FOLLOW" and (orderKind == "follow" or activeBehavior == "follow" or activeBehavior == "following"))
-                or (cmdAction == "STAY" and orderKind == "stay")
-                or (cmdAction == "CAMP" and orderKind == "camp")
-                or ((cmdAction == "RETURN" or cmdAction == "GO_HOME") and orderKind == "return")
-            then
-                if type(generatedFlow) == "table" then
-                    generatedFlow.dispatchCount = 0
-                end
-                return Support.blockedDispatch("already_" .. string.lower(cmdAction))
+                return Support.blockedDispatch(evalRes.reason or "state_policy_blocked")
             end
         end
         if QuestResponses

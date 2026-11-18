@@ -8,9 +8,7 @@ local ConversationRegistry = require
 
 local definitions = {
     require "PNC/ConvoEngine/Dialogue/Flow_Wellbeing",
-    require "PNC/ConvoEngine/Dialogue/Flow_Needs",
     require "PNC/ConvoEngine/Dialogue/Flow_Weather",
-    require "PNC/ConvoEngine/Dialogue/Flow_Greeting",
 }
 
 for index = 1, #(ConversationRegistry.FLOWS or {}) do

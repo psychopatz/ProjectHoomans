@@ -9,6 +9,18 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "dialogue/conversation_greeting/conversation_landing_whats_up.json",
     },
+    ["flow.greeting.exchange"] = {
+        ["domain"] = "conversation_greeting",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        },
+        ["id"] = "flow.greeting.exchange",
+        ["kind"] = "dialogue",
+        ["related"] = {
+            "greeting",
+        },
+        ["source"] = "dialogue/conversation_greeting/flow_greeting_exchange.json",
+    },
     ["flow.greeting.followup.default"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
