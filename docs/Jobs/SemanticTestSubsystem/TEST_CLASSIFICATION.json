@@ -92,7 +92,7 @@
     {
       "module": "test_automatic_flow_generation.py",
       "category": "LOW_LEVEL_RUNTIME_CONTRACT",
-      "methods": 10,
+      "methods": 11,
       "usesDirectWorker": true,
       "justification": "Authoring/capability/grievance contract (Acceptance for metadata-driven simple-command flow generation.): verifies worker authoring validation, capability ABI, or grievance evidence invariants.",
       "methodDetails": [
@@ -125,6 +125,12 @@
           "category": "LOW_LEVEL_RUNTIME_CONTRACT",
           "usesDirectWorker": true,
           "reason": "S11 R5B parameterized task conversation lifecycle: available -> active -> duplicate suppressed -> terminal zero dispatch"
+        },
+        {
+          "name": "test_native_task_projection_parity_lifecycle_and_duplicate_suppression",
+          "category": "LOW_LEVEL_RUNTIME_CONTRACT",
+          "usesDirectWorker": false,
+          "reason": "S11 R8A native taskProjection parity: native context projection drives WAIT_AT retirement, duplicate zero-dispatch, and terminal projection parity"
         },
         {
           "name": "test_real_worker_records_result_nodes_and_one_dispatch",
