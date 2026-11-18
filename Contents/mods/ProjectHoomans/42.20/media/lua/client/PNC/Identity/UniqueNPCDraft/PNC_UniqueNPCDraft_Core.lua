@@ -319,11 +319,11 @@ end
 
 -- Debug-only user action: replace the visual scope, retaining authored bio,
 -- attributes, held/carried gear and audio. Never promote the old preview look.
-function Model.Randomize(draft)
+function Model.Randomize(draft, generationSeed)
     if not draft then return false end
     Model.SyncFromRuntime(draft)
     local previousSeed = tonumber(draft.previewSeed) or 1
-    draft.previewSeed = nextSeed()
+    draft.previewSeed = tonumber(generationSeed) or nextSeed()
     if draft.previewSeed == previousSeed then draft.previewSeed = previousSeed % 2147483645 + 1 end
     local voice = draft.appearance and copy(draft.appearance.voice)
     local appearance = Appearance.Normalize({ voice = voice })

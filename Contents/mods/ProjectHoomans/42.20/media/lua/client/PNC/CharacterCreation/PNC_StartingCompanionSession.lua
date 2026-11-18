@@ -272,7 +272,7 @@ function Session:ResolveSlot(traitID, context)
     plan, reason = Resolver.ResolvePlan(
         slot.blueprint,
         context or self.context,
-        Resolver.PolicyForStartingCompanion(slot.spec),
+        Resolver.PolicyForStartingCompanion(slot.spec, context or self.context),
         { id = "starter:" .. tostring(slot.traitID), version = 1 }
     )
     if not plan then
@@ -392,7 +392,7 @@ function Session:SetField(traitID, fieldID, value)
     local nextBlueprint
     local reason
     if not slot then return nil, "slot_not_found" end
-    policy = Resolver.PolicyForStartingCompanion(slot.spec)
+    policy = Resolver.PolicyForStartingCompanion(slot.spec, self.context)
     binding = policy.bindings and policy.bindings[tostring(fieldID)] or nil
     if binding and binding.editable == false then
         return nil, "field_locked:" .. tostring(fieldID)
@@ -410,7 +410,7 @@ function Session:ClearField(traitID, fieldID)
     local nextBlueprint
     local reason
     if not slot then return nil, "slot_not_found" end
-    policy = Resolver.PolicyForStartingCompanion(slot.spec)
+    policy = Resolver.PolicyForStartingCompanion(slot.spec, self.context)
     nextBlueprint, reason = Blueprint.Clear(slot.blueprint, fieldID, policy)
     if not nextBlueprint then return nil, reason end
     slot.blueprint = nextBlueprint

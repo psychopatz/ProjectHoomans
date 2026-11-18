@@ -106,7 +106,7 @@ local function relationshipFemale(spec, context, seed)
     return not female
 end
 
-local function relationshipPolicy(spec)
+local function relationshipPolicy(spec, context)
     local policy = {
         id = "starting-companion:" .. tostring(spec and spec.id or "unknown"),
         bindings = {},
@@ -198,7 +198,7 @@ local function relationshipPolicy(spec)
         }
     end
     -- Random is a default for free-sex relationships, not a mandatory rule.
-    if spec.sex ~= "random" then
+    if spec.sex ~= "random" and not (spec.sex == "orientation" and context and orientation(context) == "bisexual") then
     policy.bindings["identity.isFemale"] = {
         mandatory = true,
         source = "derived",
@@ -224,8 +224,8 @@ Resolver.Policies.Debug = Resolver.Policies.Debug or {
     },
 }
 
-function Resolver.PolicyForStartingCompanion(spec)
-    return relationshipPolicy(spec)
+function Resolver.PolicyForStartingCompanion(spec, context)
+    return relationshipPolicy(spec, context)
 end
 
 local function generatedIdentityField(fieldID, context, seed)

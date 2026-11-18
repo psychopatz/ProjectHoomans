@@ -16,6 +16,7 @@ require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCAppearanceWindow"
 require "PNC/UI/Inventory/PNC_InventoryWindow"
 require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Profile"
 require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringFields"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringRelationshipPresentation"
 
 PNC = PNC or {}
 PNC.NPCAuthoringEditor = PNC.NPCAuthoringEditor or {}
@@ -268,5 +269,6 @@ require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Details"
 require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringAttributes"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Preview"
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Persistence"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringRandomization"
 
 return Editor

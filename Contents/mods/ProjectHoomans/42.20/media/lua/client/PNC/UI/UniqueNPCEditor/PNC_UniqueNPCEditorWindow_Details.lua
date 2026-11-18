@@ -198,18 +198,8 @@ function Window:refreshDetails()
         self.relationshipDetails:clear()
         self.relationshipDetails:setVisible(self.presentationMode == "companion" and not self.inspectorVisible)
         if self.presentationAdapter then
-            local slot = self.presentationAdapter:Slot()
-            local kind = slot and slot.spec and slot.spec.relationshipKind or ""
-            self.relationshipDetails:addItem("", {
-                label = tr("UI_PNC_Authoring_Relationship", "Relationship"),
-                value = tr("UI_PNC_Relationship_" .. string.upper(string.sub(kind, 1, 1)) .. string.sub(kind, 2), kind),
-            })
-            for _, row in ipairs(inspectorRows(self)) do
-                if row.inherited or row.derived then
-                    self.relationshipDetails:addItem("", {
-                        label = Profile.Label(row.fieldID), value = row.sourceLabel,
-                    })
-                end
+            for _, row in ipairs(PNC.NPCAuthoringRelationshipPresentation.Rows(self.presentationAdapter, self.draft)) do
+                self.relationshipDetails:addItem(row.label, row)
             end
         end
     end

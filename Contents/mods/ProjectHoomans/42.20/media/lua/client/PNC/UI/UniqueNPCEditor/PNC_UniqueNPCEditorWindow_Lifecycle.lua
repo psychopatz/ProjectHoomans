@@ -178,7 +178,8 @@ local function buildEditorForm(self)
     self:buildAttributeGroups()
 
     self.relationshipDetails = UI.CreateList(self.pages.relations, {
-        itemHeight = Layout.Pixels(32, self.uiScale), doDrawItem = drawDetail,
+        itemHeight = Layout.Pixels(32, self.uiScale), virtualized = false,
+        doDrawItem = PNC.NPCAuthoringRelationshipPresentation.DrawRow,
     })
     self.details = UI.CreateList(self.pages.relations, {
         itemHeight = Layout.Pixels(25, self.uiScale),
@@ -204,9 +205,7 @@ local function buildEditorForm(self)
             target = self, onclick = ISPNCNPCAuthoringEditor.onAction, variant = "quiet",
         })
     end
-    self.variationButton = UI.CreateButton(self, { id = "vary_look",
-        title = tr("UI_PNC_Authoring_VaryLook", "Randomize face and clothes"), target = self,
-        onclick = ISPNCNPCAuthoringEditor.onAction, variant = "primary" })
+    self:buildTabRandomizers()
     self.statusLabel = addLabel(self, "")
 end
 

@@ -71,4 +71,15 @@ T.equal(gender.buttons[2].psychopatzVariant, 'selected', 'locked selected value 
 gender:setEnabled(true); gender.buttons[1].onclick(gender)
 T.equal(gender.selected, 1, 'unlocked friend-style gender toggles to male')
 T.equal(gender.buttons[1].psychopatzVariant, 'selected', 'new selection is highlighted')
+function editor:fieldCapability() return { editable = false, visible = true, source = 'generated' } end
+Fields.Lock(editor, entry, 'appearance.skinTexture', parent)
+T.equal(entry.pncLocked, false, 'generic unavailable data has no trait-constraint padlock')
+T.falsy(entry.pncLock.visible, 'lock icon is hidden without a real constraint')
+function editor:fieldCapability() return { editable = false, visible = true, constraint = true, explanation = 'Father requires a male companion.' } end
+Fields.Lock(editor, gender, 'identity.isFemale', parent)
+T.equal(gender.pncLock.tooltip, 'Father requires a male companion.', 'constraint tooltip uses the current relationship explanation')
+function editor:fieldCapability() return { editable = true, visible = true, constraint = false } end
+Fields.Lock(editor, gender, 'identity.isFemale', parent)
+T.falsy(gender.pncLock.visible, 'switching to an unconstrained type removes the lock')
+T.truthy(gender.enabled, 'the unconstrained control is editable again')
 T.finish('pnc_npc_authoring_text_edit_smoke')

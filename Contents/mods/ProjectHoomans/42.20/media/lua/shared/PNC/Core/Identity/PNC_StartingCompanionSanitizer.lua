@@ -93,7 +93,7 @@ function Sanitizer.SanitizeDefinition(definition, traitID, options)
     if hasLegacyAlias(definition) then return nil, "unsupported_source_schema" end
     if not id then return nil, "unknown_companion_trait" end
     spec = StartingTraits.GetDefinition(id)
-    policy = Resolver.PolicyForStartingCompanion(spec)
+    policy = Resolver.PolicyForStartingCompanion(spec, options.context)
     source, reason = Blueprint.FromDefinition(definition, {
         id = "source:" .. tostring(definition.id or "unique"),
         generationSeed = options.generationSeed or definition.generationSeed,

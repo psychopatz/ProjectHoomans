@@ -1,48 +1,51 @@
 # Progress — Unified Starting Companion Authoring
 
-## Current state — 2026-11-18 P5R6
+## Current state — 2026-11-18 P5R7
 
-Developer repair of the latest native control report is complete. Native P5R6
-acceptance remains **UNVERIFIED**. Both entry points still use the shared editor.
-The user's latest clarification permits a wide explicit appearance-variation
-action in companion creation; Random policies remain absent from selectors.
+Developer-side scoped randomization and constraint repair is verified. Native
+P5R7 acceptance remains **UNVERIFIED**. Both entry points use the shared editor.
+Per-tab dice replace the wide visual footer; companion selectors still omit
+Random policies.
 
-- Friend gender is editable because random sex is a default, not a mandatory
-  relationship binding. Fixed family/orientation rules remain locked. Both
-  boolean choices survive canonical form commits, presets and context refresh.
-  Male values also remain present in identity traces. Body changes create a
-  fresh gender-specific preview instead of retaining old skin/hair caches.
-- Gender/segmented selections own a selected theme variant, so enabling,
-  disabling and theme refresh cannot erase the selected background color.
-- The composer reserves Core's title-bar content inset. Its toolbar no longer
-  starts at top=0. A wide **Randomize face and clothes** action spans the shared
-  editor footer and is unavailable behind browser overlays.
-- Companion variation materializes concrete visuals, projects only editable
-  appearance fields/wardrobe, validates once and commits atomically. It keeps
-  the original generation seed, names, gender, relationship inheritance,
-  attributes, voice and held/carried gear. Failed materialization changes nothing.
-- Actorless menu voice preview now follows native creation's audio-bus resume
-  and emitter-origin reset, without changing music state. In-game debug playback
-  does not resume unrelated paused world audio. Playback failures have localized
-  output/sample/startup explanations; only the owned sound handle is stopped.
+- Bio dice generates names/nickname, retaining chosen gender/archetype and
+  inherited values. Appearance varies editable skin/hair/voice while retaining
+  wardrobe/gear. Attributes uses loaded catalogs and existing compatibility
+  validators, excluding companion-selection traits and their native aliases.
+  Loadout materializes exact clothes/gear while retaining face/voice/identity.
+  Each companion action validates and commits one canonical candidate, leaving
+  unrelated generated scopes stable. Rejected generation preserves pending text.
+- Relationships explains the NPC's role toward the player, reciprocal role,
+  originating trait and current editable/inherited constraints in wrapped rows.
+  Its dice is visibly disabled with a backstory TODO explanation. Semantic
+  backstory generation is explicitly deferred; paid relationship types remain
+  selected-trait authority.
+- Lock icons appear only for actual applicable constraints. Reasons include the
+  current inherited surname, family trait or orientation rule. Policy is rebuilt
+  from current context: Friend and bisexual Lover gender are editable; fixed
+  family and straight/gay partner rules remain authoritative. Context-free wire
+  sanitization retains optional partner sex intent for final contextual resolution.
+- Manual edits validate/commit the complete candidate before repainting. Locked
+  appearance callbacks cannot mutate drafts. Selecting a native skin texture
+  clears stale cached custom RGB so it reaches the portrait consistently.
+- Each page reserves dice space above its controls; the wide footer is removed.
+  EN/TL Character catalogs contain 26 new keys and one updated failure message.
 
-`TEST_VERIFIED`: **56/56** focused; **1049/1053** full suite. The same four prior
-failures remain: scene debug routes, context scene lab, population director
-initialization and Debug Hub translation expectation. Added a real wide-button
-routing regression and extended policy/adapter, gender/form, theme, frame/footer,
-body-cache and actorless audio-boundary tests.
+`TEST_VERIFIED`: **58/58** focused; **1052/1056** full suite. The same four prior
+failures remain: animation scene debug routes, context scene lab, population
+initialization and Debug Hub translation expectation. New real adapter/session
+regressions cover scoped isolation, compatible generation, exact gear, native
+trait aliases, live Lover policy, contextual authority and skin callback commits.
 
-`STATIC_ONLY`: **20** changed/new Lua files parse, **12** production Kahlua checks
-pass, JSON/static references/**five** new EN/TL keys/parity/whitespace pass.
-Graph coverage was checked for 26 Hoomans/four Core paths and SoundManager;
-dirty/new source and installed native CharacterCreationMain supplied current
-source evidence. Java harness confirms the installed baseline is current.
+`STATIC_ONLY`: **32** owned Lua files parse; **22** production Kahlua checks pass.
+JSON, EN/TL key/placeholder parity, static/dynamic key references and whitespace
+checks pass. Coverage checked for 39 Hoomans and two Core evidence paths;
+changed/new source supplied current evidence against the committed graph baseline.
 
-Next: **P6 user-owned native retest** of Friend male/female selection and colors,
-fixed family locks, header spacing/font scales, wide visual variation, wardrobe
-stability and audible play/stop before world entry, then existing SP/MP/co-op
-finalization. No game was launched/driven and no native audibility/rendering
-success is claimed. No push or Workshop publication.
+Next: **P6 user-owned native retest** of per-page dice at compact/large-font
+sizes, repeated skin/gender edits, dynamic locks, directional relationship text,
+Save/Load and scope stability. Continue prior audible voice, browser and
+SP/MP/co-op/finalization matrix. No game was launched/driven; native rendering,
+input and audio success remain unverified. No push or Workshop publication.
 
 ## Historical developer checkpoints
 

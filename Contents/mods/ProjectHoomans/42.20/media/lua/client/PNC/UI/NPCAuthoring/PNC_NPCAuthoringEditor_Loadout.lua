@@ -223,15 +223,15 @@ function Window:layoutSlotTiles()
 end
 function Window:layoutLoadoutPage(width, height, rowHeight, gap)
     local w = math.max(1, width - gap * 2 - 16)
-    L.SetBounds(self.outfitBrowse, gap, gap, math.min(w, L.Pixels(170, self.uiScale)), rowHeight)
+    L.SetBounds(self.outfitBrowse, gap, rowHeight + gap * 2, math.min(w, L.Pixels(170, self.uiScale)), rowHeight)
     self.outfitValue:setName(L.Ellipsize(self.outfitCaption or "", UIFont.Small, w))
     self.outfitValue.tooltip = self.outfitCaption
-    L.SetBounds(self.outfitValue, gap, gap + rowHeight, w, rowHeight)
-    L.SetBounds(self.loadoutModeRow.labelControl, gap, rowHeight * 2 + gap * 2, w, rowHeight)
+    L.SetBounds(self.outfitValue, gap, gap * 2 + rowHeight * 2, w, rowHeight)
+    L.SetBounds(self.loadoutModeRow.labelControl, gap, rowHeight * 3 + gap * 3, w, rowHeight)
     self.loadoutModeRow.labelControl:setVisible(true); self.loadoutModeRow.entry:setVisible(true)
-    L.SetBounds(self.loadoutModeRow.entry, gap, rowHeight * 3 + gap * 2, math.min(w, L.Pixels(360, self.uiScale)), rowHeight * 2 + 4)
+    L.SetBounds(self.loadoutModeRow.entry, gap, rowHeight * 4 + gap * 3, math.min(w, L.Pixels(360, self.uiScale)), rowHeight * 2 + 4)
     self.loadoutModeRow.entry:onResize()
-    local top = rowHeight * 5 + gap * 3 + 4
+    local top = rowHeight * 6 + gap * 4 + 4
     local contentHeight = math.max(rowHeight * 3, height - top - gap)
     L.SetBounds(self.slotContent, gap, top, w, contentHeight)
     local page = self.pages.loadout

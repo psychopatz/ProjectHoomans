@@ -55,8 +55,10 @@ function Fields.Lock(editor, control, id, parent)
         if lock.setImage and getTexture then lock:setImage(getTexture("media/ui/MP/mp_ui_passwordOn.png")) end
         control.pncLock = lock
     end
-    local reason = capability.sourceLabel or tr("UI_PNC_Authoring_Locked", "Derived value")
-    if capability.rule and string.find(capability.rule, "surname", 1, true) then
+    local reason = capability.explanation or capability.sourceLabel or tr("UI_PNC_Authoring_Locked", "Derived value")
+    if capability.explanation then
+        reason = capability.explanation
+    elseif capability.rule and string.find(capability.rule, "surname", 1, true) then
         reason = tr("UI_PNC_Authoring_LockSurname", "Matches the player's surname for this family relationship")
     elseif capability.rule and string.find(capability.rule, "appearance", 1, true) then
         reason = tr("UI_PNC_Authoring_LockAppearance", "Inherited from the player's family appearance")
@@ -65,7 +67,9 @@ function Fields.Lock(editor, control, id, parent)
     end
     control.pncLock.tooltip = reason
     control.tooltip = locked and control.pncLock.tooltip or nil
-    control.pncLocked = locked and capability.visible ~= false
+    local constrained = capability.constraint == true or capability.inherited == true or capability.derived == true
+        or capability.rule and string.sub(capability.rule, 1, 13) == "relationship."
+    control.pncLocked = locked and constrained == true and capability.visible ~= false
     control.pncLock:setVisible(control.pncLocked)
     return locked
 end

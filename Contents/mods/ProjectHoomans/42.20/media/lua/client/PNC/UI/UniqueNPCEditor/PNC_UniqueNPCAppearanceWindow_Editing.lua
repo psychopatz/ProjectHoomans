@@ -8,6 +8,11 @@ local runtimeItemFor = Internal.runtimeItemFor
 local conflictWithDraft = Internal.conflictWithDraft
 local skinTextureForTone = Internal.skinTextureForTone
 
+function ISPNCUniqueNPCAppearanceWindow:canEdit(id)
+    return not self.parentEditor or not self.parentEditor.fieldCapability
+        or self.parentEditor:fieldCapability(id).editable ~= false
+end
+
 function ISPNCUniqueNPCAppearanceWindow:policy(location)
     local appearance = Appearance and Appearance.Normalize
         and Appearance.Normalize(self.draft and self.draft.appearance) or {}
@@ -26,6 +31,7 @@ function ISPNCUniqueNPCAppearanceWindow:markChanged()
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onPolicyChanged(combo)
+    if not self:canEdit("appearance") then return false end
     local selectedValue = comboData(combo)
     if selectedValue == "__current" then return false end
     if (selectedValue == "random" or selectedValue == "__random")
@@ -74,6 +80,7 @@ function ISPNCUniqueNPCAppearanceWindow:onPolicyChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onItemChanged(combo)
+    if not self:canEdit("appearance") then return false end
     local location = combo and combo.bodyLocation
     local fullType = comboData(combo)
     if not location or not fullType then return end
@@ -104,6 +111,7 @@ function ISPNCUniqueNPCAppearanceWindow:onItemChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onOutfitChanged(combo)
+    if not self:canEdit("appearance") then return false end
     local selectedValue = comboData(combo)
     if selectedValue == "__current" then return false end
     if (selectedValue == "random" or selectedValue == "__random")
@@ -131,6 +139,7 @@ function ISPNCUniqueNPCAppearanceWindow:onOutfitChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onHairChanged(combo)
+    if not self:canEdit("appearance.hairModel") then return false end
     local selectedValue = comboData(combo)
     if selectedValue == "__current" then return false end
     if (selectedValue == "random" or selectedValue == "__random")
@@ -149,6 +158,7 @@ function ISPNCUniqueNPCAppearanceWindow:onHairChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onBeardChanged(combo)
+    if not self:canEdit("appearance.beardModel") then return false end
     local selectedValue = comboData(combo)
     if selectedValue == "__current" then return false end
     if (selectedValue == "random" or selectedValue == "__random")
@@ -185,6 +195,7 @@ function ISPNCUniqueNPCAppearanceWindow:setVoiceDraft(profile)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onVoiceChanged(combo)
+    if not self:canEdit("appearance.voice") then return false end
     local selectedValue = comboData(combo)
     if selectedValue == "__current" then return false end
     if (selectedValue == "random" or selectedValue == "__random")
@@ -224,6 +235,7 @@ function ISPNCUniqueNPCAppearanceWindow:onVoiceChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onVoicePitchChanged(value)
+    if not self:canEdit("appearance.voicePitch") then return false end
     if self.syncing then return end
     local appearance = Appearance.Normalize(self.draft.appearance)
     local voice = appearance.voice or {}
@@ -257,6 +269,7 @@ function ISPNCUniqueNPCAppearanceWindow:onVoiceSampleChanged(combo)
 end
 
 function ISPNCUniqueNPCAppearanceWindow:onSkinModeChanged(combo)
+    if not self:canEdit("appearance.skinTexture") then return false end
     local selectedValue = comboData(combo)
     if selectedValue == "__current" then return false end
     if (selectedValue == "random" or selectedValue == "__random")
@@ -282,6 +295,7 @@ end
 
 
 function Window:onHairColorChanged(combo)
+    if not self:canEdit("appearance.hairColor") then return false end
     local selectedValue = comboData(combo)
     if selectedValue == "__current" then return false end
     if (selectedValue == "random" or selectedValue == "__random")

@@ -17,7 +17,7 @@ local function scroll(page, height)
 end
 
 function Window:layoutBio(width, rowHeight, gap)
-    local y = gap
+    local y = rowHeight + gap * 2
     local available = math.max(1, width - gap * 2 - 16)
     local columns = available >= Layout.Pixels(580, self.uiScale) and 2 or 1
     local inputWidth = math.min(Layout.Pixels(340, self.uiScale), (available - gap * (columns - 1)) / columns)
@@ -85,7 +85,7 @@ function Window:onResponsiveLayout()
     local toolbar = Layout.Flow(self.toolbar, rect,
         { scale = scale, minWidth = 76, gap = 6 })
     local top = toolbar.bottom + gap
-    local height = math.max(1, rect.height - top - rowHeight * 2 - gap * 2)
+    local height = math.max(1, rect.height - top - rowHeight - gap)
     local rosterWidth = math.min(Layout.Pixels(200, scale), rect.width * 0.23)
     local remaining = math.max(1, rect.width - rosterWidth - gap)
     local compact = remaining < Layout.Pixels(690, scale)
@@ -105,9 +105,12 @@ function Window:onResponsiveLayout()
     self:layoutAttributes(contentWidth, rowHeight, gap)
     self.appearanceTab:onResponsiveLayout()
     self:layoutLoadoutPage(contentWidth, viewHeight, rowHeight, gap)
-    bounds(self.relationshipDetails, gap, gap, contentWidth - gap * 2, viewHeight - rowHeight - gap * 3)
+    if self.layoutTabDice then for scope in pairs(self.pages) do self:layoutTabDice(scope, contentWidth, rowHeight, gap) end end
+    if self.refreshTabRandomizers then self:refreshTabRandomizers() end
+    bounds(self.relationshipDetails, gap, rowHeight + gap * 2, contentWidth - gap * 2, viewHeight - rowHeight * 2 - gap * 4)
+    if PNC.NPCAuthoringRelationshipPresentation then PNC.NPCAuthoringRelationshipPresentation.Layout(self.relationshipDetails) end
     bounds(self.inspectorButton, gap, viewHeight - rowHeight - gap, contentWidth - gap * 2, rowHeight)
-    bounds(self.details, gap, gap, contentWidth - gap * 2, viewHeight - rowHeight * 2 - gap * 3)
+    bounds(self.details, gap, rowHeight + gap * 2, contentWidth - gap * 2, viewHeight - rowHeight * 3 - gap * 4)
     bounds(self.resetDetailsButton, gap, viewHeight - rowHeight * 2 - gap * 2,
         contentWidth - gap * 2, rowHeight)
     bounds(self.removeButton, gap, viewHeight - rowHeight - gap, contentWidth - gap * 2, rowHeight)
@@ -116,7 +119,6 @@ function Window:onResponsiveLayout()
         self.statusLabel:setName(Layout.Ellipsize(self.statusText or "", UIFont.Small, remaining))
     end
     bounds(self.statusLabel, contentX, rect.height - rowHeight, remaining, rowHeight)
-    bounds(self.variationButton, 0, rect.height - rowHeight * 2 - gap, rect.width, rowHeight)
     local previewOnly = self.previewExpanded == true
     self.tabPanel:setVisible(self.draft ~= nil and not previewOnly)
     local px = contentX + contentWidth + gap
@@ -143,7 +145,6 @@ function Window:onResponsiveLayout()
         self.roster:setVisible(true); self.rosterLabel:setVisible(true)
     end
     for _, control in ipairs(self.toolbar) do control:setVisible(not exploring) end
-    if self.variationButton then self.variationButton:setVisible(self.draft ~= nil and not exploring) end
     PNC.NPCAuthoringFields.NativeMetrics(self)
     self.layout = { x = rect.x, y = top, leftWidth = contentWidth,
         portraitX = px, portraitY = top, portraitWidth = portraitWidth,

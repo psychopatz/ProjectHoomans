@@ -82,6 +82,17 @@ function Window:onFormChanged(force)
 end
 
 function Window:onAppearanceChanged()
+    if self.presentationAdapter then
+        local changed, reason = self:commitAdapterDraft()
+        if reason then
+            self:refreshFromAdapter(false)
+            self:setStatus(tostring(reason)); return false
+        end
+        if changed then return true end
+        -- A locked/no-op edit must show the accepted source, not a local mutation.
+        self:refreshFromAdapter(false)
+        return true
+    end
     self:syncControls()
     if self.appearanceTab then
         self.appearanceTab.draft = self.draft

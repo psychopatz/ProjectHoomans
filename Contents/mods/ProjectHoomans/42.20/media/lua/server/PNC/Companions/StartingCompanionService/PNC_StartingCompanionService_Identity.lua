@@ -181,7 +181,6 @@ function H.ResolveAuthoringDefinition(
         return nil, "authoring_pipeline_unavailable"
     end
     resolver = authoring.Resolver
-    policy = resolver.PolicyForStartingCompanion(spec)
     context = {
         player = player,
         playerSurname = H.PlayerSurname(player),
@@ -196,6 +195,7 @@ function H.ResolveAuthoringDefinition(
         seed = seed,
         identitySeed = seed,
     }
+    policy = resolver.PolicyForStartingCompanion(spec, context)
     plan, reason = resolver.ResolvePlan(
         blueprint,
         context,

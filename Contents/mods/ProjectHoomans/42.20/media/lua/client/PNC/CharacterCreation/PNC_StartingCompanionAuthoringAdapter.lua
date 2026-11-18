@@ -10,6 +10,8 @@ require "PNC/Identity/PNC_NPCAuthoringComposer"
 require "PNC/Identity/PNC_UniqueNPCDraft"
 require "PNC/Core/Identity/PNC_NPCAuthoring"
 require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Profile"
+require "PNC/Identity/PNC_NPCAuthoringVariation"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringRelationshipPresentation"
 
 PNC = PNC or {}
 PNC.StartingCompanionAuthoringAdapter =
@@ -129,9 +131,10 @@ function Adapter:FieldCapability(fieldID)
             sourceLabel = sourceHelp("generated"),
         }
     end
-    return {
+    local capability = {
         visible = true,
         editable = row.editable == true,
+        constraint = row.locked == true,
         required = row.required == true,
         inherited = row.inherited == true,
         derived = row.derived == true,
@@ -140,6 +143,8 @@ function Adapter:FieldCapability(fieldID)
         rule = row.rule,
         dependencies = copy(row.dependencies),
     }
+    capability.explanation = PNC.NPCAuthoringRelationshipPresentation.Reason(self, fieldID, capability)
+    return capability
 end
 
 function Adapter:InspectorRows(limit)
@@ -177,40 +182,33 @@ function Adapter:BuildDraft()
     return draft
 end
 
+function Adapter:_commitCandidate(candidate)
+    local slot = self:Slot()
+    local policy = Authoring.Resolver.PolicyForStartingCompanion(slot.spec, self.session:GetContext())
+    local plan, reason = Authoring.Resolver.ResolvePlan(candidate, self.session:GetContext(), policy)
+    if not plan then return false, reason end
+    return self.session:SetBlueprint(self.traitID, candidate)
+end
+
 function Adapter:CommitDraft(draft)
     local intent = self:BlueprintIntent()
-    local candidate
-    local reason
-    local current
-    local changed = false
     if not self.session or not draft or not intent then return false end
-    candidate, reason = Model.BuildBlueprint(draft, {
-        generationSeed = intent.generationSeed,
-        id = intent.id,
-    })
-    if not candidate then return false, reason end
-    current = self:_snapshotDraft(draft)
+    local proposed, reason = Model.BuildBlueprint(draft, { generationSeed = intent.generationSeed, id = intent.id })
+    if not proposed then return false, reason end
+    local current = self:_snapshotDraft(draft)
+    local candidate, changed = Blueprint.Clone(intent), false
     for _, field in ipairs(Profile.List("companion")) do
-        local capability = self:FieldCapability(field.id)
         local before = self._viewSnapshot and self._viewSnapshot[field.id]
         local after = current[field.id]
-        if capability.editable ~= false and before
-            and not sameValue(before, after)
-        then
-            local result
-            if after.state == "value" then
-                result = self.session:SetField(
-                    self.traitID, field.id, after.value)
-            elseif after.state == "clear" or after.state == "absent" then
-                result = self.session:ClearField(self.traitID, field.id)
-            end
-            if result then changed = true end
+        if self:FieldCapability(field.id).editable ~= false and before and not sameValue(before, after) then
+            if after.state == "value" then candidate, reason = Blueprint.Set(candidate, field.id, after.value)
+            else candidate, reason = Blueprint.Clear(candidate, field.id) end
+            if not candidate then return false, reason end
+            changed = true
         end
     end
-    if changed and self.session.ResolveSlot then
-        self.session:ResolveSlot(self.traitID, self.session:GetContext())
-    end
-    return changed
+    if not changed then return false end
+    return self:_commitCandidate(candidate)
 end
 
 -- Explicit visual variation is allowed in character creation. Random policies
@@ -256,13 +254,39 @@ function Adapter:VaryLook()
     local slot = self:Slot()
     local plan
     plan, reason = Authoring.Resolver.ResolvePlan(candidate, self.session:GetContext(),
-        Authoring.Resolver.PolicyForStartingCompanion(slot.spec))
+        Authoring.Resolver.PolicyForStartingCompanion(slot.spec, self.session:GetContext()))
     if not plan then return nil, reason end
     local ok
     ok, reason = self.session:SetBlueprint(self.traitID, candidate)
     if not ok then return nil, reason end
     self._viewSnapshot = nil
     return true
+end
+
+function Adapter:RandomizeTab(scope)
+    local intent = self:BlueprintIntent()
+    local source = self:BuildDraft()
+    if not source then return nil, "slot_not_found" end
+    self.variationCount = (self.variationCount or 0) + 1
+    local V = PNC.NPCAuthoringVariation
+    local varied, reason = V.Generate(source, scope, V.Seed(intent.generationSeed, scope, self.variationCount, Blueprint.Fingerprint(intent)))
+    if not varied then return nil, reason end
+    local proposed
+    proposed, reason = Model.BuildBlueprint(varied)
+    if not proposed then return nil, reason end
+    local candidate = Blueprint.Clone(intent)
+    for _, field in ipairs(Profile.List("companion")) do
+        if V.Includes(scope, field.id) and self:FieldCapability(field.id).editable ~= false then
+            local state, value = Blueprint.Get(proposed, field.id)
+            if state == "value" then candidate, reason = Blueprint.Set(candidate, field.id, value)
+            else candidate, reason = Blueprint.Clear(candidate, field.id) end
+            if not candidate then return nil, reason end
+        end
+    end
+    local ok
+    ok, reason = self:_commitCandidate(candidate)
+    if ok then self._viewSnapshot = nil end
+    return ok, reason
 end
 
 function Adapter:Randomize()

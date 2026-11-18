@@ -1,9 +1,40 @@
 # Creator randomization and browser audit / proposed P5R5
 
-Date: 2026-11-18. Status: P5R6 developer follow-up verified; native acceptance
+Date: 2026-11-18. Status: P5R7 developer follow-up verified; native acceptance
 pending. The historical P5R4/P5R5 audit below is preserved for provenance.
 
-## P5R6 clarification and repair
+## Current P5R7 clarification and repair
+
+Per-tab dice replace the wide footer. Bio varies names/nickname, preserving
+chosen gender/archetype and inherited surname. Appearance varies editable body,
+hair and voice without changing clothes; Attributes selects compatible loaded
+skills/traits, excluding companion-selection traits and native resource aliases;
+Loadout materializes exact clothes/equipment without changing identity/body/voice.
+Companion transactions project editable scope fields and validate once; failed
+generation preserves accepted values and pending text. Debug uses the same scope
+generator. No Random policy choices are added to companion selectors.
+
+Relationships now states the directional NPC/player roles, originating trait and
+current field constraints. Semantic backstory generation is **TODO**, and the
+relationship dice is visible but disabled with that explanation. Future
+backstories must preserve the selected relationship trait's authority.
+
+Locks are visible only for actual current constraints, with surname/family/sexual
+orientation explanations. Context is read again for each policy lookup: bisexual
+Lover gender can be chosen, while straight/gay rules and family sex remain
+protected. Manual appearance changes commit atomically before controls repaint;
+native skin texture selection removes stale RGB cache. These changes are covered
+by **58/58** focused tests, **1052/1056** full suite (four prior failures), 32 Lua
+syntax/22 production Kahlua checks and EN/TL catalog parity/reference checks.
+
+Current user-owned native retest: all page dice, scope preservation, repeated
+skin/gender edits, changing orientation and player surname, lock hover reasons,
+wrapped relationship text, saved/reopened presets and compact/large-font layout.
+Continue previous browser/audio/SP/MP/co-op checks. Native rendering/audibility
+remains unverified. The sections below record preceding requests and checkpoints;
+P5R7 is current where their randomization presentation differs.
+
+## Historical P5R6 clarification and repair
 
 The latest user report requests editable Friend gender, persistent selected
 button color, a wide explicit appearance-variation action, proper title-bar
@@ -25,7 +56,7 @@ Evidence: **56/56** focused, **1049/1053** full suite (same four known failures)
 JSON/static references/parity/whitespace. Native audio/rendering remains
 unverified; the harness checks the call sequence, not audible sound.
 
-Current native retest: choose Friend male then female, confirm colors survive
+Historical P5R6 native retest: choose Friend male then female, confirm colors survive
 refresh, verify family locks, resize/change fonts without header overlap, use
 the wide variation action while preserving name/skills/gender/gear, and play/stop
 voice before entering the world. Complete the earlier browser/preset and P6
@@ -54,7 +85,7 @@ Use a fresh installed PZ42.22.2 session and both entry points:
 
 1. In companion customization, inspect every page/browser after new generation,
    reset and loading old presets: no Random policy option should be exposed; the
-   wide explicit appearance-variation action should be available.
+   current per-tab dice should be available (P5R7 replaces the former wide action).
    Opening/closing without edits must preserve generated/inherited defaults.
 2. In debug, select explicit hair, body tone and clothes; use Randomize look.
    Confirm controls, slot icons and portrait agree, old visual overrides are

@@ -417,4 +417,16 @@ local nextBody = PNC.UniqueNPCEditorModel.EnsureRuntimeRecord(genderPreview, fal
 T.truthy(previousBody ~= nextBody, "gender change creates a new body-specific runtime preview")
 T.equal(nextBody.isFemale, true, "new body uses selected gender")
 
+local skinDraft = Model.New()
+skinDraft.displayName = 'Skin Tester'; skinDraft.isFemale = false
+skinDraft.identity.survivor = { forename = 'Skin', surname = 'Tester', skinTexture = 'MaleBody05' }
+skinDraft.appearanceAuthored.skinTexture = true; skinDraft.appearanceAuthored.skinColor = true
+skinDraft.runtimeRecord = { isFemale = false, identitySeed = 7, equipmentSpawnMode = 'none', startingItems = {},
+    identity = { survivor = { skinTexture = 'MaleBody01', skinColor = { r = .1, g = .1, b = .1 } } },
+    inventory = { items = {} }, appearance = PNC.Identity.Appearance.Normalize(skinDraft.appearance),
+    runtime = { appearanceCache = { skinTexture = 'MaleBody01', skinColor = { r = .1, g = .1, b = .1 }, outfitItems = { 'Base.Shirt' } } } }
+local skinSpec = Model.BuildPortraitSpec(skinDraft)
+T.equal(skinSpec.appearance.skinTexture, 'MaleBody05', 'selected native skin tone reaches the portrait projection')
+T.falsy(skinSpec.appearance.skinColor, 'native tone selection clears stale custom RGB from the preview cache')
+T.equal(skinSpec.appearance.outfitItems[1], 'Base.Shirt', 'skin tone edits leave wardrobe state stable')
 T.finish("pnc_unique_npc_editor_model_smoke")

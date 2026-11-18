@@ -54,9 +54,9 @@ T.contains(companionSource, "Store.Load",
     "starting companion loads through the existing preset store")
 T.contains(companionSource, "Presets.ApplyToSession",
     "preset application stays on the canonical session")
-T.contains(adapterSource, "session:SetField",
+T.contains(adapterSource, "self:_commitCandidate",
     "companion edits use the policy-aware session setter")
-T.contains(adapterSource, "session:ClearField",
+T.contains(adapterSource, "Blueprint.Clear(candidate",
     "companion clears use the policy-aware session clearer")
 T.contains(lifecycleSource, "ISPNCNPCAuthoringEditor",
     "mature editor lifecycle is attached to the shared component")

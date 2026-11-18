@@ -115,9 +115,8 @@ end
 function Composer:Policy()
     if self.policy then return self.policy end
     local slot = self:Slot()
-    self.policy = slot and Resolver.PolicyForStartingCompanion(slot.spec)
+    return slot and Resolver.PolicyForStartingCompanion(slot.spec, self.session:GetContext())
         or Resolver.Policies.Debug
-    return self.policy
 end
 
 function Composer:FieldRows(limit)

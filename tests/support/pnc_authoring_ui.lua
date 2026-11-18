@@ -93,7 +93,8 @@ PsychopatzCore = { UI = UI }
 local Model = { New = function() return { identity = { survivor = {} }, appearance = {} } end }
 local Storage = { List = function() return {} end }
 PNC = { UniqueNPCEditorModel = Model, UniqueNPCEditorStorage = Storage,
-    NPCAuthoringEditorProfile = { IsVisible = function() return true end, SourceHelp = function() return "" end },
+    NPCAuthoringVariation = { Includes = function() return false end },
+    NPCAuthoringEditorProfile = { List = function() return {} end, IsVisible = function() return true end, SourceHelp = function() return "" end },
     Identity = { Appearance = { Normalize = function(v) return v or { slots = {} } end } },
     UniqueNPCAppearanceUI = { Internal = { locations = function() return {} end } },
     NPCAuthoringCatalog = { Search = function() return {} end }, NPCAuthoringLoadout = {} }
@@ -112,6 +113,9 @@ for _, path in ipairs({ "PNC_NPCAuthoringLoadout", "PNC_NPCAuthoringCatalog" }) 
     package.loaded["PNC/UI/NPCAuthoring/" .. path] = true
 end
 T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Loadout.lua")
+package.loaded["PNC/Identity/PNC_NPCAuthoringVariation"] = true
+T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringRelationshipPresentation.lua")
+T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringRandomization.lua")
 T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringAttributes.lua")
 T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Lifecycle.lua")
 T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow_Layout.lua")

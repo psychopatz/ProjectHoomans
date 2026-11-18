@@ -161,7 +161,7 @@ function Window:layoutIntegratedAppearance()
     local gap = Layout.Pixels(10, self.uiScale)
     local h = math.max(Layout.Pixels(28, self.uiScale),
         (getTextManager and getTextManager():getFontHeight(UIFont.Small) or 16) + 10)
-    local top = Layout.Flow(self.topControls, { x = gap, y = gap,
+    local top = Layout.Flow(self.topControls, { x = gap, y = h + gap * 2,
         width = math.max(1, self.width - gap * 2) },
         { scale = self.uiScale, minWidth = 80, gap = 6 })
     Layout.SetBounds(self.content, gap, top.bottom + gap,

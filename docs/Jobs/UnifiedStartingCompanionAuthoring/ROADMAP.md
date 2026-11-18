@@ -1,6 +1,6 @@
 # Roadmap — Unified Starting Companion Authoring
 
-**Status:** P5R6 developer repair verified — P6 native acceptance pending
+**Status:** P5R7 developer repair verified — P6 native acceptance pending
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -860,6 +860,34 @@ selector policies remain excluded; the explicit action is allowed.
 Native rendered/input/audio acceptance remains P6, including the new Friend,
 selection-color, title-frame, wide-action and menu-voice retest.
 
+### P5R7 — Per-tab dice and live relationship constraints
+
+The latest request replaces the wide appearance action with dice on Bio,
+Appearance, Attributes, Loadout and Relationships. Semantic backstory generation
+is explicitly deferred; Relationships explains current meaning and has disabled
+TODO dice.
+
+- Each shared page owns a dice control above its form. Bio varies names/nickname
+  and preserves chosen body/archetype; Appearance varies editable face/hair/voice;
+  Attributes generates compatible loaded skills/traits without companion-selection
+  traits; Loadout captures concrete clothing/equipment. Every companion result is
+  projected through editable scope fields and committed atomically without
+  changing unrelated generation or inherited fields.
+- Relationship rows explain NPC-to-player and player-to-NPC roles, originating
+  trait and current inherited/independent fields. Long explanations wrap.
+- Only actual constraints display locks; current surname/trait/orientation supply
+  dynamic explanations. Policy is recomputed from live context. Bisexual Lover
+  and Friend sex are editable; fixed and straight/gay rules retain final authority.
+- Complete manual candidates commit before repaint; stale locked callbacks are
+  rejected. Native tone selection removes stale cached custom skin RGB.
+- **58/58** focused and **1052/1056** full suite; the same four known unrelated
+  failures. **32** Lua syntax and **22** production Kahlua checks, JSON,
+  26 new/one updated EN/TL keys, parity/reference and whitespace checks pass.
+
+**P5R7 gate:** developer verification complete; exact local phase commit required.
+Native hit testing, rendering/audio and final SP/MP/co-op behavior remain P6.
+Backstory generation is a future feature and not a condition of this repair.
+
 ### P6 — Native acceptance
 
 After all developer-side gates pass, perform the user-owned native matrix
@@ -889,8 +917,10 @@ unless the user explicitly delegates native control:
 - reopen the editor repeatedly and confirm no reroll until Randomize is used;
 - verify companion Reset/Revert and debug Randomize look have distinct behavior;
 - verify companion customization exposes no Random policy choices, while the
-  wide explicit appearance-variation action works, including
-  after loading older randomized presets;
+  per-tab dice changes only its documented scope, including after loading older
+  presets; Relationships dice remains disabled with its backstory TODO reason;
+- verify repeated gender/skin edits, live orientation changes, constraint-specific
+  lock visibility/tooltips and directional relationship explanations;
 - verify browser selection, focused outfit preview, Apply/Cancel, grouped
   attributes and compact preset scope using the P5R5 native matrix;
 - verify the final active-companion summary before world entry;

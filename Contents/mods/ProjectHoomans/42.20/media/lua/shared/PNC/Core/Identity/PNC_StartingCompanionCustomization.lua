@@ -341,7 +341,9 @@ function Customization.SanitizeBlueprint(blueprint, spec)
     if not normalized then return nil, reason end
     policy = PNC.NPCAuthoringResolver.PolicyForStartingCompanion(spec)
     for fieldID, binding in pairs(policy.bindings or {}) do
-        if binding.mandatory then
+        -- Orientation is unavailable at wire sanitization. Retain partner sex
+        -- intent here; final resolution enforces the actual player's policy.
+        if binding.mandatory and not (fieldID == "identity.isFemale" and spec.sex == "orientation") then
             state = Blueprint.Get(normalized, fieldID)
             if state ~= "absent" then
                 normalized = removeField(normalized, fieldID)

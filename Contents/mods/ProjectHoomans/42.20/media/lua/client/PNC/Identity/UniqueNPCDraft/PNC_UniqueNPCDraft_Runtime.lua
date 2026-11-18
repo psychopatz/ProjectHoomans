@@ -76,10 +76,11 @@ local function applyPreviewAppearance(record, cleared)
     if cleared then
         for _, key in ipairs({ "skinTexture", "hairModel", "beardModel",
             "hairColor", "skinColor" }) do
-            if cleared[key] and survivor[key] == nil
-                and generated[key] ~= nil
-            then
-                appearance[key] = copy(generated[key])
+            if cleared[key] and survivor[key] == nil then
+                -- A native skin texture replaces custom RGB; an absent
+                -- generated value must also remove an old manual cache value.
+                if key == "skinColor" and survivor.skinTexture ~= nil then appearance[key] = nil
+                else appearance[key] = copy(generated[key]) end
             end
         end
         if (cleared.voice or cleared.voicePrefix or cleared.voiceType

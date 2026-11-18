@@ -71,7 +71,7 @@ function Window:layoutAttributeGroups(width, rowHeight, gap)
         row.browse:setEnable(cap.editable ~= false)
         row.empty:setVisible(show and #row.configured.items == 0)
         if show then
-            local x, y = gap + visible % columns * (cell + gap), gap + math.floor(visible / columns) * groupHeight
+            local x, y = gap + visible % columns * (cell + gap), rowHeight + gap * 2 + math.floor(visible / columns) * groupHeight
             L.SetBounds(row.labelControl, x, y, cell, rowHeight)
             y = y + rowHeight + gap
             if row.id == 'skill' then
@@ -92,7 +92,7 @@ function Window:layoutAttributeGroups(width, rowHeight, gap)
     end
     self.configuredDetails:setVisible(false); self.removeConfiguredButton:setVisible(false)
     local page = self.pages.attributes
-    page.contentHeight = math.max(page.height, math.ceil(visible / columns) * groupHeight + gap)
+    page.contentHeight = math.max(page.height, math.ceil(visible / columns) * groupHeight + rowHeight + gap * 2)
     page.maxScroll = math.max(0, page.contentHeight - page.height)
     page:setScrollHeight(page.contentHeight); page:setYScroll(math.max(-page.maxScroll, math.min(0, page:getYScroll()))); page:onResize()
 end
