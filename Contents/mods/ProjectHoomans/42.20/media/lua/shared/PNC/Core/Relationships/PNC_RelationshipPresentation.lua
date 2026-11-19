@@ -192,6 +192,36 @@ function Presentation.BuildForConversation(player, npcID)
     summary.relationshipLookup = relationship and "matched" or "missing"
     summary.socialRevision = record.social
         and tonumber(record.social.revision) or 0
+    local coreActors = PsychopatzCore and PsychopatzCore.Actors or nil
+    local coreReg = coreActors and coreActors.DefaultRegistry or nil
+    if coreReg and type(coreReg.ProjectIdentity) == "function" then
+        local npcRef = tostring(record.coreActorID or record.id)
+        local npcProj = coreReg:ProjectIdentity(npcRef)
+        local targetProj = coreReg:ProjectIdentity(targetKey)
+        if npcProj then
+            summary.lifecycleStatus = npcProj.status
+            summary.lifecycleRevision = npcProj.lifecycleRevision
+        end
+        if targetProj then
+            summary.targetLifecycleStatus = targetProj.status
+            summary.targetLifecycleRevision = targetProj.lifecycleRevision
+            if targetProj.status == "FORGOTTEN" then
+                summary.degradedLabel = (type(relationship) == "table"
+                    and (relationship.degradedLabel or relationship.historicalLabel))
+                    or "someone"
+            end
+        end
+    end
+    if type(relationship) == "table" then
+        summary.historical = relationship.historical == true
+        summary.targetLifecycleStatus = summary.targetLifecycleStatus
+            or relationship.targetLifecycleStatus
+        summary.targetLifecycleRevision = summary.targetLifecycleRevision
+            or relationship.targetLifecycleRevision
+        summary.degradedLabel = summary.degradedLabel
+            or relationship.degradedLabel
+            or relationship.historicalLabel
+    end
     summary.identityDiagnostics = {
         accountIdentity = targetKey
             and tostring(string.match(targetKey, "^player:([^:]+):") or "")

@@ -147,6 +147,12 @@ function Adapter.ToCoreSocial(recordSocial, core)
                     revision = tonumber(rel.revision) or 0,
                     lastEventAt = rel.lastInteractionAt or rel.lastEvaluatedAt,
                     lastEvaluatedAt = tonumber(rel.lastEvaluatedAt) or 0,
+                    historical = rel.historical,
+                    historicalPin = rel.historicalPin,
+                    historicalLabel = rel.historicalLabel,
+                    degradedLabel = rel.degradedLabel,
+                    targetLifecycleStatus = rel.targetLifecycleStatus,
+                    targetLifecycleRevision = rel.targetLifecycleRevision,
                     extensions = relExt,
                 }
                 for _, mem in ipairs(rel.memories or {}) do

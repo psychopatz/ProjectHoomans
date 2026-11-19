@@ -1,9 +1,9 @@
 # Progress — Project Hoomans Portable Actor Lifecycle & GC Adoption
 
-**Status:** IN_PROGRESS (H0, H1, H2, H3A, H4-policy, H6-player-lifecycle ACCEPTED — awaiting H3/H5).
+**Status:** IN_PROGRESS (H0, H1, H2, H3, H4, H6-player-lifecycle ACCEPTED — next H5 scale/soak acceptance).
 **Parent:** PsychopatzCore Docs/portable_actor_lifecycle_gc/.
-**Current phase:** H6-player-lifecycle complete; next H3 social memoryBank consumer sweep / H5 soak & regression.
-**Participant completion:** 4/6 phases accepted (H0, H1, H2, plus H3A/H4-policy/H6-player-lifecycle).
+**Current phase:** H3–H4 complete; next H5 large-scale GC soak & final regression.
+**Participant completion:** 5/6 phases accepted (H0, H1, H2, H3, H4, plus H6-player-lifecycle).
 
 ## Verified H0 Audit Facts (Checkpoint `67510b0db`)
 
@@ -41,6 +41,12 @@
 - Wired `PsychopatzCore.PlayerIdentity.RetirePlayerCharacter` inside `PNC_PlayerCharacterService_Lifecycle.lua` (`PlayerCharacters.MarkDead`) with `authority = "server"`, `reason = "player_death"`, `allowAlreadyRetired = true`, and `adoptUnissued = true`.
 - Verified `python3 tests/run_tests.py player_character` PASS (`3/3` in `0.17s`), Core `psychopatz_player_character_lifecycle_mp_smoke.lua` PASS, and `pz_verify.py --kahlua --severity ERROR` (`0` errors) across both edited files.
 
+## H3 & H4 — Social History Migration & Lifecycle Semantic Projections
+
+- Extended `PNC_Persistence_CoreSocial.lua` (`ToCoreSocial`) to forward historical edge metadata (`historical`, `historicalPin`, `historicalLabel`, `degradedLabel`, `targetLifecycleStatus`, `targetLifecycleRevision`) while strictly persisting actor memories to `memoryBank` with zero `rel.memories`.
+- Enriched `PNC_RelationshipPresentation.lua` (`BuildForConversation`) with O(1) read-only Core `ProjectIdentity` lookups exposing `lifecycleStatus`, `lifecycleRevision`, `targetLifecycleStatus`, `targetLifecycleRevision`, `historical`, and `degradedLabel` with zero GC trigger on open.
+- Created `tests/pnc_lifecycle_semantic_projection_smoke.lua` and verified `python3 tests/run_tests.py lifecycle_semantic_projection core_actor_lifecycle_gc core_social portable_social relationship_graph npc_knowledge_service` (`PASS 6/6`) plus Kahlua lint (`0` errors).
+
 ## Next Chunk
 
-Complete remaining Hoomans **H3** social `memoryBank` consumer cleanup and participate in Core **L8-L9** semantic projection and scale/soak acceptance.
+Complete **H5** large-scale NPC retirement, multi-generation budgeted GC soak, save/reload, and combined DT regression under Core **L9**.
