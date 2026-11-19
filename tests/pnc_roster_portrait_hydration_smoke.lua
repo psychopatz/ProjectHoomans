@@ -171,6 +171,39 @@ now = now + 1000
 local afterDisconnect = join(modern, const.ROSTER_PORTRAIT_PROTOCOL)
 T.truthy(net.ClientState.snapshots.npc == afterDisconnect,
     "reconnect accepts lower directory revision from fresh server")
+local codec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
+local originalPack = codec.Pack
+local packCalls = 0
+codec.Pack = function(value)
+    packCalls = packCalls + 1
+    return originalPack(value)
+end
+npc.equipment.wornVisuals = { Hat = {
+    fullType = "Fixture.Hat", textureChoice = 2, baseTexture = 0,
+    modelIndex = 3, hue = 0.12345678901234567, decal = "fixture:hat",
+    customColor = true, tint = { r = 0.31, g = 0.58, b = 0.49, a = 1 },
+} }
+net.NegotiateRosterPortraits(modern, const.ROSTER_PORTRAIT_PROTOCOL, codec.Fingerprint)
+net.NegotiateRosterPortraits(legacy, const.ROSTER_PORTRAIT_PROTOCOL, codec.Fingerprint)
+local function requestPacked(player, requestID, force)
+    sent = {}
+    router.Handle(const.CMD_REQUEST_ROSTER_PORTRAIT, player, {
+        id = npc.id, incarnation = afterDisconnect.portraitRef.incarnation,
+        requestID = requestID, forceResolved = force,
+    })
+    T.equal(#sent, 1, "recipient-specific response")
+    return sent[1].args
+end
+local encoded = requestPacked(modern, "packed-a")
+T.truthy(encoded.packedPortrait, "compatible, smaller encoding is selected")
+T.equal(encoded.portraitCodec, codec.Fingerprint, "dialect on response")
+local shared = requestPacked(legacy, "packed-b")
+T.equal(shared.packedPortrait, encoded.packedPortrait, "matching class shares compiled data")
+T.equal(packCalls, 1, "matching class encodes once")
+T.truthy(requestPacked(modern, "resolved", true).portrait, "repair forces resolved")
+net.NegotiateRosterPortraits(legacy, const.ROSTER_PORTRAIT_PROTOCOL, "unknown-catalog-dependent-codec")
+T.truthy(requestPacked(legacy, "mismatch").portrait, "mismatched dialect gets resolved")
+
 local overflow
 for index = 1, 129 do
     local record = copy(npc)

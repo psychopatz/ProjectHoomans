@@ -1,3 +1,4 @@
+local Codec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
 local Client = PNC.Client
 local Internal = Client.Internal
 local State = PNC.Network.ClientState
@@ -83,6 +84,7 @@ function Client.GetRosterPortrait(id)
     entry.requestAt, lastRequestAt = now, now
     sendClientCommand(player, Const.MODULE, Const.CMD_REQUEST_ROSTER_PORTRAIT, {
         id = id, incarnation = ref.incarnation, requestID = entry.requestID,
+        forceResolved = entry.forceResolved or nil,
     })
     return entry.portrait, entry.displayRevision
 end
@@ -94,8 +96,17 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_PORTRAIT, function(args)
         or not snapshot or snapshot.deathMarker
         or not matches(snapshot.portraitRef, args.portraitRef)
         or not matches(entry.reference, args.portraitRef)
-        or type(args.portrait) ~= "table"
     then
+        return
+    end
+    local portrait = args.portrait
+    if args.portraitCodec == Codec.Fingerprint then
+        portrait = Codec.Unpack(args.packedPortrait)
+    end
+    if type(portrait) ~= "table" then
+        entry.forceResolved = true
+        entry.requestID = nil
+        entry.requestAt = nil
         return
     end
     entry.displayRevision = args.portraitRef.incarnation .. ":" .. tostring(args.portraitRef.revision)
@@ -103,7 +114,7 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_PORTRAIT, function(args)
         entry.displayRevision = entry.displayRevision .. ":" .. entry.requestID
     end
     entry.requestID = nil
-    entry.portrait = args.portrait
+    entry.portrait = portrait
     entry.expiresAt = args.transient == true and Core.Now() + RETRY_MS or nil
 end)
 

@@ -86,9 +86,16 @@ require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerCharacterReplicationCommandHandler"
 
 local network, const, router = PNC.Network, PNC.Const, PNC.ServerCommandRouter
+local codec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
 local totals
 local function count(name)
     totals[name] = (totals[name] or 0) + 1
+end
+
+local pack = codec.Pack
+function codec.Pack(portrait)
+    count("codecBuilds")
+    return pack(portrait)
 end
 
 local buildPortrait = PNC.Identity.BuildPortraitSummary
@@ -174,6 +181,7 @@ end
 local function join(player)
     local args = {}
     if mode ~= "legacy" then args.portraitProtocol = const.ROSTER_PORTRAIT_PROTOCOL end
+    if mode == "packed" then args.portraitCodec = codec.Fingerprint end
     assert(router.Handle(const.CMD_FULL_SYNC_REQUEST, player, args))
 end
 
@@ -188,7 +196,7 @@ local function measure(name, npcs, clients, density, trial, workload)
     workload()
     local elapsed = 1000 * (os.clock() - started)
     local estimate, portraitBytes, entries, maxBatch, detail = 0, 0, 0, 0, 0
-    local refusal, chunks = 0, 0
+    local refusal, chunks, packed, resolved = 0, 0, 0, 0
     local recipients = {}
     local function inspect(snapshot)
         if not snapshot then return end
@@ -214,7 +222,13 @@ local function measure(name, npcs, clients, density, trial, workload)
         if payload.entries then inspectRows(payload.entries, true) end
         if payload.snapshots then inspectRows(payload.snapshots, false) end
         inspect(payload.snapshot)
-        if payload.portrait then inspect(payload) end
+        if payload.portrait then
+            inspect(payload)
+            resolved = resolved + 1
+        elseif payload.packedPortrait then
+            packed = packed + 1
+            portraitBytes = portraitBytes + estimatePayload(payload.packedPortrait, math.huge)
+        end
         if payload.pncChunk then
             chunks = chunks + 1
             for _, part in ipairs(payload.pncChunk.parts) do
@@ -240,7 +254,7 @@ local function measure(name, npcs, clients, density, trial, workload)
         totals.portraitLookups or 0, totals.portraitHits or 0, totals.portraitMisses or 0,
         totals.invalidations or 0, occupants, refusal, chunks,
         totals.budgetEstimates or 0, totals.budgetSplits or 0,
-        totals.resolvedProjections or 0,
+        totals.resolvedProjections or 0, totals.codecBuilds or 0, packed, resolved,
     }, ","))
     sent = {}
 end
@@ -313,7 +327,7 @@ local function run(npcs, clients, density, trial)
     sample("reconnect", function() join(players[1]); refresh() end)
 end
 
-print("npcs,clients,interest,trial,scenario,cpu_ms,sends,recipients,roster_rows,max_batch,estimated_bytes,portrait_estimated_bytes,detailed_snapshots,roster_builds,full_builds,presence_builds,character_builds,portrait_lookups,cache_hits,cache_misses,invalidations,cache_entries,refusals,chunks,budget_estimates,budget_splits,resolved_projections")
+print("npcs,clients,interest,trial,scenario,cpu_ms,sends,recipients,roster_rows,max_batch,estimated_bytes,portrait_estimated_bytes,detailed_snapshots,roster_builds,full_builds,presence_builds,character_builds,portrait_lookups,cache_hits,cache_misses,invalidations,cache_entries,refusals,chunks,budget_estimates,budget_splits,resolved_projections,codec_builds,packed_responses,resolved_responses")
 local trials = tonumber(arg[1]) or 3
 for _, npcs in ipairs({ 100, 300, 600 }) do
     for _, clients in ipairs({ 1, 8, 16 }) do

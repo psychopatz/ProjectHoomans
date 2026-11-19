@@ -38,6 +38,8 @@ P2 developer gate accepted. See the [hydration evidence](P2_HYDRATION.md).
 - Explicit fallback covers unsupported/mismatched encodings, unknown or unrepresentable appearance fields, mismatched variants, and unsupported native values. Full resolved projection is a data fallback **only when the receiving client has the necessary assets**; missing resources use a documented safe placeholder/error path, never a false claim of exact parity.
 - **Gate:** exact supported-field round-trips against server projections for saved presets, unique NPCs, randomized NPCs, explicit empty slots and real modded variant/tint/metadata cases; mismatch, reorder, missing-asset, changed-generator, altered-defaults and reconnect tests; prove one compile can serve same-class recipients; prove class/cache bounds; compare candidate sizes including dictionary setup; report per-scenario CPU, bytes, cache, no-op suppression and fallback rates vs P2. Enable hybrid only when parity, robustness and net savings pass, otherwise retain P2.
 
+P3 developer evaluation accepted for the resolved and reversible field formats. Seeded and shared-definition candidates remain off. See the [representation evidence](P3_REPRESENTATIONS.md).
+
 ## P4 Revisioned appearance updates and convergence
 
 - Send only visual field/slot changes against `baseRevision` -> `targetRevision`. Preserve `set`, `clear`, and `default` meanings. Do not mutate `identitySeed` or treat initial loadout as current inventory state. Use the normalized presentation hash/equality key to suppress revisions whose resulting projection is unchanged.

@@ -1,3 +1,4 @@
+local Codec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
 local Network = PNC.Network
 local Internal = Network.Internal
 local Const = PNC.Const
@@ -33,14 +34,16 @@ function Network.ResetPortraitReplication()
     epoch = nil
 end
 
-function Network.NegotiateRosterPortraits(player, protocol)
+function Network.NegotiateRosterPortraits(player, protocol, codec)
     if not player then return false end
     local lean = Const.ROSTER_PORTRAIT_PROTOCOL ~= nil
         and protocol == Const.ROSTER_PORTRAIT_PROTOCOL
         and isServer and isServer() == true
         and (not getSpecificPlayer or player ~= getSpecificPlayer(0))
     if lean then
-        capabilities[player] = capabilities[player] or { window = 0, requests = 0 }
+        local capability = capabilities[player] or { window = 0, requests = 0 }
+        capability.packed = codec == Codec.Fingerprint
+        capabilities[player] = capability
     else
         capabilities[player] = nil
     end
@@ -101,6 +104,7 @@ local function update(record, state, portrait)
         revision = state.reference.revision + 1,
     }
     state.portrait = portrait
+    state.packed = nil
     Network.QueueRosterDelta(record, false, "portrait_changed", false)
 end
 
@@ -144,6 +148,19 @@ function Internal.FlushPortraitInvalidations()
     end
 end
 
+local function selectPacked(state, portrait)
+    if state.packed ~= nil then return state.packed end
+    local packed = Codec.Pack(portrait)
+    local budget = Network.PayloadBudget
+    if packed and budget.Estimate({ packedPortrait = packed, portraitCodec = Codec.Fingerprint }, math.huge)
+        >= budget.Estimate({ portrait = portrait }, math.huge)
+    then
+        packed = nil
+    end
+    state.packed = packed or false
+    return packed
+end
+
 function Network.SendRosterPortrait(player, args)
     local capability = capabilities[player]
     if not capability or type(args) ~= "table" or type(args.id) ~= "string" or #args.id > 128
@@ -182,13 +199,21 @@ function Network.SendRosterPortrait(player, args)
     end
     local portrait = state.portrait or identity.ProjectPortrait(record)
     local cached = retain(record, state, portrait)
-    return Internal.SendToPlayer(player, Const.CMD_ROSTER_PORTRAIT, {
+    local payload = {
         id = args.id,
         requestID = args.requestID,
         portraitRef = state.reference,
-        portrait = portrait,
         transient = not cached,
-    })
+    }
+    if cached and capability.packed and args.forceResolved ~= true then
+        local packed = selectPacked(state, portrait)
+        if packed then
+            payload.packedPortrait = packed
+            payload.portraitCodec = Codec.Fingerprint
+        end
+    end
+    if not payload.packedPortrait then payload.portrait = portrait end
+    return Internal.SendToPlayer(player, Const.CMD_ROSTER_PORTRAIT, payload)
 end
 
 return Network
