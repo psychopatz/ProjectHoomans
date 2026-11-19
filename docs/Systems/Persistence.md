@@ -5,9 +5,10 @@
 - `PNC_Registry` delegates all long-lived record writes to this subsystem.
 
 ## Owned Data
-- versioned per-NPC persisted schema, with exact-version reset semantics
+- Core-backed SurvivorWorld actors keep canonical identity, appearance, personal inventory, social/persona state, affiliation/world/journey, and provider lease in `PsychopatzCore` (`ActorExtension` storage on `actor.extensions["ProjectHoomans.ActorExtension"]`, `schemaVersion = 1`, encoded as `nil` / 0 bytes for unmodified bystanders); Core-backed records do not duplicate legacy `PNC_NPC_<id>` ModData
+- versioned per-NPC persisted schema for non-Core legacy/local records, with exact-version reset semantics
 - `PNC_Core_Global.records` directory pointers
-- isolated `PNC_NPC_<id>` record tables
+- isolated `PNC_NPC_<id>` record tables (non-Core records only)
 - canonical persisted fields only
 - nested `identity` payload
 - compact `inventory` payload
@@ -24,13 +25,17 @@
 - save-time position/stamina snapshots and current-version compaction
 
 ## Public Functions
-- `PNC.Persistence.SerializeRecord(record)`
+- `PNC.Persistence.SerializeRecord(record)` (returns `payload, outcome, reason` with canonical `WRITTEN` / `TERMINAL_OR_NOT_APPLICABLE` / `RETRYABLE_FAILURE`)
 - `PNC.Persistence.DeserializeRecord(raw, fallbackID)`
 - `PNC.Persistence.LoadAll(serializedRecords)`
 - `PNC.Persistence.SaveAll(records)`
 - `PNC.Persistence.RebuildRuntime(record)`
 - `PNC.Registry.MarkDirty(record, domain)`
-- `PNC.Registry.FlushDirty()`
+- `PNC.Registry.FlushDirty(options)`
+- `PNC.Registry.PumpPhysicalCheckpoints(now, force)`
+- `PNC.PersistenceCoordinator.Commit(reason, options)` (deferred/coalescing by default; `{ immediate = true }` for synchronous flush)
+- `PNC.PersistenceCoordinator.Pump(now)`
+- `PNC.PersistenceCoordinator.FlushNow(reason)`
 - `PNC.PlayerCharacters.Load()`
 - `PNC.PlayerCharacters.Save()`
 - `PNC.PlayerCharacters.NormalizeRegistry()`
@@ -72,9 +77,15 @@
   caches. Inventory item/delta state remains authoritative and repairs those
   caches when hydrated
 - continuous live movement and passive stamina recovery update runtime records
-  without calling `MarkDirty` every tick. `FlushDirty` compares compact saved
-  snapshots and dirties only records whose position or stamina actually
-  differs at save time
+  without calling `MarkDirty` every tick. Ordinary logical
+  `PersistenceCoordinator.Commit(reason)` calls enqueue/coalesce dirty domains
+  and return immediately without scanning all records or invoking
+  `GlobalModData.save()`. The server tick (`PersistenceCoordinator.Pump`, every
+  2,000 ms, capped at 8 dirty records per pass) and bounded physical
+  checkpoints (`Registry.PumpPhysicalCheckpoints`, every 5,000 ms, round-robin
+  cap of 8 promoted records) drain deltas incrementally, while `OnSave`,
+  shutdown, or explicit `{ immediate = true }` flushes execute full
+  `FlushNow()` drain including `GlobalModData.save()` and Core `RuntimeStore.Save()`
 - missing Need state is intentionally valid for old saves. Individual state is
   initialized only when existing ownership/recruitment makes it eligible;
   group state is initialized only for an active mobile faction. Need debug
@@ -100,7 +111,12 @@
   accepted only when their exact current version and directory identity match
 - unreferenced `PNC_NPC_<id>` tables are removed during startup maintenance and
   are never recovered as live records
-- failed record serialization or writes remain dirty and retry on a later save
+- serialization and Core sync classify outcomes into `WRITTEN`,
+  `TERMINAL_OR_NOT_APPLICABLE` (for example Core-backed records owned by
+  `ProjectHoomans.ActorExtension` or Core appearance envelopes, which clear
+  immediately on attempt 1 without down-converting schemas or looping), and
+  `RETRYABLE_FAILURE` (retained dirty with exponential backoff 1s..30s up to
+  5 attempts before quarantine until a fresh gameplay mutation marks it dirty)
 
 ## Deterministic Generated-State Healing
 

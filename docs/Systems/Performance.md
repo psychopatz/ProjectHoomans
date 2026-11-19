@@ -10,11 +10,22 @@
 
 ## World Census
 
-`PNC_WorldCensus` is the only recurring owner of a full
-`getCell():getZombieList()` traversal. It refreshes at most every 100 ms while
-live NPC bodies exist and relaxes to 500 ms when the entire roster is abstract.
-It reuses its arrays. The spatial index and body audit consume that same
-census. Forced administrative audits may explicitly request a fresh census.
+`PNC_WorldCensus` is the single canonical owner of full
+`getCell():getZombieList()` traversals and exposes shared buckets
+(`AllZombies`, `OrdinaryZombies`, `ManagedBodies`, `BanditBodies`,
+`LifecycleCandidates`, and `ByOnlineID`). It uses 3-tier activity-sensitive
+cadence:
+
+- combat / active bites / `MarkUrgent` wake: 100 ms (`WORLD_CENSUS_REFRESH_MS`);
+- calm live NPC bodies present: 250 ms (`WORLD_CENSUS_CALM_REFRESH_MS`);
+- zero live NPC bodies: 1,000 ms (`WORLD_CENSUS_IDLE_REFRESH_MS`).
+
+`MarkUrgent(now, durationMs, invalidateThrottle)` wakes census immediately on
+zombie provocation and live materialization. `PNC_SpatialIndex`,
+`PNC_BodyLifecycle_Audit`, `PNC_BodyLifecycle_Startup` maintenance,
+`PNC_Bandits_Targeting.EnumerateTargets`, and
+`PNC_LiveBodyControl.ScanLoadedManagedBodies` all consume this shared census
+instead of running redundant engine scans.
 
 Ordinary zombies receive their stable PNC spatial ID during census collection.
 A stale target lookup respects the normal census throttle and never forces a
@@ -29,11 +40,19 @@ actually indexed.
 
 `PNC_ZombieAggro_ActiveSet` admits zombies that are near a live NPC, were
 provoked, have an NPC aggro lease, or own a bite lease. Entries expire after
-leaving those conditions.
+leaving those conditions. `RefreshActiveSet` fast-exits when zero live bodies
+exist and deduplicates `ActorOwnership.IsForeignOwned` + activation checks
+once per unique zombie across nearby NPCs. `PumpActiveSet` applies per-entry
+cadence (`150 ms` mid-range pursuit / `250 ms` idle) while waking at zero
+latency for close-range bites (`<= ZOMBIE_BITE_DISTANCE + 1.5`), active bite
+states, hit-settling, native player targets/attackers, and
+`OnZombieProvoked`. Pursuit diagnostic string formatting is gated behind
+`isPursuitAuditEnabled()`.
 
 Defaults:
 
 - active-set discovery: 250 ms
+- mid-range pursuit / idle per-entry cadence: 150 ms / 250 ms
 - active entry lease: 1,500 ms
 - PNC zombie updates: 64 per server tick
 - zombie pursuit path requests: 16 per server tick
@@ -79,12 +98,16 @@ The scheduler uses these default tiers:
 Health and stamina use elapsed time and therefore do not need to execute at
 combat decision frequency. Abstract movement also uses elapsed time.
 
-Player proximity is a separate wake lane. Every 250 ms it spatially finds
-abstract NPCs inside materialization range and schedules them through the
-normal 24-record server-tick budget. Body creation has a separate two-NPC
-per-tick budget, with overflow retaining a 50 ms presence wake. A 60-second
-dormant cadence therefore cannot delay range entry or create a mass-spawn
-frame spike.
+Player proximity is a separate wake lane. Every 250 ms it queries Core's
+lazy 32-tile spatial index (`QueryPromotionCandidates`, capped at
+`CORE_PROMOTE_MAX_PER_REFRESH = 4` per refresh while leaving far/abstract
+Core actors Core-only) and Hoomans `SpatialIndex.QueryNPCs`, prioritizes
+candidates (`forceLive` > active follower > bystander), respects active
+`materializeRetryAt` / `materializeWakeAt` backoff so retries never thrash,
+and schedules them through the normal 24-record server-tick budget. Body
+creation has a separate two-NPC per-tick budget, while `PumpDemotions`
+(`2,000 ms` grace, `1,000 ms` cadence, `8` per pass) reversibly releases
+demoted Core-backed Hoomans records without deleting Core actors.
 
 ## Allocation Policy
 
@@ -120,13 +143,21 @@ Authorized debug-roster responses include `PNC_Performance.Snapshot()`:
 
 Counters and clocks are never serialized.
 
-Collection is normally off. An authorized debug-roster request with
-`performance=true` enables a 60-second capture window; Lua-console diagnostics
-may also call `PNC.Performance.Enable(durationMs)`. Refresh the debug roster
-after the workload to read the accumulated snapshot.
+Collection is normally `OFF` (`0` wrappers installed, `0` wrapper calls).
+`COARSE` sampling wraps bounded top-level boundaries (`<= 15`, no per-NPC
+hot-function deep wrappers). Deep profiling requires explicit opt-in with
+clamped time-bounding (`5,000..300,000 ms`, never persisted as `"deep"` in
+`PsychopatzCore_Profiler.txt`), deterministically restores every wrapped
+function/event on expiry or `Disable()`, and labels timings separately
+(`no_performance_timers` / `coarse_sampled` / `deep_instrumented_diagnostic_only`).
 
 ## Regression Gates
 
+- `pnc_lightweight_runtime_simulation_smoke.lua`
+- `pnc_lightweight_runtime_cadence_smoke.lua`
+- `pnc_lightweight_persistence_authority_smoke.lua`
+- `pnc_lightweight_domain_delta_replication_smoke.lua`
+- `tests/benchmarks/lightweight_npc_runtime.lua`
 - `pnc_world_census_smoke.lua`
 - `pnc_zombie_aggro_budget_smoke.lua`
 - `pnc_perception_frame_smoke.lua`

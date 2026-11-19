@@ -15,8 +15,10 @@ Shared networking modules:
 - `PNC_Network`: public `PNC.Network` facade and shared state
 - `PNC_Network_SnapshotParts`: reusable identity, movement, combat, roster,
   and debug-state payload sections
-- `PNC_Network_Snapshots`: detailed snapshots, presence deltas, and character
-  payloads
+- `PNC_Network_Snapshots`: detailed snapshots (`BuildSnapshot`), narrow
+  domain-delta builders (`PNC_NetworkSnapshots_DomainDeltas`: `combat_state`,
+  `health_wounds`, `equipment`), presence/combat-damage deltas (`presence`,
+  `combat_damage`), and character payloads
 - `PNC_Network_Server`: transport fan-out, interest sets, roster deltas,
   removals, and server response payloads
 - `PNC_Network_CombatEvents`: transient zombie reaction, bite, and firearm
@@ -107,8 +109,9 @@ using the public `PNC.Network.*` and `PNC.Client.*` APIs rather than requiring
 feature modules directly.
 
 ## Current Payload Lanes
-- `BuildRosterSnapshot`: compact list data sent in 50-record join chunks and batched roster deltas
-- `BuildSnapshot`: live-presence and nearby view state
+- `BuildRosterSnapshot`: compact list data sent in 50-record join chunks and batched roster deltas (preserving `NPCReplicationScaling` P1-P4 negotiated lean `portraitRef` vs inline portrait payloads)
+- `BuildDomainDelta` / `BuildPresenceDelta` / `BuildCombatDamageDelta`: narrow authoritative domain updates stamped with `deltaKind`, `replicaIncarnation`, and per-domain `domainRevision`/`baseDomainRevision` (`presence`, `combat_damage`, `combat_state`, `health_wounds`, `equipment`)
+- `BuildSnapshot` (`deltaKind = "full"`): reserved for initial hydration (`interest_enter`), reconnect/repair (`CMD_REQUEST_RECORD_REPAIR`), explicit inspection, and lazy legacy-client capability fallback
 - `BuildCharacterPayload`: on-demand detailed payload for `View Character`
 - `BroadcastRecord` and `BroadcastFullSync`: server dispatch only
 - `BroadcastZombieReaction`: transient server-authored visual result for an
@@ -149,9 +152,14 @@ feature modules directly.
   optional nil payloads must use an explicit branch rather than Lua's
   `condition and nil or value` idiom, which always evaluates the fallback
 - live-body client reconciliation is handled by `PNC_ClientPresenceSync`, not by networking itself
-- movement stays on periodic compact snapshots, while attack starts, newly
-  assigned body online IDs, and bite damage request one immediate transition
-  snapshot instead of increasing the global movement frequency
+- movement and routine domain mutations route through narrow authoritative
+  domain deltas (`presence`, `combat_damage`, `combat_state`, `health_wounds`,
+  `equipment`) negotiated via `DOMAIN_DELTA_PROTOCOL = 1` in
+  `CMD_FULL_SYNC_REQUEST`; mixed-capability broadcasts send narrow deltas to
+  modern recipients while lazily building full fallback snapshots only for
+  legacy recipients, and clients validate `replicaIncarnation` + per-domain
+  monotonic revisions with 1s-throttled targeted `CMD_REQUEST_RECORD_REPAIR`
+  convergence instead of rebuilding unrelated domains on ordinary events
 - client appearance identity is keyed by the live body lease/instance and
   actual appearance or worn-equipment fields. Combat draw/holster state has a
   separate hand key, so entering combat cannot recreate clothing, reroll its

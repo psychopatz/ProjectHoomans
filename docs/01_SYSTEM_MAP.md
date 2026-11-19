@@ -19,13 +19,15 @@
 - `PNC_Inventory_EquipmentGeneration`: generic categorized equipment pools and deterministic starting-equipment policy
 - `PNC_DeathMarkers`: compact post-death identity/location persistence after full NPC retirement
 - `PNC/EquipmentDefinitions/PNC_EquipmentPools`: version-independent built-in equipment catalog
-- `PNC_Persistence`: versioned canonical save schema, migration, runtime
-  rehydrate, and compact prior-body instance hints used only for relog cleanup
-- `PNC_Registry`: authoritative NPC records and live body lookup
-- `PNC_Performance`: debug-only runtime counters, gauges, and timings; no
-  performance telemetry is persisted
-- `PNC_WorldCensus`: one cadence-bounded loaded-zombie snapshot shared by
-  spatial indexing, lifecycle auditing, and aggro discovery
+- `PNC_Persistence`: versioned Core-extension / legacy record save schema,
+  explicit outcome classification (`WRITTEN`/`TERMINAL_OR_NOT_APPLICABLE`/`RETRYABLE_FAILURE`),
+  coalesced `PersistenceCoordinator.Pump` deferred flushing, and compact relog body hints
+- `PNC_Registry`: authoritative NPC records, lazy Core promotion/demotion, and live body lookup
+- `PNC_Performance`: debug-only runtime counters, gauges, and timings integrated
+  with safe Core profiler `OFF`/`coarse`/`deep` modes; no performance telemetry is persisted
+- `PNC_WorldCensus`: single canonical 3-tier activity-sensitive (`100`/`250`/`1000 ms`)
+  loaded-zombie snapshot (including `BanditBodies`) shared by spatial indexing,
+  lifecycle auditing/startup maintenance, Bandits targeting, managed-body scans, and aggro discovery
 - `PNC_EntityRef`: stable `npc:` and account-plus-character `player:` keys
 - `PNC_RelationshipTypes`, `PNC_RelationshipMath`, and
   `PNC_RelationshipStates`: serialization-safe directed social records,
@@ -113,11 +115,12 @@
   abstract-far, and dormant cadence policy
 - `PNC_Scheduler`: identity-seeded LOD scheduling and a hard 24-record
   server-tick budget with overflow deferred to later slots
-- `PNC_Network`: roster snapshots, live presence snapshots, instance-specific
-  stale-body removals, and on-demand character payloads
+- `PNC_Network`: roster snapshots (with `NPCReplicationScaling` P1-P4 negotiation),
+  narrow authoritative domain deltas (`presence`, `combat_damage`, `combat_state`,
+  `health_wounds`, `equipment`), full repair/fallback snapshots, and stale-body removals
 - `PNC_ZombieAggro`: zombie-to-NPC aggro bridge and bite flow
-- `PNC_ZombieAggro_ActiveSet`: expiring spatially discovered zombie work set
-  with separate per-tick update and pursuit-path budgets
+- `PNC_ZombieAggro_ActiveSet`: deduplicated expiring zombie work set with
+  per-entry pursuit/idle cadence, immediate urgent wakes, and per-tick update/path budgets
 - `PNC_API`: external entry points
 
 ## Layout Rule

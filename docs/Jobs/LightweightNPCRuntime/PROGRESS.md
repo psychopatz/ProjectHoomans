@@ -2,7 +2,7 @@
 
 ## Current state
 
-**IN PROGRESS — L0, L1, L2, L3, L4 COMPLETE; L5 NEXT.**
+**DEVELOPER COMPLETE — L0–L5 PASSED; READY FOR USER-OWNED NATIVE SP/MP ACCEPTANCE.**
 
 Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded deep profiling (`coarse` vs `deep`), and the deterministic integrated headless runtime simulator foundation before optimizing downstream phases.
 
@@ -74,6 +74,22 @@ Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded dee
   - Benchmark (`Z=64, 20s`, `OFF`): `N=100: 965.22ms` (L0 `2001.45ms` `-51.8%`, L3 `2260.03ms` `-57.3%`); `N=500: 994.00ms` (L0 `4004.86ms` `-75.2%`, L3 `2123.57ms` `-53.2%`).
 - **L4 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings (zero `next()` calls) across all 17 modified runtime Lua files; new `pnc_lightweight_runtime_cadence_smoke.lua` pass; `pnc_constants_presence_boundary_smoke.lua` pass; `pnc_lightweight_runtime_simulation_smoke.lua` pass; `tests/benchmarks/lightweight_npc_runtime.lua` pass; 18 focused Lua suites 221/221 pass.
 
+## L5 — Scale acceptance, docs and phase close (COMPLETE)
+
+- **Simulator & benchmark matrix upgrade:** Updated `tests/support/lightweight_runtime_simulator.lua` (multi-client player alignment/packing, synchronized departure, mixed-capability client negotiation, clean non-instrumented per-tick `AvgTickCpuMs`/`P95TickCpuMs`/`MaxTickCpuMs` and `PeakLiveBodies`) and `tests/benchmarks/lightweight_npc_runtime.lua` (Sections A–F with automated scaling/bound assertions).
+- **HEADLESS LUA SIMULATOR (NON-NATIVE) L5 Scale Benchmark Matrix (`OFF` unless marked):**
+  - **A. Core Population Scaling (`L=6, nearby=14, Z=50, C=1, 12s, OFF`):** Bit-identical Hoomans operations across `N=100, 500, 1000, 2000` (`PkPr=9, EnPr=9, PkLv=9, Mat=46/9, SchPr=105/0, Com=4/Pmp=6/SerA=16, PrsD=93/CmbD=7/HWEq=4, Full=18, Census=75, ExtraZ=0, ZAggr=3244, DirtyEnd=0, GSave=1`); CPU `N=100: 547.10ms (Avg 2.28 / P95 9.23 / Max 33.71ms)`, `N=500: 536.80ms (Avg 2.24 / P95 7.42 / Max 29.85ms)`, `N=1000: 692.48ms (Avg 2.89 / P95 10.34 / Max 55.35ms)`, `N=2000: 742.30ms (Avg 3.09 / P95 11.27 / Max 40.78ms)`.
+  - **B. Active Set Scaling (`N=500, Z=50, C=1, 12s, OFF`):** `L=1: PkPr=1/1, PkLv=1, Full=2, 231.89ms`; `L=6: PkPr=6/6, PkLv=6, Full=12, 476.52ms`; `L=12: PkPr=12/12, PkLv=12, Full=24, 730.71ms`; `L=24: PkPr=20/20, PkLv=20 (capped <=20, MaxProm<=4, MaxMat<=2), Full=40, 981.19ms`.
+  - **C. Zombie Pressure & Idle Cadence (`N=500, C=1, 12s, OFF`):** `L=6 Z=0: Census=75, ZAggr=0, ExtraZ=0, 294.26ms`; `Z=50: ZAggr=3244, ExtraZ=0, 492.46ms`; `Z=200: ZAggr=6739, ExtraZ=0, 860.24ms`; `IDLE0_Z200 (L=0, Z=200): PkPr=0/0, Census=12, ZAggr=0, ExtraZ=0, 39.23ms (Avg 0.16 / P95 0.44 / Max 3.52ms)`.
+  - **D. Client Fan-Out & Mixed-Capability Repair (`N=500, L=6, Z=50, 10s, OFF`):** `C=1: PrsD=77, CmbD=5, HWEq=4, Full=16, 400.60ms`; `C=4: PrsD=308, CmbD=20, HWEq=16, Full=64, 573.71ms`; `C=16: PrsD=1232, CmbD=80, HWEq=64, Full=256, 901.62ms`; `C=4 MIX_REP (8s): PrsD=180, CmbD=15, HWEq=9, Full=133, Rep=1, Fb=84, SafePhaseFailures=0, 760.49ms`.
+  - **E. Lifecycle Demotion & Knowledge Mutation Storm (`N=500, OFF`):** `DEPART_DEM: PkPr=9 -> EnPr=0, CoreN=500, 357.51ms`; `MUT_STORM: Com=33 -> Pmp=4, SerA=13, GSave=1, DirtyEnd=0, 349.15ms`.
+  - **F. Profiler Control (`Z=64, 20s`, `DEEP` = `deep_instrumented_diagnostic_only`):** `N=100: OFF 1126.22ms (L0 2001.45ms, -43.7%), COARSE 1076.39ms (13 coarseWr / 0 deepWr), DEEP 1343.65ms (+217.43ms, 9803 deepCalls, RestoredCleanly=true)`; `N=500: OFF 971.07ms (L0 4004.86ms, -75.8%), COARSE 1183.33ms (+212.27ms, 13 coarseWr / 0 deepWr), DEEP 1493.02ms (+521.95ms, 9803 deepCalls, RestoredCleanly=true)`.
+- **Architecture & system docs reconciled:** `docs/01_SYSTEM_MAP.md`, `docs/Systems/Persistence.md`, `docs/Systems/Networking.md`, `docs/Systems/Performance.md`, `docs/Systems/Presence.md`, `docs/Jobs/LightweightNPCRuntime/ARCHITECTURE.md`, and `docs/Jobs/LightweightNPCRuntime/README.md`.
+- **Full regression verification:**
+  - `luac -p` pass on modified simulator/benchmark files; `lua tests/benchmarks/lightweight_npc_runtime.lua` (`ALL L5 BENCHMARK MATRIX ASSERTIONS PASSED`); `lua tests/pnc_lightweight_runtime_simulation_smoke.lua` (10/10 pass); `lua tests/benchmarks/npc_replication.lua` (P1–P4 pass).
+  - `ProjectHoomans` full sweep (`python3 tests/run_tests.py`): `1078/1082` pass (4 pre-existing unrelated baseline failures left untouched: `pnc_animation_scene_debug_routes_smoke.lua`, `pnc_context_debug_smoke.lua`, `pnc_population_director_smoke.lua`, `pz_custom_translation_manager_smoke.lua`).
+  - `psychopatzCore` (unchanged since L1 `2fc8e5e8c237caa9507a93272896cf87b75e295a`): Python profiler suite `54/54` pass; relevant Lua smoke suite (`profiler`/`actor`/`survivor_world`/`social`/`npc`) `65/69` pass (4 pre-existing unrelated headless baseline failures left untouched: `psychopatz_profiler_client_composition_smoke.lua`, `psychopatz_profiler_server_composition_smoke.lua`, `psychopatz_survivor_world_client_knowledge_smoke.lua`, `psychopatz_survivor_world_generation_smoke.lua`); full Core Lua sweep `192/202` pass (only pre-existing unrelated headless UI/translation/semantic failures).
+
 ## Accepted dependencies
 
 Do not reopen:
@@ -86,4 +102,4 @@ This job corrects Hoomans runtime adoption so it actually obeys those accepted c
 
 ## Next Chunk
 
-**L5 — scale acceptance, docs and phase close.**
+**User-owned native SP/MP feel and capacity acceptance** (all developer-side L0–L5 gates complete and locally committed; native Project Zomboid intentionally not launched).

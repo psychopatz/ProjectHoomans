@@ -147,11 +147,25 @@
   lifecycle facade before the Presence coordinator can load
 - server checks player distance with hysteresis through the player spatial
   index, computing the nearest result once per reconciliation
-- a 250 ms player-interest wake pass schedules nearby abstract records even
-  when their far/dormant AI cadence is sleeping; materialization responsiveness
-  therefore does not depend on a distant NPC's next AI decision
+- Core-backed SurvivorWorld actors remain Core-only while abstract and are
+  lazily promoted on demand via `PNC.Persistence.CoreProvider.PromoteCoreActor`
+  (`RestoreActiveCoreActors` restores only active/persisted Hoomans extensions
+  on startup; bulk `HydrateCoreActors()` is retired). Demotion reversibly
+  releases rich Hoomans runtime/scheduler/spatial state (`PumpDemotions`) once
+  no body or active Hoomans responsibility remains, preserving canonical ID
+- a 250 ms player-interest wake pass discovers nearby Core candidates (`<= 4`
+  promotions per refresh respecting admission headroom) and Hoomans abstract
+  records, sorts them by priority (`forceLive` > active follower > closer
+  bystander), skips records with an active `materializeRetryAt` /
+  `materializeWakeAt` backoff, and spaces startup-burst retries via
+  `Presence.Metrics` without thrashing
 - range-entry body creation is limited to two NPCs per server tick. Deferred
   records keep a 50 ms presence-wake cadence until their body is created
+- post-startup `BodyLifecycle.PumpStartupBodyCleanup` maintenance and
+  `LiveBodyControl.ScanLoadedManagedBodies` consume `PNC_WorldCensus`
+  (skipping batch construction completely when zero records, husks, or
+  lifecycle candidates exist), eliminating extra `getCell():getZombieList()`
+  scans outside `PNC_WorldCensus`
 - live position reads occur with each budgeted record update, with a slower
   one-second whole-live-set pass retained only as an integrity safety net
 - `Materialize` uses `addZombiesInOutfit(...)`

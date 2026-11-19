@@ -17,6 +17,10 @@ The key correction is architectural:
 - Profiling is observational and bounded. Deep hot-path wrapping must never be a normal-play tax.
 - A deterministic integrated headless runtime simulator is the mandatory developer feedback loop for L0-L5; native Project Zomboid is reserved for engine-specific/final acceptance rather than every implementation iteration.
 
+## Implementation status (L0–L5)
+
+All architectural fixes (L0–L4) and full developer-side headless acceptance benchmarks and regression sweeps (L5) are implemented and verified. See [PROGRESS.md](PROGRESS.md) and [HANDOFF.md](HANDOFF.md) for current metrics, commit checkpoints, and remaining user-owned native SP/MP acceptance scope.
+
 ## Why this goal exists
 
 A native new-save audit on 2026-11-20 found approximately 32 Core/Hoomans NPC records, only 6 live Hoomans bodies, about 63 loaded ordinary zombies, and roughly 18 FPS while PsychopatzProfiler performance capture was active.

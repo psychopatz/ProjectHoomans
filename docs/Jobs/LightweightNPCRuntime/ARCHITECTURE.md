@@ -27,7 +27,7 @@ A compact actor remaining far away must never be promoted merely because it exis
 
 ## 3. Lazy promotion
 
-Remove bulk `HydrateCoreActors()` from normal startup/generated-view refresh. Do not replace it with another whole-registry Hoomans projection pass.
+Bulk `HydrateCoreActors()` is retired from startup and generated-view refresh (`RestoreActiveCoreActors` restores only active/persisted Hoomans extensions, and interest refresh promotes at most `CORE_PROMOTE_MAX_PER_REFRESH = 4` per pass). Do not replace it with another whole-registry Hoomans projection pass.
 
 Promote one actor on demand when at least one Hoomans responsibility requires a rich runtime record, for example entering Hoomans materialization/interaction interest, becoming/reloading a recruited companion, explicit Hoomans provider handoff, Hoomans job/facility/medical/combat state that cannot execute abstractly, or authorized debug force-live.
 
@@ -49,11 +49,16 @@ Demotion never deletes or replaces the canonical Core actor. Do not introduce a 
 
 ## 5. Hoomans durable extension storage
 
-Prefer the existing bounded Core actor namespaced-extension seam if it can hold required Hoomans-owned durable data without violating Core ownership or size contracts. If exact source proves that seam unsuitable, use one sparse Hoomans extension repository keyed by canonical actor ID.
+The single chosen extension authority is `PsychopatzCore` actor namespaced
+extension storage at `actor.extensions["ProjectHoomans.ActorExtension"]`
+(`schemaVersion = 1`, managed by `PNC_CoreActorExtension.lua`). Unmodified
+bystanders encode to `nil` (`0` bytes), and Core-backed records never write
+duplicate `PNC_NPC_<id>` ModData or re-serialize Core appearance envelopes.
 
-There must be **one chosen extension authority**, never both.
-
-The extension must not duplicate identity/name/seed, Core appearance, Core personal inventory, Core social/persona state, canonical affiliation/world/journey, or provider lease. Each extension field requires an owner, durability reason, bound, and save/reload test.
+The extension never duplicates identity/name/seed, Core appearance, Core
+personal inventory, Core social/persona state, canonical
+affiliation/world/journey, or provider lease. Each extension field has an
+explicit owner, durability reason, bound, and save/reload test.
 
 ## 6. Persistence transaction model
 

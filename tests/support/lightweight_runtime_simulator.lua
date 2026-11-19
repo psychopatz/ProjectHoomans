@@ -143,7 +143,11 @@ function Simulator.New(options)
         nearbyActors = math.max(0, math.floor(tonumber(options.nearbyActors) or 14)),
         expectedPromotedActors = math.max(0, math.floor(tonumber(options.expectedPromotedActors) or 6)),
         zombieCount = math.max(0, math.floor(tonumber(options.zombieCount) or 40)),
-        playerCount = math.max(1, math.floor(tonumber(options.playerCount) or 1)),
+        playerCount = math.max(
+            1,
+            math.floor(tonumber(options.playerCount) or 1),
+            math.floor(tonumber(options.clientCount) or 1)
+        ),
         clientCount = math.max(1, math.floor(tonumber(options.clientCount) or 1)),
         simulatedMs = math.max(100, math.floor(tonumber(options.simulatedMs) or 15000)),
         stepMs = math.max(10, math.floor(tonumber(options.stepMs) or 50)),
@@ -329,7 +333,14 @@ function Simulator:Run()
     end
 
     for p = 1, cfg.playerCount do
-        local px, py, pz = 10000 + (p - 1) * 2, 10000, 0
+        local px, py, pz
+        if p == 1 then
+            px, py, pz = 10000, 10000, 0
+        else
+            px = 9999 - ((p - 2) % 3)
+            py = 9999 + math.floor((p - 2) / 3)
+            pz = 0
+        end
         local pInv = makeInv()
         local pMod = {}
         players[p] = {
@@ -600,22 +611,25 @@ function Simulator:Run()
     for _, fn in ipairs(events.OnInitGlobalModData or {}) do fn() end
     for _, fn in ipairs(events.OnServerStarted or {}) do fn() end
     if cfg.mixedCapabilities and PNC.ServerCommandRouter and PNC.ServerCommandRouter.Handle then
-        if players[1] then
-            PNC.ServerCommandRouter.Handle(PNC.Const.CMD_FULL_SYNC_REQUEST, players[1], {
-                domainDeltaProtocol = PNC.Const.DOMAIN_DELTA_PROTOCOL or 1,
-                portraitProtocol = PNC.Const.ROSTER_PORTRAIT_PROTOCOL,
-            })
-        end
-        if players[2] then
-            PNC.ServerCommandRouter.Handle(PNC.Const.CMD_FULL_SYNC_REQUEST, players[2], {
-                domainDeltaProtocol = 0,
-            })
+        for p = 1, #players do
+            if p == 2 then
+                PNC.ServerCommandRouter.Handle(PNC.Const.CMD_FULL_SYNC_REQUEST, players[p], {
+                    domainDeltaProtocol = 0,
+                })
+            else
+                PNC.ServerCommandRouter.Handle(PNC.Const.CMD_FULL_SYNC_REQUEST, players[p], {
+                    domainDeltaProtocol = PNC.Const.DOMAIN_DELTA_PROTOCOL or 1,
+                    portraitProtocol = PNC.Const.ROSTER_PORTRAIT_PROTOCOL,
+                })
+            end
         end
     end
     local startupCpuMs = (os.clock() - startupCpuStart) * 1000
     snapshotStoreWrites()
     local promotedAtStartup = countMap(PNC.Registry and PNC.Registry.Data)
     local peakPromotedHoomansRecords = promotedAtStartup
+    local peakLiveBodies = countMap(PNC.Registry and PNC.Registry.LiveByID)
+    local tickDurationsMs = {}
     local maxPromotionsInSingleRefresh = 0
     local maxMaterializationsInSingleTick = 0
     local departed = false
@@ -662,16 +676,19 @@ function Simulator:Run()
         local elapsedMs = nowMs - startMs
         if cfg.departAtMs and not departed and elapsedMs >= cfg.departAtMs then
             departed = true
-            local p1 = players[1]
-            if p1 and p1._setX then
-                p1._setX(12000)
-                if p1._setY then p1._setY(12000) end
+            for _, pl in ipairs(players) do
+                if pl and pl._setX then
+                    pl._setX(12000)
+                    if pl._setY then pl._setY(12000) end
+                end
             end
         end
         local matBeforeTick = metrics.materializationSuccesses
+        local oneTickT0 = os.clock()
         for _, fn in ipairs(events.OnTick or {}) do
             fn()
         end
+        tickDurationsMs[#tickDurationsMs + 1] = (os.clock() - oneTickT0) * 1000
         local matDelta = metrics.materializationSuccesses - matBeforeTick
         if matDelta > maxMaterializationsInSingleTick then
             maxMaterializationsInSingleTick = matDelta
@@ -686,6 +703,10 @@ function Simulator:Run()
         local promotedNow = countMap(PNC.Registry and PNC.Registry.Data)
         if promotedNow > peakPromotedHoomansRecords then
             peakPromotedHoomansRecords = promotedNow
+        end
+        local liveNow = countMap(PNC.Registry and PNC.Registry.LiveByID)
+        if liveNow > peakLiveBodies then
+            peakLiveBodies = liveNow
         end
         if nowMs % 1000 == 0 then
             local p1 = players[1]
@@ -760,6 +781,11 @@ function Simulator:Run()
     end
     local tickLoopCpuMs = (os.clock() - tickCpuStart) * 1000
     metrics.inTickPhase = false
+    table.sort(tickDurationsMs)
+    local avgTickCpuMs = #tickDurationsMs > 0 and (tickLoopCpuMs / #tickDurationsMs) or 0
+    local p95Idx = math.max(1, math.ceil(#tickDurationsMs * 0.95))
+    local p95TickCpuMs = tickDurationsMs[p95Idx] or 0
+    local maxTickCpuMs = tickDurationsMs[#tickDurationsMs] or 0
 
     -- Fire OnSave (real pre-save body retirement + Coordinator.Commit("world_save")).
     for _, fn in ipairs(events.OnSave or {}) do
@@ -851,6 +877,7 @@ function Simulator:Run()
         SchedulerMembersAtEnd = schedulerMembersAtEnd,
         SpatialMembersAtEnd = spatialMembersAtEnd,
         LiveBodies = countMap(PNC.Registry and PNC.Registry.LiveByID),
+        PeakLiveBodies = peakLiveBodies,
         SchedulerProcessed = tonumber(diagCounters["Scheduler.DueProcessed"]) or 0,
         SchedulerDeferred = tonumber(diagCounters["Scheduler.Deferred"]) or 0,
         PromotionAttempts = promotionsCount,
@@ -920,6 +947,9 @@ function Simulator:Run()
         RestoredCleanly = restoredCleanly,
         StartupCpuMs = startupCpuMs,
         TickLoopCpuMs = tickLoopCpuMs,
+        AvgTickCpuMs = avgTickCpuMs,
+        P95TickCpuMs = p95TickCpuMs,
+        MaxTickCpuMs = maxTickCpuMs,
         TotalCpuMs = startupCpuMs + tickLoopCpuMs,
     }
 
