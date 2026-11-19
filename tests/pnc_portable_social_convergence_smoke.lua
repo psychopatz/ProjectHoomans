@@ -254,12 +254,14 @@ T.equal(pncPayload.social.relationshipExtensions[playerKey].bond.class, "friend"
 T.equal(#pncPayload.social.relationshipExtensions[playerKey].interactionJournal, 1,
     "PNC save payload preserves interaction journal extension")
 
--- Core payload holds the single authoritative generic relationship and memories
+-- Core payload holds the single authoritative generic relationship and actor-level memoryBank
 local coreP10Rel = coreEncoded.social.relationships[playerKey]
 T.truthy(coreP10Rel, "Core actor social carries canonical directed relationship")
 T.equal(coreP10Rel.baselineApproval, 5, "Core actor persists baselineApproval once")
 T.equal(coreP10Rel.baselineRespect, 3, "Core actor persists baselineRespect once")
-T.equal(#coreP10Rel.memories, 2, "Core actor persists both DT and Hoomans memories once")
+T.equal(coreP10Rel.memories, nil, "Core relationship omits embedded memories array")
+local coreP10Memories = CoreActors.Social.GetMemoriesForTarget(coreEncoded.social, playerKey)
+T.equal(#coreP10Memories, 2, "Core actor persists both DT and Hoomans memories once in memoryBank")
 
 -- Strip ProjectHoomans extension from Core save and verify full reload reconstructs from Core + PNC envelope
 local savedCoreActor = assert(registry:Get(p10Record.id))

@@ -1,9 +1,9 @@
 # Progress — Project Hoomans Portable Actor Lifecycle & GC Adoption
 
-**Status:** IN_PROGRESS (H0 ACCEPTED — awaiting Core L1-L4 contracts).
+**Status:** IN_PROGRESS (H0 + H3A Core `memoryBank` parity implemented — awaiting Core L1-L4/H1-H2 completion).
 **Parent:** PsychopatzCore Docs/portable_actor_lifecycle_gc/.
-**Current phase:** H0 complete; next H1 (pending Core L1-L4).
-**Participant completion:** 1/6 phases accepted.
+**Current phase:** H0 complete + H3A Core `memoryBank` persistence parity updated (`PNC_Persistence_CoreSocial.lua`); next H1 after Core L4.
+**Participant completion:** 1/6 phases accepted (H3A persistence compatibility landed early with Core L3).
 
 ## Verified H0 Audit Facts (Checkpoint `67510b0db`)
 
@@ -17,6 +17,11 @@
   - `PNC_NPCKnowledgeService_PlayerSnapshots.lua:69` fails with `"npc_not_found"` after `RemoveRecord`.
   - ~24 Hoomans Lua modules assume per-relationship `memories` arrays (to be updated in H3 after Core L3).
 - Unrelated dirty NPCAuthoring / StartingCompanions / Equipment worktree files were verified and preserved untouched.
+
+## H3A — Core `memoryBank` Persistence Compatibility
+
+- Updated `PNC_Persistence_CoreSocial.lua` (`HasGenericSocialPayload`, `ToCoreSocial`, `FromCoreSocial`, `SyncToCore`) to store and synchronize Core memories strictly in actor-level `memoryBank` (`Social.SCHEMA_VERSION = 3`, `rel.memories = nil`) while preserving Hoomans runtime view projection (`memories = targetMemories`) without writing `.memories` back to Core ModData.
+- Updated `tests/pnc_npc_foundation_social_adapter_smoke.lua` and `tests/pnc_portable_social_convergence_smoke.lua` assertions on raw Core social payloads to inspect `CoreSocial.GetMemoriesForTarget` and verify `rel.memories == nil`.
 
 ## Next Chunk
 

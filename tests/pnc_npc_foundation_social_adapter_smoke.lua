@@ -5,6 +5,7 @@ T.load("ProjectHoomans", "shared", "PNC/Core/Travel/PNC_Travel.lua")
 local Fixtures = require
     "tests/support/pnc_npc_foundation_import_plan_fixtures"
 local Core = require "PsychopatzCore/Actors/PsychopatzActors"
+local CoreSocial = PsychopatzCore.Social
 local Adapter = PNC.Persistence.CoreSocial
 
 T.truthy(Adapter, "Core social adapter was not registered")
@@ -13,8 +14,11 @@ local sourceRecord, targetKey = Fixtures.PrepareContinuitySourceRecord(
 local originalSocial = PNC.Persistence.ImportPlan.Copy(sourceRecord.social)
 local projected, projectReason = Adapter.Project(sourceRecord, PsychopatzCore)
 T.truthy(projected, projectReason)
-T.equal(projected.relationships[targetKey].memories[1].id,
+local projMemories = CoreSocial.GetMemoriesForTarget(projected, targetKey)
+T.equal(projMemories[1].id,
     "memory:p0b:friend", "relationship memory projected")
+T.equal(projected.relationships[targetKey].memories, nil,
+    "actor-level memoryBank omits embedded relationship.memories")
 T.equal(projected.relationships[targetKey].targetKey, targetKey,
     "relationship direction projected")
 T.equal(projected.revision, sourceRecord.social.revision,
@@ -41,8 +45,8 @@ T.truthy(applied, eventReason)
 T.equal(applied.relationships[targetKey].approval,
     approvalBeforeEvent + 6,
     "authorized approval delta")
-T.equal(applied.relationships[targetKey].memories[#applied.relationships[
-    targetKey].memories].id, event.eventID, "authorized event memory")
+local appliedMemories = CoreSocial.GetMemoriesForTarget(applied, targetKey)
+T.equal(appliedMemories[#appliedMemories].id, event.eventID, "authorized event memory")
 
 local duplicate, duplicateReason = Adapter.RecordAuthorizedEvent(applied,
     PsychopatzCore, event)

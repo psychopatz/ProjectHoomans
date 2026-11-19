@@ -70,7 +70,10 @@ function Adapter.HasGenericSocialPayload(social)
     if type(social) ~= "table" or social.authority == "core" then
         return false
     end
-    if hasEntries(social.recentEventIDs) or hasEntries(social.personality) then
+    if hasEntries(social.recentEventIDs)
+        or hasEntries(social.personality)
+        or (type(social.memoryBank) == "table" and #social.memoryBank > 0)
+    then
         return true
     end
     if type(social.relationships) == "table" then
@@ -118,6 +121,7 @@ function Adapter.ToCoreSocial(recordSocial, core)
     }
 
     local relationships = {}
+    local memoryBank = {}
     if type(recordSocial.relationships) == "table" then
         for targetKey, rel in pairs(recordSocial.relationships) do
             if type(targetKey) == "string" and type(rel) == "table" then
@@ -143,9 +147,15 @@ function Adapter.ToCoreSocial(recordSocial, core)
                     revision = tonumber(rel.revision) or 0,
                     lastEventAt = rel.lastInteractionAt or rel.lastEvaluatedAt,
                     lastEvaluatedAt = tonumber(rel.lastEvaluatedAt) or 0,
-                    memories = clone(rel.memories or {}),
                     extensions = relExt,
                 }
+                for _, mem in ipairs(rel.memories or {}) do
+                    if type(mem) == "table" then
+                        local mCopy = clone(mem)
+                        mCopy.aboutKey = targetKey
+                        memoryBank[#memoryBank + 1] = mCopy
+                    end
+                end
             end
         end
     end
@@ -157,6 +167,7 @@ function Adapter.ToCoreSocial(recordSocial, core)
         personalityOverrides = clone(recordSocial.personalityOverrides or {}),
         recentEventIDs = clone(recordSocial.recentEventIDs or {}),
         relationships = relationships,
+        memoryBank = memoryBank,
         extensions = existingExt,
     })
 end
@@ -164,6 +175,7 @@ end
 function Adapter.FromCoreSocial(coreSocial, fallbackSocial)
     if type(coreSocial) ~= "table" then return nil, "core_social_missing" end
     fallbackSocial = type(fallbackSocial) == "table" and fallbackSocial or {}
+    local Social = service(PsychopatzCore)
 
     local hoomansExt = coreSocial.extensions
         and coreSocial.extensions.ProjectHoomans or {}
@@ -211,13 +223,22 @@ function Adapter.FromCoreSocial(coreSocial, fallbackSocial)
                     end
                 end
 
+                local targetMemories
+                if Social and type(Social.GetMemoriesForTarget) == "function"
+                    and type(coreSocial.memoryBank) == "table"
+                then
+                    targetMemories = Social.GetMemoriesForTarget(coreSocial, targetKey)
+                else
+                    targetMemories = clone(coreRel.memories or {})
+                end
+
                 local baseApp = coreRel.baselineApproval
                 if baseApp == nil then baseApp = relExt.baselineApproval end
                 local baseResp = coreRel.baselineRespect
                 if baseResp == nil then baseResp = relExt.baselineRespect end
                 if baseApp == nil or baseResp == nil then
                     local memApp, memResp = 0, 0
-                    for _, m in ipairs(coreRel.memories or {}) do
+                    for _, m in ipairs(targetMemories) do
                         memApp = memApp + (tonumber(m.approvalEffect) or 0)
                         memResp = memResp + (tonumber(m.respectEffect) or 0)
                     end
@@ -282,7 +303,7 @@ function Adapter.FromCoreSocial(coreSocial, fallbackSocial)
                     lastInteractionAt = lastIntAt,
                     lastEvaluatedAt = tonumber(coreRel.lastEvaluatedAt
                         or relExt.lastEvaluatedAt or fallbackRel.lastEvaluatedAt) or 0,
-                    memories = clone(coreRel.memories or {}),
+                    memories = targetMemories,
                     extensions = clone(coreRel.extensions or {}),
                 }
             end
@@ -456,7 +477,33 @@ function Adapter.SyncToCore(record, core, changeSpec)
         currentSocial.relationships[changeSpec.legacyTargetKey] = nil
     end
 
-    -- 2. Non-destructively merge relationships
+    -- 2. Non-destructively merge relationships and actor-level memoryBank
+    currentSocial.memoryBank = currentSocial.memoryBank or {}
+    if type(changeSpec) == "table"
+        and changeSpec.kind == "memory_removed"
+        and type(changeSpec.memoryID) == "string"
+    then
+        if type(Social.RemoveMemory) == "function" then
+            Social.RemoveMemory(currentSocial, changeSpec.memoryID, "server")
+        else
+            local filtered = {}
+            for _, m in ipairs(currentSocial.memoryBank) do
+                local mid = m.id or m.eventID
+                if mid ~= changeSpec.memoryID then
+                    filtered[#filtered + 1] = m
+                end
+            end
+            currentSocial.memoryBank = filtered
+        end
+    end
+
+    local existingMemoryIDs = {}
+    for _, m in ipairs(currentSocial.memoryBank) do
+        local mid = m.id or m.eventID
+        if mid then existingMemoryIDs[mid] = true end
+    end
+    local maxWorldAge = nil
+
     if type(record.social.relationships) == "table" then
         currentSocial.relationships = currentSocial.relationships or {}
         for targetKey, hoomRel in pairs(record.social.relationships) do
@@ -523,47 +570,28 @@ function Adapter.SyncToCore(record, core, changeSpec)
                         rel.extensions.ProjectHoomans = hoomExt
                     end
 
-                    -- Deduplicating memory merge using Core retention bounds
-                    rel.memories = rel.memories or {}
-                    if type(changeSpec) == "table"
-                        and changeSpec.kind == "memory_removed"
-                        and type(changeSpec.memoryID) == "string"
-                    then
-                        local filtered = {}
-                        for _, m in ipairs(rel.memories) do
-                            local mid = m.id or m.eventID
-                            if mid ~= changeSpec.memoryID then
-                                filtered[#filtered + 1] = m
-                            end
-                        end
-                        rel.memories = filtered
+                    rel.memories = nil
+                    local ageCandidate = tonumber(hoomRel.lastEvaluatedAt) or tonumber(rel.lastEvaluatedAt)
+                    if ageCandidate ~= nil and (maxWorldAge == nil or ageCandidate > maxWorldAge) then
+                        maxWorldAge = ageCandidate
                     end
-                    local existingMemoryIDs = {}
-                    for _, m in ipairs(rel.memories) do
-                        local mid = m.id or m.eventID
-                        if mid then existingMemoryIDs[mid] = true end
-                    end
+
+                    -- Deduplicating memory merge into Core actor-level memoryBank
                     for _, m in ipairs(hoomRel.memories or {}) do
                         local mid = m.id or m.eventID
                         if mid and not existingMemoryIDs[mid] then
                             existingMemoryIDs[mid] = true
                             local cloned = clone(m)
+                            cloned.id = mid
                             cloned.aboutKey = resolvedKey
                             if Social.ConsolidateOrInsertMemory then
-                                Social.ConsolidateOrInsertMemory(rel, cloned, {
+                                Social.ConsolidateOrInsertMemory(currentSocial, cloned, {
                                     consolidate = false,
-                                    worldAgeHours = hoomRel.lastEvaluatedAt or rel.lastEvaluatedAt,
+                                    worldAgeHours = ageCandidate,
                                 })
                             else
-                                rel.memories[#rel.memories + 1] = cloned
+                                currentSocial.memoryBank[#currentSocial.memoryBank + 1] = cloned
                             end
-                        end
-                    end
-                    if Social.PruneMemories then
-                        Social.PruneMemories(rel, hoomRel.lastEvaluatedAt or rel.lastEvaluatedAt)
-                    else
-                        while #rel.memories > (Social.MAX_MEMORIES or 64) do
-                            table.remove(rel.memories, 1)
                         end
                     end
 
@@ -571,6 +599,18 @@ function Adapter.SyncToCore(record, core, changeSpec)
                 end
             end
         end
+    end
+
+    if Social.PruneMemories then
+        Social.PruneMemories(currentSocial, maxWorldAge)
+    else
+        local maxActorMemories = Social.MAX_ACTOR_MEMORIES or Social.MAX_MEMORIES or 96
+        while #currentSocial.memoryBank > maxActorMemories do
+            table.remove(currentSocial.memoryBank, 1)
+        end
+    end
+    if type(Social.InvalidateMemoryIndex) == "function" then
+        Social.InvalidateMemoryIndex(currentSocial)
     end
 
     currentSocial.recentEventIDs = currentSocial.recentEventIDs or {}
