@@ -19,6 +19,7 @@
         "hearsayPolicy": { "allowHearsay": false, "maxHops": 0 }
       },
       "relationship": { "approvalDelta": -4, "respectDelta": -3, "familiarityDelta": 1 },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance", "hostility"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -35,6 +36,7 @@
         "shareable": false
       },
       "relationship": { "approvalDelta": -2, "respectDelta": -2, "familiarityDelta": 1 },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance", "hostility"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -51,6 +53,7 @@
         "shareable": false
       },
       "relationship": { "approvalDelta": -4, "respectDelta": -3, "familiarityDelta": 1 },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance", "hostility"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -64,6 +67,7 @@
         "shareable": false
       },
       "relationship": { "approvalDelta": -8, "respectDelta": -8, "familiarityDelta": 1 },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance", "hostility"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -72,6 +76,7 @@
       "aliases": ["npc_spoke_hostile_remark"],
       "memory": { "retentionClass": "LONG", "salience": 130, "decayPerDay": 0.08, "shareable": false },
       "relationship": { "approvalDelta": -2, "respectDelta": -2, "familiarityDelta": 1 },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance", "hostility"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -80,6 +85,7 @@
       "aliases": ["npc_spoke_insult"],
       "memory": { "retentionClass": "LONG", "salience": 150, "decayPerDay": 0.05, "shareable": false },
       "relationship": { "approvalDelta": -4, "respectDelta": -3, "familiarityDelta": 1 },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance", "hostility"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -88,6 +94,7 @@
       "aliases": ["npc_threatened_npc"],
       "memory": { "retentionClass": "LONG", "salience": 200, "decayPerDay": 0.025, "shareable": false },
       "relationship": { "approvalDelta": -8, "respectDelta": -8, "familiarityDelta": 1 },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance", "hostility"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -96,6 +103,7 @@
       "aliases": ["player_disapproved"],
       "memory": { "retentionClass": "LONG", "salience": 60, "decayPerDay": 0.08, "shareable": false },
       "relationship": { "approvalDelta": -1, "respectDelta": -1, "familiarityDelta": 0, "saturationCaps": { "approval": 15, "respect": 15 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["disapproval"], "relations": {} },
       "extensions": ["ProjectHoomans"]
     },
@@ -104,6 +112,7 @@
       "aliases": ["player_greeted"],
       "memory": { "retentionClass": "LONG", "salience": 30, "decayPerDay": 0.08, "shareable": false },
       "relationship": { "approvalDelta": 2, "respectDelta": 0, "familiarityDelta": 2, "cooldownHours": 2, "saturationCaps": { "approval": 20, "respect": 10 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["greeting"], "relations": {} },
       "extensions": ["ProjectHoomans"]
     },
@@ -112,6 +121,7 @@
       "aliases": ["npc_greeted_player"],
       "memory": { "retentionClass": "LONG", "salience": 30, "decayPerDay": 0.08, "shareable": false },
       "relationship": { "approvalDelta": 2, "respectDelta": 0, "familiarityDelta": 2, "saturationCaps": { "approval": 20, "respect": 10 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["greeting"], "relations": {} },
       "extensions": ["ProjectHoomans"]
     },
@@ -119,6 +129,7 @@
       "id": "necroa_mask_removed",
       "memory": { "retentionClass": "LONG", "salience": 140, "decayPerDay": 0.04, "shareable": false },
       "relationship": { "approvalDelta": -3, "respectDelta": -3, "familiarityDelta": 0, "saturationCaps": { "approval": 30, "respect": 30 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -126,6 +137,7 @@
       "id": "necroa_player_mask_removed",
       "memory": { "retentionClass": "LONG", "salience": 170, "decayPerDay": 0.035, "shareable": false },
       "relationship": { "approvalDelta": -6, "respectDelta": -5, "familiarityDelta": 1, "saturationCaps": { "approval": 60, "respect": 50 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["grievance"], "relations": { "opens": ["repair"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -134,6 +146,7 @@
       "aliases": ["player_farewelled"],
       "memory": { "retentionClass": "LONG", "salience": 20, "decayPerDay": 0.1, "shareable": false },
       "relationship": { "approvalDelta": 1, "respectDelta": 0, "familiarityDelta": 1, "cooldownHours": 2, "saturationCaps": { "approval": 10, "respect": 5 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["farewell"], "relations": {} },
       "extensions": ["ProjectHoomans"]
     },
@@ -142,6 +155,7 @@
       "aliases": ["player_thanked"],
       "memory": { "retentionClass": "LONG", "salience": 70, "decayPerDay": 0.05, "shareable": false },
       "relationship": { "approvalDelta": 3, "respectDelta": 1, "familiarityDelta": 1, "cooldownHours": 1, "saturationCaps": { "approval": 25, "respect": 15 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["gratitude"], "relations": { "addresses": ["gratitude"] } },
       "extensions": ["ProjectHoomans"]
     },
@@ -150,6 +164,7 @@
       "aliases": ["player_praised"],
       "memory": { "retentionClass": "LONG", "salience": 60, "decayPerDay": 0.05, "shareable": false },
       "relationship": { "approvalDelta": 3, "respectDelta": 2, "familiarityDelta": 1, "cooldownHours": 1, "saturationCaps": { "approval": 25, "respect": 20 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["praise"], "relations": {} },
       "extensions": ["ProjectHoomans"]
     },
@@ -157,6 +172,7 @@
       "id": "player_emote_clap",
       "memory": { "retentionClass": "LONG", "salience": 60, "decayPerDay": 0.05, "shareable": false },
       "relationship": { "approvalDelta": 3, "respectDelta": 2, "familiarityDelta": 1, "cooldownHours": 1, "saturationCaps": { "approval": 25, "respect": 20 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["praise"], "relations": {} },
       "extensions": ["ProjectHoomans"]
     },
@@ -165,6 +181,7 @@
       "aliases": ["player_saluted"],
       "memory": { "retentionClass": "LONG", "salience": 50, "decayPerDay": 0.05, "shareable": false },
       "relationship": { "approvalDelta": 0, "respectDelta": 3, "familiarityDelta": 1, "cooldownHours": 2, "saturationCaps": { "approval": 10, "respect": 25 } },
+      "references": { "target": "WEAK", "maxActorRefs": 1, "maxStrongRefs": 0, "degradeOnPurge": "LABEL_ONLY" },
       "evidence": { "semantic": true, "classes": ["respect"], "relations": {} },
       "extensions": ["ProjectHoomans"]
     }

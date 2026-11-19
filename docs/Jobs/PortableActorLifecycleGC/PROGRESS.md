@@ -23,6 +23,11 @@
 - Updated `PNC_Persistence_CoreSocial.lua` (`HasGenericSocialPayload`, `ToCoreSocial`, `FromCoreSocial`, `SyncToCore`) to store and synchronize Core memories strictly in actor-level `memoryBank` (`Social.SCHEMA_VERSION = 3`, `rel.memories = nil`) while preserving Hoomans runtime view projection (`memories = targetMemories`) without writing `.memories` back to Core ModData.
 - Updated `tests/pnc_npc_foundation_social_adapter_smoke.lua` and `tests/pnc_portable_social_convergence_smoke.lua` assertions on raw Core social payloads to inspect `CoreSocial.GetMemoriesForTarget` and verify `rel.memories == nil`.
 
+## H4-policy — Social Policy Reference Strength Metadata
+
+- Annotated `tools/providers/pnc/codebuilder/sources/social_policy/events/combat_and_care.json` and `dialogue_and_emotes.json` with explicit `references` (`STRONG`/`WEAK`/`LABEL_ONLY`, role caps, `degradeOnPurge`, `anchorMax = 16` on `friendship_established`).
+- Regenerated `PNC/SocialPolicy/Events/CombatAndCare.lua`, `DialogueAndEmotes.lua`, and `Registry.lua` via Core CodeBuilder `reconcile.py --apply` (`clean: true`; Kahlua lint 0 errors; `social_policy` & `core_social` tests PASS).
+
 ## Next Chunk
 
 Wait for Core L1-L4 acceptance, then implement **H1** (bridge `Health.Kill` / `retireDeadRecord` to Core `Retire` after consequences and `API.Despawn` rollback to Core `HardDelete`, preserving consequence ordering and `DeathMarkers`).

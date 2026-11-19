@@ -22,6 +22,12 @@
         "saturationCaps": { "approval": 20, "respect": 15 },
         "personalityModulation": false
       },
+      "references": {
+        "target": "WEAK",
+        "maxActorRefs": 1,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
+      },
       "evidence": {
         "semantic": true,
         "classes": ["assistance"],
@@ -45,6 +51,13 @@
         "respectDelta": 25,
         "familiarityDelta": 8,
         "saturationCaps": { "approval": 70, "respect": 80 }
+      },
+      "references": {
+        "target": "WEAK",
+        "source": "WEAK",
+        "maxActorRefs": 2,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
       },
       "evidence": {
         "semantic": true,
@@ -70,6 +83,13 @@
         "familiarityDelta": 4,
         "saturationCaps": { "approval": 50, "respect": 70 }
       },
+      "references": {
+        "target": "WEAK",
+        "source": "WEAK",
+        "maxActorRefs": 2,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
+      },
       "evidence": {
         "semantic": true,
         "classes": ["assistance"],
@@ -91,6 +111,13 @@
         "approvalDelta": -2,
         "respectDelta": -3,
         "familiarityDelta": 0
+      },
+      "references": {
+        "target": "WEAK",
+        "source": "WEAK",
+        "maxActorRefs": 2,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
       },
       "evidence": {
         "semantic": true,
@@ -114,6 +141,13 @@
         "respectDelta": -4,
         "familiarityDelta": 0
       },
+      "references": {
+        "target": "WEAK",
+        "source": "WEAK",
+        "maxActorRefs": 2,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
+      },
       "evidence": {
         "semantic": true,
         "classes": ["grievance", "hostility"],
@@ -135,6 +169,14 @@
         "approvalDelta": -2,
         "respectDelta": -3,
         "familiarityDelta": 0
+      },
+      "references": {
+        "target": "WEAK",
+        "subject": "WEAK",
+        "source": "WEAK",
+        "maxActorRefs": 3,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
       },
       "evidence": {
         "semantic": true,
@@ -158,6 +200,12 @@
         "respectDelta": 6,
         "familiarityDelta": 4,
         "saturationCaps": { "approval": 30, "respect": 50 }
+      },
+      "references": {
+        "target": "WEAK",
+        "maxActorRefs": 1,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
       },
       "evidence": {
         "semantic": true,
@@ -183,6 +231,13 @@
         "familiarityDelta": 5,
         "saturationCaps": { "approval": 35, "respect": 60 }
       },
+      "references": {
+        "target": "WEAK",
+        "source": "WEAK",
+        "maxActorRefs": 2,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
+      },
       "evidence": {
         "semantic": true,
         "classes": ["shared_danger"],
@@ -207,6 +262,13 @@
         "familiarityDelta": 5,
         "saturationCaps": { "approval": 80, "respect": 80 }
       },
+      "references": {
+        "target": "WEAK",
+        "source": "WEAK",
+        "maxActorRefs": 2,
+        "maxStrongRefs": 0,
+        "degradeOnPurge": "LABEL_ONLY"
+      },
       "evidence": {
         "semantic": true,
         "classes": ["grievance"],
@@ -221,7 +283,7 @@
         "salience": 220,
         "decayPerDay": 0.0,
         "permanent": true,
-        "anchorMax": 6,
+        "anchorMax": 16,
         "shareable": true,
         "observerPolicy": { "maxObservers": 2, "allowWitnesses": false },
         "hearsayPolicy": { "allowHearsay": true, "maxHops": 1, "attenuation": 0.75 }
@@ -231,6 +293,13 @@
         "respectDelta": 0,
         "familiarityDelta": 0,
         "updateState": true
+      },
+      "references": {
+        "target": "STRONG",
+        "source": "WEAK",
+        "maxActorRefs": 2,
+        "maxStrongRefs": 1,
+        "degradeOnPurge": "KEEP_HISTORICAL"
       },
       "evidence": {
         "semantic": true,
