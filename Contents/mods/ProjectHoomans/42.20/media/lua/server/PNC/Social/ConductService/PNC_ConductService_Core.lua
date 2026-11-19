@@ -25,6 +25,11 @@ function H.Resolve(entityKey)
         record = PNC.Registry and PNC.Registry.Get
             and PNC.Registry.Get(parsed.npcID) or nil
         if not record then return nil, "npc_not_found" end
+        if PNC.Persistence and PNC.Persistence.CoreSocial
+            and type(PNC.Persistence.CoreSocial.EnsureRuntimeView) == "function"
+        then
+            PNC.Persistence.CoreSocial.EnsureRuntimeView(record, PsychopatzCore)
+        end
         return {
             kind = "npc",
             key = entityKey,
@@ -64,6 +69,11 @@ function H.Commit(owner, conduct)
     end
     local record = PNC.Registry.Get(owner.id)
     if not record then return false, "npc_not_found" end
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.EnsureRuntimeView) == "function"
+    then
+        PNC.Persistence.CoreSocial.EnsureRuntimeView(record, PsychopatzCore)
+    end
     local social = PNC.RelationshipTypes.NormalizeSocialState(
         record.social,
         record.identitySeed,

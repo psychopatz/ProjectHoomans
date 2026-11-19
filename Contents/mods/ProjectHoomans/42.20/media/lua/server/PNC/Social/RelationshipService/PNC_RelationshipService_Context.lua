@@ -45,6 +45,11 @@ local function validateTarget(targetKey)
 end
 
 local function getRelationship(record, targetKey)
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.EnsureRuntimeView) == "function"
+    then
+        PNC.Persistence.CoreSocial.EnsureRuntimeView(record, PsychopatzCore)
+    end
     local social = type(record.social) == "table" and record.social or nil
     local relationships = social
         and type(social.relationships) == "table"
@@ -110,6 +115,11 @@ local function buildMemorySpec(memorySpec, targetKey)
 end
 
 local function prepareSocial(record)
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.EnsureRuntimeView) == "function"
+    then
+        PNC.Persistence.CoreSocial.EnsureRuntimeView(record, PsychopatzCore)
+    end
     local normalized = Types.NormalizeSocialState(
         record.social,
         record.identitySeed,

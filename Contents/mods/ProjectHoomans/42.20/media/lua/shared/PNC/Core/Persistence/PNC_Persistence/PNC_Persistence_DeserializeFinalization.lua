@@ -45,7 +45,6 @@ function Internal.FinalizeDeserializedRecord(
     NeedsRecordRepository.RestoreRecord(record, raw)
     BodyRepository.RestoreCorpse(record, raw.corpse)
     IdentityRestoration.RestoreRecord(record, raw, identity)
-    RelationshipRepository.RestoreRecord(record, raw)
     HealthRepository.RestoreStamina(raw.stamina, record)
     record = InventoryRepository.RestoreRecord(record, raw.inventory)
     record = Persistence.RebuildRuntime(record)
@@ -55,6 +54,7 @@ function Internal.FinalizeDeserializedRecord(
             sourceVersion = tonumber(raw.schemaVersion) or 0,
         })
     end
+    RelationshipRepository.RestoreRecord(record, raw)
     restoreJournalAndTravel(record, raw)
     record.persistenceSourceVersion = tonumber(raw.schemaVersion) or 0
     BodyRepository.RestoreHint(record, raw)

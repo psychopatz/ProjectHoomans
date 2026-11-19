@@ -1,23 +1,21 @@
 # Progress — Project Hoomans Portable Social State Adoption
 
-**Status:** READY FOR USER LIVE TEST (Developer H0–H6 / Parent P0–P9 Accepted).
+**Status:** ACTIVE — H7 accepted under parent P10; H8 pending.
 **Parent:** PsychopatzCore Docs/portable_social_state/.
-**Current participant phase:** H6 accepted (`P9` complete; awaiting user live SP/MP test).
-**Participant completion:** 7/7 phases accepted (H0, H1, H2, H3, H4, H5, H6).
+**Current participant phase:** H8 under parent P12.
+**Participant completion:** H0-H7 accepted; H8 pending.
 
 ## Verified progress
 
-- **H0 (Accepted):** Full H0 inventory recorded in `AUDIT.md`; baseline smoke suites green.
-- **H1/H2 (Accepted):** Reconciled `PNC_EntityRef.lua` (supports `actor:*` and colon `npc:*` while preserving strict 3-segment `player:*`), `PNC_RelationshipTypes_Public.lua` (preserves portable `retentionClass`/`salience`/`consolidationKey`/`count`/`sourceMode`/`confidence`), `PNC_Persistence_CoreSocial.lua` (promotes generic `baselineApproval`, `baselineRespect`, `state`, `previousState`, `cooldowns`, `saturation`, `lastEvaluatedAt` to first-class Core relationship fields, merges `recentEventIDs`, preserves foreign deltas/memories), `PNC_RelationshipMath.lua` (delegates memory strength to Core lazy decay), and `PNC_RelationshipService_Context.lua` (refreshes stale Hoomans snapshots when Core revision advances).
-- **H3 (Accepted):** Authored `tools/providers/pnc/codebuilder/sources/social_policy/` (`hoomans.social_policy`) and synchronized `PNC_SocialEventDefinitions.lua` from compiled `PNC/SocialPolicy/Registry.lua`.
-- **H4 (Accepted):** Updated `PNC_RelationshipService_Queries.lua` (`QuerySemanticEvidence`) to surface both Hoomans and foreign Core SocialPolicy memories (with provenance/confidence/count) through Unified Semantic Evidence.
-- **H5 (Accepted):** Verified MP server authority enforcement, replay idempotency, player `onlineID` reconnect alias migration (`MigrateAliases`), `DTAbstract -> DTHoomans -> DTAbstract` materialization/dematerialization social continuity (`PNC.Persistence.CoreSocial.SyncToCore`), and private `actor.social` omission in client projections via Core `tests/psychopatz_social_mp_continuity_matrix_smoke.lua` (`63/63` Core Lua suites passing) alongside `24/24` Hoomans tests.
-- **H6 (Accepted):** Verified scale stress (`1,000` actors, `500` repeated same-pair events, anchor/short/long caps, observer/hearsay bounds, `365d` lazy decay, `RuntimeStore` 30KB chunking) via Core `tests/psychopatz_social_scale_stress_smoke.lua`, standalone convergence test resolution in `tests/pnc_portable_social_convergence_smoke.lua`, `48/48` scoped ProjectHoomans social/relationship/conduct/semantic-evidence suites passing (`0` failures), `pz_verify --kahlua` (`0` errors on all 7 modified Hoomans production Lua files), and CodeBuilder `reconcile.py --check` (`clean=true`). Full 1,070-test ProjectHoomans sweep reported `1,066/1,070` passing with `4` unrelated pre-existing dirty-work failures (`pnc_animation_scene_debug_routes_smoke`, `pnc_context_debug_smoke`, `pnc_population_director_smoke`, `pz_custom_translation_manager_smoke`).
+- H0-H7 remain source and test verified (H0-H6 committed historical milestones; H7 accepted under parent P10).
+- Hoomans correctly consumes Core target keys, retention and provenance fields, compiled SocialPolicy definitions and foreign Core memories through semantic evidence.
+- H7 single-persistence Core social authority implemented: `PNC_Persistence_CoreSocial` and `PNC_RelationshipRepository.SerializeRecord` persist only PNC-owned extensions (`authority == "core"`, `morale`, `moraleBaseline`, `conduct` without derived `scores`, `relationshipExtensions` with `bond`, `interactionRevision`, `lastInteractionAt`, `interactionJournal`) while Core `actor.social` is the sole persisted generic relationship/memory authority.
+- Ephemeral combined runtime views (`EnsureRuntimeView`, `FromCoreSocial`, `SyncFromCore`) hydrate generic approval, respect, familiarity, baselines, states, memories, cooldowns, and saturation from Core on load/access; generic mutations sync once to Core (`SyncToCore` with `changeSpec` support) and refresh the runtime view.
+- Versioned one-time legacy migration (`core_social_single_authority` v1) imports older pre-P10 PNC generic saves into Core once, prevents duplicate re-migration, and writes the `authority == "core"` envelope on subsequent saves.
+- Verified 17/17 Hoomans convergence/social/persistence smoke tests, `pnc_portable_social_convergence_smoke` (PASS), Core `core_lua` 66/66 (including cross-repo `psychopatz_social_single_persistence_authority_smoke`), and 0 Kahlua errors across all 9 modified Hoomans production Lua files.
 
 ## Immediate Next Chunk
 
-Developer-side **H0–H6** and parent **P0–P9** accepted. Ready for user-driven live SP/MP smoke acceptance.
+Await Core P11 completion, then execute H8 final regression under parent P12 across Hoomans social, conduct, semantic evidence, reconnect alias, combined DTAbstract/DTHoomans continuity, and the full Hoomans Lua test sweep.
 
-## Acceptance
-
-Hoomans H0-H6 is participant completion only. Parent completion requires Core P0-P9 including DynamicTrading/DTAbstract adoption.
+Do not touch the unrelated dirty NPC authoring or portrait work.

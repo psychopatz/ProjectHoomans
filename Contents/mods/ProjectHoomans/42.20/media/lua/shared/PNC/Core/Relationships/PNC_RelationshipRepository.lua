@@ -46,6 +46,17 @@ function Repository.Normalize(raw, identitySeed, archetypeID)
 end
 
 function Repository.SerializeRecord(record)
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.SerializeRecord) == "function"
+    then
+        local coreEnvelope = PNC.Persistence.CoreSocial.SerializeRecord(
+            record,
+            PsychopatzCore
+        )
+        if type(coreEnvelope) == "table" then
+            return coreEnvelope
+        end
+    end
     local social = Repository.Normalize(
         record and record.social,
         record and record.identitySeed,
@@ -60,7 +71,11 @@ function Repository.SerializeRecord(record)
 end
 
 function Repository.IsStaleGeneratedPersonality(raw)
-    local social = type(raw.social) == "table" and raw.social or nil
+    local social = type(raw) == "table" and type(raw.social) == "table"
+        and raw.social or nil
+    if not social or social.authority == "core" then
+        return false
+    end
     local personality = social and social.personality or nil
     local version = personality and tonumber(personality.generationVersion)
         or nil
@@ -86,6 +101,11 @@ function Repository.RestoreRecord(record, raw)
         and PNC.Registry and PNC.Registry.MarkDirty
     then
         PNC.Registry.MarkDirty(record, "social_profile_regenerated")
+    end
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.RestoreRecord) == "function"
+    then
+        PNC.Persistence.CoreSocial.RestoreRecord(record, raw, PsychopatzCore)
     end
 end
 

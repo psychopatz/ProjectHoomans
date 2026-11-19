@@ -142,4 +142,226 @@ T.truthy(PNC.EntityRef.Parse("actor:dt:world:7"), "EntityRef parses actor:*")
 T.truthy(PNC.EntityRef.Parse("npc:colon:id"), "EntityRef parses colon npc:*")
 T.equal(PNC.EntityRef.Parse("player:Patrick"), nil, "malformed 2-segment player key still rejected")
 
+-- 5. Verify single persisted generic social authority (P10 / H7)
+local p10Actor = assert(registry:Create({
+    actorId = "actor:p10:single_auth",
+    identitySeed = "p10-single-auth-seed",
+    providerLease = { leaseID = "lease:p10:1", provider = "ProjectHoomans", owner = "ProjectHoomans" },
+}))
+local dtP10Social = assert(CoreActors.Social.RecordAuthorizedEvent(p10Actor.social, {
+    targetKey = playerKey,
+    eventID = "dt:trade:p10_1",
+    type = "trade.fair_high_value",
+    createdAt = 100,
+    authority = "server",
+    authorized = true,
+}))
+p10Actor = assert(registry:Commit(p10Actor.actorId, { social = dtP10Social }, p10Actor.revision))
+
+local p10Record = assert(PNC.Types.NewRecord({
+    id = "actor:p10:single_auth",
+    coreActorID = "actor:p10:single_auth",
+    displayName = "P10 Authority NPC",
+    identitySeed = 731,
+    archetypeID = "parity_merchant",
+    tacticalClass = "neutral",
+    x = 10,
+    y = 20,
+    z = 0,
+    equipment = { worn = {}, attached = {} },
+}))
+PNC.Registry.Data = PNC.Registry.Data or {}
+PNC.Registry.Data[p10Record.id] = p10Record
+PNC.Registry.Get = function(id)
+    if id == hoomansRecord.id then return hoomansRecord end
+    return PNC.Registry.Data[tostring(id)]
+end
+
+local syncFromOk, syncFromErr = PNC.Persistence.CoreSocial.SyncFromCore(p10Record, PsychopatzCore)
+T.truthy(syncFromOk, syncFromErr)
+
+local baseOk, baseErr = PNC.Relationships.SetInitialBaseline(
+    p10Record.id, playerKey, { approval = 5, respect = 3 }, 105
+)
+T.truthy(baseOk, baseErr)
+
+local p10Added, p10AddErr = PNC.Relationships.AddMemory(p10Record.id, playerKey, {
+    id = "hoomans:treated:p10_1",
+    type = "treated_wound",
+    aboutKey = playerKey,
+    createdAt = 105,
+    approvalEffect = 6,
+    respectEffect = 4,
+    strength = 1,
+    decayPerDay = 0.05,
+    retentionClass = "LONG",
+})
+T.truthy(p10Added, p10AddErr)
+
+local bondOk, bondErr = PNC.Relationships.SetDurableBond(
+    p10Record.id, playerKey, { class = "friend" }, 105, "relationship_milestone"
+)
+T.truthy(bondOk, bondErr)
+
+local intOk, intErr = PNC.Relationships.RecordInteraction(p10Record.id, playerKey, {
+    eventID = "p10:int:1",
+    interactionType = "conversation",
+    worldAgeHours = 105,
+    applied = true,
+})
+T.truthy(intOk, intErr)
+
+p10Record.social.morale = 17
+p10Record.social.moraleBaseline = 4
+p10Record.social.conduct.evidence = {
+    {
+        id = "conduct:p10:1",
+        eventID = "social:p10:1",
+        eventType = "treated_wound",
+        actorKey = "npc:" .. p10Record.id,
+        subjectKey = playerKey,
+        createdAt = 105,
+        lastEvaluatedAt = 105,
+        effects = { compassion = 5 },
+        strength = 1,
+        decayPerDay = 0,
+        permanent = true,
+        visibility = "public",
+        shareable = true,
+    },
+}
+local syncP10Ok, syncP10Err = PNC.Persistence.CoreSocial.SyncToCore(p10Record, PsychopatzCore)
+T.truthy(syncP10Ok, syncP10Err)
+
+local coreActorAfterP10 = assert(registry:Get(p10Record.id))
+local coreEncoded = assert(CoreActors.Persistence.EncodeActor(coreActorAfterP10))
+local pncPayload = assert(PNC.Persistence.SerializeRecord(p10Record))
+
+-- PNC save envelope keeps ONLY PNC-specific extensions; zero generic social graph!
+T.equal(pncPayload.social.authority, "core", "PNC social envelope records core authority")
+T.equal(pncPayload.social.coreSocialMigrationVersion, 1, "PNC social envelope records migration version 1")
+T.equal(pncPayload.social.relationships, nil, "PNC save payload omits generic relationships table")
+T.equal(pncPayload.social.recentEventIDs, nil, "PNC save payload omits generic recentEventIDs")
+T.equal(pncPayload.social.personality, nil, "PNC save payload omits generic personality")
+T.equal(pncPayload.social.revision, nil, "PNC save payload omits generic social revision")
+T.equal(pncPayload.social.morale, 17, "PNC save payload preserves morale")
+T.equal(pncPayload.social.moraleBaseline, 4, "PNC save payload preserves moraleBaseline")
+T.truthy(pncPayload.social.conduct and #pncPayload.social.conduct.evidence == 1,
+    "PNC save payload preserves conduct evidence")
+T.equal(pncPayload.social.conduct.scores, nil, "PNC save payload omits derived conduct scores")
+T.equal(pncPayload.social.relationshipExtensions[playerKey].bond.class, "friend",
+    "PNC save payload preserves durable bond extension")
+T.equal(#pncPayload.social.relationshipExtensions[playerKey].interactionJournal, 1,
+    "PNC save payload preserves interaction journal extension")
+
+-- Core payload holds the single authoritative generic relationship and memories
+local coreP10Rel = coreEncoded.social.relationships[playerKey]
+T.truthy(coreP10Rel, "Core actor social carries canonical directed relationship")
+T.equal(coreP10Rel.baselineApproval, 5, "Core actor persists baselineApproval once")
+T.equal(coreP10Rel.baselineRespect, 3, "Core actor persists baselineRespect once")
+T.equal(#coreP10Rel.memories, 2, "Core actor persists both DT and Hoomans memories once")
+
+-- Strip ProjectHoomans extension from Core save and verify full reload reconstructs from Core + PNC envelope
+local savedCoreActor = assert(registry:Get(p10Record.id))
+savedCoreActor.social.extensions.ProjectHoomans = nil
+savedCoreActor.social.relationships[playerKey].extensions.ProjectHoomans = nil
+local savedCoreJson = assert(CoreActors.Persistence.SerializeRegistry({ savedCoreActor }, registry.revision))
+
+local freshReg = CoreActors.NewRegistry()
+T.truthy(freshReg:Load(savedCoreJson), "Reload stripped Core registry")
+PsychopatzCore.Actors.DefaultRegistry = freshReg
+
+local reloadedP10 = assert(PNC.Persistence.DeserializeRecord(pncPayload, p10Record.id))
+T.truthy(reloadedP10.social, "Reloaded record reconstructs ephemeral runtime social view")
+T.equal(reloadedP10.social.morale, 17, "Reloaded record restores PNC morale independently")
+T.equal(reloadedP10.social.moraleBaseline, 4, "Reloaded record restores PNC moraleBaseline independently")
+T.truthy(reloadedP10.social.conduct.scores and reloadedP10.social.conduct.scores.compassion > 0,
+    "Reloaded record rebuilds conduct scores from PNC conduct evidence")
+local reloadedRel = reloadedP10.social.relationships[playerKey]
+T.truthy(reloadedRel, "Reloaded record reconstructs relationship view")
+T.equal(reloadedRel.approval, coreP10Rel.approval, "Reloaded approval comes from Core authority")
+T.equal(reloadedRel.baselineApproval, 5, "Reloaded baselineApproval comes from Core authority")
+T.equal(#reloadedRel.memories, 2, "Reloaded memories come from Core authority")
+T.equal(reloadedRel.bond.class, "friend", "Reloaded bond comes from PNC extension envelope")
+T.equal(#reloadedRel.interactionJournal, 1, "Reloaded interactionJournal comes from PNC extension envelope")
+
+-- Supported legacy/pre-P10 save migrates into Core exactly once, then saves in new shape
+local legacyActor = assert(freshReg:Create({
+    actorId = "actor:p10:legacy",
+    identitySeed = "p10-legacy-seed",
+    providerLease = { leaseID = "lease:p10:legacy", provider = "ProjectHoomans", owner = "ProjectHoomans" },
+}))
+local legacyRaw = PNC.Persistence.ImportPlan.Copy(pncPayload)
+legacyRaw.id = "actor:p10:legacy"
+legacyRaw.repairVersions = nil
+legacyRaw.social = {
+    schemaVersion = 4,
+    revision = 3,
+    morale = 9,
+    moraleBaseline = 2,
+    lastEvaluatedAt = 50,
+    recentEventIDs = { "ev:legacy:1" },
+    relationships = {
+        [playerKey] = {
+            approval = 18,
+            respect = 11,
+            familiarity = 14,
+            baselineApproval = 8,
+            baselineRespect = 4,
+            state = "neutral",
+            revision = 3,
+            bond = { schemaVersion = 1, class = "friend", establishedAt = 50, source = "legacy" },
+            interactionJournal = {
+                { eventID = "legacy:int:1", interactionType = "conversation", at = 50, worldAgeHours = 50, applied = true },
+            },
+            interactionRevision = 1,
+            memories = {
+                {
+                    id = "legacy:pre_p10:mem_1",
+                    type = "treated_wound",
+                    aboutKey = playerKey,
+                    createdAt = 50,
+                    lastEvaluatedAt = 50,
+                    approvalEffect = 10,
+                    respectEffect = 7,
+                    strength = 1,
+                    decayPerDay = 0.05,
+                    knowledgeSource = "experienced",
+                    retentionClass = "LONG",
+                    salience = 140,
+                },
+            },
+        },
+    },
+}
+
+local migrated = assert(PNC.Persistence.DeserializeRecord(legacyRaw, "actor:p10:legacy"))
+T.equal(migrated.persistenceRepairVersions.core_social_single_authority, 1,
+    "Legacy pre-P10 save records single-authority migration version")
+local migratedCoreActor = assert(freshReg:Get("actor:p10:legacy"))
+local migratedCoreRel = assert(CoreActors.Social.Get(migratedCoreActor.social, playerKey))
+T.equal(migratedCoreRel.approval, 18, "Legacy approval imported into Core")
+T.equal(migratedCoreRel.baselineApproval, 8, "Legacy baselineApproval imported into Core")
+T.equal(#migratedCoreRel.memories, 1, "Legacy memory imported into Core")
+T.equal(migratedCoreRel.memories[1].id, "legacy:pre_p10:mem_1", "Legacy memory ID preserved in Core")
+
+local secondMigOk, secondMigReason = PNC.Persistence.CoreSocial.MigrateLegacyRecordToCore(
+    migrated, legacyRaw.social, PsychopatzCore
+)
+T.equal(secondMigOk, false, "Second legacy migration does not rerun")
+T.equal(secondMigReason, "already_migrated", "Second migration reports already_migrated")
+T.equal(#CoreActors.Social.Get(freshReg:Get("actor:p10:legacy").social, playerKey).memories, 1,
+    "Legacy memory imported into Core exactly once")
+
+local nextSavePayload = assert(PNC.Persistence.SerializeRecord(migrated))
+T.equal(nextSavePayload.social.authority, "core", "Next save after migration uses core authority shape")
+T.equal(nextSavePayload.social.relationships, nil, "Next save after migration omits generic relationships")
+T.equal(nextSavePayload.social.morale, 9, "Next save preserves legacy morale")
+T.equal(nextSavePayload.social.relationshipExtensions[playerKey].bond.class, "friend",
+    "Next save preserves legacy bond extension")
+T.equal(#nextSavePayload.social.relationshipExtensions[playerKey].interactionJournal, 1,
+    "Next save preserves legacy interactionJournal extension")
+
+PsychopatzCore.Actors.DefaultRegistry = registry
+
 T.finish("pnc_portable_social_convergence_smoke")

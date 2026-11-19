@@ -286,7 +286,24 @@ function Adapter.EnsureActor(record, core)
     actor, reason = ensureAbstractLease(actor, record)
     if not actor then return nil, reason end
 
-    return Adapter.AnnotateExistingCoreRecord(record, core)
+    local ok, result = Adapter.AnnotateExistingCoreRecord(record, core)
+    if ok and PNC.Persistence and PNC.Persistence.CoreSocial then
+        local coreSocial = PNC.Persistence.CoreSocial
+        local migratedVersion = tonumber(
+            record.persistenceRepairVersions
+                and record.persistenceRepairVersions[coreSocial.MIGRATION_ID or "core_social_single_authority"]
+        ) or 0
+        if migratedVersion < (coreSocial.MIGRATION_VERSION or 1)
+            and type(coreSocial.HasGenericSocialPayload) == "function"
+            and coreSocial.HasGenericSocialPayload(record.social)
+            and type(coreSocial.MigrateLegacyRecordToCore) == "function"
+        then
+            coreSocial.MigrateLegacyRecordToCore(record, record.social, core)
+        elseif type(coreSocial.EnsureRuntimeView) == "function" then
+            coreSocial.EnsureRuntimeView(record, core)
+        end
+    end
+    return ok, result
 end
 
 function Adapter.ReconcileExistingCoreRecords(core)
@@ -323,7 +340,17 @@ local function buildRecord(actor, baseRecord)
     record.displayName = record.name
     record.identity = actor.identity
     record.appearance = actor.appearance
-    record.social = actor.social
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.FromCoreSocial) == "function"
+        and type(actor.social) == "table"
+    then
+        record.social = PNC.Persistence.CoreSocial.FromCoreSocial(
+            actor.social,
+            record.social
+        ) or actor.social
+    else
+        record.social = actor.social
+    end
     record.personalInventory = actor.personalInventory
     record.coreActorID = tostring(actor.actorId)
     record.x = point.x

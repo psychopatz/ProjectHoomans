@@ -148,6 +148,11 @@ function Presentation.BuildForConversation(player, npcID)
     if not record or record.alive == false then
         return nil, "npc_not_found"
     end
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.EnsureRuntimeView) == "function"
+    then
+        PNC.Persistence.CoreSocial.EnsureRuntimeView(record, PsychopatzCore)
+    end
     if not playerCharacters or not playerCharacters.GetEntityKey then
         return nil, "player_identity_unavailable"
     end

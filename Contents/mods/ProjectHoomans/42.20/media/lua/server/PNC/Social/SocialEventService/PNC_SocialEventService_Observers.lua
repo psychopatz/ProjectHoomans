@@ -16,6 +16,11 @@ local personalRelationshipQueries = Internal.PersonalRelationshipQueries
 local finiteNumber = Internal.FiniteNumber
 
 local function hasRecentEvent(record, eventID)
+    if record and PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.EnsureRuntimeView) == "function"
+    then
+        PNC.Persistence.CoreSocial.EnsureRuntimeView(record, PsychopatzCore)
+    end
     local social = RelationshipTypes.NormalizeSocialState(
         record and record.social,
         record and record.identitySeed,

@@ -1,8 +1,8 @@
 # Roadmap — Project Hoomans Portable Social State Adoption
 
-**Status:** READY FOR USER LIVE TEST (H0–H6 Accepted under Core P0–P9).
-**Canonical parent:** PsychopatzCore Docs/portable_social_state/ P0-P9.
-**Participant completion:** H0-H6 does not complete the parent goal by itself.
+**Status:** ACTIVE — H0-H7 accepted; H8 pending after Core P11-P12.
+**Canonical parent:** PsychopatzCore Docs/portable_social_state/ P0-P12.
+**Participant completion:** H0-H8 plus relevant parent gates are required; Hoomans alone never completes the multi-repo parent.
 
 ## H0 — Hoomans overlap and ownership audit
 
@@ -67,6 +67,29 @@ Stress sparse contacts, repeated events, anchor/retention pressure, many abstrac
 Run Hoomans social/semantic/director regressions and parent-required cross-mod fixtures.
 
 **Gate:** participant is accepted only when Hoomans-specific gates pass and parent Core integration remains green.
+
+
+## H7 — Single-persistence Core social authority (Parent P10) — ACCEPTED
+
+Remove the second persisted copy of generic social relationship and memory state from Project Hoomans for Core-backed actors.
+
+Requirements:
+
+- preserve PNC-owned morale, conduct, bond or romance, interaction journal and other genuinely Hoomans-specific state;
+- hydrate generic approval, respect, familiarity, baselines, memories and revisions from Core at runtime instead of independently serializing them through RelationshipRepository.SerializeRecord;
+- route generic mutations to Core authority once, then refresh the PNC runtime view;
+- provide explicit versioned migration for supported older PNC saves that still contain generic social state;
+- do not retain a permanent dual-write compatibility shim;
+- prove save and reload, semantic evidence, SocialEvents, Conduct, conversation and relationship presentation remain correct;
+- add a combined Core plus PNC payload test that fails if the same generic social history is persisted twice.
+
+**Gate:** a Core-backed Hoomans NPC has one persisted generic social history in Core plus an independently persisted PNC-specific extension envelope.
+
+## H8 — Final Hoomans regression under parent P12
+
+After Core P11 and player-identity cleanup, rerun Hoomans social, conduct, semantic evidence, reconnect alias, combined DTAbstract to DTHoomans continuity and persistence-footprint tests.
+
+**Gate:** all Hoomans portable-social tests pass with no duplicate generic persistence and the known unrelated full-suite baseline is unchanged or improved.
 
 ## Stop rules
 
