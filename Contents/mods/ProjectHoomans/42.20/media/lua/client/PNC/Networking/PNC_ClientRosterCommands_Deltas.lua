@@ -75,6 +75,14 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
             end
             ClientState.snapshots[entryID] = nil
             ClientState.snapshots[entry.id] = nil
+            if ClientState.domainRevisions then
+                ClientState.domainRevisions[entryID] = nil
+                ClientState.domainRevisions[entry.id] = nil
+            end
+            if ClientState.lastRepairRequestAt then
+                ClientState.lastRepairRequestAt[entryID] = nil
+                ClientState.lastRepairRequestAt[entry.id] = nil
+            end
             if ClientState.characterPayloads then
                 ClientState.characterPayloads[entryID] = nil
                 ClientState.characterPayloads[entry.id] = nil
@@ -157,6 +165,12 @@ Internal.RegisterServerCommand(Const.CMD_REMOVE_RECORD, function(args)
     BodyBinding.Forget(id)
     if PNC.Client.ForgetRosterPortrait then PNC.Client.ForgetRosterPortrait(id) end
     ClientState.snapshots[id] = nil
+    if ClientState.domainRevisions then
+        ClientState.domainRevisions[id] = nil
+    end
+    if ClientState.lastRepairRequestAt then
+        ClientState.lastRepairRequestAt[id] = nil
+    end
     if ClientState.characterPayloads then
         ClientState.characterPayloads[id] = nil
     end

@@ -74,6 +74,7 @@ function Network.BuildSnapshot(record, inventorySummaryOverride, leanPortrait)
     local bodyBinding, liveBodyOnlineID, liveBodyLease =
         BodyBinding.Projection(record)
     local snapshot = buildIdentityProjection(record, state, leanPortrait)
+    snapshot.deltaKind = "full"
     snapshot.residence = buildResidenceProjection(record)
     snapshot.commandFeedback = buildCommandFeedback(record)
     snapshot.corpseHaulManualDiagnostic = buildCorpseHaulDiagnostic(record)

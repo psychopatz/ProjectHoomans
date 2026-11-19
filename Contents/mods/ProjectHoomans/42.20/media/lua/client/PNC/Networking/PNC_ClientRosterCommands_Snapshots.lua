@@ -174,21 +174,30 @@ local function logClientPresenceRemoval(current, id, reason, eventName)
     })
 end
 
-local function compareLifetimes(current, incoming)
-    if type(current) ~= "table" or type(incoming) ~= "table"
-        or type(current.incarnation) ~= "string" or type(incoming.incarnation) ~= "string"
-        or current.incarnation == incoming.incarnation
+local function compareIncarnationStrings(currentInc, incomingInc)
+    if type(currentInc) ~= "string" or type(incomingInc) ~= "string"
+        or currentInc == incomingInc
     then
         return 0
     end
-    local currentEpoch, currentSerial = string.match(current.incarnation, "^(.*):(%d+)$")
-    local incomingEpoch, incomingSerial = string.match(incoming.incarnation, "^(.*):(%d+)$")
-    if not currentEpoch or not incomingEpoch then return -1 end
-    if currentEpoch ~= incomingEpoch then
-        return (tonumber(incomingEpoch) or 0) > (tonumber(currentEpoch) or 0)
-            and 1 or -1
+    local curPrefix, curEpoch, curSerial =
+        string.match(currentInc, "^(.-)(%d+):(%d+)$")
+    local incPrefix, incEpoch, incSerial =
+        string.match(incomingInc, "^(.-)(%d+):(%d+)$")
+    if curEpoch and incEpoch and curPrefix == incPrefix then
+        if tonumber(curEpoch) ~= tonumber(incEpoch) then
+            return tonumber(incEpoch) > tonumber(curEpoch) and 1 or -1
+        end
+        return tonumber(incSerial) > tonumber(curSerial) and 1 or -1
     end
-    return tonumber(incomingSerial) > tonumber(currentSerial) and 1 or -1
+    return -1
+end
+
+local function compareLifetimes(current, incoming)
+    if type(current) ~= "table" or type(incoming) ~= "table" then
+        return 0
+    end
+    return compareIncarnationStrings(current.incarnation, incoming.incarnation)
 end
 
 local function isStaleSnapshot(current, incoming)
@@ -237,6 +246,42 @@ local function mergeSnapshot(current, incoming)
     return current
 end
 
+local function ensureTrackedDomains(id, incarnation)
+    ClientState.domainRevisions = ClientState.domainRevisions or {}
+    local tracked = ClientState.domainRevisions[id]
+    if not tracked then
+        tracked = { incarnation = incarnation, domains = {} }
+        ClientState.domainRevisions[id] = tracked
+    elseif not tracked.incarnation and incarnation then
+        tracked.incarnation = incarnation
+    end
+    return tracked
+end
+
+local function isSupportedDelta(deltaKind, protocol)
+    if deltaKind == nil or deltaKind == "full" then
+        return true
+    end
+    local supported = (Network and Network.SUPPORTED_DELTA_KINDS) or {
+        presence = true,
+        combat_damage = true,
+        combat_state = true,
+        health_wounds = true,
+        equipment = true,
+        full = true,
+    }
+    if not supported[deltaKind] then
+        return false
+    end
+    if protocol ~= nil
+        and Const.DOMAIN_DELTA_PROTOCOL ~= nil
+        and tonumber(protocol) ~= tonumber(Const.DOMAIN_DELTA_PROTOCOL)
+    then
+        return false
+    end
+    return true
+end
+
 local function storeSnapshot(
     incoming,
     replace,
@@ -250,6 +295,45 @@ local function storeSnapshot(
     end
     id = normalizeSnapshotID(incoming.id)
     current = ClientState.snapshots[id]
+
+    local deltaKind = incoming.deltaKind ~= nil
+        and tostring(incoming.deltaKind) or nil
+    if not isSupportedDelta(deltaKind, incoming.deltaProtocol) then
+        ClientState.unsupportedDeltas =
+            (tonumber(ClientState.unsupportedDeltas) or 0) + 1
+        if Client.RequestRecordRepair then
+            Client.RequestRecordRepair(id, "unsupported_delta", {
+                deltaKind = deltaKind,
+            })
+        end
+        return current
+    end
+
+    ClientState.domainRevisions = ClientState.domainRevisions or {}
+    local tracked = ClientState.domainRevisions[id]
+    if tracked and tracked.incarnation and incoming.replicaIncarnation
+        and tracked.incarnation ~= incoming.replicaIncarnation
+    then
+        local order = compareIncarnationStrings(
+            tracked.incarnation,
+            incoming.replicaIncarnation
+        )
+        if deltaKind == "full" or replace == true then
+            if order < 0 and replace ~= true then
+                return current
+            end
+        elseif order > 0 then
+            if Client.RequestRecordRepair then
+                Client.RequestRecordRepair(id, "incarnation_mismatch", {
+                    deltaKind = deltaKind,
+                })
+            end
+            return current
+        else
+            return current
+        end
+    end
+
     if current and type(incoming.portraitRef) == "table"
         and type(current.portraitRef) == "table"
         and current.portraitRef.incarnation == incoming.portraitRef.incarnation
@@ -268,6 +352,41 @@ local function storeSnapshot(
     then
         return current
     end
+
+    if deltaKind ~= nil and deltaKind ~= "full" then
+        if current == nil
+            and deltaKind ~= "presence"
+            and incoming.deathMarker ~= true
+        then
+            if Client.RequestRecordRepair then
+                Client.RequestRecordRepair(id, "missing_baseline", {
+                    deltaKind = deltaKind,
+                })
+            end
+        end
+        local incomingRev = tonumber(incoming.domainRevision)
+        if incomingRev ~= nil then
+            tracked = ensureTrackedDomains(id, incoming.replicaIncarnation)
+            local lastRev = tonumber(tracked.domains[deltaKind]) or 0
+            if incomingRev <= lastRev then
+                return current
+            end
+            local baseRev = tonumber(incoming.baseDomainRevision)
+            if baseRev ~= nil and lastRev > 0 and baseRev > lastRev then
+                ClientState.revisionGapsDetected =
+                    (tonumber(ClientState.revisionGapsDetected) or 0) + 1
+                if Client.RequestRecordRepair then
+                    Client.RequestRecordRepair(id, "gap_repair", {
+                        deltaKind = deltaKind,
+                        expectedRevision = lastRev + 1,
+                        receivedRevision = incomingRev,
+                    })
+                end
+            end
+            tracked.domains[deltaKind] = incomingRev
+        end
+    end
+
     if current and type(current.portraitRef) == "table"
         and type(incoming.portraitRef) == "table"
         and current.portraitRef.incarnation ~= incoming.portraitRef.incarnation
@@ -285,6 +404,24 @@ local function storeSnapshot(
     if Diagnostics and Diagnostics.FollowerPresenceAuditEnabled == true then
         logClientPresenceTransition(current, incoming, eventName)
         logClientPresencePosition(current, incoming, eventName)
+    end
+    if deltaKind == "full" or replace == true or incoming.deathMarker == true then
+        if incoming.deathMarker == true then
+            ClientState.domainRevisions[id] = nil
+        else
+            local nextDomains = {}
+            if type(incoming.domainRevisions) == "table" then
+                for dk, dv in pairs(incoming.domainRevisions) do
+                    nextDomains[dk] = tonumber(dv) or 0
+                end
+            end
+            ClientState.domainRevisions[id] = {
+                incarnation = incoming.replicaIncarnation
+                    or (incoming.portraitRef and incoming.portraitRef.incarnation)
+                    or nil,
+                domains = nextDomains,
+            }
+        end
     end
     if replace == true or incoming.deathMarker == true then
         ClientState.snapshots[id] = incoming

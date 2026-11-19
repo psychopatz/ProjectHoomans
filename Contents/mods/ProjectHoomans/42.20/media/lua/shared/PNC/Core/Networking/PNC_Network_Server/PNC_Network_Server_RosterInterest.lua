@@ -5,6 +5,44 @@ local Const = PNC.Const
 local ServerState = Network.ServerState
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
+Network.Metrics = Network.Metrics or {
+    presenceDeltas = 0,
+    combatDamageDeltas = 0,
+    combatStateDeltas = 0,
+    healthWoundsDeltas = 0,
+    equipmentDeltas = 0,
+    fullSnapshots = 0,
+    repairSnapshots = 0,
+    fallbackSnapshots = 0,
+}
+
+local REPAIR_EVENTS = {
+    repair = true,
+    gap_repair = true,
+    reconnect = true,
+    unsupported_delta = true,
+    missing_baseline = true,
+    incarnation_mismatch = true,
+}
+
+local MICRO_ROSTER_SKIP_EVENTS = {
+    tick = true,
+    materialize = true,
+    interest_enter = true,
+    attack_start = true,
+    attack_hit = true,
+    attack_finish = true,
+    reload_finished = true,
+    weapon_restore_ranged = true,
+    weapon_fallback_melee = true,
+    weapon_fallback_shove = true,
+    animation_scene = true,
+    animation_scene_debug = true,
+    body_online_id = true,
+    position_recovery = true,
+    grounded_recovery = true,
+}
+
 local function hasHostedLocalPlayer()
     local count
     local i
@@ -20,22 +58,52 @@ local function hasHostedLocalPlayer()
     return false
 end
 
-local function recordPayloadDiagnostics(eventName)
-    local eventKey
+local function recordPayloadDiagnostics(eventName, deltaKind)
+    local eventKey = tostring(eventName or "unknown")
+    local metrics = Network.Metrics
+    if eventKey == "" then eventKey = "unknown" end
+    local kind = tostring(deltaKind or "full")
+    if metrics then
+        if kind == "presence" then
+            metrics.presenceDeltas = (tonumber(metrics.presenceDeltas) or 0) + 1
+        elseif kind == "combat_damage" then
+            metrics.combatDamageDeltas =
+                (tonumber(metrics.combatDamageDeltas) or 0) + 1
+        elseif kind == "combat_state" then
+            metrics.combatStateDeltas =
+                (tonumber(metrics.combatStateDeltas) or 0) + 1
+        elseif kind == "health_wounds" then
+            metrics.healthWoundsDeltas =
+                (tonumber(metrics.healthWoundsDeltas) or 0) + 1
+        elseif kind == "equipment" then
+            metrics.equipmentDeltas =
+                (tonumber(metrics.equipmentDeltas) or 0) + 1
+        else
+            metrics.fullSnapshots = (tonumber(metrics.fullSnapshots) or 0) + 1
+            if REPAIR_EVENTS[eventKey] then
+                metrics.repairSnapshots =
+                    (tonumber(metrics.repairSnapshots) or 0) + 1
+            end
+        end
+    end
     if not ScalingDiagnostics
         or type(ScalingDiagnostics.Increment) ~= "function"
         or ScalingDiagnostics.Enabled == false
     then
         return
     end
-    eventKey = tostring(eventName or "unknown")
-    if eventKey == "" then eventKey = "unknown" end
-    if eventKey == "tick" then
+    if kind == "presence" then
         ScalingDiagnostics.Increment("Network.PayloadBuild.PresenceDelta")
-    elseif eventKey == "combat_damage" then
+    elseif kind == "combat_damage" then
         ScalingDiagnostics.Increment(
             "Network.PayloadBuild.CombatDamageDelta"
         )
+    elseif kind == "combat_state" then
+        ScalingDiagnostics.Increment("Network.PayloadBuild.CombatStateDelta")
+    elseif kind == "health_wounds" then
+        ScalingDiagnostics.Increment("Network.PayloadBuild.HealthWoundsDelta")
+    elseif kind == "equipment" then
+        ScalingDiagnostics.Increment("Network.PayloadBuild.EquipmentDelta")
     else
         ScalingDiagnostics.Increment("Network.PayloadBuild.FullSnapshot")
     end
@@ -151,14 +219,27 @@ local function collectVisibleIDs(player, state)
             then
                 nextIDs[record.id] = true
                 if not state.ids[record.id] then
+                    local enterSnapshot = Network.BuildSnapshot(
+                        record,
+                        nil,
+                        Internal.UsesLeanRosterPortraits(player)
+                    )
+                    if type(Network.StampDomainMetadata) == "function" then
+                        Network.StampDomainMetadata(
+                            record,
+                            enterSnapshot,
+                            "full",
+                            false
+                        )
+                    end
+                    recordPayloadDiagnostics("interest_enter", "full")
                     Internal.SendToPlayer(
                         player,
                         Const.CMD_SYNC_RECORD,
                         {
                             event = "interest_enter",
                             directoryRevision = ServerState.rosterRevision,
-                            snapshot = Network.BuildSnapshot(record, nil,
-                                Internal.UsesLeanRosterPortraits(player)),
+                            snapshot = enterSnapshot,
                         }
                     )
                 end
@@ -295,7 +376,8 @@ function Network.FlushRosterDeltas(now, force)
 end
 
 function Internal.QueueBroadcastRoster(record, eventName)
-    if eventName ~= "tick" and eventName ~= "materialize" and eventName ~= "interest_enter" then
+    local key = tostring(eventName or "")
+    if not MICRO_ROSTER_SKIP_EVENTS[key] then
         -- BroadcastRecord immediately builds the detailed payload. Defer the
         -- separate compact roster snapshot until the coalesced roster flush
         -- instead of constructing both snapshots back-to-back.
@@ -317,18 +399,35 @@ function Internal.CollectRecordRecipients(record)
     return recipients
 end
 
-function Internal.BuildRecordPayload(record, eventName, leanPortrait)
+function Internal.BuildRecordPayload(record, eventName, leanPortrait, forceFull)
+    local deltaKind = "full"
+    if forceFull ~= true then
+        if type(Network.ResolveEventDeltaKind) == "function" then
+            deltaKind = Network.ResolveEventDeltaKind(eventName)
+        elseif eventName == "tick" then
+            deltaKind = "presence"
+        elseif eventName == "combat_damage" then
+            deltaKind = "combat_damage"
+        end
+    end
+
     local snapshot
-    recordPayloadDiagnostics(eventName)
-    if eventName == "tick" then
+    if type(Network.BuildDomainDelta) == "function" then
+        snapshot = Network.BuildDomainDelta(record, deltaKind, leanPortrait)
+    elseif deltaKind == "presence"
+        and type(Network.BuildPresenceDelta) == "function"
+    then
         snapshot = Network.BuildPresenceDelta(record)
-    elseif eventName == "combat_damage"
+    elseif deltaKind == "combat_damage"
         and type(Network.BuildCombatDamageDelta) == "function"
     then
         snapshot = Network.BuildCombatDamageDelta(record)
     else
+        deltaKind = "full"
         snapshot = Network.BuildSnapshot(record, nil, leanPortrait)
     end
+
+    recordPayloadDiagnostics(eventName, snapshot and snapshot.deltaKind or deltaKind)
     return {
         event = eventName or "update",
         directoryRevision = ServerState.rosterRevision,

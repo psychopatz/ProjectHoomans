@@ -9,6 +9,7 @@ local MAX_REQUESTS_PER_SECOND = 16
 local MAX_RETAINED_PORTRAITS = 128
 
 local capabilities = setmetatable({}, { __mode = "k" })
+local domainDeltaFallback = setmetatable({}, { __mode = "k" })
 local lifetimes = setmetatable({}, { __mode = "k" })
 local retained = {}
 local invalidations
@@ -17,10 +18,28 @@ local serial = 0
 
 function Network.ResetPortraitReplication()
     capabilities = setmetatable({}, { __mode = "k" })
+    domainDeltaFallback = setmetatable({}, { __mode = "k" })
     lifetimes = setmetatable({}, { __mode = "k" })
     retained = {}
     invalidations = nil
     epoch = nil
+end
+
+function Network.NegotiateDomainDeltas(player, protocol)
+    if not player then return false end
+    local supported = Const.DOMAIN_DELTA_PROTOCOL == nil
+        or protocol == nil
+        or tonumber(protocol) == tonumber(Const.DOMAIN_DELTA_PROTOCOL)
+    if supported then
+        domainDeltaFallback[player] = nil
+        return true
+    end
+    domainDeltaFallback[player] = true
+    return false
+end
+
+function Internal.UsesDomainDeltas(player)
+    return not (player ~= nil and domainDeltaFallback[player] == true)
 end
 
 function Network.NegotiateRosterPortraits(player, protocol, codec, patch)
@@ -48,6 +67,12 @@ function Internal.PruneRosterPortraitCapabilities(interests)
     for player, _ in pairs(capabilities) do
         local state = interests[Internal.PlayerKey(player)]
         if not state or state.player ~= player then capabilities[player] = nil end
+    end
+    for player, _ in pairs(domainDeltaFallback) do
+        local state = interests[Internal.PlayerKey(player)]
+        if not state or state.player ~= player then
+            domainDeltaFallback[player] = nil
+        end
     end
 end
 

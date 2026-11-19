@@ -2,7 +2,7 @@
 
 ## Current state
 
-**IN PROGRESS — L0, L1, L2 COMPLETE; L3 NEXT.**
+**IN PROGRESS — L0, L1, L2, L3 COMPLETE; L4 NEXT.**
 
 Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded deep profiling (`coarse` vs `deep`), and the deterministic integrated headless runtime simulator foundation before optimizing downstream phases.
 
@@ -51,6 +51,16 @@ Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded dee
     - `N=500`: `Promoted=9, DirtyEnd=0, globalSaves=1` (was 6), `TickCpuMs=1836.38ms` (L1: `3340.07ms`, L0: `4004.86ms`).
 - **L2 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings on all 12 modified runtime Lua files (zero `next()` calls); `luac -p` pass on all 36 updated native write tests; new `pnc_lightweight_persistence_authority_smoke.lua` pass; all 14 focused suites pass (`persistence` 14/14, `registry` 10/10, `presence` 119/119, `lightweight` 3/3, `profiler` 10/10, `core_actor` 4/4, `survivor_world` 8/8, `knowledge` 17/17, `starting_companion` 12/12, `provision` 5/5, `colony` 21/21, `recruit` 2/2, `world_save` 3/3, `companion` 28/28); full `tests/run_tests.py` sweep 1076/1080 pass (4 pre-existing unrelated failures untouched: `pnc_animation_scene_debug_routes_smoke`, `pnc_context_debug_smoke`, `pnc_population_director_smoke`, `pz_custom_translation_manager_smoke`).
 
+## L3 — Domain-delta replication (COMPLETE)
+
+- **Audited narrow domain-delta routing:** Added `PNC_NetworkSnapshots_DomainDeltas.lua` (`SUPPORTED_DELTA_KINDS`, `ResolveEventDeltaKind`, `StampDomainMetadata`, `BuildCombatStateDelta`, `BuildHealthWoundsDelta`, `BuildEquipmentDelta`, `BuildDomainDelta`) covering audited `forceSyncEvent` / `BroadcastRecord` mutation classes while reusing existing `presence` and `combat_damage` deltas (explicitly tagged with `deltaKind`) and reserving `BuildSnapshot()` (`deltaKind = "full"`) for initial hydration, detail inspection, reconnect/repair, revision-gap recovery, and negotiated fallback.
+- **Negotiation, mixed-capability fallback & repair convergence:** Added `DOMAIN_DELTA_PROTOCOL = 1` and `CMD_REQUEST_RECORD_REPAIR = "RequestRecordRepair"` in `NetworkCommands.lua`, negotiated via `CMD_FULL_SYNC_REQUEST` (`PNC_ClientRequests_Bootstrap.lua`, `PNC_ServerCharacterReplicationCommandHandler.lua`, `PNC_Network_Server_Portraits.lua`). `PNC_Network_Server_Broadcasts.lua` partitions recipients so modern clients receive narrow domain deltas while legacy clients lazily receive full fallback snapshots without penalizing modern clients; `PNC_ClientRosterCommands_Snapshots.lua` enforces `replicaIncarnation`, per-domain `domainRevision`/`baseDomainRevision` monotonicity, stale/older-incarnation drops, and 1s-throttled targeted repair (`Network.SendRecordRepair`), preserving `NPCReplicationScaling` P1–P4 lean `portraitRef` vs inline `portrait` negotiation. Wrapped the 3 new delta builders in coarse profiler boundaries (`13 <= 15` total coarse wrappers).
+- **HEADLESS LUA SIMULATOR (NON-NATIVE) L3 results vs L0–L2:**
+  - Smoke (`N=100, Z=40, 15s`, `OFF` / `COARSE` / `DEEP` / `OFF_300` bit-identical ops): `presD=133, combatD=8, hwD=4, eqD=2, fullSnap=18` (was `157` in L1/L2, `-88.5%`), `repSnap=0, fbSnap=0, globalSaves=1, coreSaves=2, dirtyEnd=0, census=129, extraZScans=102, SafePhaseFailures=0`.
+  - Mixed-capability & injected revision-gap scenario (`NET_DLT`): `presD=75, combatD=5, hwD=2, eqD=1, fullSnap=116, repSnap=1, fbSnap=99, SafePhaseFailures=0`.
+  - Benchmark (`Z=64, 20s`, `OFF`): `N=100 FullSnap=18` (was `205`/`216`), `TickCpuMs=2260.03ms`; `N=500 FullSnap=18`, `TickCpuMs=2123.57ms`, `CoarseWr=13`, `globalSaves=1`.
+- **L3 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings (zero `next()` calls) on all 15 modified/created runtime Lua files; new `pnc_lightweight_domain_delta_replication_smoke.lua` pass; `pnc_lightweight_runtime_simulation_smoke.lua` pass; `tests/benchmarks/npc_replication.lua` (P1–P4) pass; `tests/benchmarks/lightweight_npc_runtime.lua` pass; focused suites pass (`network` 3/3, `replication` 4/4, `portrait` 6/6, `roster` 3/3, `client_requests` 1/1, `lightweight` 4/4, `profiler` 10/10, `presence` 119/119, `combat` 35/35, `wound` 3/3, `medical` 6/6).
+
 ## Accepted dependencies
 
 Do not reopen:
@@ -63,4 +73,4 @@ This job corrects Hoomans runtime adoption so it actually obeys those accepted c
 
 ## Next Chunk
 
-**L3 — domain-delta replication.**
+**L4 — measured runtime cadence and allocation optimization.**

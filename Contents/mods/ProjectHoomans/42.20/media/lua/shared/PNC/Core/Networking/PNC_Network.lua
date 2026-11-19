@@ -46,6 +46,11 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     playerContext = nil,
     rosterRevision = 0,
     rosterEntryRevisions = {},
+    domainRevisions = {},
+    lastRepairRequestAt = {},
+    repairRequestsSent = 0,
+    revisionGapsDetected = 0,
+    unsupportedDeltas = 0,
     bootstrapState = "idle",
     knowledgeDebug = nil,
     knowledgeDebugAuthorized = false,
@@ -99,6 +104,21 @@ if PNC.Network.ClientState.directorDebugAuthorized == nil then
 end
 if PNC.Network.ClientState.zombiePursuitDirectives == nil then
     PNC.Network.ClientState.zombiePursuitDirectives = {}
+end
+if PNC.Network.ClientState.domainRevisions == nil then
+    PNC.Network.ClientState.domainRevisions = {}
+end
+if PNC.Network.ClientState.lastRepairRequestAt == nil then
+    PNC.Network.ClientState.lastRepairRequestAt = {}
+end
+if PNC.Network.ClientState.repairRequestsSent == nil then
+    PNC.Network.ClientState.repairRequestsSent = 0
+end
+if PNC.Network.ClientState.revisionGapsDetected == nil then
+    PNC.Network.ClientState.revisionGapsDetected = 0
+end
+if PNC.Network.ClientState.unsupportedDeltas == nil then
+    PNC.Network.ClientState.unsupportedDeltas = 0
 end
 PNC.Network.Internal = PNC.Network.Internal or {}
 

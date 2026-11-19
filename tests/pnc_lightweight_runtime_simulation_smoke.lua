@@ -85,12 +85,24 @@ for _, field in ipairs({
     "FullSnapshots",
     "PresenceDeltas",
     "CombatDeltas",
+    "HealthOrWoundDeltas",
+    "EquipmentDeltas",
+    "RepairSnapshots",
     "CensusScans",
     "PerNpcGlobalZombieScans",
 }) do
     T.equal(coarseReport[field], offReport[field], "COARSE determinism mismatch on " .. field)
     T.equal(deepReport[field], offReport[field], "DEEP determinism mismatch on " .. field)
 end
+
+-- 5a. L3 domain-delta vs full-snapshot invariants on OFF baseline.
+T.truthy((offReport.PresenceDeltas or 0) > 0, "OFF run must emit narrow presence deltas")
+T.truthy((offReport.CombatDeltas or 0) > 0, "OFF run must emit narrow combat deltas")
+T.truthy((offReport.HealthOrWoundDeltas or 0) > 0, "OFF run must emit narrow health/wound deltas")
+T.truthy((offReport.EquipmentDeltas or 0) > 0, "OFF run must emit narrow equipment deltas")
+T.truthy((offReport.FullSnapshots or 0) <= 40,
+    "OFF run ordinary mutations must not rebuild full snapshots; got "
+        .. tostring(offReport.FullSnapshots))
 
 -- 5b. L2 deferred physical persistence invariants on OFF baseline.
 T.equal(offReport.GlobalSaveCalls, 1, "ordinary OFF run should call GlobalModData.save only on OnSave")
@@ -177,5 +189,23 @@ T.truthy((mutStormReport.CoreRuntimeStoreSaves or 0) <= 2,
 T.equal(mutStormReport.DirtyRecordsEnd, 0, "MUT_STORM dirty records at end must be 0")
 T.equal(mutStormReport.TerminalPersistenceOutcomes, 0, "MUT_STORM terminal errors must be 0")
 T.equal(mutStormReport.RetryablePersistenceFailures, 0, "MUT_STORM retryable failures must be 0")
+
+-- 11. L3 mixed-capability domain deltas + revision-gap repair scenario.
+local netDeltaReport = withMode("OFF", {
+    actorCount = 100,
+    playerCount = 2,
+    clientCount = 2,
+    simulatedMs = 8000,
+    mixedCapabilities = true,
+    injectRevisionGap = true,
+})
+print("NET_DLT: " .. Simulator.FormatSummary(netDeltaReport))
+T.equal(netDeltaReport.SafePhaseFailures, 0, "NET_DELTA SafePhase failures")
+T.truthy((netDeltaReport.PresenceDeltas or 0) > 0, "NET_DELTA modern client received presence deltas")
+T.truthy((netDeltaReport.CombatDeltas or 0) > 0, "NET_DELTA modern client received combat deltas")
+T.truthy((netDeltaReport.FallbackSnapshots or 0) > 0,
+    "NET_DELTA legacy fallback client must receive full snapshots")
+T.truthy((netDeltaReport.RepairSnapshots or 0) >= 1,
+    "NET_DELTA injected revision gap must produce targeted repair snapshot")
 
 T.finish("pnc_lightweight_runtime_simulation_smoke")

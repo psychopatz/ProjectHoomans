@@ -5,6 +5,9 @@ local Const = PNC.Const
 local MotionHints = PNC.MotionHints
 local ServerState = Network.ServerState
 
+local MAX_REPAIR_REQUESTS_PER_SECOND = 16
+local repairWindows = setmetatable({}, { __mode = "k" })
+
 local function nextReplicaSequence(record)
     local runtime
     if not record then
@@ -16,8 +19,33 @@ local function nextReplicaSequence(record)
     return runtime.replicaSequence
 end
 
+local function cloneInlinePortraitVariant(record, payload)
+    local legacy = Core.ShallowCopy(payload)
+    legacy.snapshot = Core.ShallowCopy(payload.snapshot)
+    legacy.snapshot.portraitRef = nil
+    local identity = PNC.Identity
+    legacy.snapshot.portrait = identity and identity.BuildPortraitSummary
+        and identity.BuildPortraitSummary(record) or nil
+    return legacy
+end
+
+local function dispatchPayloadBatch(record, recipientList, payload, anyLean)
+    if not payload.snapshot or not payload.snapshot.portraitRef or not anyLean then
+        Internal.SendRecordPayload(recipientList, payload)
+        return
+    end
+    local legacy
+    for _, player in ipairs(recipientList) do
+        local selected = payload
+        if not Internal.UsesLeanRosterPortraits(player) then
+            legacy = legacy or cloneInlinePortraitVariant(record, payload)
+            selected = legacy
+        end
+        Internal.SendToPlayer(player, Const.CMD_SYNC_RECORD, selected)
+    end
+end
+
 function Network.BroadcastRecord(record, eventName)
-    local payload
     local path
     local recipients
     if not Core.IsAuthority() then
@@ -36,39 +64,90 @@ function Network.BroadcastRecord(record, eventName)
     nextReplicaSequence(record)
     Internal.QueueBroadcastRoster(record, eventName)
     recipients = Internal.CollectRecordRecipients(record)
-    if isServer and isServer() and #recipients <= 0 then return end
-    local lean = false
-    for _, player in ipairs(recipients) do
-        if Internal.UsesLeanRosterPortraits(player) then
-            lean = true
-            break
-        end
-    end
-    payload = Internal.BuildRecordPayload(record, eventName, lean)
+    local serverMode = isServer and isServer() == true
+    if serverMode and #recipients <= 0 then return end
+
     path = record and record.runtime and record.runtime.pathing or nil
     if path and MotionHints and MotionHints.MarkBroadcast then
         MotionHints.MarkBroadcast(record, path, Core.Now())
     end
-    if not payload.snapshot or not payload.snapshot.portraitRef then
+
+    if not serverMode then
+        local payload = Internal.BuildRecordPayload(record, eventName, false)
         Internal.SendRecordPayload(recipients, payload)
         return
     end
-    local legacy
+
+    local deltaRecipients = {}
+    local fallbackRecipients = {}
+    local anyDeltaLean = false
+    local anyFallbackLean = false
+    local usesDeltaFn = Internal.UsesDomainDeltas
+
     for _, player in ipairs(recipients) do
-        local selected = payload
-        if not Internal.UsesLeanRosterPortraits(player) then
-            if not legacy then
-                legacy = Core.ShallowCopy(payload)
-                legacy.snapshot = Core.ShallowCopy(payload.snapshot)
-                legacy.snapshot.portraitRef = nil
-                local identity = PNC.Identity
-                legacy.snapshot.portrait = identity and identity.BuildPortraitSummary
-                    and identity.BuildPortraitSummary(record) or nil
-            end
-            selected = legacy
+        local lean = Internal.UsesLeanRosterPortraits(player)
+        if not usesDeltaFn or usesDeltaFn(player) then
+            deltaRecipients[#deltaRecipients + 1] = player
+            if lean then anyDeltaLean = true end
+        else
+            fallbackRecipients[#fallbackRecipients + 1] = player
+            if lean then anyFallbackLean = true end
         end
-        Internal.SendToPlayer(player, Const.CMD_SYNC_RECORD, selected)
     end
+
+    if #deltaRecipients > 0 then
+        local deltaPayload = Internal.BuildRecordPayload(
+            record, eventName, anyDeltaLean
+        )
+        dispatchPayloadBatch(record, deltaRecipients, deltaPayload, anyDeltaLean)
+    end
+
+    if #fallbackRecipients > 0 then
+        if Network.Metrics then
+            Network.Metrics.fallbackSnapshots =
+                (tonumber(Network.Metrics.fallbackSnapshots) or 0) + 1
+        end
+        local fallbackPayload = Internal.BuildRecordPayload(
+            record, eventName or "fallback", anyFallbackLean, true
+        )
+        dispatchPayloadBatch(
+            record, fallbackRecipients, fallbackPayload, anyFallbackLean
+        )
+    end
+end
+
+function Network.SendRecordRepair(player, record, reason)
+    if not Core.IsAuthority() or not player or type(record) ~= "table" then
+        return false
+    end
+    local now = Core.Now and Core.Now() or 0
+    local window = math.floor(now / 1000)
+    local state = repairWindows[player]
+    if not state or state.window ~= window then
+        state = { window = window, count = 0 }
+        repairWindows[player] = state
+    end
+    if state.count >= MAX_REPAIR_REQUESTS_PER_SECOND then
+        return false
+    end
+    state.count = state.count + 1
+
+    local repairReason = tostring(reason or "gap_repair")
+    local lean = Internal.UsesLeanRosterPortraits
+        and Internal.UsesLeanRosterPortraits(player) or false
+    local payload = Internal.BuildRecordPayload(
+        record, repairReason, lean, true
+    )
+    if repairReason ~= "repair" and repairReason ~= "gap_repair"
+        and repairReason ~= "reconnect" and repairReason ~= "unsupported_delta"
+        and repairReason ~= "missing_baseline"
+        and repairReason ~= "incarnation_mismatch"
+        and Network.Metrics
+    then
+        Network.Metrics.repairSnapshots =
+            (tonumber(Network.Metrics.repairSnapshots) or 0) + 1
+    end
+    return Internal.SendToPlayer(player, Const.CMD_SYNC_RECORD, payload)
 end
 
 local function sendInterestRemoval(id, command, payload)

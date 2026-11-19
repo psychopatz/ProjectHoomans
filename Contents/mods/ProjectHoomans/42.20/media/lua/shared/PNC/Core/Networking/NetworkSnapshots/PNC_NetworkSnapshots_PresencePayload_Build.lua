@@ -63,6 +63,7 @@ function Network.BuildPresenceDelta(record)
         firearmState
     )
     return {
+        deltaKind = "presence",
         interestDetailed = true,
         id = record.id,
         x = record.x,
@@ -162,6 +163,7 @@ function Network.BuildCombatDamageDelta(record)
         and wounds.BuildSnapshot(record) or nil
     local visualState = buildVisualState and buildVisualState(record) or nil
     return {
+        deltaKind = "combat_damage",
         interestDetailed = true,
         id = record and record.id or nil,
         x = record and record.x or nil,

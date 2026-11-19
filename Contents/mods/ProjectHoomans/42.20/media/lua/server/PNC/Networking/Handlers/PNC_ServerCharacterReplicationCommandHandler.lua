@@ -26,6 +26,9 @@ end
 
 Router.Register(Const.CMD_FULL_SYNC_REQUEST, function(player, args)
     local network = PNC.Network
+    if network.NegotiateDomainDeltas then
+        network.NegotiateDomainDeltas(player, args and args.domainDeltaProtocol)
+    end
     local leanPortrait = network.NegotiateRosterPortraits
         and network.NegotiateRosterPortraits(player, args and args.portraitProtocol,
             args and args.portraitCodec, args and args.portraitPatch)
@@ -36,6 +39,26 @@ Router.Register(Const.CMD_FULL_SYNC_REQUEST, function(player, args)
         leanPortrait and Const.ROSTER_PORTRAIT_PROTOCOL or nil
     )
 end)
+
+if Const.CMD_REQUEST_RECORD_REPAIR then
+    Router.Register(Const.CMD_REQUEST_RECORD_REPAIR, function(player, args)
+        if type(args) ~= "table" or type(args.id) ~= "string"
+            or args.id == "" or #args.id > 128
+        then
+            return false
+        end
+        local registry = PNC.Registry
+        local network = PNC.Network
+        local record = registry and registry.Get and registry.Get(args.id) or nil
+        if not record then return false end
+        if network and type(network.SendRecordRepair) == "function" then
+            return network.SendRecordRepair(
+                player, record, args.reason or "gap_repair"
+            )
+        end
+        return false
+    end)
+end
 
 Router.Register(Const.CMD_REQUEST_ROSTER_PORTRAIT, function(player, args)
     return PNC.Network.SendRosterPortrait(player, args)

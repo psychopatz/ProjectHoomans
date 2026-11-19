@@ -178,6 +178,8 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_END, function(args)
     end
     if PNC.Client.ResetRosterPortraits then PNC.Client.ResetRosterPortraits() end
     ClientState.snapshots = committed
+    ClientState.domainRevisions = {}
+    ClientState.lastRepairRequestAt = {}
     ClientState.characterPayloads = {}
     ClientState.rosterRevision = incomingRevision
     clearPendingRoster()

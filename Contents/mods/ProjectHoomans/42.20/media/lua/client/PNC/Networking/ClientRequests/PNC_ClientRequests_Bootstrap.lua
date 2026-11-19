@@ -91,6 +91,7 @@ local function requestFullSync()
         ClientState.latestRosterRequestID = syncID
         sendClientCommand(player, Const.MODULE, Const.CMD_FULL_SYNC_REQUEST, {
             requestID = syncID,
+            domainDeltaProtocol = Const.DOMAIN_DELTA_PROTOCOL,
             portraitProtocol = Const.ROSTER_PORTRAIT_PROTOCOL,
             portraitCodec = PortraitCodec.Fingerprint,
             portraitPatch = PortraitPatch.Protocol,
@@ -121,5 +122,38 @@ local function requestFullSync()
 end
 
 Client.RequestFullSync = requestFullSync
+
+local REPAIR_COOLDOWN_MS = 1000
+
+function Client.RequestRecordRepair(id, reason, details)
+    local npcID = id ~= nil and tostring(id) or ""
+    if npcID == "" or not Const.CMD_REQUEST_RECORD_REPAIR then
+        return false
+    end
+    local player = Internal.GetPlayer()
+    if not player or not sendClientCommand then
+        return false
+    end
+    local now = Core and Core.Now and Core.Now() or 0
+    ClientState.lastRepairRequestAt = ClientState.lastRepairRequestAt or {}
+    local lastAt = tonumber(ClientState.lastRepairRequestAt[npcID]) or 0
+    local force = type(details) == "table" and details.force == true
+    if not force and lastAt > 0 and (now - lastAt) < REPAIR_COOLDOWN_MS then
+        return false
+    end
+    ClientState.lastRepairRequestAt[npcID] = now
+    ClientState.repairRequestsSent =
+        (tonumber(ClientState.repairRequestsSent) or 0) + 1
+    sendClientCommand(player, Const.MODULE, Const.CMD_REQUEST_RECORD_REPAIR, {
+        id = npcID,
+        reason = tostring(reason or "gap_repair"),
+        deltaKind = type(details) == "table" and details.deltaKind or nil,
+        expectedRevision = type(details) == "table"
+            and details.expectedRevision or nil,
+        receivedRevision = type(details) == "table"
+            and details.receivedRevision or nil,
+    })
+    return true
+end
 
 return Client

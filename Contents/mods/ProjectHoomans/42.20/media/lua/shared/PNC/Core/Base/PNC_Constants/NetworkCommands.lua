@@ -5,6 +5,8 @@ local Const = PNC.Const
 
 Const.CMD_FULL_SYNC_REQUEST = "RequestFullSync"
 Const.ROSTER_PORTRAIT_PROTOCOL = 1
+Const.DOMAIN_DELTA_PROTOCOL = 1
+Const.CMD_REQUEST_RECORD_REPAIR = "RequestRecordRepair"
 Const.CMD_REQUEST_ROSTER_PORTRAIT = "RequestRosterPortrait"
 Const.CMD_ROSTER_PORTRAIT = "RosterPortrait"
 Const.CMD_FULL_SYNC = "FullSync"

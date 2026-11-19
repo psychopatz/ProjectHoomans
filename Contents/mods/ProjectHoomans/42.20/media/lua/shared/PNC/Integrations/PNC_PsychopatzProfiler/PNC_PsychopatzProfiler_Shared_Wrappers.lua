@@ -23,6 +23,12 @@ function Internal.InstallCoarseSharedPerformanceWrappers()
         "ProjectHoomans.Network.Snapshot.Full", "coarse")
     Internal.Wrap(PNC.Network, "BuildCombatDamageDelta",
         "ProjectHoomans.Network.Snapshot.CombatDamageDelta", "coarse")
+    Internal.Wrap(PNC.Network, "BuildCombatStateDelta",
+        "ProjectHoomans.Network.Snapshot.CombatStateDelta", "coarse")
+    Internal.Wrap(PNC.Network, "BuildHealthWoundsDelta",
+        "ProjectHoomans.Network.Snapshot.HealthWoundsDelta", "coarse")
+    Internal.Wrap(PNC.Network, "BuildEquipmentDelta",
+        "ProjectHoomans.Network.Snapshot.EquipmentDelta", "coarse")
     Internal.Wrap(PNC.Network, "BuildPresenceDelta",
         "ProjectHoomans.Network.Snapshot.PresenceDelta", "coarse")
     Internal.Wrap(PNC.Network, "FlushRosterDeltas",

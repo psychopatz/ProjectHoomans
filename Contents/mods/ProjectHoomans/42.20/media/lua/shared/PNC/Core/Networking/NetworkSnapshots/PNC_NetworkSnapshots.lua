@@ -36,5 +36,6 @@ require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_RosterPayload
 require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_DetailedPayloads"
 require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_CharacterPayload"
 require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_PresencePayload"
+require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_DomainDeltas"
 
 return Network

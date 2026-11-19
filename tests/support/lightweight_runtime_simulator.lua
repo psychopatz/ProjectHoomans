@@ -12,6 +12,9 @@ local COARSE_METRICS = {
     ["ProjectHoomans.Network.BroadcastRecord"] = true,
     ["ProjectHoomans.Network.Snapshot.Full"] = true,
     ["ProjectHoomans.Network.Snapshot.CombatDamageDelta"] = true,
+    ["ProjectHoomans.Network.Snapshot.CombatStateDelta"] = true,
+    ["ProjectHoomans.Network.Snapshot.HealthWoundsDelta"] = true,
+    ["ProjectHoomans.Network.Snapshot.EquipmentDelta"] = true,
     ["ProjectHoomans.Network.Snapshot.PresenceDelta"] = true,
     ["ProjectHoomans.Server.Update.Network.FlushRosterDeltas"] = true,
     ["ProjectHoomans.Persistence.Commit"] = true,
@@ -144,7 +147,10 @@ function Simulator.New(options)
         clientCount = math.max(1, math.floor(tonumber(options.clientCount) or 1)),
         simulatedMs = math.max(100, math.floor(tonumber(options.simulatedMs) or 15000)),
         stepMs = math.max(10, math.floor(tonumber(options.stepMs) or 50)),
+        mutationIntervalMs = math.max(100, math.floor(tonumber(options.mutationIntervalMs) or 1000)),
         knowledgeMutationIntervalMs = math.max(50, math.floor(tonumber(options.knowledgeMutationIntervalMs) or 4000)),
+        mixedCapabilities = options.mixedCapabilities == true,
+        injectRevisionGap = options.injectRevisionGap == true,
         departAtMs = tonumber(options.departAtMs),
         massInterestActors = tonumber(options.massInterestActors),
         profilerMode = string.upper(tostring(options.profilerMode or "OFF")),
@@ -193,11 +199,14 @@ function Simulator:Run()
         coreRuntimeStoreSaves = 0,
         materializationAttempts = 0,
         presenceDeltas = 0,
+        combatDamageDeltas = 0,
+        combatStateDeltas = 0,
         combatDeltas = 0,
         healthOrWoundDeltas = 0,
         equipmentDeltas = 0,
         fullSnapshots = 0,
         repairSnapshots = 0,
+        fallbackSnapshots = 0,
         rosterDeltas = 0,
         packetsSent = 0,
         zombieListQueriesTick = 0,
@@ -473,7 +482,7 @@ function Simulator:Run()
         makeZombieShell(10005 + (i % 12), 10005 + math.floor(i / 12), 0)
     end
 
-    sendServerCommand = function(_, _, command, payload)
+    sendServerCommand = function(targetPlayer, _, command, payload)
         metrics.packetsSent = metrics.packetsSent + 1
         if command == "SyncRecord" then
             local snap = type(payload) == "table" and payload.snapshot or nil
@@ -481,15 +490,29 @@ function Simulator:Run()
             if deltaKind == "presence" then
                 metrics.presenceDeltas = metrics.presenceDeltas + 1
             elseif deltaKind == "combat_damage" then
+                metrics.combatDamageDeltas = metrics.combatDamageDeltas + 1
                 metrics.combatDeltas = metrics.combatDeltas + 1
-            elseif deltaKind == "health" or deltaKind == "wounds" or deltaKind == "medical" then
+            elseif deltaKind == "combat_state" then
+                metrics.combatStateDeltas = metrics.combatStateDeltas + 1
+                metrics.combatDeltas = metrics.combatDeltas + 1
+            elseif deltaKind == "health_wounds"
+                or deltaKind == "health"
+                or deltaKind == "wounds"
+                or deltaKind == "medical"
+            then
                 metrics.healthOrWoundDeltas = metrics.healthOrWoundDeltas + 1
             elseif deltaKind == "equipment" or deltaKind == "appearance" then
                 metrics.equipmentDeltas = metrics.equipmentDeltas + 1
             else
                 metrics.fullSnapshots = metrics.fullSnapshots + 1
+                if cfg.mixedCapabilities and targetPlayer == players[2] then
+                    metrics.fallbackSnapshots = metrics.fallbackSnapshots + 1
+                end
                 local ev = type(payload) == "table" and tostring(payload.event or "") or ""
-                if ev == "repair" or ev == "reconnect" or ev == "gap_repair" then
+                if ev == "repair" or ev == "reconnect" or ev == "gap_repair"
+                    or ev == "unsupported_delta" or ev == "missing_baseline"
+                    or ev == "incarnation_mismatch"
+                then
                     metrics.repairSnapshots = metrics.repairSnapshots + 1
                 end
             end
@@ -574,6 +597,19 @@ function Simulator:Run()
     local startupCpuStart = os.clock()
     for _, fn in ipairs(events.OnInitGlobalModData or {}) do fn() end
     for _, fn in ipairs(events.OnServerStarted or {}) do fn() end
+    if cfg.mixedCapabilities and PNC.ServerCommandRouter and PNC.ServerCommandRouter.Handle then
+        if players[1] then
+            PNC.ServerCommandRouter.Handle(PNC.Const.CMD_FULL_SYNC_REQUEST, players[1], {
+                domainDeltaProtocol = PNC.Const.DOMAIN_DELTA_PROTOCOL or 1,
+                portraitProtocol = PNC.Const.ROSTER_PORTRAIT_PROTOCOL,
+            })
+        end
+        if players[2] then
+            PNC.ServerCommandRouter.Handle(PNC.Const.CMD_FULL_SYNC_REQUEST, players[2], {
+                domainDeltaProtocol = 0,
+            })
+        end
+    end
     local startupCpuMs = (os.clock() - startupCpuStart) * 1000
     snapshotStoreWrites()
     local promotedAtStartup = countMap(PNC.Registry and PNC.Registry.Data)
@@ -601,12 +637,19 @@ function Simulator:Run()
     end
 
     local mutationEvents = {
+        "attack_start",
         "combat_damage",
         "equipment_changed",
         "wound_treated",
+        "attack_finish",
+        "reload_finished",
+        "medical_care_treating",
+        "weapon_restore_ranged",
+        "self_bandaged",
         "position_recovery",
     }
     local mutationIndex = 0
+    local gapRepairInjected = false
 
     metrics.inTickPhase = true
     local tickCpuStart = os.clock()
@@ -651,7 +694,7 @@ function Simulator:Run()
                 fn()
             end
         end
-        if nowMs % 2000 == 0 then
+        if nowMs % cfg.mutationIntervalMs == 0 then
             mutationIndex = mutationIndex + 1
             local targetRecord
             for _, rec in pairs(PNC.Registry.Data or {}) do
@@ -666,6 +709,29 @@ function Simulator:Run()
             if targetRecord then
                 local evName = mutationEvents[((mutationIndex - 1) % #mutationEvents) + 1]
                 PNC.Network.BroadcastRecord(targetRecord, evName)
+            end
+        end
+        if cfg.injectRevisionGap
+            and not gapRepairInjected
+            and elapsedMs >= math.floor(cfg.simulatedMs * 0.65)
+            and PNC.ServerCommandRouter
+            and PNC.ServerCommandRouter.Handle
+            and PNC.Const.CMD_REQUEST_RECORD_REPAIR
+        then
+            local repairTarget = PNC.Registry.Get("sim_actor_1")
+            if not repairTarget then
+                for _, rec in pairs(PNC.Registry.Data or {}) do
+                    repairTarget = rec
+                    break
+                end
+            end
+            if repairTarget and players[1] then
+                gapRepairInjected = true
+                PNC.ServerCommandRouter.Handle(
+                    PNC.Const.CMD_REQUEST_RECORD_REPAIR,
+                    players[1],
+                    { id = repairTarget.id, reason = "gap_repair" }
+                )
             end
         end
         if nowMs % cfg.knowledgeMutationIntervalMs == 0 then
@@ -810,11 +876,14 @@ function Simulator:Run()
         TerminalPersistenceOutcomes = tonumber(finalRegMetrics.terminal) or 0,
         DirtyRecordsEnd = countMap(PNC.Registry and PNC.Registry.DirtyByID),
         PresenceDeltas = metrics.presenceDeltas,
+        CombatDamageDeltas = metrics.combatDamageDeltas,
+        CombatStateDeltas = metrics.combatStateDeltas,
         CombatDeltas = metrics.combatDeltas,
         HealthOrWoundDeltas = metrics.healthOrWoundDeltas,
         EquipmentDeltas = metrics.equipmentDeltas,
         FullSnapshots = metrics.fullSnapshots,
         RepairSnapshots = metrics.repairSnapshots,
+        FallbackSnapshots = metrics.fallbackSnapshots,
         RosterDeltas = metrics.rosterDeltas,
         PacketsSent = metrics.packetsSent,
         CensusScans = censusScans,
@@ -852,7 +921,7 @@ end
 
 function Simulator.FormatSummary(report)
     return string.format(
-        "mode=%s core=%d startProm=%d peakProm=%d endProm=%d demoted=%d schedEnd=%d spatialEnd=%d live=%d schedProc=%d schedDef=%d commits=%d pumps=%d serAttempts=%d physWrites=%d globalSaves=%d coreSaves=%d term=%d retry=%d dirtyEnd=%d presD=%d combatD=%d fullSnap=%d census=%d extraZScans=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
+        "mode=%s core=%d startProm=%d peakProm=%d endProm=%d demoted=%d schedEnd=%d spatialEnd=%d live=%d schedProc=%d schedDef=%d commits=%d pumps=%d serAttempts=%d physWrites=%d globalSaves=%d coreSaves=%d term=%d retry=%d dirtyEnd=%d presD=%d combatD=%d hwD=%d eqD=%d fullSnap=%d repSnap=%d fbSnap=%d census=%d extraZScans=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
         tostring(report.ProfilerMode),
         report.CoreActors,
         report.PromotedAtStartup or 0,
@@ -875,7 +944,11 @@ function Simulator.FormatSummary(report)
         report.DirtyRecordsEnd,
         report.PresenceDeltas,
         report.CombatDeltas,
+        report.HealthOrWoundDeltas or 0,
+        report.EquipmentDeltas or 0,
         report.FullSnapshots,
+        report.RepairSnapshots or 0,
+        report.FallbackSnapshots or 0,
         report.CensusScans,
         report.PerNpcGlobalZombieScans,
         report.ProfilerCoarseWrapperCalls,
