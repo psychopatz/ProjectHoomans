@@ -33,11 +33,18 @@ function Equipment.EnsureRecordEquipment(record)
     return record.equipment
 end
 
+local function refreshPortrait(record)
+    if PNC.Network and PNC.Network.RefreshPortraitEquipment then
+        PNC.Network.RefreshPortraitEquipment(record)
+    end
+end
+
 function Equipment.SetLoadout(record, loadoutSpec)
     if not record then
         return false
     end
     record.equipment = Equipment.NormalizeLoadoutSpec(loadoutSpec)
+    refreshPortrait(record)
     return true
 end
 
@@ -55,6 +62,7 @@ function Equipment.SetPrimary(record, fullType)
     then
         equipment.primaryVisual = nil
     end
+    refreshPortrait(record)
     return true
 end
 
@@ -65,6 +73,7 @@ function Equipment.SetSecondary(record, fullType)
     end
     equipment = Equipment.EnsureRecordEquipment(record)
     equipment.secondaryFullType = Internal.NormalizeString(fullType)
+    refreshPortrait(record)
     return true
 end
 
@@ -88,6 +97,7 @@ local function setSlotValue(record, collectionName, location, fullType, normaliz
     then
         equipment.wornVisuals[location] = nil
     end
+    refreshPortrait(record)
     return true
 end
 

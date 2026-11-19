@@ -50,11 +50,12 @@ local function buildResidenceProjection(record)
     }
 end
 
-function Network.BuildSnapshot(record, inventorySummaryOverride)
+function Network.BuildSnapshot(record, inventorySummaryOverride, leanPortrait)
     if type(buildSnapshotState) ~= "function"
         or type(buildIdentityProjection) ~= "function"
         or type(buildPresentationProjection) ~= "function"
     then return nil end
+    if record.runtimeView == true then leanPortrait = false end
     local state = buildSnapshotState(record, inventorySummaryOverride)
     local aiState = state.aiState
     local canRevive = state.canRevive
@@ -72,7 +73,7 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
     local attackMode = state.attackMode
     local bodyBinding, liveBodyOnlineID, liveBodyLease =
         BodyBinding.Projection(record)
-    local snapshot = buildIdentityProjection(record, state)
+    local snapshot = buildIdentityProjection(record, state, leanPortrait)
     snapshot.residence = buildResidenceProjection(record)
     snapshot.commandFeedback = buildCommandFeedback(record)
     snapshot.corpseHaulManualDiagnostic = buildCorpseHaulDiagnostic(record)
@@ -163,6 +164,9 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
     snapshot.inventorySummary = presentation.inventorySummary
     snapshot.characterWindow = presentation.characterWindow
     snapshot.debugState = presentation.debugState
+    if leanPortrait == true then
+        snapshot.portraitRef = Network.Internal.GetPortraitReference(record)
+    end
     return snapshot
 end
 

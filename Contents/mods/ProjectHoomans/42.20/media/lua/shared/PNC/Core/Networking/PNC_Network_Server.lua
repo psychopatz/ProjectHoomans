@@ -11,6 +11,7 @@ PNC.Network.Internal = PNC.Network.Internal or {}
 
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Budget"
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Transport"
+require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Portraits"
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_RosterInterest"
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Broadcasts"
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Character"

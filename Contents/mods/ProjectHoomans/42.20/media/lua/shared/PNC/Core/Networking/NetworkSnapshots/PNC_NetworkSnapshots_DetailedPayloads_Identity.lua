@@ -14,7 +14,7 @@ local Core = H.Core
 local Parts = H.Parts
 local buildOrganizationalFactionSummary = H.buildOrganizationalFactionSummary
 
-function H.BuildIdentityProjection(record, state)
+function H.BuildIdentityProjection(record, state, leanPortrait)
     local identity = state.identity
     local ownership = state.ownership
     return {
@@ -22,7 +22,7 @@ function H.BuildIdentityProjection(record, state)
         id = record.id,
         displayName = identity.displayName,
         identitySeed = identity.identitySeed,
-        portrait = PNC.Identity
+        portrait = leanPortrait ~= true and PNC.Identity
             and PNC.Identity.BuildPortraitSummary
             and PNC.Identity.BuildPortraitSummary(record)
             or nil,

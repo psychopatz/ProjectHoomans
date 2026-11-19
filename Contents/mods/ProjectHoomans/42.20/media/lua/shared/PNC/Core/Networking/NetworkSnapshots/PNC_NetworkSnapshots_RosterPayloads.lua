@@ -15,7 +15,7 @@ local buildIdentityOwnershipSummary =
     Parts.BuildIdentityOwnershipSummary
 local buildStaminaRecoverySummary = Parts.BuildStaminaRecoverySummary
 
-function Network.BuildRosterSnapshot(record, includeTravelRoute)
+function Network.BuildRosterSnapshot(record, includeTravelRoute, leanPortrait)
     local aiState
     local inCombat
     local staminaInfo
@@ -25,6 +25,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
     if type(record) ~= "table" then
         return nil
     end
+    if record.runtimeView == true then leanPortrait = false end
     aiState, inCombat = Parts.ResolveAIState(record)
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     identity = Parts.BuildIdentitySummary(record)
@@ -41,7 +42,9 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         identitySeed = identity.identitySeed,
         factionID = ownership.factionID,
         colonyOwned = ownership.colonyOwned,
-        portrait = Identity
+        portraitRef = leanPortrait == true
+            and Network.Internal.GetPortraitReference(record) or nil,
+        portrait = leanPortrait ~= true and Identity
             and Identity.BuildPortraitSummary
             and Identity.BuildPortraitSummary(record)
             or nil,

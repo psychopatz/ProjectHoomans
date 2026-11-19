@@ -71,5 +71,8 @@ function Equipment.CopyCharacterLoadout(record, character)
         return false, reason or "capture_failed"
     end
     record.equipment = loadout
+    if PNC.Network and PNC.Network.RefreshPortraitEquipment then
+        PNC.Network.RefreshPortraitEquipment(record)
+    end
     return true, reason or "captured"
 end

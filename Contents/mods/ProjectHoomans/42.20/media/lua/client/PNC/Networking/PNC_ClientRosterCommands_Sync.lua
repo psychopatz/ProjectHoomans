@@ -45,6 +45,12 @@ end)
 
 Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_BEGIN, function(args)
     local syncID = rosterSyncID(args)
+    if args.portraitProtocol ~= nil
+        and (args.portraitProtocol ~= Const.ROSTER_PORTRAIT_PROTOCOL
+            or (ClientState.latestRosterRequestID and syncID ~= ClientState.latestRosterRequestID))
+    then
+        return
+    end
     local expectedChunks = tonumber(args.chunkCount)
     local expectedTotal = tonumber(args.total)
     if expectedChunks == nil or expectedChunks < 0
@@ -61,6 +67,7 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_BEGIN, function(args)
     ClientState.pendingRosterExpectedChunks = expectedChunks
     ClientState.pendingRosterExpectedTotal = expectedTotal
     ClientState.pendingRosterSyncID = syncID and tostring(syncID) or nil
+    ClientState.pendingRosterPortraitProtocol = args.portraitProtocol
     ClientState.pendingRosterChunks = {}
     ClientState.pendingRosterChunkRecords = {}
     ClientState.pendingRosterReceivedTotal = 0
@@ -68,6 +75,11 @@ end)
 
 Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_CHUNK, function(args)
     local syncID = rosterSyncID(args)
+    if ClientState.pendingRosterSyncID
+        and tostring(syncID or "") ~= ClientState.pendingRosterSyncID
+    then
+        return
+    end
     local chunkIndex = tonumber(args.chunkIndex)
     local expectedChunks = tonumber(ClientState.pendingRosterExpectedChunks)
     local snapshotIDs = {}
@@ -115,6 +127,11 @@ end)
 Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_END, function(args)
     local receivedChunks = 0
     local syncID = rosterSyncID(args)
+    if ClientState.pendingRosterSyncID
+        and tostring(syncID or "") ~= ClientState.pendingRosterSyncID
+    then
+        return
+    end
     local expectedChunks = tonumber(ClientState.pendingRosterExpectedChunks) or 0
     local expectedTotal = tonumber(ClientState.pendingRosterExpectedTotal)
     local receivedTotal = tonumber(ClientState.pendingRosterReceivedTotal) or 0
@@ -128,6 +145,9 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_END, function(args)
         receivedChunks = receivedChunks + 1
     end
     if not ClientState.pendingRoster
+        or args.portraitProtocol ~= ClientState.pendingRosterPortraitProtocol
+        or (args.portraitProtocol and ClientState.latestRosterRequestID
+            and syncID ~= ClientState.latestRosterRequestID)
         or (ClientState.pendingRosterSyncID ~= nil
             and tostring(syncID or "") ~= ClientState.pendingRosterSyncID)
         or (args.directoryRevision ~= nil
@@ -156,6 +176,7 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_END, function(args)
             ClientState.rosterEntryRevisions[id] = incomingRevision
         end
     end
+    if PNC.Client.ResetRosterPortraits then PNC.Client.ResetRosterPortraits() end
     ClientState.snapshots = committed
     ClientState.characterPayloads = {}
     ClientState.rosterRevision = incomingRevision

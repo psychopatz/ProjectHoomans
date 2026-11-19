@@ -4,6 +4,9 @@ PNC.Const = PNC.Const or {}
 local Const = PNC.Const
 
 Const.CMD_FULL_SYNC_REQUEST = "RequestFullSync"
+Const.ROSTER_PORTRAIT_PROTOCOL = 1
+Const.CMD_REQUEST_ROSTER_PORTRAIT = "RequestRosterPortrait"
+Const.CMD_ROSTER_PORTRAIT = "RosterPortrait"
 Const.CMD_FULL_SYNC = "FullSync"
 Const.CMD_ROSTER_SYNC_BEGIN = "RosterSyncBegin"
 Const.CMD_ROSTER_SYNC_CHUNK = "RosterSyncChunk"

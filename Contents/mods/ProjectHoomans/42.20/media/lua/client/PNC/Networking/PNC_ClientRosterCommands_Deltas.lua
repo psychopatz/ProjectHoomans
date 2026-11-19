@@ -70,6 +70,9 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
                 )
             end
             BodyBinding.Forget(entryID)
+            if PNC.Client.ForgetRosterPortrait then
+                PNC.Client.ForgetRosterPortrait(entryID)
+            end
             ClientState.snapshots[entryID] = nil
             ClientState.snapshots[entry.id] = nil
             if ClientState.characterPayloads then
@@ -102,10 +105,10 @@ Internal.RegisterServerCommand(Const.CMD_SYNC_RECORD, function(args)
     if directoryRevision then
         lastRevision = ClientState.rosterEntryRevisions
             and tonumber(ClientState.rosterEntryRevisions[id]) or nil
-        if not lastRevision or directoryRevision >= lastRevision then
-            ClientState.rosterEntryRevisions =
-                ClientState.rosterEntryRevisions or {}
-            ClientState.rosterEntryRevisions[id] = directoryRevision
+        if lastRevision and (directoryRevision < lastRevision
+            or (directoryRevision == lastRevision and not ClientState.snapshots[id]))
+        then
+            return
         end
         if directoryRevision >= (tonumber(ClientState.rosterRevision) or 0) then
             ClientState.rosterRevision = directoryRevision
@@ -152,6 +155,7 @@ Internal.RegisterServerCommand(Const.CMD_REMOVE_RECORD, function(args)
         logClientPresenceRemoval(current, id, args.reason, "remove_record")
     end
     BodyBinding.Forget(id)
+    if PNC.Client.ForgetRosterPortrait then PNC.Client.ForgetRosterPortrait(id) end
     ClientState.snapshots[id] = nil
     if ClientState.characterPayloads then
         ClientState.characterPayloads[id] = nil

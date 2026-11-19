@@ -114,8 +114,10 @@ function Network.RefreshClientBodyIdentityIndex()
 end
 
 function Network.ResetServerState()
+    if Network.ResetPortraitReplication then Network.ResetPortraitReplication() end
     ServerState.interests = {}
     ServerState.rosterDeltas = {}
+    ServerState.hasRosterDeltas = false
     ServerState.rosterRevision = 0
     ServerState.lastInterestRefreshAt = 0
     ServerState.lastRosterFlushAt = 0

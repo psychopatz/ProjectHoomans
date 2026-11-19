@@ -6,12 +6,12 @@ then return end
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 
-local function buildSnapshotList()
+local function buildSnapshotList(leanPortrait)
     local registry = PNC.Registry
     local network = PNC.Network
     local list = {}
     registry.ForEach(function(record)
-        list[#list + 1] = network.BuildRosterSnapshot(record)
+        list[#list + 1] = network.BuildRosterSnapshot(record, true, leanPortrait)
     end)
     if registry.ForEachDeathMarker and network.BuildDeathMarkerSnapshot then
         registry.ForEachDeathMarker(function(marker)
@@ -25,11 +25,19 @@ local function buildSnapshotList()
 end
 
 Router.Register(Const.CMD_FULL_SYNC_REQUEST, function(player, args)
-    PNC.Network.BroadcastFullSync(
+    local network = PNC.Network
+    local leanPortrait = network.NegotiateRosterPortraits
+        and network.NegotiateRosterPortraits(player, args and args.portraitProtocol)
+    network.BroadcastFullSync(
         player,
-        buildSnapshotList(),
-        args and (args.requestID or args.syncID) or nil
+        buildSnapshotList(leanPortrait),
+        args and (args.requestID or args.syncID) or nil,
+        leanPortrait and Const.ROSTER_PORTRAIT_PROTOCOL or nil
     )
+end)
+
+Router.Register(Const.CMD_REQUEST_ROSTER_PORTRAIT, function(player, args)
+    return PNC.Network.SendRosterPortrait(player, args)
 end)
 
 Router.Register(Const.CMD_REQUEST_CHARACTER, function(player, args)

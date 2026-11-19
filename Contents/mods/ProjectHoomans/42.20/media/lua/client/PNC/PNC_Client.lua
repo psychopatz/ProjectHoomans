@@ -82,6 +82,9 @@ local function onResetLua()
     ClientState.pendingRosterExpectedChunks = nil
     ClientState.pendingRosterExpectedTotal = nil
     ClientState.pendingRosterSyncID = nil
+    ClientState.pendingRosterPortraitProtocol = nil
+    ClientState.latestRosterRequestID = nil
+    if Client.ResetRosterPortraits then Client.ResetRosterPortraits() end
     ClientState.pendingRosterChunks = nil
     ClientState.pendingRosterChunkRecords = nil
     ClientState.pendingRosterReceivedTotal = nil

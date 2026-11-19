@@ -36,6 +36,12 @@ function Registry.AddRecord(record)
     end
     Registry.EnsureLoaded()
     record.id = tostring(record.id)
+    local previous = Registry.Data[record.id]
+    if previous and previous ~= record and PNC.Network
+        and PNC.Network.ForgetPortraitRecord
+    then
+        PNC.Network.ForgetPortraitRecord(previous)
+    end
     Registry.Data[record.id] = record
     if record.persist ~= false then
         directory = Internal.GetDirectory()
@@ -63,6 +69,9 @@ function Registry.RemoveRecord(id)
     directory = Internal.GetDirectory()
     entry = directory.records[id]
     Registry.LiveByID[id] = nil
+    if PNC.Network and PNC.Network.ForgetPortraitRecord then
+        PNC.Network.ForgetPortraitRecord(Registry.Data[id])
+    end
     Registry.Data[id] = nil
     Registry.DirtyByID[id] = nil
     Registry.DirtyDomains[id] = nil

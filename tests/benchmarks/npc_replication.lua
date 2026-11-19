@@ -4,6 +4,7 @@ T.addPackagePaths()
 
 local records, players, byID, sent
 local now, serial = 10000, 0
+local mode = arg[2] or "legacy"
 local function copy(value)
     if type(value) ~= "table" then return value end
     local result = {}
@@ -20,6 +21,11 @@ PNC = {
         end,
         IsAuthority = function() return true end,
         DeepCopy = copy,
+        ShallowCopy = function(value)
+            local result = {}
+            for key, child in pairs(value) do result[key] = child end
+            return result
+        end,
         LogWarn = function() end,
         Distance = function(x1, y1, x2, y2)
             return math.sqrt((x1 - x2)^2 + (y1 - y2)^2)
@@ -104,6 +110,14 @@ for _, name in ipairs({ "BuildRosterSnapshot", "BuildSnapshot", "BuildPresenceDe
     end
 end
 
+local projectPortrait = PNC.Identity.ProjectPortrait
+if projectPortrait then
+    function PNC.Identity.ProjectPortrait(record)
+        count("resolvedProjections")
+        return projectPortrait(record)
+    end
+end
+
 local budget = network.PayloadBudget
 local estimatePayload = budget.Estimate
 local splitPayload = budget.Split
@@ -158,7 +172,9 @@ local function init(npcs, clients, density)
 end
 
 local function join(player)
-    assert(router.Handle(const.CMD_FULL_SYNC_REQUEST, player, {}))
+    local args = {}
+    if mode ~= "legacy" then args.portraitProtocol = const.ROSTER_PORTRAIT_PROTOCOL end
+    assert(router.Handle(const.CMD_FULL_SYNC_REQUEST, player, args))
 end
 
 local function refresh()
@@ -198,6 +214,7 @@ local function measure(name, npcs, clients, density, trial, workload)
         if payload.entries then inspectRows(payload.entries, true) end
         if payload.snapshots then inspectRows(payload.snapshots, false) end
         inspect(payload.snapshot)
+        if payload.portrait then inspect(payload) end
         if payload.pncChunk then
             chunks = chunks + 1
             for _, part in ipairs(payload.pncChunk.parts) do
@@ -223,6 +240,7 @@ local function measure(name, npcs, clients, density, trial, workload)
         totals.portraitLookups or 0, totals.portraitHits or 0, totals.portraitMisses or 0,
         totals.invalidations or 0, occupants, refusal, chunks,
         totals.budgetEstimates or 0, totals.budgetSplits or 0,
+        totals.resolvedProjections or 0,
     }, ","))
     sent = {}
 end
@@ -249,6 +267,17 @@ local function run(npcs, clients, density, trial)
         end
         network.FlushRosterDeltas(now)
     end)
+    if mode ~= "legacy" then
+        sample("hover", function()
+            local record = records[1]
+            local ref = network.Internal.GetPortraitReference(record)
+            for _, player in ipairs(players) do
+                assert(router.Handle(const.CMD_REQUEST_ROSTER_PORTRAIT, player, {
+                    id = record.id, incarnation = ref.incarnation, requestID = "hover",
+                }))
+            end
+        end)
+    end
     sample("inspect", function()
         for _, player in ipairs(players) do
             assert(router.Handle(const.CMD_REQUEST_CHARACTER, player, { id = records[1].id }))
@@ -257,12 +286,14 @@ local function run(npcs, clients, density, trial)
     sample("visible_change", function()
         local record = records[1]
         record.equipment.wornVisuals.Shirt.textureChoice = 7
+        if network.RefreshPortraitEquipment then network.RefreshPortraitEquipment(record) end
         network.BroadcastRecord(record, "equipment")
         network.FlushRosterDeltas(now, true)
     end)
     sample("nonvisible_change", function()
         local record = records[1]
         record.inventory.revision = 2
+        if network.RefreshPortraitEquipment then network.RefreshPortraitEquipment(record) end
         network.BroadcastRecord(record, "inventory")
         network.FlushRosterDeltas(now, true)
     end)
@@ -271,6 +302,7 @@ local function run(npcs, clients, density, trial)
         byID[removed.id] = nil
         network.BroadcastRemoval(removed.id, "fixture")
         network.FlushRosterDeltas(now, true)
+        if network.ForgetPortraitRecord then network.ForgetPortraitRecord(removed) end
         removed.runtime = { appearanceCache = removed.runtime.appearanceCache }
         table.insert(records, 1, removed)
         byID[removed.id] = removed
@@ -281,7 +313,7 @@ local function run(npcs, clients, density, trial)
     sample("reconnect", function() join(players[1]); refresh() end)
 end
 
-print("npcs,clients,interest,trial,scenario,cpu_ms,sends,recipients,roster_rows,max_batch,estimated_bytes,portrait_estimated_bytes,detailed_snapshots,roster_builds,full_builds,presence_builds,character_builds,portrait_lookups,cache_hits,cache_misses,invalidations,cache_entries,refusals,chunks,budget_estimates,budget_splits")
+print("npcs,clients,interest,trial,scenario,cpu_ms,sends,recipients,roster_rows,max_batch,estimated_bytes,portrait_estimated_bytes,detailed_snapshots,roster_builds,full_builds,presence_builds,character_builds,portrait_lookups,cache_hits,cache_misses,invalidations,cache_entries,refusals,chunks,budget_estimates,budget_splits,resolved_projections")
 local trials = tonumber(arg[1]) or 3
 for _, npcs in ipairs({ 100, 300, 600 }) do
     for _, clients in ipairs({ 1, 8, 16 }) do

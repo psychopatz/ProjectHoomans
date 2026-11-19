@@ -44,34 +44,12 @@ local function recordPayloadDiagnostics(eventName)
     )
 end
 
-function Network.QueueRosterDelta(record, removed, reason, includeTravelRoute)
-    local id = type(record) == "table" and record.id or record
-    local snapshot
-    if id == nil then
-        return false
-    end
-    if removed ~= true and type(record) ~= "table" then
-        return false
-    end
-    id = tostring(id)
-    -- Lua's `condition and nil or value` idiom can never produce nil: the `or`
-    -- branch runs because nil is falsey. Build removal entries explicitly so an
-    -- NPC id string is never passed to BuildRosterSnapshot as though it were a
-    -- record table.
-    if removed ~= true then
-        snapshot = Network.BuildRosterSnapshot(
-            record,
-            includeTravelRoute ~= false
-        )
-    end
-    return Network.QueueRosterSnapshot(id, snapshot, removed, reason)
-end
-
 function Network.QueueRosterSnapshot(id, snapshot, removed, reason)
     if id == nil then return false end
     if removed ~= true and type(snapshot) ~= "table" then return false end
     id = tostring(id)
     ServerState.rosterRevision = (tonumber(ServerState.rosterRevision) or 0) + 1
+    ServerState.hasRosterDeltas = true
     ServerState.rosterDeltas[id] = {
         id = id,
         removed = removed == true,
@@ -92,6 +70,7 @@ local function queueDeferredRoster(record, reason, includeTravelRoute)
     -- Periodic roster state is coalesced by NPC id until the next flush. Keep
     -- the authoritative record here and materialize only the latest state at
     -- flush time; never let this server-only reference enter the payload.
+    ServerState.hasRosterDeltas = true
     ServerState.rosterDeltas[id] = {
         id = id,
         removed = false,
@@ -102,6 +81,15 @@ local function queueDeferredRoster(record, reason, includeTravelRoute)
         includeTravelRoute = includeTravelRoute ~= false,
     }
     return true
+end
+
+function Network.QueueRosterDelta(record, removed, reason, includeTravelRoute)
+    if removed == true then
+        local id = type(record) == "table" and record.id or record
+        return Network.QueueRosterSnapshot(id, nil, true, reason)
+    end
+    if type(record) ~= "table" then return false end
+    return queueDeferredRoster(record, reason, includeTravelRoute)
 end
 
 function Network.QueuePeriodicRoster(record, now)
@@ -169,7 +157,8 @@ local function collectVisibleIDs(player, state)
                         {
                             event = "interest_enter",
                             directoryRevision = ServerState.rosterRevision,
-                            snapshot = Network.BuildSnapshot(record),
+                            snapshot = Network.BuildSnapshot(record, nil,
+                                Internal.UsesLeanRosterPortraits(player)),
                         }
                     )
                 end
@@ -195,7 +184,8 @@ local function sendInterestExits(player, previousIDs, nextIDs)
                     {
                         event = "interest_exit",
                         directoryRevision = ServerState.rosterRevision,
-                        snapshot = Network.BuildRosterSnapshot(record),
+                        snapshot = Network.BuildRosterSnapshot(record, true,
+                            Internal.UsesLeanRosterPortraits(player)),
                     }
                 )
             end
@@ -236,70 +226,71 @@ function Network.RefreshInterestSets(now)
     end
 end
 
-function Network.FlushRosterDeltas(now, force)
-    local entries = {}
-    local id
-    local queued
-    local entry
-    local snapshot
-    now = tonumber(now) or Core.Now()
-    if not force and now - (tonumber(ServerState.lastRosterFlushAt) or 0) < Const.ROSTER_DELTA_INTERVAL_MS then
-        return 0
-    end
-    for id, _ in pairs(ServerState.rosterDeltas) do
-        queued = ServerState.rosterDeltas[id]
-        if queued and queued.deferred == true then
-            snapshot = Network.BuildRosterSnapshot(
-                queued.record,
-                queued.includeTravelRoute ~= false
-            )
-            -- A record can be retired between queue and flush. Drop only this
-            -- stale periodic entry rather than sending an invalid snapshot.
-            if type(snapshot) == "table" then
-                entry = {
-                    id = queued.id,
-                    removed = false,
-                    reason = queued.reason,
-                    revision = queued.revision,
-                    snapshot = snapshot,
-                }
-                entries[#entries + 1] = entry
+local function buildRosterDelta(entries, leanPortrait)
+    local output = {}
+    local registry = PNC.Registry
+    local records = registry and registry.Data
+    for _, queued in pairs(entries) do
+        local entry = queued
+        if queued.deferred == true then
+            local snapshot
+            local record = records and records[queued.id]
+                or registry and registry.RuntimeViews and registry.RuntimeViews[queued.id]
+            if not records or record == queued.record then
+                snapshot = Network.BuildRosterSnapshot(
+                    queued.record, queued.includeTravelRoute ~= false, leanPortrait)
             end
-        else
-            entries[#entries + 1] = queued
+            entry = snapshot and {
+                id = queued.id,
+                removed = false,
+                reason = queued.reason,
+                revision = queued.revision,
+                snapshot = snapshot,
+            }
         end
+        if entry then output[#output + 1] = entry end
     end
-    if #entries <= 0 then
-        ServerState.rosterDeltas = {}
-        ServerState.lastRosterFlushAt = now
+    return { directoryRevision = ServerState.rosterRevision, entries = output }
+end
+
+function Network.FlushRosterDeltas(now, force)
+    now = tonumber(now) or Core.Now()
+    if not force and now - (tonumber(ServerState.lastRosterFlushAt) or 0)
+        < Const.ROSTER_DELTA_INTERVAL_MS
+    then
         return 0
     end
-    Core.ForEachPlayer(function(player)
-        Internal.SendToPlayer(player, Const.CMD_ROSTER_DELTA, {
-            directoryRevision = ServerState.rosterRevision,
-            entries = entries,
-        })
-    end)
-    -- Singleplayer normally enumerates the local player through
-    -- Core.ForEachPlayer. Keep a guarded loopback fallback for startup/load
-    -- phases where that list is not populated yet; this remains one coalesced
-    -- roster payload, not a per-frame presence tick.
-    if triggerEvent
-        and ((not isServer or not isServer()) or hasHostedLocalPlayer())
-    then
-        triggerEvent(
-            "OnServerCommand",
-            Const.MODULE,
-            Const.CMD_ROSTER_DELTA,
-            {
-                directoryRevision = ServerState.rosterRevision,
-                entries = entries,
-            }
-        )
-    end
+    Internal.FlushPortraitInvalidations()
+    local entries = ServerState.rosterDeltas
     ServerState.rosterDeltas = {}
     ServerState.lastRosterFlushAt = now
-    return #entries
+    if not ServerState.hasRosterDeltas then return 0 end
+    ServerState.hasRosterDeltas = false
+
+    local legacy, lean
+    local function getPayload(usesLean)
+        if usesLean then
+            lean = lean or buildRosterDelta(entries, true)
+            return lean
+        end
+        legacy = legacy or buildRosterDelta(entries, false)
+        return legacy
+    end
+    Core.ForEachPlayer(function(player)
+        local payload = getPayload(Internal.UsesLeanRosterPortraits(player))
+        if #payload.entries > 0 then
+            Internal.SendToPlayer(player, Const.CMD_ROSTER_DELTA, payload)
+        end
+    end)
+    -- Keep local startup/host notifications on their existing resolved path.
+    if triggerEvent and ((not isServer or not isServer()) or hasHostedLocalPlayer()) then
+        local payload = getPayload(false)
+        if #payload.entries > 0 then
+            triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_ROSTER_DELTA, payload)
+        end
+    end
+    local payload = legacy or lean
+    return payload and #payload.entries or 0
 end
 
 function Internal.QueueBroadcastRoster(record, eventName)
@@ -325,7 +316,7 @@ function Internal.CollectRecordRecipients(record)
     return recipients
 end
 
-function Internal.BuildRecordPayload(record, eventName)
+function Internal.BuildRecordPayload(record, eventName, leanPortrait)
     local snapshot
     recordPayloadDiagnostics(eventName)
     if eventName == "tick" then
@@ -335,7 +326,7 @@ function Internal.BuildRecordPayload(record, eventName)
     then
         snapshot = Network.BuildCombatDamageDelta(record)
     else
-        snapshot = Network.BuildSnapshot(record)
+        snapshot = Network.BuildSnapshot(record, nil, leanPortrait)
     end
     return {
         event = eventName or "update",

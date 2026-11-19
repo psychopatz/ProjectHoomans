@@ -37,12 +37,38 @@ function Network.BroadcastRecord(record, eventName)
     Internal.QueueBroadcastRoster(record, eventName)
     recipients = Internal.CollectRecordRecipients(record)
     if isServer and isServer() and #recipients <= 0 then return end
-    payload = Internal.BuildRecordPayload(record, eventName)
+    local lean = false
+    for _, player in ipairs(recipients) do
+        if Internal.UsesLeanRosterPortraits(player) then
+            lean = true
+            break
+        end
+    end
+    payload = Internal.BuildRecordPayload(record, eventName, lean)
     path = record and record.runtime and record.runtime.pathing or nil
     if path and MotionHints and MotionHints.MarkBroadcast then
         MotionHints.MarkBroadcast(record, path, Core.Now())
     end
-    Internal.SendRecordPayload(recipients, payload)
+    if not payload.snapshot or not payload.snapshot.portraitRef then
+        Internal.SendRecordPayload(recipients, payload)
+        return
+    end
+    local legacy
+    for _, player in ipairs(recipients) do
+        local selected = payload
+        if not Internal.UsesLeanRosterPortraits(player) then
+            if not legacy then
+                legacy = Core.ShallowCopy(payload)
+                legacy.snapshot = Core.ShallowCopy(payload.snapshot)
+                legacy.snapshot.portraitRef = nil
+                local identity = PNC.Identity
+                legacy.snapshot.portrait = identity and identity.BuildPortraitSummary
+                    and identity.BuildPortraitSummary(record) or nil
+            end
+            selected = legacy
+        end
+        Internal.SendToPlayer(player, Const.CMD_SYNC_RECORD, selected)
+    end
 end
 
 local function sendInterestRemoval(id, command, payload)
@@ -92,6 +118,7 @@ local function broadcastDeathRemoval(id, reason)
     if not snapshot then return false end
     Network.QueueRosterSnapshot(id, snapshot, false, reason)
     payload = { event = "death", snapshot = snapshot }
+    payload.directoryRevision = ServerState.rosterRevision
     sendInterestRemoval(id, Const.CMD_SYNC_RECORD, payload)
     return true
 end
@@ -170,7 +197,7 @@ function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason, 
     return true
 end
 
-function Network.BroadcastFullSync(targetPlayer, records, requestID)
+function Network.BroadcastFullSync(targetPlayer, records, requestID, portraitProtocol)
     local chunkSize = math.max(1, tonumber(Const.ROSTER_CHUNK_SIZE) or 50)
     local total = #(records or {})
     local chunkCount = math.ceil(total / chunkSize)
@@ -188,6 +215,7 @@ function Network.BroadcastFullSync(targetPlayer, records, requestID)
     Internal.SendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_BEGIN, {
         syncID = syncID,
         directoryRevision = directoryRevision,
+        portraitProtocol = portraitProtocol,
         total = total,
         chunkCount = chunkCount,
     })
@@ -210,6 +238,7 @@ function Network.BroadcastFullSync(targetPlayer, records, requestID)
     Internal.SendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_END, {
         syncID = syncID,
         directoryRevision = directoryRevision,
+        portraitProtocol = portraitProtocol,
         total = total,
         chunkCount = chunkCount,
     })

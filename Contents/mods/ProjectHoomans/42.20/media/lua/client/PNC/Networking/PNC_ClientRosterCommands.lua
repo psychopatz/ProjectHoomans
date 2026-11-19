@@ -6,3 +6,7 @@ PNC.Client.Internal = PNC.Client.Internal or {}
 require "PNC/Networking/PNC_ClientRosterCommands_Snapshots"
 require "PNC/Networking/PNC_ClientRosterCommands_Sync"
 require "PNC/Networking/PNC_ClientRosterCommands_Deltas"
+
+if PNC.Const.CMD_ROSTER_PORTRAIT then
+    require "PNC/Networking/PNC_ClientRosterPortraits"
+end

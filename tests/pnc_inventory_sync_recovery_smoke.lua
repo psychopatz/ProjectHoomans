@@ -22,6 +22,7 @@ PNC = {
         MODULE = "PNC",
         CMD_FULL_SYNC_REQUEST = "FullSyncRequest",
         CMD_REQUEST_CHARACTER = "RequestCharacter",
+        CMD_REQUEST_ROSTER_PORTRAIT = "RequestRosterPortrait",
         CMD_REQUEST_CHARACTER_INVENTORY = "RequestCharacterInventoryPayload",
         CMD_CHARACTER_PAYLOAD = "CharacterPayload",
         CMD_CHARACTER_INVENTORY_PAYLOAD = "CharacterInventoryPayload",

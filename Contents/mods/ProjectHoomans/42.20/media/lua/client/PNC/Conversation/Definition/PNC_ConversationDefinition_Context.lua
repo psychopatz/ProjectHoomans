@@ -213,7 +213,13 @@ end
 local function portraitSpec(entry)
     local snapshot = entry and entry.snapshot or {}
     local record = entry and entry.record or {}
-    local summary = snapshot.portrait or {}
+    local summary = snapshot.portrait
+    if not summary and not snapshot.appearance and entry and entry.id
+        and PNC.Client and PNC.Client.GetRosterPortrait
+    then
+        summary = PNC.Client.GetRosterPortrait(tostring(entry.id))
+    end
+    summary = summary or {}
     local equipment = snapshot.equipmentSummary
         or summary.equipment
         or record.equipment

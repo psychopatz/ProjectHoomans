@@ -95,5 +95,8 @@ function Inventory.SyncEquipmentFromInventory(record)
     for slot, _ in pairs(inv.attached or {}) do
         record.equipment.attached[slot] = fullTypeFor(inv.attached[slot])
     end
+    if PNC.Network and PNC.Network.RefreshPortraitEquipment then
+        PNC.Network.RefreshPortraitEquipment(record)
+    end
     return record.equipment
 end

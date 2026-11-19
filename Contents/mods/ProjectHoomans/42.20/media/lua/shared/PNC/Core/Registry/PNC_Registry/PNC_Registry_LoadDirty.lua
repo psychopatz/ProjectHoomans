@@ -51,6 +51,12 @@ function Registry.MarkDirty(recordOrID, domain)
     then
         return true
     end
+    -- Native visual capture persists through this specific dirty domain.
+    if domain == "equipment_visuals" and PNC.Network
+        and PNC.Network.RefreshPortraitEquipment
+    then
+        PNC.Network.RefreshPortraitEquipment(record)
+    end
     if not Registry.DirtyByID[id] then
         record.recordRevision = math.max(0, math.floor(tonumber(record.recordRevision) or 0)) + 1
     end

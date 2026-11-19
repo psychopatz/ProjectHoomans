@@ -21,12 +21,23 @@ end
 
 local function portraitSpec(entry)
     local portrait = entry and entry.portrait or nil
-    if type(portrait) ~= "table" then return nil end
-    if type(portrait.face) == "table" then
+    if type(portrait) == "table" and type(portrait.face) == "table" then
         return SurvivorWorldClient.GetPortraitSpec(entry)
     end
+    local revision
+    local client = PNC.Client
+    local id = actorIDFor(entry)
+    local state = PNC.Network and PNC.Network.ClientState
+    local snapshot = state and state.snapshots and state.snapshots[id]
+    if client and client.GetRosterPortrait and snapshot and snapshot.portraitRef
+        and not (entry and entry.deathMarker)
+    then
+        portrait, revision = client.GetRosterPortrait(id)
+    end
+    if type(portrait) ~= "table" then return nil end
     return {
         id = actorIDFor(entry),
+        revision = revision or portrait.revision,
         identitySeed = portrait.identitySeed or 1,
         isFemale = portrait.isFemale == true,
         preferDescriptor = true,

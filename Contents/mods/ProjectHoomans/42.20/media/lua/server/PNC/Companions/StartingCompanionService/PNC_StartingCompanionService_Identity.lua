@@ -128,6 +128,9 @@ function H.ApplySharedAppearance(player, record, spec)
     record.runtime.appearanceCacheKey = nil
     record.runtime.portraitSummaryCache = nil
     record.runtime.portraitSummaryCacheKey = nil
+    if PNC.Network and PNC.Network.RefreshRosterPortrait then
+        PNC.Network.RefreshRosterPortrait(record)
+    end
     if Registry.MarkDirty then
         Registry.MarkDirty(record, "starting_companion_shared_appearance")
     end

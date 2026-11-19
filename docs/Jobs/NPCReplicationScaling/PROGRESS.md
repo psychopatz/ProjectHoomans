@@ -2,10 +2,10 @@
 
 ## Current state
 
-- **P1 developer-side accepted.** The [baseline](P1_BASELINE.md) records the consumer audit, 540 headless measurements, and the measured first optimization. The native multiplayer gate remains user-owned.
-- **CODE_VERIFIED.** Runtime identity and authored generation seed are distinct. Roster, nearby presence, and inspected character/inventory detail have independent consumers and access boundaries. Modded asset reconstruction parity remains unverified.
-- P2–P4 are mandatory and remain open.
+- **P1 developer-side accepted.** The [baseline](P1_BASELINE.md) records the consumer audit and 540 headless measurements.
+- **P2 developer-side accepted.** [Hydration evidence](P2_HYDRATION.md) records the lean roster and reference protocol, bounded resolved hydration, mutation equality, and 594 comparison samples.
+- P3 and P4 remain open. Native multiplayer remains user-owned.
 
 ## Next Chunk
 
-**P2 lean roster and progressive presentation.** Negotiate a lean roster while preserving legacy resolved payloads and the current map, death marker, nearby, and inspection behavior. Add incarnation/revision-aware presentation hydration and mutation-driven equality checks, then repeat the P1 matrix and verify production seams.
+**P3 exact representation evaluation.** Preserve the effective identity and authored generation provenance. Compare resolved portraits with catalog-dependent candidates and a reversible fixed-field representation. Reject unsupported catalog or generator equivalence, measure total cost, and keep exact resolved fallback.

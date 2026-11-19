@@ -86,8 +86,10 @@ local function requestFullSync()
     end
     ClientState.lastFullSyncRequestAt = Core.Now()
     if player and sendClientCommand then
+        ClientState.latestRosterRequestID = syncID
         sendClientCommand(player, Const.MODULE, Const.CMD_FULL_SYNC_REQUEST, {
             requestID = syncID,
+            portraitProtocol = Const.ROSTER_PORTRAIT_PROTOCOL,
         })
         Client.EnsurePlayerBootstrap(Core.Now(), false)
         if Client.RequestWorldDiscovery then

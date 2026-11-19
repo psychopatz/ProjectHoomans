@@ -51,6 +51,7 @@ local function clearPendingRoster()
     ClientState.pendingRosterExpectedChunks = nil
     ClientState.pendingRosterExpectedTotal = nil
     ClientState.pendingRosterSyncID = nil
+    ClientState.pendingRosterPortraitProtocol = nil
     ClientState.pendingRosterChunks = nil
     ClientState.pendingRosterChunkRecords = nil
     ClientState.pendingRosterReceivedTotal = nil
@@ -173,6 +174,23 @@ local function logClientPresenceRemoval(current, id, reason, eventName)
     })
 end
 
+local function compareLifetimes(current, incoming)
+    if type(current) ~= "table" or type(incoming) ~= "table"
+        or type(current.incarnation) ~= "string" or type(incoming.incarnation) ~= "string"
+        or current.incarnation == incoming.incarnation
+    then
+        return 0
+    end
+    local currentEpoch, currentSerial = string.match(current.incarnation, "^(.*):(%d+)$")
+    local incomingEpoch, incomingSerial = string.match(incoming.incarnation, "^(.*):(%d+)$")
+    if not currentEpoch or not incomingEpoch then return -1 end
+    if currentEpoch ~= incomingEpoch then
+        return (tonumber(incomingEpoch) or 0) > (tonumber(currentEpoch) or 0)
+            and 1 or -1
+    end
+    return tonumber(incomingSerial) > tonumber(currentSerial) and 1 or -1
+end
+
 local function isStaleSnapshot(current, incoming)
     local currentSequence
     local incomingSequence
@@ -181,6 +199,8 @@ local function isStaleSnapshot(current, incoming)
     if type(current) ~= "table" or type(incoming) ~= "table" then
         return false
     end
+    local lifetimeOrder = compareLifetimes(current.portraitRef, incoming.portraitRef)
+    if lifetimeOrder ~= 0 then return lifetimeOrder < 0 end
     currentSequence = tonumber(current.replicaSequence)
     incomingSequence = tonumber(incoming.replicaSequence)
     if currentSequence ~= nil then
@@ -230,10 +250,36 @@ local function storeSnapshot(
     end
     id = normalizeSnapshotID(incoming.id)
     current = ClientState.snapshots[id]
+    if current and type(incoming.portraitRef) == "table"
+        and type(current.portraitRef) == "table"
+        and current.portraitRef.incarnation == incoming.portraitRef.incarnation
+    then
+        local previous = tonumber(current.portraitRef.revision) or 0
+        local updated = tonumber(incoming.portraitRef.revision) or 0
+        if updated < previous then
+            incoming.portraitRef = current.portraitRef
+        elseif updated > previous then
+            current.portraitRef = incoming.portraitRef
+            current.portrait = nil
+        end
+    end
     if incoming.deathMarker ~= true
         and isStaleSnapshot(current, incoming)
     then
         return current
+    end
+    if current and type(current.portraitRef) == "table"
+        and type(incoming.portraitRef) == "table"
+        and current.portraitRef.incarnation ~= incoming.portraitRef.incarnation
+    then
+        BodyBinding.Forget(id)
+        if PNC.Client.ForgetRosterPortrait then PNC.Client.ForgetRosterPortrait(id) end
+        if ClientState.characterPayloads then ClientState.characterPayloads[id] = nil end
+        replace = true
+    end
+    if incoming.portraitRef then
+        incoming.portrait = nil
+        if current then current.portrait = nil end
     end
     BodyBinding.AcceptSnapshot(incoming)
     if Diagnostics and Diagnostics.FollowerPresenceAuditEnabled == true then

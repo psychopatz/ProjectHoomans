@@ -201,6 +201,14 @@ end
 
 Internal.ApplyCharacterInventoryPayload = applyCharacterInventoryPayload
 
+local function matchesRosterIncarnation(args)
+    if not args.portraitIncarnation then return true end
+    local id = args.npcId and tostring(args.npcId) or nil
+    local row = id and ClientState.snapshots[id]
+    local ref = row and row.portraitRef
+    return ref ~= nil and ref.incarnation == args.portraitIncarnation
+end
+
 Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
     local id
     local currentPayload
@@ -211,7 +219,7 @@ Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
     local currentSnapshot
     local snapshotIsStale
     local inventoryAction = "replace"
-    if not args.npcId then
+    if not args.npcId or not matchesRosterIncarnation(args) then
         return
     end
     id = tostring(args.npcId)
@@ -287,11 +295,12 @@ end)
 
 Internal.RegisterServerCommand(Const.CMD_CHARACTER_INVENTORY_PAYLOAD,
     function(args)
+        if not matchesRosterIncarnation(args) then return end
         applyCharacterInventoryPayload(args, "inventory_payload")
     end)
 
 Internal.RegisterServerCommand(Const.CMD_INVENTORY_DELTA, function(args)
-    if args.npcId then
+    if args.npcId and matchesRosterIncarnation(args) then
         Internal.ApplyInventoryDelta(args)
     end
 end)

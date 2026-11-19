@@ -25,6 +25,8 @@ P1 developer baseline accepted. See the [measurement and consumer audit](P1_BASE
 - Deliver a resolved appearance on demand/first relevant presence. Use an explicit NPC incarnation plus appearance revision/reference, coalesce requests, and invalidate presentation only from events that can change the normalized visible projection. Compute a deterministic projection hash (or equivalent equality key) so inventory/task/state mutations that do not alter visuals cannot bump appearance revision or resend portraits. Preserve the existing compatible full-payload path.
 - **Gate:** roster/map/tooltips/inspection retain required fields; hydration is demand-driven and bounded; unrelated movement, needs, tasks, non-visible inventory changes and orders do not rebuild or resend unchanged portrait data; incarnation/revision handling prevents stale revival; requests/reconnect/removal/fallback converge. Repeat P1 workloads and report traffic, build cost, cache occupancy and no-op suppression.
 
+P2 developer gate accepted. See the [hydration evidence](P2_HYDRATION.md).
+
 ## P3 Evaluate hybrid seeded / compact reconstruction (opt-in until proven)
 
 - Trace the actual source-to-runtime seed lineage for regular NPCs, starting-companion presets, and unique NPCs: saved `generationSeed`, runtime `identitySeed`, context/definition overrides, generator version, and resolved authoritative appearance. Include the unique-NPC reservation path that can derive a runtime seed separately; never assume the two values always equal. Formalize stable versioned domain namespaces/sub-seeds (for example identity, appearance, loadout and supplies) so changing one generator cannot reroll unrelated domains.

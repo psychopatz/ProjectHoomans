@@ -21,6 +21,14 @@ local function inventoryRecipientKey(player)
     return tostring(player)
 end
 
+local function setIncarnation(player, record, payload)
+    if Internal.UsesLeanRosterPortraits and Internal.UsesLeanRosterPortraits(player)
+        and record.runtimeView ~= true
+    then
+        payload.portraitIncarnation = Internal.GetPortraitReference(record).incarnation
+    end
+end
+
 local function inventoryRevision(payload)
     local inventory = payload and payload.inventory or nil
     return inventory and tonumber(inventory.revision
@@ -153,6 +161,7 @@ function Network.SendInventoryDelta(targetPlayer, record, sinceRevision)
         Network.SendCharacterPayload(targetPlayer, record)
         return false
     end
+    setIncarnation(targetPlayer, record, delta)
     sent = Internal.SendToPlayer(targetPlayer, Const.CMD_INVENTORY_DELTA, delta)
     if not sent and isLocalPlayer(targetPlayer) and triggerEvent then
         -- Same local-server fallback as SendCharacterPayload. This is used

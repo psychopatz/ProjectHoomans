@@ -157,6 +157,23 @@ function Identity.NormalizePortraitSummary(source, fallback)
     }
 end
 
+function Identity.ProjectPortrait(record)
+    local identity = Identity.GetCharacterSummary(record)
+    local appearance = record.runtime and record.runtime.appearanceCache
+        or Identity.RollAppearance(record)
+    return Identity.NormalizePortraitSummary({
+        id = record.id,
+        identitySeed = identity.identitySeed,
+        isFemale = identity.isFemale == true,
+        appearance = appearance,
+        equipment = record.equipment,
+    })
+end
+
+function Identity.NormalizePortraitEquipment(record)
+    return normalizeEquipment(record.equipment or {})
+end
+
 function Identity.BuildPortraitSummary(record)
     local identity
     local appearance
