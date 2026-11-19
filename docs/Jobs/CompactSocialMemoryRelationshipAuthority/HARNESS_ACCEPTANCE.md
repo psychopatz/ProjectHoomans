@@ -152,7 +152,7 @@ Before final developer acceptance:
 - source saves remain untouched;
 - accepted Unified Semantic Evidence and Social Conversation Director regressions remain green.
 
-Only then mark READY FOR USER LIVE TEST.
+Those original H0-H6 checks remain required, but final live-test readiness now additionally requires H7-H8 and parent P10-P12.
 
 
 ## Parent portability acceptance
@@ -167,3 +167,17 @@ The canonical Core parent additionally requires:
 - one shared actor identity and one generic directed relationship state across representation changes.
 
 Do not satisfy Hoomans tests by introducing a PNC-only contract that DTAbstract cannot consume.
+
+## Post-P9 single-persistence acceptance
+
+Before final user live-test status:
+
+- create a Core-backed Hoomans NPC with a meaningful relationship and retained memory;
+- serialize both the Core actor registry and the Hoomans NPC record;
+- assert generic approval, respect, familiarity, baselines, memories and revisions are authoritative in the Core payload and are not duplicated as a second generic graph in the new PNC save shape;
+- assert PNC-owned morale, conduct, bond and journal extension state survives independently;
+- reload and reconstruct the normal PNC runtime view from Core plus PNC extension;
+- verify a supported pre-cleanup PNC save migrates generic state into Core exactly once and the next save uses the new single-authority shape;
+- rerun semantic evidence, SocialEvent, relationship, conduct and combined DTAbstract or DTHoomans continuity tests.
+
+**Verified under H7/H8 (P10-P12):** Passed via `pnc_portable_social_convergence_smoke` (Section 5), `psychopatz_social_single_persistence_authority_smoke`, `26/26` H8 scoped suite, `core_lua` `66/66`, `dynamic_trading` `90/90`, and `1,065/1,070` full Hoomans Lua sweep.

@@ -4,7 +4,7 @@
 
 This is a participant of PsychopatzCore Docs/portable_social_state/.
 
-Read the Core parent job first. Parent P0-P9 is the completion boundary.
+Read the Core parent job first. Parent P0-P12 is the completion boundary; H0-H8 are accepted and verified (`READY FOR USER LIVE TEST`).
 
 ## Hoomans responsibility
 

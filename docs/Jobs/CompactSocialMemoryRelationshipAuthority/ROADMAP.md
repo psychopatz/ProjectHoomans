@@ -1,6 +1,6 @@
 # Roadmap — Project Hoomans Portable Social State Adoption
 
-**Status:** ACTIVE — H0-H7 accepted; H8 pending after Core P11-P12.
+**Status:** ACCEPTED — H0-H8 complete under parent P0-P12 (READY FOR USER LIVE TEST).
 **Canonical parent:** PsychopatzCore Docs/portable_social_state/ P0-P12.
 **Participant completion:** H0-H8 plus relevant parent gates are required; Hoomans alone never completes the multi-repo parent.
 
@@ -85,7 +85,7 @@ Requirements:
 
 **Gate:** a Core-backed Hoomans NPC has one persisted generic social history in Core plus an independently persisted PNC-specific extension envelope.
 
-## H8 — Final Hoomans regression under parent P12
+## H8 — Final Hoomans regression under parent P12 — ACCEPTED
 
 After Core P11 and player-identity cleanup, rerun Hoomans social, conduct, semantic evidence, reconnect alias, combined DTAbstract to DTHoomans continuity and persistence-footprint tests.
 

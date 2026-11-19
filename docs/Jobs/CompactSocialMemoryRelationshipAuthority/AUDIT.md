@@ -30,3 +30,15 @@ Current repository inspection verified exact source paths under `Contents/mods/P
 ## Cross-repo ownership conclusion
 
 Generic portable relationship/memory state evolves in `PsychopatzCore` `PsychopatzSocial`. Hoomans reconciles `PNC_EntityRef`, `PNC_RelationshipTypes_Public`, `PNC_Persistence_CoreSocial`, `PNC_RelationshipMath`, and `PNC_SocialEventDefinitions` in parent P4 (`H1-H4`) so there is one generic writable relationship history without breaking Hoomans conduct/knowledge/evidence/director contracts.
+
+## Post-P9 persistence correction
+
+Independent verification after H6 found that the earlier phrase "one generic directed relationship/history is authoritative" is true at the mutation and convergence level but not yet at the persistence level.
+
+Current PNC persistence still calls RelationshipRepository.SerializeRecord(record) and writes the result as the NPC social payload. Core separately persists the same generic actor.social relationship and memory state.
+
+H7 is therefore mandatory: retain PNC-specific extension data, hydrate a runtime convenience view from Core, migrate supported legacy PNC generic social data into Core once, and stop serializing the generic projection a second time.
+
+This is a storage and ownership cleanup, not a request to remove Hoomans SocialEvents, Conduct, morale, bonds, romance, semantic evidence or conversation behavior.
+
+**H7/H8 Resolution (verified):** Core-backed PNC records now serialize solely the `authority == "core"` extension envelope (`morale`, `moraleBaseline`, `conduct` without derived `scores`, `relationshipExtensions` with `bond` & `interactionJournal`), hydrate generic social fields ephemerally from Core `actor.social`, migrate supported legacy saves once via `core_social_single_authority`, and pass all H8 regressions (`26/26` scoped suite, `1,065/1,070` full suite with only the 4 unrelated baseline failures + 1 concurrent dirty UI test, and `psychopatz_social_single_persistence_authority_smoke`).

@@ -1,8 +1,8 @@
 # Compact Social Memory & Relationship Authority — Project Hoomans Adoption
 
-**Status:** PLANNED participant work.
+**Status:** ACCEPTED (H0-H8 complete under parent P0-P12; READY FOR USER LIVE TEST).
 **Canonical parent job:** /home/psychopatz/Zomboid/Workshop/psychopatzCore/Docs/portable_social_state/
-**Parent completion boundary:** PsychopatzCore Portable Social State P0-P9.
+**Parent completion boundary:** PsychopatzCore Portable Social State P0-P12. P0-P9 are accepted historical milestones; P10-P12 are mandatory post-audit cleanup.
 **Role of this directory:** Project Hoomans adopter architecture, migration evidence and acceptance only.
 
 ## Hoomans objective
