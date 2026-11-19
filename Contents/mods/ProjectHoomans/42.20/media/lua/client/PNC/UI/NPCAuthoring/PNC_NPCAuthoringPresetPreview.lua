@@ -12,7 +12,7 @@ local function portrait(definition, seed)
     local record
     record, reason = model.EnsureRuntimeRecord(candidate, true)
     if not record then return nil, nil, reason end
-    return model.BuildPortraitSpec(candidate), draft.displayName
+    return model.BuildPortraitSpec(candidate, record), draft.displayName
 end
 function Preview.Draft(draft)
     local cached
@@ -21,19 +21,25 @@ function Preview.Draft(draft)
             local model = PNC.UniqueNPCEditorModel
             local candidate = model.BuildPreviewDraft(draft)
             local record, reason = model.EnsureRuntimeRecord(candidate, true)
-            cached = { spec = record and model.BuildPortraitSpec(candidate), label = draft.displayName, reason = reason }
+            cached = { spec = record and model.BuildPortraitSpec(candidate, record), label = draft.displayName, reason = reason }
         end
         return cached.spec, cached.label, 1, cached.reason
     end
 end
-function Preview.Companions(payload, context)
+function Preview.Companions(payload, context, session, selectedTraitID)
     local authoring = PNC.NPCAuthoring
     local presets = PNC.StartingCompanionPresets
     local normalized, reason = presets.Deserialize(payload)
     if not normalized then return function() return nil, nil, 0, reason end end
     local members, cache = {}, {}
-    for _, spec in ipairs(PNC.StartingCompanionTraits.DEFINITIONS) do
-        if normalized.slots[spec.id] then members[#members + 1] = spec end
+    if normalized.kind == "template" then
+        members[1] = { source = normalized.companionTraitID, target = selectedTraitID or normalized.companionTraitID }
+    else
+        for _, spec in ipairs(PNC.StartingCompanionTraits.DEFINITIONS) do
+            if normalized.slots[spec.id] and (not session or session:GetSlot(spec.id, false)) then
+                members[#members + 1] = { source = spec.id, target = spec.id }
+            end
+        end
     end
     context = authoring.Registry.Copy(context or {})
     return function(index)
@@ -41,12 +47,12 @@ function Preview.Companions(payload, context)
         local member = members[index]
         if not member then return nil, nil, 0, 'preset_empty' end
         if not cache[index] then
-            local blueprint, why = authoring.Blueprint.Deserialize(normalized.slots[member.id])
-            local plan
-            if blueprint then plan, why = authoring.Resolver.ResolvePlan(blueprint, context,
-                authoring.Resolver.PolicyForStartingCompanion(member, context), { id = 'starter:' .. member.id, version = 1 }) end
-            local spec, label
-            if plan then spec, label, why = portrait(plan.definition, blueprint.generationSeed) end
+            local slot = session and session:GetSlot(member.target, false)
+            local blueprint, plan = presets.PrepareSlot(
+                normalized.slots[member.source], member.target, context, slot and slot.blueprint)
+            local spec, label, why
+            if blueprint then spec, label, why = portrait(plan.definition, blueprint.generationSeed)
+            else why = plan end
             cache[index] = { spec = spec, label = label, reason = why }
         end
         local selected = cache[index]

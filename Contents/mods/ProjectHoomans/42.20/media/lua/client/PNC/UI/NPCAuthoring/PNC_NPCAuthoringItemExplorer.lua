@@ -79,7 +79,7 @@ function Explorer:createChildren()
             local item = control.item
             if not item then return end
             local row = self.customItems ~= nil
-            local texture = item.script and item.script:getNormalTexture()
+            local texture = Catalog.Texture(item)
             if texture then control:drawTextureScaledAspect(texture, 8, 5, control.width - 16, control.height - 30, 1, 1, 1, 1) end
             local label = L.Ellipsize(item.label, UIFont.Small, math.max(1, control.width - 16))
             if row then control:drawText(label, 8, 7, .9, .94, .94, 1, UIFont.Small)
@@ -93,6 +93,7 @@ function Explorer:createChildren()
         self.preview:initialise(); self.preview:instantiate(); self:addChild(self.preview); self.preview:setVisible(false)
     end
     self:buildExplorerPortraitControls()
+    self:buildVariantButton()
     self.quantityLabel = ISLabel:new(0, 0, 24, tr('UI_PNC_Authoring_Quantity', 'Quantity / Destination'), .8, .85, .85, 1, UIFont.Small, true)
     self.quantityLabel:initialise(); self:addChild(self.quantityLabel)
     self.quantity = UI.CreateTextEntry(self, { onlyNumbers = true, maxTextLength = 2, text = '1' })
@@ -129,6 +130,7 @@ function Explorer:createChildren()
     self.counter:initialise(); self:addChild(self.counter)
 end
 function Explorer:Show(options)
+    self:closeVariantDialog()
     self.options = options
     self.allowed, self.onChoose, self.customItems = options.allowed, options.onChoose, options.items
     self.mode = options.mode or 'item'
@@ -137,6 +139,7 @@ function Explorer:Show(options)
     self.deleteArmedID = nil
     self.confirming = false
     self.previewItemID, self.previewIndex = nil, 1
+    if self.preview then self.preview:setViewRegion('body', true) end
     self.quantity:setText(tostring(options.initialQuantity or 1)); self.destination:selectData(options.initialDestination or 'root')
     self.confirm:setTitle(options.applyLabel or tr(self.mode == 'outfit' and 'UI_PNC_Authoring_ApplyOutfit' or 'UI_PNC_Authoring_Equip', self.mode == 'outfit' and 'Apply outfit' or 'Equip / Add'))
     self.confirm.tooltip = options.applyTooltip
@@ -144,14 +147,24 @@ function Explorer:Show(options)
     self.contextActionButton:setTitle(action and action.title or '')
     self.contextActionButton.tooltip = action and action.tooltip or nil
     self.contextActionButton:setVisible(action ~= nil)
-    self.search:setText(options.initialQuery or ''); self:refreshResults()
+    local query = options.initialQuery or ''
+    self.search:setText(query)
+    if options.initialID then
+        local _, _, position = Catalog.Query({
+            query = query, allowed = self.allowed, items = self.customItems,
+            initialID = options.initialID, limit = 1,
+        })
+        self.selectedID = options.initialID
+        self.offset = position and math.floor((position - 1) / self.pageSize) * self.pageSize or 0
+    end
+    self:refreshResults()
     self:setVisible(true); self:bringToTop(); self:onResize(); self.search:focus()
     if self.onShown then self.onShown() end
 end
 function Explorer:confirmSelection()
-    if not self:getIsVisible() or self.confirming then return false end
+    if not self:getIsVisible() or self.confirming or self.variantDialog then return false end
     local item = self:currentSelection()
-    if not item or not self.onChoose or self.previewReason or self.allowed and not self.allowed[item.id] then return false end
+    if not item or not self.onChoose or (self.options.previewRequired ~= false and self.previewReason) or self.allowed and not self.allowed[item.id] then return false end
     local quantity = self.mode == 'carry' and tonumber(self.quantity:getText()) or 1
     if not quantity or quantity < 1 or quantity > 99 or quantity ~= math.floor(quantity) then
         self:setHint(tr('UI_PNC_Authoring_QuantityInvalid', 'Enter a quantity from 1 to 99')); return false
@@ -165,6 +178,7 @@ function Explorer:confirmSelection()
     return false
 end
 function Explorer:Hide()
+    self:closeVariantDialog()
     self.search:unfocus(); self:setVisible(false)
     if self.preview then self.preview:setVisible(false); self.preview.targetKey = nil end
     if self.onDismiss then self.onDismiss() end
@@ -235,10 +249,12 @@ function Explorer:refreshDetails()
         for _, detail in ipairs(self.options.describe and self.options.describe(item) or {}) do UI.AddKeyValue(self.details, detail.label, detail.value) end
         if not self.customItems then UI.AddKeyValue(self.details, tr('UI_PNC_Authoring_ItemID', 'Item ID'), item.id) end
     end
+    self:refreshVariantButton(item)
     self:refreshExplorerPortrait(item)
-    local compatible = not self.previewReason and (not self.allowed or item and self.allowed[item.id] == true)
+    local blockingReason = self.options.previewRequired ~= false and self.previewReason
+    local compatible = not blockingReason and (not self.allowed or item and self.allowed[item.id] == true)
     PNC.NPCAuthoringFields.EnableButton(self.confirm, item ~= nil and compatible == true)
-    self.hintText = tr(not item and (#(self.visibleRows or {}) == 0 and 'UI_PNC_Authoring_NoMatches' or 'UI_PNC_Authoring_SelectResult') or not compatible and 'UI_PNC_Authoring_DoesNotFit' or 'UI_PNC_Authoring_ReviewSelection',
+    self.hintText = blockingReason or tr(not item and (#(self.visibleRows or {}) == 0 and 'UI_PNC_Authoring_NoMatches' or 'UI_PNC_Authoring_SelectResult') or not compatible and 'UI_PNC_Authoring_DoesNotFit' or 'UI_PNC_Authoring_ReviewSelection',
         not item and (#(self.visibleRows or {}) == 0 and 'No matching results' or 'Select a result to review it') or not compatible and 'Does not fit the selected slot' or 'Review the selection, then apply')
     self:onResize()
 end
@@ -251,7 +267,7 @@ function Explorer:onResize()
     local h, width = math.max(28, self.fontHeight + 10), math.max(1, self.width - g * 2)
     local filters = not self.customItems
     local filterWidth = filters and math.min(230, math.max(140, width * .19)) or 0
-    local side = (width >= 850 or self.options.preview and width >= 550) and math.min(300, width * .28) or 0
+    local side = (width >= 850 or self.options.preview and width >= 550) and math.min(340, width * .28) or 0
     local x = g + (filters and filterWidth + g or 0)
     local contentWidth = math.max(1, width - (filters and filterWidth + g or 0) - (side > 0 and side + g or 0))
     self.heading:setName(L.Ellipsize(self.titleText or '', UIFont.Small, math.max(1, width - 110))); self.heading.tooltip = self.titleText
@@ -266,6 +282,9 @@ function Explorer:onResize()
     self.quantityLabel:setVisible(carry); self.quantity:setVisible(carry); self.destination:setVisible(carry)
     local top = h * 2 + g * 3 + contextHeight
     local bottom = carry and h * 5 + g * 7 or h * 3 + g * 5
+    local hasVariants = self.variantButton:getIsVisible()
+    local changeHeight = h + 4
+    if side == 0 and hasVariants then bottom = bottom + changeHeight + g end
     local gridHeight = math.max(h * 2, self.height - top - bottom)
     self.sources:setVisible(filters); self.categories:setVisible(filters)
     L.SetBounds(self.sources, g, top, filterWidth, math.max(1, gridHeight * .48))
@@ -279,14 +298,26 @@ function Explorer:onResize()
     for index, tile in ipairs(self.tiles) do L.SetBounds(tile, (index - 1) % columns * tileWidth, math.floor((index - 1) / columns) * tileHeight, tileWidth - 5, tileHeight - 5) end
     self.details:setVisible(side > 0)
     local detailY, detailHeight = self:layoutExplorerPortrait(x + contentWidth + g, top, side, gridHeight, h, g)
+    if side > 0 and hasVariants then
+        local changeWidth = math.min(210, side)
+        local changeX = x + contentWidth + g + (side - changeWidth) / 2
+        L.SetBounds(self.variantButton, changeX, detailY, changeWidth, changeHeight)
+        detailY, detailHeight = detailY + changeHeight + g, detailHeight - changeHeight - g
+    end
     L.SetBounds(self.details, x + contentWidth + g, detailY, side, math.max(1, detailHeight))
     local y = top + gridHeight + g
+    self:positionVariantDialog()
     L.SetBounds(self.previous, x, y, 40, h); L.SetBounds(self.counter, x + 48, y, math.max(1, contentWidth - 96), h); L.SetBounds(self.nextButton, x + contentWidth - 40, y, 40, h)
     y = y + h + g
     self.hint:setName(L.Ellipsize(self.hintText or '', UIFont.Small, contentWidth)); self.hint.tooltip = self.hintText
     local selected = self:currentSelection()
     if selected then self.hint.tooltip = self.hint.tooltip .. "\n" .. selected.label .. "\n" .. tostring(selected.source or "") .. "\n" .. tostring(selected.id) end
     L.SetBounds(self.hint, x, y, contentWidth, h); y = y + h + g
+    if side == 0 and hasVariants then
+        local changeWidth = math.min(210, contentWidth)
+        L.SetBounds(self.variantButton, x + (contentWidth - changeWidth) / 2, y, changeWidth, changeHeight)
+        y = y + changeHeight + g
+    end
     if carry then
         L.SetBounds(self.quantityLabel, x, y, contentWidth, h); y = y + h
         L.SetBounds(self.quantity, x, y, math.max(1, contentWidth * .15 - g), h)
@@ -300,4 +331,5 @@ function Explorer:onResize()
     PNC.NPCAuthoringFields.NativeMetrics(self)
 end
 require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringExplorerPortrait'
+require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringVariantDialog'
 return Explorer

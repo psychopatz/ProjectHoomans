@@ -31,6 +31,7 @@ local function normalizeVisualState(source)
     output = {
         fullType = normalizeString(source.fullType or source.type),
         baseTexture = tonumber(source.baseTexture),
+        hue = tonumber(source.hue),
         textureChoice = tonumber(source.textureChoice),
         decal = normalizeString(source.decal),
         modelIndex = tonumber(source.modelIndex),
@@ -40,7 +41,7 @@ local function normalizeVisualState(source)
     color = normalizeColor(source.color)
     if tint then output.tint = tint end
     if color then output.color = color end
-    if not output.fullType and not output.baseTexture
+    if not output.fullType and not output.baseTexture and not output.hue
         and not output.textureChoice and not output.decal
         and not output.modelIndex and not tint and not color
     then

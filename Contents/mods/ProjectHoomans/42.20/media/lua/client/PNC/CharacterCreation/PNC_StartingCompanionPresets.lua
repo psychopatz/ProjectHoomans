@@ -6,6 +6,7 @@
 
 require "PNC/Core/Traits/PNC_StartingCompanionTraits"
 require "PNC/Core/Identity/PNC_NPCAuthoring"
+require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor_Profile"
 
 PNC = PNC or {}
 PNC.StartingCompanionPresets = PNC.StartingCompanionPresets or {}
@@ -15,6 +16,7 @@ local StartingTraits = PNC.StartingCompanionTraits
 local Authoring = PNC.NPCAuthoring
 local Registry = Authoring.Registry
 local Blueprint = Authoring.Blueprint
+local Profile = PNC.NPCAuthoringEditorProfile
 
 Presets.SCHEMA_ID = "ProjectHoomans.StartingCompanionPreset"
 Presets.SCHEMA_VERSION = 1
@@ -150,8 +152,9 @@ end
 
 function Presets.TemplateFromSession(session, traitID, label)
     local id = normalizeTraitID(traitID)
-    local blueprint = session and session.GetBlueprint
-        and session:GetBlueprint(id)
+    local blueprint
+    if session and session.GetOutputBlueprint then blueprint = session:GetOutputBlueprint(id) end
+    if not blueprint and session and session.GetBlueprint then blueprint = session:GetBlueprint(id) end
     if not id then return nil, "unknown_companion_trait" end
     if not blueprint then return nil, "slot_not_found" end
     return Presets.Serialize({
@@ -164,49 +167,72 @@ function Presets.TemplateFromSession(session, traitID, label)
     })
 end
 
-local function applyBlueprint(session, traitID, blueprint)
-    local slot = session.GetSlot and session:GetSlot(traitID, true) or nil
-    if slot then
-        return session:SetBlueprint(traitID, blueprint, {
-            presetBaseline = true,
-        })
-    end
-    session.pendingBlueprints = session.pendingBlueprints or {}
-    session.pendingBlueprints[traitID] = Blueprint.Clone(blueprint)
-    return true, "pending"
-end
-
-function Presets.ApplyToSession(session, payload)
-    local normalized, reason = Presets.Deserialize(payload)
-    local applied = {}
-    local pending = {}
-    local id
-    local serialized
-    local blueprint
-    local ok
-    if not normalized then return nil, reason end
-    if not session or type(session.SetBlueprint) ~= "function" then
-        return nil, "session_invalid"
-    end
-    for id, serialized in pairs(normalized.slots) do
-        blueprint, reason = Blueprint.Deserialize(serialized)
-        if not blueprint then return nil, reason end
-        ok, reason = applyBlueprint(session, id, blueprint)
-        if not ok then return nil, reason end
-        if reason == "pending" then
-            pending[#pending + 1] = id
-        else
-            applied[#applied + 1] = id
+function Presets.PrepareSlot(serialized, traitID, context, current)
+    local spec = StartingTraits.GetDefinition(traitID)
+    if not spec then return nil, "unknown_companion_trait" end
+    local incoming, reason = Blueprint.Deserialize(serialized)
+    if not incoming then return nil, reason end
+    local policy = Authoring.Resolver.PolicyForStartingCompanion(spec, context)
+    local candidate = Blueprint.New({ id = "starter:" .. traitID, generationSeed = incoming.generationSeed })
+    for _, field in ipairs(Registry.List()) do
+        local id = field.id
+        local binding = policy.bindings[id]
+        local projected = id == "identity.displayName" and policy.displayNameProjection
+        if field.authorable and field.persistable and not policy.serverControlledFields[id]
+            and not (binding and binding.editable == false) and not projected
+        then
+            local state, value = "absent", nil
+            if Profile.IsVisible("companion", id) then state, value = Blueprint.Get(incoming, id) end
+            if state == "absent" and current then state, value = Blueprint.Get(current, id) end
+            if state == "value" then
+                candidate, reason = Blueprint.Set(candidate, id, value)
+            elseif state == "clear" then
+                candidate, reason = Blueprint.Clear(candidate, id, policy)
+            end
+            if not candidate then return nil, reason end
         end
     end
+    local plan
+    plan, reason = Authoring.Resolver.ResolvePlan(candidate, context, policy, { id = candidate.id, version = 1 })
+    if not plan then return nil, reason end
+    return candidate, plan
+end
+
+function Presets.ApplyToSession(session, preset, options)
+    local normalized, reason = Presets.Deserialize(preset)
+    if not normalized then return nil, reason end
+    if not session or type(session.SetBlueprint) ~= "function" then return nil, "session_invalid" end
+    options = options or {}
+    local context = session:GetContext()
+    local prepared, queued = {}, {}
+    local applied, pending = {}, {}
+    for savedID, serialized in pairs(normalized.slots) do
+        if normalized.kind ~= "template" or savedID == normalized.companionTraitID then
+            local id = normalized.kind == "template" and options.targetTraitID or savedID
+            local slot = session:GetSlot(id, true)
+            if slot and (slot.active or not options.activeOnly) then
+                local candidate
+                candidate, reason = Presets.PrepareSlot(serialized, id, context, slot.blueprint)
+                if not candidate then return nil, reason end
+                prepared[id] = candidate
+                applied[#applied + 1] = id
+            elseif not options.activeOnly then
+                queued[id] = serialized
+                pending[#pending + 1] = id
+            end
+        end
+    end
+    if options.activeOnly and #applied == 0 then return nil, "preset_no_matching_companions" end
     table.sort(applied)
     table.sort(pending)
-    return {
-        preset = normalized,
-        applied = applied,
-        pending = pending,
-        addedTraits = false,
-    }
+    for _, id in ipairs(applied) do
+        local ok
+        ok, reason = session:SetBlueprint(id, prepared[id], { presetBaseline = true })
+        if not ok then return nil, reason end
+    end
+    session.pendingBlueprints = session.pendingBlueprints or {}
+    for _, id in ipairs(pending) do session.pendingBlueprints[id] = queued[id] end
+    return { preset = normalized, applied = applied, pending = pending, addedTraits = false }
 end
 
 function Presets.Encode(payload)

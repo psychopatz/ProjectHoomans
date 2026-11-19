@@ -44,6 +44,7 @@ end
 
 local function normalizeString(value, limits)
     if value == nil then return nil end
+    if value == "" and limits and limits.allowEmpty then return "" end
     local output = trim(value)
     if not output then return nil end
     limits = limits or {}
@@ -307,7 +308,7 @@ local DESCRIPTORS = {
         authoredPath = { "appearanceAuthored", "beardModel" },
         authorable = true, persistable = true, networkable = true,
         bindingAllowed = true, clearable = true,
-        limits = { maxLength = 64 },
+        limits = { maxLength = 64, allowEmpty = true },
     }),
     descriptor("appearance.skinTexture", 8, "string", {
         runtimePath = { "identity", "survivor", "skinTexture" },

@@ -358,13 +358,8 @@ function Customization.SanitizeBlueprint(blueprint, spec)
             report.removed[#report.removed + 1] = fieldID
         end
     end
-    if spec.sharesAppearance then
-        state = Blueprint.Get(normalized, "appearance")
-        if state ~= "absent" then
-            normalized = removeField(normalized, "appearance")
-            report.rebound[#report.rebound + 1] = "appearance"
-        end
-    end
+    -- Family policy binds the human skin and hair fields. The outfit,
+    -- makeup and other worn item visuals are editable for every companion.
     normalized.id = "starter:" .. tostring(spec.id)
     table.sort(report.rebound)
     table.sort(report.removed)

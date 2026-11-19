@@ -97,25 +97,36 @@ function Internal.applyItemVisualState(item, visualState)
             item:setColorBlue(tonumber(visualState.color.b) or 1)
             applied = true
         end
+        if visualState.customColor and item.setColor and Color then
+            -- ItemVisual:getTint reads InventoryItem:getR/G/B for custom
+            -- colors. The separate color channel setters do not update it.
+            item:setColor(Color.new(
+                tonumber(visualState.color.r) or 1,
+                tonumber(visualState.color.g) or 1,
+                tonumber(visualState.color.b) or 1, 1))
+        end
         if item.setCustomColor then
             item:setCustomColor(visualState.customColor == true)
         end
     end
     visual = item.getVisual and item:getVisual() or nil
     if not visual then return applied end
-    if visualState.baseTexture ~= nil
-        and visual.setBaseTexture
-    then
-        visual:setBaseTexture(
-            tonumber(visualState.baseTexture) or -1
-        )
+    if visualState.hue ~= nil and visual.setHue then visual:setHue(visualState.hue) end
+    local clothing = item.getClothingItem and item:getClothingItem()
+    local function textureIndex(index, choices)
+        index = tonumber(index) or -1
+        if choices and choices:size() > 0 and (index < 0 or index >= choices:size()) then
+            return 0
+        end
+        return index
     end
-    if visualState.textureChoice ~= nil
-        and visual.setTextureChoice
-    then
-        visual:setTextureChoice(
-            tonumber(visualState.textureChoice) or -1
-        )
+    if visualState.baseTexture ~= nil and visual.setBaseTexture then
+        visual:setBaseTexture(textureIndex(visualState.baseTexture,
+            clothing and clothing.getBaseTextures and clothing:getBaseTextures()))
+    end
+    if visualState.textureChoice ~= nil and visual.setTextureChoice then
+        visual:setTextureChoice(textureIndex(visualState.textureChoice,
+            clothing and clothing.getTextureChoices and clothing:getTextureChoices()))
     end
     if visualState.decal ~= nil and visual.setDecal then
         visual:setDecal(tostring(visualState.decal))
@@ -140,6 +151,7 @@ function Internal.visualStateSignature(state)
     return table.concat({
         tostring(state and state.fullType or ""),
         tostring(state and state.baseTexture or ""),
+        tostring(state and state.hue or ""),
         tostring(state and state.textureChoice or ""),
         tostring(state and state.decal or ""),
         tostring(tint.r or ""),

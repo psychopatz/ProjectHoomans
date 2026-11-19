@@ -49,13 +49,20 @@ function Slots.Build(draft, record)
             local worn = item.wornSlot and string.lower(string.match(item.wornSlot, '([^:]+)$') or item.wornSlot)
             if worn == normalized then selected = item.type end
         end
-        for _, item in ipairs(draft.startingItems or {}) do if item.wornSlot and string.lower(string.match(item.wornSlot, '([^:]+)$') or item.wornSlot) == identity then selected = item.type end end
+        local authored
+        for _, item in ipairs(draft.startingItems or {}) do
+            if item.wornSlot and string.lower(string.match(item.wornSlot, '([^:]+)$') or item.wornSlot) == identity then
+                authored = item.type
+            end
+        end
         local policy, policyID
         for id, value in pairs(draft.appearance and draft.appearance.slots or {}) do
             if string.lower(string.match(id, '([^:]+)$') or id) == identity then policy, policyID = value, id end
         end
         if policy and policy.mode == 'item' then selected = policy.type end
-        if policy and policy.mode == 'none' then selected = nil end
+        if not policy or policy.mode ~= 'item' then
+            if authored or policy and policy.mode == 'none' then selected = authored end
+        end
         if #options > 0 or selected then
             rows[#rows + 1] = { kind = 'worn', id = policyID or location, label = Slots.Label(location),
                 group = Slots.Group(location).id, type = selected }

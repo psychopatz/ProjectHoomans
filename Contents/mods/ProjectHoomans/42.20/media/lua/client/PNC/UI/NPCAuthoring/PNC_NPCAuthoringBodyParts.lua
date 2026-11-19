@@ -3,10 +3,10 @@ local Parts = {}
 local definitions = {
     { id = 'head', key = 'Head', label = 'Head and face', tokens = 'fullsuithead|scba|head|helmet|mask|hood|hat|makeup|lipstick|eyeshadow|lefteye|righteye|eyes|eye|ears|ear|nose' },
     { id = 'neck', key = 'Neck', label = 'Neck', tokens = 'necklace|neck|scarf|gorget' },
-    { id = 'torso', key = 'Torso', label = 'Torso and layers', tokens = 'underwearbra|underweartop|underweartorso|hoodedponcho|sweaterhood|tshirt|shortsleeveshirt|jersey|fulltop|tanktop|shoulderholster|shoulderpad|vesttexture|leftarm|rightarm|elbow|wound|bandage|bodycostume|boilersuit|cuirass|shirt|vest|jacket|torso|suit|sweater|dress|robe|poncho' },
+    { id = 'torso', key = 'Torso', label = 'Torso and layers', tokens = 'underwearbra|underweartop|underweartorso|hoodedponcho|sweaterhood|tshirt|shortsleeveshirt|jersey|fulltop|tanktop|shoulderholster|shoulderpad|vesttexture|leftarm|rightarm|elbow|wound|bandage|zeddmg|bodycostume|boilersuit|cuirass|shirt|vest|jacket|torso|suit|sweater|longdress|dress|bathrobe|fullrobe|robe|poncho|sportshoulderpad|sportshoulderpadontop' },
     { id = 'hands', key = 'Hands', label = 'Hands and jewelry', tokens = 'forearm|hand|glove|ringfinger|middlefinger|finger|leftwrist|rightwrist|wrist|bracelet' },
     { id = 'waist', key = 'Waist', label = 'Waist and holsters', tokens = 'belt|holster|ammo|strap|bellybutton|codpiece|tail' },
-    { id = 'legs', key = 'Legs', label = 'Legs', tokens = 'pants|trousers|skirt|leg|thigh|knee|gaiter|calf|shorts|underwear' },
+    { id = 'legs', key = 'Legs', label = 'Legs', tokens = 'shortpants|pants|trousers|longskirt|skirt|leg|thigh|knee|gaiter|calf|shorts|underwear' },
     { id = 'feet', key = 'Feet', label = 'Feet', tokens = 'ankleholster|shoe|sock|foot|boot' },
     { id = 'back', key = 'Back', label = 'Back and bags', tokens = 'back|bag|fanny|webbing|satchel' },
     { id = 'other', key = 'Other', label = 'Other equipment', tokens = '' },

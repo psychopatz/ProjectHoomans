@@ -204,6 +204,7 @@ function H.ResolveAuthoringDefinition(
     )
     if not plan then return nil, reason or "starter_resolution_failed" end
     definition = plan.definition
+    local appearanceSeed = definition.generationSeed or seed
     resolvedFemale = definition.identity and definition.identity.isFemale
         or definition.isFemale
     identity = Identity.GenerateResolvedIdentity({
@@ -212,13 +213,13 @@ function H.ResolveAuthoringDefinition(
         isFemale = resolvedFemale == true,
         identity = definition.identity,
         archetypeID = definition.archetypeID or "General",
-        identitySeed = seed,
+        identitySeed = appearanceSeed,
     })
     if not identity then return nil, "identity_generation_failed" end
     definition.id = npcID
     definition.uniqueDefinitionId = nil
     definition.uniqueDefinitionVersion = nil
-    definition.identitySeed = seed
+    definition.identitySeed = appearanceSeed
     definition.identity = identity
     definition.displayName = identity.displayName
     definition.name = identity.displayName

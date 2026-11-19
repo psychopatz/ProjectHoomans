@@ -42,6 +42,30 @@ T.equal(#categories, 1, "empty compatible categories are omitted")
 local _, searchedCategories = Catalog.Filters(nil, "Item 0500", "Mod0")
 T.equal(searchedCategories[1], "Tools", "search and source narrow available categories")
 
+local question = { getName = function() return "Question_On" end }
+local paintingIcon, applianceIcon = {}, {}
+local painting, appliance = Catalog.Find("Mod0.Item500"), Catalog.Find("Mod1.Item501")
+painting.script.getNormalTexture = function() return question end
+painting.script.getIcon = function() return "Painting" end
+appliance.script.getNormalTexture = function() return question end
+getItemTex = function() return question end
+getTexture = function(path) return path == "Item_Painting" and paintingIcon or nil end
+getScriptManager = function()
+    return { getItem = function(_, id) return Catalog.Find(id).script end }
+end
+local iconFactoryCalls = 0
+InventoryItemFactory = {
+    CreateItem = function(id)
+        iconFactoryCalls = iconFactoryCalls + 1
+        if id == appliance.id then return { getTex = function() return applianceIcon end } end
+    end,
+}
+T.equal(Catalog.Texture(painting), paintingIcon, "script icon replaces the question mark")
+T.equal(iconFactoryCalls, 0, "script icon skips item construction")
+T.equal(Catalog.Texture(appliance), applianceIcon, "moveable icon comes from the native item")
+T.equal(Catalog.Texture(appliance), applianceIcon, "repeated tile draws reuse the icon")
+T.equal(iconFactoryCalls, 1, "Core caches the moveable icon lookup")
+
 local function hiddenVisual(id, location, category)
     return {
         getFullName = function() return id end,
@@ -52,10 +76,27 @@ local function hiddenVisual(id, location, category)
         getDisplayCategory = function() return category end,
     }
 end
+MakeUpDefinitions = { makeup = { {
+    name = "FullFaceCamo1", item = "Base.MakeUp_CamoFullFace1",
+} } }
+getText = function(key)
+    return key == "MakeUpType_FullFaceCamo1" and "Camo Face Paint" or key
+end
+local resolvedTexture
+getTexture = function(path)
+    if path == resolvedTexture then return path end
+end
 local makeup = hiddenVisual("Base.MakeUp_CamoFullFace1", "base:makeup_fullface", "Appearance")
+makeup.getClothingItemAsset = function()
+    return { getBaseTextures = function() return {
+        size = function() return 1 end,
+        get = function() return [[body\makeup\camo]] end,
+    } end }
+end
+local customMakeup = hiddenVisual("Mod.MakeUp_StormEyes2", "base:makeup_eyes", "Appearance")
 local injury = hiddenVisual("Base.Wound_Chest_Scratch_Male", "base:wound", "Wound")
 local zombieDamage = hiddenVisual("Base.ZedDmg", "base:zeddmg", "Appearance")
-items = { makeup, injury, zombieDamage }
+items = { makeup, injury, zombieDamage, customMakeup }
 PNC.UniqueNPCAppearanceUI = { Internal = { itemOptions = function(location)
     if location == "base:wound" then return { { id = injury:getFullName() } } end
     return { { id = makeup:getFullName() } }
@@ -67,6 +108,15 @@ T.equal(#Catalog.Clothing("base:wound", false), 1, "male wound overlay is select
 T.equal(#Catalog.Clothing("base:wound", true), 0, "male wound overlay is hidden for female bodies")
 T.equal(#Catalog.Clothing("base:zeddmg"), 0, "native zombie damage is excluded from the editor")
 T.equal(#Catalog.Query({ allowed = { [makeup:getFullName()] = true } }), 1, "slot browser can show hidden makeup")
+local makeupEntry = Catalog.Find(makeup:getFullName())
+T.equal(makeupEntry.label, "Camo Face Paint", "makeup uses the game's display name")
+T.equal(Catalog.Find(customMakeup:getFullName()).label, "Storm Eyes 2", "untranslated mod makeup has a readable fallback")
+T.equal(#Catalog.Query({ allowed = { [makeup:getFullName()] = true }, query = "face paint" }), 1,
+    "makeup can be searched by its display name")
+resolvedTexture = "media/textures/body/makeup/camo.png"
+T.equal(Catalog.Texture(makeupEntry), resolvedTexture, "native layer art remains available when the makeup icon is unavailable")
+resolvedTexture = "Item_MakeupFoundation"
+T.equal(Catalog.Texture(makeupEntry), resolvedTexture, "makeup uses the full-size inventory product icon")
 ScriptManager = { instance = { FindItem = function() return makeup end } }
 PNC.Equipment.CreateItem = function(id) nativeCalls = nativeCalls + 1; return { id = id } end
 T.falsy(Catalog.Create(makeup:getFullName()), "hidden makeup cannot be added through the carried-item picker")

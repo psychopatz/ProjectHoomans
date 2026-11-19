@@ -39,6 +39,10 @@ session:Reconcile(
 session:SetField(TID.BROTHER, "identity.forename", "Riley")
 session:SetField(TID.BROTHER, "identity.nickname", "Rye")
 session:ClearField(TID.BROTHER, "identity.nickname")
+session:SetField(TID.BROTHER, "appearance", { outfit = { mode = "none" }, slots = {
+    ["base:makeup_lips"] = { mode = "item", type = "Base.MakeUp_LipsPink" },
+    Tshirt = { mode = "item", type = "Base.Tshirt_Rock", itemState = { visualDecal = "RockPrint" } },
+} })
 
 local envelope, reason = Customization.BuildEnvelope(
     session,
@@ -98,6 +102,12 @@ T.equal(Blueprint.Get(sanitized, "identity.surname"), "absent",
 T.equal(report.rebound[1], "identity.surname",
     "sanitizer reports the relationship rebinding")
 
+local family = assert(Customization.SanitizeBlueprint(
+    decoded.blueprints[TID.BROTHER], StartingTraits.GetDefinition(TID.BROTHER)))
+local _, familyOutfit = Blueprint.Get(family, "appearance")
+T.equal(familyOutfit.slots["base:makeup_lips"].type, "Base.MakeUp_LipsPink", "family inheritance keeps equipped makeup")
+T.equal(familyOutfit.slots.Tshirt.itemState.visualDecal, "RockPrint", "family inheritance keeps clothing variants")
+
 local clock = 100000
 local oldNow = PNC.Core and PNC.Core.Now
 PNC.Core = PNC.Core or {}
@@ -110,7 +120,9 @@ PNC.StartingCompanions = {
         local value = options and options.blueprints
             and options.blueprints[TID.BROTHER] or nil
         if value then
-            T.truthy(true, "validated customization reaches starter owner")
+            local _, outfit = Blueprint.Get(value, "appearance")
+            T.equal(outfit.slots["base:makeup_lips"].type, "Base.MakeUp_LipsPink",
+                "server grant receives the makeup through the validated envelope")
         end
         return true, "granted", { customized = value ~= nil }
     end,

@@ -1,6 +1,8 @@
 -- Loaded game/mod scripts, with bounded pages and lazy native validation.
 PNC.NPCAuthoringCatalog = PNC.NPCAuthoringCatalog or {}
 local Catalog = PNC.NPCAuthoringCatalog
+local Cosmetics = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringCosmetics"
+local ImageResolver = require "PsychopatzCore/UI/Components/PsychopatzImageResolver"
 local entries, byID
 local clothing, creationFailures = {}, {}
 local blockedTypes = {
@@ -56,6 +58,7 @@ function Catalog.Items()
     local items = getAllItems and getAllItems()
     if not items then return {} end -- Do not cache a pre-script-loading failure.
     entries, byID = {}, {}
+    local makeupLabels = Cosmetics.Labels()
     for index = 0, items:size() - 1 do
         local item = items:get(index)
         local hidden = item:isHidden()
@@ -64,6 +67,9 @@ function Catalog.Items()
         local category = item.getDisplayCategory and item:getDisplayCategory() or 'Other'
         if not blockedTypes[id] and category ~= 'Hidden' and not item:getObsolete() and (not hidden or cosmetic) then
             local label = item:getDisplayName() or id
+            if Cosmetics.IsMakeup(cosmetic) then
+                label = makeupLabels[id] or (label ~= id and label) or Cosmetics.FallbackLabel(id)
+            end
             local module = item.getModuleName and item:getModuleName() or string.match(id, '^([^%.]+)') or ''
             local modID = WorldDictionary and WorldDictionary.getItemModID and WorldDictionary.getItemModID(id)
             local entry = { id = id, label = label, module = module, source = modID or module,
@@ -113,17 +119,18 @@ function Catalog.Query(options)
     local query = string.lower(tostring(options.query or ''))
     local limit = math.max(1, math.min(200, tonumber(options.limit) or 48))
     local offset = math.max(0, tonumber(options.offset) or 0)
-    local rows, total = {}, 0
+    local rows, total, initialPosition = {}, 0, nil
     for _, item in ipairs(options.items or Catalog.Items()) do
         if (not options.source or item.source == options.source)
             and (not options.category or item.category == options.category)
             and matches(item, options.allowed, query)
         then
             total = total + 1
+            if item.id == options.initialID then initialPosition = total end
             if total > offset and #rows < limit then rows[#rows + 1] = item end
         end
     end
-    return rows, total
+    return rows, total, initialPosition
 end
 
 function Catalog.Search(query, allowed)
@@ -135,6 +142,13 @@ end
 function Catalog.Find(id)
     Catalog.Items()
     return byID and byID[id]
+end
+
+function Catalog.Texture(entry)
+    local script = entry and entry.script
+    if not script then return nil end
+    local makeup = Cosmetics.Texture(script, entry.cosmeticLocation)
+    return makeup or ImageResolver.ResolveItemTexture(entry.id)
 end
 
 function Catalog.Create(id, location)

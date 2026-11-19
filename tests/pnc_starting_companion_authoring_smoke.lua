@@ -123,6 +123,47 @@ T.equal(applied.addedTraits, false, "preset does not add paid traits")
 other:Reconcile({ TID.BROTHER }, context("Cruz", false, "straight"))
 T.equal(other:GetSlot(TID.BROTHER).resolvedDefinition.identity.survivor.surname,
     "Cruz", "preset resolves against the current player")
+local direct = Session.New({ sessionSeed = 94, context = context("Cruz", false, "straight") })
+direct:Reconcile({ TID.BROTHER }, context("Cruz", false, "straight"))
+T.truthy(direct:SetField(TID.BROTHER, "identity.nickname", "Keep me"))
+local foreign = Blueprint.New({ id = "saved-sister", generationSeed = 411 })
+foreign = assert(Blueprint.Set(foreign, "identity.forename", "Jamie"))
+foreign = assert(Blueprint.Set(foreign, "identity.surname", "Old family"))
+foreign = assert(Blueprint.Set(foreign, "identity.isFemale", true))
+foreign = assert(Blueprint.Set(foreign, "identity.displayName", "Jamie Old family"))
+foreign = assert(Blueprint.Set(foreign, "appearance.skinTexture", "FemaleBody05"))
+foreign = assert(Blueprint.Set(foreign, "appearance.hairColor", { r = 1, g = 0, b = 0 }))
+foreign = assert(Blueprint.Set(foreign, "factionID", "preset-faction"))
+foreign = assert(Blueprint.Set(foreign, "attackType", "preset-only-attack"))
+local foreignTemplate = assert(Presets.Serialize({
+    schemaId = Presets.SCHEMA_ID, schemaVersion = Presets.SCHEMA_VERSION,
+    kind = "template", companionTraitID = TID.SISTER,
+    slots = { [TID.SISTER] = Blueprint.Serialize(foreign) },
+}))
+local result = assert(Presets.ApplyToSession(direct, foreignTemplate, {
+    targetTraitID = TID.BROTHER, activeOnly = true,
+}))
+T.equal(result.applied[1], TID.BROTHER, "template applies to the currently selected companion")
+T.equal(#result.pending, 0, "loading a template does not queue a different relationship")
+local resolved = direct:GetSlot(TID.BROTHER).resolvedDefinition
+T.equal(resolved.identity.survivor.forename, "Jamie", "editable preset fields apply")
+T.equal(resolved.identity.survivor.surname, "Cruz", "loaded family surname comes from the current player")
+T.equal(resolved.identity.survivor.skinTexture, "MaleBody03", "skin is inherited and adapted to the target")
+T.equal(resolved.identity.survivor.hairColor.r, appearance.hairColor.r, "family hair color is inherited")
+T.equal(resolved.isFemale, false, "target relationship controls sex")
+T.equal(resolved.displayName, "Jamie Cruz", "the current family name is used in the preview")
+T.equal(resolved.identity.nickname, "Keep me", "an unspecified field retains the existing edit")
+T.equal(direct:GetBlueprint(TID.BROTHER).fields["identity.surname"], nil, "preset does not store spoofed inheritance")
+T.equal(direct:GetBlueprint(TID.BROTHER).fields.factionID, nil, "preset cannot assign server-owned faction")
+T.equal(direct:GetBlueprint(TID.BROTHER).fields.attackType, nil, "preset cannot apply a debug-only field")
+local missing, missingReason = Presets.ApplyToSession(direct, {
+    schemaId = Presets.SCHEMA_ID, schemaVersion = Presets.SCHEMA_VERSION,
+    kind = "whole", slots = { [TID.SISTER] = Blueprint.Serialize(foreign) },
+}, { activeOnly = true })
+T.falsy(missing, "unmatched roster cannot silently succeed")
+T.equal(missingReason, "preset_no_matching_companions")
+T.equal(next(direct.pendingBlueprints), nil, "unmatched UI load does not change pending slots")
+
 local loadedForename = other:GetSlot(TID.BROTHER).blueprint.fields["identity.forename"]
 other:SetField(TID.BROTHER, "identity.forename", "Changed")
 other:RevertToPreset(TID.BROTHER)

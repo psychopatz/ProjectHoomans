@@ -48,7 +48,7 @@ function Window:refreshPreview(force)
     local rendered = false
     if previewRecord then
         self.previewDraft = candidatePreview
-        local spec = Model.BuildPortraitSpec(self.previewDraft)
+        local spec = Model.BuildPortraitSpec(self.previewDraft, previewRecord)
         self.portraitSourceSpec = spec
         self.previewSpecKey = spec and spec.key or nil
         self.portraitTarget = spec
@@ -58,6 +58,9 @@ function Window:refreshPreview(force)
     else
         self:setStatus(tostring(previewReason or reason or "preview unavailable"))
         return false
+    end
+    if rendered and self.presentationAdapter and self.presentationAdapter.RememberPreview then
+        self.presentationAdapter:RememberPreview(previewRecord)
     end
     self:refreshDetails()
     if valid and rendered then
@@ -69,7 +72,16 @@ function Window:refreshPreview(force)
         self:setStatus(tostring(previewReason or reason
             or "preview unavailable"):gsub("_", " "))
     end
-    if self.refreshLoadoutPage then self:refreshLoadoutPage() end
+    if self.refreshLoadoutPage then
+        if self.presentationMode ~= "companion" or (self.tabPanel and self.pages
+            and self.tabPanel:getActiveView() == self.pages.loadout)
+        then
+            self:refreshLoadoutPage()
+            self.loadoutRefreshPending = nil
+        else
+            self.loadoutRefreshPending = true
+        end
+    end
     if self.refreshRosterSummary then self:refreshRosterSummary() end
     if self.refreshDebugRoster then self:refreshDebugRoster() end
     if self.pages then self:requestResponsiveLayout() end

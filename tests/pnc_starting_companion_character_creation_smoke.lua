@@ -98,6 +98,7 @@ local function finalScreenClass()
             return true
         end,
         prerender = function() return true end,
+        onKeyRelease = function(self) self.vanillaKey = true end,
         onOptionMouseDown = function(self, option)
             if option and option.internal == "NEXT" then
                 self.vanillaNextCount = (self.vanillaNextCount or 0) + 1
@@ -137,6 +138,7 @@ package.preload["OptionScreens/CharacterCreationMain"] =
 package.preload["OptionScreens/CoopCharacterCreationMain"] =
     function() return CoopCharacterCreationMain end
 
+local capturedVanillaPlay = CharacterCreationMain.onOptionMouseDown
 Events = {
     OnCreatePlayer = { Add = function() end },
     OnGameBoot = { Add = function() end },
@@ -329,13 +331,45 @@ T.equal(resolvedBrother.identity.survivor.surname, "Cruz",
     "reopen inherits the current player surname")
 T.equal(resolvedBrother.identity.survivor.skinTexture, "MaleBody05",
     "reopen inherits the current family appearance")
-authoredFinal:onOptionMouseDown(authoredFinal.playButton)
+authoredFinal.playButton.onclick = capturedVanillaPlay
+authoredFinal.playButton.target = authoredFinal
+authoredFinal:setVisible(true)
+local dispatchedBack = false
+authoredFinal.backButton.onclick = function() dispatchedBack = true end
+authoredFinal:setVisible(true)
+PNC.StartingCompanionComposerUI = { IsOpen = function() return true end }
+authoredFinal.playButton.onclick(authoredFinal, authoredFinal.playButton)
+authoredFinal.backButton.onclick(authoredFinal, authoredFinal.backButton)
+authoredFinal:onKeyRelease(1)
+T.falsy(authoredFinal.vanillaNextCount, "Play is blocked while composer owns input")
+T.falsy(dispatchedBack, "cached native Back callback is blocked")
+T.falsy(authoredFinal.vanillaKey, "background key navigation is blocked")
+PNC.StartingCompanionComposerUI = nil
+local preCommitCalls, preCommit = 0, Adapter.PreCommit
+Adapter.PreCommit = function(screen)
+    preCommitCalls = preCommitCalls + 1
+    return preCommit(screen)
+end
+authoredFinal.playButton.onclick(authoredFinal.playButton.target, authoredFinal.playButton)
+Adapter.PreCommit = preCommit
+T.equal(preCommitCalls, 1, "the real Play callback stages once even if it cached the unpatched native method")
 T.equal(authoredFinal.vanillaNextCount, 1,
     "authored Play reaches vanilla only after staging")
 T.truthy(Adapter.LastPreCommit.authored,
     "meaningful field edit creates authored intent")
 T.truthy(Customization.LocalEnvelope,
     "authored Play stages a canonical local envelope")
+
+local mixedFinal = startFlow({ TID.BROTHER, TID.FRIEND }, 0)
+local mixed = Adapter.GetSession(mixedFinal)
+mixed:SetField(TID.BROTHER, "identity.forename", "Custom")
+mixed:SetField(TID.FRIEND, "identity.forename", "Discard me")
+mixed:ResetSlot(TID.FRIEND)
+mixed:RememberPreview(TID.FRIEND, mixed:GetBlueprint(TID.FRIEND))
+T.truthy(Adapter.PreCommit(mixedFinal))
+local mixedEnvelope = assert(Customization.DecodeEnvelope(Customization.LocalEnvelope))
+T.truthy(mixedEnvelope.blueprints[TID.BROTHER], "custom companion remains in spawn payload")
+T.falsy(mixedEnvelope.blueprints[TID.FRIEND], "reset companion is generated through the default server path")
 
 -- 6. Lover sex follows current player sex and social orientation.
 local loverFinal = startFlow({

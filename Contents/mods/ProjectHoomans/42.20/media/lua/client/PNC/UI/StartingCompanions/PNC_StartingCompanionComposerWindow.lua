@@ -68,6 +68,7 @@ end
 
 function ISPNCStartingCompanionComposerWindow:createChildren()
     PsychopatzFixedWindow.createChildren(self)
+    if self.closeButton then self.closeButton:setVisible(false) end
     -- ISComboBox invokes onChange as (target, combo, arg1, arg2).  Keep the
     -- callback boundary faithful to the vanilla widget and route all state
     -- changes through the bounded selection transactions below.
@@ -92,20 +93,15 @@ function ISPNCStartingCompanionComposerWindow:createChildren()
         target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
         variant = "quiet",
     })
-    self.revertButton = UI.CreateButton(self, {
-        id = "revert",
-        title = tr("UI_PNC_StartingCompanion_Revert", "REVERT TO PRESET"),
-        target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
-        variant = "quiet",
-    })
-    self.closeButton = UI.CreateButton(self, {
-        id = "close",
+    self.doneButton = UI.CreateButton(self, {
+        id = "done",
         title = tr("UI_PNC_StartingCompanion_Done", "Done"),
         target = self, onclick = ISPNCStartingCompanionComposerWindow.onAction,
         variant = "primary",
     })
     self.saveButton.tooltip = tr("UI_PNC_Authoring_SaveNPCHelp", "Save the selected NPC, including every tab and its loadout, as a reusable preset.")
-    self.closeButton.tooltip = tr("UI_PNC_StartingCompanion_DoneHelp", "Keep your companion changes and return to character creation. Saving a reusable preset is optional.")
+    self.resetButton.tooltip = tr("UI_PNC_StartingCompanion_ResetDefaultHelp", "Discard edits for this companion and let the game generate them at spawn.")
+    self.doneButton.tooltip = tr("UI_PNC_StartingCompanion_DoneHelp", "Keep your companion changes and return to character creation. Saving a reusable preset is optional.")
     self.statusLabel = ISLabel:new(0, 0, 24, "", 0.75, 0.8, 0.85, 1,
         UIFont.Small, true)
     self.statusLabel:initialise()
@@ -231,9 +227,7 @@ end
 
 function ISPNCStartingCompanionComposerWindow:refresh()
     self:refreshSlots()
-    self:refreshPresets()
     self:refreshSelected()
-    self:refreshSummary()
     self:onResponsiveLayout()
 end
 
@@ -244,15 +238,19 @@ function ISPNCStartingCompanionComposerWindow:onResponsiveLayout()
     self.presetCombo:setVisible(false)
     local toolbar = Layout.Flow({
         self.loadButton, self.saveButton,
-        self.resetButton, self.revertButton, self.closeButton,
     }, { x = rect.x, y = rect.y, width = rect.width },
         { scale = self.uiScale, minWidth = 78, gap = 6 })
     local exploring = self.editor and self.editor.itemExplorer and self.editor.itemExplorer:getIsVisible()
-    for _, control in ipairs({ self.loadButton, self.saveButton, self.resetButton, self.revertButton, self.closeButton }) do PNC.NPCAuthoringFields.EnableButton(control, not exploring) end
+    for _, control in ipairs({ self.loadButton, self.saveButton, self.resetButton, self.doneButton }) do PNC.NPCAuthoringFields.EnableButton(control, not exploring) end
     local y = toolbar.bottom + gap
     local statusHeight = Layout.Pixels(22, self.uiScale)
+    local footerY = rect.y + rect.height - statusHeight - gap - rowHeight
+    local buttonWidth = math.min(Layout.Pixels(132, self.uiScale), (rect.width - gap) / 2)
+    local footerX = rect.x + (rect.width - buttonWidth * 2 - gap) / 2
+    Layout.SetBounds(self.resetButton, footerX, footerY, buttonWidth, rowHeight)
+    Layout.SetBounds(self.doneButton, footerX + buttonWidth + gap, footerY, buttonWidth, rowHeight)
     Layout.SetBounds(self.editor, rect.x, y, rect.width,
-        math.max(1, rect.y + rect.height - y - statusHeight - gap))
+        math.max(1, footerY - y - gap))
     self.editor.uiScale = self.uiScale
     self.editor:requestResponsiveLayout()
     PNC.NPCAuthoringFields.NativeMetrics(self)
@@ -315,15 +313,17 @@ function ISPNCStartingCompanionComposerWindow:loadSelected()
     local payload, reason = Store.Load(self.selectedPresetFile)
     if not payload then return false, reason end
     local result
-    result, reason = Presets.ApplyToSession(self.session, payload)
+    result, reason = Presets.ApplyToSession(self.session, payload, {
+        targetTraitID = self.selectedTraitID, activeOnly = true,
+    })
     if not result then return false, reason end
-    local nextTraitID = payload.kind == "template"
-        and payload.companionTraitID or self.selectedTraitID
-    if activeSlot(self.session, nextTraitID) then
-        self:SelectCompanion(nextTraitID)
-    else
-        self:refreshSelected()
+    local nextTraitID = self.selectedTraitID
+    local selectedWasApplied = false
+    for _, id in ipairs(result.applied) do
+        if id == nextTraitID then selectedWasApplied = true; break end
     end
+    self:SelectCompanion(selectedWasApplied and nextTraitID or result.applied[1])
+    self:setStatus(tr("UI_PNC_StartingCompanion_PresetLoaded", "Preset loaded"))
     return true
 end
 
@@ -347,12 +347,14 @@ function ISPNCStartingCompanionComposerWindow:browsePresets()
             onClick = function() self:promptSaveSet() end,
         },
         reloadItems = entries,
+        initialID = self.selectedPresetFile,
+        previewRequired = false,
         preview = function(item, index)
             if not portraitProviders[item.id] then
                 local payload = Store.Load(item.id)
                 if not payload then return nil end
                 local previews = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'
-                portraitProviders[item.id] = previews.Companions(payload, self.session:GetContext())
+                portraitProviders[item.id] = previews.Companions(payload, self.session:GetContext(), self.session, self.selectedTraitID)
             end
             return portraitProviders[item.id](index)
         end,
@@ -373,7 +375,9 @@ function ISPNCStartingCompanionComposerWindow:browsePresets()
         onChoose = function(item)
             self:SelectPreset(item.id)
             local ok, reason = self:loadSelected()
-            if ok then self:refreshSummary() end
+            if reason == "preset_no_matching_companions" then
+                reason = tr("UI_PNC_StartingCompanion_PresetNoMatch", "This preset has no matching active companions")
+            end
             return ok, reason
         end })
     self.editor.itemExplorer.onDismiss = function() self.editor:requestResponsiveLayout(); self:onResponsiveLayout() end
@@ -382,15 +386,13 @@ end
 
 function ISPNCStartingCompanionComposerWindow:onAction(button)
     local id = button and button.internal
-    local ok
-    local reason
     if id == "randomize" then return false end
     if self.editor.itemExplorer and self.editor.itemExplorer:getIsVisible() then return false end
-    if self.editor.draft and id ~= "reset" and id ~= "revert" and id ~= "load" and id ~= "close" then
+    if self.editor.draft and id ~= "reset" and id ~= "load" and id ~= "done" then
         if self.editor:pullForm() == false then return end
     end
-    if id == "close" then
-        self:close()
+    if id == "done" then
+        self:finish()
         return
     end
     if not self.session then
@@ -416,25 +418,33 @@ function ISPNCStartingCompanionComposerWindow:onAction(button)
         self:promptSaveSet()
     elseif id == "load" then
         self:browsePresets()
-    elseif id == "reset" or id == "revert" then
-        ok = self.editor:invokeWorkflow(id)
+    elseif id == "reset" then
+        self.editor:invokeWorkflow(id)
         self:refreshSummary()
         self:setStatus(self.editor.statusText
             or tr("UI_PNC_StartingCompanion_Ready", "Companion ready"))
-        if not ok and id == "revert" then
-            self:setStatus(tr("UI_PNC_StartingCompanion_NoPresetBaseline",
-                "No preset baseline is loaded"))
-        end
     end
 end
 
 function ISPNCStartingCompanionComposerWindow:close()
+    return false
+end
+
+function ISPNCStartingCompanionComposerWindow:finish()
     if self.editor then
         if self.editor:pullForm() == false then return false end
-        self.editor.appearanceTab:onStopVoice()
+        if self.editor.appearanceTab then self.editor.appearanceTab:onStopVoice() end
     end
     self:setVisible(false)
-    self:removeFromUIManager()
+    if self.modalRoot then
+        if self.saveGeometry then self:saveGeometry(true) end
+        self.modalRoot:setVisible(false)
+        self.modalRoot:removeChild(self)
+        self.modalRoot:removeFromUIManager()
+        self.modalRoot = nil
+    else
+        self:removeFromUIManager()
+    end
     UIState.instance = nil
 end
 
@@ -444,6 +454,39 @@ function ISPNCStartingCompanionComposerWindow:new(x, y, width, height, options)
     self.__index = self
     object.session = options and options.session
     return object
+end
+
+local function mountComposer(window)
+    if not ISPanel or not getCore then
+        window:addToUIManager()
+        return
+    end
+
+    -- One root makes native input dispatch visit the composer before the
+    -- background. Independent top-level windows can change stacking order.
+    local root = ISPanel:new(0, 0, 1, 1)
+    root.background = false
+    local function consume() return true end
+    root.onMouseDown, root.onMouseUp = consume, consume
+    root.onRightMouseDown, root.onRightMouseUp = consume, consume
+    root.onMouseWheel = consume
+    function root:update()
+        local core = getCore()
+        local width, height = core:getScreenWidth(), core:getScreenHeight()
+        if self.width ~= width then self:setWidth(width) end
+        if self.height ~= height then self:setHeight(height) end
+    end
+    root:initialise()
+    root:instantiate()
+    root:update()
+    root:addChild(window)
+    root:addToUIManager()
+    root:bringToTop()
+    window.modalRoot = root
+end
+
+function UIState.IsOpen()
+    return UIState.instance ~= nil
 end
 
 function UIState.Open(session)
@@ -462,20 +505,20 @@ function UIState.Open(session)
         })
         window:initialise()
         window:instantiate()
-        window:addToUIManager()
+        mountComposer(window)
         UIState.instance = window
     else
         window.session = session
-        window:addToUIManager()
         window:setVisible(true)
-        window:bringToTop()
+        local root = window.modalRoot or window
+        root:bringToTop()
     end
     window:refresh()
     return window
 end
 
 function UIState.Close()
-    if UIState.instance then UIState.instance:close() end
+    if UIState.instance then UIState.instance:finish() end
 end
 
 return UIState

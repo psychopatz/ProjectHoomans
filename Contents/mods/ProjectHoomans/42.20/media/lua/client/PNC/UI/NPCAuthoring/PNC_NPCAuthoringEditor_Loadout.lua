@@ -1,3 +1,4 @@
+local Cosmetics = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringCosmetics"
 require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringLoadout'
 require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringCatalog'
 require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringSlots'
@@ -90,27 +91,31 @@ function Window:openSlot(slot)
         allowed = Catalog.Weapons()
     end
     local carried = slot.group == 'carry' and slot.kind == 'item'
-    local preview, choose, refresh = self:loadoutPickerCallbacks(slot, allowed)
+    local preview, choose, refresh, variants, changeVariant, beginVariantEdit = self:loadoutPickerCallbacks(slot, allowed)
+    local makeup = slot.kind == 'worn' and Cosmetics.IsMakeup(slot.id)
     self.itemExplorer:Show({ mode = carried and 'carry' or slot.kind, title = slot.label, allowed = allowed,
         viewRegion = slot.group == self.loadoutPart and (self.loadoutViewRegion or slot.group) or slot.group,
+        baselinePreview = makeup and Cosmetics.FacePreview(self.portraitSourceSpec) or self.portraitSourceSpec,
+        faceDetail = makeup,
+        projectPreview = makeup and Cosmetics.FacePreview or nil,
         preview = (slot.kind == 'worn' or slot.kind == 'held' or slot.kind == 'attach') and preview or nil,
         onRefresh = refresh,
         applyLabel = tr(carried and 'UI_PNC_Authoring_UpdateCarried' or slot.kind == 'carry' and 'UI_PNC_Authoring_AddCarried' or 'UI_PNC_Authoring_EquipItem',
             carried and 'Update carried item' or slot.kind == 'carry' and 'Add carried item' or 'Equip item'),
         applyTooltip = tr('UI_PNC_Authoring_LoadoutEditHelp', 'Changes update this NPC in the editor immediately. Save NPC preset keeps a reusable copy of all tabs, including this loadout.'),
-        initialID = carried and slot.type or nil, initialQuery = carried and slot.type or nil,
+        initialID = slot.type, initialQuery = carried and slot.type or nil,
         initialQuantity = carried and slot.quantity or nil, initialDestination = carried and slot.destination or nil,
         reloadAllowed = slot.weapon and function() return Catalog.Weapons() end or slot.kind == 'worn' and function()
             local refreshed = {}; for _, item in ipairs(Catalog.Clothing(slot.id, self.draft.isFemale == true)) do refreshed[item.id] = true end; return refreshed
         end or nil,
-        onChoose = choose })
+        onChoose = choose, variants = variants, changeVariant = changeVariant, beginVariantEdit = beginVariantEdit })
     self:requestResponsiveLayout()
 end
-function Window:buildLoadoutCandidate(slot, fullType, quantity, destination, selection)
+function Window:buildLoadoutCandidate(slot, fullType, quantity, destination, selection, previewOnly)
     if not self.draft then return false end
     local capability = self:fieldCapability(slot.kind == 'worn' and 'appearance' or 'startingItems')
     if capability.editable == false then return false, capability.sourceLabel end
-    local spec, native, reason
+    local spec, native, reason, fitReason
     local targetSlot = slot
     if fullType then
         if selection then native = selection.native else native, reason = Catalog.Create(fullType, slot.kind == 'worn' and slot.id or nil) end
@@ -133,7 +138,9 @@ function Window:buildLoadoutCandidate(slot, fullType, quantity, destination, sel
                 if item.equipSlot and item.equipSlot ~= slot.id then
                     local other = Catalog.Create(item.type)
                     if native:isTwoHandWeapon() or other and other:isTwoHandWeapon() then
-                        return false, tr('UI_PNC_Authoring_TwoHands', 'Clear the other hand before equipping a two-handed item')
+                        fitReason = tr('UI_PNC_Authoring_TwoHands', 'Clear the other hand before equipping a two-handed item')
+                        if not previewOnly then return false, fitReason end
+                        break
                     end
                 end
             end
@@ -141,13 +148,17 @@ function Window:buildLoadoutCandidate(slot, fullType, quantity, destination, sel
     elseif slot.kind == 'carry' or slot.kind == 'attach' then return false end
     local candidate = PNC.NPCAuthoring.Registry.Copy(self.draft)
     local record = self.previewDraft and self.previewDraft.runtimeRecord
+    if fitReason then
+        local otherHand = slot.id == 'primary' and 'secondary' or 'primary'
+        Edits.SetSlot(candidate, { kind = 'held', id = otherHand }, nil, record)
+    end
     local ok
     ok, reason = Edits.SetSlot(candidate, targetSlot, spec, record)
     if not ok then return false, tr('UI_PNC_Authoring_ClothingConflict', 'Clothing conflicts with another slot') end
     local valid
     valid, reason = I.Model.BuildBlueprint(candidate)
     if not valid then return false, tostring(reason) end
-    return candidate
+    return candidate, fitReason
 end
 function Window:applyLoadout(slot, fullType, quantity, destination, selection)
     local candidate, reason = self:buildLoadoutCandidate(slot, fullType, quantity, destination, selection)
@@ -169,7 +180,7 @@ function Window:refreshLoadoutPage()
                 local row = control.slot
                 if not row then return end
                 local item = row.type and Catalog.Find(row.type)
-                local texture = item and item.script:getNormalTexture()
+                local texture = Catalog.Texture(item)
                 if texture then control:drawTextureScaledAspect(texture, 8, 5, control.width - 16, control.height - 31, 1, 1, 1, 1) end
                 control:drawTextCentre(L.Ellipsize(row.label, UIFont.Small, math.max(1, control.width - 8)), control.width / 2,
                     control.height - (getTextManager and getTextManager():getFontHeight(UIFont.Small) or 16) - 4, 0.88, 0.93, 0.94, 1, UIFont.Small)

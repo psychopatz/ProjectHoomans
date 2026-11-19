@@ -55,8 +55,14 @@ function Base:getItem() return self.items[self.selected] end
 function Base:addOptionWithData(label, data) self.options[#self.options + 1] = { text = label, data = data }; if self.selected == 0 then self.selected = 1 end end
 function Base:selectData(data) for i, option in ipairs(self.options) do if option.data == data then self.selected = i end end end
 function Base:setOnMouseDownFunction(target, callback) self.target, self.onmousedown = target, callback end
-ISPanel, ISLabel, ISComboBox = Base, Base, Base
+ISPanel, ISLabel, ISComboBox = Base, Base, Base:derive()
+function ISComboBox:new(x, y, w, h, target, onChange)
+    local control = Base.new(self, x, y, w, h)
+    control.target, control.onChange = target, onChange
+    return control
+end
 package.loaded["ISUI/ISPanel"] = true
+package.loaded["ISUI/ISComboBox"] = true
 ISToolTip = Base:derive()
 function ISToolTip:new() return Base.new(self, 0, 0, 0, 0) end
 function ISToolTip:setOwner(owner) self.owner = owner end
@@ -120,7 +126,7 @@ PNC = { UniqueNPCEditorModel = Model, UniqueNPCEditorStorage = Storage,
     NPCAuthoringEditorProfile = { List = function() return {} end, IsVisible = function() return true end, SourceHelp = function() return "" end },
     Identity = { Appearance = { Normalize = function(v) return v or { slots = {} } end } },
     UniqueNPCAppearanceUI = { Internal = { locations = function() return {} end } },
-    NPCAuthoringCatalog = { Search = function() return {} end }, NPCAuthoringLoadout = {} }
+    NPCAuthoringCatalog = { Search = function() return {} end, Find = function() end }, NPCAuthoringLoadout = {} }
 local savedRequire = require
 require = function() return {} end
 T.load("ProjectHoomans", "client", "PNC/UI/NPCAuthoring/PNC_NPCAuthoringEditor.lua")

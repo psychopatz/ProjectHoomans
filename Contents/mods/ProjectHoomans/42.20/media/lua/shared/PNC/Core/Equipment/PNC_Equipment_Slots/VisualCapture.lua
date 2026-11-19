@@ -22,6 +22,7 @@ function Internal.VisualStateSignature(state)
     return table.concat({
         tostring(state and state.fullType or ""),
         tostring(state and state.baseTexture or ""),
+        tostring(state and state.hue or ""),
         tostring(state and state.textureChoice or ""),
         tostring(state and state.decal or ""),
         tostring(tint.r or ""),
@@ -39,6 +40,7 @@ function Equipment.CaptureItemVisualState(item, fullType)
     local visual
     local clothingItem
     local tint
+    local hue
     local modelIndex
     local customColor
     local color
@@ -46,6 +48,13 @@ function Equipment.CaptureItemVisualState(item, fullType)
     visual = item.getVisual and item:getVisual() or nil
     clothingItem = item.getClothingItem
         and item:getClothingItem() or nil
+    if visual and clothingItem and clothingItem.isReady and clothingItem:isReady() then
+        -- The no-argument accessors return unresolved indices until the
+        -- engine has selected from the loaded asset.
+        hue = tonumber(readVisualValue(visual, "getHue", clothingItem))
+        readVisualValue(visual, "getBaseTexture", clothingItem)
+        readVisualValue(visual, "getTextureChoice", clothingItem)
+    end
     tint = visual and readVisualValue(
         visual, "getTint", clothingItem
     ) or nil
@@ -68,6 +77,7 @@ function Equipment.CaptureItemVisualState(item, fullType)
             or item.getFullType
                 and tostring(item:getFullType())
             or nil,
+        hue = hue and hue >= -1 and hue <= 1 and hue or nil,
         baseTexture = visual and tonumber(readVisualValue(
             visual, "getBaseTexture"
         )) or nil,

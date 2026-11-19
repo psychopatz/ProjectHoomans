@@ -102,7 +102,7 @@ function H.EnsureOne(player, character, state, spec, index, at, options)
         spawnDefinition.tacticalClass = spawnDefinition.tacticalClass
             or PNC.Const.TACTICAL_CLASS_NEUTRAL
         spawnDefinition.isFemale = isFemale
-        spawnDefinition.identitySeed = seed
+        spawnDefinition.identitySeed = spawnDefinition.identitySeed or seed
         spawnDefinition.identity = resolvedIdentity
         spawnDefinition.x = x + offsetX
         spawnDefinition.y = y + offsetY

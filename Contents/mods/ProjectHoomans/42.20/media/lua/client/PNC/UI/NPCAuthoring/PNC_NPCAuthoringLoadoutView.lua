@@ -23,6 +23,16 @@ function Window:onMouseUp(x, y)
     if ISPanel.onMouseUp then return ISPanel.onMouseUp(self, x, y) end
 end
 
+local function itemIcon(fullType)
+    local manager = ScriptManager and ScriptManager.instance
+    if manager then
+        local script = manager:FindItem(fullType)
+        return script and script:getNormalTexture()
+    end
+    local entry = Catalog.Find(fullType)
+    return entry and entry.script and entry.script:getNormalTexture()
+end
+
 function Window:buildLoadoutNavigation()
     self.loadoutParts = {}
     self.bodyMap = BodyMap:new(0, 0, 123, 302, function(id, region)
@@ -43,11 +53,21 @@ function Window:buildLoadoutNavigation()
                     target:selectLoadoutPart(group.id)
                 end })
             control.part = group
-            if group.id == 'back' or group.id == 'carry' then control.navImage = getTexture and getTexture('media/ui/Sidebar/64/Inventory_On_64.png') end
+            if group.id == 'back' then
+                control.navImage, control.secondaryIcon = itemIcon('Base.Bag_Schoolbag'), itemIcon('Base.Bag_FannyPackFront')
+            elseif group.id == 'held' then
+                control.navImage, control.secondaryIcon = itemIcon('Base.Axe'), itemIcon('Base.DoubleBarrelShotgun')
+            elseif group.id == 'carry' then control.navImage = getTexture and getTexture('media/ui/Sidebar/64/Inventory_On_64.png') end
             control.render = function(c)
                 ISButton.render(c)
                 local fontHeight = getTextManager():getFontHeight(UIFont.Small)
-                if c.navImage then c:drawTextureScaledAspect(c.navImage, 6, 3, c.width - 12, math.max(1, c.height - fontHeight - 8), 1, 1, 1, 1) end
+                local iconHeight = math.max(1, c.height - fontHeight - 8)
+                local iconWidth = c.secondaryIcon and (c.width - 12) / 2 or c.width - 12
+                if c.navImage then c:drawTextureScaledAspect(c.navImage, 6, 3, iconWidth, iconHeight, 1, 1, 1, 1) end
+                if c.secondaryIcon then
+                    c:drawTextureScaledAspect(c.secondaryIcon, 6 + (c.navImage and iconWidth or 0), 3,
+                        iconWidth, iconHeight, 1, 1, 1, 1)
+                end
                 c:drawTextCentre(L.Ellipsize(c.caption or '', UIFont.Small, math.max(1, c.width - 8)), c.width / 2,
                     c.height - fontHeight - 4, .9, .95, .95, 1, UIFont.Small)
             end
@@ -72,13 +92,6 @@ function Window:refreshLoadoutNavigation()
     self.loadoutSelectionLabel:setName(selected and I.tr('UI_PNC_Authoring_Group_' .. selected.key, selected.label) or '')
     for _, button in ipairs(self.loadoutParts) do
         local group, count = button.part, counts[button.part.id]
-        if group.id == 'held' then
-            local entry = Catalog.Find('Base.Axe')
-            for _, row in ipairs(self.slotRows or {}) do
-                if row.kind == 'held' and row.type then entry = Catalog.Find(row.type); break end
-            end
-            button.navImage = entry and entry.script:getNormalTexture()
-        end
         local title = I.tr('UI_PNC_Authoring_Group_' .. group.key, group.label)
         local key = ({ back = 'BagsShortcut', carry = 'InventoryShortcut', held = 'WeaponsShortcut', other = 'OtherShortcut' })[group.id]
         button.caption = I.tr('UI_PNC_Authoring_' .. key, group.label) .. ' (' .. tostring(count and count.equipped or 0) .. ')'

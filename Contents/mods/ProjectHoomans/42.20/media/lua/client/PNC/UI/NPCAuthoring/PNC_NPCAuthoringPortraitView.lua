@@ -1,7 +1,8 @@
 -- Preview framing is presentation state, never an authored NPC mutation.
 local Window = ISPNCNPCAuthoringEditor
+local Weapon = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringWeaponPreview"
 
-local function stowedItems(equipment)
+local function stowedItems(equipment, heldPrimary)
     local gear = PNC.Equipment
     if not equipment or not gear or not gear.ResolveAttachedLocation or not AttachedLocations then return nil end
     local group = AttachedLocations.getGroup("Human")
@@ -13,7 +14,7 @@ local function stowedItems(equipment)
         end
     end
     for _, hand in ipairs({ 'primaryFullType', 'secondaryFullType' }) do
-        local item = equipment[hand] and gear.CreateItem(equipment[hand])
+        local item = (not heldPrimary or hand ~= 'primaryFullType') and equipment[hand] and gear.CreateItem(equipment[hand])
         local location = item and gear.ResolveAttachedLocation(item, nil, occupied)
         if location and group:getLocation(location) then items[location], occupied[location] = item, true end
     end
@@ -55,12 +56,22 @@ function Window:syncPortraitView(force, resetBodyView)
         spec.appearance = spec.appearance or {}
         spec.appearance.outfit, spec.appearance.outfitItems, spec.appearance.outfitItemSpecs = nil, {}, {}
     elseif loadout then
-        spec.key = spec.key .. ':stowed'
+        spec.key = spec.key .. ':loadout'
         if self.stowedPortraitKey ~= spec.key then
-            self.stowedPortraitItems = stowedItems(spec.equipment)
+            local gear = PNC.Equipment
+            local primary = spec.equipment and spec.equipment.primaryFullType
+            local item = primary and gear and gear.CreateItem(primary)
+            self.loadoutWeaponPose = Weapon.Describe(item)
+            self.loadoutHandItems = self.loadoutWeaponPose and { primary = item } or nil
+            self.stowedPortraitItems = stowedItems(spec.equipment, self.loadoutHandItems)
             self.stowedPortraitKey = spec.key
         end
         spec.previewStowedItems = self.stowedPortraitItems
+        spec.previewWeaponPose = self.loadoutWeaponPose
+        spec.previewHandItems = self.loadoutHandItems
+    end
+    if self.previewSpecKey ~= spec.key then
+        self.nextWeaponPreviewAt, self.weaponPreviewEndsAt = nil, nil
     end
     self.portraitTarget, self.previewSpecKey = spec, spec.key
     local rendered = panel:setTarget(nil, spec, force == true)
@@ -79,6 +90,21 @@ function Window:update()
     local voice = self.appearanceTab and self.appearanceTab.voicePreview
     if voice then voice:Update() end
     local panel = self.portraitPanel
+    if panel and panel.modelView and panel:isReallyVisible() and panel.setWeaponPreviewAttacking
+        and self.portraitTarget and self.portraitTarget.previewWeaponPose and getTimeInMillis then
+        local now = getTimeInMillis()
+        if not self.nextWeaponPreviewAt then self.nextWeaponPreviewAt = now + 700 end
+        if now >= self.nextWeaponPreviewAt then
+            panel:setWeaponPreviewAttacking(true)
+            self.weaponPreviewEndsAt = now + 900
+            self.nextWeaponPreviewAt = now + 3600
+        elseif self.weaponPreviewEndsAt and now >= self.weaponPreviewEndsAt then
+            panel:setWeaponPreviewAttacking(false)
+            self.weaponPreviewEndsAt = nil
+        end
+    else
+        self.nextWeaponPreviewAt, self.weaponPreviewEndsAt = nil, nil
+    end
     if self.portraitMode ~= 'face' or not panel or not panel.modelView
         or not panel:isReallyVisible() or not getTimeInMillis then
         self.nextPreviewWaveAt = nil

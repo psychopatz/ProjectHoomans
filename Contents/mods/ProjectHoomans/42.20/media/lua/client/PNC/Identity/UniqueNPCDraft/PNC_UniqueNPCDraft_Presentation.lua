@@ -10,8 +10,8 @@ local hasEntries = Internal.hasEntries
 local generatedItem = Internal.generatedItem
 local exportItems = Internal.exportItems
 
-function Model.BuildPortraitSpec(draft)
-    local record = Model.EnsureRuntimeRecord(draft)
+function Model.BuildPortraitSpec(draft, record)
+    record = record or Model.EnsureRuntimeRecord(draft)
     local runtime = record and record.runtime or {}
     local snapshot = runtime.previewVisualSnapshot or {}
     local appearance = snapshot.appearance

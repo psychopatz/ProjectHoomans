@@ -93,6 +93,12 @@ function ISPNCNPCAuthoringEditor:syncPageVisibility()
     for _, entry in ipairs(tabs.viewList or {}) do
         entry.view:setVisible(self.draft ~= nil and entry.view == active)
     end
+    if self.draft and self.loadoutRefreshPending and self.pages and active == self.pages.loadout
+        and self.refreshLoadoutPage
+    then
+        self.loadoutRefreshPending = nil
+        self:refreshLoadoutPage()
+    end
     if self.syncPortraitView then self:syncPortraitView() end
 end
 

@@ -191,3 +191,32 @@ T.equal(Blueprint.Fingerprint(session:GetBlueprint(TID.FRIEND)), beforeFailure, 
 Model.EnsureRuntimeRecord, Model.BuildPortraitSpec = savedEnsure, savedPortrait
 
 T.finish("pnc_starting_companion_shared_adapter_smoke")
+
+local previewSession = Session.New({ sessionSeed = 821, context = context("Reyes", true, "straight") })
+previewSession:Reconcile({ TID.BROTHER }, context("Reyes", true, "straight"))
+local previewAdapter = Adapter.New(previewSession, TID.BROTHER)
+local shown = {
+    runtime = { previewVisualSnapshot = { appearance = {
+        hairModel = "Long", beardModel = "", skinTexture = "MaleBody05",
+    } } },
+    inventory = { items = { shirt = {
+        type = "Base.Shirt", wornSlot = "Shirt",
+        itemState = { visualFullType = "Base.Shirt", visualTextureChoice = 2 },
+    } } },
+}
+previewAdapter:RememberPreview(shown)
+T.truthy(previewSession:HasPreviewLook(), "a displayed default look is eligible for spawn packaging")
+T.falsy(previewSession:HasAuthoredIntent(), "preview does not mutate the editing blueprint")
+local packed = previewSession:FinalBlueprints()[TID.BROTHER]
+local _, packedHair = Blueprint.Get(packed, "appearance.hairModel")
+local _, packedClothing = Blueprint.Get(packed, "appearance")
+local _, packedBeard = Blueprint.Get(packed, "appearance.beardModel")
+T.equal(packedBeard, "", "a clean-shaven preview stays clean-shaven")
+T.equal(packedHair, "Long", "spawn carries native hair shown to the user")
+T.equal(packedClothing.slots.Shirt.itemState.visualTextureChoice, 2, "spawn carries shown item variant")
+T.equal(Blueprint.Get(packed, "appearance.skinTexture"), "absent", "family appearance stays policy-bound")
+previewSession:Reconcile({ TID.BROTHER }, context("Cruz", true, "straight"))
+T.truthy(previewSession:HasPreviewLook(), "current player surname can rebind without losing the wardrobe")
+T.equal(previewSession:GetSlot(TID.BROTHER).resolvedDefinition.identity.survivor.surname, "Cruz")
+previewSession:RandomizeSlot(TID.BROTHER)
+T.falsy(previewSession:HasPreviewLook(), "randomization invalidates the old look")

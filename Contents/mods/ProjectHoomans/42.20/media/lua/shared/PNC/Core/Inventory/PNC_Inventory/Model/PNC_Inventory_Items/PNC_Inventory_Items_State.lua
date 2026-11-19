@@ -49,6 +49,7 @@ local SCALAR_FIELDS = {
     "bloodLevel",
     "dirtyness",
     "visualBaseTexture",
+    "visualHue",
     "visualTextureChoice",
     "visualDecal",
     "visualTintR",

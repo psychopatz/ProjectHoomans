@@ -222,19 +222,20 @@ function editorClass:setRoster(rows, selected, callback)
     self.rosterRows, self.rosterSelection, self.onSelectRoster = rows, selected, callback
 end
 
-local appliedPreset
+local appliedPreset, appliedOptions
 local Presets = {
     TemplateFromSession = function(_, traitID, label)
         return { kind = "template", companionTraitID = traitID, label = label }, nil
     end,
     FromSession = function() return { kind = "whole", label = "set" }, nil end,
-    ApplyToSession = function(_, payload)
-        appliedPreset = payload
-        return { applied = { payload.companionTraitID or brother } }, nil
+    ApplyToSession = function(_, payload, options)
+        appliedPreset, appliedOptions = payload, options
+        return { applied = { options.targetTraitID or brother } }, nil
     end,
 }
-local Store = {}
+local Store, presetReads = {}, 0
 function Store.List()
+    presetReads = presetReads + 1
     return { { fileName = selectedPreset, label = "Sister template" } }
 end
 function Store.Load(fileName)
@@ -287,7 +288,13 @@ local window = ISPNCStartingCompanionComposerWindow:new(0, 0, 1060, 800,
     { session = session })
 window:initialise()
 window:createChildren()
+window:onResponsiveLayout()
+T.falsy(window.revertButton, "there is one reset action")
+T.truthy(window.doneButton.y > window.loadButton.y, "Done sits in the footer")
+T.equal((window.resetButton.x + window.doneButton.x + window.doneButton.width) / 2,
+    window.width / 2, "Reset and Done are centered together")
 window:refresh()
+T.equal(presetReads, 0, "opening does not read saved preset files")
 T.truthy(window.loadButton.y >= 30, "toolbar reserves the native title bar")
 T.truthy(window.editor.y >= window.loadButton.y + 32, "editor starts below the toolbar")
 T.falsy(window.saveSetButton, 'roster saving is absent from the editing toolbar')
@@ -322,6 +329,8 @@ T.equal(window.editor.previewIdentity, oldIdentity,
 T.equal(window.editor.portraitTarget.traitID, sister,
     "randomize keeps the portrait on the selected companion")
 
+window:SelectCompanion(brother)
+window:refreshPresets()
 window.presetCombo:selectData(selectedPreset)
 window.presetCombo:invokeChange()
 T.equal(window.selectedPresetFile, selectedPreset,
@@ -333,10 +342,11 @@ T.equal(explorer.options.mode, "preset", "presets use the contextual shared brow
 local portraitProviders = 0
 function session:GetContext() return { playerSurname = 'patz' } end
 package.loaded['PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'] = {
-    Companions = function(payload, context)
+    Companions = function(payload, context, _, target)
         portraitProviders = portraitProviders + 1
         T.equal(payload.companionTraitID, sister, 'browser previews the saved file instead of the edited NPC')
         T.equal(context.playerSurname, 'patz', 'preview receives current inheritance context')
+        T.equal(target, brother, 'preview uses the selected companion policy')
         return function() return { key = 'saved-sister' }, 'Jane patz', 1 end
     end,
 }
@@ -347,8 +357,10 @@ T.falsy(appliedPreset, 'previewing a saved record never applies it to the curren
 explorer.options.onChoose(explorer.options.items[1])
 explorer:Hide()
 T.equal(appliedPreset.companionTraitID, sister, "explicit browser apply loads the selected preset")
-T.equal(window.selectedTraitID, sister,
-    "template load rebinds the same selected companion transaction")
+T.equal(appliedOptions.targetTraitID, brother, "loading a template targets the selected companion")
+T.truthy(appliedOptions.activeOnly, "UI preset loads operate on active slots")
+T.equal(window.selectedTraitID, brother, "template load refreshes the selected companion")
+T.equal(window.statusText, "Preset loaded", "successful load gives visible feedback")
 
 window.editor.onSelectRoster(nil)
 T.falsy(window.selectedTraitID, "invalid selection clears selected trait")
@@ -406,11 +418,48 @@ T.truthy(window.editor.itemExplorer.visible, 'saving a roster returns to its pre
 
 window.editor.pullForm = function() return false end
 window:close()
+T.falsy(window.removed, 'native close cannot dismiss the composer')
+window:finish()
 T.falsy(window.removed, 'Done leaves an invalid pending edit visible for correction')
 window.editor.pullForm = function() return true end
 local stopped = false
 window.editor.appearanceTab = { onStopVoice = function() stopped = true end }
-window:close()
+window:finish()
 T.truthy(window.removed, 'Done returns to character creation after committing valid edits')
 T.truthy(stopped, 'Done releases voice preview')
+local mounted = {}
+getCore = function()
+    return { getScreenWidth = function() return 1920 end, getScreenHeight = function() return 1080 end }
+end
+ISPanel = {}
+function ISPanel:new()
+    local panel = { width = 1, height = 1 }
+    function panel:initialise() end
+    function panel:instantiate() end
+    function panel:setWidth(value) self.width = value end
+    function panel:setHeight(value) self.height = value end
+    function panel:setVisible(value) self.visible = value end
+    function panel:addChild(child) self.child = child end
+    function panel:removeChild(child) if self.child == child then self.child = nil end end
+    function panel:addToUIManager() mounted[#mounted + 1] = self end
+    function panel:removeFromUIManager() self.unmounted = true end
+    function panel:bringToTop() self.onTop = true end
+    return panel
+end
+UI.NewWindow = function(class, options)
+    local created = class:new(0, 0, 1060, 800, options)
+    function created:instantiate() self:createChildren() end
+    function created:addToUIManager() mounted[#mounted + 1] = self end
+    return created
+end
+local modal = assert(UIState.Open(session))
+local root = modal.modalRoot
+T.equal(#mounted, 1, "only the modal root is registered at the top level")
+T.equal(mounted[1], root)
+T.equal(root.child, modal, "native child dispatch reaches the composer before the backdrop")
+T.truthy(root.onMouseDown(), "clicks outside the composer are consumed")
+T.equal(root.width, 1920)
+modal:onAction({ internal = "done" })
+T.truthy(root.unmounted, "Done unregisters the entire modal root")
+T.falsy(UIState.IsOpen(), "closing the composer unlocks character creation")
 T.finish("pnc_starting_companion_ui_interaction_smoke")

@@ -85,4 +85,26 @@ now = 30000
 e:update()
 T.equal(waves, 1, 'hidden preview does not wave')
 T.equal(e.nextPreviewWaveAt, nil, 'hidden preview drops its pending wave')
+local axe = { type = 'Base.Axe' }
+instanceof = function(item, class) return item == axe and class == 'HandWeapon' end
+WeaponType = { getWeaponType = function() return { getType = function() return '2handed' end } end }
+PNC.Equipment = { CreateItem = function() return axe end }
+local attacks = {}
+function e.portraitPanel:setWeaponPreviewAttacking(value) attacks[#attacks + 1] = value end
+e.portraitPanel:setVisible(true)
+e.stowedPortraitKey = nil
+e.tabPanel:activateView(PNC.Translation.GetKey('UI_PNC_Authoring_Loadout', 'Loadout'))
+e:syncPageVisibility()
+T.equal(targets[#targets].previewHandItems.primary, axe, 'main Loadout portrait holds its primary weapon')
+T.equal(targets[#targets].previewWeaponPose, '2handed', 'primary item determines the native pose')
+e:update()
+now = now + 700
+e:update()
+T.equal(attacks[1], true, 'main portrait starts a preview attack')
+now = now + 900
+e:update()
+T.equal(attacks[2], false, 'portrait returns to its weapon-ready pose')
+e.width = 1560
+e:onResponsiveLayout()
+T.truthy(e.portraitPanel.width > 260, 'large editors give the Loadout portrait more width')
 T.finish('pnc_npc_authoring_portrait_framing_smoke')

@@ -92,6 +92,7 @@ local function portableCompactItemState(record, item)
     if visual then
         state.visualFullType = tostring(visual.fullType or item.type)
         state.visualBaseTexture = tonumber(visual.baseTexture)
+        state.visualHue = tonumber(visual.hue)
         state.visualTextureChoice = tonumber(visual.textureChoice)
         state.visualDecal = visual.decal
             and tostring(visual.decal) or nil

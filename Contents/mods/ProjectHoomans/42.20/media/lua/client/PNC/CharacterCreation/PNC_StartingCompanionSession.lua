@@ -1,8 +1,7 @@
 -- Character-creation state for starting companions.
 --
 -- The session is keyed by the canonical starting-companion trait ID.  It
--- stores authored blueprints only; previews and traces are rebuilt from the
--- current survivor/context without mutating the blueprint.
+-- keeps authored blueprints separate from resolved previews and traces.
 
 require "PNC/Core/Traits/PNC_StartingCompanionTraits"
 require "PNC/Core/Relationships/PNC_SocialProfileConstants"
@@ -322,6 +321,7 @@ function Session:Reconcile(selectedTraitIDs, context)
     local slot
     local pending
     local errors
+    self.context = context or self.context or {}
 
     for _, spec in ipairs(StartingTraits.DEFINITIONS) do
         id = spec.id
@@ -332,9 +332,13 @@ function Session:Reconcile(selectedTraitIDs, context)
             slot.active = true
             pending = self.pendingBlueprints[id]
             if pending then
-                setBlueprint(slot, pending)
-                slot.presetBaseline = Blueprint.Clone(pending)
-                self.pendingBlueprints[id] = nil
+                local Presets = require "PNC/CharacterCreation/PNC_StartingCompanionPresets"
+                local candidate = Presets.PrepareSlot(pending, id, self.context, slot.blueprint)
+                if candidate then
+                    setBlueprint(slot, candidate)
+                    slot.presetBaseline = Blueprint.Clone(candidate)
+                    self.pendingBlueprints[id] = nil
+                end
             end
             self.slots[id] = slot
             self.cache[id] = slot
@@ -353,7 +357,6 @@ function Session:Reconcile(selectedTraitIDs, context)
     end
     self.selected = current
     self.selectedOrder = currentOrder
-    self.context = context or self.context or {}
     errors = self:ResolveActive()
     self.lastReconciliation = {
         added = copy(added),
@@ -440,6 +443,8 @@ function Session:ResetSlot(traitID)
     local slot = self:GetSlot(traitID, true)
     if not slot then return nil, "slot_not_found" end
     slot.blueprint = Blueprint.Clone(slot.defaultBlueprint)
+    slot.previewSource, slot.previewBlueprint = nil, nil
+    slot.useDefaultSpawn = true
     self:ResolveSlot(slot.traitID, self.context)
     return Blueprint.Clone(slot.blueprint)
 end
@@ -480,11 +485,50 @@ function Session:SetBlueprint(traitID, blueprint, options)
     return true
 end
 
+local function previewSource(slot)
+    if not slot.resolvedDefinition then return nil end
+    -- Player-derived fields are resolved again at spawn. Only a body
+    -- change invalidates the captured visual defaults of an unchanged draft.
+    return Blueprint.Fingerprint(slot.blueprint) .. ":" .. tostring(slot.resolvedDefinition.isFemale)
+end
+
+function Session:RememberPreview(traitID, resolvedBlueprint)
+    local slot = self:GetSlot(traitID, false)
+    if not slot then return end
+    if self:UsesDefaultSpawn(traitID) then return end
+    slot.previewSource = previewSource(slot)
+    slot.previewBlueprint = Blueprint.Clone(resolvedBlueprint)
+end
+
+function Session:GetOutputBlueprint(traitID)
+    local slot = self:GetSlot(traitID, false)
+    if not slot then return nil end
+    if slot.previewSource and slot.previewSource == previewSource(slot) then
+        return Blueprint.Clone(slot.previewBlueprint)
+    end
+    return Blueprint.Clone(slot.blueprint)
+end
+
+function Session:UsesDefaultSpawn(traitID)
+    local slot = self:GetSlot(traitID, false)
+    return slot and slot.useDefaultSpawn == true and not self:IsSlotAuthored(traitID)
+end
+
+function Session:HasPreviewLook()
+    for _, id in ipairs(self.selectedOrder) do
+        local slot = self.slots[id]
+        if slot and slot.active and slot.previewSource and slot.previewSource == previewSource(slot) then
+            return true
+        end
+    end
+    return false
+end
+
 function Session:FinalBlueprints()
     local output = {}
     for _, id in ipairs(self.selectedOrder) do
         local slot = self.slots[id]
-        if slot and slot.active then output[id] = Blueprint.Clone(slot.blueprint) end
+        if slot and slot.active then output[id] = self:GetOutputBlueprint(id) end
     end
     return output
 end

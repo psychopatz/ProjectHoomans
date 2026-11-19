@@ -1,4 +1,5 @@
 -- Portrait selection/lifecycle for the shared browser, including roster members.
+local Zoom = require "PNC/UI/NPCAuthoring/PNC_NPCAuthoringPreviewZoom"
 local Explorer, UI = ISPNCNPCAuthoringItemExplorer, PsychopatzCore.UI
 local L = UI.Layout
 local function tr(k, fallback) return PNC.Translation.GetKey(k, fallback) end
@@ -14,23 +15,34 @@ function Explorer:buildExplorerPortraitControls()
     self.portraitCaption = ISLabel:new(0, 0, 24, '', .9, .95, .95, 1, UIFont.Small, true)
     self.portraitCaption:initialise(); self:addChild(self.portraitCaption)
     self.previewIndex, self.previewCount = 1, 1
+    if self.preview then self.previewZoom = Zoom.Build(self, self.preview) end
 end
 function Explorer:refreshExplorerPortrait(item)
     if self.previewItemID ~= (item and item.id) then self.previewIndex = 1 end
     self.previewItemID = item and item.id
     local spec, label, count, reason
     if item and self.options.preview then spec, label, count, reason = self.options.preview(item, self.previewIndex) end
+    local triedOn = spec ~= nil
+    if not spec and self.options.preview then spec = self.options.baselinePreview end
+    if triedOn and self.options.projectPreview then spec = self.options.projectPreview(spec) end
     self.previewCount = math.max(1, count or 1)
     self.hasPreview = spec ~= nil
-    self.previewLabel = label or item and item.label or ''
+    self.previewLabel = triedOn and (label or item and item.label or '')
+        or spec and tr('UI_PNC_Authoring_CurrentLook', 'Current look') or ''
     self.previewReason = reason
     if self.preview then
         if spec then
-            self.preview:setViewRegion(self.options.viewRegion or 'body')
+            local region = self.options.viewRegion or 'body'
+            if self.options.faceDetail then region = 'head'
+            elseif not triedOn then region = 'body'
+            elseif spec.previewWeaponPose then region = 'weapon'
+            elseif region == 'body' and self.options.variants then region = 'equipment' end
+            self.preview:setViewRegion(region, false, self.preview:getViewRegion() ~= nil)
             self.preview:setTarget(nil, spec, false)
+            if self.preview.modelView then self.preview.modelView.animateWhilePaused = true end
         else self.preview:setVisible(false); self.preview.targetKey = nil end
     end
-    if item and self.options.preview and not spec then
+    if item and self.options.preview and not triedOn and not spec then
         UI.AddKeyValue(self.details, tr('UI_PNC_Authoring_Preview', 'Preview'),
             tr('UI_PNC_Authoring_PreviewUnavailable', 'Preview unavailable'))
     end
@@ -52,7 +64,10 @@ function Explorer:layoutExplorerPortrait(x, y, side, height, h, gap)
     self.portraitCaption:setName(L.Ellipsize(caption, UIFont.Small, math.max(1, side - inset * 2)))
     self.portraitCaption.tooltip = caption
     L.SetBounds(self.portraitCaption, x + inset, captionY, math.max(1, side - inset * 2), h)
-    if visible then return captionY + h + gap, math.max(1, height - portraitHeight - h - gap * 2) end
+    if self.previewZoom then
+        Zoom.Layout(self.previewZoom, x, captionY + h + gap, side, h, gap, visible)
+    end
+    if visible then return captionY + 2 * (h + gap), math.max(1, height - portraitHeight - 2 * h - 3 * gap) end
     return y, height
 end
 return Explorer

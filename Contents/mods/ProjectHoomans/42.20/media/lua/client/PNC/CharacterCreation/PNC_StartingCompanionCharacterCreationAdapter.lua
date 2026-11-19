@@ -321,7 +321,7 @@ function Adapter.PreCommit(screen)
         authored = authored,
         staged = false,
     }
-    if #companionIDs == 0 or not authored then
+    if #companionIDs == 0 or (not authored and not session:HasPreviewLook()) then
         Adapter.LastPreCommit.reason = "default"
         return true, "default"
     end
@@ -331,7 +331,11 @@ function Adapter.PreCommit(screen)
         Adapter.LastPreCommit.reason = reason
         return false, reason
     end
-    envelope, reason = Customization.BuildEnvelope(session, companionIDs)
+    local customizedIDs = {}
+    for _, traitID in ipairs(companionIDs) do
+        if not session:UsesDefaultSpawn(traitID) then customizedIDs[#customizedIDs + 1] = traitID end
+    end
+    envelope, reason = Customization.BuildEnvelope(session, customizedIDs)
     if not envelope then
         Adapter.LastPreCommit.reason = reason
         return false, reason

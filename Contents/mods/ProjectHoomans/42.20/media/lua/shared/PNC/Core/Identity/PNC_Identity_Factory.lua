@@ -213,7 +213,7 @@ function Identity.GenerateResolvedIdentity(source)
             beardModel = survivorOverride.beardModel ~= nil
                 and tostring(survivorOverride.beardModel)
                 or (humanVisual and humanVisual.getBeardModel
-                    and normalizeString(humanVisual:getBeardModel()) or nil),
+                    and humanVisual:getBeardModel() or nil),
             hairStubble = survivorOverride.hairStubble == true,
             beardStubble = survivorOverride.beardStubble == true,
             chestHair = survivorOverride.chestHair == true,

@@ -182,6 +182,45 @@ function Adapter:BuildDraft()
     return draft
 end
 
+-- Project the look already shown to the user into the existing blueprint
+-- fields at export. The live editing blueprint keeps its sparse intent.
+function Adapter:RememberPreview(record)
+    local slot = self:Slot()
+    local intent = self:BlueprintIntent()
+    local snapshot = record.runtime and record.runtime.previewVisualSnapshot
+    if not slot or not intent or not snapshot or not self.session.RememberPreview then return end
+    local output = Blueprint.Clone(intent)
+    local look = snapshot.appearance
+    for _, name in ipairs({ "hairModel", "beardModel", "skinTexture", "skinColor", "hairColor",
+        "hairStubble", "beardStubble", "chestHair" }) do
+        local key = "appearance." .. name
+        local state = Blueprint.Get(intent, key)
+        if state ~= "value" and look[name] ~= nil and self:FieldCapability(key).editable then
+            output = Blueprint.Set(output, key, look[name])
+            if not output then return end
+        end
+    end
+    if self:FieldCapability("appearance").editable then
+        local appearance = PNC.Identity.Appearance.Normalize(slot.resolvedDefinition.appearance)
+        local captured = false
+        for _, item in pairs(record.inventory and record.inventory.items or {}) do
+            if item.wornSlot and not item.maxWeight and not item.bagContainer then
+                captured = true
+                PNC.Identity.Appearance.CaptureSlot(appearance.slots, item.wornSlot, {
+                    mode = "item", type = item.type, wornSlot = item.wornSlot,
+                    itemState = copy(item.itemState),
+                })
+            end
+        end
+        if captured or appearance.outfit.mode == "none" then
+            appearance.outfit = { mode = "none" }
+            output = Blueprint.Set(output, "appearance", appearance)
+            if not output then return end
+        end
+    end
+    self.session:RememberPreview(self.traitID, output)
+end
+
 function Adapter:_commitCandidate(candidate)
     local slot = self:Slot()
     local policy = Authoring.Resolver.PolicyForStartingCompanion(slot.spec, self.session:GetContext())

@@ -210,6 +210,7 @@ function Visuals.AddClothingVisual(zombie, fullType, visualState)
         itemVisual:setClothingItemName(fullType)
     end
     if visualState then
+        if visualState.hue ~= nil and itemVisual.setHue then itemVisual:setHue(visualState.hue) end
         if visualState.baseTexture ~= nil
             and itemVisual.setBaseTexture
         then

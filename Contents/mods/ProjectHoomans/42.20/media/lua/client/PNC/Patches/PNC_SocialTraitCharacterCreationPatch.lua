@@ -97,11 +97,57 @@ local function installClassMethod(class, methodName, marker, handler)
     return true
 end
 
+local function composerOpen()
+    local composer = PNC.StartingCompanionComposerUI
+    return composer and composer.IsOpen and composer.IsOpen()
+end
+
+local function guardBackButton(screen)
+    local button = screen and screen.backButton
+    if not button or type(button.onclick) ~= "function" or button.onclick == button.pncStarterBack then return end
+    local original = button.onclick
+    button.pncStarterBack = function(...)
+        if composerOpen() then return false end
+        return original(...)
+    end
+    button.onclick = button.pncStarterBack
+end
+
+local function stagePlay(screen)
+    if composerOpen() then return false end
+    local ok, reason = Adapter.PreCommit(screen)
+    if not ok then
+        Patch.ShowFinalError(screen, reason)
+        return false, reason
+    end
+    Patch.ClearFinalError(screen)
+    return true
+end
+
+local function bindPlayButton(screen)
+    local play = screen and screen.playButton
+    if not play or type(play.onclick) ~= "function"
+        or play.onclick == play.pncStarterClick then return end
+    local original = play.onclick
+    local function beforePlay(target, button, ...)
+        local ok, reason = stagePlay(target)
+        if not ok then return false, reason end
+        target.pncStarterPlayStaged = true
+        local result, detail = original(target, button, ...)
+        target.pncStarterPlayStaged = nil
+        return result, detail
+    end
+    play.pncStarterClick = beforePlay
+    play.onclick = beforePlay
+end
+
 local function createFinalCompanionButton(screen)
     local button
     local label
     local width
     local x
+    bindPlayButton(screen)
+    guardBackButton(screen)
     if not screen or screen.pncStartingCompanionButton
         or not screen.playButton or not ISButton
     then
@@ -193,7 +239,11 @@ local function installFinalScreenHooks()
         "_pncStartingCompanionFinalVisibilityPatched",
         function(original, screen, visible, ...)
             local result = original(screen, visible, ...)
-            if visible == true then Adapter.UpdateFinalActionState(screen) end
+            if visible == true then
+                bindPlayButton(screen)
+                guardBackButton(screen)
+                Adapter.UpdateFinalActionState(screen)
+            end
             return result
         end
     )
@@ -208,19 +258,22 @@ local function installFinalScreenHooks()
         end
     )
 
+    local function finalKey(original, screen, key, ...)
+        if composerOpen() then return end
+        return original(screen, key, ...)
+    end
+    -- Co-op may inherit the base callback, so install its guard first.
+    installClassMethod(CoopCharacterCreationMain, "onKeyRelease", "_pncStarterCoopKey", finalKey)
+    installClassMethod(CharacterCreationMain, "onKeyRelease", "_pncStarterKey", finalKey)
+
     local function finalAction(original, screen, button, ...)
-        local ok
-        local reason
+        if composerOpen() then return false end
         if button and button.internal == "COMPANIONS" then
             return Patch.HandleFinalAction(screen, button, ...)
         end
-        if button and button.internal == "NEXT" then
-            ok, reason = Adapter.PreCommit(screen)
-            if not ok then
-                Patch.ShowFinalError(screen, reason)
-                return false, reason
-            end
-            Patch.ClearFinalError(screen)
+        if button and button.internal == "NEXT" and not screen.pncStarterPlayStaged then
+            local ok, reason = stagePlay(screen)
+            if not ok then return false, reason end
         end
         return original(screen, button, ...)
     end

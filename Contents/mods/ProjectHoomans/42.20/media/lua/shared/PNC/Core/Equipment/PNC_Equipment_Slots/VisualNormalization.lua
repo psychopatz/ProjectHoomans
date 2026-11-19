@@ -29,6 +29,7 @@ function Internal.NormalizeVisualState(source, fullType)
     return {
         fullType = tostring(fullType),
         baseTexture = tonumber(state.baseTexture),
+        hue = tonumber(state.hue),
         textureChoice = tonumber(state.textureChoice),
         decal = Internal.NormalizeString(state.decal),
         tint = normalizeVisualColor(state.tint),
@@ -75,6 +76,7 @@ function Equipment.VisualStateFromItemState(itemState, fullType)
         }
     end
     if itemState.visualBaseTexture == nil
+        and itemState.visualHue == nil
         and itemState.visualTextureChoice == nil
         and itemState.visualDecal == nil
         and itemState.visualModelIndex == nil
@@ -88,6 +90,7 @@ function Equipment.VisualStateFromItemState(itemState, fullType)
     return {
         fullType = fullType and tostring(fullType) or nil,
         baseTexture = tonumber(itemState.visualBaseTexture),
+        hue = tonumber(itemState.visualHue),
         textureChoice = tonumber(itemState.visualTextureChoice),
         decal = itemState.visualDecal
             and tostring(itemState.visualDecal) or nil,
@@ -121,6 +124,7 @@ function Equipment.StoreVisualStateInItemState(item, visualState)
         or item.type and tostring(item.type)
         or nil
     state.visualBaseTexture = tonumber(visualState.baseTexture)
+    state.visualHue = tonumber(visualState.hue)
     state.visualTextureChoice = tonumber(visualState.textureChoice)
     state.visualDecal = visualState.decal
         and tostring(visualState.decal) or nil

@@ -89,7 +89,7 @@ function Window:onResponsiveLayout()
     local rosterWidth = math.min(Layout.Pixels(200, scale), rect.width * 0.23)
     local remaining = math.max(1, rect.width - rosterWidth - gap)
     local compact = remaining < Layout.Pixels(690, scale)
-    local portraitWidth = compact and 0 or math.min(Layout.Pixels(260, scale), remaining * 0.32)
+    local portraitWidth = compact and 0 or math.min(Layout.Pixels(380, scale), remaining * 0.34)
     local contentWidth = math.max(1, remaining - (portraitWidth > 0 and portraitWidth + gap or 0))
     local contentX = rosterWidth + gap
     self.roster.itemheight = math.max(Layout.Pixels(52, scale), fontHeight * 2 + 14)

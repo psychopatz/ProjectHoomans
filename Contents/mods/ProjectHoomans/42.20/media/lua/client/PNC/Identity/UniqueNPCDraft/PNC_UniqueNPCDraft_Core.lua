@@ -192,7 +192,6 @@ local function captureAppearanceItems(draft, appearance)
     local slot
     local policy
     local spec
-    local previous
     if not inventory or type(inventory.items) ~= "table"
         or not appearance or type(appearance.slots) ~= "table"
     then
@@ -204,15 +203,15 @@ local function captureAppearanceItems(draft, appearance)
         if presentationClothing(item) then
             slot = tostring(item.wornSlot)
             policy = appearance.slots[slot]
-            if not (policy and policy.mode == "none")
-                and (not generatedLookItem(item)
-                    or policy and policy.mode == "item"
-                    and (not policy.type
-                        or tostring(policy.type) == tostring(item.type)))
+            -- A retained preview may still have the previous garment or variant.
+            local authoredSlot = policy and (policy.mode == "none"
+                or policy.mode == "item" and (type(policy.itemState) == "table"
+                    or policy.type and tostring(policy.type) ~= tostring(item.type)))
+            if not authoredSlot
+                and (not generatedLookItem(item) or policy and policy.mode == "item")
                 and not captured[slot]
             then
                 spec = Appearance.CaptureItemSpec(item, slot)
-                previous = policy
                 -- A retained preview may still contain an older outfit's
                 -- generated garment. It cannot replace the pending policy.
                 for existingSlot, existing in pairs(appearance.slots) do
@@ -221,11 +220,6 @@ local function captureAppearanceItems(draft, appearance)
                     then spec = nil; break end
                 end
                 if spec then
-                    if not spec.itemState and previous
-                        and type(previous.itemState) == "table"
-                    then
-                        spec.itemState = copy(previous.itemState)
-                    end
                     appearance.slots[slot] = spec
                     captured[slot] = true
                 end
