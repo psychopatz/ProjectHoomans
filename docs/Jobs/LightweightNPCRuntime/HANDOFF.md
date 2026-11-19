@@ -18,8 +18,11 @@ updated_at: "2026-11-20"
 
 A live new-save audit found that the remaining lag is broader than accepted NPCReplicationScaling portrait work. The most important source-level defects are bulk Core->Hoomans hydration, duplicate/incompatible Core-backed record persistence, synchronous broad persistence commits, and full-snapshot fallback for many mutation events.
 
-The current profiler snapshot is useful for attribution but not a clean normal-play baseline because the `performance` section installed deep wrappers on hot paths. Start L0 by proving profiler-OFF behavior and measuring the same workload without deep wrapping. Do not micro-optimize FollowOwner or stamina from the current timing numbers.
+The current profiler snapshot is useful for attribution but not a clean normal-play baseline because the `performance` section installed deep wrappers on hot paths. Start L0 by proving profiler-OFF behavior and establishing the deterministic integrated headless runtime simulator in `RUNTIME_SIMULATOR.md`. Use that same simulator workload to compare OFF/coarse/deep capture without repeatedly launching Project Zomboid. Do not micro-optimize FollowOwner or stamina from the current timing numbers.
 
 After L0, proceed automatically through lazy promotion/demotion (L1), single-authority deferred persistence (L2), domain-delta replication (L3), then only measured runtime cadence/allocation work (L4), followed by full scale/docs acceptance (L5).
 
 Preserve the Compact Survivor World contract: Core abstract actors must remain compact and provider-neutral until Hoomans physical gameplay actually needs a rich runtime representation. Preserve NPCReplicationScaling P1-P4.
+
+
+Every L1-L4 phase must extend this simulator with the contract it changes. Native Project Zomboid is reserved for engine-specific/final acceptance; a phase whose main optimization can be verified headlessly is not complete if it still depends on manual game launches.

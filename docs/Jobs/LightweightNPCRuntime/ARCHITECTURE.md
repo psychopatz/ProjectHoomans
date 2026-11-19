@@ -99,7 +99,15 @@ Profiler default normal-play cost must be effectively zero.
 
 Implement shared profiler behavior in PsychopatzCore; Project Hoomans owns only its feature registration/metrics.
 
-## 9. Activity-sensitive budgets
+## 9. Headless runtime simulation contract
+
+The developer feedback loop uses one deterministic integrated simulator described in [RUNTIME_SIMULATOR.md](RUNTIME_SIMULATOR.md). It drives real production seams behind narrow fake Project Zomboid boundaries and must cover Core actor population, Hoomans promotion/demotion, scheduler membership, persistence, domain networking, materialization, zombie/census budgeting and profiler modes.
+
+A phase optimization is not considered developer-verifiable if it can only be exercised by manually launching Project Zomboid. L1-L4 must extend the simulator whenever their runtime contract changes. Prefer operation/count assertions over machine-specific timing thresholds; headless elapsed timing is supporting evidence only.
+
+The simulator does not replace native acceptance for body creation, Java pathfinding, rendering/chunk costs, real sockets, asset rendering or actual SP/MP engine event behavior.
+
+## 10. Activity-sensitive budgets
 
 After authority/persistence/network work lands and a clean baseline identifies remaining cost, tune global simulation budgets without reducing correctness.
 
@@ -107,7 +115,7 @@ Candidate policy: combat/urgent danger uses fastest cadence; ordinary moving/fol
 
 Materialization remains bounded and prioritized. Do not synchronously promote or spawn an unbounded crowd when the player enters a populated area.
 
-## 10. Complexity target
+## 11. Complexity target
 
 For `N` canonical Core actors and `L` actors with current Hoomans runtime responsibility, ordinary Hoomans hot-path work should trend with `L`, not `N`.
 

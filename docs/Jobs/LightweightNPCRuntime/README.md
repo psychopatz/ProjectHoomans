@@ -15,6 +15,7 @@ The key correction is architectural:
 - Logical gameplay commits mark/coalesce dirty state; they do not synchronously scan every NPC and flush all GlobalModData during ordinary mutations.
 - Full network snapshots are repair/detail tools, not the default response to every mutation event.
 - Profiling is observational and bounded. Deep hot-path wrapping must never be a normal-play tax.
+- A deterministic integrated headless runtime simulator is the mandatory developer feedback loop for L0-L5; native Project Zomboid is reserved for engine-specific/final acceptance rather than every implementation iteration.
 
 ## Why this goal exists
 
@@ -29,7 +30,7 @@ The audit found four high-confidence architectural problems:
 
 Detailed performance capture also installed more than one hundred Project Hoomans timer wrappers and recorded tens of thousands of wrapped calls. That capture is useful evidence, but it is not a clean normal-play baseline.
 
-See [AUDIT.md](AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [ROADMAP.md](ROADMAP.md), [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md), [PROGRESS.md](PROGRESS.md), and [HANDOFF.md](HANDOFF.md).
+See [AUDIT.md](AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [RUNTIME_SIMULATOR.md](RUNTIME_SIMULATOR.md), [ROADMAP.md](ROADMAP.md), [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md), [PROGRESS.md](PROGRESS.md), and [HANDOFF.md](HANDOFF.md).
 
 ## Scope
 

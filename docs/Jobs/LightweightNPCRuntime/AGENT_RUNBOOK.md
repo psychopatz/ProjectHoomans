@@ -61,9 +61,17 @@ Before adding a packet, inspect current negotiated capability, incarnation, revi
 
 A domain delta must be smaller and semantically narrower than the full snapshot. A delta that cannot safely converge must fall back to the existing full current baseline.
 
+## Integrated runtime simulator
+
+[RUNTIME_SIMULATOR.md](RUNTIME_SIMULATOR.md) is mandatory developer infrastructure for this job. Prefer one reusable simulator over many phase-specific fake worlds. Mock native Project Zomboid boundaries narrowly and execute real production modules wherever practical.
+
+The fast smoke must remain deterministic and cheap enough for routine iteration. The slower benchmark may sweep larger actor/zombie/client populations. Every L1-L4 phase must add assertions/counters for its runtime contract before the phase closes. Native PZ is not required merely to validate architecture that can be exercised headlessly.
+
+Do not treat the simulator as proof of Java pathfinder cost, rendering FPS, chunk streaming, real socket bytes, native model rendering or final SP/MP event behavior. Those are explicit native acceptance boundaries.
+
 ## Validation
 
-Prefer existing focused smoke/native-harness tests and add explicit regressions for the defects in AUDIT.md. Run touched-subsystem tests first, then the repository's normal full developer suite/baseline gates before accepting a phase.
+Prefer the integrated runtime simulator plus existing focused smoke/native-harness tests and add explicit regressions for the defects in AUDIT.md. Run touched-subsystem tests first, then the repository's normal full developer suite/baseline gates before accepting a phase.
 
 Do not delete or weaken unrelated failing tests to make the new goal green. Label existing baseline failures separately.
 

@@ -17,6 +17,7 @@ Verified source findings that do not depend on timing accuracy:
 - `FlushDirty()` performs broad save-snapshot discovery;
 - many mutation events still fall back to full `Network.BuildSnapshot()`;
 - performance capture installs deep Project Hoomans wrappers while the `performance` section is active.
+- existing scale/scheduler/persistence/provider/network tests already provide reusable production seams for a deterministic integrated headless runtime simulator, but that simulator does not yet exist.
 
 ## Accepted dependencies
 
@@ -36,6 +37,7 @@ Immediate evidence required:
 
 1. current source/config path that enables persisted performance capture;
 2. tests proving profiler OFF restores/no-ops every ProjectHoomans deep wrapper;
-3. identical synthetic/runtime-harness workload with OFF vs current deep capture, clearly separated;
-4. coarse top-level sampling design/implementation if needed so later phases can measure server/persistence/network cost without wrapping hot helpers;
-5. updated `PROGRESS.md`/`HANDOFF.md` and local accepted-phase commits before L1.
+3. create the integrated deterministic headless runtime simulator foundation and run an identical simulator workload with OFF vs current deep capture, clearly separated;
+4. assert profiler OFF installs/calls zero deep wrappers and print useful runtime counters;
+5. coarse top-level sampling design/implementation if needed so later phases can measure server/persistence/network cost without wrapping hot helpers;
+6. updated `PROGRESS.md`/`HANDOFF.md` and local accepted-phase commits before L1.
