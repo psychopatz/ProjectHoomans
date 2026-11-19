@@ -1,9 +1,9 @@
 # Progress — Project Hoomans Portable Actor Lifecycle & GC Adoption
 
-**Status:** IN_PROGRESS (H0, H1, H2, H3, H4, H6-player-lifecycle ACCEPTED — next H5 scale/soak acceptance).
+**Status:** COMPLETE — H0–H5, H3A, H4-policy, H6-player-lifecycle ACCEPTED (**READY FOR USER LIVE TEST**).
 **Parent:** PsychopatzCore Docs/portable_actor_lifecycle_gc/.
-**Current phase:** H3–H4 complete; next H5 large-scale GC soak & final regression.
-**Participant completion:** 5/6 phases accepted (H0, H1, H2, H3, H4, plus H6-player-lifecycle).
+**Current phase:** H5 complete — all Project Hoomans Portable Actor Lifecycle & GC phases accepted.
+**Participant completion:** 6/6 phases accepted (H0, H1, H2, H3, H4, H5, plus H6-player-lifecycle).
 
 ## Verified H0 Audit Facts (Checkpoint `67510b0db`)
 
@@ -47,6 +47,12 @@
 - Enriched `PNC_RelationshipPresentation.lua` (`BuildForConversation`) with O(1) read-only Core `ProjectIdentity` lookups exposing `lifecycleStatus`, `lifecycleRevision`, `targetLifecycleStatus`, `targetLifecycleRevision`, `historical`, and `degradedLabel` with zero GC trigger on open.
 - Created `tests/pnc_lifecycle_semantic_projection_smoke.lua` and verified `python3 tests/run_tests.py lifecycle_semantic_projection core_actor_lifecycle_gc core_social portable_social relationship_graph npc_knowledge_service` (`PASS 6/6`) plus Kahlua lint (`0` errors).
 
+## H5 — Scale, GC Soak & Final Acceptance
+
+- Created `tests/pnc_lifecycle_gc_scale_soak_smoke.lua` retiring 200 Hoomans NPCs across colony `DeathMarkers` + reanimation release, active quests, surviving durable bonds, dead unique NPCs (`WEAK`), and 120 ordinary unowned deaths across multiple budgeted Core GC slices/generations (`budget = 20`) plus Kahlua `_G.next = nil` Core `Save()`/`Load()` roundtrip.
+- Verified `27/27 PASS` (`0.59s`) across `lifecycle_gc_scale_soak`, `core_actor_lifecycle_gc`, `lifecycle_semantic_projection`, `player_character`, `factions_foundation`, `quest`, `medical_care`, `core_social`, `portable_social`, `social_policy`, `death`, `reanimat`, and `npc_knowledge`, preserving dead `UniqueNPCRegistry` flags (`status = "dead"`) after tombstone purge without pinning tombstones.
+- Status: **READY FOR USER LIVE TEST**.
+
 ## Next Chunk
 
-Complete **H5** large-scale NPC retirement, multi-generation budgeted GC soak, save/reload, and combined DT regression under Core **L9**.
+Complete — READY FOR USER LIVE TEST (no pending developer phases).
