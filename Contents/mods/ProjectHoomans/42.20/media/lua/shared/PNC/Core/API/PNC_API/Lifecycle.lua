@@ -83,7 +83,7 @@ function Internal.ApplyLiveEquipment(record, reason, scope)
     return applied, applyReason
 end
 
-local function finalizeNewRecord(record, definition)
+local function finalizeNewRecord(record, definition, prepare)
     if Inventory then
         if definition.inventory and Inventory.Deserialize then
             Inventory.Deserialize(record, definition.inventory)
@@ -121,7 +121,6 @@ local function finalizeNewRecord(record, definition)
     end
     OrderSystem.SetOrder(record, definition.orderSpec)
     OrderSystem.SetHostility(record, definition.hostility or Types.DefaultHostility(definition.tacticalClass))
-    Registry.AddRecord(record)
     local coreProvider = PNC.Persistence
         and PNC.Persistence.CoreProvider or nil
     if coreProvider and type(coreProvider.EnsureActor) == "function"
@@ -131,10 +130,15 @@ local function finalizeNewRecord(record, definition)
             record, PsychopatzCore)
         if not adopted then
             Core.LogWarn(
-                "PNC Core actor adoption deferred id=" .. tostring(record.id)
+                "PNC Core actor adoption failed id=" .. tostring(record.id)
                     .. " reason=" .. tostring(adoptionReason or "unknown")
             )
+            return nil, adoptionReason
         end
+    end
+    Registry.AddRecord(record)
+    if record.coreBacked == true then
+        Registry.MarkDirty(record, "created")
     end
     if definition.factionID
         and PNC.Factions
@@ -158,11 +162,18 @@ local function finalizeNewRecord(record, definition)
                     .. tostring(definition.factionID)
                     .. " reason=" .. tostring(reason)
             )
-        elseif coreProvider
-            and type(coreProvider.EnsureActor) == "function"
-            and PsychopatzCore
-        then
-            coreProvider.EnsureActor(record, PsychopatzCore)
+        end
+    end
+    if type(prepare) == "function" then
+        local ready, reason = prepare(record)
+        if not ready then
+            if reason == "recruitment_rollback_pending" then return nil, reason end
+            Registry.RemoveRecord(record.id)
+            local lifecycle = PNC.Persistence and PNC.Persistence.CoreLifecycle
+            if lifecycle and lifecycle.HardDeleteRollback and record.coreBacked then
+                lifecycle.HardDeleteRollback(record, reason or "spawn_preparation_failed")
+            end
+            return nil, reason
         end
     end
     if definition.forceLive == true then
@@ -182,7 +193,7 @@ local function finalizeNewRecord(record, definition)
     return record
 end
 
-function API.Spawn(definition)
+function API.Spawn(definition, prepare)
     local def
     local record
     if not Core.IsAuthority() then
@@ -193,7 +204,7 @@ function API.Spawn(definition)
         return nil
     end
     record = Types.NewRecord(def)
-    return finalizeNewRecord(record, def)
+    return finalizeNewRecord(record, def, prepare)
 end
 
 function API.Despawn(npcId, options)

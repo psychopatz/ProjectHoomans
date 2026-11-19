@@ -103,45 +103,53 @@ end
 local ACTOR_IDENTITY_EXTENSION = "PsychopatzCore.ActorIdentity"
 local AFFILIATION_EXTENSION = "PsychopatzCore.SurvivorWorld"
 
-local function recordAffiliation(record)
-    local source = type(record) == "table" and record or {}
+local function cloneTable(value)
+    if PNC.Core and type(PNC.Core.DeepCopy) == "function" then
+        return PNC.Core.DeepCopy(value)
+    end
+    if type(value) ~= "table" then return value end
+    local out = {}
+    for k, v in pairs(value) do
+        out[k] = cloneTable(v)
+    end
+    return out
+end
+
+local function tablesEqual(left, right)
+    if left == right then return true end
+    if type(left) ~= type(right) then return false end
+    if type(left) ~= "table" then return false end
+    for k, v in pairs(left) do
+        if not tablesEqual(v, right[k]) then return false end
+    end
+    for k, _ in pairs(right) do
+        if left[k] == nil then return false end
+    end
+    return true
+end
+
+local function recordAffiliation(source)
     local affiliation = type(source.affiliation) == "table"
-        and source.affiliation or {}
-    local factionID = source.factionID or source.factionId
-        or affiliation.factionID or affiliation.factionId
-    local communityID = source.communityID or source.communityId
-        or affiliation.communityID or affiliation.communityId
-    local groupID = source.groupID or source.groupId
-        or affiliation.groupID or affiliation.groupId
-    local output = {
-        factionID = factionID,
-        factionName = source.factionName or affiliation.factionName,
-        factionArchetypeID = source.factionArchetypeID
-            or affiliation.factionArchetypeID,
-        communityID = communityID,
-        groupID = groupID,
-        role = source.factionRole or source.role or affiliation.role,
-    }
-    if output.factionID == nil and output.communityID == nil
-        and output.groupID == nil
+        and cloneTable(source.affiliation) or {}
+    -- A normalized Hoomans affiliation can explicitly clear membership.
+    -- Older/provider records may only have the denormalized fields.
+    if not affiliation.membershipStatus then
+        affiliation.factionID = affiliation.factionID or source.factionID
+        affiliation.communityID = affiliation.communityID or source.communityID
+        affiliation.role = affiliation.role or source.factionRole or source.role
+    end
+    affiliation.groupID = source.groupID or affiliation.groupID
+    if not (affiliation.factionID or affiliation.communityID or affiliation.groupID)
+        and affiliation.membershipStatus ~= "unaffiliated"
     then
         return nil
     end
-    return output
-end
-
-local function affiliationChanged(previous, next)
-    for _, key in ipairs({
-        "factionID", "factionName", "factionArchetypeID", "communityID",
-        "groupID", "role",
-    }) do
-        if next[key] ~= nil and tostring(previous[key] or "")
-            ~= tostring(next[key])
-        then
-            return true
-        end
+    if affiliation.factionID then
+        affiliation.factionName = source.factionName or affiliation.factionName
+        affiliation.factionArchetypeID =
+            source.factionArchetypeID or affiliation.factionArchetypeID
     end
-    return false
+    return affiliation
 end
 
 -- Reconcile Hoomans records against the canonical Core actor registry. The
@@ -201,8 +209,12 @@ function Adapter.AnnotateExistingCoreRecord(record, core)
     local affiliation = recordAffiliation(record)
     local currentAffiliation = type(actor.extensions) == "table"
         and actor.extensions[AFFILIATION_EXTENSION] or {}
-    if affiliation and type(api.AttachExtension) == "function"
-        and affiliationChanged(currentAffiliation, affiliation)
+    if record.coreBacked ~= true and affiliation
+        and (affiliation.factionID or affiliation.communityID or affiliation.groupID)
+        and currentAffiliation.factionID == nil
+        and currentAffiliation.communityID == nil
+        and currentAffiliation.groupID == nil
+        and type(api.AttachExtension) == "function"
     then
         local updated, reason = api.AttachExtension(
             canonicalID,
@@ -218,7 +230,13 @@ function Adapter.AnnotateExistingCoreRecord(record, core)
     then
         recordChanged = true
     end
+    if record.coreBacked ~= true or record.persistenceAuthority ~= "core_extension" then
+        recordChanged = true
+    end
+    record.coreBacked = true
+    record.persistenceAuthority = "core_extension"
     record.coreActorID = canonicalID
+    record.coreRevision = tonumber(actor.revision) or record.coreRevision
     record.runtime = runtime
     record.runtime.coreActorID = canonicalID
     local expectedPresence
@@ -281,6 +299,8 @@ function Adapter.EnsureActor(record, core)
             ownerMod = "ProjectHoomans",
             identitySeed = record.identitySeed,
             identity = record.identity,
+            displayName = record.displayName or record.name,
+            appearance = record.appearanceAuthored and record.appearance or nil,
             archetypeID = record.archetypeID or "core.survivor",
             world = {
                 location = {
@@ -301,6 +321,7 @@ function Adapter.EnsureActor(record, core)
         end
     end
 
+    local reason
     actor, reason = ensureAbstractLease(actor, record)
     if not actor then return nil, reason end
 
@@ -322,18 +343,6 @@ function Adapter.EnsureActor(record, core)
         end
     end
     return ok, result
-end
-
-function Adapter.ReconcileExistingCoreRecords(core)
-    if not PNC.Registry or type(PNC.Registry.ForEach) ~= "function" then
-        return 0, "registry_unavailable"
-    end
-    local reconciled = 0
-    PNC.Registry.ForEach(function(record)
-        local ok = Adapter.EnsureActor(record, core)
-        if ok then reconciled = reconciled + 1 end
-    end)
-    return reconciled, "reconciled"
 end
 
 local function projectProviderLease(record, leaseID)
@@ -471,6 +480,17 @@ local function applyCoreActorProjection(record, actor, projected, options)
     assign("factionRole", definition.factionRole)
     assign("communityID", definition.communityID)
     assign("groupID", definition.groupID)
+    if (not record.runtime or not record.runtime.coreAffiliationDirty)
+        and PNC.FactionTypes and PNC.FactionTypes.NormalizeAffiliation
+    then
+        local affiliation = PNC.FactionTypes.NormalizeAffiliation(
+            survivorWorldAffiliation(actor)
+        )
+        if not tablesEqual(record.affiliation, affiliation) then
+            record.affiliation = affiliation
+            changed = true
+        end
+    end
     if record.coreBacked ~= true then
         record.coreBacked = true
         changed = true
@@ -554,31 +574,6 @@ local function hasInventoryBridgeDeps()
     return PNC.Inventory
         and PNC.Inventory.Internal
         and type(PNC.Inventory.Internal.createBaseInventory) == "function"
-end
-
-local function cloneTable(value)
-    if PNC.Core and type(PNC.Core.DeepCopy) == "function" then
-        return PNC.Core.DeepCopy(value)
-    end
-    if type(value) ~= "table" then return value end
-    local out = {}
-    for k, v in pairs(value) do
-        out[k] = cloneTable(v)
-    end
-    return out
-end
-
-local function tablesEqual(left, right)
-    if left == right then return true end
-    if type(left) ~= type(right) then return false end
-    if type(left) ~= "table" then return false end
-    for k, v in pairs(left) do
-        if not tablesEqual(v, right[k]) then return false end
-    end
-    for k, _ in pairs(right) do
-        if left[k] == nil then return false end
-    end
-    return true
 end
 
 function Adapter.IsAliveCoreActor(actorID, core)
@@ -883,6 +878,9 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     if record.coreBacked ~= true then
         return false, "not_core_backed", OUTCOME_TERMINAL
     end
+    if record.runtime and record.runtime.pendingRecruitmentRollback then
+        return false, "recruitment_rollback_pending", OUTCOME_RETRYABLE
+    end
     local reg = coreRegistry(core)
     if not reg then
         return false, "core_registry_unavailable", OUTCOME_RETRYABLE
@@ -977,10 +975,15 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     local oldExt = oldExts[CoreActorExtension.EXTENSION_ID]
     local extChanged = not tablesEqual(oldExt, nextExt)
 
-    local affiliation = recordAffiliation(record)
+    local syncAffiliation = options.syncAffiliation == true
+        or (record.runtime and record.runtime.coreAffiliationDirty == true)
+    local affiliation = syncAffiliation and recordAffiliation(record) or nil
     local curAff = type(oldExts[AFFILIATION_EXTENSION]) == "table"
         and oldExts[AFFILIATION_EXTENSION] or {}
-    local affChanged = affiliation ~= nil and affiliationChanged(curAff, affiliation)
+    local affChanged = affiliation ~= nil
+        and (oldExts[AFFILIATION_EXTENSION] ~= nil or affiliation.factionID ~= nil
+            or affiliation.communityID ~= nil or affiliation.groupID ~= nil)
+        and not tablesEqual(curAff, affiliation)
 
     if extChanged or affChanged then
         local nextExts = cloneTable(oldExts)
@@ -1001,6 +1004,7 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         end
         Adapter.Metrics.syncs = (tonumber(Adapter.Metrics.syncs) or 0) + 1
         record.coreRevision = committed.revision
+        if record.runtime then record.runtime.coreAffiliationDirty = nil end
         if PNC.Registry then
             PNC.Registry.CoreStoreDirty = true
         end
@@ -1011,11 +1015,28 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         }, OUTCOME_WRITTEN
     end
 
+    if record.runtime then record.runtime.coreAffiliationDirty = nil end
     return true, {
         committed = false,
         actor = actor,
         extensionPersisted = nextExt ~= nil,
     }, OUTCOME_WRITTEN
+end
+
+function Adapter.VerifyMigratedActor(record, actor, core)
+    local codec = core and core.ActorPersistence
+    if not codec or not actor then return false, "core_actor_codec_unavailable" end
+    local encoded, reason = codec.SerializeActor(actor)
+    if not encoded then return false, reason end
+    local restored
+    restored, reason = codec.DecodeActor(encoded)
+    if not restored then return false, reason end
+    if restored.actorId ~= record.coreActorID
+        or not tablesEqual(restored.extensions, actor.extensions)
+    then
+        return false, "legacy_core_roundtrip_mismatch"
+    end
+    return true
 end
 
 function Adapter.SyncAllPromotedCoreActors(core)
@@ -1623,10 +1644,9 @@ function Adapter.Release(actor, core, spec)
     return service.Release(actor, spec)
 end
 
-local function reconcileExistingCoreRecords()
+local function reconcileExistingWorld()
     if isServer and isServer() ~= true then return end
     if PsychopatzCore then
-        Adapter.ReconcileExistingCoreRecords(PsychopatzCore)
         local worldAdapter = PNC.CoreSurvivorWorldAdapter
         if worldAdapter
             and type(worldAdapter.ReconcileExistingWorld) == "function"
@@ -1656,7 +1676,7 @@ if Events and Events.OnInitGlobalModData
     and not Adapter.ReconcileInitHookRegistered
 then
     Adapter.ReconcileInitHookRegistered = true
-    Events.OnInitGlobalModData.Add(reconcileExistingCoreRecords)
+    Events.OnInitGlobalModData.Add(reconcileExistingWorld)
 end
 
 if Events and Events.OnServerStarted
@@ -1664,7 +1684,7 @@ if Events and Events.OnServerStarted
     and not Adapter.ReconcileServerHookRegistered
 then
     Adapter.ReconcileServerHookRegistered = true
-    Events.OnServerStarted.Add(reconcileExistingCoreRecords)
+    Events.OnServerStarted.Add(reconcileExistingWorld)
 end
 
 return Adapter

@@ -232,11 +232,11 @@ function Extension.Encode(record, actor)
 
     if record.recruited == true then
         put("recruited", true)
+        put("ownerUsername", boundedString(record.ownerUsername, MAX_STRING_LEN))
+        put("ownerCharacterUUID", boundedString(
+            record.ownerCharacterUUID, MAX_STRING_LEN
+        ))
     end
-    put("ownerUsername", boundedString(record.ownerUsername, MAX_STRING_LEN))
-    put("ownerCharacterUUID", boundedString(
-        record.ownerCharacterUUID, MAX_STRING_LEN
-    ))
 
     local serializedOrder = trimOrder(CompanionRecordRepository.SerializeOrder(record))
     if serializedOrder then
@@ -456,7 +456,7 @@ function Extension.Apply(record, ext)
 
     if type(ext.progression) == "table" then
         local progression = SkillsRepository.NormalizeProgression(ext.progression)
-        progression.recruited = progression.recruited or record.recruited == true
+        progression.recruited = record.recruited == true
         SkillsRepository.RestoreRecord(record, progression)
     end
     if type(ext.skillBaseLevels) == "table" then

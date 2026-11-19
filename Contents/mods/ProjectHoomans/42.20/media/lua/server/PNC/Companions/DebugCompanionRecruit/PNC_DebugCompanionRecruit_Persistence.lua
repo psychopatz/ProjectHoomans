@@ -30,26 +30,37 @@ function H.SynchronizeRecordMembership(record, faction, community)
     return changed
 end
 
--- Recruitment crosses three authoritative stores: the NPC record, faction
--- membership, and community membership. Commit all three at the successful
--- boundary so a restart cannot expose a half-recruited NPC or recreate the
--- first-colony naming prompt from stale ModData.
-function H.SaveRecruitment()
-    if Factions and Factions.Commit then Factions.Commit() end
-    if PNC.Communities and PNC.Communities.Commit then
-        PNC.Communities.Commit()
+function H.RollbackMembership(record, previous, at)
+    local communities = PNC.Communities
+    local current = record.affiliation or {}
+    previous = previous or {}
+    if current.communityID and current.communityID ~= previous.communityID then
+        local ok, reason = communities.RemoveNPC(current.communityID, record.id)
+        if not ok then return false, reason end
     end
-    if PNC.PersistenceCoordinator and PNC.PersistenceCoordinator.Commit then
-        PNC.PersistenceCoordinator.Commit("recruitment")
-    else
-        if Registry and Registry.Save then Registry.Save() end
-        if GlobalModData and GlobalModData.save then GlobalModData.save() end
+    if current.factionID ~= previous.factionID then
+        local ok, reason
+        if previous.factionID then
+            local options = Core.DeepCopy(previous)
+            options.deferBehavior = true
+            ok, reason = Factions.TransferNPC(record.id, previous.factionID, options)
+        else
+            ok, reason = Factions.RemoveNPC(current.factionID, record.id, "unknown", at)
+        end
+        if not ok and reason ~= "unchanged" then return false, reason end
     end
+    if previous.communityID and record.affiliation.communityID ~= previous.communityID then
+        local ok, reason = communities.AddNPC(previous.communityID, record.id, previous)
+        if not ok and reason ~= "unchanged" then return false, reason end
+    end
+    record.affiliation = previous
+    return true
 end
 
-
--- Shared authoritative assignment boundary used by both normal/debug
--- recruitment and character-start companions. Eligibility belongs to the
--- caller; this function owns the cross-store faction/community transaction.
+function H.SaveRecruitment()
+    if PNC.PersistenceCoordinator and PNC.PersistenceCoordinator.Commit then
+        PNC.PersistenceCoordinator.Commit("recruitment")
+    end
+end
 
 return Recruit

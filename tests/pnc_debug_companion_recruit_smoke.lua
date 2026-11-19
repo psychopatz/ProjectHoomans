@@ -35,20 +35,44 @@ local endedCalls = 0
 local orderCalls = 0
 local communityCreates = 0
 local communityAdds = 0
-local registrySaves = 0
-local factionSaves = 0
-local communitySaves = 0
+local deferredCommits = 0
+local actorCommits = 0
 local playerCommunities = {}
 local communityByNPC = {}
 
+local function copy(value)
+    if type(value) ~= "table" then return value end
+    local result = {}
+    for k, v in pairs(value) do result[k] = copy(v) end
+    return result
+end
+
 PNC = {
+    Persistence = { CoreProvider = {
+        EnsureActor = function(record)
+            record.coreBacked = true
+            record.coreActorID = record.id
+            return true
+        end,
+        SyncPromotedCoreActorToCore = function(record)
+            T.equal(record.recruited, true, "owner is ready for the Core commit")
+            actorCommits = actorCommits + 1
+            return true
+        end,
+    } },
+    PersistenceCoordinator = {
+        Commit = function(reason)
+            T.equal(reason, "recruitment")
+            deferredCommits = deferredCommits + 1
+        end,
+    },
     Const = {
         TACTICAL_CLASS_NEUTRAL = "neutral",
         TACTICAL_CLASS_HOSTILE = "hostile",
         TACTICAL_CLASS_COLONIST = "colonist",
         ORDER_FOLLOW = "follow",
     },
-    Core = { LogInfo = function() end },
+    Core = { LogInfo = function() end, DeepCopy = copy },
     Types = {
         NormalizeTacticalClass = function(value) return tostring(value or "") end,
         ResolveTacticalClass = function(value)
@@ -59,7 +83,6 @@ PNC = {
         Get = function(id) return records[id] end,
         GetLiveZombie = function() return nil end,
         MarkDirty = function() end,
-        Save = function() registrySaves = registrySaves + 1 end,
     },
     Factions = {
         EnsurePlayerFaction = function()
@@ -85,7 +108,6 @@ PNC = {
             affiliations[id] = { factionID = factionID }
             return true, "added"
         end,
-        Commit = function() factionSaves = factionSaves + 1 end,
     },
     IndividualNeeds = {
         Ensure = function() needsCalls = needsCalls + 1 end,
@@ -112,12 +134,16 @@ PNC = {
         AddNPC = function(_, npcID)
             communityAdds = communityAdds + 1
             communityByNPC[npcID] = playerCommunities[1]
+            records[npcID].affiliation = {
+                factionID = affiliations[npcID].factionID,
+                communityID = playerCommunities[1].id,
+                membershipStatus = "member",
+            }
             return true, "added"
         end,
         GetNPCCommunity = function(npcID)
             return communityByNPC[npcID]
         end,
-        Commit = function() communitySaves = communitySaves + 1 end,
     },
     ConversationScene = {
         End = function() endedCalls = endedCalls + 1 end,
@@ -194,9 +220,8 @@ T.equal(endedCalls, 2, "conversation lease ended after recruitment")
 T.equal(orderCalls, 2, "every recruit receives a follow order")
 T.equal(communityCreates, 1, "first companion creates a player community")
 T.equal(communityAdds, 2, "recruits populate the player community")
-T.equal(registrySaves, 2, "each recruit commits its NPC record")
-T.equal(factionSaves, 2, "each recruit commits faction membership")
-T.equal(communitySaves, 2, "each recruit commits community membership")
+T.equal(actorCommits, 2, "each recruit publishes canonical actor ownership")
+T.equal(deferredCommits, 2, "each recruit requests deferred persistence")
 
 ok, reason = Recruit.Try(player, { npcID = "companion" })
 T.equal(ok, false, "existing companion rejected")

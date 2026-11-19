@@ -204,6 +204,13 @@ local canonical = PNC.NeedsUtils.NormalizeState({
 T.equal(canonical.hunger, 0.25, "canonical pressure is not migrated")
 T.equal(canonical.thirst, 0.80, "canonical thirst pressure")
 PNC.Registry.Data[npc.id] = npc
+PNC.Registry.Get = function(id) return PNC.Registry.Data[id] end
+PNC.Factions.GetPlayerFaction = function() return { id = "faction_test" } end
+PNC.Communities = {
+    GetForFaction = function()
+        return { { id = "colony_test", status = "active", memberIDs = { [npc.id] = true } } }
+    end,
+}
 local colonySnapshot = PNC.ColonyManagement.BuildSnapshot({})
 T.equal(#colonySnapshot.people, 1, "colony companion summary")
 T.truthy(colonySnapshot.levels.hunger ~= nil, "colony need-level summary")

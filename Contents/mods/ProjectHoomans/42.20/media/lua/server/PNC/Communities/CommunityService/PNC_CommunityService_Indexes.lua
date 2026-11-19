@@ -17,7 +17,7 @@ local touchSite = Internal.touchSite
 local touchRegistry = Internal.touchRegistry
 local commitAffiliation = Internal.commitAffiliation
 
-local function rebuildDerivedIndexes()
+local function rebuildDerivedIndexes(canonicalMembership)
     local byFaction = {}
     local memberIDs = {}
     local changed = false
@@ -63,20 +63,22 @@ local function rebuildDerivedIndexes()
             changed = true
         end
     end
-    for npcID, record in pairs(
-        PNC.Registry and PNC.Registry.Data or {}
-    ) do
-        local communityID = record.affiliation
-            and record.affiliation.communityID or nil
-        local community = communityID
-            and Communities.Registry.byID[communityID] or nil
-        if community and record.alive ~= false
-            and record.affiliation.factionID
-                == community.factionID
-            and community.status ~= "archived"
-            and community.status ~= "destroyed"
-        then
-            memberIDs[communityID][npcID] = true
+    if not canonicalMembership then
+        for npcID, record in pairs(
+            PNC.Registry and PNC.Registry.Data or {}
+        ) do
+            local communityID = record.affiliation
+                and record.affiliation.communityID or nil
+            local community = communityID
+                and Communities.Registry.byID[communityID] or nil
+            if community and record.alive ~= false
+                and record.affiliation.factionID
+                    == community.factionID
+                and community.status ~= "archived"
+                and community.status ~= "destroyed"
+            then
+                memberIDs[communityID][npcID] = true
+            end
         end
     end
     if not Types.AreEqual(
@@ -86,17 +88,19 @@ local function rebuildDerivedIndexes()
         Communities.Registry.byFaction = byFaction
         changed = true
     end
-    for communityID, community in pairs(
-        Communities.Registry.byID
-    ) do
-        local expected = memberIDs[communityID] or {}
-        if not Types.AreEqual(
-            community.memberIDs,
-            expected
-        ) then
-            community.memberIDs = expected
-            touchCommunity(community)
-            changed = true
+    if not canonicalMembership then
+        for communityID, community in pairs(
+            Communities.Registry.byID
+        ) do
+            local expected = memberIDs[communityID] or {}
+            if not Types.AreEqual(
+                community.memberIDs,
+                expected
+            ) then
+                community.memberIDs = expected
+                touchCommunity(community)
+                changed = true
+            end
         end
     end
     if changed then touchRegistry() end

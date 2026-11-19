@@ -99,8 +99,7 @@ function Types.NewRecord(definition)
         lastSyncAt = 0,
         liveBodyInstanceID = nil,
         corpse = nil,
-        recruited = def.ownerOnlineID ~= nil or def.ownerUsername ~= nil
-            or def.recruited == true,
+        recruited = def.recruited == true,
         mapPresentation = PNC.MapPresentation
             and PNC.MapPresentation.Normalize(def.mapPresentation) or nil,
         persist = def.persist ~= false,

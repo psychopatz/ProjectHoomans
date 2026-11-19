@@ -91,6 +91,7 @@ local function factionHasPlayerMembers(factionID)
 end
 
 local function touchCommunity(community)
+    local previousRevision = community.revision
     community.revision = math.max(
         0,
         math.floor(tonumber(community.revision) or 0)
@@ -112,10 +113,12 @@ local function touchCommunity(community)
                     .. " reason=" .. Communities.LastCoreSyncError
                 )
             end
-        else
-            Communities.LastCoreSyncError = nil
+            community.revision = previousRevision
+            return false, Communities.LastCoreSyncError
         end
+        Communities.LastCoreSyncError = nil
     end
+    return true
 end
 
 local function touchSite(site)
@@ -143,6 +146,8 @@ local function commitAffiliation(record, affiliation)
         ) or 0)
     ) + 1
     record.affiliation = affiliation
+    record.runtime = record.runtime or {}
+    record.runtime.coreAffiliationDirty = true
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "community_affiliation")
     end

@@ -44,14 +44,18 @@ local function cutoverPending()
         and type(extensions.ActivateCutover) == "function"
 end
 
-function Communities.ReconcileLoadedView(reason)
+function Communities.ReconcileLoadedView(reason, canonicalMembership)
     local changed = false
     if not authority() then return false, "not_authority" end
     if not Communities.Loaded then return false, "not_loaded" end
 
-    changed = reconcileNPCReferences() or changed
-    changed = rebuildDerivedIndexes() or changed
-    changed = reconcileLeaders() or changed
+    if not canonicalMembership then
+        changed = reconcileNPCReferences() or changed
+    end
+    changed = rebuildDerivedIndexes(canonicalMembership) or changed
+    if not canonicalMembership then
+        changed = reconcileLeaders() or changed
+    end
     Communities.Ready = true
     Communities.LoadDeferred = nil
     Communities.LastLoadReason = reason

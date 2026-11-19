@@ -100,6 +100,15 @@ Do not reopen:
 
 This job corrects Hoomans runtime adoption so it actually obeys those accepted contracts during ordinary play.
 
+## Core-backed recruitment and tooling ownership
+
+- Repaired 15 verified files to `psychopatz:psychopatz` with modes intact. Both repositories and the bridge runtime scan clean for UID 0. The bridge lock and JSON are readable and writable as UID 1000. A temporary request in the same directory was atomically replaced and deleted.
+- The pre-fix regression observed a follow order on an NPC without Core persistence markers, then demonstrated missing Core community affiliation after fixing adoption. A separate reload assertion exposed canonical indexes being rebuilt from an incompletely promoted Hoomans runtime.
+- Core now keeps unsaved SurvivorWorld mutations across repeated activation. Hoomans adopts API spawns before registry registration, commits recruitment through the shared assignment path, and reads roster membership from the indexed community. The migration queues legacy records during load and retires them after Core serialization and save succeed.
+- Headless acceptance exercised manual recruitment, authored and randomized starting companions together, indexed Colonists membership, save/reconnect, rollback and retry, legacy migration, dismissal and a second reload. The integrated simulator exercises save, demotion, reload and re-promotion and checks both legacy storage entry points.
+- The full Hoomans developer run passed 1078/1082 with the same four baseline failures listed above. The focused Core actor and SurvivorWorld run passed 47/49, with the existing client knowledge and generation failures. The lightweight matrix assertions and NPC replication benchmark passed.
+- The pre-existing empty save `mods.txt` is a separate follow-up. Trace the vanilla `currentGame` ActiveMods through `manipulateSavefile(..., "WriteModsDotTxt")` to the save manifest. Neither the save manifest nor the default mod list was edited.
+
 ## Next Chunk
 
 **User-owned native SP/MP feel and capacity acceptance** (all developer-side L0–L5 gates complete and locally committed; native Project Zomboid intentionally not launched).

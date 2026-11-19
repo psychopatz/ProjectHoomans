@@ -8,7 +8,6 @@ PNC.ColonyManagement.Internal = PNC.ColonyManagement.Internal or {}
 local Management = PNC.ColonyManagement
 local Internal = Management.Internal
 local Definitions = PNC.NeedsDefinitions
-local owned = Internal.owned
 local summary = Internal.summary
 local Deps = Internal.SnapshotDeps or {}
 local resolveSnapshotOwner = Deps.resolveSnapshotOwner
@@ -72,57 +71,25 @@ function Management.BuildSnapshot(player, options)
     local counts = { hunger = {}, thirst = {}, fatigue = {} }
     local supplyShortages = { food = {}, hydration = {}, medical = {} }
     local ownedRecords = {}
-    local candidateRecords = {}
     local playerFaction, colony
     local factionReason
     local ownershipContext, identityReason, resolverAvailable =
         resolveSnapshotOwner(player)
-    local identityReady = not resolverAvailable
-        or ownershipContext and ownershipContext.playerKey ~= nil
-    local function recordOwned(record)
-        if resolverAvailable then
-            return identityReady and owned(
-                record, player, ownershipContext) or false
-        end
-        return owned(record, player)
-    end
     playerFaction, factionReason = playerFactionForSnapshot(
         player, ownershipContext, resolverAvailable)
-    if want("roster") then
-        for _, record in pairs(PNC.Registry.Data or {}) do
-            if record.alive ~= false then
-                if recordOwned(record) then
-                    ownedRecords[#ownedRecords + 1] = record
-                elseif playerFaction and record.affiliation
-                    and tostring(record.affiliation.factionID or "")
-                        == tostring(playerFaction.id or "")
-                then
-                    -- The record is already in the resolved player's faction.
-                    -- Let the canonical recruitment repair reconcile secondary
-                    -- membership state without accepting username ownership.
-                    candidateRecords[#candidateRecords + 1] = record
-                end
-            end
-        end
-        if PNC.Recruitment and PNC.Recruitment.ReconcileOwned then
-            for _, record in ipairs(ownedRecords) do
-                PNC.Recruitment.ReconcileOwned(player, record, {
-                    ownershipContext = ownershipContext,
-                    playerFaction = playerFaction,
-                })
-            end
-            for _, record in ipairs(candidateRecords) do
-                local repaired = PNC.Recruitment.ReconcileOwned(player, record, {
-                    ownershipContext = ownershipContext,
-                    playerFaction = playerFaction,
-                })
-                if repaired and recordOwned(record) then
-                    ownedRecords[#ownedRecords + 1] = record
-                end
+    colony = activeColonyForFaction(playerFaction)
+    if want("roster") and colony then
+        for npcID, present in pairs(colony.memberIDs or {}) do
+            local record = present == true and PNC.Registry.Get(npcID) or nil
+            local pending = record and record.runtime and record.runtime.pendingRecruitmentRollback
+            if record and record.alive ~= false and not pending
+                and (not record.coreBacked
+                    or (record.affiliation and record.affiliation.communityID == colony.id))
+            then
+                ownedRecords[#ownedRecords + 1] = record
             end
         end
     end
-    colony = activeColonyForFaction(playerFaction)
     if want("roster") then
         local people, attention = {}, {}
         for _, record in ipairs(ownedRecords) do

@@ -69,6 +69,12 @@ The fast smoke must remain deterministic and cheap enough for routine iteration.
 
 Do not treat the simulator as proof of Java pathfinder cost, rendering FPS, chunk streaming, real socket bytes, native model rendering or final SP/MP event behavior. Those are explicit native acceptance boundaries.
 
+## Execution identity
+
+Run development, test, profiler, and bridge operations as the workspace owner. Check `id -un` and compare it with `stat -c '%U' <repository>` before writing. On this workspace's host that account is `psychopatz` (UID 1000). For a root-running remote service, wrap the entire command in `sudo -u psychopatz -H bash -lc '…'` so pipelines, redirection, and child processes share the intended UID.
+
+Run `find <repository> <participant-repository> <bridge-runtime> -user root -print` before and after each phase. Investigate any output with `stat`. Repair only verified tooling-created paths and preserve their modes. Check that the active bridge request files are readable and writable by the workspace owner and that a temporary request-directory probe can be replaced and removed. Verify Git write access with the phase commit itself.
+
 ## Validation
 
 Prefer the integrated runtime simulator plus existing focused smoke/native-harness tests and add explicit regressions for the defects in AUDIT.md. Run touched-subsystem tests first, then the repository's normal full developer suite/baseline gates before accepting a phase.

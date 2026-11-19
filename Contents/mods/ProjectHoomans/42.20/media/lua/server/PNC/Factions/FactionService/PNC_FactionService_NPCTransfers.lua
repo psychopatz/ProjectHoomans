@@ -90,7 +90,7 @@ function Factions.AddNPC(factionID, npcID, options)
     if Types.AreEqual(affiliation, nextAffiliation)
         and faction.memberIDs[npcID] == true
     then
-        if refreshFactionDogTag(record, faction) then
+        if refreshFactionDogTag(record, faction) and not options.deferBehavior then
             broadcastFactionDogTag(record, "faction_dogtag_added")
         end
         return false, "unchanged"
@@ -120,7 +120,7 @@ function Factions.AddNPC(factionID, npcID, options)
         Internal.touchFaction(faction)
         Internal.touchRegistry()
     end
-    if PNC.FactionBehavior
+    if not options.deferBehavior and PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyNPC
     then
         behaviorChanged = PNC.FactionBehavior.ApplyNPC(
@@ -128,7 +128,7 @@ function Factions.AddNPC(factionID, npcID, options)
             "faction_joined"
         )
     end
-    if dogTagChanged and behaviorChanged ~= true then
+    if not options.deferBehavior and dogTagChanged and behaviorChanged ~= true then
         broadcastFactionDogTag(record, "faction_dogtag_added")
     end
     if PNC.ProvisionScheduler then
@@ -359,7 +359,7 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
         Internal.touchFaction(destination)
         Internal.touchRegistry()
     end
-    if PNC.FactionBehavior
+    if not options.deferBehavior and PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyNPC
     then
         behaviorChanged = PNC.FactionBehavior.ApplyNPC(
@@ -367,7 +367,7 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
             "faction_transferred"
         )
     end
-    if dogTagChanged and behaviorChanged ~= true then
+    if not options.deferBehavior and dogTagChanged and behaviorChanged ~= true then
         broadcastFactionDogTag(record, "faction_dogtag_transferred")
     end
     if source and PNC.FactionLeadership

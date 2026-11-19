@@ -97,6 +97,7 @@ function Registry.Load()
     Registry.RetryState = {}
     Registry.DirectoryDirty = false
     Registry.CoreStoreDirty = false
+    Registry.LegacyCoreRetirements = {}
     Registry.LastCheckpointAt = 0
     Registry._checkpointCursor = 0
     if PNC.Scheduler then
@@ -161,6 +162,7 @@ function Registry.Load()
                 and Internal.DeserializeSafely(raw, id, key) or nil
             if record then
                 Registry.Data[record.id] = record
+                record.runtime.legacyCoreMigration = true
                 Registry.SavedSnapshots[record.id] = Internal.CaptureSnapshot(record)
                 if record.persistenceRepairApplied == true
                     or record.persistenceRepairPending == true
@@ -361,7 +363,16 @@ function Registry.FlushDirty(options)
         else
             attempted = attempted + 1
             local record = Registry.Data[id]
-            if not record or record.persist == false or record.runtimeView == true then
+            local adoptionFailure
+            if record and record.runtime and record.runtime.legacyCoreMigration
+                and record.coreBacked ~= true and coreProvider
+            then
+                local adopted, reason = coreProvider.EnsureActor(record, PsychopatzCore)
+                if not adopted then adoptionFailure = reason or "core_adoption_failed" end
+            end
+            if adoptionFailure then
+                handleRetryable(id, adoptionFailure)
+            elseif not record or record.persist == false or record.runtimeView == true then
                 handleTerminal(id, not record and "record_missing" or "non_persistent")
             elseif record.coreBacked == true then
                 if coreProvider
@@ -376,28 +387,33 @@ function Registry.FlushDirty(options)
                     if not callOK then
                         handleRetryable(id, tostring(synced))
                     elseif synced == true then
-                        Registry.SavedSnapshots[id] =
-                            Internal.CaptureSnapshot(record)
+                        local verified, migrationReason = true, nil
                         if directory.records[id] then
-                            local legacyKey = directory.records[id].storageKey
-                                or Internal.StorageKeyForID(id)
-                            directory.records[id] = nil
-                            if ModData and ModData.remove then
-                                ModData.remove(legacyKey)
+                            verified, migrationReason = coreProvider.VerifyMigratedActor(
+                                record, syncResult.actor, PsychopatzCore
+                            )
+                        end
+                        if not verified then
+                            handleRetryable(id, migrationReason or "legacy_core_roundtrip_failed")
+                        else
+                            Registry.SavedSnapshots[id] =
+                                Internal.CaptureSnapshot(record)
+                            if directory.records[id] then
+                                Registry.LegacyCoreRetirements[id] = true
+                                Registry.CoreStoreDirty = true
                             end
-                            Registry.DirectoryDirty = true
-                        end
-                        if type(syncResult) == "table"
-                            and syncResult.committed == true
-                        then
-                            coreSyncedCount = coreSyncedCount + 1
-                            Registry.CoreStoreDirty = true
-                        end
-                        clearDirty(id)
-                        count = count + 1
-                        writtenCount = writtenCount + 1
-                        if metrics then
-                            metrics.written = (tonumber(metrics.written) or 0) + 1
+                            if type(syncResult) == "table"
+                                and syncResult.committed == true
+                            then
+                                coreSyncedCount = coreSyncedCount + 1
+                                Registry.CoreStoreDirty = true
+                            end
+                            clearDirty(id)
+                            count = count + 1
+                            writtenCount = writtenCount + 1
+                            if metrics then
+                                metrics.written = (tonumber(metrics.written) or 0) + 1
+                            end
                         end
                     elseif syncOutcome == outcomeTerminal then
                         handleTerminal(
@@ -474,6 +490,17 @@ function Registry.FlushDirty(options)
         local storeSaved = PsychopatzCore.Actors.RuntimeStore.Save()
         if storeSaved then
             Registry.CoreStoreDirty = false
+            for id in pairs(Registry.LegacyCoreRetirements) do
+                local entry = directory.records[id]
+                if entry and ModData and ModData.remove then
+                    ModData.remove(entry.storageKey or Internal.StorageKeyForID(id))
+                    directory.records[id] = nil
+                    Registry.DirectoryDirty = true
+                end
+                local record = Registry.Data[id]
+                if record and record.runtime then record.runtime.legacyCoreMigration = nil end
+                Registry.LegacyCoreRetirements[id] = nil
+            end
         end
     end
 

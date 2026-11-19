@@ -35,12 +35,12 @@ local function cutoverPending()
         and type(extensions.ActivateCutover) == "function"
 end
 
-function Factions.ReconcileLoadedView(reason)
+function Factions.ReconcileLoadedView(reason, canonicalMembership)
     local changed
     if not Internal.authority() then return false, "not_authority" end
     if not Factions.Loaded then return false, "not_loaded" end
 
-    changed = Internal.rebuildIndexes()
+    changed = Internal.rebuildIndexes(canonicalMembership)
     if Factions.ReconcilePlayerMemberships then
         Factions.ReconcilePlayerMemberships(
             getGameTime and getGameTime()

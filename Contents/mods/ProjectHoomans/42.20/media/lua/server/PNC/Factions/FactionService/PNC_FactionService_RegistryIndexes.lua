@@ -9,7 +9,7 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
-function Internal.rebuildIndexes()
+function Internal.rebuildIndexes(canonicalMembership)
     local byArchetype = {}
     local byPlayerKey = {}
     local membersByFaction = {}
@@ -123,75 +123,78 @@ function Internal.rebuildIndexes()
             end
         end
     end
-    for npcID, record in pairs(
-        PNC.Registry and PNC.Registry.Data or {}
-    ) do
-        local affiliation = Types.NormalizeAffiliation(
-            record.affiliation
-        )
-        local faction = affiliation.factionID
-            and Factions.Registry.byID[affiliation.factionID]
-            or nil
-        if affiliation.factionID and (
-            not faction
-            or faction.status == "archived"
-            or faction.status == "destroyed"
-        ) then
-            local former = Internal.addHistory(
-                affiliation,
-                affiliation.factionID,
-                math.max(
-                    tonumber(affiliation.leftAt) or 0,
-                    tonumber(affiliation.joinedAt) or 0
-                ),
-                faction and faction.status == "destroyed"
-                    and "faction_destroyed"
-                    or faction and "faction_archived"
-                    or "unknown"
+    -- Core member IDs also refer to actors outside the promoted runtime.
+    if not canonicalMembership then
+        for npcID, record in pairs(
+            PNC.Registry and PNC.Registry.Data or {}
+        ) do
+            local affiliation = Types.NormalizeAffiliation(
+                record.affiliation
             )
-            affiliation = Types.NewAffiliation({
-                leftAt = affiliation.leftAt,
-                formerFactionIDs = former,
-                revision = affiliation.revision,
-            })
-        elseif faction then
-            affiliation = Types.NormalizeAffiliation(
-                affiliation,
-                faction
-            )
-        end
-        if not Types.AreEqual(record.affiliation, affiliation) then
-            record.affiliation = affiliation
-            if PNC.Registry and PNC.Registry.MarkDirty then
-                PNC.Registry.MarkDirty(
-                    record,
-                    "affiliation_repair"
+            local faction = affiliation.factionID
+                and Factions.Registry.byID[affiliation.factionID]
+                or nil
+            if affiliation.factionID and (
+                not faction
+                or faction.status == "archived"
+                or faction.status == "destroyed"
+            ) then
+                local former = Internal.addHistory(
+                    affiliation,
+                    affiliation.factionID,
+                    math.max(
+                        tonumber(affiliation.leftAt) or 0,
+                        tonumber(affiliation.joinedAt) or 0
+                    ),
+                    faction and faction.status == "destroyed"
+                        and "faction_destroyed"
+                        or faction and "faction_archived"
+                        or "unknown"
+                )
+                affiliation = Types.NewAffiliation({
+                    leftAt = affiliation.leftAt,
+                    formerFactionIDs = former,
+                    revision = affiliation.revision,
+                })
+            elseif faction then
+                affiliation = Types.NormalizeAffiliation(
+                    affiliation,
+                    faction
                 )
             end
-            changed = true
-        end
-        if affiliation.factionID
-            and membersByFaction[affiliation.factionID]
-        then
-            membersByFaction[affiliation.factionID][npcID] = true
-        end
-    end
-    for factionID, faction in pairs(Factions.Registry.byID) do
-        local expected = membersByFaction[factionID] or {}
-        if not Types.AreEqual(faction.memberIDs, expected) then
-            faction.memberIDs = expected
-            changed = true
-        end
-        if faction.leaderNPCID then
-            local leader = PNC.Registry.Data[
-                faction.leaderNPCID
-            ]
-            if not expected[faction.leaderNPCID]
-                or not leader
-                or leader.alive == false
-            then
-                faction.leaderNPCID = nil
+            if not Types.AreEqual(record.affiliation, affiliation) then
+                record.affiliation = affiliation
+                if PNC.Registry and PNC.Registry.MarkDirty then
+                    PNC.Registry.MarkDirty(
+                        record,
+                        "affiliation_repair"
+                    )
+                end
                 changed = true
+            end
+            if affiliation.factionID
+                and membersByFaction[affiliation.factionID]
+            then
+                membersByFaction[affiliation.factionID][npcID] = true
+            end
+        end
+        for factionID, faction in pairs(Factions.Registry.byID) do
+            local expected = membersByFaction[factionID] or {}
+            if not Types.AreEqual(faction.memberIDs, expected) then
+                faction.memberIDs = expected
+                changed = true
+            end
+            if faction.leaderNPCID then
+                local leader = PNC.Registry.Data[
+                    faction.leaderNPCID
+                ]
+                if not expected[faction.leaderNPCID]
+                    or not leader
+                    or leader.alive == false
+                then
+                    faction.leaderNPCID = nil
+                    changed = true
+                end
             end
         end
     end

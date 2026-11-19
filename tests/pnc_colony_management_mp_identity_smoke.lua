@@ -82,6 +82,13 @@ PNC = {
             error("legacy faction lookup should not run")
         end,
     },
+    Communities = {
+        GetForFaction = function(id)
+            if id ~= faction.id then return {} end
+            return { { id = "community_mp", status = "active",
+                memberIDs = { npc_one = true, npc_two = true } } }
+        end,
+    },
     ColonyStorageService = {
         BuildSnapshot = function(_, _, ownershipContext)
             storageContext = ownershipContext
@@ -116,6 +123,8 @@ PNC = {
     } },
 }
 
+PNC.Registry.Get = function(id) return PNC.Registry.Data[id] end
+
 T.load(SHARED .. "PNC/Core/Identity/PNC_Identity_Verifier.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandRegistry.lua")
 T.load(SERVER .. "PNC/Colony/ColonyManagement/PNC_ColonyManagement_Core.lua")
@@ -124,8 +133,8 @@ T.load(SERVER .. "PNC/Colony/ColonyManagement/PNC_ColonyManagement_Snapshots.lua
 local snapshot = PNC.ColonyManagement.BuildSnapshot(player)
 T.equal(identityCalls, 1,
     "multiplayer snapshot resolves identity once for all NPCs")
-T.equal(factionLookups, 2,
-    "each owned NPC is checked once during snapshot construction")
+T.equal(factionLookups, 0,
+    "canonical community roster needs no per-NPC faction lookup")
 T.equal(fallbackCharacterLookups, 0,
     "snapshot ownership does not repeat character lookups")
 T.equal(snapshot.identityStatus.state, "ready",

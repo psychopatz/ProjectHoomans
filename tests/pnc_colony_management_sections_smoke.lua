@@ -162,7 +162,7 @@ PNC = {
     FishingService = { GetSnapshot = function() return nil end },
     Communities = {
         GetForFaction = function()
-            return { { id = "colony_mp", status = "active" } }
+            return { { id = "colony_mp", status = "active", memberIDs = { npc_one = true, npc_two = true } } }
         end,
     },
     Journals = {
@@ -180,6 +180,8 @@ PNC = {
         },
     } },
 }
+
+PNC.Registry.Get = function(id) return PNC.Registry.Data[id] end
 
 T.load(SHARED .. "PNC/Core/Identity/PNC_Identity_Verifier.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandRegistry.lua")

@@ -105,7 +105,7 @@ function Extensions.RebuildAll(coreSnapshot)
     then
         local reconciled, reason =
             PNC.Communities.ReconcileLoadedView(
-                "survivor_world_cutover"
+                "survivor_world_cutover", true
             )
         if not reconciled then return false, reason end
     end
@@ -114,7 +114,7 @@ function Extensions.RebuildAll(coreSnapshot)
     then
         local reconciled, reason =
             PNC.Factions.ReconcileLoadedView(
-                "survivor_world_cutover"
+                "survivor_world_cutover", true
             )
         if not reconciled then return false, reason end
     end

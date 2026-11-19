@@ -153,6 +153,7 @@ function Simulator.New(options)
         stepMs = math.max(10, math.floor(tonumber(options.stepMs) or 50)),
         mutationIntervalMs = math.max(100, math.floor(tonumber(options.mutationIntervalMs) or 1000)),
         knowledgeMutationIntervalMs = math.max(50, math.floor(tonumber(options.knowledgeMutationIntervalMs) or 4000)),
+        recruitmentRoundtrip = options.recruitmentRoundtrip == true,
         mixedCapabilities = options.mixedCapabilities == true,
         injectRevisionGap = options.injectRevisionGap == true,
         departAtMs = tonumber(options.departAtMs),
@@ -850,6 +851,40 @@ function Simulator:Run()
     local extraZombieListQueries = math.max(0, metrics.zombieListQueriesTick - censusScans)
 
     local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
+    local recruitmentRoundtrip = false
+    if cfg.recruitmentRoundtrip then
+        local player = players[1]
+        local record = assert(PNC.API.Spawn({
+            id = "sim_recruited_companion", displayName = "Sim Companion",
+            x = player:getX() + 1, y = player:getY() + 1, z = player:getZ(),
+        }))
+        local function assertRoster(id)
+            local snapshot = PNC.ColonyManagement.BuildSnapshot(player, { sections = { "roster" } })
+            for _, person in ipairs(snapshot.people or {}) do
+                if person.id == id then return end
+            end
+            error("recruited simulator actor missing from canonical colony roster")
+        end
+        assert(record.coreBacked and record.persistenceAuthority == "core_extension")
+        local recruited, reason = PNC.Recruitment.Assign(player, record)
+        assert(recruited, reason)
+        assertRoster(record.id)
+        local id = assert(record.coreActorID)
+        local legacyKey = PNC.Registry.Internal.StorageKeyForID(record.id)
+        assert(not ModData.get(legacyKey), "adoption created a legacy NPC payload")
+        for _, onSave in ipairs(events.OnSave or {}) do onSave() end
+        assert(coreProvider.DemoteCoreActor(record, PsychopatzCore, { force = true }))
+        assert(runtimeStore.Load(true))
+        local promoted = assert(coreProvider.PromoteCoreActor(id, PsychopatzCore))
+        assert(promoted.coreActorID == id and promoted.coreBacked and promoted.recruited)
+        assert(promoted.ownerCharacterUUID == record.ownerCharacterUUID)
+        assert(promoted.orderSpec.kind == "follow")
+        assertRoster(promoted.id)
+        assert(not ModData.get(legacyKey), "Core-backed simulator record re-entered legacy storage")
+        assert(not PNC.Registry.Internal.GetDirectory().records[promoted.id],
+            "Core-backed simulator record acquired a legacy directory pointer")
+        recruitmentRoundtrip = true
+    end
     local coreMetrics = coreProvider and coreProvider.Metrics or {}
     local finalCoordMetrics = PNC.PersistenceCoordinator
         and PNC.PersistenceCoordinator.Metrics or {}
@@ -869,6 +904,7 @@ function Simulator:Run()
     end
 
     local report = {
+        RecruitmentRoundtrip = recruitmentRoundtrip,
         CoreActors = actorRegistry:Count(),
         PromotedAtStartup = promotedAtStartup,
         PromotedHoomansRecords = endPromotedHoomansRecords,

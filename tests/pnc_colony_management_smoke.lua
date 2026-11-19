@@ -40,6 +40,8 @@ local companion = {
 
 isDebugEnabled = function() return true end
 
+community.memberIDs = { [companion.id] = true }
+
 PNC = {
     Core = {
         DeepCopy = function(value)

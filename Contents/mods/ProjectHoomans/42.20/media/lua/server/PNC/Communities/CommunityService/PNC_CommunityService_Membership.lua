@@ -171,9 +171,14 @@ function Communities.AddNPC(communityID, npcID, options)
     ) and community.memberIDs[npcID] == true then
         return false, "unchanged"
     end
+    local previousMember = community.memberIDs[npcID]
     community.memberIDs[npcID] = true
+    local saved, reason = touchCommunity(community)
+    if not saved then
+        community.memberIDs[npcID] = previousMember
+        return false, reason
+    end
     commitAffiliation(record, nextAffiliation)
-    touchCommunity(community)
     touchRegistry()
     return true, "added", copy(nextAffiliation)
 end
@@ -198,12 +203,16 @@ function Communities.RemoveNPC(
     if affiliation.communityID ~= communityID then
         return false, "not_a_community_member"
     end
+    local previousMember, leader = community.memberIDs[npcID], community.leaderNPCID
     community.memberIDs[npcID] = nil
-    if community.leaderNPCID == npcID then
-        community.leaderNPCID = nil
+    if leader == npcID then community.leaderNPCID = nil end
+    local saved, failure = touchCommunity(community)
+    if not saved then
+        community.memberIDs[npcID] = previousMember
+        community.leaderNPCID = leader
+        return false, failure
     end
     commitAffiliation(record, clearAffiliationCommunity(record))
-    touchCommunity(community)
     touchRegistry()
     return true, reason or "removed",
         copy(record.affiliation)

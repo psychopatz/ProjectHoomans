@@ -576,4 +576,206 @@ local knowNote = assert(PNC.NPCKnowledge.GetGiftPreference("char_l2_tester", "co
 T.equal(knowNote.disposition, "like", "reloaded queued+pumped NPCKnowledge preserved")
 T.equal(countMap(PNC.Registry.DirtyByID), 0, "reloaded save leaves 0 dirty records")
 
+-- A recruited API spawn must use the same canonical actor before and after save.
+local recruited = assert(PNC.API.Spawn({
+    id = "authority_recruit", name = "Authority Recruit",
+    x = 100, y = 101, z = 0, tacticalClass = "neutral",
+}))
+local recruitedID = assert(recruited.coreActorID)
+local function rosterContains(id)
+    local snapshot = PNC.ColonyManagement.BuildSnapshot(env.getPlayer(), { sections = { "roster" } })
+    for _, person in ipairs(snapshot.people or {}) do
+        if person.id == id then return true end
+    end
+    return false
+end
+assert(PNC.API.SetOrder(recruited.id, {
+    kind = "follow", ownerUsername = env.getPlayer():getUsername(),
+}))
+T.equal(rosterContains(recruited.id), false, "follow alone grants no membership")
+
+local recruitedOK, recruitedReason, membership =
+    PNC.Recruitment.Try(env.getPlayer(), { npcID = recruited.id })
+assert(recruitedOK, recruitedReason)
+T.equal(recruited.orderSpec.kind, "follow", "recruitment installs the normal follow order")
+T.truthy(recruited.ownerUsername, "follow has an owner")
+
+local function checkRecruitment(record, actor, actorID)
+    T.equal(record.coreBacked, true, "API spawn uses Core persistence authority")
+    T.equal(record.persistenceAuthority, "core_extension")
+    T.equal(record.coreActorID, actorID or recruitedID)
+    T.equal(record.affiliation.membershipStatus, "member")
+    T.equal(record.affiliation.factionID, membership.factionID)
+    T.equal(record.affiliation.communityID, membership.communityID)
+    local affiliation = actor.extensions["PsychopatzCore.SurvivorWorld"]
+    T.equal(affiliation and affiliation.factionID, membership.factionID)
+    T.equal(affiliation and affiliation.communityID, membership.communityID)
+    T.truthy(actor.extensions["ProjectHoomans.ActorExtension"], "Core owns the recruited extension")
+end
+
+local owner = recruited.ownerUsername
+local ownerCharacter = recruited.ownerCharacterUUID
+checkRecruitment(recruited, assert(reg2:Get(recruitedID)))
+local rp, rr = PNC.Factions.GetPlayerFaction(env.getPlayer())
+assert(rp, rr)
+local communities = PNC.Communities.GetForFaction(rp.id)
+assert(communities[1], "player faction has no community")
+T.equal(communities[1].memberIDs[recruited.id], true, "community member index")
+T.equal(rosterContains(recruited.id), true, "canonical community members appear in Colonists")
+local storageKey = PNC.Registry.Internal.StorageKeyForID(recruited.id)
+T.equal(env.getStores()[storageKey], nil, "Core-backed spawn wrote no legacy NPC payload")
+
+local failedRecord = assert(PNC.API.Spawn({
+    id = "authority_recruit_failure", x = 100, y = 103, z = 0,
+}))
+local commitActor = reg2.Commit
+reg2.Commit = function(self, id, patch, rev)
+    if id == failedRecord.coreActorID and patch.extensions
+        and patch.extensions["ProjectHoomans.ActorExtension"]
+        and patch.extensions["ProjectHoomans.ActorExtension"].recruited
+    then
+        return nil, "injected_commit_failure"
+    end
+    return commitActor(self, id, patch, rev)
+end
+local failed, failure = PNC.Recruitment.Assign(env.getPlayer(), failedRecord)
+reg2.Commit = commitActor
+T.equal(failed, false, "Core failure rejects recruitment")
+T.equal(failure, "injected_commit_failure")
+T.equal(failedRecord.recruited, false)
+T.falsy(failedRecord.orderSpec.kind == "follow", "failed recruit never follows")
+T.equal(failedRecord.affiliation.factionID, nil)
+T.equal(failedRecord.affiliation.communityID, nil)
+T.equal(rosterContains(failedRecord.id), false, "rollback removes both membership indexes")
+
+local rollbackCommunity = PNC.Communities.RemoveNPC
+PNC.Communities.RemoveNPC = function() return false, "injected_rollback_failure" end
+reg2.Commit = function(self, id, patch, rev)
+    if id == failedRecord.coreActorID then return nil, "injected_commit_failure" end
+    return commitActor(self, id, patch, rev)
+end
+local pendingOK, pendingReason = PNC.Recruitment.Assign(env.getPlayer(), failedRecord)
+PNC.Communities.RemoveNPC = rollbackCommunity
+reg2.Commit = commitActor
+T.equal(pendingOK, false)
+T.equal(pendingReason, "recruitment_rollback_pending")
+T.equal(rosterContains(failedRecord.id), false, "pending rollback is outside the roster")
+T.falsy(failedRecord.orderSpec.kind == "follow")
+local retried, retryReason = PNC.Recruitment.Assign(env.getPlayer(), failedRecord)
+assert(retried, retryReason)
+T.equal(rosterContains(failedRecord.id), true, "retry repairs rollback and recruits")
+
+local player = env.getPlayer()
+local starterTraits = PNC.StartingCompanionTraits.IDS
+player.getCharacterTraits = function()
+    return { getKnownTraits = function() return { starterTraits.FRIEND, starterTraits.BROTHER } end }
+end
+local sanitizer = require "PNC/Core/Identity/PNC_StartingCompanionSanitizer"
+local authored = assert(sanitizer.SanitizeDefinition({
+    displayName = "Riley Reyes",
+    identity = { nickname = "Rye", survivor = { forename = "Riley", surname = "Reyes" } },
+}, starterTraits.FRIEND))
+local granted, grantReason = PNC.StartingCompanions.Ensure(
+    player, assert(ownerCharacter), 50, { blueprints = { [starterTraits.FRIEND] = authored } }
+)
+assert(granted, grantReason)
+local startingGrants = PNC.PlayerCharacters.GetRegistryRecord(ownerCharacter).startingCompanions.grants
+local starterIDs = {}
+for _, trait in ipairs({ starterTraits.FRIEND, starterTraits.BROTHER }) do
+    local id = assert(startingGrants[trait].npcID)
+    starterIDs[#starterIDs + 1] = id
+    local record = assert(PNC.Registry.Get(id))
+    T.equal(record.orderSpec.kind, "follow", "starter joins before publication")
+    local actor = assert(reg2:Get(record.coreActorID))
+    checkRecruitment(record, actor, id)
+    if trait == starterTraits.FRIEND then
+        T.equal(actor.identity.survivor.forename, "Riley", "authored starter identity is canonical")
+    end
+    T.equal(rosterContains(id), true, "each starter is canonically rostered")
+end
+
+local legacy = PNC.Types.NewRecord({
+    id = "legacy_migration_npc", displayName = "Legacy Migration",
+    x = 100, y = 102, z = 0,
+})
+assert(PNC.Registry.AddRecord(legacy))
+local legacyKey = PNC.Registry.Internal.StorageKeyForID(legacy.id)
+
+for _, onSave in ipairs(env.getEvents().OnSave or {}) do onSave() end
+local recruitedStores = env.getStores()
+T.truthy(recruitedStores[legacyKey], "old-format source is present awaiting migration")
+env.resetModuleCache()
+env.installGlobals(recruitedStores)
+require "PsychopatzCore/Profiler/PsychopatzProfilerBootstrap"
+require "PsychopatzCore/Runtime/PC_RuntimeRole"
+require "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorld"
+local reloadedActors = require "PsychopatzCore/Actors/PsychopatzActors"
+require "PNC/00_PNC_Init"
+require "PNC/Composition/PNC_ServerComposition"
+for _, fn in ipairs(env.getEvents().OnInitGlobalModData or {}) do fn() end
+for _, fn in ipairs(env.getEvents().OnServerStarted or {}) do fn() end
+local recovered = assert(PNC.Registry.Get(recruited.id)
+    or PNC.Persistence.CoreProvider.PromoteCoreActor(recruitedID, PsychopatzCore))
+checkRecruitment(recovered, assert(reloadedActors.Get(recruitedID)))
+T.equal(recovered.ownerUsername, owner)
+T.equal(recovered.ownerCharacterUUID, ownerCharacter)
+T.equal(recovered.orderSpec.kind, "follow")
+T.equal(rosterContains(recovered.id), true, "reloaded canonical member appears in Colonists")
+for _, id in ipairs(starterIDs) do
+    local record = assert(PNC.Registry.Get(id))
+    checkRecruitment(record, assert(reloadedActors.Get(id)), id)
+    T.equal(record.orderSpec.kind, "follow")
+    T.equal(rosterContains(id), true, "starter remains a colonist after reconnect")
+end
+local loadedLegacy = assert(PNC.Registry.Get(legacy.id))
+PNC.Registry.FlushDirty({ mode = "pump", maxRecords = 64, now = env.now() })
+T.equal(loadedLegacy.coreBacked, true, "bounded pump adopts legacy NPC")
+T.truthy(recruitedStores[legacyKey], "legacy data remains before durable save")
+for _, onSave in ipairs(env.getEvents().OnSave or {}) do onSave() end
+T.equal(recruitedStores[legacyKey], nil, "legacy data retired after Core save")
+T.truthy(reloadedActors.Get(legacy.id), "legacy actor is now canonical")
+local dismissed, dismissReason = PNC.ColonistDeparture.Depart(recovered, "manual", {
+    player = env.getPlayer(),
+})
+assert(dismissed, dismissReason)
+T.equal(rosterContains(recovered.id), false, "dismissed NPC leaves the roster")
+T.equal(recovered.recruited, false)
+T.equal(recovered.ownerUsername, nil)
+T.falsy(recovered.orderSpec.kind == "follow", "dismissal stops following")
+for _, onSave in ipairs(env.getEvents().OnSave or {}) do onSave() end
+local dismissedActor = assert(reloadedActors.Get(recruitedID))
+local roundtrip = assert(PsychopatzCore.ActorPersistence.DecodeActor(
+    assert(PsychopatzCore.ActorPersistence.SerializeActor(dismissedActor))
+))
+local dismissedAffiliation = roundtrip.extensions["PsychopatzCore.SurvivorWorld"] or {}
+T.falsy(dismissedAffiliation.factionID == membership.factionID,
+    "departure releases the player's faction")
+T.equal(dismissedAffiliation.communityID, nil)
+local dismissedExtension = roundtrip.extensions["ProjectHoomans.ActorExtension"] or {}
+T.equal(dismissedExtension.recruited, nil)
+T.equal(dismissedExtension.ownerUsername, nil)
+T.equal(env.getStores()[storageKey], nil, "recruit and dismissal never write a legacy payload")
+
+local dismissedStores = env.getStores()
+env.resetModuleCache()
+env.installGlobals(dismissedStores)
+require "PsychopatzCore/Profiler/PsychopatzProfilerBootstrap"
+require "PsychopatzCore/Runtime/PC_RuntimeRole"
+require "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorld"
+local finalActors = require "PsychopatzCore/Actors/PsychopatzActors"
+require "PNC/00_PNC_Init"
+require "PNC/Composition/PNC_ServerComposition"
+for _, fn in ipairs(env.getEvents().OnInitGlobalModData or {}) do fn() end
+for _, fn in ipairs(env.getEvents().OnServerStarted or {}) do fn() end
+local dismissedRecord = assert(PNC.Registry.Get(recruitedID)
+    or PNC.Persistence.CoreProvider.PromoteCoreActor(recruitedID, PsychopatzCore))
+T.equal(dismissedRecord.recruited, false, "dismissal survives a fresh reload")
+T.equal(dismissedRecord.ownerUsername, nil)
+T.equal(dismissedRecord.ownerCharacterUUID, nil)
+T.falsy(dismissedRecord.orderSpec.kind == "follow")
+T.equal(rosterContains(recruitedID), false, "dismissal survives roster reconstruction")
+T.truthy(finalActors.Get(legacy.id), "migrated actor survives a fresh reload")
+T.equal(dismissedStores[legacyKey], nil, "legacy retirement is idempotent")
+
+
 T.finish("pnc_lightweight_persistence_authority_smoke")

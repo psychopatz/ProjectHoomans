@@ -117,14 +117,7 @@ local function resolveXPThreshold(level)
 end
 
 function Skills.SyncRecruitment(record)
-    if type(record) ~= "table" then
-        return false
-    end
-    if record.recruited == true then
-        return true
-    end
-    record.recruited = record.ownerOnlineID ~= nil or (record.ownerUsername ~= nil and tostring(record.ownerUsername) ~= "")
-    return record.recruited == true
+    return type(record) == "table" and record.recruited == true
 end
 
 function Skills.CanLearn(record)

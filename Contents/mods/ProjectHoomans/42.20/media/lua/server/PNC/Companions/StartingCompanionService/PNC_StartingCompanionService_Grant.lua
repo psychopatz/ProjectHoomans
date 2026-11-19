@@ -47,6 +47,11 @@ function H.EnsureOne(player, character, state, spec, index, at, options)
             { reason = "starting_companion_ensure" }
         )
     end
+    if record and record.colonistDeparture
+        and record.colonistDeparture.state == "completed"
+    then
+        return false, "companion_departed"
+    end
     if grant and grant.status == "granted"
         and (tonumber(grant.enrichmentVersion) or 0)
             >= Starting.ENRICHMENT_VERSION
@@ -130,8 +135,15 @@ function H.EnsureOne(player, character, state, spec, index, at, options)
             relationshipSince = "before_outbreak",
             playerCharacterUUID = character.uuid,
         }
-        record = PNC.API.Spawn(spawnDefinition)
-        if not record then return false, "spawn_failed" end
+        local spawnReason
+        record, spawnReason = PNC.API.Spawn(spawnDefinition, function(created)
+            return PNC.Recruitment.Assign(player, created, {
+                source = "starting_companion",
+                endConversation = false,
+                publish = false,
+            })
+        end)
+        if not record then return false, spawnReason or "spawn_failed" end
     end
     record.generation = record.generation or {}
     record.generation.source = "starting_companion_trait"

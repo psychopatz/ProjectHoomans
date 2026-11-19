@@ -1,24 +1,25 @@
 ---
 state: "USER_ACCEPTANCE"
 parent_status: "DEVELOPER_COMPLETE"
-phase: "L5"
-chunk: "Scale acceptance, docs and phase close"
+phase: "core-recruitment-authority"
+chunk: "Core-backed recruitment, save migration, and tooling ownership"
 retrieval_tier: "verify"
 handoff_schema: 2
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 participant_repos: "/home/psychopatz/Zomboid/Workshop/psychopatzCore"
 branch: "main"
 next_phase: "USER_NATIVE_ACCEPTANCE"
-updated_at: "2026-11-19T21:55:42.969577Z"
+updated_at: "2026-11-19T23:09:16.905128Z"
 checkpoint_mode: "committed_handoff"
 phase_commit: "self"
-phase_commit_phase: "L5"
-phase_commit_message: "phase(L5): add L5 scale acceptance matrix, reconcile architecture and system docs, and close developer-side gates"
-phase_commit_vector: "psychopatz-core=2fc8e5e8c237caa9507a93272896cf87b75e295a;project-hoomans=self;dynamic-trading=2b66a9583fcbe3d9e915b6c16ab9d6851d053eab"
+phase_commit_phase: "core-recruitment-authority"
+phase_commit_message: "phase(core-recruitment-authority): adopt and persist recruited companions through Core authority"
+phase_commit_vector: "psychopatz-core=7ba3976943b4324a3f875e1db1b9cd87f1d467e6;project-hoomans=self;dynamic-trading=2b66a9583fcbe3d9e915b6c16ab9d6851d053eab"
 phase_residual_vector: "psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "6635ccc81e21f02383feb598dc3b92c91b093d6a"
 ---
+
 
 
 # Session Handoff
@@ -35,6 +36,14 @@ codebase_memory_indexed_commit: "6635ccc81e21f02383feb598dc3b92c91b093d6a"
 - **Local commit checkpoints (`pushed=false`, branch `main`):**
   - `psychopatzCore`: L0 `37ab6da`, L1 `2fc8e5e` (clean at `2fc8e5e8c237caa9507a93272896cf87b75e295a`).
   - `ProjectHoomans`: L0 `1303f51`, L1 `9ca238a`, L2 `879c878`, L3 `c388168`, L4 `a1fa4ac`, L5 `self`.
+
+## Core-backed recruitment closed
+
+Project Hoomans adopts API-spawned NPCs into Core before registry insertion. Permanent recruitment publishes canonical affiliation and the personal ownership extension before installing follow. Starting companions use the same transaction on their first spawn. The Colonists roster consumes indexed community membership. Legacy records are processed by the bounded persistence pump and retired after the Core round trip and successful store save.
+
+The headless suite covers failed and retried recruitment, multiple starters with authored and randomized identities, reconnect, dismissal and save reconstruction. The runtime matrix and NPC replication benchmark passed. Hoomans retains four documented unrelated baseline failures. Core retains the existing actor-discovery and generation parity failures in the focused set.
+
+The tooling repair changed ownership on the 15 verified paths and preserved their modes. Both workspaces and the bridge were verified as UID 1000 with no root-owned files. The save's empty `mods.txt` is tracked independently in PROGRESS.
 
 ## Remaining User-Owned Scope
 

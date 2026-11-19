@@ -84,3 +84,13 @@ Report Core actor count, Hoomans promoted-record count, live-body count, schedul
 **Gate:** the integrated smoke simulator and scale benchmark pass; developer-side tests/benchmarks pass; current architecture/system docs match implementation; no obsolete eager-hydration or duplicate-persistence instruction remains; accepted phases are locally committed with participant repos first and ProjectHoomans docs/HANDOFF last. Do not push.
 
 Native SP/MP feel/capacity acceptance remains user-owned unless explicitly assigned.
+
+
+## Core-backed recruitment acceptance
+
+- Adopt API spawns before registry registration and record Core as the persistence authority.
+- Route manual and starting-companion recruitment through one transaction. Publish personal ownership and faction/community affiliation through Core before installing the default follow order.
+- Build the Colonists roster from community membership indexes and preserve those indexes when runtime records are absent during load.
+- Adopt existing legacy records in bounded persistence batches. Verify the Core codec round trip and wait for a successful Core store save before retiring the old payload.
+- Test failed recruitment, save and reconnect, dismissal, and demotion/re-promotion through the integrated headless harness. Rerun the existing runtime and replication matrices.
+- Verify execution identity and root ownership for both repositories and the bridge runtime.

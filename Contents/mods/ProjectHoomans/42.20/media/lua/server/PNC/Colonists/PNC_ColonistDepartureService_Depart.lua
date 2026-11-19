@@ -114,10 +114,16 @@ function Service.Depart(record, cause, options)
     record.tacticalClass = Const.TACTICAL_CLASS_NEUTRAL or "neutral"
     record.ownerUsername = nil
     record.ownerOnlineID = nil
+    record.ownerCharacterUUID = nil
     record.runtime = record.runtime or {}
     record.runtime.colonistDeparture = nil
     record.activeJob = nil
     record.activeBehavior = nil
+    if record.orderSpec and record.orderSpec.kind == Const.ORDER_FOLLOW then
+        PNC.OrderSystem.SetOrder(record, {
+            kind = Const.ORDER_GUARD, x = record.x, y = record.y, z = record.z,
+        })
+    end
 
     local current = Factions.Get(mobileFaction.id)
     local roadTarget

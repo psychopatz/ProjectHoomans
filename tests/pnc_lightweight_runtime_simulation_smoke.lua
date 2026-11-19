@@ -270,4 +270,14 @@ T.truthy((idleZeroReport.CensusScans or 0) <= 20,
     "IDLE_ZERO WorldCensus scans must obey idle cadence (<= 20 over 15s); got "
         .. tostring(idleZeroReport.CensusScans))
 
+local recruitmentReport = withMode("OFF", {
+    actorCount = 20,
+    nearbyActors = 0,
+    zombieCount = 0,
+    simulatedMs = 100,
+    recruitmentRoundtrip = true,
+})
+T.equal(recruitmentReport.RecruitmentRoundtrip, true,
+    "Core adoption, recruitment, roster, persistence and promotion roundtrip")
+
 T.finish("pnc_lightweight_runtime_simulation_smoke")

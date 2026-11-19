@@ -63,8 +63,6 @@ function Registry.AddRecord(record)
 end
 
 function Registry.ReleasePromotedRecord(id)
-    local directory
-    local entry
     local existing
     Registry.EnsureLoaded()
     if id == nil then return false end
@@ -89,15 +87,6 @@ function Registry.ReleasePromotedRecord(id)
     end
     if PNC.SpatialIndex and PNC.SpatialIndex.RemoveNPC then
         PNC.SpatialIndex.RemoveNPC(id)
-    end
-    directory = Internal.GetDirectory and Internal.GetDirectory() or nil
-    entry = directory and directory.records and directory.records[id] or nil
-    if entry then
-        directory.records[id] = nil
-        if ModData and ModData.remove then
-            ModData.remove(entry.storageKey or Internal.StorageKeyForID(id))
-        end
-        Registry.DirectoryDirty = true
     end
     return existing ~= nil
 end

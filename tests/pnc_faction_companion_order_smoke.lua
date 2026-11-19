@@ -40,11 +40,13 @@ PNC = {
     },
     Factions = {
         Registry = { byID = { player_faction = faction } },
+        IsTerritorialTollFaction = function() return false end,
+        IsFactionAtWar = function() return false end,
         GetFactionID = function(record)
             return record.affiliation and record.affiliation.factionID
         end,
     },
-    FactionArchetypes = {},
+    FactionArchetypes = { IsHostileToOutsiders = function() return false end },
     FactionConstants = {},
     FactionBalance = {},
     EntityRef = {
@@ -219,10 +221,12 @@ joining.runtime = {}
 records.joining = joining
 
 PNC.FactionBehavior.ApplyNPC(joining, "faction_joined")
-T.truthy(joining.orderSpec.kind == "follow",
-    "new player-faction member did not receive its initial Follow order")
-T.truthy(joining.orderSpec.ownerUsername == "alice",
-    "initial Follow order did not bind the faction owner")
+T.falsy(joining.orderSpec.kind == "follow",
+    "faction membership does not confer the personal Follow order")
+T.equal(joining.ownerUsername, nil,
+    "faction behavior does not invent personal ownership")
+T.equal(joining.recruited, false,
+    "faction behavior does not bypass permanent recruitment")
 
 local released = copy(waiting)
 released.id = "released"
@@ -259,6 +263,7 @@ faction.mobile = {
 }
 local mobileJoining = copy(joining)
 mobileJoining.id = "mobile_joining"
+mobileJoining.recruited = true
 mobileJoining.orderSpec = { kind = "follow",
     ownerUsername = "alice", ownerOnlineID = 7 }
 mobileJoining.runtime = {}

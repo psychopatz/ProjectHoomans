@@ -129,7 +129,8 @@ function Behavior.ApplyNPC(record, reason)
     if not faction then
         return Behavior.ApplyUnaffiliated(record, reason)
     end
-    if faction.ownerPlayerKey then
+    -- Organizational membership alone does not assign a personal owner.
+    if faction.ownerPlayerKey and record.recruited == true then
         parsed, livePlayer = ownerIdentity(faction)
         owner = {
             -- The faction key is durable, while RuntimeByUUID is populated
