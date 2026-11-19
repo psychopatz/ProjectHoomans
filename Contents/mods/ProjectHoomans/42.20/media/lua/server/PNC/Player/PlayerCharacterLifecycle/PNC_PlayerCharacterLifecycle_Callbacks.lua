@@ -25,9 +25,9 @@ function Lifecycle.OnPlayerDeath(first, second)
         local faction = PNC.Factions
             and PNC.Factions.GetPlayerDiplomacyFaction
             and PNC.Factions.GetPlayerDiplomacyFaction(player) or nil
-        local changed, result = H.Service().MarkDead(
+        local changed, result, deadUUID = H.Service().MarkDead(
             player, at, "OnPlayerDeath")
-        local deadCharacterUUID = changed == true and result or nil
+        local deadCharacterUUID = changed == true and deadUUID or nil
         if deadCharacterUUID and PNC.Recruitment
             and PNC.Recruitment.ReleaseCharacterOwnership
         then
@@ -57,7 +57,7 @@ function Lifecycle.OnPlayerDeath(first, second)
             PNC.FactionBehavior.ReconcileFaction(
                 faction.id, "player_character_died")
         end
-        return changed, result
+        return changed, result, deadUUID
     end
     return false, "player_unavailable"
 end

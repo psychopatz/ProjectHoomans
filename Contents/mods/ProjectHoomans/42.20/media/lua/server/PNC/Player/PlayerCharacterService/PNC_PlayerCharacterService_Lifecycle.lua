@@ -82,6 +82,20 @@ function PlayerCharacters.MarkDead(player, at, reason)
     record.diedAt = at
     markRecordChanged(record)
     unbindRuntime(player)
+    local coreIdentity = PsychopatzCore and PsychopatzCore.PlayerIdentity or nil
+    if coreIdentity and type(coreIdentity.RetirePlayerCharacter) == "function" then
+        coreIdentity.RetirePlayerCharacter(
+            "player:" .. tostring(accountKey) .. ":" .. tostring(uuid),
+            {
+                authority = "server",
+                reason = "player_death",
+                retiredAt = at,
+                label = record.displayName,
+                allowAlreadyRetired = true,
+                adoptUnissued = true,
+            }
+        )
+    end
     logIdentity({
         callback = "player_death",
         accountKey = accountKey,

@@ -1,9 +1,9 @@
 # Progress — Project Hoomans Portable Actor Lifecycle & GC Adoption
 
-**Status:** IN_PROGRESS (H0, H1, H2, H3A, H4-policy ACCEPTED — awaiting Core L6/H6+H3).
+**Status:** IN_PROGRESS (H0, H1, H2, H3A, H4-policy, H6-player-lifecycle ACCEPTED — awaiting H3/H5).
 **Parent:** PsychopatzCore Docs/portable_actor_lifecycle_gc/.
-**Current phase:** H1-H2 complete; next H3 / L6 player-character lifecycle.
-**Participant completion:** 4/6 phases accepted (H0, H1, H2, plus H3A/H4-policy).
+**Current phase:** H6-player-lifecycle complete; next H3 social memoryBank consumer sweep / H5 soak & regression.
+**Participant completion:** 4/6 phases accepted (H0, H1, H2, plus H3A/H4-policy/H6-player-lifecycle).
 
 ## Verified H0 Audit Facts (Checkpoint `67510b0db`)
 
@@ -35,6 +35,12 @@
 - Wired `PNC_Health_Death.lua` (calling `QuestService.OnNPCDeath` and `MedicalCareService.OnNPCDeath`, then calling `CoreLifecycle.RetireActor` after `AddDeathMarker`/`RemoveRecord` + post-retirement `faction.memberIDs` scrub), `PNC_API/Lifecycle.lua` (`API.Despawn` rollback `HardDelete` vs `retire = true` vs skipping `dtProviderProjection`), and `PNC_NPCKnowledgeService_PlayerSnapshots.lua` (historical Core tombstone/`DeathMarker`/note degradation).
 - Verified 18/18 tests PASS (`core_actor_lifecycle_gc`, `factions_foundation`, `quest`, `medical_care`, `core_social`, `death`, `reanimat`) and Kahlua lint 0 errors across all 7 files.
 
+## H6-player-lifecycle — Player Character Death & Core Identity Retirement
+
+- Fixed the 3-return destructuring bug in `PNC_PlayerCharacterLifecycle_Callbacks.lua` (`local changed, result, deadUUID = H.Service().MarkDead(...)`) so `ReleaseCharacterOwnership` receives the actual dead character UUID instead of `"marked_dead"`.
+- Wired `PsychopatzCore.PlayerIdentity.RetirePlayerCharacter` inside `PNC_PlayerCharacterService_Lifecycle.lua` (`PlayerCharacters.MarkDead`) with `authority = "server"`, `reason = "player_death"`, `allowAlreadyRetired = true`, and `adoptUnissued = true`.
+- Verified `python3 tests/run_tests.py player_character` PASS (`3/3` in `0.17s`), Core `psychopatz_player_character_lifecycle_mp_smoke.lua` PASS, and `pz_verify.py --kahlua --severity ERROR` (`0` errors) across both edited files.
+
 ## Next Chunk
 
-Wait for Core L1-L4 acceptance, then implement **H1** (bridge `Health.Kill` / `retireDeadRecord` to Core `Retire` after consequences and `API.Despawn` rollback to Core `HardDelete`, preserving consequence ordering and `DeathMarkers`).
+Complete remaining Hoomans **H3** social `memoryBank` consumer cleanup and participate in Core **L8-L9** semantic projection and scale/soak acceptance.
