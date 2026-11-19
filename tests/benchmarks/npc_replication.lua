@@ -87,9 +87,16 @@ require "PNC/Networking/Handlers/PNC_ServerCharacterReplicationCommandHandler"
 
 local network, const, router = PNC.Network, PNC.Const, PNC.ServerCommandRouter
 local codec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
+local patch = require "PNC/Core/Networking/PNC_RosterPortraitPatch"
 local totals
 local function count(name)
     totals[name] = (totals[name] or 0) + 1
+end
+
+local compilePatch = patch.Create
+function patch.Create(...)
+    count("patchBuilds")
+    return compilePatch(...)
 end
 
 local pack = codec.Pack
@@ -181,7 +188,8 @@ end
 local function join(player)
     local args = {}
     if mode ~= "legacy" then args.portraitProtocol = const.ROSTER_PORTRAIT_PROTOCOL end
-    if mode == "packed" then args.portraitCodec = codec.Fingerprint end
+    if mode == "packed" or mode == "patch" then args.portraitCodec = codec.Fingerprint end
+    if mode == "patch" then args.portraitPatch = patch.Protocol end
     assert(router.Handle(const.CMD_FULL_SYNC_REQUEST, player, args))
 end
 
@@ -196,7 +204,7 @@ local function measure(name, npcs, clients, density, trial, workload)
     workload()
     local elapsed = 1000 * (os.clock() - started)
     local estimate, portraitBytes, entries, maxBatch, detail = 0, 0, 0, 0, 0
-    local refusal, chunks, packed, resolved = 0, 0, 0, 0
+    local refusal, chunks, packed, resolved, patched = 0, 0, 0, 0, 0
     local recipients = {}
     local function inspect(snapshot)
         if not snapshot then return end
@@ -228,6 +236,9 @@ local function measure(name, npcs, clients, density, trial, workload)
         elseif payload.packedPortrait then
             packed = packed + 1
             portraitBytes = portraitBytes + estimatePayload(payload.packedPortrait, math.huge)
+        elseif payload.portraitPatch then
+            patched = patched + 1
+            portraitBytes = portraitBytes + estimatePayload(payload.portraitPatch, math.huge)
         end
         if payload.pncChunk then
             chunks = chunks + 1
@@ -255,6 +266,7 @@ local function measure(name, npcs, clients, density, trial, workload)
         totals.invalidations or 0, occupants, refusal, chunks,
         totals.budgetEstimates or 0, totals.budgetSplits or 0,
         totals.resolvedProjections or 0, totals.codecBuilds or 0, packed, resolved,
+        totals.patchBuilds or 0, patched,
     }, ","))
     sent = {}
 end
@@ -297,6 +309,10 @@ local function run(npcs, clients, density, trial)
             assert(router.Handle(const.CMD_REQUEST_CHARACTER, player, { id = records[1].id }))
         end
     end)
+    local firstPortraitRevision
+    if mode == "patch" then
+        firstPortraitRevision = network.Internal.GetPortraitReference(records[1]).revision
+    end
     sample("visible_change", function()
         local record = records[1]
         record.equipment.wornVisuals.Shirt.textureChoice = 7
@@ -304,6 +320,24 @@ local function run(npcs, clients, density, trial)
         network.BroadcastRecord(record, "equipment")
         network.FlushRosterDeltas(now, true)
     end)
+    if mode == "patch" then
+        local record = records[1]
+        local ref = network.Internal.GetPortraitReference(record)
+        local function afterChange(name, baseRevision, forceResolved)
+            now = now + 1000
+            sample(name, function()
+                for _, player in ipairs(players) do
+                    assert(router.Handle(const.CMD_REQUEST_ROSTER_PORTRAIT, player, {
+                        id = record.id, incarnation = ref.incarnation, requestID = name,
+                        baseRevision = baseRevision, targetRevision = ref.revision,
+                        forceResolved = forceResolved,
+                    }))
+                end
+            end)
+        end
+        afterChange("hover_after_visible_change", firstPortraitRevision, false)
+        afterChange("hover_repair", firstPortraitRevision, true)
+    end
     sample("nonvisible_change", function()
         local record = records[1]
         record.inventory.revision = 2
@@ -327,7 +361,7 @@ local function run(npcs, clients, density, trial)
     sample("reconnect", function() join(players[1]); refresh() end)
 end
 
-print("npcs,clients,interest,trial,scenario,cpu_ms,sends,recipients,roster_rows,max_batch,estimated_bytes,portrait_estimated_bytes,detailed_snapshots,roster_builds,full_builds,presence_builds,character_builds,portrait_lookups,cache_hits,cache_misses,invalidations,cache_entries,refusals,chunks,budget_estimates,budget_splits,resolved_projections,codec_builds,packed_responses,resolved_responses")
+print("npcs,clients,interest,trial,scenario,cpu_ms,sends,recipients,roster_rows,max_batch,estimated_bytes,portrait_estimated_bytes,detailed_snapshots,roster_builds,full_builds,presence_builds,character_builds,portrait_lookups,cache_hits,cache_misses,invalidations,cache_entries,refusals,chunks,budget_estimates,budget_splits,resolved_projections,codec_builds,packed_responses,resolved_responses,patch_builds,patch_responses")
 local trials = tonumber(arg[1]) or 3
 for _, npcs in ipairs({ 100, 300, 600 }) do
     for _, clients in ipairs({ 1, 8, 16 }) do

@@ -6,6 +6,7 @@ Project Hoomans needs responsive roster browsing and nearby NPC presentation wit
 - [Architecture](ARCHITECTURE.md) defines seed provenance, transport ownership, mod-asset compatibility, and recovery.
 - [Runbook](AGENT_RUNBOOK.md) defines workload, exact-round-trip, and failure-injection validation.
 - [P1 baseline](P1_BASELINE.md) records the pre-change measurements and consumer audit.
+- [P2 hydration](P2_HYDRATION.md), [P3 representation selection](P3_REPRESENTATIONS.md), and [P4 convergence](P4_CONVERGENCE.md) record outcomes and final acceptance evidence.
 - [Progress](PROGRESS.md) records verified work and exactly one starting Next Chunk.
 - [Handoff](HANDOFF.md) records the resumable workspace checkpoint.
 

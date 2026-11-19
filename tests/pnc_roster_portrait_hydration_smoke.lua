@@ -204,6 +204,69 @@ T.truthy(requestPacked(modern, "resolved", true).portrait, "repair forces resolv
 net.NegotiateRosterPortraits(legacy, const.ROSTER_PORTRAIT_PROTOCOL, "unknown-catalog-dependent-codec")
 T.truthy(requestPacked(legacy, "mismatch").portrait, "mismatched dialect gets resolved")
 
+local patch = require "PNC/Core/Networking/PNC_RosterPortraitPatch"
+net.NegotiateRosterPortraits(modern, const.ROSTER_PORTRAIT_PROTOCOL, codec.Fingerprint, patch.Protocol)
+now = now + 1000
+local warmed = hydrate(afterDisconnect)
+clientHandlers[const.CMD_ROSTER_PORTRAIT](warmed)
+T.truthy(client.GetRosterPortrait("npc"), "packed baseline warms patch client")
+
+local function mutateAndFlush(choice)
+    npc.equipment.wornVisuals.Hat.textureChoice = choice
+    net.RefreshPortraitEquipment(npc)
+    sent = {}
+    net.FlushRosterDeltas(now, true)
+    clientHandlers[const.CMD_ROSTER_DELTA](sent[1].args)
+    return net.ClientState.snapshots.npc
+end
+
+local revised = mutateAndFlush(1)
+now = now + 1000
+local incremental = hydrate(revised)
+T.truthy(incremental.portraitPatch, "adjacent revision gets a patch")
+T.equal(incremental.portraitPatch.baseRevision, warmed.portraitRef.revision, "exact baseline")
+T.equal(incremental.portraitPatch.targetRevision, revised.portraitRef.revision, "exact target")
+clientHandlers[const.CMD_ROSTER_PORTRAIT](incremental)
+T.equal(client.GetRosterPortrait("npc").equipment.wornVisuals.Hat.textureChoice, 1,
+    "patch converges to authoritative visible value")
+clientHandlers[const.CMD_ROSTER_PORTRAIT](warmed)
+clientHandlers[const.CMD_ROSTER_PORTRAIT](incremental)
+T.equal(client.GetRosterPortrait("npc").equipment.wornVisuals.Hat.textureChoice, 1,
+    "stale and duplicate replies do not change applied state")
+
+revised = mutateAndFlush(4)
+now = now + 1000
+local malformed = hydrate(revised)
+T.truthy(malformed.portraitPatch, "next update can be patched")
+malformed = copy(malformed)
+malformed.portraitPatch = copy(malformed.portraitPatch)
+malformed.portraitPatch.baseRevision = 0
+clientHandlers[const.CMD_ROSTER_PORTRAIT](malformed)
+now = now + 101
+local repair = hydrate(revised)
+T.truthy(requested[#requested].args.forceResolved, "wrong base coalesces full repair")
+T.truthy(repair.portrait, "repair skips packed and patch formats")
+clientHandlers[const.CMD_ROSTER_PORTRAIT](repair)
+T.equal(client.GetRosterPortrait("npc").equipment.wornVisuals.Hat.textureChoice, 4,
+    "repair reaches the newest visual")
+
+mutateAndFlush(5)
+revised = mutateAndFlush(6)
+now = now + 1000
+local gap = hydrate(revised)
+T.equal(gap.portraitPatch, nil, "skipped revision receives baseline")
+T.truthy(gap.packedPortrait or gap.portrait, "revision gap is recoverable")
+clientHandlers[const.CMD_ROSTER_PORTRAIT](gap)
+T.equal(client.GetRosterPortrait("npc").equipment.wornVisuals.Hat.textureChoice, 6,
+    "burst converges at latest revision")
+
+net.NegotiateRosterPortraits(modern, const.ROSTER_PORTRAIT_PROTOCOL, codec.Fingerprint, "stale-patch-protocol")
+revised = mutateAndFlush(7)
+now = now + 1000
+local downgrade = hydrate(revised)
+T.equal(downgrade.portraitPatch, nil, "capability change invalidates patch lane")
+T.truthy(downgrade.packedPortrait or downgrade.portrait, "capability change resolves")
+
 local overflow
 for index = 1, 129 do
     local record = copy(npc)

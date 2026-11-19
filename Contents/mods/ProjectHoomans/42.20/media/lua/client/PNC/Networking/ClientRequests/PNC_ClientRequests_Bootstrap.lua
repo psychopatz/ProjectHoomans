@@ -1,3 +1,4 @@
+local PortraitPatch = require "PNC/Core/Networking/PNC_RosterPortraitPatch"
 local PortraitCodec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
 -- Player identity and NPC roster/bootstrap request transport.
 PNC = PNC or {}
@@ -92,6 +93,7 @@ local function requestFullSync()
             requestID = syncID,
             portraitProtocol = Const.ROSTER_PORTRAIT_PROTOCOL,
             portraitCodec = PortraitCodec.Fingerprint,
+            portraitPatch = PortraitPatch.Protocol,
         })
         Client.EnsurePlayerBootstrap(Core.Now(), false)
         if Client.RequestWorldDiscovery then

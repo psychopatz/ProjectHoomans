@@ -224,6 +224,7 @@ function Network.RefreshInterestSets(now)
             ServerState.interests[key] = nil
         end
     end
+    Internal.PruneRosterPortraitCapabilities(ServerState.interests)
 end
 
 local function buildRosterDelta(entries, leanPortrait)

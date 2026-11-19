@@ -28,7 +28,7 @@ Router.Register(Const.CMD_FULL_SYNC_REQUEST, function(player, args)
     local network = PNC.Network
     local leanPortrait = network.NegotiateRosterPortraits
         and network.NegotiateRosterPortraits(player, args and args.portraitProtocol,
-            args and args.portraitCodec)
+            args and args.portraitCodec, args and args.portraitPatch)
     network.BroadcastFullSync(
         player,
         buildSnapshotList(leanPortrait),

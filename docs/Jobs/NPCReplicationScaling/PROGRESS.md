@@ -2,10 +2,12 @@
 
 ## Current state
 
-- **P1 developer-side accepted.** The [baseline](P1_BASELINE.md) records the consumer audit and 540 headless measurements.
-- **P2 developer-side accepted.** The [hydration evidence](P2_HYDRATION.md) records lean replication, bounded demand and mutation equality.
-- **P3 developer-side evaluation accepted.** The [representation evidence](P3_REPRESENTATIONS.md) records exact field packing, candidate selection and costs. Catalog-dependent encodings remain off. Native multiplayer remains user-owned.
+- **P1 developer-side accepted.** The [baseline](P1_BASELINE.md) records 540 samples and the consumer audit.
+- **P2 developer-side accepted.** The [hydration evidence](P2_HYDRATION.md) records negotiated lean rows, bounded demand hydration, normalized equality, and 594 comparison samples.
+- **P3 developer-side evaluation accepted.** The [representation evidence](P3_REPRESENTATIONS.md) records exact typed field packing, resolved fallback, and the decision to keep catalog-dependent formats off.
+- **P4 developer-side accepted.** The [convergence evidence](P4_CONVERGENCE.md) records strict adjacent-revision patches, fallback, production-seam fault injection, and 702 final comparison samples.
+- **Parent developer-side objective complete.** Native multiplayer capacity, actual network bytes, and rendered modded asset behavior await user acceptance.
 
 ## Next Chunk
 
-**P4 revisioned appearance patch and convergence.** Compile exact changes from one retained baseline to its adjacent revision. Gate patch support, preserve strict set/clear/default semantics, and recover with a bounded resolved reply on a gap or incompatibility. Re-run production regression and benchmark gates.
+**User-owned native multiplayer acceptance.** Run the scenarios in [convergence evidence](P4_CONVERGENCE.md) and record the actual native behavior separately from the verified headless results.

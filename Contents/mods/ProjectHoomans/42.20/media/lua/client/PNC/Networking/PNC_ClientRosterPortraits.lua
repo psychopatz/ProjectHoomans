@@ -1,4 +1,5 @@
 local Codec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
+local Patch = require "PNC/Core/Networking/PNC_RosterPortraitPatch"
 local Client = PNC.Client
 local Internal = Client.Internal
 local State = PNC.Network.ClientState
@@ -57,36 +58,41 @@ function Client.GetRosterPortrait(id)
     end
     local entry = entries[id]
     local now = Core.Now()
+    local displayed, displayRevision
     if entry then
         entry.usedAt = now
-        if matches(entry.reference, ref) then
-            if entry.portrait and (not entry.expiresAt or now < entry.expiresAt) then
-                return entry.portrait, entry.displayRevision
+        if matches(entry.portraitReference, ref) then
+            displayed, displayRevision = entry.portrait, entry.displayRevision
+            if displayed and (not entry.expiresAt or now < entry.expiresAt) then
+                return displayed, displayRevision
             end
-            if entry.requestAt and now - entry.requestAt < RETRY_MS then
-                return entry.portrait, entry.displayRevision
-            end
+        end
+        if matches(entry.reference, ref) and entry.requestAt
+            and now - entry.requestAt < RETRY_MS
+        then
+            return displayed, displayRevision
         end
     end
     local player = Internal.GetPlayer()
     if not player or not sendClientCommand
         or (lastRequestAt and now - lastRequestAt < MIN_REQUEST_SPACING_MS)
     then
-        if entry and matches(entry.reference, ref) then
-            return entry.portrait, entry.displayRevision
-        end
-        return nil
+        return displayed, displayRevision
     end
     entry = reserve(id)
-    if not matches(entry.reference, ref) then entry.portrait = nil end
     entry.usedAt, entry.reference = now, ref
     entry.requestID = Internal.RequestID("roster-portrait")
     entry.requestAt, lastRequestAt = now, now
+    local base = entry.portraitReference
+    local baseRevision = base and base.incarnation == ref.incarnation
+        and type(base.revision) == "number" and base.revision + 1 == ref.revision
+        and not entry.expiresAt and base.revision or nil
     sendClientCommand(player, Const.MODULE, Const.CMD_REQUEST_ROSTER_PORTRAIT, {
         id = id, incarnation = ref.incarnation, requestID = entry.requestID,
+        baseRevision = baseRevision, targetRevision = ref.revision,
         forceResolved = entry.forceResolved or nil,
     })
-    return entry.portrait, entry.displayRevision
+    return displayed, displayRevision
 end
 
 Internal.RegisterServerCommand(Const.CMD_ROSTER_PORTRAIT, function(args)
@@ -100,15 +106,31 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_PORTRAIT, function(args)
         return
     end
     local portrait = args.portrait
-    if args.portraitCodec == Codec.Fingerprint then
+    local patch = args.portraitPatch
+    if patch ~= nil then
+        local base = entry.portraitReference
+        if type(patch) == "table" and patch.protocol == Patch.Protocol
+            and entry.forceResolved ~= true
+            and base and base.incarnation == args.portraitRef.incarnation
+            and patch.baseRevision == base.revision
+            and patch.targetRevision == args.portraitRef.revision
+            and base.revision + 1 == patch.targetRevision
+        then
+            portrait = Patch.Apply(entry.portrait, patch.changes)
+        else
+            portrait = nil
+        end
+    elseif args.portraitCodec == Codec.Fingerprint then
         portrait = Codec.Unpack(args.packedPortrait)
     end
-    if type(portrait) ~= "table" then
+    if not Codec.ValidateResolved(portrait) then
+        if not entry.forceResolved then entry.requestAt = nil end
         entry.forceResolved = true
         entry.requestID = nil
-        entry.requestAt = nil
         return
     end
+    entry.forceResolved = nil
+    entry.portraitReference = args.portraitRef
     entry.displayRevision = args.portraitRef.incarnation .. ":" .. tostring(args.portraitRef.revision)
     if args.transient == true then
         entry.displayRevision = entry.displayRevision .. ":" .. entry.requestID
@@ -126,6 +148,8 @@ if Events and Events.OnDisconnect then
         State.rosterEntryRevisions = {}
         State.snapshots = {}
         State.characterPayloads = {}
+        State.inventoryResyncPending = {}
+        State.pendingCharacterInventoryRequest = nil
         Internal.ClearPendingRoster()
     end)
 end

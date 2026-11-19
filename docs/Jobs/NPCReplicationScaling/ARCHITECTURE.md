@@ -1,5 +1,13 @@
 # NPC Replication Architecture
 
+## Implemented transport
+
+Negotiated Hoomans clients receive roster and nearby portrait references. The reference names a server-session NPC incarnation and a visual revision independent of nearby gameplay ordering. An authorized demand request carries a correlation ID and may identify the last accepted adjacent appearance revision. Appearance invalidation coalesces until the authority samples the changed normalized equipment or appearance. Equality leaves the revision alone. Legacy recipients continue to consume their resolved paths.
+
+The server retains at most 128 warmed portraits, one previous projection, and one compiled payload per supported alternative for each retained portrait. Overflow gets a transient resolved view. The client cache holds up to 64 NPCs. Fixed aliases depend only on the acknowledged wire schema. A patch depends on the same NPC incarnation, matching protocol, and the immediate validated base revision. A candidate must offer a smaller estimated response than the complete available baseline. Unknown formats, invalid shape, stale requests, lifetime mismatches and gaps cannot overwrite an accepted portrait.
+
+The patch treats absent optional values as clear and restores explicit schema defaults for stable empty maps, empty arrays, and boolean flags. Authoritative generated or authored defaults with nonconstant resolved values are sent as ordinary set operations. Transport never derives those values by rerunning generation on a client.
+
 ## Existing boundaries and source evidence
 
 - The Composer already submits compact authored blueprints. The resolver applies server-side validation/inheritance before NPC creation. The recurring roster sends resolved portrait summaries; nearby presence and inventory detail are separate interest/mutation paths.

@@ -82,4 +82,42 @@ T.equal(codec.Unpack(packed).equipment.wornVisuals["fixture:costume"].textureCho
     2, "representation cannot rewrite ordinal for mismatched catalog")
 T.equal(codec.Unpack(packed).equipment.worn["fixture:costume"], itemType,
     "missing client asset leaves authoritative type intact")
+local patch = require "PNC/Core/Networking/PNC_RosterPortraitPatch"
+local old = copy(populated)
+local target = copy(cleared)
+old.appearance.hairStubble = true
+old.appearance.beardModel = "Old"
+target.appearance.hairModel = "New"
+local changes = assert(patch.Create(old, target))
+local operation = {}
+for _, change in ipairs(changes) do
+    operation[change.field] = change.op
+end
+T.equal(operation.hairStubble, "default", "restore schema default")
+T.equal(operation.beardModel, "clear", "clear optional appearance field")
+T.equal(operation.hairModel, "set", "set explicit appearance field")
+T.equal(operation.worn, "clear", "remove a visible wearable slot")
+compare(target, patch.Apply(old, changes), "patched projection")
+T.equal(old.equipment.worn["fixture:costume"], itemType, "atomic patch leaves baseline untouched")
+T.equal(patch.Create(target, copy(target)), nil, "unchanged projection emits no patch")
+T.equal(patch.Apply(old, { changes[1], changes[1] }), nil, "duplicate operation rejects atomically")
+T.equal(patch.Apply(old, { { group = "appearance", field = "identitySeed", op = "set", value = 1 } }),
+    nil, "immutable identity cannot be patched")
+target.identitySeed = 777
+T.equal(patch.Create(old, target), nil, "identity differences require full resolved fallback")
+local invalid = copy(packed)
+invalid.a.h = {}
+T.equal(codec.Unpack(invalid), nil, "packed leaf type is validated")
+local invalidRaw = copy(old)
+invalidRaw.appearance.hairModel = {}
+T.falsy(codec.ValidateResolved(invalidRaw), "resolved leaf type is validated")
+T.equal(patch.Apply(old, {
+    { group = "appearance", field = "hairStubble", op = "set", value = {} },
+}), nil, "patch leaf type is validated")
+T.equal(patch.Apply(old, {
+    { group = "equipment", field = "worn", slot = "Hat", op = "set", value = false },
+}), nil, "patch worn slot type is validated")
+local omitted = copy(old)
+omitted.appearance.hairStubble = nil
+T.equal(patch.Create(old, omitted), nil, "generator cannot erase normalized required default")
 T.finish("pnc_roster_portrait_codec_smoke")

@@ -1,4 +1,5 @@
 local Codec = require "PNC/Core/Networking/PNC_RosterPortraitCodec"
+local Patch = require "PNC/Core/Networking/PNC_RosterPortraitPatch"
 local Network = PNC.Network
 local Internal = Network.Internal
 local Const = PNC.Const
@@ -14,18 +15,6 @@ local invalidations
 local epoch
 local serial = 0
 
-local function equal(a, b)
-    if a == b then return true end
-    if type(a) ~= "table" or type(b) ~= "table" then return false end
-    for key, value in pairs(a) do
-        if not equal(value, b[key]) then return false end
-    end
-    for key, _ in pairs(b) do
-        if a[key] == nil then return false end
-    end
-    return true
-end
-
 function Network.ResetPortraitReplication()
     capabilities = setmetatable({}, { __mode = "k" })
     lifetimes = setmetatable({}, { __mode = "k" })
@@ -34,7 +23,7 @@ function Network.ResetPortraitReplication()
     epoch = nil
 end
 
-function Network.NegotiateRosterPortraits(player, protocol, codec)
+function Network.NegotiateRosterPortraits(player, protocol, codec, patch)
     if not player then return false end
     local lean = Const.ROSTER_PORTRAIT_PROTOCOL ~= nil
         and protocol == Const.ROSTER_PORTRAIT_PROTOCOL
@@ -43,6 +32,7 @@ function Network.NegotiateRosterPortraits(player, protocol, codec)
     if lean then
         local capability = capabilities[player] or { window = 0, requests = 0 }
         capability.packed = codec == Codec.Fingerprint
+        capability.patch = patch == Patch.Protocol
         capabilities[player] = capability
     else
         capabilities[player] = nil
@@ -52,6 +42,13 @@ end
 
 function Internal.UsesLeanRosterPortraits(player)
     return player ~= nil and capabilities[player] ~= nil
+end
+
+function Internal.PruneRosterPortraitCapabilities(interests)
+    for player, _ in pairs(capabilities) do
+        local state = interests[Internal.PlayerKey(player)]
+        if not state or state.player ~= player then capabilities[player] = nil end
+    end
 end
 
 local function lifetime(record)
@@ -98,13 +95,15 @@ local function retain(record, state, portrait)
 end
 
 local function update(record, state, portrait)
-    if equal(state.portrait, portrait) then return end
+    if Patch.Equal(state.portrait, portrait) then return end
+    state.previous = { revision = state.reference.revision, portrait = state.portrait }
     state.reference = {
         incarnation = state.reference.incarnation,
         revision = state.reference.revision + 1,
     }
     state.portrait = portrait
-    state.packed = nil
+    state.packed, state.packedBytes, state.fullBytes = nil, nil, nil
+    state.patch, state.patchBytes = nil, nil
     Network.QueueRosterDelta(record, false, "portrait_changed", false)
 end
 
@@ -127,7 +126,7 @@ local function processInvalidation(record, state, scope)
     local identity = PNC.Identity
     if scope == "equipment" then
         local equipment = identity.NormalizePortraitEquipment(record)
-        if equal(state.portrait.equipment, equipment) then return end
+        if Patch.Equal(state.portrait.equipment, equipment) then return end
         local projection = Core.ShallowCopy(state.portrait)
         projection.equipment = equipment
         update(record, state, projection)
@@ -148,17 +147,54 @@ function Internal.FlushPortraitInvalidations()
     end
 end
 
-local function selectPacked(state, portrait)
+local function estimatedCost(payload)
+    local bytes, sections, oversize = Network.PayloadBudget.Estimate(payload)
+    if oversize or sections._omittedSections then return math.huge end
+    return bytes
+end
+
+local function fullBytes(state)
+    state.fullBytes = state.fullBytes or estimatedCost({ portrait = state.portrait })
+    return state.fullBytes
+end
+
+local function selectPacked(state)
     if state.packed ~= nil then return state.packed end
-    local packed = Codec.Pack(portrait)
-    local budget = Network.PayloadBudget
-    if packed and budget.Estimate({ packedPortrait = packed, portraitCodec = Codec.Fingerprint }, math.huge)
-        >= budget.Estimate({ portrait = portrait }, math.huge)
-    then
-        packed = nil
+    local packed = Codec.Pack(state.portrait)
+    if packed then
+        local bytes = estimatedCost(
+            { packedPortrait = packed, portraitCodec = Codec.Fingerprint })
+        if bytes < fullBytes(state) then
+            state.packed = packed
+            state.packedBytes = bytes
+            return packed
+        end
     end
-    state.packed = packed or false
-    return packed
+    state.packed = false
+end
+
+local function selectPatch(state, args, packed)
+    local previous = state.previous
+    if not previous or args.baseRevision ~= previous.revision
+        or args.targetRevision ~= state.reference.revision
+        or previous.revision + 1 ~= state.reference.revision
+    then
+        return nil
+    end
+    if state.patch == nil then
+        local changes = Patch.Create(previous.portrait, state.portrait)
+        state.patch = changes and {
+            protocol = Patch.Protocol, baseRevision = previous.revision,
+            targetRevision = state.reference.revision, changes = changes,
+        } or false
+        if state.patch then
+            state.patchBytes = estimatedCost({ portraitPatch = state.patch })
+        end
+    end
+    if state.patch and state.patchBytes < (packed and state.packedBytes or fullBytes(state)) then
+        return state.patch
+    end
+    return nil
 end
 
 function Network.SendRosterPortrait(player, args)
@@ -205,14 +241,19 @@ function Network.SendRosterPortrait(player, args)
         portraitRef = state.reference,
         transient = not cached,
     }
-    if cached and capability.packed and args.forceResolved ~= true then
-        local packed = selectPacked(state, portrait)
-        if packed then
-            payload.packedPortrait = packed
-            payload.portraitCodec = Codec.Fingerprint
-        end
+    local packed, patch
+    if cached and args.forceResolved ~= true then
+        if capability.packed then packed = selectPacked(state) end
+        if capability.patch then patch = selectPatch(state, args, packed) end
     end
-    if not payload.packedPortrait then payload.portrait = portrait end
+    if patch then
+        payload.portraitPatch = patch
+    elseif packed then
+        payload.packedPortrait = packed
+        payload.portraitCodec = Codec.Fingerprint
+    else
+        payload.portrait = portrait
+    end
     return Internal.SendToPlayer(player, Const.CMD_ROSTER_PORTRAIT, payload)
 end
 
