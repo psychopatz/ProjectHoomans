@@ -52,7 +52,7 @@ Prove direct witness/hearsay, grievance/assistance, relationship, threat/faction
 
 **Gate:** no full social-store dump and no new conversation/memory authority.
 
-## H5 — Multiplayer and actor continuity
+## H5 — Multiplayer and actor continuity (Accepted)
 
 Prove NPC-to-NPC, NPC-to-player, player-caused events, reconnect identity and any Core provider/materialization transitions preserve authoritative social state.
 
@@ -60,7 +60,7 @@ Clients cannot author relationship/memory outcomes.
 
 **Gate:** protocol/harness cases pass with bounded projections.
 
-## H6 — Scale and participant acceptance
+## H6 — Scale and participant acceptance (Next)
 
 Stress sparse contacts, repeated events, anchor/retention pressure, many abstract/non-live actors and long world time.
 
