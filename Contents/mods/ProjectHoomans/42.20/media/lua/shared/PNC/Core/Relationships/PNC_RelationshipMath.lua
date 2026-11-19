@@ -34,11 +34,16 @@ end
 
 function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
     local normalized = Types.NormalizeMemory(memory)
-    local elapsedDays
+    local coreSocial = PsychopatzCore and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.Social or nil
     if not normalized then
         return 0
     end
-    if normalized.permanent then
+    if coreSocial and type(coreSocial.CalculateMemoryStrength) == "function" then
+        return coreSocial.CalculateMemoryStrength(normalized, worldAgeHours)
+    end
+    local elapsedDays
+    if normalized.permanent or normalized.retentionClass == "ANCHOR" then
         return normalized.strength
     end
     worldAgeHours = tonumber(worldAgeHours) or normalized.createdAt
@@ -47,6 +52,9 @@ function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
         or worldAgeHours == -math.huge
     then
         worldAgeHours = normalized.createdAt
+    end
+    if normalized.retentionClass == "SCENE" then
+        return worldAgeHours <= normalized.createdAt and normalized.strength or 0
     end
     elapsedDays = math.max(
         0,

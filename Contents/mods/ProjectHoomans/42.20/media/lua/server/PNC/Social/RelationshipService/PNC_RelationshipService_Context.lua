@@ -59,7 +59,7 @@ local function getRelationship(record, targetKey)
         if actor and actor.social then
             local coreRel = PsychopatzCore.Actors.Social.Get(actor.social, targetKey)
             if coreRel then
-                if not rel then
+                if not rel or (tonumber(coreRel.revision) or 0) > (tonumber(rel.revision) or 0) then
                     if PNC.Persistence and PNC.Persistence.CoreSocial
                         and PNC.Persistence.CoreSocial.FromCoreSocial
                     then

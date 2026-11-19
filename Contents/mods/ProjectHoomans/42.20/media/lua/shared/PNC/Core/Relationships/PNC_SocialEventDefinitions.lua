@@ -496,6 +496,45 @@ for _, definition in pairs(Definitions) do
     if metadata then metadata.retain = true end
 end
 
+-- Synchronize portable retention/salience/decay/caps from CodeBuilder-compiled
+-- PNC/SocialPolicy/Registry when present while keeping Hoomans gameplay hooks.
+local socialPolicyRegistry = PNC and PNC.SocialPolicy and PNC.SocialPolicy.Registry
+if not socialPolicyRegistry and type(require) == "function" then
+    local ok, loaded = pcall(require, "PNC/SocialPolicy/Registry")
+    if ok and type(loaded) == "table" then
+        socialPolicyRegistry = loaded
+    end
+end
+if type(socialPolicyRegistry) == "table" and type(socialPolicyRegistry.Resolve) == "function" then
+    for id, definition in pairs(Definitions) do
+        local compiled = socialPolicyRegistry.Resolve(id)
+        if type(compiled) == "table" and type(definition.targetMemory) == "table" then
+            definition.targetMemory.retentionClass = compiled.retentionClass
+            if compiled.salience ~= nil then
+                definition.targetMemory.salience = compiled.salience
+            end
+            if compiled.decayPerDay ~= nil then
+                definition.targetMemory.decayPerDay = compiled.decayPerDay
+            end
+            if compiled.permanent ~= nil then
+                definition.targetMemory.permanent = compiled.permanent == true
+            end
+            if compiled.shareable ~= nil then
+                definition.targetMemory.shareable = compiled.shareable == true
+            end
+            if compiled.consolidationFamily ~= nil then
+                definition.targetMemory.consolidationFamily = compiled.consolidationFamily
+            end
+            if compiled.cooldownHours ~= nil and compiled.cooldownHours > 0 then
+                definition.cooldownHours = compiled.cooldownHours
+            end
+            if type(compiled.evidence) == "table" and type(definition.semantic) == "table" then
+                definition.semantic.retentionSalience = compiled.salience or definition.semantic.retentionSalience
+            end
+        end
+    end
+end
+
 -- An NPC helper also remembers providing aid. This is a zero-effect actor
 -- projection of the same authoritative event, with explicitly reversed roles.
 for _, id in ipairs({ "treated_wound", "saved_from_incapacitation" }) do

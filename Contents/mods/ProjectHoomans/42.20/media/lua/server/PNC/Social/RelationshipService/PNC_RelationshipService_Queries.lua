@@ -70,6 +70,19 @@ function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, 
         local memory = memories[index]
         local entry = Events.GetType(memory.type)
         local metadata = entry and entry.semantic
+        if not metadata and PsychopatzCore and PsychopatzCore.SocialPolicy
+            and type(PsychopatzCore.SocialPolicy.Resolve) == "function"
+        then
+            local compiled = PsychopatzCore.SocialPolicy.Resolve(memory.type)
+            if compiled and compiled.evidence and compiled.evidence.semantic ~= false then
+                metadata = {
+                    retain = true,
+                    retentionSalience = compiled.salience or 100,
+                    classes = compiled.evidence.classes or {},
+                    relations = compiled.evidence.relations or {},
+                }
+            end
+        end
         local strength = Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
         if metadata and strength > 0 and memory.aboutKey == targetKey and Evidence.MatchesMeaning(metadata, query) then
             rows[#rows + 1] = { sourceRef = memory.id, eventType = memory.type,
@@ -77,10 +90,15 @@ function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, 
                 targetID = metadata.actorRole == "observer" and actorID or observerNPCID,
                 classes = metadata.classes, relations = metadata.relations,
                 retentionSalience = metadata.retentionSalience,
+                confidence = memory.confidence,
+                sourceMode = memory.sourceMode,
+                sourceKey = memory.sourceKey,
+                count = memory.count,
                 effectiveStrength = strength, occurredAt = memory.createdAt,
                 sequence = memory.eventSequence or index,
                 ageHours = math.max(0, (tonumber(worldAgeHours) or memory.createdAt) - memory.createdAt),
-                provenance = "relationship.memories", visibility = memory.knowledgeSource }
+                provenance = memory.sourceMode == "hearsay" and "relationship.memories:hearsay" or "relationship.memories",
+                visibility = memory.knowledgeSource }
         end
     end
     table.sort(rows, function(a, b)

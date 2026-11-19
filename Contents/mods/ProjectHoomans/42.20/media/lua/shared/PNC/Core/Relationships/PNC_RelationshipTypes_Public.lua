@@ -135,19 +135,25 @@ function Types.NormalizeMemory(value)
     if not source then
         return nil
     end
-    id = normalizeRequiredString(source.id)
+    id = normalizeRequiredString(source.id or source.eventID)
     memoryType = normalizeRequiredString(source.type)
-    aboutKey = EntityRef.IsValid(source.aboutKey) and source.aboutKey or nil
+    local validAbout = EntityRef.IsCoreTargetValid
+        and EntityRef.IsCoreTargetValid(source.aboutKey)
+        or EntityRef.IsValid(source.aboutKey)
+    aboutKey = validAbout and source.aboutKey or nil
     knowledgeSource = tostring(source.knowledgeSource or
         Constants.KNOWLEDGE_EXPERIENCED)
     if not Constants.VALID_KNOWLEDGE_SOURCES[knowledgeSource] then
         knowledgeSource = Constants.KNOWLEDGE_EXPERIENCED
     end
-    sourceKey = EntityRef.IsValid(source.sourceKey) and source.sourceKey or nil
+    local validSource = EntityRef.IsCoreTargetValid
+        and EntityRef.IsCoreTargetValid(source.sourceKey)
+        or EntityRef.IsValid(source.sourceKey)
+    sourceKey = validSource and source.sourceKey or nil
     if not id or not memoryType or not aboutKey then
         return nil
     end
-    return {
+    local normalized = {
         id = id,
         type = memoryType,
         aboutKey = aboutKey,
@@ -194,14 +200,60 @@ function Types.NormalizeMemory(value)
         sourceKey = sourceKey,
         tags = normalizeTags(source.tags),
     }
+    if type(source.retentionClass) == "string" and source.retentionClass ~= "" then
+        normalized.retentionClass = source.retentionClass
+    end
+    if tonumber(source.salience) ~= nil then
+        normalized.salience = math.floor(clamp(source.salience, 0, 255, 100))
+    end
+    if type(source.consolidationKey) == "string" and source.consolidationKey ~= "" then
+        normalized.consolidationKey = source.consolidationKey
+    end
+    if tonumber(source.count) ~= nil then
+        normalized.count = math.max(1, math.floor(tonumber(source.count)))
+    end
+    if tonumber(source.firstCreatedAt) ~= nil then
+        normalized.firstCreatedAt = nonNegative(source.firstCreatedAt, normalized.createdAt)
+    end
+    if type(source.lastEventID) == "string" and source.lastEventID ~= "" then
+        normalized.lastEventID = source.lastEventID
+    end
+    if type(source.sourceMode) == "string" and source.sourceMode ~= "" then
+        normalized.sourceMode = source.sourceMode
+    end
+    if tonumber(source.confidence) ~= nil then
+        normalized.confidence = clamp(source.confidence, 0, 1, 1)
+    end
+    if tonumber(source.familiarityEffect) ~= nil then
+        normalized.familiarityEffect = clamp(source.familiarityEffect, 0, 100, 0)
+    end
+    return normalized
 end
 
 function Types.NewMemory(spec)
     return Types.NormalizeMemory(spec)
 end
 
-function Types.NewRelationship(targetKey)
+local function parseTargetFlexible(targetKey)
     local parsed = EntityRef.Parse(targetKey)
+    if parsed then return parsed end
+    local social = PsychopatzCore and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.Social or nil
+    if social and type(social.ParseTargetKey) == "function" then
+        local coreParsed = social.ParseTargetKey(targetKey)
+        if coreParsed then
+            return {
+                key = coreParsed.key,
+                kind = coreParsed.kind,
+                targetID = coreParsed.id,
+            }
+        end
+    end
+    return nil
+end
+
+function Types.NewRelationship(targetKey)
+    local parsed = parseTargetFlexible(targetKey)
     if not parsed then
         return nil
     end
@@ -228,7 +280,7 @@ function Types.NewRelationship(targetKey)
 end
 
 function Types.NormalizeRelationship(value, targetKey)
-    local parsed = EntityRef.Parse(targetKey)
+    local parsed = parseTargetFlexible(targetKey)
     local source = type(value) == "table" and value or {}
     local state
     local previousState

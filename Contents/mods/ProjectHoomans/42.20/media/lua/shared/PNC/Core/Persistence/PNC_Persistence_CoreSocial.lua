@@ -51,25 +51,24 @@ function Adapter.ToCoreSocial(recordSocial, core)
                 local relExt = type(rel.extensions) == "table"
                     and clone(rel.extensions) or {}
                 relExt.ProjectHoomans = {
-                    baselineApproval = tonumber(rel.baselineApproval) or 0,
-                    baselineRespect = tonumber(rel.baselineRespect) or 0,
-                    state = rel.state,
-                    previousState = rel.previousState,
                     bond = clone(rel.bond),
-                    saturation = clone(rel.saturation),
-                    cooldowns = clone(rel.cooldowns),
                     interactionJournal = clone(rel.interactionJournal),
                     interactionRevision = tonumber(rel.interactionRevision) or 0,
-                    lastInteractionAt = tonumber(rel.lastInteractionAt) or 0,
-                    lastEvaluatedAt = tonumber(rel.lastEvaluatedAt) or 0,
                 }
                 relationships[targetKey] = {
                     targetKey = targetKey,
                     approval = tonumber(rel.approval) or 0,
                     respect = tonumber(rel.respect) or 0,
                     familiarity = tonumber(rel.familiarity) or 0,
+                    baselineApproval = tonumber(rel.baselineApproval) or 0,
+                    baselineRespect = tonumber(rel.baselineRespect) or 0,
+                    state = rel.state,
+                    previousState = rel.previousState,
+                    cooldowns = clone(rel.cooldowns),
+                    saturation = clone(rel.saturation),
                     revision = tonumber(rel.revision) or 0,
                     lastEventAt = rel.lastInteractionAt or rel.lastEvaluatedAt,
+                    lastEvaluatedAt = tonumber(rel.lastEvaluatedAt) or 0,
                     memories = clone(rel.memories or {}),
                     extensions = relExt,
                 }
@@ -106,7 +105,7 @@ function Adapter.FromCoreSocial(coreSocial, fallbackSocial)
                 local relExt = coreRel.extensions
                     and coreRel.extensions.ProjectHoomans or {}
 
-                local state = relExt.state or fallbackRel.state
+                local state = coreRel.state or relExt.state or fallbackRel.state
                 if not state or state == "" then
                     if PNC.RelationshipStates
                         and type(PNC.RelationshipStates.ResolveState) == "function"
@@ -117,31 +116,52 @@ function Adapter.FromCoreSocial(coreSocial, fallbackSocial)
                     end
                 end
 
+                local baseApp = coreRel.baselineApproval
+                if baseApp == nil then baseApp = relExt.baselineApproval end
+                local baseResp = coreRel.baselineRespect
+                if baseResp == nil then baseResp = relExt.baselineRespect end
+                if baseApp == nil or baseResp == nil then
+                    local memApp, memResp = 0, 0
+                    for _, m in ipairs(coreRel.memories or {}) do
+                        memApp = memApp + (tonumber(m.approvalEffect) or 0)
+                        memResp = memResp + (tonumber(m.respectEffect) or 0)
+                    end
+                    if baseApp == nil then
+                        baseApp = fallbackRel.baselineApproval ~= nil
+                            and tonumber(fallbackRel.baselineApproval)
+                            or ((tonumber(coreRel.approval) or 0) - memApp)
+                    end
+                    if baseResp == nil then
+                        baseResp = fallbackRel.baselineRespect ~= nil
+                            and tonumber(fallbackRel.baselineRespect)
+                            or ((tonumber(coreRel.respect) or 0) - memResp)
+                    end
+                end
+
                 relationships[targetKey] = {
                     targetKey = targetKey,
                     approval = tonumber(coreRel.approval) or 0,
                     respect = tonumber(coreRel.respect) or 0,
                     familiarity = tonumber(coreRel.familiarity) or 0,
                     revision = tonumber(coreRel.revision) or 0,
-                    baselineApproval = tonumber(relExt.baselineApproval
-                        or fallbackRel.baselineApproval) or 0,
-                    baselineRespect = tonumber(relExt.baselineRespect
-                        or fallbackRel.baselineRespect) or 0,
+                    baselineApproval = tonumber(baseApp) or 0,
+                    baselineRespect = tonumber(baseResp) or 0,
                     state = state,
-                    previousState = relExt.previousState
+                    previousState = coreRel.previousState
+                        or relExt.previousState
                         or fallbackRel.previousState
                         or Constants and Constants.STATE_UNKNOWN or "unknown",
                     bond = clone(relExt.bond or fallbackRel.bond),
-                    saturation = clone(relExt.saturation or fallbackRel.saturation or {}),
-                    cooldowns = clone(relExt.cooldowns or fallbackRel.cooldowns or {}),
+                    saturation = clone(coreRel.saturation or relExt.saturation or fallbackRel.saturation or {}),
+                    cooldowns = clone(coreRel.cooldowns or relExt.cooldowns or fallbackRel.cooldowns or {}),
                     interactionJournal = clone(relExt.interactionJournal
                         or fallbackRel.interactionJournal or {}),
                     interactionRevision = tonumber(relExt.interactionRevision
                         or fallbackRel.interactionRevision) or 0,
                     lastInteractionAt = tonumber(relExt.lastInteractionAt
                         or coreRel.lastEventAt or fallbackRel.lastInteractionAt) or 0,
-                    lastEvaluatedAt = tonumber(relExt.lastEvaluatedAt
-                        or fallbackRel.lastEvaluatedAt) or 0,
+                    lastEvaluatedAt = tonumber(coreRel.lastEvaluatedAt
+                        or relExt.lastEvaluatedAt or fallbackRel.lastEvaluatedAt) or 0,
                     memories = clone(coreRel.memories or {}),
                     extensions = clone(coreRel.extensions or {}),
                 }
@@ -257,17 +277,9 @@ function Adapter.SyncToCore(record, core)
 
                 if rel then
                     local hoomExt = {
-                        baselineApproval = tonumber(hoomRel.baselineApproval) or 0,
-                        baselineRespect = tonumber(hoomRel.baselineRespect) or 0,
-                        state = hoomRel.state,
-                        previousState = hoomRel.previousState,
                         bond = clone(hoomRel.bond),
-                        saturation = clone(hoomRel.saturation),
-                        cooldowns = clone(hoomRel.cooldowns),
                         interactionJournal = clone(hoomRel.interactionJournal),
                         interactionRevision = tonumber(hoomRel.interactionRevision) or 0,
-                        lastInteractionAt = tonumber(hoomRel.lastInteractionAt) or 0,
-                        lastEvaluatedAt = tonumber(hoomRel.lastEvaluatedAt) or 0,
                     }
 
                     local relRev = tonumber(rel.revision) or 0
@@ -285,6 +297,19 @@ function Adapter.SyncToCore(record, core)
                             rel.familiarity = math.max(Social.MIN_FAMILIARITY or 0,
                                 math.min(Social.MAX_FAMILIARITY or 100, tonumber(hoomRel.familiarity) or 0))
                         end
+                        if hoomRel.baselineApproval ~= nil then
+                            rel.baselineApproval = tonumber(hoomRel.baselineApproval) or 0
+                        end
+                        if hoomRel.baselineRespect ~= nil then
+                            rel.baselineRespect = tonumber(hoomRel.baselineRespect) or 0
+                        end
+                        if hoomRel.state ~= nil then rel.state = hoomRel.state end
+                        if hoomRel.previousState ~= nil then rel.previousState = hoomRel.previousState end
+                        if hoomRel.cooldowns ~= nil then rel.cooldowns = clone(hoomRel.cooldowns) end
+                        if hoomRel.saturation ~= nil then rel.saturation = clone(hoomRel.saturation) end
+                        if hoomRel.lastEvaluatedAt ~= nil then
+                            rel.lastEvaluatedAt = tonumber(hoomRel.lastEvaluatedAt) or 0
+                        end
                     end
 
                     rel.lastEventAt = math.max(
@@ -297,7 +322,7 @@ function Adapter.SyncToCore(record, core)
                     rel.extensions = rel.extensions or {}
                     rel.extensions.ProjectHoomans = hoomExt
 
-                    -- Deduplicating memory merge
+                    -- Deduplicating memory merge using Core retention bounds
                     rel.memories = rel.memories or {}
                     local existingMemoryIDs = {}
                     for _, m in ipairs(rel.memories) do
@@ -308,17 +333,46 @@ function Adapter.SyncToCore(record, core)
                         local mid = m.id or m.eventID
                         if mid and not existingMemoryIDs[mid] then
                             existingMemoryIDs[mid] = true
-                            rel.memories[#rel.memories + 1] = clone(m)
+                            local cloned = clone(m)
+                            cloned.aboutKey = resolvedKey
+                            if Social.ConsolidateOrInsertMemory then
+                                Social.ConsolidateOrInsertMemory(rel, cloned, {
+                                    consolidate = false,
+                                    worldAgeHours = hoomRel.lastEvaluatedAt or rel.lastEvaluatedAt,
+                                })
+                            else
+                                rel.memories[#rel.memories + 1] = cloned
+                            end
                         end
                     end
-                    while #rel.memories > (Social.MAX_MEMORIES or 32) do
-                        table.remove(rel.memories, 1)
+                    if Social.PruneMemories then
+                        Social.PruneMemories(rel, hoomRel.lastEvaluatedAt or rel.lastEvaluatedAt)
+                    else
+                        while #rel.memories > (Social.MAX_MEMORIES or 64) do
+                            table.remove(rel.memories, 1)
+                        end
                     end
 
                     rel.revision = math.max(relRev, hoomRev) + 1
                 end
             end
         end
+    end
+
+    currentSocial.recentEventIDs = currentSocial.recentEventIDs or {}
+    local seenRecent = {}
+    for _, eid in ipairs(currentSocial.recentEventIDs) do
+        seenRecent[eid] = true
+    end
+    for _, eid in ipairs(record.social.recentEventIDs or {}) do
+        if type(eid) == "string" and eid ~= "" and not seenRecent[eid] then
+            seenRecent[eid] = true
+            currentSocial.recentEventIDs[#currentSocial.recentEventIDs + 1] = eid
+        end
+    end
+    local maxRecent = Social.MAX_RECENT_EVENTS or 128
+    while #currentSocial.recentEventIDs > maxRecent do
+        table.remove(currentSocial.recentEventIDs, 1)
     end
 
     currentSocial.revision = (tonumber(currentSocial.revision) or 0) + 1

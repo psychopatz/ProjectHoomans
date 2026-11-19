@@ -23,12 +23,30 @@ local function normalizeComponent(value)
     return text
 end
 
+local function normalizeTargetPayload(value)
+    if type(value) ~= "string" then return nil end
+    if value == "" or #value > MAX_COMPONENT_LENGTH
+        or string.match(value, "^%s+$") or string.find(value, "%c")
+    then
+        return nil
+    end
+    return value
+end
+
 function EntityRef.ForNPC(npcID)
     npcID = normalizeComponent(npcID)
     if not npcID then
         return nil
     end
     return "npc:" .. npcID
+end
+
+function EntityRef.ForActor(actorID)
+    actorID = normalizeTargetPayload(actorID)
+    if not actorID then
+        return nil
+    end
+    return "actor:" .. actorID
 end
 
 function EntityRef.ForPlayerIdentity(accountIdentity, characterUUID)
@@ -42,14 +60,15 @@ end
 
 function EntityRef.Parse(key)
     local npcID
+    local actorID
     local accountIdentity
     local characterUUID
     if type(key) ~= "string" then
         return nil
     end
-    npcID = string.match(key, "^npc:([^:]+)$")
+    npcID = string.match(key, "^npc:(.+)$")
     if npcID then
-        npcID = normalizeComponent(npcID)
+        npcID = normalizeTargetPayload(npcID)
         if not npcID then
             return nil
         end
@@ -59,6 +78,20 @@ function EntityRef.Parse(key)
             id = npcID,
             npcID = npcID,
             targetID = npcID,
+        }
+    end
+    actorID = string.match(key, "^actor:(.+)$")
+    if actorID then
+        actorID = normalizeTargetPayload(actorID)
+        if not actorID then
+            return nil
+        end
+        return {
+            key = key,
+            kind = "actor",
+            id = actorID,
+            actorID = actorID,
+            targetID = actorID,
         }
     end
     accountIdentity, characterUUID =
@@ -76,6 +109,21 @@ function EntityRef.Parse(key)
         characterUUID = characterUUID,
         targetID = accountIdentity .. ":" .. characterUUID,
     }
+end
+
+function EntityRef.IsActor(key)
+    local parsed = EntityRef.Parse(key)
+    return parsed ~= nil and parsed.kind == "actor"
+end
+
+function EntityRef.IsCoreTargetValid(key)
+    if EntityRef.Parse(key) ~= nil then return true end
+    local social = PsychopatzCore and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.Social or nil
+    if social and type(social.NormalizeTargetKey) == "function" then
+        return social.NormalizeTargetKey(key) ~= nil
+    end
+    return false
 end
 
 function EntityRef.IsNPC(key)
