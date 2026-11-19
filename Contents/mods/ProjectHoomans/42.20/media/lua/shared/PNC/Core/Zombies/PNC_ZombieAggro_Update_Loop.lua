@@ -5,18 +5,66 @@ require "PNC/Core/Zombies/PNC_ZombieAggro_Update_Targets"
 
 local Internal = ZombieAggro.Internal
 local Core = Internal.Core
+local Const = Internal.Const
+local Registry = Internal.Registry
 local ZombieReaction = Internal.ZombieReaction
 local isForeignOwnedBody = Internal.isForeignOwnedBody
 local isMultiplayerServer = Internal.isMultiplayerServer
 local setNoLungeAttack = Internal.setNoLungeAttack
 local logPursuitDiagnostic = Internal.logPursuitDiagnostic
+local isPursuitAuditEnabled = Internal.isPursuitAuditEnabled
 local actionStateName = Internal.actionStateName
 local clearMPTargetDirective = Internal.clearMPTargetDirective
 local pursueNPCRecord = Internal.pursueNPCRecord
 local acquireNearestTarget = Internal.acquireNearestTarget
 local incrementDiagnostic = Internal.incrementDiagnostic
 
-local function processZombie(zombie, now)
+local function hasActiveWork()
+    local liveByID = Registry and Registry.LiveByID or nil
+    if not liveByID then
+        return true
+    end
+    for id, body in pairs(liveByID) do
+        if id ~= nil and body ~= nil then
+            return true
+        end
+    end
+    local activeSet = ZombieAggro.ActiveSet
+    if activeSet and activeSet.order and #activeSet.order > 0 then
+        return true
+    end
+    local bites = ZombieAggro.State and ZombieAggro.State.bites or nil
+    if bites then
+        for _, _ in pairs(bites) do
+            return true
+        end
+    end
+    return false
+end
+
+local function closeOrHitCooldown(zombie, npcBody, hitSettling)
+    if hitSettling == true or not npcBody then
+        return 0
+    end
+    if Core and Core.DistanceSq
+        and zombie.getX and zombie.getY
+        and npcBody.getX and npcBody.getY
+    then
+        local biteDist = Const and tonumber(Const.ZOMBIE_BITE_DISTANCE) or 1.2
+        local closeRange = biteDist + 1.5
+        if Core.DistanceSq(
+            zombie:getX(),
+            zombie:getY(),
+            npcBody:getX(),
+            npcBody:getY()
+        ) <= (closeRange * closeRange) then
+            return 0
+        end
+    end
+    return (Const and tonumber(Const.ZOMBIE_AGGRO_PURSUIT_INTERVAL_MS)) or 150
+end
+
+local function processZombie(zombie, now, foreignChecked)
     local target
     local record
     local npcBody
@@ -27,13 +75,14 @@ local function processZombie(zombie, now)
     local nativePlayerTarget
     local nativePlayerSource
     local nativePlayerAction
-    if isForeignOwnedBody(zombie) then
-        return
+    local idleInterval = (Const and tonumber(Const.ZOMBIE_AGGRO_IDLE_INTERVAL_MS)) or 250
+    if foreignChecked ~= true and isForeignOwnedBody(zombie) then
+        return idleInterval, nil
     end
     if Internal.ShouldYieldToPursuitOwner
         and Internal.ShouldYieldToPursuitOwner(zombie, "ProjectHoomans", now)
     then
-        return
+        return idleInterval, nil
     end
     if ZombieReaction and ZombieReaction.Pump then
         ZombieReaction.Pump(zombie, now)
@@ -78,18 +127,24 @@ local function processZombie(zombie, now)
         biteEntry = ZombieAggro.BiteInternal
             and ZombieAggro.BiteInternal.GetBiteEntry
             and ZombieAggro.BiteInternal.GetBiteEntry(zombieId)
-        logPursuitDiagnostic(
-            zombie,
-            biteEntry and biteEntry.npcId or nil,
-            "server_combat",
-            "bite_state_owns_zombie",
-            "action=" .. actionStateName(zombie)
-                .. " phase=" .. tostring(biteEntry and biteEntry.phase)
-                .. " damageApplied="
-                .. tostring(biteEntry and biteEntry.appliedDamage == true),
-            now
-        )
-        return
+        if isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                biteEntry and biteEntry.npcId or nil,
+                "server_combat",
+                "bite_state_owns_zombie",
+                "action=" .. actionStateName(zombie)
+                    .. " phase=" .. tostring(biteEntry and biteEntry.phase)
+                    .. " damageApplied="
+                    .. tostring(biteEntry and biteEntry.appliedDamage == true),
+                now
+            )
+        end
+        local biteNpcBody = biteEntry and biteEntry.npcId
+            and Registry and Registry.GetLiveZombie
+            and Registry.GetLiveZombie(biteEntry.npcId)
+            or nil
+        return 0, biteNpcBody
     end
 
     if nativePlayerOwned then
@@ -99,16 +154,18 @@ local function processZombie(zombie, now)
             now,
             "player_target_" .. tostring(nativePlayerSource or "handoff")
         )
-        logPursuitDiagnostic(
-            zombie,
-            nil,
-            "compatibility",
-            "native_player_handoff",
-            "action=" .. tostring(nativePlayerAction)
-                .. " source=" .. tostring(nativePlayerSource),
-            now
-        )
-        return
+        if isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                nil,
+                "compatibility",
+                "native_player_handoff",
+                "action=" .. tostring(nativePlayerAction)
+                    .. " source=" .. tostring(nativePlayerSource),
+                now
+            )
+        end
+        return 0, nil
     end
 
     -- A foreign provider may own the native target without publishing a
@@ -117,15 +174,17 @@ local function processZombie(zombie, now)
     if Internal.GetNativeTargetOwner then
         local nativeOwner = Internal.GetNativeTargetOwner(zombie)
         if nativeOwner and nativeOwner ~= "ProjectHoomans" then
-            logPursuitDiagnostic(
-                zombie,
-                nil,
-                "compatibility",
-                "native_control_yield",
-                "owner=" .. tostring(nativeOwner),
-                now
-            )
-            return
+            if isPursuitAuditEnabled() then
+                logPursuitDiagnostic(
+                    zombie,
+                    nil,
+                    "compatibility",
+                    "native_control_yield",
+                    "owner=" .. tostring(nativeOwner),
+                    now
+                )
+            end
+            return idleInterval, nil
         end
     end
 
@@ -133,23 +192,26 @@ local function processZombie(zombie, now)
     -- falls back to players only after this NPC target is no longer eligible.
     record, npcBody = Internal.getForcedNPCBodyTarget(zombie, now)
     if pursueNPCRecord(zombie, record, npcBody, now, hitSettling) then
-        return
+        return closeOrHitCooldown(zombie, npcBody, hitSettling), npcBody
     end
 
     target = zombie.getTarget and zombie:getTarget() or nil
     if Core.IsManagedNPCBody(target) then
         Internal.forceAggro(zombie, target)
         record, npcBody = Internal.getForcedNPCBodyTarget(zombie, now)
-        pursueNPCRecord(zombie, record, npcBody, now, hitSettling)
-        return
+        if pursueNPCRecord(zombie, record, npcBody, now, hitSettling) then
+            return closeOrHitCooldown(zombie, npcBody, hitSettling), npcBody
+        end
+        return idleInterval, nil
     end
     if Internal.isCloseLivePlayerTarget(zombie, target) then
         record, npcBody = acquireNearestTarget(zombie)
         if not pursueNPCRecord(zombie, record, npcBody, now, hitSettling) then
             setNoLungeAttack(zombie, false)
             clearMPTargetDirective(zombie, now)
+            return idleInterval, nil
         end
-        return
+        return closeOrHitCooldown(zombie, npcBody, hitSettling), npcBody
     end
     record, npcBody = acquireNearestTarget(zombie)
     if isMultiplayerServer() then
@@ -159,11 +221,18 @@ local function processZombie(zombie, now)
             clearMPTargetDirective(zombie, now)
         end
     end
+    if record and npcBody then
+        return 0, npcBody
+    end
+    return idleInterval, nil
 end
 
 function ZombieAggro.Pump(now)
     if not Core.IsAuthority() then
-        return
+        return 0
+    end
+    if not hasActiveWork() then
+        return 0
     end
 
     if ZombieAggro.PumpBiteRecovery then
@@ -184,6 +253,7 @@ Internal.UpdateProviders.Multiplayer = Multiplayer
 Internal.UpdateProviders.isMultiplayerServer = isMultiplayerServer
 Internal.UpdateProviders.incrementDiagnostic = incrementDiagnostic
 Internal.UpdateProviders.logPursuitDiagnostic = logPursuitDiagnostic
+Internal.UpdateProviders.isPursuitAuditEnabled = isPursuitAuditEnabled
 require "PNC/Core/Zombies/PNC_ZombieAggro_Update_Multiplayer"
 
 return ZombieAggro

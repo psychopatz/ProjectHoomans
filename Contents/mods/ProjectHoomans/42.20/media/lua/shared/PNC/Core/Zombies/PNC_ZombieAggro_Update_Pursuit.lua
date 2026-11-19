@@ -9,6 +9,7 @@ local Multiplayer = Internal.Multiplayer
 local isMultiplayerServer = Internal.isMultiplayerServer
 local setNoLungeAttack = Internal.setNoLungeAttack
 local logPursuitDiagnostic = Internal.logPursuitDiagnostic
+local isPursuitAuditEnabled = Internal.isPursuitAuditEnabled
 local actionStateName = Internal.actionStateName
 local refreshPursuitPath = Internal.refreshPursuitPath
 
@@ -37,14 +38,16 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
         zombie, "ProjectHoomans", now, 100
     )
     if not canWriteNative then
-        logPursuitDiagnostic(
-            zombie,
-            record and record.id or nil,
-            "server_target",
-            "native_control_denied",
-            "owner=" .. tostring(nativeOwner),
-            now
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                record and record.id or nil,
+                "server_target",
+                "native_control_denied",
+                "owner=" .. tostring(nativeOwner),
+                now
+            )
+        end
         return false
     end
     if not Internal.AcquirePursuitLease(
@@ -57,19 +60,21 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
         100,
         "hoomans_npc"
     ) then
-        logPursuitDiagnostic(
-            zombie,
-            record and record.id or nil,
-            "server_target",
-            "pursuit_lease_denied",
-            "owner=" .. tostring(
-                Internal.GetPursuitLease
-                    and Internal.GetPursuitLease(zombie, now)
-                    and Internal.GetPursuitLease(zombie, now).owner
-                    or "unknown"
-            ),
-            now
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                record and record.id or nil,
+                "server_target",
+                "pursuit_lease_denied",
+                "owner=" .. tostring(
+                    Internal.GetPursuitLease
+                        and Internal.GetPursuitLease(zombie, now)
+                        and Internal.GetPursuitLease(zombie, now).owner
+                        or "unknown"
+                ),
+                now
+            )
+        end
         return
     end
     if npcBody.setZombiesDontAttack then
@@ -118,12 +123,14 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
         npcSquare = npcBody.getSquare and npcBody:getSquare() or nil
         if not zombieSquare or not npcSquare then
             repathClose = true
-            logPursuitDiagnostic(
-                zombie, record.id, "server_combat", "close_square_missing",
-                "distance=" .. tostring(dist)
-                    .. " zombieSquare=" .. tostring(zombieSquare ~= nil)
-                    .. " npcSquare=" .. tostring(npcSquare ~= nil), now
-            )
+            if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+                logPursuitDiagnostic(
+                    zombie, record.id, "server_combat", "close_square_missing",
+                    "distance=" .. tostring(dist)
+                        .. " zombieSquare=" .. tostring(zombieSquare ~= nil)
+                        .. " npcSquare=" .. tostring(npcSquare ~= nil), now
+                )
+            end
         else
             blocked = zombieSquare:isSomethingTo(npcSquare)
         end
@@ -135,21 +142,25 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
                     )
                     approach = biteStarted ~= true
                     repathClose = approach
-                    logPursuitDiagnostic(
-                        zombie, record.id, "server_combat",
-                        biteStarted and "bite_started_or_active"
-                            or "bite_start_rejected",
-                        "distance=" .. tostring(dist)
-                            .. " action=" .. actionStateName(zombie), now
-                    )
+                    if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+                        logPursuitDiagnostic(
+                            zombie, record.id, "server_combat",
+                            biteStarted and "bite_started_or_active"
+                                or "bite_start_rejected",
+                            "distance=" .. tostring(dist)
+                                .. " action=" .. actionStateName(zombie), now
+                        )
+                    end
                 else
                     approach = true
                     repathClose = true
-                    logPursuitDiagnostic(
-                        zombie, record.id, "server_combat", "hit_settling",
-                        "distance=" .. tostring(dist)
-                            .. " action=" .. actionStateName(zombie), now
-                    )
+                    if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+                        logPursuitDiagnostic(
+                            zombie, record.id, "server_combat", "hit_settling",
+                            "distance=" .. tostring(dist)
+                                .. " action=" .. actionStateName(zombie), now
+                        )
+                    end
                 end
             elseif zombie.faceThisObject then
                 -- Keep the pursuit alive while the zombie turns. The old
@@ -159,29 +170,35 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
                 approach = true
                 repathClose = true
                 zombie:faceThisObject(npcBody)
-                logPursuitDiagnostic(
-                    zombie, record.id, "server_combat", "turning_to_npc",
-                    "distance=" .. tostring(dist)
-                        .. " action=" .. actionStateName(zombie), now
-                )
+                if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+                    logPursuitDiagnostic(
+                        zombie, record.id, "server_combat", "turning_to_npc",
+                        "distance=" .. tostring(dist)
+                            .. " action=" .. actionStateName(zombie), now
+                    )
+                end
             else
                 approach = true
                 repathClose = true
-                logPursuitDiagnostic(
-                    zombie, record.id, "server_combat", "cannot_face_npc",
-                    "distance=" .. tostring(dist)
-                        .. " hasFacingApi="
-                        .. tostring(zombie.isFacingObject ~= nil), now
-                )
+                if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+                    logPursuitDiagnostic(
+                        zombie, record.id, "server_combat", "cannot_face_npc",
+                        "distance=" .. tostring(dist)
+                            .. " hasFacingApi="
+                            .. tostring(zombie.isFacingObject ~= nil), now
+                    )
+                end
             end
         elseif zombieSquare and npcSquare and blocked then
             approach = true
             repathClose = true
-            logPursuitDiagnostic(
-                zombie, record.id, "server_combat", "close_path_blocked",
-                "distance=" .. tostring(dist)
-                    .. " action=" .. actionStateName(zombie), now
-            )
+            if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+                logPursuitDiagnostic(
+                    zombie, record.id, "server_combat", "close_path_blocked",
+                    "distance=" .. tostring(dist)
+                        .. " action=" .. actionStateName(zombie), now
+                )
+            end
         end
         if repathClose and not isMultiplayerServer() then
             refreshPursuitPath(zombie, npcBody, now, record.id)

@@ -61,10 +61,23 @@ function ZombieAggro.OnZombieProvoked(zombie, npcBody)
     then
         return
     end
+    local now = Core and Core.Now and Core.Now() or 0
     if ZombieAggro.Activate then
-        ZombieAggro.Activate(zombie, Core.Now(), "provoked")
+        ZombieAggro.Activate(zombie, now, "provoked")
+    end
+    if PNC.WorldCensus and PNC.WorldCensus.MarkUrgent then
+        PNC.WorldCensus.MarkUrgent(now, 2000)
     end
     Internal.forceAggro(zombie, npcBody)
+end
+
+local function isPursuitAuditEnabled()
+    if not Core or not Core.LogInfo then
+        return false
+    end
+    return not Diagnostics
+        or type(Diagnostics.IsZombieAggroAuditEnabled) ~= "function"
+        or Diagnostics.IsZombieAggroAuditEnabled() == true
 end
 
 local function setNoLungeAttack(zombie, disabled)
@@ -254,6 +267,7 @@ Internal.UpdateProviders.Multiplayer = Multiplayer
 Internal.UpdateProviders.isMultiplayerServer = isMultiplayerServer
 Internal.UpdateProviders.incrementDiagnostic = incrementDiagnostic
 Internal.UpdateProviders.logPursuitDiagnostic = logPursuitDiagnostic
+Internal.UpdateProviders.isPursuitAuditEnabled = isPursuitAuditEnabled
 Internal.Core = Core
 Internal.Const = Const
 Internal.Registry = Registry
@@ -267,6 +281,7 @@ Internal.isMultiplayerServer = isMultiplayerServer
 Internal.setNoLungeAttack = setNoLungeAttack
 Internal.incrementDiagnostic = incrementDiagnostic
 Internal.logPursuitDiagnostic = logPursuitDiagnostic
+Internal.isPursuitAuditEnabled = isPursuitAuditEnabled
 Internal.actionStateName = actionStateName
 Internal.isPursuitActionLocked = isPursuitActionLocked
 Internal.suppressForStealth = suppressForStealth

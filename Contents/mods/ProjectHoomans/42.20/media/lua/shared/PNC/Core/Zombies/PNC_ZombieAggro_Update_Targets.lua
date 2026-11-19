@@ -10,6 +10,7 @@ local Stealth = Internal.Stealth
 local setNoLungeAttack = Internal.setNoLungeAttack
 local incrementDiagnostic = Internal.incrementDiagnostic
 local logPursuitDiagnostic = Internal.logPursuitDiagnostic
+local isPursuitAuditEnabled = Internal.isPursuitAuditEnabled
 local isMultiplayerServer = Internal.isMultiplayerServer
 local suppressForStealth = Internal.suppressForStealth
 local pursueForcedTarget = Internal.pursueForcedTarget
@@ -32,22 +33,26 @@ local function acquireNearestTarget(zombie)
             nearestPlayerDistSq
         )
     then
-        logPursuitDiagnostic(
-            zombie, nil, "server_target", "player_preferred",
-            "npcDistanceSq=" .. tostring(nearestDistSq)
-                .. " playerDistanceSq=" .. tostring(nearestPlayerDistSq),
-            Core.Now()
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie, nil, "server_target", "player_preferred",
+                "npcDistanceSq=" .. tostring(nearestDistSq)
+                    .. " playerDistanceSq=" .. tostring(nearestPlayerDistSq),
+                Core.Now()
+            )
+        end
         setNoLungeAttack(zombie, false)
         return nil, nil
     end
     if nearestRecord and nearestBody then
-        logPursuitDiagnostic(
-            zombie, nearestRecord.id, "server_target", "npc_selected",
-            "npcDistanceSq=" .. tostring(nearestDistSq)
-                .. " playerDistanceSq=" .. tostring(nearestPlayerDistSq),
-            Core.Now()
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie, nearestRecord.id, "server_target", "npc_selected",
+                "npcDistanceSq=" .. tostring(nearestDistSq)
+                    .. " playerDistanceSq=" .. tostring(nearestPlayerDistSq),
+                Core.Now()
+            )
+        end
         incrementDiagnostic("ZombieAggro.NPCTargetSelected")
         Internal.forceAggro(zombie, nearestBody)
         if isMultiplayerServer() then
@@ -60,12 +65,14 @@ local function acquireNearestTarget(zombie)
         end
         return nearestRecord, nearestBody
     end
-    logPursuitDiagnostic(
-        zombie, nil, "server_target", "no_npc_selected",
-        "npcDistanceSq=" .. tostring(nearestDistSq)
-            .. " playerDistanceSq=" .. tostring(nearestPlayerDistSq),
-        Core.Now()
-    )
+    if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+        logPursuitDiagnostic(
+            zombie, nil, "server_target", "no_npc_selected",
+            "npcDistanceSq=" .. tostring(nearestDistSq)
+                .. " playerDistanceSq=" .. tostring(nearestPlayerDistSq),
+            Core.Now()
+        )
+    end
     setNoLungeAttack(zombie, false)
     return nil, nil
 end
@@ -86,15 +93,17 @@ local function pursueNPCRecord(zombie, record, npcBody, now, hitSettling)
             zombie, "ProjectHoomans", now, 100
         )
     then
-        logPursuitDiagnostic(
-            zombie,
-            record.id,
-            "server_target",
-            "foreign_pursuit_owner",
-            "owner=" .. tostring(lease.owner)
-                .. " provider=" .. tostring(lease.provider),
-            now
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                record.id,
+                "server_target",
+                "foreign_pursuit_owner",
+                "owner=" .. tostring(lease.owner)
+                    .. " provider=" .. tostring(lease.provider),
+                now
+            )
+        end
         return false
     end
     if not Settings.CanZombieTargetRecord(record) then

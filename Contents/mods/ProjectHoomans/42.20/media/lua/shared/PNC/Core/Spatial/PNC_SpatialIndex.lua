@@ -16,6 +16,7 @@ Spatial.ZombieCells = Spatial.ZombieCells or {}
 Spatial.ZombieByID = Spatial.ZombieByID or {}
 Spatial.NPCMembership = Spatial.NPCMembership or {}
 Spatial.NPCInitialized = Spatial.NPCInitialized or false
+Spatial.RebuildCount = tonumber(Spatial.RebuildCount) or 0
 if tonumber(Spatial.IndexSchemaVersion) ~= 3 then
     Spatial.PlayerCells = {}
     Spatial.PlayerByOnlineID = {}
@@ -165,6 +166,7 @@ function Spatial.Rebuild(now, force)
         return false
     end
     Spatial.LastRebuildAt = now
+    Spatial.RebuildCount = (tonumber(Spatial.RebuildCount) or 0) + 1
     local timerName
     local timerStart
     if Diagnostics then
@@ -208,6 +210,7 @@ function Spatial.Rebuild(now, force)
         then
             Spatial.ZombieCells = {}
             Spatial.ZombieByID = {}
+            local indexedCount = 0
             for i = 1, #censusZombies do
                 zombie = censusZombies[i]
                 insertCell(
@@ -218,14 +221,19 @@ function Spatial.Rebuild(now, force)
                 )
                 zombieID = ensureZombieID(zombie)
                 if zombieID then
+                    if Spatial.ZombieByID[zombieID] == nil then
+                        indexedCount = indexedCount + 1
+                    end
                     Spatial.ZombieByID[zombieID] = zombie
                 end
             end
+            Spatial.ZombieIndexedCount = indexedCount
             Spatial.LastCensusGeneration = generation
         end
     elseif getCell then
         Spatial.ZombieCells = {}
         Spatial.ZombieByID = {}
+        local indexedCount = 0
         zombieList = getCell():getZombieList()
         if zombieList then
             for i = 0, zombieList:size() - 1 do
@@ -234,15 +242,19 @@ function Spatial.Rebuild(now, force)
                     insertCell(Spatial.ZombieCells, zombie:getX(), zombie:getY(), zombie)
                     zombieID = ensureZombieID(zombie)
                     if zombieID then
+                        if Spatial.ZombieByID[zombieID] == nil then
+                            indexedCount = indexedCount + 1
+                        end
                         Spatial.ZombieByID[zombieID] = zombie
                     end
                 end
             end
         end
+        Spatial.ZombieIndexedCount = indexedCount
     end
     if Diagnostics then
         Diagnostics.SetGauge("Spatial.ZombieIDIndexSize",
-            Core.TableSize(Spatial.ZombieByID))
+            tonumber(Spatial.ZombieIndexedCount) or 0)
     end
     if timerName then Diagnostics.EndTiming(timerName, timerStart) end
     return true

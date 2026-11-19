@@ -2,7 +2,7 @@
 
 ## Current state
 
-**IN PROGRESS — L0, L1, L2, L3 COMPLETE; L4 NEXT.**
+**IN PROGRESS — L0, L1, L2, L3, L4 COMPLETE; L5 NEXT.**
 
 Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded deep profiling (`coarse` vs `deep`), and the deterministic integrated headless runtime simulator foundation before optimizing downstream phases.
 
@@ -61,6 +61,19 @@ Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded dee
   - Benchmark (`Z=64, 20s`, `OFF`): `N=100 FullSnap=18` (was `205`/`216`), `TickCpuMs=2260.03ms`; `N=500 FullSnap=18`, `TickCpuMs=2123.57ms`, `CoarseWr=13`, `globalSaves=1`.
 - **L3 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings (zero `next()` calls) on all 15 modified/created runtime Lua files; new `pnc_lightweight_domain_delta_replication_smoke.lua` pass; `pnc_lightweight_runtime_simulation_smoke.lua` pass; `tests/benchmarks/npc_replication.lua` (P1–P4) pass; `tests/benchmarks/lightweight_npc_runtime.lua` pass; focused suites pass (`network` 3/3, `replication` 4/4, `portrait` 6/6, `roster` 3/3, `client_requests` 1/1, `lightweight` 4/4, `profiler` 10/10, `presence` 119/119, `combat` 35/35, `wound` 3/3, `medical` 6/6).
 
+## L4 — Measured runtime cadence and allocation optimization (COMPLETE)
+
+- **Clean post-L3 profiler-OFF hot-path audit:** Measured exact `OFF`-mode CPU and `getCell():getZombieList()` callers before touching hot paths (`ZombieAggro.Pump` = `651.29ms` / `50.9%` with `48,412` `ActorOwnership.IsForeignOwned` `pcall`s; `Presence.Materialize` = `85` calls / `198.98ms` from startup-settle/spacing retry thrashing; `extraZScans` = `102` from `Bandits_Targeting` `68`, `BodyLifecycle_Startup_Batch` `37`, `LiveBodyControl_Events` `1`; `Stamina`/`FollowOwner`/`SimulationLOD` already had caches/throttles and required no speculative churn).
+- **Shared `WorldCensus` & zero extra loaded-zombie scans:** Extended `PNC_WorldCensus.lua` with `BanditBodies`/`GetBandits`, `CellAvailable`, 3-tier activity-sensitive cadence (`100ms` hot combat/urgent -> `250ms` calm live -> `1000ms` zero-live idle via `SchedulingPresence.lua`), and `MarkUrgent(now, durationMs, invalidateThrottle)` wired on zombie provocation and live materialization. Routed `PNC_Bandits_Targeting.lua`, `PNC_BodyLifecycle_Startup_{Batch,Sweep,Coordinator}.lua` (plus empty-world maintenance skip), and `PNC_LiveBodyControl_Events.lua` through `PNC.WorldCensus`, and removed the redundant O(Z) `Core.TableSize` gauge walk in `PNC_SpatialIndex.lua`.
+- **`ZombieAggro` deduplication, per-entry cadence & zero-alloc guards:** Added fast empty-world exit in `ZombieAggro.Pump`, per-refresh `seenForeign` + `activatedThisRefresh` deduplication in `RefreshActiveSet`, per-entry cadence (`150ms` mid-range pursuit / `250ms` idle) in `PumpActiveSet` + `processZombie` with zero-latency urgent wake for close range (`<= bite + 1.5`), active bites, native player targets/attackers, hit-settling, and `OnZombieProvoked`, and `isPursuitAuditEnabled()` guards before string concatenation across `PNC_ZombieAggro_Update_{Core,Loop,Pursuit,Targets,Path,Multiplayer}.lua`.
+- **Prioritized non-thrashing materialization:** Added `Presence.Metrics` (`materializeAttempts`/`materializeSuccesses`), moved `allowStartupMaterialization` ahead of `prepareRecord` (`EnsureRecordInventory`), added startup-not-ready retry scheduling + staggered burst retry cursor in `PNC_Presence_Materialize.lua`, and prioritized `forceLive` > active follower > bystander while respecting `materializeRetryAt`/`materializeWakeAt` in `PNC_Presence_Reconcile.lua`.
+- **HEADLESS LUA SIMULATOR (NON-NATIVE) L4 results vs L0–L3:**
+  - Smoke (`N=100, Z=40, 15s`, `OFF` / `COARSE` / `DEEP` / `OFF_300` bit-identical ops): `extraZScans=0` (was `102`), `census=90` (was `129`), `matAtt=46` (was `85`), `matOk=9`, `schedProc=132` (was `231`), `zAggro=3398`, `fullSnap=18`, `globalSaves=1`, `dirtyEnd=0`, `SafePhaseFailures=0`, `tickCpuMs=698.78ms` (was `1188.04ms` L0 / `1256.02ms` L3).
+  - Zombie pressure (`Z_PRESS`, `N=100, Z=200, 15s, OFF`): `extraZScans=0`, `zAggro=8884`, `matOk=9`, `SafePhaseFailures=0`, `tickCpuMs=1206.03ms` (was `1839.13ms` pre-L4).
+  - Idle zero-live (`IDLE_0`, `N=100, L=0, Z=200, 15s, OFF`): `extraZScans=0`, `zAggro=0`, `census=15` (was `30`), `SafePhaseFailures=0`, `tickCpuMs=141.22ms`.
+  - Benchmark (`Z=64, 20s`, `OFF`): `N=100: 965.22ms` (L0 `2001.45ms` `-51.8%`, L3 `2260.03ms` `-57.3%`); `N=500: 994.00ms` (L0 `4004.86ms` `-75.2%`, L3 `2123.57ms` `-53.2%`).
+- **L4 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings (zero `next()` calls) across all 17 modified runtime Lua files; new `pnc_lightweight_runtime_cadence_smoke.lua` pass; `pnc_constants_presence_boundary_smoke.lua` pass; `pnc_lightweight_runtime_simulation_smoke.lua` pass; `tests/benchmarks/lightweight_npc_runtime.lua` pass; 18 focused Lua suites 221/221 pass.
+
 ## Accepted dependencies
 
 Do not reopen:
@@ -73,4 +86,4 @@ This job corrects Hoomans runtime adoption so it actually obeys those accepted c
 
 ## Next Chunk
 
-**L4 — measured runtime cadence and allocation optimization.**
+**L5 — scale acceptance, docs and phase close.**

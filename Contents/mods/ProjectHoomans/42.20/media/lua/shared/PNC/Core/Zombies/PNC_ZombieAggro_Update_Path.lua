@@ -6,6 +6,7 @@ local Diagnostics = Internal.Diagnostics
 local Multiplayer = Internal.Multiplayer
 local incrementDiagnostic = Internal.incrementDiagnostic
 local logPursuitDiagnostic = Internal.logPursuitDiagnostic
+local isPursuitAuditEnabled = Internal.isPursuitAuditEnabled
 local actionStateName = Internal.actionStateName
 local isPursuitActionLocked = Internal.isPursuitActionLocked
 
@@ -29,14 +30,16 @@ local function refreshPursuitPath(zombie, npcBody, now, npcId)
     ) or 1500
     now = tonumber(now) or Core.Now()
     if isPursuitActionLocked(zombie) then
-        logPursuitDiagnostic(
-            zombie,
-            npcId,
-            "server_path",
-            "action_state_locked",
-            "action=" .. actionStateName(zombie),
-            now
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                npcId,
+                "server_path",
+                "action_state_locked",
+                "action=" .. actionStateName(zombie),
+                now
+            )
+        end
         return false
     end
     elapsed = lastAt and (now - lastAt) or math.huge
@@ -45,18 +48,20 @@ local function refreshPursuitPath(zombie, npcBody, now, npcId)
         or (movedSq < (refreshDistance * refreshDistance)
             and elapsed < stableRetryMs)
     ) then
-        logPursuitDiagnostic(
-            zombie,
-            npcId,
-            "server_path",
-            elapsed < refreshMs and "request_cooldown"
-                or "stable_goal_kept",
-            "targetMovedSq=" .. tostring(movedSq)
-                .. " elapsedMs=" .. tostring(elapsed)
-                .. " minIntervalMs=" .. tostring(refreshMs)
-                .. " stableRetryMs=" .. tostring(stableRetryMs),
-            now
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                npcId,
+                "server_path",
+                elapsed < refreshMs and "request_cooldown"
+                    or "stable_goal_kept",
+                "targetMovedSq=" .. tostring(movedSq)
+                    .. " elapsedMs=" .. tostring(elapsed)
+                    .. " minIntervalMs=" .. tostring(refreshMs)
+                    .. " stableRetryMs=" .. tostring(stableRetryMs),
+                now
+            )
+        end
         return false
     end
     if ZombieAggro.ConsumePathRequestBudget
@@ -67,15 +72,17 @@ local function refreshPursuitPath(zombie, npcBody, now, npcId)
                 "ZombieAggro.PathRequestsDeferred"
             )
         end
-        logPursuitDiagnostic(
-            zombie,
-            npcId,
-            "server_path",
-            "budget_deferred",
-            "targetX=" .. tostring(targetX)
-                .. " targetY=" .. tostring(targetY),
-            now
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                npcId,
+                "server_path",
+                "budget_deferred",
+                "targetX=" .. tostring(targetX)
+                    .. " targetY=" .. tostring(targetY),
+                now
+            )
+        end
         return false
     end
     if modData then
@@ -106,18 +113,20 @@ local function refreshPursuitPath(zombie, npcBody, now, npcId)
             Diagnostics.Increment("ZombieAggro.PathRequests")
         end
     end
-    logPursuitDiagnostic(
-        zombie,
-        npcId,
-        "server_path",
-        requested and "path_requested" or "path_request_failed",
-        "api=" .. tostring(requestReason or "pathToLocationF")
-            .. " action=" .. actionStateName(zombie)
-            .. " distance=" .. tostring(math.sqrt(distanceSq))
-            .. " targetX=" .. tostring(targetX)
-            .. " targetY=" .. tostring(targetY),
-        now
-    )
+    if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+        logPursuitDiagnostic(
+            zombie,
+            npcId,
+            "server_path",
+            requested and "path_requested" or "path_request_failed",
+            "api=" .. tostring(requestReason or "pathToLocationF")
+                .. " action=" .. actionStateName(zombie)
+                .. " distance=" .. tostring(math.sqrt(distanceSq))
+                .. " targetX=" .. tostring(targetX)
+                .. " targetY=" .. tostring(targetY),
+            now
+        )
+    end
     return true
 end
 

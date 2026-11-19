@@ -138,17 +138,33 @@ function LiveBodyControl.ProtectManagedPlant(zombie)
 end
 
 function LiveBodyControl.ScanLoadedManagedBodies(source)
-    local cell = getCell and getCell() or nil
-    local zombies = cell and cell.getZombieList and cell:getZombieList() or nil
+    local census = PNC.WorldCensus
     local repaired = 0
     local i
-    if not zombies then return 0 end
-    for i = 0, zombies:size() - 1 do
-        if LiveBodyControl.EnforceManagedSafety(
-            zombies:get(i),
-            source or "loaded_scan"
-        ) then
-            repaired = repaired + 1
+    if census and type(census.GetManaged) == "function" then
+        local managed = census.GetManaged(
+            Core and Core.Now and Core.Now() or nil,
+            false
+        )
+        for i = 1, #(managed or {}) do
+            if LiveBodyControl.EnforceManagedSafety(
+                managed[i],
+                source or "loaded_scan"
+            ) then
+                repaired = repaired + 1
+            end
+        end
+    else
+        local cell = getCell and getCell() or nil
+        local zombies = cell and cell.getZombieList and cell:getZombieList() or nil
+        if not zombies then return 0 end
+        for i = 0, zombies:size() - 1 do
+            if LiveBodyControl.EnforceManagedSafety(
+                zombies:get(i),
+                source or "loaded_scan"
+            ) then
+                repaired = repaired + 1
+            end
         end
     end
     if repaired > 0 and Core and Core.LogDebug then

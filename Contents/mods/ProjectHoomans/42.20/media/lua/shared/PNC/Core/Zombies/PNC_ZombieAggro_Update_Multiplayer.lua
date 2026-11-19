@@ -15,6 +15,7 @@ local Core = PNC.Core
 local incrementDiagnostic = Providers.incrementDiagnostic
 local isMultiplayerServer = Providers.isMultiplayerServer
 local logPursuitDiagnostic = Providers.logPursuitDiagnostic
+local isPursuitAuditEnabled = Providers.isPursuitAuditEnabled
 
 -- The shared composition loads the zombie subsystem before PNC_Network. Keep
 -- this lookup lazy so a fresh dedicated-server load sees the transport after
@@ -110,14 +111,16 @@ local function publishMPTargetDirective(
     local network
     network = getMPNetwork()
     if isMultiplayerServer() and not network then
-        logPursuitDiagnostic(
-            zombie,
-            record and record.id or nil,
-            "server_mp",
-            "network_unavailable",
-            "networkFacade=" .. tostring(PNC.Network ~= nil),
-            now
-        )
+        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            logPursuitDiagnostic(
+                zombie,
+                record and record.id or nil,
+                "server_mp",
+                "network_unavailable",
+                "networkFacade=" .. tostring(PNC.Network ~= nil),
+                now
+            )
+        end
         return 0
     end
     if not isMultiplayerServer()
@@ -181,19 +184,21 @@ local function publishMPTargetDirective(
         Const.CMD_ZOMBIE_PURSUIT,
         payload
     )
-    logPursuitDiagnostic(
-        zombie,
-        npcId,
-        "server_mp",
-        sent > 0 and "directive_sent" or "directive_no_recipients",
-        "recipients=" .. tostring(sent)
-            .. " revision=" .. tostring(payload.revision)
-            .. " x=" .. tostring(targetX)
-            .. " y=" .. tostring(targetY)
-            .. " z=" .. tostring(targetZ)
-            .. " approach=" .. tostring(approach == true),
-        now
-    )
+    if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+        logPursuitDiagnostic(
+            zombie,
+            npcId,
+            "server_mp",
+            sent > 0 and "directive_sent" or "directive_no_recipients",
+            "recipients=" .. tostring(sent)
+                .. " revision=" .. tostring(payload.revision)
+                .. " x=" .. tostring(targetX)
+                .. " y=" .. tostring(targetY)
+                .. " z=" .. tostring(targetZ)
+                .. " approach=" .. tostring(approach == true),
+            now
+        )
+    end
     modData.PNC_MPAggroDirectiveNPCId = npcId
     modData.PNC_MPAggroDirectiveX = targetX
     modData.PNC_MPAggroDirectiveY = targetY

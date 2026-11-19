@@ -38,7 +38,7 @@ end
 
 Internal.QuarantineRehydrateCandidate = quarantineRehydrateCandidate
 
-function Lifecycle.SweepPersistedLiveShells(now)
+function Lifecycle.SweepPersistedLiveShells(now, forceCensus)
     local batch
     local stats
     local i
@@ -52,7 +52,7 @@ function Lifecycle.SweepPersistedLiveShells(now)
     local match
     local orphan
     now = tonumber(now) or Core.Now()
-    batch = Lifecycle.BuildStartupBodyBatch(now, true)
+    batch = Lifecycle.BuildStartupBodyBatch(now, true, forceCensus ~= false)
     stats = batch and batch.stats or {
         available = false,
         scanned = 0,

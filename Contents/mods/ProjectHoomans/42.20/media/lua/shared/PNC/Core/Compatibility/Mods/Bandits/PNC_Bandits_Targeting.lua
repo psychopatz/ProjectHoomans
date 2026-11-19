@@ -65,14 +65,16 @@ function Targeting.EnumerateTargets(context)
             end
         end
     end
-    if isServer and isServer() and getCell then
-        local cell = getCell()
-        local zombieList = cell and cell.getZombieList
-            and cell:getZombieList() or nil
-        local index
-        if zombieList then
-            for index = 0, zombieList:size() - 1 do
-                body = zombieList:get(index)
+    if isServer and isServer() then
+        local census = PNC.WorldCensus
+        if census and type(census.GetBandits) == "function" then
+            local bandits = census.GetBandits(
+                PNC.Core and PNC.Core.Now and PNC.Core.Now() or nil,
+                false
+            )
+            local index
+            for index = 1, #(bandits or {}) do
+                body = bandits[index]
                 if body and Internal.IsBanditBody(body)
                     and body.isAlive and body:isAlive()
                 then
@@ -92,6 +94,37 @@ function Targeting.EnumerateTargets(context)
                     elseif ref and not output[ref.actorId] then
                         output[#output + 1] = ref
                         output[ref.actorId] = true
+                    end
+                end
+            end
+        elseif getCell then
+            local cell = getCell()
+            local zombieList = cell and cell.getZombieList
+                and cell:getZombieList() or nil
+            local index
+            if zombieList then
+                for index = 0, zombieList:size() - 1 do
+                    body = zombieList:get(index)
+                    if body and Internal.IsBanditBody(body)
+                        and body.isAlive and body:isAlive()
+                    then
+                        ref = Internal.MakeRef(body)
+                        if ref and not output[ref.actorId]
+                            and source and source.x ~= nil
+                            and source.y ~= nil
+                        then
+                            dx = (tonumber(ref.x) or 0)
+                                - (tonumber(source.x) or 0)
+                            dy = (tonumber(ref.y) or 0)
+                                - (tonumber(source.y) or 0)
+                            if (dx * dx) + (dy * dy) <= radiusSq then
+                                output[#output + 1] = ref
+                                output[ref.actorId] = true
+                            end
+                        elseif ref and not output[ref.actorId] then
+                            output[#output + 1] = ref
+                            output[ref.actorId] = true
+                        end
                     end
                 end
             end

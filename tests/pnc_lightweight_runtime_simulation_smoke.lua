@@ -88,6 +88,10 @@ for _, field in ipairs({
     "HealthOrWoundDeltas",
     "EquipmentDeltas",
     "RepairSnapshots",
+    "MaterializationAttempts",
+    "Materializations",
+    "ZombieAggroProcessed",
+    "SpatialRebuilds",
     "CensusScans",
     "PerNpcGlobalZombieScans",
 }) do
@@ -103,6 +107,18 @@ T.truthy((offReport.EquipmentDeltas or 0) > 0, "OFF run must emit narrow equipme
 T.truthy((offReport.FullSnapshots or 0) <= 40,
     "OFF run ordinary mutations must not rebuild full snapshots; got "
         .. tostring(offReport.FullSnapshots))
+
+-- 5a-L4. Zero extra zombie scans + bounded materialization/census cadence.
+T.equal(offReport.PerNpcGlobalZombieScans, 0,
+    "OFF run must have 0 extra getZombieList scans outside WorldCensus")
+T.truthy((offReport.CensusScans or 0) <= 105,
+    "OFF run calm WorldCensus scans must stay <= 105; got "
+        .. tostring(offReport.CensusScans))
+T.truthy((offReport.MaterializationAttempts or 0) <= 55,
+    "OFF run MaterializationAttempts must stay <= 55 (no thrashing); got "
+        .. tostring(offReport.MaterializationAttempts))
+T.equal(offReport.Materializations, 9,
+    "OFF run must still materialize all 9 active nearby NPCs")
 
 -- 5b. L2 deferred physical persistence invariants on OFF baseline.
 T.equal(offReport.GlobalSaveCalls, 1, "ordinary OFF run should call GlobalModData.save only on OnSave")
@@ -133,6 +149,10 @@ T.equal(scale300Report.SpatialMembersAtEnd, offReport.SpatialMembersAtEnd,
     "spatial membership must be invariant across N=100 vs N=300")
 T.equal(scale300Report.SchedulerProcessed, offReport.SchedulerProcessed,
     "scheduler work processed must be invariant across N=100 vs N=300")
+T.equal(scale300Report.PerNpcGlobalZombieScans, 0,
+    "N=300 run must have 0 extra zombie scans")
+T.equal(scale300Report.ZombieAggroProcessed, offReport.ZombieAggroProcessed,
+    "zombie aggro processed must be invariant across N=100 vs N=300")
 
 -- 8. L1 departure & reversible demotion: leaving range abstracts & demotes cleanly without losing Core actors.
 local departReport = withMode("OFF", { departAtMs = 6000, simulatedMs = 15000 })
@@ -207,5 +227,47 @@ T.truthy((netDeltaReport.FallbackSnapshots or 0) > 0,
     "NET_DELTA legacy fallback client must receive full snapshots")
 T.truthy((netDeltaReport.RepairSnapshots or 0) >= 1,
     "NET_DELTA injected revision gap must produce targeted repair snapshot")
+
+-- 12. L4 zombie-pressure scenario (Z=200 nearby ordinary zombies): shared census, bounded aggro.
+local zPressureReport = withMode("OFF", {
+    actorCount = 100,
+    nearbyActors = 14,
+    expectedPromotedActors = 6,
+    zombieCount = 200,
+    simulatedMs = 15000,
+})
+print("Z_PRESS: " .. Simulator.FormatSummary(zPressureReport))
+T.equal(zPressureReport.SafePhaseFailures, 0, "Z_PRESSURE SafePhase failures")
+T.equal(zPressureReport.PerNpcGlobalZombieScans, 0,
+    "Z_PRESSURE must perform 0 per-NPC global zombie scans")
+T.equal(zPressureReport.Materializations, 9,
+    "Z_PRESSURE must still materialize all 9 active NPCs")
+T.truthy((zPressureReport.MaterializationAttempts or 0) <= 55,
+    "Z_PRESSURE MaterializationAttempts must stay <= 55; got "
+        .. tostring(zPressureReport.MaterializationAttempts))
+T.truthy((zPressureReport.ZombieAggroProcessed or 0) > 0
+    and (zPressureReport.ZombieAggroProcessed or 0) <= 9500,
+    "Z_PRESSURE ZombieAggroProcessed must stay active yet throttled; got "
+        .. tostring(zPressureReport.ZombieAggroProcessed))
+
+-- 13. L4 idle zero-live scenario (Z=200, L=0): slow census cadence and 0 aggro work.
+local idleZeroReport = withMode("OFF", {
+    actorCount = 100,
+    nearbyActors = 0,
+    expectedPromotedActors = 0,
+    zombieCount = 200,
+    simulatedMs = 15000,
+})
+print("IDLE_0:  " .. Simulator.FormatSummary(idleZeroReport))
+T.equal(idleZeroReport.SafePhaseFailures, 0, "IDLE_ZERO SafePhase failures")
+T.equal(idleZeroReport.PerNpcGlobalZombieScans, 0,
+    "IDLE_ZERO must perform 0 extra zombie scans")
+T.equal(idleZeroReport.ZombieAggroProcessed, 0,
+    "IDLE_ZERO must process 0 zombie aggro entries")
+T.equal(idleZeroReport.EndPromotedHoomansRecords, 0,
+    "IDLE_ZERO must retain 0 promoted Hoomans records")
+T.truthy((idleZeroReport.CensusScans or 0) <= 20,
+    "IDLE_ZERO WorldCensus scans must obey idle cadence (<= 20 over 15s); got "
+        .. tostring(idleZeroReport.CensusScans))
 
 T.finish("pnc_lightweight_runtime_simulation_smoke")

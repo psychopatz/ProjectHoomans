@@ -1,4 +1,8 @@
 local Presence = PNC.Presence
+Presence.Metrics = Presence.Metrics or {
+    materializeAttempts = 0,
+    materializeSuccesses = 0,
+}
 local Internal = Presence.Internal
 local Core = PNC.Core
 local Const = PNC.Const
@@ -109,6 +113,8 @@ local function allowStartupMaterialization(record, now)
     local state = lifecycle and lifecycle.StartupCleanup or nil
     local nextAt
     local burstUntil
+    local spacing
+    local retryAt
     if not state or state.complete ~= true then
         return true
     end
@@ -118,15 +124,26 @@ local function allowStartupMaterialization(record, now)
         return true
     end
     nextAt = tonumber(state.nextMaterializeAt) or 0
+    spacing = tonumber(Const.BODY_SHELL_STARTUP_MATERIALIZE_SPACING_MS) or 250
     if nextAt > (tonumber(now) or 0) then
+        local cursor = tonumber(state.deferredRetryCursorAt) or 0
+        if cursor < nextAt then
+            retryAt = nextAt
+        else
+            retryAt = cursor + spacing
+        end
+        if retryAt > nextAt + (spacing * 8) then
+            retryAt = nextAt
+        end
+        state.deferredRetryCursorAt = retryAt
         record.runtime = record.runtime or {}
-        scheduleMaterializationRetry(record, nextAt)
+        scheduleMaterializationRetry(record, retryAt)
         markLifecycleFailure(record, "materialize_deferred",
             "startup_population_settle")
         return false
     end
-    state.nextMaterializeAt = (tonumber(now) or 0)
-        + (tonumber(Const.BODY_SHELL_STARTUP_MATERIALIZE_SPACING_MS) or 250)
+    state.nextMaterializeAt = (tonumber(now) or 0) + spacing
+    state.deferredRetryCursorAt = state.nextMaterializeAt
     return true
 end
 
@@ -427,6 +444,13 @@ local function finishMaterialization(
         )
     end
     Animation.Apply(zombie, record, "Idle")
+    if Presence.Metrics then
+        Presence.Metrics.materializeSuccesses =
+            (tonumber(Presence.Metrics.materializeSuccesses) or 0) + 1
+    end
+    if PNC.WorldCensus and PNC.WorldCensus.MarkUrgent then
+        PNC.WorldCensus.MarkUrgent(Core and Core.Now and Core.Now() or nil, 1500)
+    end
     if net and net.BroadcastRecord then
         net.BroadcastRecord(record, "materialize")
     end
@@ -508,6 +532,10 @@ function Presence.Materialize(record, reason, nearest)
     local lateStreamStatus
     local lateStreamBody
     local net = Internal.ResolveNetwork()
+    if Presence.Metrics then
+        Presence.Metrics.materializeAttempts =
+            (tonumber(Presence.Metrics.materializeAttempts) or 0) + 1
+    end
     if not Core.IsAuthority() or record.alive == false
         or record.presenceState == Const.PRESENCE_LIVE
     then
@@ -526,15 +554,22 @@ function Presence.Materialize(record, reason, nearest)
         end
         return nil
     end
+    now = Core.Now()
     if not startupReady() then
+        local startupState = PNC.BodyLifecycle
+            and PNC.BodyLifecycle.StartupCleanup or nil
+        local settleUntil = startupState and startupState.complete == true
+            and tonumber(startupState.settleUntil) or 0
+        local retryAt = (settleUntil > now)
+            and settleUntil
+            or (now + (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250))
+        scheduleMaterializationRetry(record, retryAt)
         if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
             PresenceDiagnostics.LogMaterializeGate(record, "startup_cleanup",
                 "startup_not_ready")
         end
         return nil, "startup_not_ready"
     end
-
-    now = Core.Now()
     if PNC.BodyLifecycle
         and PNC.BodyLifecycle.ReconcileLateStreamRehydrate
     then
@@ -589,7 +624,6 @@ function Presence.Materialize(record, reason, nearest)
         end
         return nil, "startup_rehydration_pending"
     end
-    prepareRecord(record)
     if not allowStartupMaterialization(record, now) then
         if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
             PresenceDiagnostics.LogMaterializeGate(record, "startup_spacing",
@@ -597,6 +631,7 @@ function Presence.Materialize(record, reason, nearest)
         end
         return nil
     end
+    prepareRecord(record)
     if PNC.BodyLifecycle and PNC.BodyLifecycle.IsStartupRecordBlocked then
         startupBodyBlocked, startupBodyBlockReason =
             PNC.BodyLifecycle.IsStartupRecordBlocked(record, now)

@@ -117,6 +117,29 @@ function Lifecycle.RunStartupBodyCleanupNow(now, source, forceReset)
     return state
 end
 
+local function hasPendingMaintenanceWork(now)
+    local reg = Internal.registry and Internal.registry() or nil
+    if reg and reg.Data then
+        for _, record in pairs(reg.Data) do
+            if record ~= nil then return true end
+        end
+    end
+    if reg and reg.RuntimeViews then
+        for _, record in pairs(reg.RuntimeViews) do
+            if record ~= nil then return true end
+        end
+    end
+    if Lifecycle.HuskLedgerCount and (tonumber(Lifecycle.HuskLedgerCount()) or 0) > 0 then
+        return true
+    end
+    local census = PNC.WorldCensus
+    if not census or type(census.GetLifecycleCandidates) ~= "function" then
+        return true
+    end
+    local candidates = census.GetLifecycleCandidates(now, false)
+    return type(candidates) == "table" and #candidates > 0
+end
+
 function Lifecycle.PumpStartupBodyCleanup(now, force)
     local state = Lifecycle.StartupCleanup
     local stats
@@ -125,11 +148,24 @@ function Lifecycle.PumpStartupBodyCleanup(now, force)
         if not force and now < (tonumber(state.nextMaintenanceAt) or 0) then
             return state.lastStats
         end
+        if not force and not hasPendingMaintenanceWork(now) then
+            local baseMs = tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000
+            state.nextMaintenanceAt = now + math.max(3000, baseMs * 3)
+            stats = {
+                available = true,
+                scanned = 0,
+                removed = 0,
+                matched = 0,
+                skipped = true,
+            }
+            state.lastStats = stats
+            return stats
+        end
         state.nextMaintenanceAt = now
             + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
-        return Lifecycle.SweepPersistedLiveShells(now)
+        return Lifecycle.SweepPersistedLiveShells(now, force == true)
     end
-    stats = Lifecycle.SweepPersistedLiveShells(now)
+    stats = Lifecycle.SweepPersistedLiveShells(now, true)
     state.lastStats = stats
     if stats.available ~= true then
         return stats

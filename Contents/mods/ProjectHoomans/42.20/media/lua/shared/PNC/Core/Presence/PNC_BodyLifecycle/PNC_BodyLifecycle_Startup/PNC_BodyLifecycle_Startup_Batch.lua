@@ -128,7 +128,20 @@ local function nearbyUnmarkedRecords(records, reg, zombie)
     return output
 end
 
-local function snapshotCell()
+local function snapshotCell(now, forceCensus)
+    local census = PNC.WorldCensus
+    if census and type(census.GetAll) == "function" then
+        local all = census.GetAll(now, forceCensus == true)
+        if census.CellAvailable == false then
+            return nil
+        end
+        local bodies = {}
+        local i
+        for i = 1, #(all or {}) do
+            bodies[i] = all[i]
+        end
+        return bodies
+    end
     local cell = getCell and getCell() or nil
     local list = cell and cell.getZombieList and cell:getZombieList() or nil
     local bodies = {}
@@ -144,7 +157,7 @@ local function snapshotCell()
     return bodies
 end
 
-local function buildBatch(now)
+local function buildBatch(now, forceCensus)
     local reg = Internal.registry()
     local bodies
     local records
@@ -194,7 +207,7 @@ local function buildBatch(now)
         return batch
     end
     reg.EnsureLoaded()
-    bodies = snapshotCell()
+    bodies = snapshotCell(now, forceCensus)
     if not bodies then
         return batch
     end
@@ -467,7 +480,7 @@ local function buildBatch(now)
     return batch
 end
 
-function Lifecycle.BuildStartupBodyBatch(now, force)
+function Lifecycle.BuildStartupBodyBatch(now, force, forceCensus)
     local state = Lifecycle.StartupCleanup
     local previous
     now = tonumber(now) or Core.Now()
@@ -477,7 +490,10 @@ function Lifecycle.BuildStartupBodyBatch(now, force)
     then
         return previous
     end
-    previous = buildBatch(now)
+    if forceCensus == nil then
+        forceCensus = (force == true)
+    end
+    previous = buildBatch(now, forceCensus)
     if state then
         state.lastBatch = previous
     end

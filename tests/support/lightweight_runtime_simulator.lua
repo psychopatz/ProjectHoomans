@@ -198,6 +198,8 @@ function Simulator:Run()
         physicalWrites = 0,
         coreRuntimeStoreSaves = 0,
         materializationAttempts = 0,
+        materializationSuccesses = 0,
+        spatialRebuilds = 0,
         presenceDeltas = 0,
         combatDamageDeltas = 0,
         combatStateDeltas = 0,
@@ -475,7 +477,7 @@ function Simulator:Run()
     getWorld = function() return { getCell = getCell } end
 
     addZombiesInOutfit = function(x, y, z)
-        metrics.materializationAttempts = metrics.materializationAttempts + 1
+        metrics.materializationSuccesses = metrics.materializationSuccesses + 1
         return makeJavaList({ makeZombieShell(x, y, z) })
     end
     for i = 1, cfg.zombieCount do
@@ -666,11 +668,11 @@ function Simulator:Run()
                 if p1._setY then p1._setY(12000) end
             end
         end
-        local matBeforeTick = metrics.materializationAttempts
+        local matBeforeTick = metrics.materializationSuccesses
         for _, fn in ipairs(events.OnTick or {}) do
             fn()
         end
-        local matDelta = metrics.materializationAttempts - matBeforeTick
+        local matDelta = metrics.materializationSuccesses - matBeforeTick
         if matDelta > maxMaterializationsInSingleTick then
             maxMaterializationsInSingleTick = matDelta
         end
@@ -859,8 +861,15 @@ function Simulator:Run()
         MaxPromotionsInSingleRefresh = maxPromotionsInSingleRefresh,
         MaxMaterializationsInSingleTick = maxMaterializationsInSingleTick,
         CoreExtensionsAttached = coreExtensionsAttached,
-        MaterializationAttempts = metrics.materializationAttempts,
-        Materializations = countMap(PNC.Registry and PNC.Registry.LiveByID),
+        MaterializationAttempts = tonumber(
+            PNC.Presence and PNC.Presence.Metrics
+                and PNC.Presence.Metrics.materializeAttempts
+        ) or 0,
+        Materializations = metrics.materializationSuccesses,
+        SpatialRebuilds = tonumber(
+            PNC.SpatialIndex and PNC.SpatialIndex.RebuildCount
+        ) or 0,
+        ZombieAggroProcessed = tonumber(diagCounters["ZombieAggro.ProcessedCount"]) or 0,
         LogicalCommits = tonumber(finalCoordMetrics.logicalCommits) or 0,
         DirtyDomainMarks = tonumber(finalCoordMetrics.dirtyDomainMarks) or 0,
         PersistencePumps = tonumber(finalCoordMetrics.pumpRuns) or 0,
@@ -921,7 +930,7 @@ end
 
 function Simulator.FormatSummary(report)
     return string.format(
-        "mode=%s core=%d startProm=%d peakProm=%d endProm=%d demoted=%d schedEnd=%d spatialEnd=%d live=%d schedProc=%d schedDef=%d commits=%d pumps=%d serAttempts=%d physWrites=%d globalSaves=%d coreSaves=%d term=%d retry=%d dirtyEnd=%d presD=%d combatD=%d hwD=%d eqD=%d fullSnap=%d repSnap=%d fbSnap=%d census=%d extraZScans=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
+        "mode=%s core=%d startProm=%d peakProm=%d endProm=%d demoted=%d schedEnd=%d spatialEnd=%d live=%d matAtt=%d matOk=%d schedProc=%d schedDef=%d commits=%d pumps=%d serAttempts=%d physWrites=%d globalSaves=%d coreSaves=%d term=%d retry=%d dirtyEnd=%d presD=%d combatD=%d hwD=%d eqD=%d fullSnap=%d repSnap=%d fbSnap=%d census=%d extraZScans=%d zAggro=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
         tostring(report.ProfilerMode),
         report.CoreActors,
         report.PromotedAtStartup or 0,
@@ -931,6 +940,8 @@ function Simulator.FormatSummary(report)
         report.SchedulerMembersAtEnd or 0,
         report.SpatialMembersAtEnd or 0,
         report.LiveBodies,
+        report.MaterializationAttempts or 0,
+        report.Materializations or 0,
         report.SchedulerProcessed,
         report.SchedulerDeferred,
         report.LogicalCommits,
@@ -951,6 +962,7 @@ function Simulator.FormatSummary(report)
         report.FallbackSnapshots or 0,
         report.CensusScans,
         report.PerNpcGlobalZombieScans,
+        report.ZombieAggroProcessed or 0,
         report.ProfilerCoarseWrapperCalls,
         report.ProfilerDeepWrapperCalls,
         report.TickLoopCpuMs

@@ -36,6 +36,7 @@ function Presence.Reconcile(record)
     record.runtime.nearestPlayerDistSq = nearest and nearest.distSq or nil
     record.runtime.lastPresenceCheckAt = Core.Now()
     record.runtime.forcePresenceCheck = nil
+    record.runtime.materializeWakeAt = nil
     shouldMaterialize, materializeReason = Presence.ShouldMaterialize(
         record,
         nearest
@@ -105,6 +106,32 @@ local function collectCandidate(
     end
 end
 
+local function candidatePriority(record)
+    local runtime = record and record.runtime or nil
+    if runtime and runtime.forceLive == true then
+        return 3
+    end
+    local order = record and record.orderSpec or nil
+    if order
+        and tostring(order.kind or "") == tostring(Const.ORDER_FOLLOW or "follow")
+    then
+        return 2
+    end
+    return 1
+end
+
+local function compareCandidates(left, right)
+    local leftPri = candidatePriority(left.record)
+    local rightPri = candidatePriority(right.record)
+    if leftPri ~= rightPri then
+        return leftPri > rightPri
+    end
+    if left.distSq == right.distSq then
+        return tostring(left.record.id) < tostring(right.record.id)
+    end
+    return left.distSq < right.distSq
+end
+
 local function collectCandidates(radius, useRegistryFallback)
     local seen = {}
     local ordered = {}
@@ -147,12 +174,7 @@ local function collectCandidates(radius, useRegistryFallback)
             end
         end)
     end
-    table.sort(ordered, function(left, right)
-        if left.distSq == right.distSq then
-            return tostring(left.record.id) < tostring(right.record.id)
-        end
-        return left.distSq < right.distSq
-    end)
+    table.sort(ordered, compareCandidates)
     return ordered, #players, indexedCount, players
 end
 
@@ -229,12 +251,7 @@ local function promoteNearbyCoreCandidates(
     end
 
     if promoted > 0 then
-        table.sort(ordered, function(left, right)
-            if left.distSq == right.distSq then
-                return tostring(left.record.id) < tostring(right.record.id)
-            end
-            return left.distSq < right.distSq
-        end)
+        table.sort(ordered, compareCandidates)
     end
     return promoted
 end
@@ -242,6 +259,27 @@ end
 local function wakeCandidates(ordered, now)
     local slotMs = tonumber(PNC.Scheduler and PNC.Scheduler.SLOT_MS)
         or 50
+    local startupState = PNC.BodyLifecycle
+        and PNC.BodyLifecycle.StartupCleanup or nil
+    local settleUntil = startupState and startupState.complete == true
+        and tonumber(startupState.settleUntil) or 0
+    local burstUntil = startupState and startupState.complete == true
+        and ((tonumber(startupState.completedAt) or 0)
+            + (tonumber(Const.BODY_SHELL_STARTUP_BURST_MS) or 5000))
+        or 0
+    local inStartupBurst = settleUntil > 0 and now <= burstUntil
+    local spacingMs = inStartupBurst
+        and math.max(
+            slotMs,
+            tonumber(Const.BODY_SHELL_STARTUP_MATERIALIZE_SPACING_MS) or 250
+        )
+        or slotMs
+    local baseAt = settleUntil > now and settleUntil or now
+    local maxNewWakes = math.max(
+        8,
+        (tonumber(Const.MATERIALIZE_MAX_PER_TICK) or 2) * 5
+    )
+    local woken = 0
     local i
     local entry
     local record
@@ -250,16 +288,32 @@ local function wakeCandidates(ordered, now)
         record = entry.record
         record.runtime = record.runtime or {}
         record.runtime.nearestPlayerDistSq = entry.distSq
-        record.runtime.forcePresenceCheck = true
         record.runtime.presenceInterestSource = entry.source
         record.runtime.presenceInterestIndexed = entry.source == "spatial"
         record.runtime.presenceInterestFallback =
             entry.source == "registry_fallback"
-        if PNC.SimulationClock and PNC.SimulationClock.Wake then
-            PNC.SimulationClock.Wake(record, "presence", now)
-        end
-        if PNC.Scheduler and PNC.Scheduler.Schedule then
-            PNC.Scheduler.Schedule(record, now + i * slotMs)
+        local retryAt = tonumber(record.runtime.materializeRetryAt) or 0
+        local wakeAt = tonumber(record.runtime.materializeWakeAt) or 0
+        local hasPendingWake = (retryAt > now) or (wakeAt > now)
+        if not hasPendingWake and woken < maxNewWakes then
+            woken = woken + 1
+            local wakeClockAt = baseAt
+            local targetAt = baseAt + (woken * spacingMs)
+            if inStartupBurst then
+                local nextMatAt = tonumber(startupState.nextMaterializeAt) or 0
+                if nextMatAt > wakeClockAt then
+                    wakeClockAt = nextMatAt
+                end
+                targetAt = wakeClockAt + ((woken - 1) * spacingMs)
+            end
+            record.runtime.forcePresenceCheck = true
+            record.runtime.materializeWakeAt = targetAt
+            if PNC.SimulationClock and PNC.SimulationClock.Wake then
+                PNC.SimulationClock.Wake(record, "presence", wakeClockAt)
+            end
+            if PNC.Scheduler and PNC.Scheduler.Schedule then
+                PNC.Scheduler.Schedule(record, targetAt)
+            end
         end
     end
 end
