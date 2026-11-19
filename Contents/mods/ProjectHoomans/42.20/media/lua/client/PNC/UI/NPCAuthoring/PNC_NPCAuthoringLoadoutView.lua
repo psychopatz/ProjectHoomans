@@ -1,8 +1,9 @@
 -- Body-part navigation and equipment tiles; editing stays in the loadout model.
 local Window, UI = ISPNCNPCAuthoringEditor, PsychopatzCore.UI
 local I, L = Window.Internal, UI.Layout
-local Slots, Catalog, Fields = PNC.NPCAuthoringSlots, PNC.NPCAuthoringCatalog, PNC.NPCAuthoringFields
+local Slots, Fields = PNC.NPCAuthoringSlots, PNC.NPCAuthoringFields
 local BodyMap = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringBodyMap'
+local ImageResolver = require 'PsychopatzCore/UI/Components/PsychopatzImageResolver'
 function Window:selectLoadoutPart(id, region)
     self.loadoutPart = id
     self.loadoutViewRegion = region or id
@@ -21,16 +22,6 @@ end
 function Window:onMouseUp(x, y)
     if self:deselectLoadoutPart() then return true end
     if ISPanel.onMouseUp then return ISPanel.onMouseUp(self, x, y) end
-end
-
-local function itemIcon(fullType)
-    local manager = ScriptManager and ScriptManager.instance
-    if manager then
-        local script = manager:FindItem(fullType)
-        return script and script:getNormalTexture()
-    end
-    local entry = Catalog.Find(fullType)
-    return entry and entry.script and entry.script:getNormalTexture()
 end
 
 function Window:buildLoadoutNavigation()
@@ -54,9 +45,11 @@ function Window:buildLoadoutNavigation()
                 end })
             control.part = group
             if group.id == 'back' then
-                control.navImage, control.secondaryIcon = itemIcon('Base.Bag_Schoolbag'), itemIcon('Base.Bag_FannyPackFront')
+                control.navImage = ImageResolver.ResolveItemTexture('Base.Bag_Schoolbag')
+                control.secondaryIcon = ImageResolver.ResolveItemTexture('Base.Bag_FannyPackFront')
             elseif group.id == 'held' then
-                control.navImage, control.secondaryIcon = itemIcon('Base.Axe'), itemIcon('Base.DoubleBarrelShotgun')
+                control.navImage = ImageResolver.ResolveItemTexture('Base.Axe')
+                control.secondaryIcon = ImageResolver.ResolveItemTexture('Base.DoubleBarrelShotgun')
             elseif group.id == 'carry' then control.navImage = getTexture and getTexture('media/ui/Sidebar/64/Inventory_On_64.png') end
             control.render = function(c)
                 ISButton.render(c)

@@ -13,10 +13,9 @@ catalog.Create = function(id)
     captures = captures + 1
     return { fullType = id, tint = captures / 10 }
 end
-catalog.Query = function(options)
-    return { { id = 'Base.Necklace', label = 'Necklace', script = script } }, 1
+catalog.Items = function()
+    return { { id = 'Base.Necklace', label = 'Necklace', script = script, search = 'necklace' } }
 end
-catalog.Filters = function() return {}, {} end
 PNC.Equipment = { NormalizeLoadoutSpec = function(v) return v end }
 PNC.UniqueNPCAppearanceUI.Internal.locations = function() return { 'Neck' } end
 PNC.Inventory = { CaptureNativeItem = function(item) return { type = item.fullType, itemState = { visualTintR = item.tint } } end }

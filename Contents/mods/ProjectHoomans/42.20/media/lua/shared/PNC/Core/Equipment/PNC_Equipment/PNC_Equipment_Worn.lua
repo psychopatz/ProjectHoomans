@@ -52,19 +52,19 @@ local function storeCapturedVisual(
     local changed = false
     if capturedVisual and inventoryItem
         and Equipment.StoreVisualStateInItemState
-        and Internal.visualStateSignature(
+        and Internal.VisualStateSignature(
             Equipment.VisualStateFromItemState(
                 inventoryItem.itemState,
                 inventoryItem.type
             )
-        ) ~= Internal.visualStateSignature(capturedVisual)
+        ) ~= Internal.VisualStateSignature(capturedVisual)
     then
         Equipment.StoreVisualStateInItemState(inventoryItem, capturedVisual)
         changed = true
     end
     if capturedVisual
-        and Internal.visualStateSignature(storedVisual)
-            ~= Internal.visualStateSignature(capturedVisual)
+        and Internal.VisualStateSignature(storedVisual)
+            ~= Internal.VisualStateSignature(capturedVisual)
     then
         equipment.wornVisuals[entry.bodyLocation] = capturedVisual
         changed = true

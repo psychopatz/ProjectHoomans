@@ -1,3 +1,5 @@
+require "PNC/Core/Equipment/PNC_Equipment_Slots/VisualCapture"
+
 PNC = PNC or {}
 PNC.Equipment = PNC.Equipment or {}
 PNC.Equipment.Internal = PNC.Equipment.Internal or {}
@@ -70,100 +72,8 @@ function Internal.applyInventoryState(item, record, bodyLocation)
     return item
 end
 
-function Internal.applyItemVisualState(item, visualState)
-    local visual
-    local applied = false
-    if not item or type(visualState) ~= "table" then
-        return false
-    end
-    if visualState.modelIndex ~= nil
-        and item.setModelIndex
-    then
-        item:setModelIndex(
-            math.floor(tonumber(visualState.modelIndex) or -1)
-        )
-        applied = true
-    end
-    if visualState.color then
-        if item.setColorRed then
-            item:setColorRed(tonumber(visualState.color.r) or 1)
-            applied = true
-        end
-        if item.setColorGreen then
-            item:setColorGreen(tonumber(visualState.color.g) or 1)
-            applied = true
-        end
-        if item.setColorBlue then
-            item:setColorBlue(tonumber(visualState.color.b) or 1)
-            applied = true
-        end
-        if visualState.customColor and item.setColor and Color then
-            -- ItemVisual:getTint reads InventoryItem:getR/G/B for custom
-            -- colors. The separate color channel setters do not update it.
-            item:setColor(Color.new(
-                tonumber(visualState.color.r) or 1,
-                tonumber(visualState.color.g) or 1,
-                tonumber(visualState.color.b) or 1, 1))
-        end
-        if item.setCustomColor then
-            item:setCustomColor(visualState.customColor == true)
-        end
-    end
-    visual = item.getVisual and item:getVisual() or nil
-    if not visual then return applied end
-    if visualState.hue ~= nil and visual.setHue then visual:setHue(visualState.hue) end
-    local clothing = item.getClothingItem and item:getClothingItem()
-    local function textureIndex(index, choices)
-        index = tonumber(index) or -1
-        if choices and choices:size() > 0 and (index < 0 or index >= choices:size()) then
-            return 0
-        end
-        return index
-    end
-    if visualState.baseTexture ~= nil and visual.setBaseTexture then
-        visual:setBaseTexture(textureIndex(visualState.baseTexture,
-            clothing and clothing.getBaseTextures and clothing:getBaseTextures()))
-    end
-    if visualState.textureChoice ~= nil and visual.setTextureChoice then
-        visual:setTextureChoice(textureIndex(visualState.textureChoice,
-            clothing and clothing.getTextureChoices and clothing:getTextureChoices()))
-    end
-    if visualState.decal ~= nil and visual.setDecal then
-        visual:setDecal(tostring(visualState.decal))
-    end
-    if visualState.tint
-        and ImmutableColor
-        and visual.setTint
-    then
-        visual:setTint(ImmutableColor.new(
-            tonumber(visualState.tint.r) or 1,
-            tonumber(visualState.tint.g) or 1,
-            tonumber(visualState.tint.b) or 1,
-            1
-        ))
-    end
-    return true
-end
-
-function Internal.visualStateSignature(state)
-    local tint = state and state.tint or {}
-    local color = state and state.color or {}
-    return table.concat({
-        tostring(state and state.fullType or ""),
-        tostring(state and state.baseTexture or ""),
-        tostring(state and state.hue or ""),
-        tostring(state and state.textureChoice or ""),
-        tostring(state and state.decal or ""),
-        tostring(tint.r or ""),
-        tostring(tint.g or ""),
-        tostring(tint.b or ""),
-        tostring(state and state.modelIndex or ""),
-        tostring(state and state.customColor == true),
-        tostring(color.r or ""),
-        tostring(color.g or ""),
-        tostring(color.b or ""),
-    }, ":")
-end
+local VisualState = require "PsychopatzCore/Inventory/PsychopatzItemVisualState"
+Internal.applyItemVisualState = VisualState.Apply
 
 function Internal.applyPrimaryInventoryState(item, record)
     local inventory = record and record.inventory or nil
@@ -191,8 +101,8 @@ function Internal.applyPrimaryInventoryState(item, record)
         ) or nil
     if capturedVisual and state
         and Equipment.StoreVisualStateInItemState
-        and Internal.visualStateSignature(storedVisual)
-            ~= Internal.visualStateSignature(capturedVisual)
+        and Internal.VisualStateSignature(storedVisual)
+            ~= Internal.VisualStateSignature(capturedVisual)
     then
         Equipment.StoreVisualStateInItemState(
             state,
@@ -201,8 +111,8 @@ function Internal.applyPrimaryInventoryState(item, record)
         visualChanged = true
     end
     if capturedVisual and equipment
-        and Internal.visualStateSignature(equipment.primaryVisual)
-            ~= Internal.visualStateSignature(capturedVisual)
+        and Internal.VisualStateSignature(equipment.primaryVisual)
+            ~= Internal.VisualStateSignature(capturedVisual)
     then
         equipment.primaryVisual = capturedVisual
         visualChanged = true

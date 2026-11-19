@@ -2,6 +2,7 @@ local F = require('tests/support/pnc_authoring_session')()
 local T, Session, copy, ID = F.T, F.Session, F.copy, F.TID
 local Presets = require 'PNC/CharacterCreation/PNC_StartingCompanionPresets'
 local Preview = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'
+local CompanionPreview = require 'PNC/UI/StartingCompanions/PNC_StartingCompanionPresetPreview'
 local created, resolved = 0, {}
 PNC.UniqueNPCs.Resolve = function(def, options)
     created = created + 1
@@ -24,7 +25,7 @@ T.truthy(session:SetField(ID.FRIEND, 'startingItems', { { type = 'Base.Axe', equ
 local payload = Presets.FromSession(session, 'My roster')
 local hash = F.Authoring.Registry.Hash
 local payloadBefore, sessionBefore = hash(payload), hash(session:FinalBlueprints())
-local provider = Preview.Companions(payload, context)
+local provider = CompanionPreview.BuildProvider(payload, context)
 T.equal(created, 0, 'opening a roster does not construct every native portrait')
 local first, label, count = provider(1)
 T.truthy(first, 'first saved roster member has a portrait')
@@ -42,10 +43,10 @@ T.equal(resolved[2].startingItems[1].type, 'Base.Axe', 'saved exact weapon reach
 T.equal(created, 2, 'only visited members construct a native preview')
 T.equal(hash(payload), payloadBefore, 'browsing never mutates the saved preset')
 T.equal(hash(session:FinalBlueprints()), sessionBefore, 'browsing never applies a preset to the live session')
-local single = Preview.Companions(Presets.TemplateFromSession(session, ID.FRIEND, 'Sam'), context)
+local single = CompanionPreview.BuildProvider(Presets.TemplateFromSession(session, ID.FRIEND, 'Sam'), context)
 local _, _, singleCount = single(1)
 T.equal(singleCount, 1, 'single companion presets expose one portrait')
-local invalid = Preview.Companions({}, context)
+local invalid = CompanionPreview.BuildProvider({}, context)
 T.falsy(invalid(1), 'invalid saved data does not construct or leak an old portrait')
 
 local draft = F.Adapter.New(session, ID.FRIEND):BuildDraft()

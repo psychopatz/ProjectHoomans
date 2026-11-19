@@ -5,17 +5,6 @@ PNC.Equipment.Internal = PNC.Equipment.Internal or {}
 local Equipment = PNC.Equipment
 local Internal = Equipment.Internal
 
-local function readVisualValue(visual, methodName, ...)
-    local method
-    local ok
-    local value
-    if not visual then return nil end
-    method = visual[methodName]
-    if type(method) ~= "function" then return nil end
-    ok, value = pcall(method, visual, ...)
-    return ok and value or nil
-end
-
 function Internal.VisualStateSignature(state)
     local tint = state and state.tint or {}
     local color = state and state.color or {}
@@ -36,71 +25,5 @@ function Internal.VisualStateSignature(state)
     }, ":")
 end
 
-function Equipment.CaptureItemVisualState(item, fullType)
-    local visual
-    local clothingItem
-    local tint
-    local hue
-    local modelIndex
-    local customColor
-    local color
-    if not item then return nil end
-    visual = item.getVisual and item:getVisual() or nil
-    clothingItem = item.getClothingItem
-        and item:getClothingItem() or nil
-    if visual and clothingItem and clothingItem.isReady and clothingItem:isReady() then
-        -- The no-argument accessors return unresolved indices until the
-        -- engine has selected from the loaded asset.
-        hue = tonumber(readVisualValue(visual, "getHue", clothingItem))
-        readVisualValue(visual, "getBaseTexture", clothingItem)
-        readVisualValue(visual, "getTextureChoice", clothingItem)
-    end
-    tint = visual and readVisualValue(
-        visual, "getTint", clothingItem
-    ) or nil
-    modelIndex = item.getModelIndex
-        and tonumber(item:getModelIndex()) or nil
-    customColor = item.isCustomColor
-        and item:isCustomColor() == true or false
-    if item.getColorRed
-        and item.getColorGreen
-        and item.getColorBlue
-    then
-        color = {
-            r = tonumber(item:getColorRed()),
-            g = tonumber(item:getColorGreen()),
-            b = tonumber(item:getColorBlue()),
-        }
-    end
-    return {
-        fullType = fullType
-            or item.getFullType
-                and tostring(item:getFullType())
-            or nil,
-        hue = hue and hue >= -1 and hue <= 1 and hue or nil,
-        baseTexture = visual and tonumber(readVisualValue(
-            visual, "getBaseTexture"
-        )) or nil,
-        textureChoice = visual and tonumber(readVisualValue(
-            visual, "getTextureChoice"
-        )) or nil,
-        decal = visual and readVisualValue(
-            visual, "getDecal", clothingItem
-        ) or nil,
-        tint = tint and {
-            r = tonumber(tint:getRedFloat()),
-            g = tonumber(tint:getGreenFloat()),
-            b = tonumber(tint:getBlueFloat()),
-        } or nil,
-        modelIndex = modelIndex,
-        customColor = customColor,
-        color = color,
-    }
-end
-PNC = PNC or {}
-PNC.Equipment = PNC.Equipment or {}
-PNC.Equipment.Internal = PNC.Equipment.Internal or {}
-
-local Equipment = PNC.Equipment
-local Internal = Equipment.Internal
-
+local VisualState = require "PsychopatzCore/Inventory/PsychopatzItemVisualState"
+Equipment.CaptureItemVisualState = VisualState.Capture

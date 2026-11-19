@@ -10,7 +10,16 @@ A.AreExclusive = function(a, b) return a == 'Pants' and b == 'Shorts' or a == 'S
 PNC.Equipment = { NormalizeLoadoutSpec = function(value) return value end }
 PNC.UniqueNPCAppearanceUI.Internal.locations = function() return { 'Back', 'Pants', 'Shorts', 'UnderwearBra', 'ForearmLeft', 'Neck', 'mod:UtilitySocket' } end
 Catalog.Clothing = function() return { { id = 'Base.Item' } } end
-Catalog.Find = function(id) return { label = id, script = { getNormalTexture = function() return id end } } end
+Catalog.Find = function(id) return { id = id, label = id } end
+local placeholder = { getName = function() return 'Question_On' end }
+getItemTex = function(id)
+    return id == 'Base.Bag_Schoolbag' and placeholder or { id = id }
+end
+getScriptManager = function()
+    return { getItem = function(_, id) return {
+        getNormalTexture = function() return { id = id } end,
+    } end }
+end
 Catalog.Items = function() return { { id = 'Base.Money', label = 'Money', search = 'base.money money' } } end
 Catalog.Create = function(id) return { fullType = id } end
 PNC.Inventory = { CaptureNativeItem = function(native) return { type = native.fullType } end }
@@ -107,10 +116,10 @@ getTextManager = function() return { getFontHeight = function() return 36 end } 
 local shortcuts = {}
 for _, control in ipairs(e.loadoutParts) do shortcuts[control.part.id] = control end
 local shortcut = shortcuts.back
-T.equal(shortcut.navImage, 'Base.Bag_Schoolbag')
-T.equal(shortcut.secondaryIcon, 'Base.Bag_FannyPackFront')
-T.equal(shortcuts.held.navImage, 'Base.Axe')
-T.equal(shortcuts.held.secondaryIcon, 'Base.DoubleBarrelShotgun')
+T.equal(shortcut.navImage.id, 'Base.Bag_Schoolbag')
+T.equal(shortcut.secondaryIcon.id, 'Base.Bag_FannyPackFront')
+T.equal(shortcuts.held.navImage.id, 'Base.Axe')
+T.equal(shortcuts.held.secondaryIcon.id, 'Base.DoubleBarrelShotgun')
 shortcut.height, shortcut.navImage, shortcut.secondaryIcon = 76, nil, nil
 function shortcut:drawTextCentre(_, _, y) T.truthy(y >= 0 and y + 36 <= self.height, 'shortcut caption fits large native fonts') end
 shortcut.render(shortcut)

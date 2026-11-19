@@ -88,21 +88,52 @@ local function matches(item, allowed, query)
     return query == '' or string.find(item.search, query, 1, true) ~= nil
 end
 
-function Catalog.Filters(allowed, search, source)
-    local seenSources, seenCategories, sources, categories = {}, {}, {}, {}
-    local query = string.lower(tostring(search or ''))
-    for _, item in ipairs(Catalog.Items()) do
+function Catalog.Collect(query, allowed, items)
+    local rows, sources, categories, categoriesBySource = {}, {}, {}, {}
+    query = string.lower(tostring(query or ''))
+    for _, item in ipairs(items or Catalog.Items()) do
         if matches(item, allowed, query) then
-            if item.source and not seenSources[item.source] then
-                seenSources[item.source] = true; sources[#sources + 1] = item.source
-            end
-            if (not source or item.source == source) and item.category and not seenCategories[item.category] then
-                seenCategories[item.category] = true; categories[#categories + 1] = item.category
+            rows[#rows + 1] = item
+            if not items and item.category then categories[item.category] = true end
+            if not items and item.source then
+                if not categoriesBySource[item.source] then
+                    sources[#sources + 1] = item.source
+                    categoriesBySource[item.source] = {}
+                end
+                if item.category then categoriesBySource[item.source][item.category] = true end
             end
         end
     end
-    table.sort(sources); table.sort(categories)
-    return sources, categories
+    table.sort(sources)
+    return {
+        rows = rows, sources = sources, categories = categories,
+        categoriesBySource = categoriesBySource,
+    }
+end
+
+function Catalog.Categories(view, source)
+    local values = {}
+    local categories = view.categories
+    if source then categories = view.categoriesBySource[source] or {} end
+    for name in pairs(categories) do values[#values + 1] = name end
+    table.sort(values)
+    return values
+end
+
+function Catalog.Filters(allowed, search, source)
+    local view = Catalog.Collect(search, allowed)
+    return view.sources, Catalog.Categories(view, source)
+end
+
+function Catalog.FilterRows(view, source, category)
+    if not source and not category then return view.rows end
+    local rows = {}
+    for _, item in ipairs(view.rows) do
+        if (not source or source == item.source) and (not category or category == item.category) then
+            rows[#rows + 1] = item
+        end
+    end
+    return rows
 end
 
 -- Script metadata includes vanilla and mod weapons without constructing them.

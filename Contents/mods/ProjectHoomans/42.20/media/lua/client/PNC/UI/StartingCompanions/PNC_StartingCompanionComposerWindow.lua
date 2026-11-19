@@ -353,8 +353,8 @@ function ISPNCStartingCompanionComposerWindow:browsePresets()
             if not portraitProviders[item.id] then
                 local payload = Store.Load(item.id)
                 if not payload then return nil end
-                local previews = require 'PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'
-                portraitProviders[item.id] = previews.Companions(payload, self.session:GetContext(), self.session, self.selectedTraitID)
+                local previews = require 'PNC/UI/StartingCompanions/PNC_StartingCompanionPresetPreview'
+                portraitProviders[item.id] = previews.BuildProvider(payload, self.session:GetContext(), self.session, self.selectedTraitID)
             end
             return portraitProviders[item.id](index)
         end,

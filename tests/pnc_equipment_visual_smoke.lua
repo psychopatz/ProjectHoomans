@@ -288,7 +288,10 @@ ImmutableColor = {
         }
     end,
 }
+local liveHue
 local liveClothingVisual = {
+    setHue = function(_, value) liveHue = value end,
+    getHue = function() return liveHue end,
     setBaseTexture = function(_, value) liveBaseTexture = value end,
     getBaseTexture = function() return liveBaseTexture end,
     setTextureChoice = function(_, value) liveTextureChoice = value end,
@@ -339,6 +342,7 @@ local dressedRecord = {
                 visualFullType = "Base.Shirt_FormalWhite",
                 visualBaseTexture = 6,
                 visualTextureChoice = 8,
+                visualHue = -0.35,
                 visualDecal = "PizzaWhirled",
                 visualTintR = 0.9,
                 visualTintG = 0.8,
@@ -354,6 +358,7 @@ T.equal(applied, true, "full clothing apply")
 T.equal(appliedCondition, 3, "virtual condition copied to live worn item")
 T.equal(liveBaseTexture, 6, "inventory item base texture was not restored")
 T.equal(liveTextureChoice, 8, "inventory item texture choice was not restored")
+T.equal(liveHue, -0.35, "inventory item hue was not restored")
 T.equal(liveDecal, "PizzaWhirled",
     "inventory item shirt decal was not restored")
 T.equal(liveTint:getGreenFloat(), 0.8,

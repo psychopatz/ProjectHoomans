@@ -341,8 +341,8 @@ local explorer = window.editor.itemExplorer
 T.equal(explorer.options.mode, "preset", "presets use the contextual shared browser")
 local portraitProviders = 0
 function session:GetContext() return { playerSurname = 'patz' } end
-package.loaded['PNC/UI/NPCAuthoring/PNC_NPCAuthoringPresetPreview'] = {
-    Companions = function(payload, context, _, target)
+package.loaded['PNC/UI/StartingCompanions/PNC_StartingCompanionPresetPreview'] = {
+    BuildProvider = function(payload, context, _, target)
         portraitProviders = portraitProviders + 1
         T.equal(payload.companionTraitID, sister, 'browser previews the saved file instead of the edited NPC')
         T.equal(context.playerSurname, 'patz', 'preview receives current inheritance context')

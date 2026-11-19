@@ -32,7 +32,11 @@ function Explorer:createChildren()
     self.hint = ISLabel:new(0, 0, 24, '', .8, .85, .85, 1, UIFont.Small, true)
     self.hint:initialise(); self:addChild(self.hint)
     self.search = UI.CreateTextEntry(self, { maxTextLength = 100,
-        onTextChange = function() self.offset = 0; self:refreshResults() end })
+        onTextChange = function()
+            if self.settingInitialSearch then return end
+            self.offset = 0
+            self:refreshResults()
+        end })
     self.search.tooltip = tr('UI_PNC_Authoring_Search', 'Search by name or ID')
     self.sources, self.categories = UI.CreateList(self, {}), UI.CreateList(self, {})
     for _, list in ipairs({ self.sources, self.categories }) do
@@ -55,6 +59,7 @@ function Explorer:createChildren()
     self.categories:setOnMouseDownFunction(self, function(target, row) target.category = row.value; target.offset = 0; target:refreshResults() end)
     self.refreshButton = button(self, tr('UI_PNC_Authoring_Refresh', 'Refresh items'), function(target)
         Catalog.Invalidate(); target.source, target.category, target.offset = nil, nil, 0
+        target.catalogView = nil
         target.selectedID = nil
         if target.options.reloadAllowed then target.allowed = target.options.reloadAllowed() end
         if target.options.onRefresh then target.options.onRefresh(target.allowed) end
@@ -63,30 +68,6 @@ function Explorer:createChildren()
     self.grid = ISPNCUniqueNPCAppearanceScrollPanel:new(0, 0, 1, 1)
     self.grid:initialise(); self.grid:instantiate(); self:addChild(self.grid)
     self.tiles = {}
-    for index = 1, self.pageSize do
-        local tile = UI.CreateButton(self.grid, { title = '', target = self, onclick = function(target, clicked)
-            if not target:getIsVisible() or not clicked.item then return end
-            target.selectedID = clicked.item.id; target:refreshDetails(); target:refreshSelection()
-        end, variant = 'quiet' })
-        tile.onMouseDoubleClick = function(control)
-            if not self:getIsVisible() or not control.item then return true end
-            self.selectedID = control.item.id; self:refreshDetails(); self:refreshSelection()
-            self:confirmSelection()
-            return true
-        end
-        tile.render = function(control)
-            ISButton.render(control)
-            local item = control.item
-            if not item then return end
-            local row = self.customItems ~= nil
-            local texture = Catalog.Texture(item)
-            if texture then control:drawTextureScaledAspect(texture, 8, 5, control.width - 16, control.height - 30, 1, 1, 1, 1) end
-            local label = L.Ellipsize(item.label, UIFont.Small, math.max(1, control.width - 16))
-            if row then control:drawText(label, 8, 7, .9, .94, .94, 1, UIFont.Small)
-            else control:drawTextCentre(label, control.width / 2, control.height - self.fontHeight - 4, .9, .94, .94, 1, UIFont.Small) end
-        end
-        self.tiles[index] = tile
-    end
     self.details = UI.CreateKeyValueList(self, {}); font(self.details)
     if UI.PortraitPanel then
         self.preview = UI.PortraitPanel:new(0, 0, 1, 1, { zoom = -3, animSetName = false, stateName = 'idle', animate = true })
@@ -114,6 +95,7 @@ function Explorer:createChildren()
         target.deleteArmedID = nil
         if not ok then target:setHint(tostring(reason)); return end
         target.customItems = target.options.reloadItems and target.options.reloadItems() or {}
+        target.catalogView = nil
         target.selectedID = nil
         target:refreshResults()
         target:setHint(tr('UI_PNC_Authoring_Deleted', 'Saved record deleted'))
@@ -129,9 +111,36 @@ function Explorer:createChildren()
     self.counter = ISLabel:new(0, 0, 24, '', .8, .85, .85, 1, UIFont.Small, true)
     self.counter:initialise(); self:addChild(self.counter)
 end
+function Explorer:ensureTiles(count)
+    for index = #self.tiles + 1, count do
+        local tile = UI.CreateButton(self.grid, { title = '', target = self, onclick = function(target, clicked)
+            if not target:getIsVisible() or not clicked.item then return end
+            target.selectedID = clicked.item.id; target:refreshDetails(); target:refreshSelection()
+        end, variant = 'quiet' })
+        tile.onMouseDoubleClick = function(control)
+            if not self:getIsVisible() or not control.item then return true end
+            self.selectedID = control.item.id; self:refreshDetails(); self:refreshSelection()
+            self:confirmSelection()
+            return true
+        end
+        tile.render = function(control)
+            ISButton.render(control)
+            local item = control.item
+            if not item then return end
+            local row = self.customItems ~= nil
+            local texture = Catalog.Texture(item)
+            if texture then control:drawTextureScaledAspect(texture, 8, 5, control.width - 16, control.height - 30, 1, 1, 1, 1) end
+            local label = L.Ellipsize(item.label, UIFont.Small, math.max(1, control.width - 16))
+            if row then control:drawText(label, 8, 7, .9, .94, .94, 1, UIFont.Small)
+            else control:drawTextCentre(label, control.width / 2, control.height - self.fontHeight - 4, .9, .94, .94, 1, UIFont.Small) end
+        end
+        self.tiles[index] = tile
+    end
+end
 function Explorer:Show(options)
     self:closeVariantDialog()
     self.options = options
+    self.catalogView, self.filteredRows = nil, nil
     self.allowed, self.onChoose, self.customItems = options.allowed, options.onChoose, options.items
     self.mode = options.mode or 'item'
     self.titleText = options.title or tr('UI_PNC_Authoring_ItemExplorer', 'Item Explorer')
@@ -147,18 +156,11 @@ function Explorer:Show(options)
     self.contextActionButton:setTitle(action and action.title or '')
     self.contextActionButton.tooltip = action and action.tooltip or nil
     self.contextActionButton:setVisible(action ~= nil)
-    local query = options.initialQuery or ''
-    self.search:setText(query)
-    if options.initialID then
-        local _, _, position = Catalog.Query({
-            query = query, allowed = self.allowed, items = self.customItems,
-            initialID = options.initialID, limit = 1,
-        })
-        self.selectedID = options.initialID
-        self.offset = position and math.floor((position - 1) / self.pageSize) * self.pageSize or 0
-    end
-    self:refreshResults()
-    self:setVisible(true); self:bringToTop(); self:onResize(); self.search:focus()
+    self.settingInitialSearch = true
+    self.search:setText(options.initialQuery or '')
+    self.settingInitialSearch = false
+    self:refreshResults(options.initialID)
+    self:setVisible(true); self:bringToTop(); self.search:focus()
     if self.onShown then self.onShown() end
 end
 function Explorer:confirmSelection()
@@ -180,6 +182,7 @@ end
 function Explorer:Hide()
     self:closeVariantDialog()
     self.search:unfocus(); self:setVisible(false)
+    self.catalogView, self.filteredRows = nil, nil
     if self.preview then self.preview:setVisible(false); self.preview.targetKey = nil end
     if self.onDismiss then self.onDismiss() end
 end
@@ -194,16 +197,16 @@ local function fillFilter(list, label, values, selected, display)
     if list.selected > 1 then return selected end
 end
 
-function Explorer:refreshFilters(query)
+function Explorer:refreshFilters(view)
     if self.customItems then return end
-    local sources, categories = Catalog.Filters(self.allowed, query, self.source)
-    local source = fillFilter(self.sources, tr('UI_PNC_Authoring_AllMods', 'All mods / modules'), sources, self.source)
+    local source = fillFilter(self.sources,
+        tr('UI_PNC_Authoring_AllMods', 'All mods / modules'), view.sources, self.source)
     if source ~= self.source then
         self.source, self.category, self.offset = source, nil, 0
-        local _, allCategories = Catalog.Filters(self.allowed, query, source)
-        categories = allCategories
     end
-    local selected = fillFilter(self.categories, tr('UI_PNC_Authoring_AllCategories', 'All categories'), categories, self.category, category)
+    local selected = fillFilter(self.categories,
+        tr('UI_PNC_Authoring_AllCategories', 'All categories'),
+        Catalog.Categories(view, source), self.category, category)
     if selected ~= self.category then self.category, self.offset = selected, 0 end
 end
 function Explorer:currentSelection()
@@ -218,19 +221,40 @@ function Explorer:refreshSelection()
             and { r = .10, g = .32, b = .23, a = 1 } or { r = .07, g = .09, b = .11, a = 1 }
     end
 end
-function Explorer:refreshResults()
+function Explorer:refreshResults(initialID)
     if not self.tiles or not self.options then return end
     local query = self.search:getText()
-    self:refreshFilters(query)
-    local rows, total = Catalog.Query({ query = query, source = self.source, category = self.category,
-        allowed = self.allowed, offset = self.offset, limit = self.pageSize, items = self.customItems })
+    if not self.catalogView or self.catalogQuery ~= query or self.catalogItems ~= self.customItems then
+        self.catalogView = Catalog.Collect(query, self.allowed, self.customItems)
+        self.catalogQuery, self.catalogItems = query, self.customItems
+        self.filteredRows = nil
+    end
+    if not self.filteredRows or self.filteredSource ~= self.source or self.filteredCategory ~= self.category then
+        self:refreshFilters(self.catalogView)
+        self.filteredRows = Catalog.FilterRows(self.catalogView, self.source, self.category)
+        self.filteredSource, self.filteredCategory = self.source, self.category
+    end
+    local matches = self.filteredRows
+    if initialID then
+        for index, item in ipairs(matches) do
+            if item.id == initialID then
+                self.offset = math.floor((index - 1) / self.pageSize) * self.pageSize
+                break
+            end
+        end
+    end
+    local rows, total = {}, #matches
+    if self.offset >= total then self.offset = 0 end
+    for index = self.offset + 1, math.min(total, self.offset + self.pageSize) do
+        rows[#rows + 1] = matches[index]
+    end
     self.total, self.visibleRows = total, rows
-    if #rows == 0 and total > 0 and self.offset > 0 then self.offset = 0; return self:refreshResults() end
+    self:ensureTiles(#rows)
     if not self:currentSelection() then self.selectedID = nil end
     for index, tile in ipairs(self.tiles) do tile.item = rows[index]; tile:setVisible(rows[index] ~= nil); tile.tooltip = rows[index] and rows[index].label end
     PNC.NPCAuthoringFields.EnableButton(self.previous, self.offset > 0); PNC.NPCAuthoringFields.EnableButton(self.nextButton, self.offset + self.pageSize < total)
     self.counter:setName(tostring(total == 0 and 0 or self.offset + 1) .. '-' .. tostring(self.offset + #rows) .. ' / ' .. total)
-    self:refreshSelection(); self:refreshDetails(); self:onResize()
+    self:refreshSelection(); self:refreshDetails()
 end
 function Explorer:refreshDetails()
     local item = self:currentSelection()
@@ -295,7 +319,10 @@ function Explorer:onResize()
     L.SetBounds(self.grid, x, top, contentWidth, gridHeight)
     self.grid.contentHeight = rows * tileHeight; self.grid.maxScroll = math.max(0, self.grid.contentHeight - gridHeight)
     self.grid:setScrollHeight(self.grid.contentHeight); self.grid:setYScroll(math.max(-self.grid.maxScroll, math.min(0, self.grid:getYScroll()))); self.grid:onResize()
-    for index, tile in ipairs(self.tiles) do L.SetBounds(tile, (index - 1) % columns * tileWidth, math.floor((index - 1) / columns) * tileHeight, tileWidth - 5, tileHeight - 5) end
+    for index = 1, #(self.visibleRows or {}) do
+        L.SetBounds(self.tiles[index], (index - 1) % columns * tileWidth,
+            math.floor((index - 1) / columns) * tileHeight, tileWidth - 5, tileHeight - 5)
+    end
     self.details:setVisible(side > 0)
     local detailY, detailHeight = self:layoutExplorerPortrait(x + contentWidth + g, top, side, gridHeight, h, g)
     if side > 0 and hasVariants then

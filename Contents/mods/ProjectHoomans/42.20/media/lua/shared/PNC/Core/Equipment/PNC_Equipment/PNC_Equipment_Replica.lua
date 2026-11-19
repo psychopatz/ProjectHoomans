@@ -109,7 +109,7 @@ function Internal.replicaPresentationSignature(equipment)
     for i = 1, #entries do
         parts[#parts + 1] = table.concat({
             tostring(entries[i].bodyLocation),
-            Internal.visualStateSignature(
+            Internal.VisualStateSignature(
                 wornVisuals[entries[i].bodyLocation]
                     or { fullType = entries[i].fullType }
             ),
@@ -287,7 +287,7 @@ function Equipment.ApplyReplicaHands(zombie, record, options)
     -- not clear/recreate hand and attachment models every frame.
     signatureParts = {
         tostring(primaryFullType or ""),
-        Internal.visualStateSignature(equipment.primaryVisual),
+        Internal.VisualStateSignature(equipment.primaryVisual),
         tostring(equipment.secondaryFullType or ""),
         attackMode and (workHeld and "work" or "attack")
             or "idle",
